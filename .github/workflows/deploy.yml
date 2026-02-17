@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - '**'
+  workflow_dispatch: # Allows manual triggering of the workflow
+
+jobs:
+  code-linting:
+    name: Code Linting
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup Node and Dependencies
+        uses: ./.github/actions/setup-node
+
+      - name: Run ESLint
+        run: yarn lint
+
+  code-security-audit:
+    name: Code Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup Node and Dependencies
+        uses: ./.github/actions/setup-node
+
+      - name: Run security audit
+        run: yarn npm audit
+
+  snyk:
+    name: Snyk Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Build local Docker image
+        working-directory: ${{ github.workspace }}
+        run: |
+          docker build -t laa-manage-your-civil-cases ./
+          docker save laa-manage-your-civil-cases -o image.tar
+
+      - name: Run Snyk to scan Docker image from tarball
+        uses: snyk/actions/docker@master
+        with:
+          image: image.tar
+          args: --docker --severity-threshold=high
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+  mocha-unit-tests:
+    name: Mocha Unit Tests
+    uses: ./.github/workflows/mocha.yml
+
+  playwright:
+    name: Playwright Tests
+    uses: ./.github/workflows/playwright.yml

@@ -1,0 +1,137 @@
+---
+title: Template structure
+last_reviewed_on: 2025-10-02
+review_in: 6 weeks
+---
+
+# Template structure
+
+## Routing
+This template uses the built-in Express JS routing. 
+
+A route is a section of Express code that associates an HTTP verb (`GET`, `POST`, `PUT`, `DELETE`, etc.), with a URL path/pattern, and a function that is called to handle that pattern.
+
+[You can find further documentation here](https://expressjs.com/en/guide/routing.html).
+
+## Template structure and source directory
+
+- Template-specific TypeScript code should go in `src/scripts/`.
+- Other source TypeScript files are located in `src/`, `middleware/`, `routes/`, and `utils/`.
+- Compiled JavaScript output is placed in the `public/` directory.
+- Do not edit files in `public/` directly; always edit the `.ts` source files.
+
+## API Connection Architecture
+
+The template organises API connection functionality across several key directories:
+
+#### `src/middleware/`
+- **`apiMiddleware.ts`** - Enhanced axios middleware with configurable instances, authentication support, and logging
+
+#### `src/services/`
+- **`baseApiService.ts`** - Abstract base class extracting common HTTP client patterns from MCC
+- **`exampleApiService.ts`** - Simple demonstration of BaseApiService usage (replace with your own services)
+
+#### `utils/`
+- **`axiosSetup.ts`** - Clean exports of enhanced middleware functionality and TypeScript interfaces
+
+#### Integration Pattern
+
+```typescript
+// Import the base service pattern
+import { BaseApiService } from '#src/services/baseApiService.js';
+
+// Import middleware utilities  
+import { createApiMiddleware } from '#utils/axiosSetup.js';
+import type { ApiMiddlewareConfig } from '#utils/axiosSetup.js';
+
+// Create domain-specific services by extending BaseApiService
+class MyApiService extends BaseApiService {
+  // Implement your API-specific methods here
+}
+```
+
+This architecture separates concerns between:
+- **Middleware layer** (`src/middleware/`) - Request/response handling, authentication, logging
+- **Service layer** (`src/services/`) - Domain-specific API logic and business operations  
+- **Utilities** (`utils/`) - Exports and configuration interfaces for easy imports
+
+## Import paths and path aliases
+- The template uses path aliases (see `tsconfig.json`), such as `import foo from '#utils/foo'`.
+- Ensure your editor/IDE is configured to recognise these aliases for best developer experience.
+
+## Running and debugging
+- The app is started using the compiled JS in `public/` (see `yarn dev` and `yarn start`).
+- If you want to run TypeScript directly (e.g., for debugging), consider using `ts-node` or a similar tool, but this is not the default workflow.
+
+## Development workflow
+The template uses ESBuild for fast compilation and bundling with watch mode for automatic rebuilds during development. The development workflow is managed through the `yarn dev` script which concurrently runs:
+
+1. **TypeScript compilation in watch mode** - Monitors TypeScript source files for changes
+2. **ESBuild bundling in watch mode** - Handles SCSS, JavaScript bundling, and asset copying
+3. **Nodemon for server restarts** - Automatically restarts the Express server when compiled files change
+
+The watch system monitors:
+
+- TypeScript source files (`src/**/*.ts`) for compilation
+- SCSS files (`src/scss/**/*.scss`) for CSS bundling
+- Asset files from GOV.UK Frontend and MOJ Frontend packages
+- The compiled output in the `public/` directory for server restarts
+
+Nodemon configuration (`nodemon.json`):
+
+```json
+{
+  "watch": ["public"],
+  "ext": "js,json",
+  "ignore": ["public/assets/"],
+  "delay": "500ms"
+}
+```
+
+This configuration:
+
+- Watches the `public` directory for changes in compiled output
+- Only monitors changes in `.js` and `.json` files
+- Ignores the `public/assets/` directory (managed by ESBuild)
+- Adds a 500ms delay before restarting to avoid excessive restarts during rapid file changes
+
+The development workflow is started with:
+
+```shell
+yarn dev
+```
+
+This command builds the template initially and then sets up all watch processes for continuous development.
+
+
+## Deployment files
+The template has an outline of how you might want to deploy your application to a hosted cloud service. The initial configuration can be enhanced to do the following;
+
+- Enhance the `.github/workflows/deploy.yml` file, to deploy a docker image to a namespace in the hosted cloud service using Helm values found in the template
+- Add a `.github/actions/deploy/action.yml` file to Deploy docker image to namespace
+- Add a `.github/actions/build_and_push/action.yml` file to Build Image and Push to a Container Registry (with caching)
+
+The file structure would look like this;
+
+```yaml
+.github/
+  actions/
+    build_and_push/
+      action.yml
+    deploy/
+      action.yml
+  workflows/
+    deploy.yml
+deploy/
+  your-repo-name/
+    values/ # Helm chart values
+src/
+  deploy.sh/
+```
+
+Example of how you might want to implement this can be found in the [MCC repo](https://github.com/ministryofjustice/laa-manage-your-civil-cases). 
+
+
+## GitHub Actions
+
+- These have been disabled in this GitHub template repo. Make sure you enable them when setting up your project. 

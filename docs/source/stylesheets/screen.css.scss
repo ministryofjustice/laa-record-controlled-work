@@ -1,0 +1,113 @@
+@import "govuk_tech_docs";
+
+.app-masthead {
+  padding-top: 30px;
+}
+
+.app-masthead {
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #b61db8;
+  color: #fff;
+  background-color: #b61db8;
+}
+
+.app-masthead__title {
+  color: #fff;
+  margin-bottom: 20px;
+}
+
+.app-masthead__description {
+  font-family: "GDS Transport", arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-weight: 400;
+  font-size: 1.3125rem;
+  line-height: 1.1904761905;
+  margin-bottom: 0;
+}
+
+.govuk-button {
+  font-family: GDS Transport, arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-weight: 400;
+  font-size: 1rem;
+  line-height: 1.1875;
+  box-sizing: border-box;
+  display: inline-block;
+  position: relative;
+  width: 100%;
+  margin: 0 0 22px;
+  padding: 8px 10px 7px;
+  border: 2px solid transparent;
+  border-radius: 0;
+  color: #fff;
+  background-color: #fff;
+  box-shadow: 0 2px 0 #e6ade7;
+  ;
+  text-align: center;
+  vertical-align: top;
+  cursor: pointer;
+}
+
+.govuk-button:link,
+.govuk-button:visited,
+.govuk-button:active,
+.govuk-button:hover {
+  color: #fff;
+  text-decoration: none;
+}
+
+.govuk-button:hover {
+  background-color: #e6ade7;
+}
+
+.govuk-button:active {
+  top: 2px;
+  box-shadow: none;
+}
+
+.govuk-button:focus {
+  outline: 3px solid transparent;
+  color: #0b0c0c;
+  background-color: #fd0;
+  box-shadow: 0 -2px #fd0, 0 4px #0b0c0c;
+  text-decoration: none;
+}
+
+.govuk-button:focus:not(:active):not(:hover) {
+  border-color: #fd0;
+  color: #0b0c0c;
+  background-color: #fd0;
+  box-shadow: 0 2px 0 #0b0c0c;
+}
+
+.govuk-button--disabled,
+.govuk-button[disabled] {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+@media (min-width: 40.0625em) {
+  .govuk-button {
+    width: auto;
+  }
+}
+
+/* Start now button variant */
+.govuk-button--start {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.govuk-button__start-icon {
+  margin-left: 0.3em;
+  height: 0.75em;
+  width: 0.75em;
+  fill: currentColor;
+}

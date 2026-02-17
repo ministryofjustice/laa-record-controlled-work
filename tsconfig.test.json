@@ -1,0 +1,17 @@
+{
+	"extends": "./tsconfig.json",
+	"compilerOptions": {
+		"allowImportingTsExtensions": true, // Allows TypeScript files to import each other with a TypeScript-specific extension like .ts, .mts, or .tsx. 
+		"noEmit": true, // Enabled, so that `allowImportingTsExtensions` can work.
+		"module": "NodeNext",
+		"moduleResolution": "NodeNext",
+	},
+	"include": [
+		"tests/**/*.spec.ts", // Unit tests (if any remain in tests/)
+		"tests/playwright/**/*.ts", // E2E tests, fixtures, pages, utils in Playwright structure
+		"routes/**/*.ts",
+		"src/**/*.ts",
+		"middleware/**/*.ts",
+		"utils/**/*.ts"
+	]
+}

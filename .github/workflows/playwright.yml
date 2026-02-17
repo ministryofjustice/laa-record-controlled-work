@@ -1,0 +1,139 @@
+name: Playwright Tests
+on:
+  workflow_dispatch: # Allow manual triggering only
+  workflow_call: # Allow this workflow to be called by other workflows
+
+jobs:
+  playwright:
+    name: Playwright Tests
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    # Mark this job as required for PR checks
+    outputs:
+      status: ${{ job.status }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0 # Fetch all history for proper change detection
+
+      - name: Setup Node and Dependencies
+        uses: ./.github/actions/setup-node
+
+      - name: Build application
+        run: yarn build
+
+      - name: Install Playwright Chromium
+        run: yarn playwright install chromium --with-deps
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-chromium-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Run Playwright tests
+        run: yarn playwright test --config=tests/playwright/playwright.config.ts --grep-invert @accessibility
+        env:
+          CI: true
+          PLAYWRIGHT_TRACING: "on" # Enable tracing for all tests
+          # Add session-related environment variables
+          SESSION_SECRET: "playwright-test-secret" # Use a simple test secret for Playwright
+          SESSION_NAME: "sessionId"
+          NODE_ENV: "test"
+          # Add other required environment variables
+          SERVICE_NAME: "Your Service Name"
+          SERVICE_PHASE: "Alpha"
+          DEPARTMENT_NAME: "LAA Digital"
+          DEPARTMENT_URL: "https://www.gov.uk/government/organisations/legal-aid-agency"
+          CONTACT_EMAIL: "your-team@digital.justice.gov.uk"
+          SERVICE_URL: "https://www.gov.uk/legal-aid"
+          RATELIMIT_HEADERS_ENABLED: "true"
+          RATE_LIMIT_MAX: "100"
+          RATE_WINDOW_MS: "900000"
+      - name: Upload trace artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces
+          path: |
+            test-results/**/trace*.zip
+            test-results/**/*.webm
+          retention-days: 14
+
+      - name: Notify on test failure
+        if: failure()
+        run: echo "::error::Playwright tests failed! Check the test report for details."
+
+  accessibility:
+    name: Accessibility Tests
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    outputs:
+      status: ${{ job.status }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Read Node version from .nvmrc
+        run: echo "NODE_VERSION=$(cat .nvmrc)" >> $GITHUB_ENV
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+        env:
+          SKIP_YARN_COREPACK_CHECK: '1'
+
+      - name: Enable Corepack and prepare Yarn
+        run: |
+          corepack enable
+          corepack prepare yarn@4.9.2 --activate
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Build application
+        run: yarn build
+
+      - name: Install Playwright Chromium
+        run: yarn playwright install chromium --with-deps
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-chromium-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Run Accessibility Tests
+        run: yarn playwright test --config=tests/playwright/playwright.config.ts --grep @accessibility
+        env:
+          CI: true
+          SESSION_SECRET: "accessibility-test-secret"
+          SESSION_NAME: "sessionId"
+          NODE_ENV: "test"
+          SERVICE_NAME: "Your Service Name"
+          SERVICE_PHASE: "Alpha"
+          DEPARTMENT_NAME: "LAA Digital"
+          DEPARTMENT_URL: "https://www.gov.uk/government/organisations/legal-aid-agency"
+          CONTACT_EMAIL: "your-team@digital.justice.gov.uk"
+          SERVICE_URL: "https://www.gov.uk/legal-aid"
+          RATELIMIT_HEADERS_ENABLED: "true"
+          RATE_LIMIT_MAX: "100"
+          RATE_WINDOW_MS: "900000"
+
+      - name: Upload Accessibility Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: accessibility-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14
+
+      - name: Notify on accessibility failure
+        if: failure()
+        run: echo "::error::Accessibility tests failed! Check the accessibility report for details."

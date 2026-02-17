@@ -1,0 +1,30 @@
+name: Mocha Unit tests
+on:
+  workflow_dispatch: # Allow manual triggering only
+  workflow_call: # Allow this workflow to be called by other workflows
+
+jobs:
+  mocha-unit-tests:
+    name: Mocha Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup Node and Dependencies
+        uses: ./.github/actions/setup-node
+
+      - name: Run Mocha unit tests & c8 code coverage
+        run: yarn c8 yarn test:unit --check-coverage
+        env:
+          CI: true
+          # Add session-related environment variables for unit tests
+          SESSION_SECRET: "mocha-test-secret" # Use a simple test secret for Mocha unit tests
+          SESSION_NAME: "sessionId"
+
+      - name: Upload coverage artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: code-coverage-report
+          path: coverage/

@@ -1,0 +1,34 @@
+host: https://ministryofjustice.github.io/laa-express-typescript-template
+
+# Header-related options
+show_govuk_logo: true
+service_name: Express with Typescript template (ETT)
+service_link: /
+phase: Internal
+
+# Links to show on right-hand-side of header
+header_links:
+  Home: /
+  GitHub: https://github.com/ministryofjustice/laa-express-typescript-template
+  Slack: https://moj.enterprise.slack.com/archives/C06Q08ASTNC
+
+# Enables search functionality. This indexes pages only and is not recommended for single-page sites.
+enable_search: true
+
+# Enable collapsible navigation in the sidebar
+collapsible_nav: false
+
+# Table of contents depth – how many levels to include in the table of contents.
+# If your ToC is too long, reduce this number and we'll only show higher-level
+# headings.
+max_toc_heading_level: 3
+
+# Prevent robots from indexing (e.g. whilst in development)
+prevent_indexing: true
+
+show_contribution_banner: true
+github_repo: ministryofjustice/laa-express-typescript-template
+github_branch: main/docs
+full_service_name: Express with Typescript template (ETT)
+show_expiry: true
+show_review_banner: true

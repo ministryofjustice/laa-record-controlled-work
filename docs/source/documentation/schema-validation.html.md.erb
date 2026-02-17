@@ -1,0 +1,180 @@
+---
+title: Schema Validation
+last_reviewed_on: 2025-10-13
+review_in: 6 weeks
+---
+
+# Schema Validation
+
+This template now includes comprehensive form validation with GOV.UK Design System integration, session caching, and sophisticated error handling. The validation system is designed to provide a complete example of how to implement enterprise-grade form validation in Express TypeScript applications.
+
+## Validation Architecture
+
+The schema validation system consists of several key components:
+
+**Core Components:**
+
+- **Schema Definition** (`src/middlewares/personSchema.ts`) - Comprehensive validation rules using `express-validator`
+- **Error Formatting** (`src/helpers/ValidationErrorHelpers.ts`) - GOV.UK-compliant error message formatting
+- **Session Management** (`src/scripts/helpers/sessionHelpers.ts`) - Form data persistence and comparison utilities
+- **Controller Logic** (`src/controllers/personController.ts`) - Request handling with validation integration
+- **Template Implementation** (`views/change-person.njk`) - Complete form with all GOV.UK components
+
+## Schema Structure
+
+The `personSchema.ts` middleware provides an example of validation for a comprehensive form including:
+
+**Text Input Validation:**
+
+- `fullName` - Required text input with trimming and sanitization
+- `address` - Required textarea with multi-line support
+
+**Selection Validation:**
+
+- `contactPreference` - Radio button validation with predefined options (`email`, `phone`, `post`)
+- `priority` - Select dropdown validation with priority levels (`low`, `medium`, `high`, `urgent`)
+- `communicationMethods` - Checkbox array validation requiring at least one selection
+
+**Date Field Validation:**
+
+- Complex three-field date validation (`dateOfBirth-day`, `dateOfBirth-month`, `dateOfBirth-year`)
+- Conditional validation - if any date component is provided, all are required
+- Valid date checking using `validator.js`
+- Proper error messaging for incomplete or invalid dates
+
+**Change Detection:**
+
+- Validates that certain fields have been modified from their original values
+- Uses session data to compare current form input against stored original values
+- Prevents submission when required changes haven't been made
+
+## Error Handling System
+
+**TypedValidationError Class:**
+
+```typescript
+// Provides structured error objects for GOV.UK Design System
+new TypedValidationError({
+  summaryMessage: 'Error for summary list',
+  inlineMessage: 'Error for field display'
+})
+```
+
+**Features:**
+
+- Dual message support (summary and inline errors)
+- i18n integration for multi-language error messages
+- GOV.UK Design System compliant error formatting
+- Automatic error propagation to templates
+
+## Session Caching for Form Data
+
+The template includes sophisticated session management for preserving form state and enabling change detection:
+
+**Session Helper Functions** (`src/scripts/helpers/sessionHelpers.ts`):
+
+```typescript
+// Store form data in session under namespace
+storeSessionData(req, 'person', formData)
+
+// Retrieve previously stored data
+const originalData = getSessionData(req, 'personOriginal')
+
+// Clear session data when no longer needed
+clearSessionData(req, 'formErrors')
+
+// Convert and store original form data for comparison
+storeOriginalFormData(req, 'personOriginal', existingData)
+```
+
+**Session Data Flow:**
+
+1. **Initial Load** - Original data stored in session for comparison
+2. **Form Submission** - Current form data cached to survive validation failures
+3. **Error Handling** - Form data persisted, error states maintained
+4. **Success Flow** - Session data cleared after successful submission
+5. **Change Detection** - Original vs current data comparison for required field changes
+
+**Session Namespaces:**
+
+- `person` - Current form data
+- `personOriginal` - Original data for change detection
+- `formErrors` - Validation error states
+- `successMessage` - Success notifications
+
+## Helper Utilities
+
+The template includes several utility modules to support the validation system:
+
+**Data Transformers** (`src/scripts/helpers/dataTransformers.ts`):
+
+- `safeString()` - Converts any input to string safely
+- `safeOptionalString()` - Handles optional string conversion
+- `isRecord()` - Type guard for object validation
+- `safeStringFromRecord()` - Safe property extraction from objects
+- `hasProperty()` - Property existence checking
+- `dateStringFromThreeFields()` - Combines day/month/year into date string
+
+**Error Handler** (`src/scripts/helpers/errorHandler.ts`):
+
+- `extractErrorMessage()` - Extracts user-friendly messages from various error types
+- `isAuthError()`, `isForbiddenError()`, etc. - HTTP status code helpers
+- `createProcessedError()` - Creates wrapped errors with context
+- `extractAndLogError()` - Logging utility for development debugging
+
+**Date Formatter** (`src/scripts/helpers/dateFormatter.ts`):
+
+- `formatDate()` - Formats ISO date strings for display
+- Handles invalid dates gracefully
+- Provides consistent date formatting across the application
+
+## GOV.UK Component Integration
+
+The validation example demonstrates all major GOV.UK Design System form components:
+
+**Implemented Components:**
+
+- `govukInput` - Text input with validation
+- `govukTextarea` - Multi-line text input
+- `govukRadios` - Radio button groups
+- `govukSelect` - Dropdown selection
+- `govukCheckboxes` - Multiple selection checkboxes
+- `govukDateInput` - Three-field date input
+- `govukErrorSummary` - Error summary at page top
+- `govukNotificationBanner` - Success message display
+
+**Each component includes:**
+
+- Proper error state handling
+- Value persistence across form submissions
+- Accessibility attributes
+- Consistent styling and behavior
+
+## Usage Example
+
+To implement similar validation in your routes:
+
+```typescript
+import { validatePerson } from '#src/middlewares/personSchema.js';
+import { getPerson, postPerson } from '#src/controllers/personController.js';
+
+// GET route for form display
+router.get('/change/person', getPerson);
+
+// POST route with validation middleware
+router.post('/change/person', validatePerson(), postPerson);
+```
+
+The middleware automatically handles validation, error formatting, and session management, while the controller focuses on business logic and response handling.
+
+## Template Integration
+
+Access the validation example at [`/change/person`](http://localhost:3000/change/person) when running the application locally. The page demonstrates:
+
+- Complete form validation workflow
+- Error summary and inline error display
+- Session-based form data persistence
+- Success/failure message handling
+- All GOV.UK Design System form components working together
+
+This comprehensive validation system serves as both a functional example and a foundation for building complex forms in LAA applications.

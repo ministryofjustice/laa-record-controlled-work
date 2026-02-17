@@ -1,0 +1,223 @@
+---
+title: Features
+last_reviewed_on: 2025-10-02
+review_in: 6 weeks
+---
+
+# Features
+
+## Asset management
+This template uses [ESBuild](https://esbuild.github.io/) for asset bundling and management, providing fast builds and efficient handling of JavaScript, TypeScript, and SCSS files.
+
+## Cache busting
+Caching allows Express applications to store and serve frequently requested data efficiently, reducing the strain on servers and minimizing latency. This template improves caching through:
+
+- intelligent browser caching, when using the template for development of an application
+- employing a package management tool, to improve the caching process of installing, upgrading, configuring, and removing software from your application
+
+## Form validation
+This template includes comprehensive form validation using express-validator with advanced patterns for complex data structures, GOV.UK Design System integration, and sophisticated error handling. Features include date field validation, session-based change detection, internationalised error messages, and production-ready validation patterns extracted from LAA applications.
+
+For detailed implementation examples and comprehensive documentation, see the [Schema Validation Guide](schema-validation.html).
+
+## CSRF protection
+The template uses the [csrf-sync](https://www.npmjs.com/package/csrf-sync/v/1.0.2) middleware, to help keep your app secure.
+
+## Content Security Policy (CSP)
+This template uses [helmet.js](https://helmetjs.github.io/) to help secure this Express template app by setting HTTP response headers, which includes your CSP. 
+
+## Response compression
+The template uses a Node.js compression middleware called [compression](https://www.npmjs.com/package/compression). The middleware will attempt to compress response bodies for all request that traverse through the middleware, based on the given options.
+
+
+## Rate limiting
+This template uses a basic rate-limiting middleware for Express, called `express-rate-limit`. It is used to limit repeated requests to public APIs and/or endpoints such as password reset. 
+
+For further information please [visit the documentation here](https://www.npmjs.com/package/express-rate-limit?activeTab=readme).
+
+## Linter
+ESLint is a static code analysis tool for identifying and fixing problems in JavaScript and TypeScript code. It helps maintain code quality and consistency across a project by enforcing a set of coding standards and best practices. ESLint can catch syntax errors, stylistic issues, and potential bugs before they become actual problems.
+
+The template has TypeScript support through the `@typescript-eslint/eslint-plugin` and `@typescript-eslint/parser` packages installed as dev dependencies.
+
+To run ESLint:
+
+```shell
+yarn lint
+```
+
+This will run ESLint on all TypeScript files in your project, ignoring specific files and directories.
+
+### Ignore Configuration
+
+The template configures ESLint to ignore certain files directly in the `eslint.config.js` file:
+
+```javascript
+{
+  ignores: [
+    'node_modules/*',
+    'public/*',
+    'tests/**/*.spec.ts'
+  ],
+}
+```
+
+This configuration:
+
+- Ignores the `node_modules` directory
+- Ignores the `public` directory (generated output)
+- Ignores all test specification files (`*.spec.ts`) in any subdirectory of the `tests` folder
+
+## Linter for staged commits
+We use [husky](https://github.com/typicode/husky) & [lint-staged](https://github.com/lint-staged/lint-staged) to run ESLint on all our staged git commits. This ensures that TypeScript files are linted before they're committed to the repository.
+
+- `husky` - helps us with our Git hooks
+- `lint-staged` - helps us run a linter on our staged commits (configured in package.json to target both .js and .ts files)
+
+
+**To set-up locally**
+- Install all the dependencies:
+```shell
+yarn install
+```
+
+- Initialise `husky`:
+```shell
+yarn husky install
+```
+
+- To help debug, run the command when you have a staged commit:
+```shell
+yarn lint-staged --debug
+```
+
+## TypeScript
+This template uses TypeScript to provide static type checking, improving code quality and developer experience. TypeScript helps catch errors during development rather than at runtime and provides better IDE support through enhanced autocompletion and navigation.
+
+### Main TypeScript Configuration
+The TypeScript configuration is defined in `tsconfig.json` with the following key settings:
+
+- Target: ES2022
+- Module System: NodeNext
+- Strict Type Checking: Enabled
+- Source Maps: Generated for debugging
+
+### Test TypeScript Configuration
+The template uses a separate TypeScript configuration for tests in `tsconfig.test.json`, which extends the main configuration:
+
+```json
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext"
+  },
+  "include": ["tests/**/*.spec.ts", "routes/**/*.ts", "src/**/*.ts", "middleware/**/*.ts", "utils/**/*.ts"]
+}
+```
+
+This configuration:
+
+- Extends the main `tsconfig.json`
+- Allows importing TypeScript files with extensions (`.ts`)
+- Doesn't emit compiled output files when running tests
+- Includes all test files (`*.spec.ts`) in all test subdirectories
+- Includes source files from routes, src, middleware, and utils directories that tests may need to reference
+
+To compile TypeScript files:
+```shell
+yarn build:ts
+```
+
+To run type checking without emitting files:
+```shell
+yarn tsc
+```
+
+## Type definitions
+- Type definitions for Node, Express, and other dependencies are included as dev dependencies (see `@types/*` packages in `package.json`).
+- These are required for type safety and improved autocompletion in TypeScript.
+
+
+## API Connection Patterns
+This template provides generalised API connection patterns. The patterns offer a robust foundation for HTTP client functionality without forcing specific response formats or domain logic.
+
+### Enhanced Axios Middleware
+The template includes enhanced axios middleware with:
+
+- **Configurable instances** - Create axios instances with custom timeout, headers, and base URLs
+- **Authentication support** - Optional JWT/token handling with automatic refresh on 401 responses  
+- **Request/response logging** - Environment-aware logging with JSON pretty-printing for debugging
+- **Error handling** - Standardised error extraction and user-friendly message transformation
+
+```typescript
+// Basic usage (existing pattern still works)
+router.get('/users', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const response = await req.axiosMiddleware.get('https://api.example.com/users');
+    res.json(response.data);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Enhanced usage with custom configuration
+import { createApiMiddleware } from '#utils/axiosSetup.js';
+
+const apiMiddleware = createApiMiddleware({
+  timeout: 10000,
+  defaultHeaders: { 'Content-Type': 'application/json' },
+  enableLogging: true,
+  authService: myAuthService // Optional authentication
+});
+```
+
+### BaseApiService Pattern
+For more complex API integrations, the template provides a `BaseApiService` abstract class that extracts common HTTP client patterns:
+
+```typescript
+// Create your own API service
+import { BaseApiService } from '#src/services/baseApiService.js';
+
+class MyApiService extends BaseApiService {
+  constructor() {
+    super({
+      baseUrl: process.env.MY_API_URL,
+      apiPrefix: '/v1',
+      timeout: 10000,
+      enableLogging: true
+    });
+  }
+
+  async getUsers(axiosWrapper: AxiosInstanceWrapper) {
+    return this.get(axiosWrapper, '/users');
+  }
+
+  async createUser(axiosWrapper: AxiosInstanceWrapper, userData: unknown) {
+    return this.post(axiosWrapper, '/users', userData);
+  }
+}
+
+// Use in routes
+const myApiService = new MyApiService();
+
+router.get('/users', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const response = await myApiService.getUsers(req.axiosMiddleware);
+    res.json(response.data);
+  } catch (error) {
+    next(error);
+  }
+});
+```
+
+### Key Benefits
+- **Production-tested patterns** extracted from LAA's MCC application
+- **Scalable architecture** - from simple API calls to complex authentication flows
+- **Comprehensive logging** - request/response logging with error context
+- **Type-safe** - Full TypeScript support with proper type definitions
+
+## Nunjucks templating
+This template uses [Nunjucks](https://mozilla.github.io/nunjucks/) for server-side HTML templating. You can render Nunjucks templates from your TypeScript route handlers just as you would from JavaScript. Templates are located in the `views/` directory and are compatible with both JS and TS backends.

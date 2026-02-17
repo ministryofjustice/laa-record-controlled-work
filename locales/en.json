@@ -1,0 +1,164 @@
+{
+  "common": {
+    "back": "Back",
+    "change": "Change",
+    "remove": "Remove",
+    "save": "Save",
+    "cancel": "Cancel",
+    "signOut": "Sign out",
+    "yes": "Yes",
+    "no": "No",
+    "error": "Error",
+    "warning": "Warning",
+    "errorSummaryTitle": "There is a problem"
+  },
+  "navigation": {
+    "mainNav": {},
+    "footer": {
+      "accessibility": "Accessibility",
+      "cookiePolicy": "Cookies",
+      "privacyPolicy": "Privacy"
+    }
+  },
+  "components": {
+    "phaseBanner": {
+      "feedbackText": "This is a new service. Help us improve it and ",
+      "feedbackLinkTextHTML": "<a class='govuk-link' href='#'>give your feedback by email</a>."
+    },
+    "errorSummary": {
+      "title": "There is a problem"
+    }
+  },
+  "pages": {
+    "home": {
+      "defaultHeading": "Default page template",
+      "defaultTemplate": "This is a default page template.",
+      "mountainsOfTheWorld": "Mountains of the world",
+      "rowName": {
+        "label": "Name",
+        "aconcagua": "Aconcagua",
+        "denali": "Denali",
+        "elbrus": "Elbrus",
+        "everest": "Everest",
+        "kilimanjaro": "Kilimanjaro",
+        "puncakJaya": "Puncak Jaya",
+        "vinson": "Vinson"
+      },
+      "rowElevation": {
+        "label": "Elevation",
+        "6961meters": "6,961 meters",
+        "6194meters": "6,194 meters",
+        "5642meters": "5,642 meters",
+        "8850meters": "8,850 meters",
+        "5895meters": "5,895 meters",
+        "4884meters": "4,884 meters",
+        "4897meters": "4,897 meters"
+      },
+      "rowContinent": {
+        "label": "Continent",
+        "southAmerica": "South America",
+        "northAmerica": "North America",
+        "europe": "Europe",
+        "asia": "Asia",
+        "africa": "Africa",
+        "australia": "Australia",
+        "antarctica": "Antarctica"
+      },
+      "rowFirstSummit": {
+        "label":"First summit",
+        "1897": "1897",
+        "1913": "1913",
+        "1874": "1874",
+        "1953": "1953",
+        "1889": "1889",
+        "1962": "1962",
+        "1966": "1966"
+      }
+    },
+    "error": {
+      "pageTitle": "Sorry, there is a problem with the service – {SERVICE_NAME} – GOV.UK"
+    }
+  },
+  "forms": {
+    "name": {
+      "label": "Full name",
+      "title": "Change your name",
+      "pageTitle": "Change your name – {serviceName} – GOV.UK",
+      "validationError": {
+        "notEmpty": "Enter your full name",
+        "notChanged": "Change your full name, or select 'Cancel'"
+      }
+    },
+    "address": {
+      "label": "Address",
+      "title": "Address",
+      "validationError": {
+        "notEmpty": "Enter your address"
+      }
+    },
+    "contactPreference": {
+      "label": "Contact preference",
+      "title": "How would you prefer to be contacted?",
+      "validationError": {
+        "notEmpty": "Select how you would prefer to be contacted",
+        "invalidOption": "Select a valid contact preference",
+        "notChanged": "Change your contact preference, or select 'Cancel'"
+      }
+    },
+    "communicationMethods": {
+      "label": "Communication methods",
+      "title": "How would you like us to contact you?",
+      "hint": "Select all that apply",
+      "validationError": {
+        "notEmpty": "Select at least one communication method"
+      }
+    },
+    "priority": {
+      "label": "Priority level",
+      "title": "Priority level",
+      "validationError": {
+        "notEmpty": "Select a priority level",
+        "invalidOption": "Select a valid priority level",
+        "notChanged": "Change the priority level, or select 'Cancel'"
+      }
+    },
+    "dateOfBirth": {
+      "label": "Date of birth",
+      "title": "Date of birth",
+      "hint": "For example, 27 3 1986",
+      "validationError": {
+        "day": {
+          "notEmpty": "Date of birth must include a day",
+          "isInt": "Day must be a number between 1 and 31"
+        },
+        "month": {
+          "notEmpty": "Date of birth must include a month",
+          "isInt": "Month must be a number between 1 and 12"
+        },
+        "year": {
+          "notEmpty": "Date of birth must include a year",
+          "isLength": "Year must be 4 numbers",
+          "isInt": "Year must be a valid number"
+        },
+        "validDate": "Enter a real date of birth"
+      }
+    },
+    "clientDetails": {
+      "name": {
+        "label": "Name", 
+        "title": "Client name",
+        "pageTitle": "Client name – {caseReference} – {serviceName} – GOV.UK",
+        "validationError": {
+          "notEmpty": "Enter the client name",
+          "notChanged": "Change the client name, or select 'Cancel'"
+        }
+      }
+    },
+    "home": {
+      "validationError": {}
+    }
+  },
+  "accessibility": {
+    "visuallyHiddenText": {}
+  }
+}

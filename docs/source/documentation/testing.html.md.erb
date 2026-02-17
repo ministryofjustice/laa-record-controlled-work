@@ -1,0 +1,231 @@
+---
+title: Testing
+last_reviewed_on: 2025-10-02
+review_in: 6 weeks
+---
+
+# Testing
+
+## Overview
+There are many frameworks to test your Express.js application (a few of these frameworks will be signposted below), but you will want to split out your test suite to cover:
+
+- Unit Tests - test individual code components to ensure each function operates as intended.
+- Integration Tests - assess the coherence of the entire application, ensuring smooth interactions between various parts.
+- End-to-end (E2E) Tests - assess the entire software system, from the user interface to the database.
+
+## Running All Tests
+
+To run both unit and end-to-end tests with a single command:
+
+```shell
+yarn test
+```
+
+This command will first run the unit tests with Mocha and then run the end-to-end tests with Playwright.
+
+## Quick Test Commands Reference
+
+| Command | Description |
+|---------|-------------|
+| `yarn test` | Run all tests (unit + e2e) |
+| `yarn test:unit` | Run only unit tests |
+| `yarn test:e2e` | Run all E2E tests |
+| `yarn coverage` | Run unit tests with coverage report |
+
+## Unit/Integration Testing frameworks
+- We use [Mocha](https://mochajs.org/) as our unit testing framework. It is a widely-used JavaScript testing framework that works well with TypeScript projects and integrates with CI pipelines.
+- We also use [chai](https://www.chaijs.com/) to help with our test assertions, in mocha.
+- Unit tests run from the `tests/unit/` directory
+- Run unit tests with `yarn test:unit`
+
+**To set-up locally**
+
+- Install all the dependencies:
+
+```shell
+yarn install
+```
+
+- run unit test's:
+
+```shell
+yarn test:unit
+```
+
+## E2E Testing with Playwright
+This project uses [Playwright](https://playwright.dev/) for end-to-end testing. Playwright provides reliable end-to-end testing for modern web apps.
+
+- E2E tests run from the `tests/playwright/tests/` directory
+- Run E2E tests with `yarn test:e2e`
+
+### Running Tests Locally
+
+To run the E2E tests locally:
+
+```shell
+# Run all E2E tests
+yarn test:e2e
+
+# Run accessibility tests only
+yarn test:accessibility
+
+# Run specific test file (full command)
+yarn playwright test --config=tests/playwright/playwright.config.ts tests/playwright/tests/specific-test.spec.ts
+
+# Run in UI mode with Playwright Test Explorer
+yarn playwright test --config=tests/playwright/playwright.config.ts --ui
+```
+
+### Configuration
+
+The project uses Chromium for testing to ensure consistency with our production environment. The configuration can be found in `tests/playwright/playwright.config.ts`.
+
+Key configuration points:
+- Tests are located in `tests/playwright/tests/` directory
+- Only Chromium browser is used for testing
+- Test retries are enabled in CI environments (2 retries)
+- Traces are automatically captured on test failures for debugging
+
+### CI/CD Integration
+
+The tests are automatically run in our GitHub Actions workflow (`.github/workflows/playwright.yml`) during pull requests and deployments to UAT.
+
+- The workflow installs only the Chromium browser to optimise CI runtime
+- Traces are captured for all test runs in CI for easier debugging
+- Test artifacts (traces, videos) are preserved for 14 days in GitHub Actions
+
+### Debugging Failed Tests
+
+When tests fail in CI:
+
+1. Check the error message in the GitHub Actions log
+2. Download the trace artifacts (named `playwright-traces.zip`) from GitHub Actions
+3. Extract the downloaded ZIP file - inside you'll find folders organised by test name
+4. Locate the `trace.zip` file within the specific test folder you want to debug
+5. Open traces using one of the following methods:
+
+   **With local Trace Viewer:**
+
+   ```shell
+   yarn playwright show-trace path/to/extracted/test-folder/trace.zip
+   ```
+
+   **With online Trace Viewer:**
+
+   Upload the trace.zip file to https://trace.playwright.dev/ - this allows sharing traces with team members without requiring local Playwright installation
+
+This provides a timeline view of the test execution with screenshots, DOM snapshots, and network requests to help diagnose issues.
+
+### Route Coverage Analysis
+The `scripts/e2e_coverage/route-coverage-analysis.sh` script analyses which Express routes have corresponding E2E tests, helping ensure comprehensive test coverage.
+
+```shell
+# Run the route coverage analysis (with tests)
+./scripts/e2e_coverage/route-coverage-analysis.sh
+
+# Run analysis without running tests (faster, shows only routes)
+./scripts/e2e_coverage/route-coverage-analysis.sh --skip-tests
+```
+
+The script:
+- Extracts all registered Express routes from the application
+- Runs E2E tests with debug logging to capture visited routes (unless --skip-tests is used)
+- Compares the two lists and reports coverage percentage
+- Shows which routes are missing E2E tests
+
+Use this to identify gaps in your E2E test coverage and ensure all user-facing routes are properly tested.
+
+## Accessibility Testing
+
+This project includes automated accessibility testing using [axe-core](https://github.com/dequelabs/axe-core) integrated with Playwright to ensure WCAG 2.2 AA compliance.
+
+### How Accessibility Tests Work
+
+- Accessibility tests run automatically as part of the CI pipeline in a separate parallel job
+- Tests scan each page for WCAG violations using axe-core rules: `wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa`, `wcag22aa`
+- Each major page has a corresponding accessibility test (e.g., `homepage should be accessible`, `search page should be accessible`)
+
+### Running Accessibility Tests Locally
+
+```shell
+# Run only accessibility tests
+yarn test:accessibility
+
+# Run all tests (functional + accessibility)
+yarn test:e2e
+
+# Run accessibility tests in UI mode for debugging
+yarn playwright test --config=tests/playwright/playwright.config.ts --grep @accessibility
+```
+
+### CI Integration
+
+Accessibility tests run in parallel with functional E2E tests in the GitHub Actions workflow:
+
+- **Functional Tests Job**: Runs all E2E tests except accessibility tests
+- **Accessibility Tests Job**: Runs only accessibility tests (filtered by `"should be accessible"`)
+
+Both jobs must pass for deployment to proceed.
+
+### Accessibility Test Reports
+
+When accessibility tests fail in CI:
+
+1. **Access the Report**:
+   - Go to the failed CI run in GitHub Actions
+   - Scroll down to the "Artifacts" section
+   - Download `accessibility-report.zip`
+
+2. **View Detailed Results**:
+   - Extract the downloaded ZIP file
+   - Open `playwright-report/index.html` in your browser
+   - This provides an interactive report with:
+     - List of all accessibility violations found
+     - WCAG rule details and impact levels (serious, moderate, minor)
+     - Affected DOM elements with selectors
+     - Screenshots showing the violations
+     - Remediation guidance
+
+3. **Understanding Violations**:
+   Each violation includes:
+   - **Rule ID**: The specific WCAG rule violated (e.g., `color-contrast`, `document-title`)
+   - **Impact**: Severity level (serious, moderate, minor, critical)
+   - **Description**: What the rule checks for
+   - **Help**: How to fix the issue
+   - **Elements**: Specific HTML elements that failed the rule
+
+### Adding Accessibility Tests
+
+To add accessibility testing to a new page:
+
+```typescript
+// In your test file: tests/playwright/tests/your-page.spec.ts
+import { test, expect } from '../fixtures/index.js';
+
+test('page name should be accessible', async ({ page, checkAccessibility }) => {
+  await page.goto('/your-page-url');
+  await checkAccessibility();
+});
+```
+
+The `checkAccessibility` fixture is available in all test files and will automatically scan the current page for WCAG 2.2 Level A violations.
+
+## Code coverage - unit tests
+We use the library [c8](https://github.com/bcoe/c8) which output unit test coverage reports using Node.js' built in coverage.
+
+- Devs can run this locally:
+```bash
+yarn coverage
+```
+
+- To open the report, after running locally:
+```bash
+open coverage/index.html
+```
+
+When coverage fails in CI:
+
+1. Check the error message in the GitHub Actions log - in the `Mocha Unit Test` job
+2. Download the trace artifacts (named `code-coverage-report.zip`) from GitHub Actions
+3. Extract the downloaded ZIP file
+4. Locate the `index.html` file within the `code-coverage-report` folder, and view in you browser

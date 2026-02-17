@@ -1,0 +1,275 @@
+{% extends "base.njk" %}
+
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+{% from "govuk/components/date-input/macro.njk" import govukDateInput %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+
+{% block pageTitle %}
+  Change person - {{ serviceName }}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      
+      {% if error and error.errorSummaryList and error.errorSummaryList.length > 0 %}
+        {{ govukErrorSummary({
+          titleText: "There is a problem",
+          errorList: error.errorSummaryList
+        }) }}
+      {% endif %}
+
+      {% if successMessage %}
+        {{ govukNotificationBanner({
+          type: "success",
+          html: "<p class=\"govuk-notification-banner__heading\">" + successMessage + "</p>"
+        }) }}
+      {% endif %}
+
+      <h1 class="govuk-heading-l">Change person</h1>
+
+      <p class="govuk-body">
+        <a href="/" class="govuk-link">← Back to homepage</a>
+      </p>
+
+      <form action="/change/person" method="post" novalidate>
+        {% if currentName %}
+          <p class="govuk-body govuk-!-margin-bottom-2">
+            <strong>Current name:</strong> {{ currentName }}
+          </p>
+        {% endif %}
+
+        {{ govukInput({
+          id: "fullName",
+          name: "fullName",
+          type: "text",
+          autocomplete: "name",
+          spellcheck: false,
+          label: {
+            text: "Full name",
+            classes: "govuk-label--m"
+          },
+          hint: {
+            text: "Enter your full name as you would like it to appear"
+          },
+          value: formData.fullName if formData else "",
+          errorMessage: {
+            text: error.inputErrors.fullName
+          } if error and error.inputErrors and error.inputErrors.fullName
+        }) }}
+
+        {% if currentAddress %}
+          <p class="govuk-body govuk-!-margin-bottom-2">
+            <strong>Current address:</strong><br>
+            {{ currentAddress | replace('\n', '<br>') | safe }}
+          </p>
+        {% endif %}
+
+        {{ govukTextarea({
+          id: "address",
+          name: "address",
+          label: {
+            text: "Address",
+            classes: "govuk-label--m"
+          },
+          hint: {
+            text: "Enter your full address including postcode"
+          },
+          value: formData.address if formData else "123 Example Street\nExample City\nEX1 2MP",
+          rows: 5,
+          errorMessage: {
+            text: error.inputErrors.address
+          } if error and error.inputErrors and error.inputErrors.address
+        }) }}
+
+        {% if currentContactPreference %}
+          <p class="govuk-body govuk-!-margin-bottom-2">
+            <strong>Current contact preference:</strong> {{ currentContactPreference | title }}
+          </p>
+        {% endif %}
+
+        {{ govukRadios({
+          name: "contactPreference",
+          fieldset: {
+            legend: {
+              text: "How would you prefer to be contacted?",
+              classes: "govuk-fieldset__legend--m"
+            }
+          },
+          hint: {
+            text: "Select your preferred method of contact"
+          },
+          items: [
+            {
+              value: "email",
+              text: "Email",
+              checked: (formData.contactPreference == "email") if formData and formData.contactPreference else (currentContactPreference == "email")
+            },
+            {
+              value: "phone",
+              text: "Phone",
+              checked: (formData.contactPreference == "phone") if formData and formData.contactPreference else (currentContactPreference == "phone")
+            },
+            {
+              value: "post",
+              text: "Post",
+              checked: (formData.contactPreference == "post") if formData and formData.contactPreference else (currentContactPreference == "post")
+            }
+          ],
+          errorMessage: {
+            text: error.inputErrors.contactPreference
+          } if error and error.inputErrors and error.inputErrors.contactPreference
+        }) }}
+
+        {% if currentPriority %}
+          <p class="govuk-body govuk-!-margin-bottom-2">
+            <strong>Current priority level:</strong> {{ currentPriority | title }}
+          </p>
+        {% endif %}
+
+        {{ govukSelect({
+          id: "priority",
+          name: "priority",
+          label: {
+            text: "Priority level",
+            classes: "govuk-label--m"
+          },
+          hint: {
+            text: "Select the priority level for this case"
+          },
+          items: [
+            {
+              value: "",
+              text: "Choose priority level",
+              selected: false
+            },
+            {
+              value: "low",
+              text: "Low priority",
+              selected: (formData.priority == "low") if formData and formData.priority else (currentPriority == "low")
+            },
+            {
+              value: "medium",
+              text: "Medium priority",
+              selected: (formData.priority == "medium") if formData and formData.priority else (currentPriority == "medium")
+            },
+            {
+              value: "high",
+              text: "High priority",
+              selected: (formData.priority == "high") if formData and formData.priority else (currentPriority == "high")
+            },
+            {
+              value: "urgent",
+              text: "Urgent priority",
+              selected: (formData.priority == "urgent") if formData and formData.priority else (currentPriority == "urgent")
+            }
+          ],
+          errorMessage: {
+            text: error.inputErrors.priority
+          } if error and error.inputErrors and error.inputErrors.priority
+        }) }}
+
+        {% if currentCommunicationMethods %}
+          <p class="govuk-body govuk-!-margin-bottom-2">
+            <strong>Current communication methods:</strong> {{ currentCommunicationMethods | join(', ') }}
+          </p>
+        {% endif %}
+
+        {{ govukCheckboxes({
+          id: "communicationMethods",
+          name: "communicationMethods",
+          fieldset: {
+            legend: {
+              text: "How would you like us to contact you?",
+              classes: "govuk-fieldset__legend--m"
+            }
+          },
+          hint: {
+            text: "Select all that apply"
+          },
+          items: [
+            {
+              value: "email",
+              text: "Email",
+              checked: (formData.communicationMethods and formData.communicationMethods.includes("email")) if formData and formData.communicationMethods else (currentCommunicationMethods and currentCommunicationMethods.includes("email"))
+            },
+            {
+              value: "phone",
+              text: "Phone",
+              checked: (formData.communicationMethods and formData.communicationMethods.includes("phone")) if formData and formData.communicationMethods else (currentCommunicationMethods and currentCommunicationMethods.includes("phone"))
+            },
+            {
+              value: "text",
+              text: "Text message",
+              checked: (formData.communicationMethods and formData.communicationMethods.includes("text")) if formData and formData.communicationMethods else (currentCommunicationMethods and currentCommunicationMethods.includes("text"))
+            },
+            {
+              value: "post",
+              text: "Post",
+              checked: (formData.communicationMethods and formData.communicationMethods.includes("post")) if formData and formData.communicationMethods else (currentCommunicationMethods and currentCommunicationMethods.includes("post"))
+            }
+          ],
+          errorMessage: {
+            text: error.inputErrors.communicationMethods
+          } if error and error.inputErrors and error.inputErrors.communicationMethods
+        }) }}
+
+        {% if currentDateOfBirth %}
+          <p class="govuk-body govuk-!-margin-bottom-2">
+            <strong>Current date of birth:</strong> {{ currentDateOfBirth.day }}/{{ currentDateOfBirth.month }}/{{ currentDateOfBirth.year }}
+          </p>
+        {% endif %}
+
+        {{ govukDateInput({
+          id: "dateOfBirth",
+          namePrefix: "dateOfBirth",
+          fieldset: {
+            legend: {
+              text: "Date of birth",
+              classes: "govuk-fieldset__legend--m"
+            }
+          },
+          hint: {
+            text: "For example, 27 3 1986"
+          },
+          errorMessage: {
+            text: error.inputErrors.validDate or error.inputErrors['dateOfBirth-day'] or error.inputErrors['dateOfBirth-month'] or error.inputErrors['dateOfBirth-year']
+          } if error and error.inputErrors and (error.inputErrors.validDate or error.inputErrors['dateOfBirth-day'] or error.inputErrors['dateOfBirth-month'] or error.inputErrors['dateOfBirth-year']),
+          items: [
+            {
+              name: "day",
+              label: "Day",
+              value: formData['dateOfBirth-day'] if formData else "",
+              classes: "govuk-input--width-2" + (" govuk-input--error" if error and error.inputErrors and (error.inputErrors.validDate or error.inputErrors['dateOfBirth-day']) else "")
+            },
+            {
+              name: "month", 
+              label: "Month",
+              value: formData['dateOfBirth-month'] if formData else "",
+              classes: "govuk-input--width-2" + (" govuk-input--error" if error and error.inputErrors and (error.inputErrors.validDate or error.inputErrors['dateOfBirth-month']) else "")
+            },
+            {
+              name: "year",
+              label: "Year", 
+              value: formData['dateOfBirth-year'] if formData else "",
+              classes: "govuk-input--width-4" + (" govuk-input--error" if error and error.inputErrors and (error.inputErrors.validDate or error.inputErrors['dateOfBirth-year']) else "")
+            }
+          ]
+        }) }}
+
+        {{ govukButton({
+          text: "Save and continue"
+        }) }}
+
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+      </form>
+
+    </div>
+  </div>
+{% endblock %}

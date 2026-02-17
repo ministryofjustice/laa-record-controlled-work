@@ -1,0 +1,26 @@
+name: Setup Node and Dependencies
+description: Setup Node.js, enable Corepack, and install dependencies
+
+runs:
+  using: "composite"
+  steps:
+    - name: Read Node version from .nvmrc
+      run: echo "NODE_VERSION=$(cat .nvmrc)" >> $GITHUB_ENV
+      shell: bash
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v5
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+      env:
+        SKIP_YARN_COREPACK_CHECK: '1'
+
+    - name: Enable Corepack and prepare Yarn
+      run: |
+        corepack enable
+        corepack prepare yarn@4.9.2 --activate
+      shell: bash
+
+    - name: Install dependencies
+      run: yarn install --immutable
+      shell: bash

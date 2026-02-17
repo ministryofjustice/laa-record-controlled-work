@@ -1,0 +1,92 @@
+name: Publish documentation
+
+on:
+  push:
+    branches:
+      - main
+
+# GITHUB_TOKEN permissions to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow one concurrent deployment
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/ministryofjustice/tech-docs-github-pages-publisher:v6.0.1
+    permissions:
+      contents: read
+    steps:
+      # We only checkout the docs directory, which allows us to keep all necessary files for
+      # generating the docs separate from the app.
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          sparse-checkout: |
+            docs
+          sparse-checkout-cone-mode: false
+      # We move the docs directory to the root so it is treated as if the docs directory was
+      # the only thing in the repository.
+      - name: Move directory to root
+        run: |
+          mv docs/* .
+          rm -rf docs
+      - name: Compile Markdown to HTML and create artifact
+        # Script to deploy is not in the repo, but in this image: `ministryofjustice/tech-docs-github-pages-publisher:v6.0.1`
+        run: |
+          /usr/local/bin/package
+      - name: Upload artifact to be published
+        uses: actions/upload-artifact@v4
+        with:
+          name: github-pages
+          path: artifact.tar
+          retention-days: 1
+          overwrite: true
+
+  deploy:
+    needs: build
+    permissions:
+      pages: write      # to deploy to Pages
+      id-token: write   # to verify the deployment originates from an appropriate source
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Pages
+        uses: actions/configure-pages@v5.0.0
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  # This job checks that all the pages/ images you link to on your documentation site exist and do not return 404s etc.
+  url-check:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download a Build Artifact from build
+        uses: actions/download-artifact@v5
+        with:
+          name: github-pages
+          path: github-pages
+      - name: Unpack files and check URL links
+        run: |
+          cd github-pages
+          tar -xvf artifact.tar
+          npm install linkinator
+          npx linkinator . --recurse --markdown \
+            --skip https://ministryofjustice.github.io/laa-manage-your-civil-cases/images/govuk-large.png \
+            --skip javascripts/govuk_frontend.js \
+            --skip 'http://localhost:.*' \
+            --skip 'https://github.com/ministryofjustice/laa-express-typescript-template/blob/main/source/.*\.md\.erb' \
+            --skip 'https://www.npmjs.com/package/csrf-sync.*'
+            # Skip govuk_frontend.js due to MOJ Docker image template bug:
+            # The tech-docs-github-pages-publisher:v6.0.1 image generates HTML with
+            # <script src="javascripts/govuk_frontend.js"> but doesn't provide the file

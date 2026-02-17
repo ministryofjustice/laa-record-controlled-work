@@ -1,0 +1,119 @@
+---
+title: Getting started
+last_reviewed_on: 2025-10-13
+review_in: 6 weeks
+---
+
+# Getting started
+
+This guide will help you set up and run the LAA Express TypeScript Template locally.
+
+## Prerequisites
+
+- node stable version [24.10.0](https://nodejs.org/en/blog/release/v24.10.0/)
+- [Yarn 4.9.2](https://yarnpkg.com/) package manager (see installation instructions below)
+- TypeScript 5.8.3
+
+### Installing Yarn
+
+This project uses Yarn 4.9.2 managed by corepack (built into Node.js 16.10+). To ensure all team members use the same version, follow these installation steps:
+
+1. **Enable corepack (if not already enabled):**
+
+   ```shell
+   corepack enable
+   ```
+
+2. **Install dependencies:**
+
+   ```shell
+   yarn install
+   ```
+
+3. **Verify the installation:**
+
+   ```shell
+   yarn --version
+   # Should output: 4.9.2
+   ```
+
+**To Note:** 
+
+- Corepack automatically uses the Yarn version specified in the `packageManager` field of `package.json`. No additional setup is required once corepack is enabled
+- Corepack is the preferred `yarn` way, to install the package manager, instead of `npm install -g yarn` in your ci/cd pipeline
+- `yarn install --immutable` ensures that the lockfile (`yarn.lock`) is not modified during the installation process
+
+## Start the application
+
+
+### Set local environment variables
+
+Create your local config file `.env` from the template file:
+
+```shell
+cp .env.example .env
+```
+
+### Align to the Node version specified for this project
+
+If using Node Version Manager (nvm), use the following command to switch to the correct version:
+
+```shell
+nvm use
+nvm install
+```
+
+### Install dependencies and run application for development
+
+```shell
+yarn install
+yarn build
+yarn dev
+```
+
+Then, load [http://localhost:3000/](http://localhost:3000/) in your browser to access the app.
+
+### Install dependencies and run application for production
+```shell
+yarn install
+yarn build
+yarn start
+```
+
+#### Node Version Manager
+
+You may have to tell your local machine to use the latest version of node already installed on your device, before installing and running the application. Use the following command.
+
+```shell
+nvm install node
+```
+
+#### Running locally with docker
+
+Prerequisites, Docker Desktop
+
+- To build the docker image
+
+  ```shell
+  docker build -t your-repo-name:latest .
+  ```
+
+- To run the docker image
+
+  ```shell
+  docker run -d -p 8888:3000 your-repo-name:latest
+  ```
+  (The application should be running at [http://localhost:8888](http://localhost:8888))
+
+- To stop the container
+
+  obtain the container id
+
+  ```shell
+  docker ps
+  ```
+  stop the container
+  
+  ```shell
+  docker stop {container_id}
+  ```

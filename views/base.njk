@@ -1,0 +1,69 @@
+{% extends "govuk/template.njk" %}
+{% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
+
+{% set govukRebrand = true %}
+
+{% block pageTitle %}{{config.SERVICE_NAME}} – GOV.UK{% endblock %}
+
+{% block head %}
+  <link rel="stylesheet" href="/css/{{getAsset('main','css')}}">
+  <meta name="description" content="{{config.SERVICE_NAME}}">
+  <meta name="keywords" content="GOV.UK, govuk, gov, government, uk, frontend, ui, user interface, jinja, python, flask, port, template, templating, macro, component, design system, html, forms, wtf, wtforms, widget, widgets, demo, example">
+  <meta name="author" content="{{config.DEPARTMENT_NAME}}">
+  <script type="module" nonce="{{ cspNonce }}" src="/js/{{getAsset('custom','min.js')}}"></script>
+{% endblock %}
+
+{% block bodyStart %}
+  <script nonce="{{ cspNonce }}">document.body.className += ' js-enabled' + ('noModule' in HTMLScriptElement.prototype ? ' govuk-frontend-supported' : '');</script>
+  {# cookie policy #}
+{% endblock %}
+
+{% block header %}
+  {{ govukHeader({
+    homepageUrl: "#",
+    serviceName: config.SERVICE_NAME,
+    serviceUrl: "#",
+    rebrand: govukRebrand
+  }) }}
+{% endblock %}
+
+{% block beforeContent %}
+  {{ govukPhaseBanner({
+    tag: {
+      text: config.SERVICE_PHASE
+    },
+    html: t('components.phaseBanner.feedbackText') + t('components.phaseBanner.feedbackLinkTextHTML')
+  }) }}
+{% endblock %}
+
+{% block content %}
+  <h1 class="govuk-heading-xl">{{ t('pages.home.defaultHeading') }}</h1>
+{% endblock %}
+
+{% block footer %}
+  {{ govukFooter({
+    rebrand: govukRebrand,
+    meta: {
+      items: [
+        {
+          href: "#",
+          text: t('navigation.footer.accessibility')
+        },
+        {
+          href: "#",
+          text: t('navigation.footer.cookiePolicy')
+        },
+        {
+          href: "#",
+          text: t('navigation.footer.privacyPolicy')
+        }
+      ],
+      html: 'Built by <a href="' + config.DEPARTMENT_URL +'" class="govuk-footer__link">' + config.DEPARTMENT_NAME + '</a>'
+    }
+  }) }}
+{% endblock %}
+
+{% block bodyEnd %}
+  {# Run JavaScript at end of the <body>, to avoid blocking the initial render. #}
+  <script type="module" nonce="{{ cspNonce }}" src="/js/{{getAsset('frontend-packages','min.js')}}"></script>
+{% endblock %}

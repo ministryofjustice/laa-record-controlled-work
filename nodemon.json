@@ -1,0 +1,28 @@
+{
+  "watch": [
+    "public/app.js",
+    "locales/**/*.json"
+  ],
+  "ext": "js,json",
+  "ignore": [
+    "public/assets/**/*",
+    "public/css/**/*",
+    "public/js/**/*",
+    "public/*.map",
+    "public/**/*.map",
+    "public/src/",
+    "public/tests/",
+    "public/types/",
+    "node_modules/",
+    "src/",
+    "*.log",
+    "*.tmp"
+  ],
+  "delay": "5000ms",
+  "debounce": 2000,
+  "verbose": false,
+  "env": {
+    "NODE_ENV": "development"
+  },
+  "exec": "node public/app.js"
+}

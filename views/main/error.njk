@@ -1,0 +1,14 @@
+{% extends "base.njk" %}
+
+{% block pageTitle %}{{ t('pages.error.pageTitle') }}{% endblock %}
+
+{% set mainClasses = "govuk-main-wrapper--l" %}
+
+{% block content %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h1 class="govuk-heading-l">{{ status }}</h1>
+            <p class="govuk-body">{{ error }}</p>
+        </div>
+    </div>
+{% endblock %}

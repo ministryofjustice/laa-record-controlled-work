@@ -1,0 +1,38 @@
+{
+  "reporter": [
+    "text",
+    "lcov",
+    "html"
+  ],
+  "include": [
+    "src/**/*.ts",
+    "routes/**/*.ts",
+    "middleware/**/*.ts",
+    "utils/**/*.ts"
+  ],
+  "exclude": [
+    "playwright.config.ts",
+    "test",
+    "tests",
+    "**/*.d.ts",
+    "**/*.test.ts",
+    "src/scripts/custom.ts",
+    "src/scripts/frontendPackagesEntry.ts",
+    "src/scripts/helpers/index.ts",
+    "src/scripts/pages/yourCases.ts",
+    "middleware/index.ts",
+    "middleware/setupCsrf.ts",
+    "utils/helmetSetup.ts",
+    "utils/rateLimitSetUp.ts",
+    "utils/index.ts",
+    "utils/axiosSetup.ts",
+    "utils/nunjucksSetup.ts" 
+  ],
+  "all": true,
+  "sourceMap": true,
+  "check-coverage": true,
+  "lines": 20,
+  "functions": 60,
+  "branches": 70,
+  "statements": 20
+}
