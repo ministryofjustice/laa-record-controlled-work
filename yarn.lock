@@ -3706,10 +3706,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"govuk-frontend@npm:^5.13.0":
-  version: 5.13.0
-  resolution: "govuk-frontend@npm:5.13.0"
-  checksum: 10c0/af1c1495c9b543b442709a8131f4455019e07cd9eeea31a4a43b098496047d3468ed3c162d9b246b178c4a3d4214f64b85360bceea95406b188b3d42353593d4
+"govuk-frontend@npm:^6.0.0":
+  version: 6.0.0
+  resolution: "govuk-frontend@npm:6.0.0"
+  checksum: 10c0/c06ac65ec25fe6b1b3db39580cd6f8879c3e46f83facfe94daea84ba53c933b465b2eb3ede0861a3211a4d1ac786892dc6b068bd75f2d160f576e426ba959701
   languageName: node
   linkType: hard
 
@@ -4534,7 +4534,7 @@ __metadata:
     figlet: "npm:^1.9.3"
     fs-extra: "npm:^11.3.2"
     globals: "npm:^16.4.0"
-    govuk-frontend: "npm:^5.13.0"
+    govuk-frontend: "npm:^6.0.0"
     helmet: "npm:^8.1.0"
     http-errors: "npm:~2.0.0"
     husky: "npm:^9.1.7"
