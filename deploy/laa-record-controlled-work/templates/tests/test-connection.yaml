@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "laa-record-controlled-work.fullname" . }}-test-connection"
+  labels:
+    {{- include "laa-record-controlled-work.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['{{ include "laa-record-controlled-work.fullname" . }}:{{ .Values.service.port }}']
+  restartPolicy: Never

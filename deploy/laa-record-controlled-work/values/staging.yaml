@@ -1,8 +1,8 @@
-# Default values for your-repo-name.
+# Default values for laa-record-controlled-work.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-# this is set as 2 prior to launch, we should increase this to 5 when the service is launched
+# this is set as 2 prior to launch, we should increase this when the service is launched
 # and we are ready for live users, staging replicaCount should match production
 replicaCount: 2
 
@@ -43,6 +43,29 @@ securityContext:
   seccompProfile:
     type: RuntimeDefault
 
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  hosts:
+    - host: your-staging-namespace.cloud-platform.service.justice.gov.uk
+      paths:
+        - path: /
+          pathType: Prefix
+  annotations:
+    external-dns.alpha.kubernetes.io/set-identifier: "ingress-name-laa-record-controlled-work-laa-record-controlled-work-staging-green"
+    external-dns.alpha.kubernetes.io/aws-weight: "100"
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi
+
 env:
   SERVICE_NAME: "Express TypeScript Template"
   SERVICE_PHASE: "Beta"
@@ -56,30 +79,7 @@ env:
   RATELIMIT_STORAGE_URI: ""
   RATE_LIMIT_MAX: 100
   RATE_WINDOW_MS: 900000
-  NODE_ENV: "production"
-
-ingress:
-  enabled: true
-  hosts:
-    - host: your-production-namespace.cloud-platform.service.justice.gov.uk
-      paths:
-        - path: /
-          pathType: Prefix
-  annotations:
-    external-dns.alpha.kubernetes.io/set-identifier: "ingress-name-your-repo-name-your-repo-name-production-green"
-    external-dns.alpha.kubernetes.io/aws-weight: "100"
-
-service:
-  type: ClusterIP
-  port: 80
-
-resources:
-  limits:
-    cpu: 500m
-    memory: 512Mi
-  requests:
-    cpu: 250m
-    memory: 256Mi
+  NODE_ENV: "staging"
 
 livenessProbe:
   httpGet:
