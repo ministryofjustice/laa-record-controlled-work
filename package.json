@@ -27,7 +27,7 @@
     "node": "24.10.0"
   },
   "dependencies": {
-    "@ministryofjustice/frontend": "^6.0.0",
+    "@ministryofjustice/frontend": "9.0.0-beta.3",
     "axios": "1.13.5",
     "body-parser": "^2.2.2",
     "chalk": "^5.6.2",

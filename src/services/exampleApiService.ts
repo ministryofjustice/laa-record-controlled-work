@@ -58,7 +58,7 @@ export class ExampleApiService extends BaseApiService {
    */
   async getUserById(
     axiosMiddleware: AxiosInstanceWrapper,
-    userId: string | number
+    userId: string[] | string
   ): Promise<AxiosResponse> {
     return await this.get(axiosMiddleware, `/users/${userId}`);
   }
