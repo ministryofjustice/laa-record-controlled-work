@@ -27,7 +27,7 @@ jobs:
       # We only checkout the docs directory, which allows us to keep all necessary files for
       # generating the docs separate from the app.
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           sparse-checkout: |
             docs
@@ -43,7 +43,7 @@ jobs:
         run: |
           /usr/local/bin/package
       - name: Upload artifact to be published
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: github-pages
           path: artifact.tar

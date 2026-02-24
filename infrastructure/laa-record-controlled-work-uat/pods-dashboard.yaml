@@ -2,11 +2,11 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: pods-dashboard
-  namespace: your-repo-name-uat
+  namespace: laa-record-controlled-work-uat
   labels:
     grafana_dashboard: ""
 data:
-  your-repo-name-pods-dashboard.json: |
+  laa-record-controlled-work-pods-dashboard.json: |
     {
       "__inputs": [
         {
@@ -396,8 +396,8 @@ data:
             "allValue": null,
             "current": {
               "selected": false,
-              "text": "your-repo-name-uat",
-              "value": "your-repo-name-uat"
+              "text": "laa-record-controlled-work-uat",
+              "value": "laa-record-controlled-work-uat"
             },
             "datasource": "Prometheus",
             "definition": "label_values(kube_deployment_metadata_generation, namespace)",
@@ -409,7 +409,7 @@ data:
             "options": [],
             "query": "label_values(kube_deployment_metadata_generation, namespace)",
             "refresh": 1,
-            "regex": "/^your-repo-name/",
+            "regex": "/^laa-record-controlled-work/",
             "skipUrlSync": false,
             "sort": 1,
             "tagValuesQuery": "",
@@ -450,7 +450,7 @@ data:
         ]
       },
       "timezone": "browser",
-      "title": "your-repo-name Pods",
-      "uid": "your-uid",
+      "title": "laa-record-controlled-work Pods",
+      "uid": "b1d0fb88-ff1e-4286-b5d2-1bd23d151763,
       "version": 1
     }

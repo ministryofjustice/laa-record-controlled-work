@@ -2,11 +2,11 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: ingress-dashboard
-  namespace: your-repo-name-uat
+  namespace: laa-record-controlled-work-uat
   labels:
     grafana_dashboard: ""
 data:
-  your-repo-name-ingress-dashboard.json: |
+  laa-record-controlled-work-ingress-dashboard.json: |
     {
       "annotations": {
         "list": [
@@ -30,7 +30,7 @@ data:
           }
         ]
       },
-      "description": "your-repo-name Ingress",
+      "description": "laa-record-controlled-work Ingress",
       "editable": true,
       "fiscalYearStartMonth": 0,
       "graphTooltip": 1,
@@ -663,8 +663,8 @@ data:
           {
             "current": {
               "selected": false,
-              "text": "your-repo-name-uat",
-              "value": "your-repo-name-uat"
+              "text": "laa-record-controlled-work-uat",
+              "value": "laa-record-controlled-work-uat"
             },
             "datasource": {
               "type": "prometheus",
@@ -681,7 +681,7 @@ data:
               "refId": "Prometheus-namespace-Variable-Query"
             },
             "refresh": 1,
-            "regex": "/^your-repo-name/",
+            "regex": "/^laa-record-controlled-work/",
             "skipUrlSync": false,
             "sort": 1,
             "tagValuesQuery": "",
@@ -692,8 +692,8 @@ data:
           {
             "current": {
               "selected": false,
-              "text": "your-repo-name",
-              "value": "your-repo-name"
+              "text": "laa-record-controlled-work",
+              "value": "laa-record-controlled-work"
             },
             "datasource": {
               "type": "prometheus",
@@ -749,8 +749,8 @@ data:
         ]
       },
       "timezone": "browser",
-      "title": "your-repo-name Ingress",
-      "uid": "your-uid",
+      "title": "laa-record-controlled-work Ingress",
+      "uid": "442e072e-b9ee-465a-a6a3-6b805708f610",
       "version": 3,
       "weekStart": ""
     }

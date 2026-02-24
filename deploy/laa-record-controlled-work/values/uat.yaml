@@ -1,4 +1,4 @@
-# Default values for your-repo-name.
+# Default values for laa-record-controlled-work.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
@@ -16,7 +16,7 @@ fullnameOverride: ""
 
 serviceAccount:
   create: false
-  # The name of the service account to use.
+  # TODO The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name: "your-github-action-service-account"
 
@@ -53,7 +53,7 @@ ingress:
         - path: /
           pathType: Prefix
   annotations:
-    external-dns.alpha.kubernetes.io/set-identifier: "ingress-name-your-repo-name-your-repo-name-uat-green"
+    external-dns.alpha.kubernetes.io/set-identifier: "ingress-name-laa-record-controlled-work-laa-record-controlled-work-uat-green"
     external-dns.alpha.kubernetes.io/aws-weight: "100"
 
 resources:
@@ -79,7 +79,7 @@ readinessProbe:
   periodSeconds: 60
 
 env:
-  SERVICE_NAME: "Express TypeScript Template"
+  SERVICE_NAME: "LAA Record Controlled Work"
   SERVICE_PHASE: "Beta"
   DEPARTMENT_NAME: "Legal Aid Agency"
   DEPARTMENT_URL: "https://www.gov.uk/government/organisations/legal-aid-agency"
