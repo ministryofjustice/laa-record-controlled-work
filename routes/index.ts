@@ -33,7 +33,8 @@ router.get('/users', async function (req: Request, res: Response, next: NextFunc
 // GET single user by ID (demonstrates BaseApiService pattern)
 router.get('/users/:id', async function (req: Request, res: Response, next: NextFunction) {
 	try {
-		const response = await exampleApiService.getUserById(req.axiosMiddleware, req.params.id);
+		const [userId] = Array.isArray(req.params.id) ? req.params.id : [req.params.id];
+		const response = await exampleApiService.getUserById(req.axiosMiddleware, userId);
 
 		// Template users add their own response handling here
 		res.json(response.data);
@@ -43,15 +44,15 @@ router.get('/users/:id', async function (req: Request, res: Response, next: Next
 });
 
 // liveness and readiness probes for Helm deployments
-router.get('/status', function (req: Request, res: Response): void {
+router.get('/status', function (_req: Request, res: Response): void {
 	res.status(SUCCESSFUL_REQUEST).send('OK');
 });
 
-router.get('/health', function (req: Request, res: Response): void {
+router.get('/health', function (_req: Request, res: Response): void {
 	res.status(SUCCESSFUL_REQUEST).send('Healthy');
 });
 
-router.get('/error', function (req: Request, res: Response): void {
+router.get('/error', function (_req: Request, res: Response): void {
 	// Simulate an error
 	res.set('X-Error-Tag', 'TEST_500_ALERT').status(UNSUCCESSFUL_REQUEST).send('Internal Server Error');
 });
