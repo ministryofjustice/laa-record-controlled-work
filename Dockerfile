@@ -5,7 +5,10 @@ FROM node:25.6.1-alpine
 WORKDIR /app
 
 # Install Corepack and prepare Yarn version
-RUN npm install -g --force corepack && corepack enable && corepack prepare yarn@4.9.2 --activate
+RUN npm install -g npm@11.10.1 && \ 
+    npm install -g --force corepack && \
+    corepack enable && \
+    corepack prepare yarn@4.9.2 --activate
 
 # Copy package.json and yarn.lock to the working directory
 COPY package*.json yarn.lock .yarnrc.yml ./
