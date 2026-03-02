@@ -129,7 +129,6 @@ jobs:
           kube-namespace: ${{ secrets.KUBE_NAMESPACE }}
           session_secret: ${{ secrets.SESSION_SECRET }}
           session_encryption_key: ${{ secrets.SESSION_ENCRYPTION_KEY }}
-          session_name: ${{ vars.SESSION_NAME}}
 
           # service_name: ${{ vars.SERVICE_NAME }}
           # service_phase: ${{ vars.SERVICE_PHASE }}
