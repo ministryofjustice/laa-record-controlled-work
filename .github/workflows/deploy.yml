@@ -43,8 +43,8 @@ jobs:
       - name: Build local Docker image
         working-directory: ${{ github.workspace }}
         run: |
-          docker build -t laa-manage-your-civil-cases ./
-          docker save laa-manage-your-civil-cases -o image.tar
+          docker build -t laa-record-controlled-work ./
+          docker save laa-record-controlled-work -o image.tar
 
       - name: Run Snyk to scan Docker image from tarball
         uses: snyk/actions/docker@master
