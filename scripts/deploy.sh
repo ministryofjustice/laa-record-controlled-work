@@ -19,7 +19,7 @@ deploy_branch() {
                 --set image.tag="$IMAGE_TAG" \
                 --set ingress.annotations."external-dns\.alpha\.kubernetes\.io/set-identifier"="$IDENTIFIER" \
                 --set ingress.hosts[0].host="$RELEASE_HOST" \
-                --set env.SESSION_SECRET="$SESSION_SECRET" \
+                --set env.SESSION_SECRET="$SESSION_SECRET" 
 }
 
 deploy_main() {  
@@ -29,7 +29,7 @@ deploy_main() {
                           --values ./deploy/laa-record-controlled-work/values/"$ENVIRONMENT".yaml \
                           --set image.repository="$REGISTRY/$REPOSITORY" \
                           --set image.tag="$IMAGE_TAG" \
-                          --set env.SESSION_SECRET="$SESSION_SECRET" \
+                          --set env.SESSION_SECRET="$SESSION_SECRET" 
 }
 
 if [[ "$GITHUB_REF_NAME" == "main" ]]; then
