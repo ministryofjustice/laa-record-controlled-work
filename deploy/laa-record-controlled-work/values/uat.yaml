@@ -16,9 +16,8 @@ fullnameOverride: ""
 
 serviceAccount:
   create: false
-  # TODO The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
-  name: "your-github-action-service-account"
+  name: "rcw-github-action-service-account"
 
 podAnnotations: {}
 podLabels: {}
@@ -48,12 +47,12 @@ service:
 ingress:
   enabled: true
   hosts:
-    - host: your-uat-namespace.cloud-platform.service.justice.gov.uk
+    - host: record-controlled-work-uat.cloud-platform.service.justice.gov.uk
       paths:
         - path: /
           pathType: Prefix
   annotations:
-    external-dns.alpha.kubernetes.io/set-identifier: "ingress-name-laa-record-controlled-work-laa-record-controlled-work-uat-green"
+    external-dns.alpha.kubernetes.io/set-identifier: "laa-record-controlled-work-record-controlled-work-uat-green"
     external-dns.alpha.kubernetes.io/aws-weight: "100"
 
 resources:
@@ -84,7 +83,6 @@ env:
   DEPARTMENT_NAME: "Legal Aid Agency"
   DEPARTMENT_URL: "https://www.gov.uk/government/organisations/legal-aid-agency"
   CONTACT_EMAIL: "eligibility@justice.gov.uk"
-  CONTACT_PHONE: ""
   SERVICE_URL: "https://www.gov.uk/legal-aid"
   SESSION_NAME: "sessionId"
   RATELIMIT_HEADERS_ENABLED: true
