@@ -52,7 +52,7 @@ ingress:
         - path: /
           pathType: Prefix
   annotations:
-    external-dns.alpha.kubernetes.io/set-identifier: "laa-record-controlled-work-laa-record-controlled-work-uat-green"
+    external-dns.alpha.kubernetes.io/set-identifier: "laa-record-controlled-work-record-controlled-work-uat-green"
     external-dns.alpha.kubernetes.io/aws-weight: "100"
 
 resources:
