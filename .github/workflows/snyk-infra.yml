@@ -45,22 +45,33 @@ jobs:
           file: infrastructure/
           sarif: snyk-infrastructure.sarif
 
-      - name: Run Snyk to check deploy files for security issues
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+
+      - name: Render Helm templates
+        run: |
+          helm template deploy/laa-record-controlled-work \
+            -f deploy/laa-record-controlled-work/values/uat.yaml \
+            > rendered-values.yaml
+
+      - name: Run Snyk to check Helm manifests for security issues
         continue-on-error: true
         uses: snyk/actions/iac@v1.0.0
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          file: deploy/
+          file: rendered-values.yaml
           sarif: snyk-deploy.sarif
 
       - name: Upload infrastructure results to GitHub Code Scanning
+        if: hashFiles('snyk-infrastructure.sarif') != ''
         uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: snyk-infrastructure.sarif
           category: snyk-infrastructure-check
 
       - name: Upload deploy results to GitHub Code Scanning
+        if: hashFiles('snyk-deploy.sarif') != ''
         uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: snyk-deploy.sarif
