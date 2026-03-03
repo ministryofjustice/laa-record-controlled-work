@@ -65,6 +65,15 @@ jobs:
           # sarif: snyk-deploy.sarif
           args: --sarif-file-output=snyk-deploy.sarif
 
+      - name: Debug
+        run: |
+          echo "pwd:"
+          pwd 
+          echo "files:"
+          ls -la
+          echo "find SARIF files:"
+          find . -name "*.sarif" 2>/dev/null || echo "None found"
+
       - name: Upload infrastructure results to GitHub Code Scanning
         if: hashFiles('snyk-infrastructure.sarif') != ''
         uses: github/codeql-action/upload-sarif@v4
