@@ -43,7 +43,7 @@ jobs:
           # For example `deployment.yaml` for a Kubernetes deployment manifest
           # or `main.tf` for a Terraform configuration file
           file: infrastructure/
-          sarif-file-output: snyk-infrastructure.sarif
+          sarif: snyk-infrastructure.sarif
 
       - name: Run Snyk to check deploy files for security issues
         continue-on-error: true
@@ -52,7 +52,7 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           file: deploy/
-          sarif-file-output: snyk-deploy.sarif
+          sarif: snyk-deploy.sarif
 
       - name: Upload infrastructure results to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@v4
