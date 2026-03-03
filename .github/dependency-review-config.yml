@@ -1,0 +1,18 @@
+# Fail build on vulnerabilities with severity >= moderate
+fail-on-severity: moderate
+
+# Allowed licenses
+allow-licenses:
+  - MIT
+  - Apache-2.0
+  - BSD-3-Clause
+  - ISC
+
+# Denied licenses (GPL variants)
+deny-licenses:
+  - GPL-3.0
+  - AGPL-3.0
+
+# Allow specific packages despite license
+# allow-dependencies-licenses:
+#   - pkg:npm/@example/package
