@@ -58,7 +58,7 @@ jobs:
           # Custom Configurations
           dependency-review-config-file: ".github/config/dependency-review.yml"
           trufflehog-config-file: ".github/config/trufflehog.yml"
-          codeql-config-file: ".github/config/codeql-config.yml"
+          codeql-config-file: ".github/config/codeql.yml"
           codeql-upload-findings: "always"
           # codeql-languages: "javascript,typescript"
           # dependency-check-suppression-file: "dependency-check-suppression.xml"
