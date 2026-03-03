@@ -64,14 +64,12 @@ jobs:
           sarif: snyk-deploy.sarif
 
       - name: Upload infrastructure results to GitHub Code Scanning
-        if: hashFiles('snyk-infrastructure.sarif') != ''
         uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: snyk-infrastructure.sarif
           category: snyk-infrastructure-check
 
       - name: Upload deploy results to GitHub Code Scanning
-        if: hashFiles('snyk-deploy.sarif') != ''
         uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: snyk-deploy.sarif
