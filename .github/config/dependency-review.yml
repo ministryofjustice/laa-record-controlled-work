@@ -9,9 +9,9 @@ allow-licenses:
   - ISC
 
 # Denied licenses (GPL variants)
-deny-licenses:
-  - GPL-3.0
-  - AGPL-3.0
+# deny-licenses:
+#   - GPL-3.0
+#   - AGPL-3.0
 
 # Allow specific packages despite license
 # allow-dependencies-licenses:
