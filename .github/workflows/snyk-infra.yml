@@ -43,7 +43,7 @@ jobs:
           # For example `deployment.yaml` for a Kubernetes deployment manifest
           # or `main.tf` for a Terraform configuration file
           file: infrastructure/
-          # sarif: snyk-infrastructure.sarif
+          sarif: false
           args: --sarif-file-output=snyk-infrastructure.sarif
 
       - name: Set up Helm
@@ -62,7 +62,7 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           file: rendered-values.yaml
-          # sarif: snyk-deploy.sarif
+          sarif: false
           args: --sarif-file-output=snyk-deploy.sarif
 
       - name: Debug
