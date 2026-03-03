@@ -46,3 +46,19 @@ jobs:
         uses: ministryofjustice/devsecops-actions/sca@234ac1dca7bb965417bae451d3ea284a1286d68c # v1.3.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+
+          # Container Scanning
+          docker-images-file: "docker-images.json"
+
+          # Dependency Management
+          renovate: "true"
+          # renovate-version: "43.31.1"
+          node_version: "25.6.1"
+
+          # Custom Configurations
+          dependency-review-config-file: ".github/config/dependency-review.yml"
+          trufflehog-config-file: ".github/config/trufflehog.yml"
+          codeql-config-file: ".github/config/codeql.yml"
+          codeql-upload-findings: "always"
+          # codeql-languages: "javascript,typescript"
+          # dependency-check-suppression-file: "dependency-check-suppression.xml"

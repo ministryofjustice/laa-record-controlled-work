@@ -1,0 +1,13 @@
+# Exclude specific paths
+exclude_paths:
+  - "test/**"
+  - "docs/**"
+  - "*.md"
+
+# Disable specific detectors
+# exclude_detectors:
+#   - detector-name-1
+#   - detector-name-2
+
+# Only scan specific detectors
+only_verified: true
