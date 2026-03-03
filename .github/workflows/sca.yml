@@ -48,7 +48,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
           # Container Scanning
-          docker-images-file: "docker-images.json"
+          docker-images-file: "source.json"
 
           # Dependency Management
           renovate: "true"
