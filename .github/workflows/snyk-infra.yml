@@ -43,7 +43,8 @@ jobs:
           # For example `deployment.yaml` for a Kubernetes deployment manifest
           # or `main.tf` for a Terraform configuration file
           file: infrastructure/
-          sarif: snyk-infrastructure.sarif
+          # sarif: snyk-infrastructure.sarif
+          args: --sarif-file-output=snyk-infrastructure.sarif
 
       - name: Set up Helm
         uses: azure/setup-helm@v4
@@ -61,15 +62,18 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           file: rendered-values.yaml
-          sarif: snyk-deploy.sarif
+          # sarif: snyk-deploy.sarif
+          args: --sarif-file-output=snyk-deploy.sarif
 
       - name: Upload infrastructure results to GitHub Code Scanning
+        if: hashFiles('snyk-infrastructure.sarif') != ''
         uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: snyk-infrastructure.sarif
           category: snyk-infrastructure-check
 
       - name: Upload deploy results to GitHub Code Scanning
+        if: hashFiles('snyk-deploy.sarif') != ''
         uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: snyk-deploy.sarif
