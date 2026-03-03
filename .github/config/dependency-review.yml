@@ -8,6 +8,8 @@ allow-licenses:
   - BSD-3-Clause
   - ISC
 
+comment-summary-in-pr: always
+
 # Denied licenses (GPL variants)
 # deny-licenses:
 #   - GPL-3.0
