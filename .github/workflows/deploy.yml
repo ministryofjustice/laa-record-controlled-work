@@ -129,29 +129,3 @@ jobs:
           kube-namespace: ${{ secrets.KUBE_NAMESPACE }}
           session_secret: ${{ secrets.SESSION_SECRET }}
           session_encryption_key: ${{ secrets.SESSION_ENCRYPTION_KEY }}
-
-          # service_name: ${{ vars.SERVICE_NAME }}
-          # service_phase: ${{ vars.SERVICE_PHASE }}
-          # department_name: ${{ vars.DEPARTMENT_NAME }}
-          # department_url: ${{ vars.DEPARTMENT_URL }}
-          # contact_email: ${{ vars.CONTACT_EMAIL }}
-          # service_url: ${{ vars.SERVICE_URL }}
-          # session_name: ${{ vars.SESSION_NAME}}
-          # ratelimit_headers_enabled: ${{ vars.RATELIMIT_HEADERS_ENABLED }}
-          # ratelimit_storage_uri: ${{ vars.RATELIMIT_STORAGE_URI }}
-          # ratelimit_max: ${{ vars.RATE_LIMIT_MAX }}
-          # ratewindow_ms: ${{ vars.RATE_WINDOW_MS }}
-
-          # require_jar: ${{ vars.REQUIRE_JAR }}
-          # identity_supported: ${{ vars.IDENTITY_SUPPORTED }}
-
-          # oidc_client_id: ${{ secrets.OIDC_CLIENT_ID }}
-          # oidc_private_key: ${{ secrets.OIDC_PRIVATE_KEY }}
-          # oidc_issuer: ${{ vars.OIDC_ISSUER }}
-          # oidc_token_auth_method: ${{ vars.OIDC_TOKEN_AUTH_METHOD }}
-          # oidc_scopes: ${{ vars.OIDC_SCOPES }}
-          # oidc_claims: ${{ vars.OIDC_CLAIMS }}
-          # oidc_authorize_redirect_url: ${{ vars.OIDC_AUTHORIZE_REDIRECT_URL }}
-          # oidc_post_logout_redirect_url: ${{ vars.OIDC_POST_LOGOUT_REDIRECT_URL }}
-          # iv_did_uri: ${{ vars.IV_DID_URI }}
-          # iv_issuer: ${{ vars.IV_ISSUER }}

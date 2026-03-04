@@ -1,5 +1,5 @@
 name: Publish documentation
-
+# TODO sort and set up all publish documentation stuff
 on:
   push:
     branches:
