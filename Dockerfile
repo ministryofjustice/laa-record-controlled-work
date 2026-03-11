@@ -1,10 +1,13 @@
 # Use the official Node.js image as the base image
-FROM node:25.6.1-alpine3.23
+FROM node:25.6.1-alpine
 
 # Set the working directory inside the container
 WORKDIR /app
 
-# Install Corepack and prepare Yarn version and removed npm to avoid vunerablity bundling 
+# Update any vulnerable Alpine packages
+RUN apk update && apk upgrade --no-cache
+
+# Install Corepack and prepare Yarn version and removed npm to avoid vunerablity bundling
 RUN npm install -g --force corepack && \
     corepack enable && \
     corepack prepare yarn@4.9.2 --activate && \
