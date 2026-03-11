@@ -83,8 +83,6 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@c8ad1c5d0f6f39c2bc446b807fa8ea2afadcddb6
-        with:
-          install: true
 
       - name: Cache Docker layers
         uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5
