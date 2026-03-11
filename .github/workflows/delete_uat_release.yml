@@ -19,7 +19,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
     - name: Extract branch name
       id: extract_branch
@@ -44,7 +44,7 @@ jobs:
   
     - name: Authenticate to the cluster
       id: authenticate_to_cluster
-      uses: ministryofjustice/laa-reusable-github-actions/.github/actions/authenticate_to_cluster@d61e0cf24795b75f719a8981a4dc21e1334a1455
+      uses: ministryofjustice/laa-reusable-github-actions/.github/actions/authenticate_to_cluster@4748f3922f8454c48671f7b372e7ce5769812c34
       with:
         kube-cert: ${{ secrets.KUBE_CERT }}
         kube-token: ${{ secrets.KUBE_TOKEN }}
