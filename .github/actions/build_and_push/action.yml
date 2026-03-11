@@ -37,13 +37,15 @@ runs:
     - name: Docker Build & Push with Cache
       id: build_and_push
       run: |
-        docker build \
+        docker buildx build \
           --push \
           --cache-from=type=local,src=/tmp/.buildx-cache \
-          --cache-to=type=local,dest=/tmp/.buildx-cache \
+          --cache-to=type=local,dest=/tmp/.buildx-cache-new \
           -t ${{ inputs.image_registry }}/${{ inputs.image_repo }}:${{ inputs.image_tag }} \
           -f ${{ inputs.dockerfile_path }} .
 
+        rm -rf /tmp/.buildx-cache
+        mv /tmp/.buildx-cache-new /tmp/.buildx-cache
       shell: bash
 
     - name: Output

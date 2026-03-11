@@ -13,7 +13,7 @@ jobs:
       status: ${{ job.status }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           fetch-depth: 0 # Fetch all history for proper change detection
 
@@ -27,7 +27,7 @@ jobs:
         run: yarn playwright install chromium --with-deps
 
       - name: Cache Playwright browsers
-        uses: actions/cache@v5
+        uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5
         with:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-chromium-${{ hashFiles('**/yarn.lock') }}
@@ -53,7 +53,7 @@ jobs:
           RATE_WINDOW_MS: "900000"
       - name: Upload trace artifacts
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
           name: playwright-traces
           path: |
@@ -73,7 +73,7 @@ jobs:
       status: ${{ job.status }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           fetch-depth: 0
 
@@ -81,7 +81,7 @@ jobs:
         run: echo "NODE_VERSION=$(cat .nvmrc)" >> $GITHUB_ENV
 
       - name: Set up Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6
         with:
           node-version: ${{ env.NODE_VERSION }}
         env:
@@ -102,7 +102,7 @@ jobs:
         run: yarn playwright install chromium --with-deps
 
       - name: Cache Playwright browsers
-        uses: actions/cache@v5
+        uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5
         with:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-chromium-${{ hashFiles('**/yarn.lock') }}
@@ -126,7 +126,7 @@ jobs:
 
       - name: Upload Accessibility Report
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
           name: accessibility-report
           path: |

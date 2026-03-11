@@ -16,12 +16,12 @@ jobs:
       actions: read # for github/codeql-action/upload-sarif to get workflow run info
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - name: Run Snyk to check infrastructure files for security issues
         # Snyk can be used to break the build when it detects security issues.
         # In this case we want to upload the issues to GitHub Code Scanning
         continue-on-error: true
-        uses: snyk/actions/iac@v1.0.0
+        uses: snyk/actions/iac@9adf32b1121593767fc3c057af55b55db032dc04 # v1.0.0
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
@@ -30,7 +30,7 @@ jobs:
           args: --sarif-file-output=snyk-infrastructure.sarif
 
       - name: Set up Helm
-        uses: azure/setup-helm@v4
+        uses: azure/setup-helm@1a275c3b69536ee54be43f2070a358922e12c8d4 # v4
 
       - name: Render Helm templates
         run: |
@@ -40,7 +40,7 @@ jobs:
 
       - name: Run Snyk to check Helm manifests for security issues
         continue-on-error: true
-        uses: snyk/actions/iac@v1.0.0
+        uses: snyk/actions/iac@9adf32b1121593767fc3c057af55b55db032dc04 # v1.0.0
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
@@ -49,14 +49,14 @@ jobs:
           args: --sarif-file-output=snyk-deploy.sarif
       - name: Upload infrastructure results to GitHub Code Scanning
         if: hashFiles('snyk-infrastructure.sarif') != ''
-        uses: github/codeql-action/upload-sarif@v4
+        uses: github/codeql-action/upload-sarif@0d579ffd059c29b07949a3cce3983f0780820c98 # v4
         with:
           sarif_file: snyk-infrastructure.sarif
           category: snyk-infrastructure-check
 
       - name: Upload deploy results to GitHub Code Scanning
         if: hashFiles('snyk-deploy.sarif') != ''
-        uses: github/codeql-action/upload-sarif@v4
+        uses: github/codeql-action/upload-sarif@0d579ffd059c29b07949a3cce3983f0780820c98 # v4
         with:
           sarif_file: snyk-deploy.sarif
           category: snyk-deploy-check
