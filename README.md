@@ -10,7 +10,7 @@ View the [full technical documentation here](https://ministryofjustice.github.io
 ## Get Started
 ### Prerequisites
 
-- node stable version [24.10.0](https://nodejs.org/en/blog/release/v24.10.0/)
+- [Node 25.6.1](https://nodejs.org/en/blog/release/v25.6.1/)
 - [Yarn 4.9.2](https://yarnpkg.com/) package manager (see installation instructions below)
 - TypeScript 5.8.3
 
@@ -61,6 +61,12 @@ nvm use
 nvm install
 ```
 
+If using [Mise](https://mise.jdx.dev/), use the following command to switch to the correct version:
+
+```shell
+mise install
+```
+
 #### Install dependencies and run application for development
 
 ```shell
@@ -86,6 +92,53 @@ You may have to tell your local machine to use the latest version of node alread
 nvm install node
 ```
 
+### 1Password CLI Setup
+
+```sh
+brew install 1password-cli
+```
+
+1. Open and unlock the [1Password app](https://1password.com/downloads/).
+2. Select your account or collection at the top of the sidebar.
+3. Navigate to **Settings** > **[Developer](onepassword://settings/developers)**.
+4. Select **Integrate with 1Password CLI**.
+5. If you want to authenticate 1Password CLI with your fingerprint, turn on **[Touch ID](https://support.1password.com/touch-id-mac/)** in the app.
+
+After you've turned on the app integration, enter any command and you'll be prompted to authenticate. For example, run this command to see all the vaults in your account:
+
+```sh
+op vault list
+```
+
+https://developer.1password.com/docs/cli/get-started/
+
+### Update your .env file with secret references
+
+```sh
+MY_SECRET="op://Dev/RCW/MY_SECRET"
+MY_OTHER_SECRET="op://Dev/RCW/MY_OTHER_SECRET"
+```
+
+This is the format
+```
+op://<vault>/<item>[/<section>]/<field-name>?attribute=<attribute-value> 
+```
+ 
+ - **section** and **attribute-value** are both optional dependent on whether you have set them up or not
+
+https://developer.1password.com/docs/cli/secret-reference-syntax#attribute-parameter
+
+### Running your application
+
+now run the following command to intercept the .env file to add the values
+```sh
+op run --env-file=.env -- <command>
+```
+- Command is the command for running your app e.g. rails server, npm run dev etc etc
+- As the 1Password CLI will not print out your environment variables into terminal you can add the **--no-masking** flag for debugging purposes.
+
+https://developer.1password.com/docs/cli/reference/commands/run
+
 ##### Running locally with docker
 
 Prerequisites, Docker Desktop
@@ -93,13 +146,13 @@ Prerequisites, Docker Desktop
 - To build the docker image
 
   ```shell
-  docker build -t your-repo-name:latest .
+  make docker-build
   ```
 
 - To run the docker image
 
   ```shell
-  docker run -d -p 8888:3000 your-repo-name:latest
+  make docker-run
   ```
   (The application should be running at http://localhost:8888)
 
@@ -115,7 +168,8 @@ Prerequisites, Docker Desktop
   ```
 
 ### GitHub Actions
-- These have been disabled in this GitHub template repo. Make sure you enable them when setting up your project. 
+
+[Workflow summaries](.github/workflows/WORKFLOWS_SUMMARIES.md)
 
 ### Licence
 
