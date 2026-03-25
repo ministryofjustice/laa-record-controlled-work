@@ -14,6 +14,18 @@ if (process.env.SESSION_SECRET == null || process.env.SESSION_SECRET === '') {
 if (process.env.SESSION_NAME == null || process.env.SESSION_NAME === '') {
   throw new Error('SESSION_NAME must be defined in environment variables.');
 }
+if (process.env.ENTRA_CLIENT_ID == null || process.env.ENTRA_CLIENT_ID === '') {
+  throw new Error('ENTRA_CLIENT_ID must be defined in environment variables.');
+}
+if (process.env.ENTRA_CLIENT_SECRET == null || process.env.ENTRA_CLIENT_SECRET === '') {
+  throw new Error('ENTRA_CLIENT_SECRET must be defined in environment variables.');
+}
+if (process.env.ENTRA_TENANT_ID == null || process.env.ENTRA_TENANT_ID === '') {
+  throw new Error('ENTRA_TENANT_ID must be defined in environment variables.');
+}
+if (process.env.ENTRA_REDIRECT_URI == null || process.env.ENTRA_REDIRECT_URI === '') {
+  throw new Error('ENTRA_REDIRECT_URI must be defined in environment variables.');
+}
 
 // Get environment variables
 const config: Config = {
@@ -49,6 +61,12 @@ const config: Config = {
   paths: {
     static: 'public',  // Path for serving static files
     views: 'src/views',  // Path for Nunjucks views
+  },
+  entra: {
+    clientId: process.env.ENTRA_CLIENT_ID,
+    clientSecret: process.env.ENTRA_CLIENT_SECRET,
+    tenantId: process.env.ENTRA_TENANT_ID,
+    redirectUri: process.env.ENTRA_REDIRECT_URI,
   }
 };
 

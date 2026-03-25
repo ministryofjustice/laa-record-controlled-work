@@ -14,6 +14,13 @@ export interface CsrfConfig {
 	httpOnly: boolean;
 }
 
+export interface EntraConfig {
+	clientId: string
+	clientSecret: string
+	tenantId: string
+	redirectUri: string
+}
+
 export interface SessionConfig {
 	secret: string;
 	name: string;
@@ -42,4 +49,5 @@ export interface Config {
 	csrf: CsrfConfig;
 	session: SessionConfig;
 	paths: PathsConfig;
+	entra: EntraConfig;
 }

@@ -75,8 +75,8 @@ jobs:
       - name: Set up AWS credentials for ECR and Kubernetes
         uses: aws-actions/configure-aws-credentials@8df5847569e6427dd6c4fb1cf565c83acfa8afa7 # v6.0.0
         with:
-          role-to-assume: ${{ secrets.ECR_ROLE_TO_ASSUME }}
-          aws-region: ${{ vars.ECR_REGION }}
+          role-to-assume: ${{ secrets.RCW_ECR_ROLE_TO_ASSUME }}
+          aws-region: ${{ vars.RCW_ECR_REGION }}
 
       - uses: aws-actions/amazon-ecr-login@fe725d47d3009d901b44f3df285a6dc9d438e63a
         id: login-ecr
@@ -96,7 +96,7 @@ jobs:
         uses: ./.github/actions/build_and_push
         with:
           image_registry: ${{ secrets.ECR_REGISTRY_URL }}
-          image_repo: ${{ vars.ECR_REPOSITORY }}
+          image_repo: ${{ vars.RCW_ECR_REPOSITORY }}
           dockerfile_path: Dockerfile
           image_tag: ${{ github.sha }}
 
@@ -119,7 +119,7 @@ jobs:
         uses: ./.github/actions/deploy
         with:
           app-environment: uat
-          ecr-repository: ${{ vars.ECR_REPOSITORY }}
+          ecr-repository: ${{ vars.RCW_ECR_REPOSITORY }}
           ecr-registry_url: ${{ secrets.ECR_REGISTRY_URL }}
           kube-cert: ${{ secrets.KUBE_CERT }}
           kube-token: ${{ secrets.KUBE_TOKEN }}
