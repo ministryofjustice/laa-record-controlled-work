@@ -10,14 +10,14 @@ const SUCCESSFUL_REQUEST = 200;
 const UNSUCCESSFUL_REQUEST = 500;
 
 /* GET home page. */
-router.get("/", function (req: Request, res: Response): void {
+router.get("/", (req: Request, res: Response): void => {
   res.render("main/index");
 });
 
 // GET users from external API using BaseApiService pattern
 router.get(
   "/users",
-  async function (req: Request, res: Response, next: NextFunction) {
+  async (req: Request, res: Response, next: NextFunction) => {
     try {
       // Use the BaseApiService - returns raw axios response (no domain transformation)
       const response = await exampleApiService.getUsers(req.axiosMiddleware, {
@@ -36,7 +36,7 @@ router.get(
 // GET single user by ID (demonstrates BaseApiService pattern)
 router.get(
   "/users/:id",
-  async function (req: Request, res: Response, next: NextFunction) {
+  async (req: Request, res: Response, next: NextFunction) => {
     try {
       const [userId] = Array.isArray(req.params.id)
         ? req.params.id
@@ -55,15 +55,15 @@ router.get(
 );
 
 // liveness and readiness probes for Helm deployments
-router.get("/status", function (_req: Request, res: Response): void {
+router.get("/status", (_req: Request, res: Response): void => {
   res.status(SUCCESSFUL_REQUEST).send("OK");
 });
 
-router.get("/health", function (_req: Request, res: Response): void {
+router.get("/health", (_req: Request, res: Response): void => {
   res.status(SUCCESSFUL_REQUEST).send("Healthy");
 });
 
-router.get("/error", function (_req: Request, res: Response): void {
+router.get("/error", (_req: Request, res: Response): void => {
   // Simulate an error
   res
     .set("X-Error-Tag", "TEST_500_ALERT")
