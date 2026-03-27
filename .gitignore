@@ -17,6 +17,7 @@ node_modules/
 # LAA Express TypeScript Template
 public/
 .env
+.env.resolved 
 
 # Playwright
 /test-results/

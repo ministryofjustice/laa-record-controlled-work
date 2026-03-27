@@ -2,17 +2,17 @@
  * @description Tests that these utility functions handle error for our API requests
  */
 
-import { strict as assert } from 'assert';
-import sinon from 'sinon';
 import {
+  createProcessedError,
+  extractAndLogError,
   extractErrorMessage,
   isAuthError,
   isForbiddenError,
   isNotFoundError,
   isServerError,
-  createProcessedError,
-  extractAndLogError,
-} from '#src/scripts/helpers/errorHandler.js';
+} from "#src/lib/errorHandler.js";
+import { strict as assert } from "assert";
+import sinon from "sinon";
 
 describe('errorHandler', () => {
   beforeEach(() => {

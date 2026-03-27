@@ -2,8 +2,8 @@
  * @description Tests for the utility function formatDate works as expected
  */
 
-import { expect } from 'chai';
-import { formatDate } from '#src/scripts/helpers/dateFormatter.js';
+import { formatDate } from "#src/lib/dateFormatter.js";
+import { expect } from "chai";
 
 describe('formatDate()', () => {
   it('formats a valid ISO date string correctly', () => {
