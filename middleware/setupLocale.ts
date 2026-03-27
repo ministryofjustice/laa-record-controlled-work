@@ -3,8 +3,8 @@
  * Provides internationalization (i18n) support by injecting locale data into templates
  */
 
-import type { Request, Response, NextFunction } from 'express';
-import { t, type ExpressLocaleLoader } from '#src/scripts/helpers/index.js';
+import { t, type ExpressLocaleLoader } from "#src/lib/index.js";
+import type { NextFunction, Request, Response } from "express";
 
 /**
  * Express middleware to inject locale data into template locals
