@@ -5,5 +5,5 @@
  * authentication support, logging, and error handling.
  */
 
-export { axiosMiddleware, createApiMiddleware } from '#src/middleware/apiMiddleware.js';
-export type { ApiMiddlewareConfig, AuthServiceInterface } from '#src/middleware/apiMiddleware.js';
+export { axiosMiddleware, createApiMiddleware } from '#middleware/apiMiddleware.js';
+export type { ApiMiddlewareConfig, AuthServiceInterface } from '#middleware/apiMiddleware.js';
