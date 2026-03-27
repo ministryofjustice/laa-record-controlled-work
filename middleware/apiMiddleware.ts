@@ -7,11 +7,11 @@
  * Based on MCC's utils/axiosSetup.ts patterns.
  */
 
-import { create } from 'middleware-axios';
-import type { Request, Response, NextFunction } from 'express';
+import { devError, devLog } from "#src/lib/index.js";
 import type { AxiosInstanceWrapper } from '#types/axios-instance-wrapper.js';
-import type { InternalAxiosRequestConfig, AxiosError } from 'axios';
-import { devLog, devError } from '#src/scripts/helpers/index.js';
+import type { AxiosError, InternalAxiosRequestConfig } from "axios";
+import type { NextFunction, Request, Response } from "express";
+import { create } from "middleware-axios";
 
 const DEFAULT_TIMEOUT = 5000;
 const HTTP_UNAUTHORIZED = 401;

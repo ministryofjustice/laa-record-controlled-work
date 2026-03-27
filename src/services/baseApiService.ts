@@ -10,9 +10,9 @@
  * Based on MCC's production-tested patterns from src/services/apiService.ts
  */
 
+import { devLog, extractAndLogError } from "#src/lib/index.js";
 import type { AxiosInstanceWrapper } from '#types/axios-instance-wrapper.js';
-import type { AxiosResponse } from 'axios';
-import { devLog, extractAndLogError } from '#src/scripts/helpers/index.js';
+import type { AxiosResponse } from "axios";
 
 // Constants to avoid magic numbers
 const DEFAULT_TIMEOUT_MS = 5000;

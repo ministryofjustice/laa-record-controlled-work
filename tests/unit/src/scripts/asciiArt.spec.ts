@@ -4,9 +4,9 @@
  * @description Tests for the ASCII art banner display functionality
  */
 
+import { displayConsoleBanner } from "#src/browser/asciiArt.js";
 import { equal, ok } from "assert";
 import sinon from "sinon";
-import { displayConsoleBanner } from "#src/scripts/asciiArt.js";
 
 describe("ASCII Art Banner", () => {
 	let consoleLogStub: sinon.SinonStub;

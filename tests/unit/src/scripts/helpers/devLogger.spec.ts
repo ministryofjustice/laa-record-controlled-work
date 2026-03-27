@@ -2,15 +2,15 @@
  * @description Tests that the utility functions work in the expected environments
  */
 
-import { expect } from 'chai';
-import sinon from 'sinon';
 import {
+  devDebug,
+  devError,
   devLog,
   devWarn,
-  devError,
-  devDebug,
-  isDevelopment
-} from '#src/scripts/helpers/devLogger.js';
+  isDevelopment,
+} from "#src/lib/devLogger.js";
+import { expect } from "chai";
+import sinon from "sinon";
 
 describe('Development Logging Utilities', () => {
   let consoleLogStub: sinon.SinonStub;
