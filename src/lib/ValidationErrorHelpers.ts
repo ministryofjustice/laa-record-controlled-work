@@ -1,4 +1,9 @@
-import type { ValidationError, Result, Meta, Location } from 'express-validator';
+import type {
+  ValidationError,
+  Result,
+  Meta,
+  Location,
+} from "express-validator";
 
 /**
  * Interface for validation error data structure
@@ -22,7 +27,7 @@ export class TypedValidationError extends Error {
    */
   constructor(errorData: ValidationErrorData) {
     super(errorData.summaryMessage);
-    this.name = 'TypedValidationError';
+    this.name = "TypedValidationError";
     this.errorData = errorData;
   }
 }
@@ -33,7 +38,7 @@ export class TypedValidationError extends Error {
  * @returns {boolean} True if value is a record object
  */
 function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 /**
@@ -42,7 +47,10 @@ function isRecord(value: unknown): value is Record<string, unknown> {
  * @param {string} key - Key to check for
  * @returns {boolean} True if object has the property
  */
-function hasProperty(obj: unknown, key: string): obj is Record<string, unknown> {
+function hasProperty(
+  obj: unknown,
+  key: string,
+): obj is Record<string, unknown> {
   return isRecord(obj) && key in obj;
 }
 
@@ -56,7 +64,13 @@ const ZERO_VALUE = 0;
  * @returns {boolean} True if should return empty string
  */
 function shouldReturnEmptyString(value: unknown): boolean {
-  return value === null || value === undefined || value === '' || value === ZERO_VALUE || value === false;
+  return (
+    value === null ||
+    value === undefined ||
+    value === "" ||
+    value === ZERO_VALUE ||
+    value === false
+  );
 }
 
 /**
@@ -67,34 +81,34 @@ function shouldReturnEmptyString(value: unknown): boolean {
 function safeString(value: unknown): string {
   // Handle null, undefined, empty string, zero, and false
   if (shouldReturnEmptyString(value)) {
-    return '';
+    return "";
   }
-  
+
   // Handle string type
-  if (typeof value === 'string') {
+  if (typeof value === "string") {
     return value;
   }
-  
+
   // Handle number and boolean types
-  if (typeof value === 'number' || typeof value === 'boolean') {
+  if (typeof value === "number" || typeof value === "boolean") {
     return String(value);
   }
-  
+
   // Handle objects - avoid unsafe toString operations
-  if (typeof value === 'object' && value !== null) {
+  if (typeof value === "object" && value !== null) {
     // Handle empty objects specifically
     if (Object.keys(value).length === EMPTY_OBJECT_LENGTH) {
-      return '';
+      return "";
     }
-    
+
     // For objects, use JSON.stringify as it's safer than toString
     try {
       return JSON.stringify(value);
     } catch {
-      return '[object Object]';
+      return "[object Object]";
     }
   }
-  
+
   // Fallback to String conversion
   return String(value);
 }
@@ -105,28 +119,32 @@ function safeString(value: unknown): string {
  * @param {ValidationError} error - The express-validator error object
  * @returns {ValidationErrorData} Typed error data object
  */
-export function formatValidationError(error: ValidationError): ValidationErrorData {
+export function formatValidationError(
+  error: ValidationError,
+): ValidationErrorData {
   // Handle TypedValidationError instances
   if (error.msg instanceof TypedValidationError) {
     return error.msg.errorData;
   }
 
   // Handle the case where the error message is already our ValidationErrorData
-  if (isRecord(error.msg) &&
-    hasProperty(error.msg, 'summaryMessage') &&
-    hasProperty(error.msg, 'inlineMessage')) {
+  if (
+    isRecord(error.msg) &&
+    hasProperty(error.msg, "summaryMessage") &&
+    hasProperty(error.msg, "inlineMessage")
+  ) {
     return {
       summaryMessage: safeString(error.msg.summaryMessage),
-      inlineMessage: safeString(error.msg.inlineMessage)
+      inlineMessage: safeString(error.msg.inlineMessage),
     };
   }
 
   // Fallback: treat the message as both summary and inline
   const safeMessage = safeString(error.msg);
-  const message = safeMessage !== '' ? safeMessage : 'Invalid value';
+  const message = safeMessage !== "" ? safeMessage : "Invalid value";
   return {
     summaryMessage: message,
-    inlineMessage: message
+    inlineMessage: message,
   };
 }
 
@@ -140,7 +158,10 @@ export function formatValidationError(error: ValidationError): ValidationErrorDa
  */
 export function createChangeDetectionValidator(
   fieldMappings: Array<{ current: string; original: string }>,
-  errorMessage: { summaryMessage: string | (() => string); inlineMessage: string | (() => string) }
+  errorMessage: {
+    summaryMessage: string | (() => string);
+    inlineMessage: string | (() => string);
+  },
 ): {
   in: Location[];
   custom: {
@@ -149,7 +170,7 @@ export function createChangeDetectionValidator(
   };
 } {
   return {
-    in: ['body'] as Location[],
+    in: ["body"] as Location[],
     custom: {
       /**
        * Schema to check if any of the specified field values have been unchanged.
@@ -159,16 +180,20 @@ export function createChangeDetectionValidator(
        */
       options: (_value: string, meta: Meta): boolean => {
         const { req } = meta;
-        
+
         if (!isRecord(req.body)) {
           return true;
         }
 
         // Check if any field has changed using type-safe property access
         const hasChanges = fieldMappings.some(({ current, original }) => {
-          const currentRaw = hasProperty(req.body, current) ? req.body[current] : '';
-          const originalRaw = hasProperty(req.body, original) ? req.body[original] : '';
-          
+          const currentRaw = hasProperty(req.body, current)
+            ? req.body[current]
+            : "";
+          const originalRaw = hasProperty(req.body, original)
+            ? req.body[original]
+            : "";
+
           // Normalize boolean/checkbox values for comparison
           /**
            * Normalize boolean/checkbox values for consistent comparison between form data and stored values
@@ -178,24 +203,32 @@ export function createChangeDetectionValidator(
           const normalizeBooleanValue = (value: string): string => {
             const stringValue = safeString(value).trim().toLowerCase();
             // Treat empty string, "false", and "off" as falsy (unchecked)
-            if (stringValue === '' || stringValue === 'false' || stringValue === 'off') {
-              return 'false';
+            if (
+              stringValue === "" ||
+              stringValue === "false" ||
+              stringValue === "off"
+            ) {
+              return "false";
             }
             // Treat "on", "true", "1" as truthy (checked)
-            if (stringValue === 'on' || stringValue === 'true' || stringValue === '1') {
-              return 'true';
+            if (
+              stringValue === "on" ||
+              stringValue === "true" ||
+              stringValue === "1"
+            ) {
+              return "true";
             }
             // For non-boolean fields, return the trimmed value as-is
             return stringValue;
           };
-          
+
           const currentValue = normalizeBooleanValue(safeString(currentRaw));
           const originalValue = normalizeBooleanValue(safeString(originalRaw));
           const hasChanged = currentValue !== originalValue;
-          
+
           return hasChanged;
         });
-        
+
         return hasChanges;
       },
       /**
@@ -208,13 +241,14 @@ export function createChangeDetectionValidator(
          * @param {string | (() => string)} val - Value or thunk
          * @returns {string} Resolved string
          */
-        const resolve = (val: string | (() => string)): string => typeof val === 'function' ? val() : val;
+        const resolve = (val: string | (() => string)): string =>
+          typeof val === "function" ? val() : val;
         const summaryMessage = resolve(errorMessage.summaryMessage);
         const inlineMessage = resolve(errorMessage.inlineMessage);
 
         return new TypedValidationError({ summaryMessage, inlineMessage });
-      }
-    }
+      },
+    },
   };
 }
 
@@ -228,35 +262,43 @@ export function formatValidationErrors(validationResult: Result): {
   errorSummaryList: Array<{ text: string; href: string }>;
 } {
   const rawErrors = validationResult.array();
-  
+
   // Format errors using the error formatter
   const formattedErrors = rawErrors.map((error: ValidationError) => {
-    const fieldName = ('path' in error && typeof error.path === 'string') ? error.path : 'unknown';
+    const fieldName =
+      "path" in error && typeof error.path === "string"
+        ? error.path
+        : "unknown";
     const errorData = formatValidationError(error);
-    
+
     return {
       fieldName,
-      ...errorData
+      ...errorData,
     };
   });
-  
+
   // Build input errors object for inline field errors
-  const inputErrors = formattedErrors.reduce<Record<string, string>>((errors, errorItem) => {
-    const { fieldName, inlineMessage } = errorItem;
-    if (inlineMessage.trim() !== '') {
-      errors[fieldName] = inlineMessage;
-    }
-    return errors;
-  }, {});
-  
+  const inputErrors = formattedErrors.reduce<Record<string, string>>(
+    (errors, errorItem) => {
+      const { fieldName, inlineMessage } = errorItem;
+      if (inlineMessage.trim() !== "") {
+        errors[fieldName] = inlineMessage;
+      }
+      return errors;
+    },
+    {},
+  );
+
   // Build error summary list for GOV.UK error summary component
-  const errorSummaryList = formattedErrors.map(({ summaryMessage, fieldName }) => ({
-    text: summaryMessage,
-    href: `#${fieldName}`
-  }));
-  
+  const errorSummaryList = formattedErrors.map(
+    ({ summaryMessage, fieldName }) => ({
+      text: summaryMessage,
+      href: `#${fieldName}`,
+    }),
+  );
+
   return {
     inputErrors,
-    errorSummaryList
+    errorSummaryList,
   };
 }

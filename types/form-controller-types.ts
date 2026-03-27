@@ -1,4 +1,4 @@
-import type { ErrorSummary } from './form-validation.js';
+import type { ErrorSummary } from "./form-validation.js";
 
 /**
  * Represents a form field with its current and existing values
@@ -28,7 +28,7 @@ export interface RenderData {
 export interface FieldConfig {
   field: string;
   path?: string;
-  type?: 'string' | 'boolean' | 'number' | 'array';
+  type?: "string" | "boolean" | "number" | "array";
   currentName?: string;
   keepOriginal?: boolean;
   includeExisting?: boolean;

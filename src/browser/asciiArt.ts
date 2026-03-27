@@ -6,16 +6,16 @@
  * ASCII Art created by: https://patorjk.com/software/taag/#p=display&f=Graffiti&t=Type%20Something%20
  */
 
-import type { DisplayConsoleBannerFunction } from '#types/ascii-art-types.js';
+import type { DisplayConsoleBannerFunction } from "#types/ascii-art-types.js";
 
 /**
  * Messages to display in the console.
  */
 const messages: string[] = [
-    "Welcome to LAA Express TypeScript Template",
-    "Like what you see? Want to work with us?",
-    "View our job availabilities or sign up for alerts:",
-    "{URL link to your departments jobs}" // Update this dynamically if needed
+  "Welcome to LAA Express TypeScript Template",
+  "Like what you see? Want to work with us?",
+  "View our job availabilities or sign up for alerts:",
+  "{URL link to your departments jobs}", // Update this dynamically if needed
 ];
 
 /**
@@ -29,7 +29,7 @@ const getFormattedMessage = (): string => messages.join("\n");
  * @returns {void}
  */
 const displayConsoleBanner: DisplayConsoleBannerFunction = (): void => {
-    console.log(`
+  console.log(`
  _____ _____ _____ 
 | ____|_   _|_   _|
 |  _|   | |   | |  

@@ -4,17 +4,19 @@
  * and {{ t("common.back") }} syntax in Nunjucks templates
  */
 
-import i18next from 'i18next';
-import path from 'node:path';
-import { readFileSync } from 'node:fs';
+import i18next from "i18next";
+import path from "node:path";
+import { readFileSync } from "node:fs";
 
 /**
  * Type guard for locale data
  * @param {unknown} value - The value to check
  * @returns {boolean} True if the value is a valid locale data structure
  */
-function isLocaleData(value: unknown): value is Record<string, Record<string, string>> {
-  return typeof value === 'object' && value !== null;
+function isLocaleData(
+  value: unknown,
+): value is Record<string, Record<string, string>> {
+  return typeof value === "object" && value !== null;
 }
 
 /**
@@ -23,10 +25,10 @@ function isLocaleData(value: unknown): value is Record<string, Record<string, st
  */
 export function initializeI18nextSync(): void {
   try {
-    const localeFile = path.join(process.cwd(), 'locales', 'en.json');
+    const localeFile = path.join(process.cwd(), "locales", "en.json");
 
     try {
-      const localeContent = readFileSync(localeFile, 'utf8');
+      const localeContent = readFileSync(localeFile, "utf8");
       const parsedData: unknown = JSON.parse(localeContent);
 
       // Use type guard
@@ -34,51 +36,51 @@ export function initializeI18nextSync(): void {
 
       // Initialise synchronously (blocks until complete)
       void i18next.init({
-        lng: 'en',
-        fallbackLng: 'en',
-        debug: process.env.NODE_ENV === 'development',
+        lng: "en",
+        fallbackLng: "en",
+        debug: process.env.NODE_ENV === "development",
 
         // Use namespaces from the JSON structure - each top-level key becomes a namespace
         ns: Object.keys(localeData),
-        defaultNS: 'common',
-        nsSeparator: '.', // Use dot instead of colon for namespace separation
-        keySeparator: '.', // Keep dot for nested keys
+        defaultNS: "common",
+        nsSeparator: ".", // Use dot instead of colon for namespace separation
+        keySeparator: ".", // Keep dot for nested keys
 
         interpolation: {
           escapeValue: false, // Modern frameworks handle XSS
-          prefix: '{',
-          suffix: '}',
+          prefix: "{",
+          suffix: "}",
         },
 
         resources: {
-          en: localeData
-        }
+          en: localeData,
+        },
       });
     } catch (fileError) {
-      console.warn('Locale file not found, initializing with empty resources');
+      console.warn("Locale file not found, initializing with empty resources");
       void i18next.init({
-        lng: 'en',
-        fallbackLng: 'en',
+        lng: "en",
+        fallbackLng: "en",
         interpolation: {
           escapeValue: false,
-          prefix: '{',
-          suffix: '}',
+          prefix: "{",
+          suffix: "}",
         },
-        resources: { en: {} }
+        resources: { en: {} },
       });
     }
   } catch (error) {
-    console.error('Failed to initialise i18next synchronously:', error);
+    console.error("Failed to initialise i18next synchronously:", error);
     // Initialise with empty resources as fallback
     void i18next.init({
-      lng: 'en',
-      fallbackLng: 'en',
+      lng: "en",
+      fallbackLng: "en",
       interpolation: {
         escapeValue: false,
-        prefix: '{',
-        suffix: '}',
+        prefix: "{",
+        suffix: "}",
       },
-      resources: { en: {} }
+      resources: { en: {} },
     });
   }
 }
@@ -119,5 +121,7 @@ export interface ExpressLocaleLoader {
  * @param {Record<string, unknown>} [options] - Optional interpolation values
  * @returns {string} The translated string
  */
-export const nunjucksT = (key: string, options?: Record<string, unknown>): string =>
-  t(key, options);
+export const nunjucksT = (
+  key: string,
+  options?: Record<string, unknown>,
+): string => t(key, options);

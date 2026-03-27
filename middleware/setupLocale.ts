@@ -15,10 +15,13 @@ import type { NextFunction, Request, Response } from "express";
  * @param {NextFunction} next - Express next function
  * @returns {void}
  */
-export function setupLocaleMiddleware(req: Request, res: Response, next: NextFunction): void {
-
+export function setupLocaleMiddleware(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): void {
   const localeData: ExpressLocaleLoader = {
-    t
+    t,
   };
 
   const { t: localeT } = localeData;
