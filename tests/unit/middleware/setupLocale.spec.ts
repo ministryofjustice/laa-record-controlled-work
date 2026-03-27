@@ -3,9 +3,9 @@
  */
 
 import { setupLocaleMiddleware } from '#middleware/setupLocale.js';
-import { initializeI18nextSync } from '#src/scripts/helpers/index.js';
+import { initializeI18nextSync } from "#src/lib/index.js";
 import { expect } from 'chai';
-import type { Request, Response, NextFunction } from 'express';
+import type { NextFunction, Request, Response } from "express";
 
 describe('setupLocaleMiddleware', () => {
   before(() => {

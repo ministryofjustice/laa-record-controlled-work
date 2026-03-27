@@ -39,6 +39,8 @@ export default [
       jsdoc: jsdocPlugin
     },
     rules: {
+      'require-unicode-regexp': 'off', // Don't require v flag on regexes
+      'prefer-named-capture-group': 'off', // Don't require named capture groups
       'indent': 'off', // Prettier is handling this
       'linebreak-style': 'off', // Prettier is handling this
       'quotes': 'off', // Prettier is handling this

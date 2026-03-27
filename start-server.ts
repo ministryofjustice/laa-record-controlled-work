@@ -29,7 +29,7 @@ let livereloadServer: ReturnType<typeof livereload.createServer> | null = null; 
  */
 const startServer = (port: number): void => {
 	// If there's an existing server process, kill it
-	if ((serverProcess != null)) {
+	if ((serverProcess !== null)) {
 		serverProcess.kill();
 		serverProcess = null;
 	}
@@ -99,7 +99,7 @@ const start = async (): Promise<void> => {
 				try {
 					await build();
 					// Refresh livereload server
-					if (livereloadServer != null) {
+					if (livereloadServer !== null) {
 						livereloadServer.refresh('/');
 					}
 					// Restart the server

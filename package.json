@@ -85,7 +85,7 @@
     "esbuild": "^0.27.3",
     "esbuild-plugin-copy": "^2.1.1",
     "esbuild-sass-plugin": "^3.6.0",
-    "eslint": "^10.0.2",
+    "eslint": "^10.1.0",
     "eslint-config-love": "^151.0.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-jsdoc": "^62.7.1",
@@ -117,5 +117,9 @@
   "lint-staged": {
     "*.{js,ts}": "eslint --fix"
   },
-  "packageManager": "yarn@4.12.0"
+  "packageManager": "yarn@4.12.0",
+  "resolutions": {
+    "@isaacs/brace-expansion": "5.0.5",
+    "brace-expansion": "5.0.5"
+  }
 }
