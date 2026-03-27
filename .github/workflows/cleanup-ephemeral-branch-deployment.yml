@@ -1,4 +1,4 @@
-name: Delete UAT release
+name: Cleanup Ephemeral Branch Deployment
 
 on:
   pull_request:
@@ -6,7 +6,7 @@ on:
       - closed
 
 jobs:
-  delete_uat_job:
+  cleanup_ephemeral_deployment:
     runs-on: ubuntu-latest
     environment: uat
     # Update this to true if there is a DB and you have PVCs
@@ -51,7 +51,7 @@ jobs:
         kube-cluster: ${{ secrets.KUBE_CLUSTER }}
         kube-namespace: ${{ secrets.KUBE_NAMESPACE }}
 
-    - name: Delete UAT release
+    - name: Delete ephemeral branch deployment
       id: delete_release
       shell: bash
       run: |
