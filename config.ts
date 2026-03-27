@@ -1,5 +1,5 @@
-import dotenv from "dotenv";
 import type { Config } from "#types/config-types.js";
+import dotenv from "dotenv";
 dotenv.config();
 
 const DEFAULT_RATE_LIMIT_MAX = 100;
@@ -8,10 +8,13 @@ const MILLISECONDS_IN_A_MINUTE = 60000;
 const DEFAULT_PORT = 3000;
 
 // Validate required session env vars
-if (process.env.SESSION_SECRET == null || process.env.SESSION_SECRET === "") {
+if (
+  process.env.SESSION_SECRET === undefined ||
+  process.env.SESSION_SECRET === ""
+) {
   throw new Error("SESSION_SECRET must be defined in environment variables.");
 }
-if (process.env.SESSION_NAME == null || process.env.SESSION_NAME === "") {
+if (process.env.SESSION_NAME === undefined || process.env.SESSION_NAME === "") {
   throw new Error("SESSION_NAME must be defined in environment variables.");
 }
 
