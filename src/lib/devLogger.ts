@@ -10,7 +10,10 @@
  * @param {string} message Log message to output in development mode
  */
 export function devLog(message: string): void {
-  if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === undefined) {
+  if (
+    process.env.NODE_ENV === "development" ||
+    process.env.NODE_ENV === undefined
+  ) {
     console.log(message);
   }
 }
@@ -20,7 +23,10 @@ export function devLog(message: string): void {
  * @param {string} message Warning message to output in development mode
  */
 export function devWarn(message: string): void {
-  if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === undefined) {
+  if (
+    process.env.NODE_ENV === "development" ||
+    process.env.NODE_ENV === undefined
+  ) {
     console.warn(message);
   }
 }
@@ -30,7 +36,10 @@ export function devWarn(message: string): void {
  * @param {string} message Error message to output in development mode
  */
 export function devError(message: string): void {
-  if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === undefined) {
+  if (
+    process.env.NODE_ENV === "development" ||
+    process.env.NODE_ENV === undefined
+  ) {
     console.error(message);
   }
 }
@@ -40,7 +49,10 @@ export function devError(message: string): void {
  * @param {string} message Debug message to output in development mode
  */
 export function devDebug(message: string): void {
-  if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === undefined) {
+  if (
+    process.env.NODE_ENV === "development" ||
+    process.env.NODE_ENV === undefined
+  ) {
     console.debug(message);
   }
 }
@@ -50,5 +62,7 @@ export function devDebug(message: string): void {
  * @returns {boolean} True if in development mode
  */
 export function isDevelopment(): boolean {
-  return process.env.NODE_ENV === 'development' || process.env.NODE_ENV === undefined;
+  return (
+    process.env.NODE_ENV === "development" || process.env.NODE_ENV === undefined
+  );
 }

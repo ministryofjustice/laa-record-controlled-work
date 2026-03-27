@@ -5,13 +5,13 @@
  * and TypedValidationError for GOV.UK Design System error formatting.
  */
 
-import { describe, it, before } from 'mocha';
-import { expect } from 'chai';
-import { validatePerson } from '#src/middlewares/personSchema.js';
-import { validationResult } from 'express-validator';
-import { formatValidationError } from '#src/helpers/ValidationErrorHelpers.js';
-import { initializeI18nextSync } from '#src/scripts/helpers/i18nLoader.js';
+import { validatePerson } from "#src/controllers/personSchema.js";
+import { formatValidationError } from "#src/lib/ValidationErrorHelpers.js";
+import { initializeI18nextSync } from "#src/lib/i18nLoader.js";
+import { expect } from "chai";
 import type { Request } from 'express';
+import { validationResult } from "express-validator";
+import { before, describe, it } from "mocha";
 
 // Mock Express request object for testing
 function createMockRequest(bodyData: Record<string, unknown>) {

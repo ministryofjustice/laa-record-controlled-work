@@ -1,5 +1,5 @@
-import type { Application, Request, Response, NextFunction } from 'express';
-import config from '#config.js';
+import type { Application, Request, Response, NextFunction } from "express";
+import config from "#config.js";
 
 /**
  * Middleware setup function to attach configuration settings to response locals.
@@ -15,7 +15,11 @@ export const setupConfig = (app: Application): void => {
    * @param {Response} res - The Express response object.
    * @param {NextFunction} next - The next middleware function in the stack.
    */
-  const configMiddleware = (req: Request, res: Response, next: NextFunction): void => {
+  const configMiddleware = (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): void => {
     res.locals.config = config;
     next();
   };

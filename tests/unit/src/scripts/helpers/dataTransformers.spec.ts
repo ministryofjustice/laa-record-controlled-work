@@ -2,14 +2,14 @@
  * @description Tests for the utility functions in dataTransformers work as expected
  */
 
-import { expect } from 'chai';
 import {
-  safeString,
-  safeOptionalString,
+  hasProperty,
   isRecord,
+  safeOptionalString,
+  safeString,
   safeStringFromRecord,
-  hasProperty
-} from '#src/scripts/helpers/dataTransformers.js';
+} from "#src/lib/dataTransformers.js";
+import { expect } from "chai";
 
 describe('Data Transformation Helpers', () => {
 

@@ -2,10 +2,10 @@
  * @description Test that ASCII Art banner displays on application startup
  */
 
-import { displayAsciiBanner } from '#utils/displayAsciiBanner.js';
-import { strict as assert } from 'assert';
-import sinon from 'sinon';
+import { displayAsciiBanner } from "#bootstrap/displayAsciiBanner.js";
+import { strict as assert } from "assert";
 import figlet from 'figlet';
+import sinon from "sinon";
 
 describe('displayAsciiBanner', () => {
   let consoleLogStub: sinon.SinonStub;

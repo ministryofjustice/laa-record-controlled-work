@@ -1,17 +1,17 @@
 // Configuration type definitions
 
 export interface AppConfig {
-	port: number;
-	environment: string;
-	appName: string;
-	useHttps: boolean;
-	// Add any other app configuration properties
+  port: number;
+  environment: string;
+  appName: string;
+  useHttps: boolean;
+  // Add any other app configuration properties
 }
 
 export interface CsrfConfig {
-	cookieName: string;
-	secure: boolean;
-	httpOnly: boolean;
+  cookieName: string;
+  secure: boolean;
+  httpOnly: boolean;
 }
 
 export interface EntraConfig {
@@ -22,15 +22,15 @@ export interface EntraConfig {
 }
 
 export interface SessionConfig {
-	secret: string;
-	name: string;
-	resave: boolean;
-	saveUninitialized: boolean;
+  secret: string;
+  name: string;
+  resave: boolean;
+  saveUninitialized: boolean;
 }
 
 export interface PathsConfig {
-	static: string;
-	views: string;
+  static: string;
+  views: string;
 }
 
 export interface Config {
