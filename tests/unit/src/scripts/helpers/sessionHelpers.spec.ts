@@ -19,7 +19,7 @@ import {
   getSessionData,
   clearSessionData,
   storeOriginalFormData
-} from '../../../src/scripts/helpers/sessionHelpers.js';
+} from '#src/scripts/helpers/sessionHelpers.js';
 
 // Mock request factory with session
 function createMockRequest(sessionData: Record<string, any> = {}): Request {
