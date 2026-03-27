@@ -56,7 +56,7 @@ function safeDateOfBirth(value: unknown): { day: string; month: string; year: st
  */
 function getCurrentPersonData(req: Request): typeof DEFAULT_PERSON_DATA {
   const sessionData = getSessionData(req, 'currentPerson');
-  if (sessionData != null) {
+  if (sessionData !== null) {
     return {
       fullName: safeStringValue(sessionData.fullName, DEFAULT_PERSON_DATA.fullName),
       address: safeStringValue(sessionData.address, DEFAULT_PERSON_DATA.address),
