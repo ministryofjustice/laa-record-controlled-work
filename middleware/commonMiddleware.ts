@@ -1,8 +1,8 @@
-import type { Application } from 'express';
-import express from 'express';
-import cookieParser from 'cookie-parser';
-import bodyParser from 'body-parser';
-import config from '../config.js';
+import type { Application } from "express";
+import express from "express";
+import cookieParser from "cookie-parser";
+import bodyParser from "body-parser";
+import config from "../config.js";
 
 /**
  * Sets up common middlewares for the given Express application.
