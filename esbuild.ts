@@ -5,12 +5,12 @@ import { sassPlugin } from "esbuild-sass-plugin";
 import fs from "fs-extra";
 import { builtinModules } from "node:module";
 import path from "node:path";
-import { getBuildNumber } from "./bootstrap/buildHelper.js";
+import { generateBuildNumber } from "./bootstrap/assetFingerprint.js";
 import type { SassPluginOptions } from "./types/sass-plugin-types.js";
 
 // Load environment variables
 dotenv.config();
-const buildNumber = getBuildNumber();
+const buildNumber = generateBuildNumber();
 const NO_MORE_ASYNC_OPERATIONS = 0;
 const UNCAUGHT_FATAL_EXCEPTION = 1;
 const SECOND_IN_ARRAY = 1;
