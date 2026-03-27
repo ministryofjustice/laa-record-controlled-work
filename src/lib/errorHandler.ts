@@ -1,6 +1,6 @@
 /**
  * Error Handler Utility
- * 
+ *
  * Provides comprehensive error handling for API requests including:
  * - HTTP status code mapping to user-friendly messages
  * - Network error handling
@@ -8,7 +8,7 @@
  * - Structured logging
  */
 
-import { devError } from './index.js';
+import { devError } from "./index.js";
 
 // HTTP Status Code Constants
 const HTTP_BAD_REQUEST = 400;
@@ -27,16 +27,18 @@ const HTTP_GATEWAY_TIMEOUT = 504;
  * @param {unknown} error - Error to check
  * @returns {boolean} True if error is an Axios error with response
  */
-function isAxiosError(error: unknown): error is { response: { status: number; data?: unknown; statusText?: string } } {
+function isAxiosError(error: unknown): error is {
+  response: { status: number; data?: unknown; statusText?: string };
+} {
   return (
     error !== null &&
     error !== undefined &&
-    typeof error === 'object' &&
-    'response' in error &&
+    typeof error === "object" &&
+    "response" in error &&
     error.response !== null &&
-    typeof error.response === 'object' &&
-    'status' in error.response &&
-    typeof (error.response as { status: unknown }).status === 'number'
+    typeof error.response === "object" &&
+    "status" in error.response &&
+    typeof (error.response as { status: unknown }).status === "number"
   );
 }
 
@@ -45,13 +47,15 @@ function isAxiosError(error: unknown): error is { response: { status: number; da
  * @param {unknown} error - Error to check
  * @returns {boolean} True if error is a network error
  */
-function isNetworkError(error: unknown): error is { code: string; message?: string } {
+function isNetworkError(
+  error: unknown,
+): error is { code: string; message?: string } {
   return (
     error !== null &&
     error !== undefined &&
-    typeof error === 'object' &&
-    'code' in error &&
-    typeof (error as { code: unknown }).code === 'string'
+    typeof error === "object" &&
+    "code" in error &&
+    typeof (error as { code: unknown }).code === "string"
   );
 }
 
@@ -63,25 +67,25 @@ function isNetworkError(error: unknown): error is { code: string; message?: stri
 function getHttpErrorMessage(status: number): string {
   switch (status) {
     case HTTP_BAD_REQUEST:
-      return 'Invalid request. Please check your input and try again.';
+      return "Invalid request. Please check your input and try again.";
     case HTTP_UNAUTHORIZED:
-      return 'Authentication failed. Please log in again.';
+      return "Authentication failed. Please log in again.";
     case HTTP_FORBIDDEN:
-      return 'You do not have permission to access this resource.';
+      return "You do not have permission to access this resource.";
     case HTTP_NOT_FOUND:
-      return 'The requested information could not be found.';
+      return "The requested information could not be found.";
     case HTTP_REQUEST_TIMEOUT:
-      return 'Request timed out. Please try again.';
+      return "Request timed out. Please try again.";
     case HTTP_TOO_MANY_REQUESTS:
-      return 'Too many requests. Please wait a moment and try again.';
+      return "Too many requests. Please wait a moment and try again.";
     case HTTP_INTERNAL_SERVER_ERROR:
-      return 'Internal server error. Please try again later.';
+      return "Internal server error. Please try again later.";
     case HTTP_BAD_GATEWAY:
-      return 'Service temporarily unavailable. Please try again later.';
+      return "Service temporarily unavailable. Please try again later.";
     case HTTP_SERVICE_UNAVAILABLE:
-      return 'Service unavailable. Please try again later.';
+      return "Service unavailable. Please try again later.";
     case HTTP_GATEWAY_TIMEOUT:
-      return 'Request timed out. Please try again later.';
+      return "Request timed out. Please try again later.";
     default:
       return `Service error (${status}). Please try again later.`;
   }
@@ -94,16 +98,16 @@ function getHttpErrorMessage(status: number): string {
  */
 function getNetworkErrorMessage(code: string): string {
   switch (code) {
-    case 'ECONNREFUSED':
-      return 'Unable to connect to the service. Please try again later.';
-    case 'ENOTFOUND':
-      return 'Service not found. Please check your connection and try again.';
-    case 'ETIMEDOUT':
-      return 'Request timed out. Please try again.';
-    case 'ECONNRESET':
-      return 'Connection was reset. Please try again.';
+    case "ECONNREFUSED":
+      return "Unable to connect to the service. Please try again later.";
+    case "ENOTFOUND":
+      return "Service not found. Please check your connection and try again.";
+    case "ETIMEDOUT":
+      return "Request timed out. Please try again.";
+    case "ECONNRESET":
+      return "Connection was reset. Please try again.";
     default:
-      return 'Network error. Please check your connection and try again.';
+      return "Network error. Please check your connection and try again.";
   }
 }
 
@@ -113,9 +117,16 @@ function getNetworkErrorMessage(code: string): string {
  * @returns {string | null} Extracted message or null
  */
 function extractResponseMessage(data: unknown): string | null {
-  if (data !== null && data !== undefined && typeof data === 'object' && 'message' in data) {
+  if (
+    data !== null &&
+    data !== undefined &&
+    typeof data === "object" &&
+    "message" in data
+  ) {
     const responseData = data as { message: unknown };
-    return typeof responseData.message === 'string' ? responseData.message : null;
+    return typeof responseData.message === "string"
+      ? responseData.message
+      : null;
   }
   return null;
 }
@@ -129,7 +140,9 @@ export function extractErrorMessage(error: unknown): string {
   // Handle Axios errors with response
   if (isAxiosError(error)) {
     const { response } = error;
-    devError(`API HTTP Error ${response.status}: ${response.statusText ?? 'Unknown'}`);
+    devError(
+      `API HTTP Error ${response.status}: ${response.statusText ?? "Unknown"}`,
+    );
 
     // Try to extract error message from response data
     const responseMessage = extractResponseMessage(response.data);
@@ -149,18 +162,18 @@ export function extractErrorMessage(error: unknown): string {
   // Handle standard Error objects
   if (error instanceof Error) {
     devError(`Error: ${error.message}`);
-    return 'An unexpected error occurred. Please try again.';
+    return "An unexpected error occurred. Please try again.";
   }
 
   // Handle string errors
-  if (typeof error === 'string') {
+  if (typeof error === "string") {
     devError(`String Error: ${error}`);
-    return 'An error occurred. Please try again.';
+    return "An error occurred. Please try again.";
   }
 
   // Fallback for unknown error types
   devError(`Unknown Error: ${String(error)}`);
-  return 'An unexpected error occurred. Please try again.';
+  return "An unexpected error occurred. Please try again.";
 }
 
 /**
@@ -206,7 +219,9 @@ export function isNotFoundError(error: unknown): boolean {
  * @returns {boolean} True if error is a server error
  */
 export function isServerError(error: unknown): boolean {
-  return isAxiosError(error) && error.response.status >= HTTP_INTERNAL_SERVER_ERROR;
+  return (
+    isAxiosError(error) && error.response.status >= HTTP_INTERNAL_SERVER_ERROR
+  );
 }
 
 /**
@@ -215,17 +230,20 @@ export function isServerError(error: unknown): boolean {
  * @param {string} context - Context description for logging (e.g., "loading cases", "fetching client details")
  * @returns {Error} Processed error with user-friendly message
  */
-export function createProcessedError(originalError: unknown, context: string): Error {
+export function createProcessedError(
+  originalError: unknown,
+  context: string,
+): Error {
   // Extract user-friendly message
   const userFriendlyMessage = extractErrorMessage(originalError);
-  
+
   // Log the error with context
   devError(`Error ${context}: ${userFriendlyMessage}`);
-  
+
   // Create processed error with user-friendly message
   const processedError = new Error(userFriendlyMessage);
   processedError.cause = originalError; // Preserve original error for debugging
-  
+
   return processedError;
 }
 

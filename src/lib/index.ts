@@ -14,8 +14,8 @@ export {
   devWarn,
   devError,
   devDebug,
-  isDevelopment
-} from './devLogger.js';
+  isDevelopment,
+} from "./devLogger.js";
 
 // Data transformation utilities
 export {
@@ -32,14 +32,11 @@ export {
   safeNestedField,
   extractCurrentFields,
   normaliseSelectedCheckbox,
-  isYes
-} from './dataTransformers.js';
+  isYes,
+} from "./dataTransformers.js";
 
 // Date formatting utilities
-export {
-  formatDate,
-  dateStringFromThreeFields
-} from './dateFormatter.js';
+export { formatDate, dateStringFromThreeFields } from "./dateFormatter.js";
 
 // Session helpers
 export {
@@ -47,16 +44,16 @@ export {
   getSessionData,
   clearSessionData,
   clearAllOriginalFormData,
-  storeOriginalFormData
-} from './sessionHelpers.js';
+  storeOriginalFormData,
+} from "./sessionHelpers.js";
 
 export {
   initializeI18nextSync,
   i18next,
   t,
   nunjucksT,
-  type ExpressLocaleLoader
-} from './i18nLoader.js';
+  type ExpressLocaleLoader,
+} from "./i18nLoader.js";
 
 // Error handling utilities
 export {
@@ -68,4 +65,4 @@ export {
   isServerError,
   createProcessedError,
   extractAndLogError,
-} from './errorHandler.js';
+} from "./errorHandler.js";

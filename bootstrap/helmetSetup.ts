@@ -3,10 +3,10 @@
  *
  * @param {import('express').Application} app - The Express application instance.
  */
-import helmet from 'helmet';
-import crypto from 'node:crypto';
-import type { Request, Response, NextFunction, Application } from 'express';
-import type { IncomingMessage, ServerResponse } from 'node:http';
+import helmet from "helmet";
+import crypto from "node:crypto";
+import type { Request, Response, NextFunction, Application } from "express";
+import type { IncomingMessage, ServerResponse } from "node:http";
 
 const RANDOMBYTES = 16;
 
@@ -17,8 +17,12 @@ const RANDOMBYTES = 16;
  * @param {Response} res - Express response object.
  * @param {NextFunction} next - Express next function.
  */
-export const nonceMiddleware = (req: Request, res: Response, next: NextFunction): void => {
-  res.locals.cspNonce = crypto.randomBytes(RANDOMBYTES).toString('base64'); // Generate a secure random nonce
+export const nonceMiddleware = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): void => {
+  res.locals.cspNonce = crypto.randomBytes(RANDOMBYTES).toString("base64"); // Generate a secure random nonce
   next();
 };
 
@@ -40,12 +44,19 @@ export const helmetSetup = (app: Application): void => {
             // Dynamic nonce function for CSP - using the correct helmet function signature
             (req: IncomingMessage, res: ServerResponse) => {
               // Type guard to check if res has locals property (Express response)
-              if ('locals' in res && typeof res.locals === 'object' && res.locals !== null) {
-                const cspNonce = 'cspNonce' in res.locals ? res.locals.cspNonce : undefined;
-                return typeof cspNonce === 'string' ? `'nonce-${cspNonce}'` : "'unsafe-inline'";
+              if (
+                "locals" in res &&
+                typeof res.locals === "object" &&
+                res.locals !== null
+              ) {
+                const cspNonce =
+                  "cspNonce" in res.locals ? res.locals.cspNonce : undefined;
+                return typeof cspNonce === "string"
+                  ? `'nonce-${cspNonce}'`
+                  : "'unsafe-inline'";
               }
               return "'unsafe-inline'";
-            }
+            },
           ],
           styleSrc: ["'self'", "'unsafe-inline'"], // Allow inline styles if needed
           fontSrc: ["'self'", "data:"], // Allow data: URIs for fonts
@@ -57,8 +68,8 @@ export const helmetSetup = (app: Application): void => {
           formAction: ["'self'"], // Restrict form submissions
           baseUri: ["'self'"], // Restrict base URI
           upgradeInsecureRequests: [], // Upgrade HTTP to HTTPS
-        }
-      }
-    })
+        },
+      },
+    }),
   );
 };
