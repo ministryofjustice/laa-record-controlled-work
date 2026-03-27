@@ -11,15 +11,15 @@
  * Shows patterns for testing form data storage and retrieval.
  */
 
-import { describe, it, beforeEach } from 'mocha';
+import {
+  clearSessionData,
+  getSessionData,
+  storeOriginalFormData,
+  storeSessionData,
+} from "#src/lib/sessionHelpers.js";
 import { expect } from 'chai';
 import type { Request } from 'express';
-import {
-  storeSessionData,
-  getSessionData,
-  clearSessionData,
-  storeOriginalFormData
-} from '#src/scripts/helpers/sessionHelpers.js';
+import { describe, it } from "mocha";
 
 // Mock request factory with session
 function createMockRequest(sessionData: Record<string, any> = {}): Request {

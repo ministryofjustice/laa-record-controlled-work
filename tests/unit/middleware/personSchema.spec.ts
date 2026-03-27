@@ -6,8 +6,8 @@
  */
 
 import { validatePerson } from "#src/controllers/personSchema.js";
-import { formatValidationError } from "#src/scripts/helpers/ValidationErrorHelpers.js";
-import { initializeI18nextSync } from '#src/scripts/helpers/i18nLoader.js';
+import { formatValidationError } from "#src/lib/ValidationErrorHelpers.js";
+import { initializeI18nextSync } from "#src/lib/i18nLoader.js";
 import { expect } from "chai";
 import type { Request } from 'express';
 import { validationResult } from "express-validator";

@@ -1,4 +1,4 @@
-import { nunjucksT } from "#src/scripts/helpers/index.js";
+import { nunjucksT } from "#src/lib/index.js";
 import type { Application } from "express";
 import path from "node:path";
 import nunjucks from "nunjucks";

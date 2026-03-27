@@ -1,12 +1,12 @@
-import type { NextFunction, Request, Response } from "express";
-import { validationResult } from "express-validator";
-import { extractFormFields } from "#src/scripts/helpers/dataTransformers.js";
+import { extractFormFields } from "#src/lib/dataTransformers.js";
 import {
   getSessionData,
   storeOriginalFormData,
   storeSessionData,
-} from "#src/scripts/helpers/sessionHelpers.js";
-import { formatValidationErrors } from "#src/scripts/helpers/ValidationErrorHelpers.js";
+} from "#src/lib/sessionHelpers.js";
+import { formatValidationErrors } from "#src/lib/ValidationErrorHelpers.js";
+import type { NextFunction, Request, Response } from "express";
+import { validationResult } from "express-validator";
 
 // Extend Request interface for CSRF token support
 interface RequestWithCSRF extends Request {

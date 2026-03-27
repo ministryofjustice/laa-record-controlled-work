@@ -13,7 +13,7 @@ import {
   setupMiddlewares,
 } from "#middleware/index.js";
 import indexRouter from "#routes/index.js";
-import { initializeI18nextSync } from "#src/scripts/helpers/index.js";
+import { initializeI18nextSync } from "#src/lib/index.js";
 import chalk from "chalk";
 import compression from "compression";
 import livereload from "connect-livereload";

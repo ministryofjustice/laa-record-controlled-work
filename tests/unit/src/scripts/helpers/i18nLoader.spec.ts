@@ -2,16 +2,16 @@
  * @description Test for i18nLoader functions
  */
 
-import { expect } from 'chai';
-import sinon from 'sinon';
-import fs from 'node:fs';
-import path from 'node:path';
 import {
-  initializeI18nextSync,
   i18next,
+  initializeI18nextSync,
+  nunjucksT,
   t,
-  nunjucksT
-} from '#src/scripts/helpers/i18nLoader.js';
+} from "#src/lib/i18nLoader.js";
+import { expect } from "chai";
+import fs from "node:fs";
+import path from "node:path";
+import sinon from "sinon";
 
 describe('i18nLoader', () => {
   let consoleWarnStub: sinon.SinonStub;
