@@ -1,9 +1,9 @@
 import chokidar from "chokidar"; // Import chokidar for file watching
 import livereload from "livereload"; // Import livereload for live reloading
-import path from "node:path"; // Import path module for handling file paths
-import { fileURLToPath } from "node:url"; // Import fileURLToPath to convert file URLs to paths
 import type { ChildProcess } from "node:child_process";
 import { spawn } from "node:child_process"; // Import spawn from child_process to spawn new processes
+import path from "node:path"; // Import path module for handling file paths
+import { fileURLToPath } from "node:url"; // Import fileURLToPath to convert file URLs to paths
 import config from "./config.js"; // Import the config
 import { build } from "./esbuild.js"; // Import the build function with correct extension
 
@@ -28,11 +28,11 @@ let livereloadServer: ReturnType<typeof livereload.createServer> | null = null; 
  * @returns {void}
  */
 const startServer = (port: number): void => {
-	// If there's an existing server process, kill it
-	if ((serverProcess !== null)) {
-		serverProcess.kill();
-		serverProcess = null;
-	}
+  // If there's an existing server process, kill it
+  if (serverProcess !== null) {
+    serverProcess.kill();
+    serverProcess = null;
+  }
 
   // Add a delay to ensure the port is released before starting a new server process
   setTimeout(() => {
@@ -95,7 +95,6 @@ const start = async (): Promise<void> => {
       persistent: true, // Keep watching for changes
     });
 
-<<<<<<< HEAD
     // Handle file change event
     watcher.on("change", (filePath: string) => {
       console.log(`File ${filePath} has been changed. Rebuilding...`);
@@ -104,7 +103,7 @@ const start = async (): Promise<void> => {
         try {
           await build();
           // Refresh livereload server
-          if (livereloadServer != null) {
+          if (livereloadServer !== null) {
             livereloadServer.refresh("/");
           }
           // Restart the server
@@ -114,26 +113,6 @@ const start = async (): Promise<void> => {
         }
       })();
     });
-=======
-		// Handle file change event
-		watcher.on('change', (filePath: string) => {
-			console.log(`File ${filePath} has been changed. Rebuilding...`);
-			// Rebuild the project and handle errors
-			void (async () => {
-				try {
-					await build();
-					// Refresh livereload server
-					if (livereloadServer !== null) {
-						livereloadServer.refresh('/');
-					}
-					// Restart the server
-					startServer(config.app.port);
-				} catch (error) {
-					console.error('Error during rebuild:', sanitizeError(error));
-				}
-			})();
-		});
->>>>>>> aeeece5 (chore(deps): lock file maintenance (#32))
 
     // Handle watcher ready event
     watcher.on("ready", () => {
