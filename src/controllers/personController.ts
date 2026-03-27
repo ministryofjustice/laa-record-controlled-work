@@ -5,8 +5,8 @@ import {
   getSessionData,
   storeOriginalFormData,
   storeSessionData,
-} from "../scripts/helpers/sessionHelpers.js";
-import { formatValidationErrors } from "../scripts/helpers/ValidationErrorHelpers.js";
+} from "#src/scripts/helpers/sessionHelpers.js";
+import { formatValidationErrors } from "#src/scripts/helpers/ValidationErrorHelpers.js";
 
 // Extend Request interface for CSRF token support
 interface RequestWithCSRF extends Request {
