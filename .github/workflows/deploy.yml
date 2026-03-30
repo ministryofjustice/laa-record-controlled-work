@@ -78,7 +78,7 @@ jobs:
           role-to-assume: ${{ secrets.ECR_ROLE_TO_ASSUME }}
           aws-region: ${{ vars.ECR_REGION }}
 
-      - uses: aws-actions/amazon-ecr-login@65ec2a197ddbfa2adf1e33236918dea29b709b5d
+      - uses: aws-actions/amazon-ecr-login@a080f59b057d681bf221f98cbdcd9f0defa1a1a9
         id: login-ecr
 
       - name: Set up Docker Buildx
