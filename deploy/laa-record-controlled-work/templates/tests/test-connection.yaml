@@ -7,9 +7,31 @@ metadata:
   annotations:
     "helm.sh/hook": test
 spec:
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 10001
+    runAsGroup: 10001
   containers:
     - name: wget
-      image: busybox
+      image: busybox:1.37.0
       command: ['wget']
       args: ['{{ include "laa-record-controlled-work.fullname" . }}:{{ .Values.service.port }}']
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities:
+          drop:
+            - ALL
+      resources:
+        limits:
+          cpu: "100m"
+          memory: "64Mi"
+        requests:
+          cpu: "10m"
+          memory: "16Mi"
+      livenessProbe:
+        exec:
+          command: ["true"]
+        initialDelaySeconds: 1
+        periodSeconds: 5
   restartPolicy: Never
