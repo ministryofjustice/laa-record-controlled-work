@@ -49,13 +49,7 @@ jobs:
 
           # Dependency Management
           renovate: "true"
-          # renovate-version: "43.31.1"
-          # node-version: "25.6.1"
 
           # Custom Configurations
-          dependency-review-config-file: ".github/config/dependency-review.yml"
-          # trufflehog-config-file: ".github/config/trufflehog-config.yml"
           codeql-config-file: ".github/config/codeql.yml"
           codeql-upload-findings: "always"
-          # codeql-languages: "javascript,typescript"
-          # dependency-check-suppression-file: "dependency-check-suppression.xml"
