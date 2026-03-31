@@ -117,7 +117,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "container_memory_usage_bytes{namespace='$namespace',container='api'}",
+              "expr": "container_memory_usage_bytes{namespace='$namespace',container='laa-record-controlled-work'}",
               "format": "time_series",
               "intervalFactor": 1,
               "legendFormat": "{{pod}}",
@@ -224,7 +224,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "increase(container_cpu_usage_seconds_total{namespace='$namespace',container='api'}[1m])/2",
+              "expr": "increase(container_cpu_usage_seconds_total{namespace='$namespace',container='laa-record-controlled-work'}[1m])/2",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{pod}}",
