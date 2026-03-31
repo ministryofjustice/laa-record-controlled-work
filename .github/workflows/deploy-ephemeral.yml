@@ -48,7 +48,7 @@ jobs:
     if: needs.resolve-pr.outputs.is-fork == 'false'
     permissions:
       contents: read
-      issues: write
+      pull-requests: write
     outputs:
       authorized: ${{ steps.check-permissions.outputs.authorized }}
     steps:
@@ -76,7 +76,7 @@ jobs:
           ACTOR: ${{ github.event.comment.user.login }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          gh issue comment "$PR_NUMBER" --body "Ephemeral environment deployment triggered for commit \`${PR_SHA}\` by @${ACTOR}. [View run](${RUN_URL})"
+          gh pr comment "$PR_NUMBER" --body "Ephemeral environment deployment triggered for commit \`${PR_SHA}\` by @${ACTOR}. [View run](${RUN_URL})"
 
   deploy:
     name: Deploy
@@ -99,7 +99,7 @@ jobs:
       - deploy
     if: always() && needs.authorize.result == 'success' && needs.authorize.outputs.authorized == 'true'
     permissions:
-      issues: write
+      pull-requests: write
     steps:
       - name: Post success comment
         if: needs.deploy.result == 'success'
@@ -110,7 +110,7 @@ jobs:
           PR_BRANCH: ${{ needs.resolve-pr.outputs.pr-ref }}
         run: |
           release_name=$(echo "${PR_BRANCH}" | tr '[:upper:]' '[:lower:]' | sed 's:^\w*\/::' | tr -s ' _/[]().' '-' | cut -c1-18 | sed 's/-$//')
-          gh issue comment "$PR_NUMBER" --body "Ephemeral environment deployed successfully. URL: https://${release_name}-laa-record-controlled-work-uat.cloud-platform.service.justice.gov.uk"
+          gh pr comment "$PR_NUMBER" --body "Ephemeral environment deployed successfully. URL: https://${release_name}-laa-record-controlled-work-uat.cloud-platform.service.justice.gov.uk"
 
       - name: Post failure comment
         if: needs.deploy.result != 'success'
@@ -120,4 +120,4 @@ jobs:
           PR_NUMBER: ${{ github.event.issue.number }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          gh issue comment "$PR_NUMBER" --body "Ephemeral environment deployment failed. [View workflow run](${RUN_URL})"
+          gh pr comment "$PR_NUMBER" --body "Ephemeral environment deployment failed. [View workflow run](${RUN_URL})"
