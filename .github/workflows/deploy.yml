@@ -58,6 +58,10 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
+  snyk-infra:
+    name: Snyk Infra Scan
+    uses: ./.github/workflows/snyk-infra.yml
+
   mocha-unit-tests:
     name: Mocha Unit Tests
     uses: ./.github/workflows/mocha.yml
@@ -115,6 +119,7 @@ jobs:
       - build-image
       - mocha-unit-tests
       - playwright
+      - snyk-infra
 
     steps:
       - name: Checkout
