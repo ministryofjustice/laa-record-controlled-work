@@ -8,7 +8,7 @@ replicaCount: 2
 
 image:
   repository: nginx
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
 
@@ -27,16 +27,17 @@ podLabels: {}
 
 podSecurityContext:
   runAsNonRoot: true
-  runAsUser: 1000
-  runAsGroup: 1000
+  runAsUser: 10001
+  runAsGroup: 10001
   seccompProfile:
     type: RuntimeDefault
 
 securityContext:
   allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
   runAsNonRoot: true
-  runAsUser: 1000
-  runAsGroup: 1000
+  runAsUser: 10001
+  runAsGroup: 10001
   capabilities:
     drop:
       - ALL
