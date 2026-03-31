@@ -14,6 +14,7 @@ spec:
   containers:
     - name: wget
       image: busybox:1.37.0
+      imagePullPolicy: Always
       command: ['wget']
       args: ['{{ include "laa-record-controlled-work.fullname" . }}:{{ .Values.service.port }}']
       securityContext:
