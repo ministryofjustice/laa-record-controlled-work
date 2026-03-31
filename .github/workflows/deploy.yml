@@ -61,6 +61,7 @@ jobs:
   snyk-infra:
     name: Snyk Infra Scan
     uses: ./.github/workflows/snyk-infra.yml
+    secrets: inherit
 
   mocha-unit-tests:
     name: Mocha Unit Tests
