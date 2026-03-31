@@ -27,3 +27,6 @@ public/
 
 # Code coverage
 coverage/
+
+# Local workspace
+.local/
