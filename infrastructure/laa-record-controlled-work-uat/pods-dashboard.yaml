@@ -117,21 +117,21 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "container_memory_usage_bytes{namespace='$namespace',container='api'}",
+              "expr": "container_memory_usage_bytes{namespace='$namespace',container='laa-record-controlled-work'}",
               "format": "time_series",
               "intervalFactor": 1,
               "legendFormat": "{{pod}}",
               "refId": "A"
             },
             {
-              "expr": "avg(kube_pod_container_resource_requests{namespace='$namespace', unit='byte'})",
+              "expr": "avg(kube_pod_container_resource_requests{namespace='$namespace',container='laa-record-controlled-work', unit='byte'})",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "Requested (soft limit)",
               "refId": "C"
             },
             {
-              "expr": "avg(kube_pod_container_resource_limits{namespace='$namespace', unit='byte'})",
+              "expr": "avg(kube_pod_container_resource_limits{namespace='$namespace',container='laa-record-controlled-work', unit='byte'})",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "Limit (hard limit)",
@@ -224,7 +224,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "increase(container_cpu_usage_seconds_total{namespace='$namespace',container='api'}[1m])/2",
+              "expr": "increase(container_cpu_usage_seconds_total{namespace='$namespace',container='laa-record-controlled-work'}[1m])/2",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{pod}}",
