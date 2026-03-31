@@ -5,93 +5,93 @@ metadata:
   labels:
     {{- include "laa-record-controlled-work.labels" . | nindent 4 }}
 spec:
-  {{- if not .Values.autoscaling.enabled }}
-  replicas: {{ .Values.replicaCount }}
+  {{- if not .Values.rcw.autoscaling.enabled }}
+  replicas: {{ .Values.rcw.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
       {{- include "laa-record-controlled-work.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
+      {{- with .Values.rcw.podAnnotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
         {{- include "laa-record-controlled-work.labels" . | nindent 8 }}
-        {{- with .Values.podLabels }}
+        {{- with .Values.rcw.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
-      {{- with .Values.imagePullSecrets }}
+      {{- with .Values.rcw.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "laa-record-controlled-work.serviceAccountName" . }}
       securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+        {{- toYaml .Values.rcw.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+            {{- toYaml .Values.rcw.securityContext | nindent 12 }}
+          image: "{{ .Values.rcw.image.repository }}:{{ .Values.rcw.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.rcw.image.pullPolicy }}
           ports:
             - name: http
               containerPort: 3000
               protocol: TCP
           livenessProbe:
-            {{- toYaml .Values.livenessProbe | nindent 12 }}
+            {{- toYaml .Values.rcw.livenessProbe | nindent 12 }}
           readinessProbe:
-            {{- toYaml .Values.readinessProbe | nindent 12 }}
+            {{- toYaml .Values.rcw.readinessProbe | nindent 12 }}
           resources:
-            {{- toYaml .Values.resources | nindent 12 }}
-          {{- with .Values.volumeMounts }}
+            {{- toYaml .Values.rcw.resources | nindent 12 }}
+          {{- with .Values.rcw.volumeMounts }}
           volumeMounts:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           env:
             - name: SERVICE_NAME
-              value: "{{ .Values.env.SERVICE_NAME }}"
+              value: "{{ .Values.rcw.env.SERVICE_NAME }}"
             - name: SERVICE_PHASE
-              value: "{{ .Values.env.SERVICE_PHASE }}"
+              value: "{{ .Values.rcw.env.SERVICE_PHASE }}"
             - name: DEPARTMENT_NAME
-              value: "{{ .Values.env.DEPARTMENT_NAME }}"
+              value: "{{ .Values.rcw.env.DEPARTMENT_NAME }}"
             - name: DEPARTMENT_URL
-              value: "{{ .Values.env.DEPARTMENT_URL }}"
+              value: "{{ .Values.rcw.env.DEPARTMENT_URL }}"
             - name: CONTACT_EMAIL
-              value: "{{ .Values.env.CONTACT_EMAIL }}"
+              value: "{{ .Values.rcw.env.CONTACT_EMAIL }}"
             - name: CONTACT_PHONE
-              value: "{{ .Values.env.CONTACT_PHONE }}"
+              value: "{{ .Values.rcw.env.CONTACT_PHONE }}"
             - name: SERVICE_URL
-              value: "{{ .Values.env.SERVICE_URL }}"
+              value: "{{ .Values.rcw.env.SERVICE_URL }}"
             - name: SESSION_SECRET
-              value: "{{ .Values.env.SESSION_SECRET }}"
+              value: "{{ .Values.rcw.env.SESSION_SECRET }}"
             - name: SESSION_NAME
-              value: "{{ .Values.env.SESSION_NAME }}"
+              value: "{{ .Values.rcw.env.SESSION_NAME }}"
             - name: RATELIMIT_HEADERS_ENABLED
-              value: "{{ .Values.env.RATELIMIT_HEADERS_ENABLED }}"
+              value: "{{ .Values.rcw.env.RATELIMIT_HEADERS_ENABLED }}"
             - name: RATELIMIT_STORAGE_URI
-              value: "{{ .Values.env.RATELIMIT_STORAGE_URI }}"
+              value: "{{ .Values.rcw.env.RATELIMIT_STORAGE_URI }}"
             - name: RATE_LIMIT_MAX
-              value: "{{ .Values.env.RATE_LIMIT_MAX }}"
+              value: "{{ .Values.rcw.env.RATE_LIMIT_MAX }}"
             - name: RATE_WINDOW_MS
-              value: "{{ .Values.env.RATE_WINDOW_MS }}"
+              value: "{{ .Values.rcw.env.RATE_WINDOW_MS }}"
             - name: NODE_ENV
-              value: "{{ .Values.env.NODE_ENV }}"
-      {{- with .Values.volumes }}
+              value: "{{ .Values.rcw.env.NODE_ENV }}"
+      {{- with .Values.rcw.volumes }}
       volumes:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.nodeSelector }}
+      {{- with .Values.rcw.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.affinity }}
+      {{- with .Values.rcw.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.tolerations }}
+      {{- with .Values.rcw.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
