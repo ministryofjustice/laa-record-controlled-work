@@ -124,14 +124,14 @@ data:
               "refId": "A"
             },
             {
-              "expr": "avg(kube_pod_container_resource_requests{namespace='$namespace', unit='byte'})",
+              "expr": "avg(kube_pod_container_resource_requests{namespace='$namespace',container='laa-record-controlled-work', unit='byte'})",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "Requested (soft limit)",
               "refId": "C"
             },
             {
-              "expr": "avg(kube_pod_container_resource_limits{namespace='$namespace', unit='byte'})",
+              "expr": "avg(kube_pod_container_resource_limits{namespace='$namespace',container='laa-record-controlled-work', unit='byte'})",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "Limit (hard limit)",
