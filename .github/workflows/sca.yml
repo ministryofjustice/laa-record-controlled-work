@@ -19,6 +19,12 @@ on:
 
   workflow_dispatch:
   workflow_call:
+    inputs:
+      sha:
+        description: 'Commit SHA to check out. Defaults to github.sha when not provided.'
+        required: false
+        type: string
+        default: ''
 
 permissions: {}
 
@@ -38,6 +44,8 @@ jobs:
     steps:
       - name: Repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: ${{ inputs.sha || github.sha }}
 
       - name: ⚡️ SCA
         uses: ministryofjustice/devsecops-actions/sca@f965eb1771ec66cfc41d7d57dc607fa6dfbc10ed # v1.4.0

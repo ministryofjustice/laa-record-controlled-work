@@ -1,0 +1,24 @@
+name: Post instructions to deploy ephemerally
+
+on:
+  pull_request:
+    types: [opened]
+
+permissions:
+  contents: read
+
+jobs:
+  post-instructions:
+    name: Post instructions to PR
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    permissions:
+      issues: write
+    steps:
+      - name: Post comment
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          gh issue comment "$PR_NUMBER" --body "To deploy an ephemeral environment for this PR, a repository member can comment \`/deploy\`. The deployment URL will be posted as a follow-up comment when the environment is ready."

@@ -5,6 +5,18 @@ on:
     branches:
       - "**"
   workflow_dispatch: # Allows manual triggering of the workflow
+  workflow_call:
+    inputs:
+      sha:
+        description: 'Commit SHA to check out. Defaults to github.sha when not provided.'
+        required: false
+        type: string
+        default: ''
+      branch-ref:
+        description: 'Branch name to use for the Helm release name. Defaults to github.ref_name when not provided.'
+        required: false
+        type: string
+        default: ''
 
 jobs:
   code-linting:
@@ -13,6 +25,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          ref: ${{ inputs.sha || github.sha }}
 
       - name: Setup Node and Dependencies
         uses: ./.github/actions/setup-node
@@ -23,6 +37,8 @@ jobs:
   sca:
     name: Software Composition Analysis
     uses: ./.github/workflows/sca.yml
+    with:
+      sha: ${{ inputs.sha || github.sha }}
 
   code-security-audit:
     name: Code Security Audit
@@ -30,6 +46,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          ref: ${{ inputs.sha || github.sha }}
 
       - name: Setup Node and Dependencies
         uses: ./.github/actions/setup-node
@@ -43,6 +61,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          ref: ${{ inputs.sha || github.sha }}
 
       - name: Build local Docker image
         working-directory: ${{ github.workspace }}
@@ -61,15 +81,21 @@ jobs:
   snyk-infra:
     name: Snyk Infra Scan
     uses: ./.github/workflows/snyk-infra.yml
+    with:
+      sha: ${{ inputs.sha || github.sha }}
     secrets: inherit
 
   mocha-unit-tests:
     name: Mocha Unit Tests
     uses: ./.github/workflows/mocha.yml
+    with:
+      sha: ${{ inputs.sha || github.sha }}
 
   playwright:
     name: Playwright Tests
     uses: ./.github/workflows/playwright.yml
+    with:
+      sha: ${{ inputs.sha || github.sha }}
 
   build-image:
     name: Build Docker Image
@@ -80,6 +106,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          ref: ${{ inputs.sha || github.sha }}
 
       - name: Set up AWS credentials for ECR and Kubernetes
         uses: aws-actions/configure-aws-credentials@8df5847569e6427dd6c4fb1cf565c83acfa8afa7 # v6.0.0
@@ -97,7 +125,7 @@ jobs:
         uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5
         with:
           path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          key: ${{ runner.os }}-buildx-${{ inputs.sha || github.sha }}
           restore-keys: |
             ${{ runner.os }}-buildx-
 
@@ -107,11 +135,12 @@ jobs:
           image_registry: ${{ secrets.ECR_REGISTRY_URL }}
           image_repo: ${{ vars.ECR_REPOSITORY }}
           dockerfile_path: Dockerfile
-          image_tag: ${{ github.sha }}
+          image_tag: ${{ inputs.sha || github.sha }}
 
   deploy-uat:
     environment: uat
     runs-on: ubuntu-latest
+    if: github.ref_name == 'main' || inputs.branch-ref != '' || github.event_name == 'workflow_dispatch'
     needs:
       - code-linting
       - sca
@@ -125,6 +154,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          ref: ${{ inputs.sha || github.sha }}
 
       - name: Deploy to UAT
         uses: ./.github/actions/deploy
@@ -138,3 +169,5 @@ jobs:
           kube-namespace: ${{ secrets.KUBE_NAMESPACE }}
           session_secret: ${{ secrets.SESSION_SECRET }}
           session_encryption_key: ${{ secrets.SESSION_ENCRYPTION_KEY }}
+          branch-ref: ${{ inputs.branch-ref }}
+          image-tag: ${{ inputs.sha || github.sha }}

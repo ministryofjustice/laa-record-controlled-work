@@ -1,0 +1,123 @@
+name: Deploy Ephemeral Environment
+
+on:
+  issue_comment:
+    types: [created]
+
+# Restrict all jobs to read-only
+permissions:
+  contents: read
+
+jobs:
+  resolve-pr:
+    name: Resolve PR
+    runs-on: ubuntu-latest
+    if: >-
+      github.event.issue.pull_request != null &&
+      contains(github.event.comment.body, '/deploy')
+    permissions:
+      contents: read
+    outputs:
+      pr-sha: ${{ steps.get-pr.outputs.sha }}
+      pr-ref: ${{ steps.get-pr.outputs.ref }}
+      is-fork: ${{ steps.get-pr.outputs.is-fork }}
+    steps:
+      - name: Get PR details
+        id: get-pr
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          pr=$(gh pr view "$PR_NUMBER" --json headRefOid,headRefName,headRepository,headRepositoryOwner)
+          sha=$(echo "$pr" | jq -r '.headRefOid')
+          ref=$(echo "$pr" | jq -r '.headRefName')
+          head_repo=$(echo "$pr" | jq -r '"\(.headRepositoryOwner.login)/\(.headRepository.name)"')
+          echo "sha=${sha}" >> "$GITHUB_OUTPUT"
+          echo "ref=${ref}" >> "$GITHUB_OUTPUT"
+          if [[ "$head_repo" != "$GH_REPO" ]]; then
+            echo "is-fork=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "is-fork=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  authorize:
+    name: Authorize
+    runs-on: ubuntu-latest
+    needs: resolve-pr
+    if: needs.resolve-pr.outputs.is-fork == 'false'
+    permissions:
+      contents: read
+      issues: write
+    outputs:
+      authorized: ${{ steps.check-permissions.outputs.authorized }}
+    steps:
+      - name: Check actor has push access
+        id: check-permissions
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          ACTOR: ${{ github.event.comment.user.login }}
+        run: |
+          permission=$(gh api "repos/$GH_REPO/collaborators/$ACTOR/permission" --jq '.permission' 2>/dev/null || echo "none")
+          if [[ "$permission" == "write" || "$permission" == "admin" || "$permission" == "maintain" ]]; then
+            echo "authorized=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "authorized=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Post acknowledgement comment
+        if: steps.check-permissions.outputs.authorized == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.issue.number }}
+          PR_SHA: ${{ needs.resolve-pr.outputs.pr-sha }}
+          ACTOR: ${{ github.event.comment.user.login }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          gh issue comment "$PR_NUMBER" --body "Ephemeral environment deployment triggered for commit \`${PR_SHA}\` by @${ACTOR}. [View run](${RUN_URL})"
+
+  deploy:
+    name: Deploy
+    needs:
+      - resolve-pr
+      - authorize
+    if: needs.authorize.outputs.authorized == 'true'
+    uses: ./.github/workflows/deploy.yml
+    with:
+      sha: ${{ needs.resolve-pr.outputs.pr-sha }}
+      branch-ref: ${{ needs.resolve-pr.outputs.pr-ref }}
+    secrets: inherit
+
+  post-deployment-result:
+    name: Post deployment result
+    runs-on: ubuntu-latest
+    needs:
+      - resolve-pr
+      - authorize
+      - deploy
+    if: always() && needs.authorize.result == 'success' && needs.authorize.outputs.authorized == 'true'
+    permissions:
+      issues: write
+    steps:
+      - name: Post success comment
+        if: needs.deploy.result == 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.issue.number }}
+          PR_BRANCH: ${{ needs.resolve-pr.outputs.pr-ref }}
+        run: |
+          release_name=$(echo "${PR_BRANCH}" | tr '[:upper:]' '[:lower:]' | sed 's:^\w*\/::' | tr -s ' _/[]().' '-' | cut -c1-18 | sed 's/-$//')
+          gh issue comment "$PR_NUMBER" --body "Ephemeral environment deployed successfully. URL: https://${release_name}-laa-record-controlled-work-uat.cloud-platform.service.justice.gov.uk"
+
+      - name: Post failure comment
+        if: needs.deploy.result != 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.issue.number }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          gh issue comment "$PR_NUMBER" --body "Ephemeral environment deployment failed. [View workflow run](${RUN_URL})"
