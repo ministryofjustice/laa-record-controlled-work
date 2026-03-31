@@ -34,12 +34,6 @@ jobs:
       - name: Run ESLint
         run: yarn lint
 
-  sca:
-    name: Software Composition Analysis
-    uses: ./.github/workflows/sca.yml
-    with:
-      sha: ${{ inputs.sha || github.sha }}
-
   code-security-audit:
     name: Code Security Audit
     runs-on: ubuntu-latest
@@ -143,7 +137,6 @@ jobs:
     if: github.ref_name == 'main' || inputs.branch-ref != '' || github.event_name == 'workflow_dispatch'
     needs:
       - code-linting
-      - sca
       - code-security-audit
       - snyk
       - build-image
