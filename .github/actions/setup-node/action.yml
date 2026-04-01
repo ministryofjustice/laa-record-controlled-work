@@ -22,7 +22,7 @@ runs:
       shell: bash
 
     - name: SLSA Supply Chain Security
-      uses: ministryofjustice/devsecops-actions/sca/slsa@3e9410cef31dd9cec64ad567efc959afd88a591c
+      uses: ministryofjustice/devsecops-actions/sca/slsa@4cd163be7859cd130800d6719d925318826038ea
 
     - name: Install dependencies
       run: yarn install --immutable
