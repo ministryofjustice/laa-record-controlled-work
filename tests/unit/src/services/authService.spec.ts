@@ -35,7 +35,7 @@ describe('AuthService', () => {
 
             const authService = authServiceFactory.createAuthService(/* confidentialClientApplication, */ sessionData);
 
-            authService.generateAuthCodeUrl(sessionData);
+            authService.getAuthCodeUrl(sessionData);
             expect(sessionData.authState).not.to.be.eq('');
         })
 
@@ -51,7 +51,7 @@ describe('AuthService', () => {
 
             const authService = authServiceFactory.createAuthService(/* confidentialClientApplication */ sessionData);
 
-            expect(authService.generateAuthCodeUrl(sessionData)).to.be.eq('myCloudInstance/myTenantId/oauth2/v2.0/authorize');
+            expect(authService.getAuthCodeUrl(sessionData)).to.be.eq('myCloudInstance/myTenantId/oauth2/v2.0/authorize');
         })
     })
 
@@ -72,7 +72,7 @@ describe('AuthService', () => {
 
             const authService = authServiceFactory.createAuthService(/* confidentialClientApplication */ sessionData);
 
-            expect(authService.generateLogoutUrl()).to.be.eq('myCloudInstance/myTenantId/oauth2/v2.0/logout?post_logout_redirect_uri=myPostLogoutUri');
+            expect(authService.getLogoutUrl()).to.be.eq('myCloudInstance/myTenantId/oauth2/v2.0/logout?post_logout_redirect_uri=myPostLogoutUri');
         })
     })
 })
