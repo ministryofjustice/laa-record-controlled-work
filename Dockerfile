@@ -30,6 +30,9 @@ WORKDIR /app
 
 RUN apk update && apk upgrade --no-cache
 
+# npm is not needed at runtime; remove it to eliminate its bundled vulnerabilities from the image
+RUN rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx
+
 RUN addgroup -g 1001 -S appuser && \
     adduser -u 1001 -G appuser -S appuser
 
