@@ -24,7 +24,7 @@ deploy_branch() {
 
 deploy_main() {  
   helm upgrade laa-record-controlled-work ./deploy/laa-record-controlled-work/. \
-                          --install --wait \
+                          --install --wait --atomic \
                           --namespace="${K8S_NAMESPACE}" \
                           --values ./deploy/laa-record-controlled-work/values/"$ENVIRONMENT".yaml \
                           --set image.repository="$REGISTRY/$REPOSITORY" \
