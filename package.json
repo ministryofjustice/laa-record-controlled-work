@@ -120,13 +120,9 @@
     "*.{js,ts}": "eslint --fix"
   },
   "packageManager": "yarn@4.13.0",
-  "@comment resolutions": {
-    "lodash": "Resolve lodash to 4.18.0, fixes vulnerability [01/04/26]"
-  },
   "resolutions": {
     "@isaacs/brace-expansion": "5.0.5",
     "brace-expansion": "5.0.5",
-    "serialize-javascript": "7.0.5",
-    "lodash": "github:lodash/lodash#59be2de61f8aa9461c7856533b51d31b7d8babc4"
+    "serialize-javascript": "7.0.5"
   }
 }
