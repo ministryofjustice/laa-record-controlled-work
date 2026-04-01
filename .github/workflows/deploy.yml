@@ -24,6 +24,16 @@ jobs:
     name: Software Composition Analysis
     uses: ./.github/workflows/sca.yml
 
+  slsa:
+    name: SLSA Supply Chain Security
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - name: SLSA Supply Chain Security
+        uses: ministryofjustice/devsecops-actions/sca/slsa@4cd163be7859cd130800d6719d925318826038ea
+
   code-security-audit:
     name: Code Security Audit
     runs-on: ubuntu-latest
@@ -118,6 +128,7 @@ jobs:
     needs:
       - code-linting
       - sca
+      - slsa
       - code-security-audit
       - snyk
       - build-image
