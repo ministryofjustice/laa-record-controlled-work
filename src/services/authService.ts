@@ -4,13 +4,14 @@ import { ConfidentialClientApplication, Configuration, CryptoProvider, Authoriza
 import config from "#config.js";
 
 export class AuthServiceFactory {
-    public createAuthService(session: SessionData): AuthService {
-        return new AuthService(session);
+    public createAuthService(session: SessionData, msalClient: ConfidentialClientApplication): AuthService {
+        return new AuthService(session, msalClient);
     }
 }
 
 export class AuthService {
     public session: SessionData;
+    public msalClient: ConfidentialClientApplication;
     private cryptoProvider: CryptoProvider = new CryptoProvider();
 
     private msalConfig: Configuration = {
@@ -23,12 +24,9 @@ export class AuthService {
     };
 
 
-    constructor(sessionData: SessionData) {
+    constructor(sessionData: SessionData, msalClient: ConfidentialClientApplication) {
         this.session = sessionData;
-    }
-
-    private getMsalInstance(msalConfig: Configuration) {
-        return new ConfidentialClientApplication(msalConfig);
+        this.msalClient = msalClient
     }
 
     private async getPkceCodes(): Promise<Record<string, string>> {
@@ -61,8 +59,6 @@ export class AuthService {
             scopes: []
         };
 
-        const msal = this.getMsalInstance(this.msalConfig);
-
         // Set generated PKCE codes and method as session vars
         session.pkceCodes = await this.getPkceCodes();
 
@@ -75,7 +71,7 @@ export class AuthService {
         };
 
         try {
-            return await msal.getAuthCodeUrl(authCodeUrlRequest);
+            return await this.msalClient.getAuthCodeUrl(authCodeUrlRequest);
         } catch (error) {
             throw error;
         }
