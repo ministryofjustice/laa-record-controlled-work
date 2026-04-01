@@ -5,9 +5,6 @@ FROM base AS builder
 
 WORKDIR /app
 
-# Required to resolve lodash via GitHub SHA until lodash@4.18.0 is published to npm
-RUN apk add --no-cache git
-
 # Enable Corepack so it picks up the yarn version from the packageManager field in package.json
 RUN npm install -g --force corepack && corepack enable
 
