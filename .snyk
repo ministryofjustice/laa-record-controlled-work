@@ -1,0 +1,9 @@
+# Snyk (https://snyk.io) policy file
+version: v1.25.0
+ignore:
+  SNYK-JS-LODASH-15869625:
+    - "*":
+        reason: >
+          lodash@4.18.0 fixes CVE-2026-4800 but was a bad release (ReferenceError in _.template modular builds).
+          lodash@4.18.1 is imminent and will replace the GitHub SHA resolution once published to npm.
+        expires: "2026-04-15T00:00:00.000Z"
