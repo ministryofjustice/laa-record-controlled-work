@@ -66,11 +66,9 @@ export class AuthService {
         // Set generated PKCE codes and method as session vars
         session.pkceCodes = await this.getPkceCodes();
 
-        const redirectUri: string = process.env.REDIRECT_URI || '';
-
         const authCodeUrlRequest: AuthorizationUrlRequest = {
             ...authCodeUrlRequestParams,
-            redirectUri: redirectUri,
+            redirectUri: config.entra.redirectUri,
             responseMode: 'form_post', // recommended for confidential clients
             codeChallenge: session.pkceCodes.challenge,
             codeChallengeMethod: session.pkceCodes.challengeMethod,

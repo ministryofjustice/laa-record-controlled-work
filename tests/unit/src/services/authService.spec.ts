@@ -1,3 +1,4 @@
+import config from '#config.js';
 import { AuthServiceFactory } from '#src/services/authService.js';
 import { expect } from 'chai';
 import { SessionData } from 'express-session';
@@ -43,6 +44,8 @@ describe('AuthService', () => {
             const session = '';
             // process.env.CLOUD_INSTANCE = 'myCloudInstance';
             // process.env.TENANT_ID = 'myTenantId';
+            config.entra.authority = "https://login.microsoftonline.com/192837"
+            config.entra.redirectUri = "example.com"
 
             // let confidentialClientApplication: SinonStubbedInstance<ConfidentialClientApplication>;
             // confidentialClientApplication = sinon.createStubInstance(ConfidentialClientApplication);
@@ -51,7 +54,9 @@ describe('AuthService', () => {
 
             const authService = authServiceFactory.createAuthService(/* confidentialClientApplication */ sessionData);
             const url = await authService.getAuthCodeUrl(sessionData)
-            expect(url).to.be.eq('myCloudInstance/myTenantId/oauth2/v2.0/authorize');
+            console.log(url)
+            expect(url).to.include('192837');
+            expect(url).to.include('example.com');
         })
     })
 
