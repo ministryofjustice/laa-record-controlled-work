@@ -17,17 +17,17 @@ if (
 if (process.env.SESSION_NAME === undefined || process.env.SESSION_NAME === "") {
   throw new Error("SESSION_NAME must be defined in environment variables.");
 }
-if (process.env.ENTRA_CLIENT_ID == null || process.env.ENTRA_CLIENT_ID === '') {
-  throw new Error('ENTRA_CLIENT_ID must be defined in environment variables.');
+if (process.env.CLIENT_ID == null || process.env.CLIENT_ID === '') {
+  throw new Error('CLIENT_ID must be defined in environment variables.');
 }
-if (process.env.ENTRA_CLIENT_SECRET == null || process.env.ENTRA_CLIENT_SECRET === '') {
-  throw new Error('ENTRA_CLIENT_SECRET must be defined in environment variables.');
+if (process.env.CLIENT_SECRET == null || process.env.CLIENT_SECRET === '') {
+  throw new Error('CLIENT_SECRET must be defined in environment variables.');
 }
-if (process.env.ENTRA_TENANT_ID == null || process.env.ENTRA_TENANT_ID === '') {
-  throw new Error('ENTRA_TENANT_ID must be defined in environment variables.');
+if (process.env.TENANT_ID == null || process.env.TENANT_ID === '') {
+  throw new Error('TENANT_ID must be defined in environment variables.');
 }
-if (process.env.ENTRA_REDIRECT_URI == null || process.env.ENTRA_REDIRECT_URI === '') {
-  throw new Error('ENTRA_REDIRECT_URI must be defined in environment variables.');
+if (process.env.REDIRECT_URI == null || process.env.REDIRECT_URI === '') {
+  throw new Error('REDIRECT_URI must be defined in environment variables.');
 }
 
 // Get environment variables
@@ -42,7 +42,7 @@ const config: Config = {
   // Default rate window: 15 minutes in milliseconds
   RATE_WINDOW_MS: Number(
     process.env.RATE_WINDOW_MS ??
-      String(DEFAULT_RATE_WINDOW_MS_MINUTE * MILLISECONDS_IN_A_MINUTE),
+    String(DEFAULT_RATE_WINDOW_MS_MINUTE * MILLISECONDS_IN_A_MINUTE),
   ),
   SERVICE_NAME: process.env.SERVICE_NAME,
   SERVICE_PHASE: process.env.SERVICE_PHASE,
@@ -69,10 +69,11 @@ const config: Config = {
     views: 'src/views',  // Path for Nunjucks views
   },
   entra: {
-    clientId: process.env.ENTRA_CLIENT_ID,
-    clientSecret: process.env.ENTRA_CLIENT_SECRET,
-    tenantId: process.env.ENTRA_TENANT_ID,
-    redirectUri: process.env.ENTRA_REDIRECT_URI,
+    clientId: process.env.CLIENT_ID,
+    clientSecret: process.env.CLIENT_SECRET,
+    authority: `${process.env.CLOUD_INSTANCE}${process.env.TENANT_ID}`,
+    tenantId: process.env.TENANT_ID,
+    redirectUri: process.env.REDIRECT_URI,
   }
 };
 

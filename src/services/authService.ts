@@ -1,6 +1,7 @@
 import { SessionData } from "#node_modules/@types/express-session/index.js";
 import { randomUUID } from 'crypto';
 import { ConfidentialClientApplication, Configuration, CryptoProvider, AuthorizationUrlRequest, AuthorizationCodeRequest } from '@azure/msal-node';
+import config from "#config.js";
 
 export class AuthServiceFactory {
     public createAuthService(session: SessionData): AuthService {
@@ -14,12 +15,9 @@ export class AuthService {
 
     private msalConfig: Configuration = {
         auth: {
-            clientId: process.env.CLIENT_ID || 'Enter_the_Application_Id_Here', // 'Application (client) ID' of app registration in Azure portal - this value is a GUID
-            //For external tenant
-            authority: process.env.AUTHORITY || `https://${TENANT_SUBDOMAIN}.ciamlogin.com/`, // replace "Enter_the_Tenant_Subdomain_Here" with your tenant name
-            //For workforce tenant
-            //authority: process.env.CLOUD_INSTANCE + process.env.TENANT_ID
-            clientSecret: process.env.CLIENT_SECRET || 'Enter_the_Client_Secret_Here', // Client secret generated from the app registration in Azure portal
+            clientId: `${config.entra.clientId}`,
+            authority: `${config.entra.authority}`,
+            clientSecret: `${config.entra.clientSecret}`
         },
         system: {},
     };
