@@ -17,77 +17,61 @@ import sinon, { SinonStubbedInstance } from 'sinon';
 // })
 
 describe('AuthService', () => {
+    
+    const authServiceFactory = new AuthServiceFactory();
+    let msalStub: Partial<ConfidentialClientApplication>;
+    let sessionData: SessionData;
+
+    beforeEach(() => {
+            msalStub = {
+                getAuthCodeUrl: sinon.stub().returns("test"),
+                acquireTokenByCode: sinon.stub().returns("test")
+            };
+            sessionData = {} as SessionData;
+    });
+
+    afterEach(() => {
+      sinon.restore();
+    });
+
     describe('Returns an Auth Code', () => {
-
-        const authServiceFactory = new AuthServiceFactory();
-
         it('should store a state in session', () => {
-            const session = '';
             process.env.CLOUD_INSTANCE = 'myCloudInstance';
             process.env.TENANT_ID = 'myTenantId';
 
-            const test = {
-                getAuthCodeUrl: sinon.stub().returns("test")
-            } as unknown as ConfidentialClientApplication
-
-            let sessionData = {} as SessionData;
-
-
-            const authService = authServiceFactory.createAuthService(sessionData, test);
+            const authService = authServiceFactory.createAuthService(sessionData, msalStub as ConfidentialClientApplication);
 
             authService.getAuthCodeUrl(sessionData);
             expect(sessionData.authState).not.to.be.eq('');
         })
 
         it('should return a URL', async () => {
-
-            const stub = {
-                getAuthCodeUrl: sinon.stub().returns("test")
-            } as unknown as ConfidentialClientApplication
-
-            let sessionData = {} as SessionData;
-
-            const authService = authServiceFactory.createAuthService(sessionData, stub);
+            const authService = authServiceFactory.createAuthService(sessionData, msalStub as ConfidentialClientApplication);
             const url = await authService.getAuthCodeUrl(sessionData)
             expect(url).to.include('test');
         })
     })
 
+    describe('getTokenByCode returns Token'), () => {
+        it('Should return an access token'), () => {
+            const authService = authServiceFactory.createAuthService(sessionData, msalStub as ConfidentialClientApplication);
+            const authCode = ""
 
-    // describe('getTokenByCode returns Token'), () => {
+            // const token = authService.getTokenByCode(authCode)
 
-    //     const authServiceFactory = new AuthServiceFactory();
-    //     let sessionData = {} as SessionData;
+            // expect(token).to.eq("accessToken")
+        }
+    }
 
-    //     it('Should return an access token'), () => {
+    describe('Returns a Logout Url', () => {
+        it('should return a Logout Url', () => {
+            process.env.CLOUD_INSTANCE = 'myCloudInstance';
+            process.env.TENANT_ID = 'myTenantId';
+            process.env.POST_LOGOUT_REDIRECT_URI = 'myPostLogoutUri';
 
-    //         const authService = authServiceFactory.createAuthService(sessionData);
-    //         const authCode = ""
-    //         const token = authService.getTokenByCode(authCode)
-    //         // mock out MSAL 
+            const authService = authServiceFactory.createAuthService(sessionData, msalStub as ConfidentialClientApplication);
 
-    //         expect(token).to.eq("accessToken")
-    //     }
-    // }
-
-    // describe('Returns a Logout Url', () => {
-
-    //     const authServiceFactory = new AuthServiceFactory();
-
-    //     it('should return a Logout Url', () => {
-    //         const session = '';
-    //         process.env.CLOUD_INSTANCE = 'myCloudInstance';
-    //         process.env.TENANT_ID = 'myTenantId';
-    //         process.env.POST_LOGOUT_REDIRECT_URI = 'myPostLogoutUri';
-
-    //         // let confidentialClientApplication: SinonStubbedInstance<ConfidentialClientApplication>;
-    //         // confidentialClientApplication = sinon.createStubInstance(ConfidentialClientApplication);
-
-    //         let sessionData = {} as SessionData;
-
-    //         const authService = authServiceFactory.createAuthService(/* confidentialClientApplication */ sessionData);
-
-    //         expect(authService.getLogoutUrl()).to.be.eq('myCloudInstance/myTenantId/oauth2/v2.0/logout?post_logout_redirect_uri=myPostLogoutUri');
-    //     })
-    // })
+            expect(authService.getLogoutUrl()).to.be.eq('myCloudInstance/myTenantId/oauth2/v2.0/logout?post_logout_redirect_uri=myPostLogoutUri');
+        })
+    })
 })

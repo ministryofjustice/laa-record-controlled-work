@@ -1,7 +1,8 @@
 import { SessionData } from "#node_modules/@types/express-session/index.js";
-import { randomUUID } from 'crypto';
-import { ConfidentialClientApplication, Configuration, CryptoProvider, AuthorizationUrlRequest, AuthorizationCodeRequest } from '@azure/msal-node';
+import { ConfidentialClientApplication, Configuration, CryptoProvider, AuthorizationUrlRequest, AuthorizationCodeRequest, AuthenticationResult } from '@azure/msal-node';
 import config from "#config.js";
+import { PKCECodes } from "#types/auth-types.js";
+import { Exception } from "#node_modules/sass/types/exception.js";
 
 export class AuthServiceFactory {
     public createAuthService(session: SessionData, msalClient: ConfidentialClientApplication): AuthService {
@@ -23,13 +24,12 @@ export class AuthService {
         system: {},
     };
 
-
     constructor(sessionData: SessionData, msalClient: ConfidentialClientApplication) {
         this.session = sessionData;
         this.msalClient = msalClient
     }
 
-    private async getPkceCodes(): Promise<Record<string, string>> {
+    private async getPkceCodes(): Promise<PKCECodes> {
         // Generate PKCE Codes before starting the authorization flow
         const { verifier, challenge } = await this.cryptoProvider.generatePkceCodes();
 
@@ -76,6 +76,19 @@ export class AuthService {
             throw error;
         }
     }
+
+    // public async getTokenByCode(session: SessionData, authCode: string): Promise<AuthenticationResult> {
+    //     if (!session.pkceCodes) {
+    //         throw new Error('Missing PKCE codes');
+    //     }
+
+    //     const authCodeRequest: AuthorizationCodeRequest = {
+    //             ...session.authCodeRequest,
+    //             code: authCode,
+    //             codeVerifier: session.pkceCodes.verifier,
+    //         };
+    //     return await this.msalClient.acquireTokenByCode(authCodeRequest, req.body);
+    // }
 
     public getLogoutUrl(): string {
         return `${process.env.CLOUD_INSTANCE}/${process.env.TENANT_ID}/oauth2/v2.0/logout?post_logout_redirect_uri=${process.env.POST_LOGOUT_REDIRECT_URI}`;
