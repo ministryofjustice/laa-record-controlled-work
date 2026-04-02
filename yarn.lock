@@ -4398,9 +4398,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"laa-express-typescript-template@workspace:.":
+"laa-record-controlled-work@workspace:.":
   version: 0.0.0-use.local
-  resolution: "laa-express-typescript-template@workspace:."
+  resolution: "laa-record-controlled-work@workspace:."
   dependencies:
     "@axe-core/playwright": "npm:^4.11.1"
     "@eslint/js": "npm:^10.0.1"

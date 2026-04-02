@@ -1,46 +1,46 @@
-# Use the official Node.js image as the base image
-FROM node:25.8.2-alpine
+FROM node:25.8.2-alpine AS base
 
-# Set the working directory inside the container
+###########################################
+FROM base AS builder
+
 WORKDIR /app
 
-# Update any vulnerable Alpine packages
-RUN apk update && apk upgrade --no-cache
+# Enable Corepack so it picks up the yarn version from the packageManager field in package.json
+RUN npm install -g --force corepack && corepack enable
 
-# Install Corepack and prepare Yarn version and removed npm to avoid vunerablity bundling
-RUN npm install -g --force corepack && \
-    corepack enable && \
-    corepack prepare yarn@4.9.2 --activate && \
-    rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx 
-
-# Copy package.json and yarn.lock to the working directory
 COPY package*.json yarn.lock .yarnrc.yml ./
-
-# Install dependencies
 RUN yarn install --immutable
 
-# Create a non-root user
+# Uses .dockerignore for filtering
+COPY . .
+RUN yarn build
+
+# Yarn 4 has no production-only install mode outside of workspaces, so use npm to prune devDependencies.
+# --legacy-peer-deps is required because npm's peer dependency resolver is stricter than Yarn's and 
+# cannot reconcile the Yarn-installed node_modules.
+RUN npm prune --omit=dev --legacy-peer-deps
+
+###########################################
+FROM base AS runner
+
+WORKDIR /app
+
+RUN apk update && apk upgrade --no-cache
+
+# npm is not needed at runtime; remove it to eliminate its bundled vulnerabilities from the image
+RUN rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx
+
 RUN addgroup -g 1001 -S appuser && \
     adduser -u 1001 -G appuser -S appuser
 
-# Copy the rest of the application code to the working directory
-# and set ownership to the non-root user
-COPY --chown=1001:1001 . .
+COPY --from=builder --chown=1001:1001 /app/public ./public
+COPY --from=builder --chown=1001:1001 /app/views ./views
+COPY --from=builder --chown=1001:1001 /app/locales ./locales
+COPY --from=builder --chown=1001:1001 /app/node_modules ./node_modules
+COPY --from=builder --chown=1001:1001 /app/package.json ./package.json
 
-# Build the application
-RUN yarn build
-
-# Set ownership of all generated files to the non-root user
-RUN chown -R 1001:1001 /app
-
-# Switch to the non-root user by ID (not name)
+# Run as non-root
 USER 1001
 
-# Set HOME environment variable to fix corepack cache issues
-ENV HOME=/app
-
-# Expose the port the app runs on
 EXPOSE 3000
-
-# Define the command to run the application
 CMD ["node", "public/app.js"]
