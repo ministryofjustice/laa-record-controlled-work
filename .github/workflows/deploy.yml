@@ -58,7 +58,7 @@ jobs:
         uses: snyk/actions/docker@9adf32b1121593767fc3c057af55b55db032dc04 # master
         with:
           image: image.tar
-          args: --docker --severity-threshold=high
+          args: --docker --severity-threshold=high --policy-path=.snyk
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
