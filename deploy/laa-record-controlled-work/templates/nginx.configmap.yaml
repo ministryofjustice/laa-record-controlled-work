@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "laa-record-controlled-work.fullname" . }}-nginx-config
+  labels:
+    {{- include "laa-record-controlled-work.labels" . | nindent 4 }}
+data:
+  nginx.conf.template: |
+{{ .Files.Get "files/nginx.conf.template" | indent 4 -}}

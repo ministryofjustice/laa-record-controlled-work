@@ -1,0 +1,50 @@
+pid /tmp/nginx.pid;
+
+events {}
+http {
+  # Do not include nginx version in error pages or Server header
+  server_tokens off;
+
+  # Prevent oversized request bodies; sufficient for all expected form submissions
+  client_max_body_size 10m;
+
+  server {
+    listen 8080;
+
+    location / {
+      proxy_pass             http://${NGINX_UPSTREAM_RCW};
+
+      # Use HTTP/1.1 upstream so nginx controls request framing; partially mitigates HTTP desync attacks
+      proxy_http_version     1.1;
+
+      # Clear hop-by-hop headers before forwarding to prevent connection state ambiguity
+      proxy_set_header       Connection        "";
+
+      # Strip Transfer-Encoding to prevent TE.CL request smuggling
+      proxy_set_header       Transfer-Encoding "";
+
+      # Node/Express sets this header; suppress it to avoid leaking implementation details
+      proxy_hide_header      X-Powered-By;
+
+      proxy_set_header       Host              $host;
+      proxy_set_header       X-Real-IP         $remote_addr;
+      proxy_set_header       X-Forwarded-For   $proxy_add_x_forwarded_for;
+      proxy_set_header       X-Forwarded-Proto $scheme;
+
+      proxy_connect_timeout  10s;
+      proxy_send_timeout     60s;
+      proxy_read_timeout     60s;
+    }
+  }
+
+  # Health endpoint on a separate port so it is never reachable via the ingress
+  server {
+    listen 9090;
+
+    location /nginx-health {
+      access_log off;
+      return 200 "ok";
+      add_header Content-Type text/plain;
+    }
+  }
+}
