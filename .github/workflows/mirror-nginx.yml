@@ -197,7 +197,7 @@ jobs:
           mv docker-images.json.tmp docker-images.json
 
           git add docker-images.env docker-images.json
-          git commit -m "chore: mirror nginx-unprivileged:alpine@${TAG} to ECR"
+          git commit -m "chore: mirror nginx-unprivileged@${TAG} to ECR"
           git push origin "$BRANCH"
 
           TAG_URL="https://hub.docker.com/layers/nginxinc/nginx-unprivileged/${TAG}"
