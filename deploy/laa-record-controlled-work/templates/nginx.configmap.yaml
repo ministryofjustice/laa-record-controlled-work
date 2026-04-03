@@ -6,4 +6,4 @@ metadata:
     {{- include "laa-record-controlled-work.labels" . | nindent 4 }}
 data:
   default.conf.template: |
-{{ .Files.Get "files/default.conf.template" | indent 4 -}}
+{{ .Files.Get "nginx/default.conf.template" | indent 4 -}}

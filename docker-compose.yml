@@ -22,7 +22,7 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./deploy/laa-record-controlled-work/files/default.conf.template:/etc/nginx/templates/default.conf.template:ro
+      - ./deploy/laa-record-controlled-work/nginx/default.conf.template:/etc/nginx/templates/default.conf.template:ro
     depends_on:
       - rcw
       # - ccq
