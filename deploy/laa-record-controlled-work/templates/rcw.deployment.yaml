@@ -11,6 +11,7 @@ spec:
   selector:
     matchLabels:
       {{- include "laa-record-controlled-work.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: rcw
   template:
     metadata:
       {{- with .Values.rcw.podAnnotations }}
@@ -19,9 +20,7 @@ spec:
       {{- end }}
       labels:
         {{- include "laa-record-controlled-work.labels" . | nindent 8 }}
-        {{- with .Values.rcw.podLabels }}
-        {{- toYaml . | nindent 8 }}
-        {{- end }}
+        app.kubernetes.io/component: rcw
     spec:
       {{- with .Values.rcw.imagePullSecrets }}
       imagePullSecrets:
