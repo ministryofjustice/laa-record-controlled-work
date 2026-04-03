@@ -200,12 +200,17 @@ jobs:
           git commit -m "chore: mirror nginx-unprivileged:alpine@${TAG} to ECR"
           git push origin "$BRANCH"
 
-          TAG_URL="https://hub.docker.com/r/nginxinc/nginx-unprivileged/tags?name=${TAG}"
-          BODY="Mirrors [nginx-unprivileged:alpine@${TAG}](${TAG_URL}) to ECR."
+          TAG_URL="https://hub.docker.com/layers/nginxinc/nginx-unprivileged/${TAG}"
+          BODY="Mirrors [nginxinc/nginx-unprivileged@${TAG}](${TAG_URL}) to ECR."
           BODY+=$'\n\n''Updates `docker-images.env`:'
           BODY+=$'\n- ''`NGINX_IMAGE_TAG` to `'"${TAG}"'`'
           BODY+=$'\n- ''`NGINX_ECR_IMAGE_DIGEST_AMD64` to `'"${ECR_DIGEST}"'`'
           BODY+=$'\n\n''Updates `docker-images.json` nginx entry to `docker.io/nginxinc/nginx-unprivileged@'"${DOCKERHUB_DIGEST}"'`.'
+          BODY+=$'\n\n''> [!NOTE]'
+          BODY+=$'\n''> Required workflows will not trigger automatically on this PR. Run the following to trigger them:'
+          BODY+=$'\n''> ```'
+          BODY+=$'\n''> ./scripts/trigger-ci-on-branch.sh '"${BRANCH}"
+          BODY+=$'\n''> ```'
 
           PR_URL=$(gh pr create \
             --head "$BRANCH" \
