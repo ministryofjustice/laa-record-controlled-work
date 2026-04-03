@@ -17,7 +17,7 @@ on:
       dry_run:
         description: "Skip ECR push and PR steps (for testing)"
         type: boolean
-        default: true
+        default: false
       skip_age_check:
         description: "Skip the 3-day age gate"
         type: boolean
