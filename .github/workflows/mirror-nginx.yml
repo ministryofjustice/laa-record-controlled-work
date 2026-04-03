@@ -37,15 +37,15 @@ jobs:
     name: Check
     runs-on: ubuntu-latest
     outputs:
-      tag: ${{ steps.metadata.outputs.tag }}
-      amd64_digest: ${{ steps.metadata.outputs.amd64_digest }}
-      proceed: ${{ steps.existing-pr.outputs.count == '0' }}
+      tag: ${{ steps.fetch_metadata.outputs.tag }}
+      amd64_digest: ${{ steps.fetch_metadata.outputs.amd64_digest }}
+      proceed: ${{ steps.pr_check.outputs.count == '0' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
-      - name: Get latest nginx-unprivileged:alpine metadata from Docker Hub
-        id: metadata
+      - name: Fetch latest nginx-unprivileged:alpine metadata from Docker Hub
+        id: fetch_metadata
         run: |
           METADATA=$(skopeo inspect docker://nginxinc/nginx-unprivileged:alpine)
           TAG=$(echo "$METADATA" | jq -r '.Labels["org.opencontainers.image.version"]')
@@ -55,7 +55,7 @@ jobs:
           echo "amd64_digest=$DIGEST" >> "$GITHUB_OUTPUT"
 
       - name: Check if version has changed
-        id: check
+        id: version_check
         run: |
           if [ "${{ inputs.skip_version_check }}" = "true" ]; then
             echo "Version check skipped."
@@ -65,7 +65,7 @@ jobs:
 
           source docker-images.env
 
-          if [ "$NGINX_IMAGE_TAG" = "${{ steps.metadata.outputs.tag }}" ]; then
+          if [ "$NGINX_IMAGE_TAG" = "${{ steps.fetch_metadata.outputs.tag }}" ]; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"
@@ -73,7 +73,7 @@ jobs:
 
       - name: Check image is at least 3 days old
         id: age_check
-        if: steps.check.outputs.changed == 'true'
+        if: steps.version_check.outputs.changed == 'true'
         run: |
           if [ "${{ inputs.skip_age_check }}" = "true" ]; then
             echo "Age check skipped."
@@ -95,13 +95,13 @@ jobs:
           fi
 
       - name: Check for existing PR
-        id: existing-pr
+        id: pr_check
         if: steps.age_check.outputs.old_enough == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           COUNT=$(gh pr list \
-            --head "chore/mirror-nginx-${{ steps.metadata.outputs.tag }}" \
+            --head "chore/mirror-nginx-${{ steps.fetch_metadata.outputs.tag }}" \
             --state open \
             --json number \
             --jq 'length')
