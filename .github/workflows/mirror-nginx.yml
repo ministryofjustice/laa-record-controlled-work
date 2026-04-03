@@ -18,6 +18,14 @@ on:
         description: "Skip ECR push and PR steps (for testing)"
         type: boolean
         default: true
+      skip_age_check:
+        description: "Skip the 3-day age gate"
+        type: boolean
+        default: false
+      skip_version_check:
+        description: "Skip version change detection (e.g. for disaster recovery)"
+        type: boolean
+        default: false
 
 permissions:
   id-token: write
@@ -25,15 +33,19 @@ permissions:
   pull-requests: write
 
 jobs:
-  mirror-nginx:
-    name: Mirror nginx-unprivileged to ECR
+  check:
+    name: Check
     runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.fetch_metadata.outputs.tag }}
+      amd64_digest: ${{ steps.fetch_metadata.outputs.amd64_digest }}
+      proceed: ${{ steps.pr_check.outputs.count == '0' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
-      - name: Get image metadata from Docker Hub
-        id: metadata
+      - name: Fetch latest nginx-unprivileged:alpine metadata from Docker Hub
+        id: fetch_metadata
         run: |
           METADATA=$(skopeo inspect docker://nginxinc/nginx-unprivileged:alpine)
           TAG=$(echo "$METADATA" | jq -r '.Labels["org.opencontainers.image.version"]')
@@ -43,20 +55,32 @@ jobs:
           echo "amd64_digest=$DIGEST" >> "$GITHUB_OUTPUT"
 
       - name: Check if version has changed
-        id: check
+        id: version_check
         run: |
+          if [ "${{ inputs.skip_version_check }}" = "true" ]; then
+            echo "Version check skipped."
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
           source docker-images.env
 
-          if [ "$NGINX_IMAGE_TAG" = "${{ steps.metadata.outputs.tag }}" ]; then
+          if [ "$NGINX_IMAGE_TAG" = "${{ steps.fetch_metadata.outputs.tag }}" ]; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Check image age
+      - name: Check image is at least 3 days old
         id: age_check
-        if: steps.check.outputs.changed == 'true'
+        if: steps.version_check.outputs.changed == 'true'
         run: |
+          if [ "${{ inputs.skip_age_check }}" = "true" ]; then
+            echo "Age check skipped."
+            echo "old_enough=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
           LAST_UPDATED=$(curl -s \
             "https://hub.docker.com/v2/repositories/nginxinc/nginx-unprivileged/tags/alpine" \
             | jq -r '.last_updated')
@@ -71,27 +95,36 @@ jobs:
           fi
 
       - name: Check for existing PR
-        id: existing-pr
+        id: pr_check
         if: steps.age_check.outputs.old_enough == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           COUNT=$(gh pr list \
-            --head "chore/mirror-nginx-${{ steps.metadata.outputs.tag }}" \
+            --head "chore/mirror-nginx-${{ steps.fetch_metadata.outputs.tag }}" \
             --state open \
             --json number \
             --jq 'length')
           echo "count=$COUNT" >> "$GITHUB_OUTPUT"
 
-      - name: Pull nginx image
-        if: steps.age_check.outputs.old_enough == 'true' && steps.existing-pr.outputs.count == '0'
+  scan-and-mirror:
+    name: Scan and mirror
+    needs: check
+    if: needs.check.outputs.proceed == 'true'
+    runs-on: ubuntu-latest
+    outputs:
+      ecr_digest: ${{ steps.push.outputs.ecr_digest }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - name: Pull nginx-unprivileged image from Docker Hub
         run: |
-          IMAGE="nginxinc/nginx-unprivileged@${{ steps.metadata.outputs.amd64_digest }}"
+          IMAGE="nginxinc/nginx-unprivileged@${{ needs.check.outputs.amd64_digest }}"
           docker pull "$IMAGE"
           docker save "$IMAGE" -o nginx.tar
 
       - name: Scan image with Snyk
-        if: steps.age_check.outputs.old_enough == 'true' && steps.existing-pr.outputs.count == '0'
         uses: snyk/actions/docker@9adf32b1121593767fc3c057af55b55db032dc04
         with:
           image: nginx.tar
@@ -100,25 +133,25 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
       - name: Configure AWS credentials
-        if: steps.age_check.outputs.old_enough == 'true' && steps.existing-pr.outputs.count == '0' && inputs.dry_run != true
+        if: inputs.dry_run != true
         uses: aws-actions/configure-aws-credentials@8df5847569e6427dd6c4fb1cf565c83acfa8afa7 # v6.0.0
         with:
           role-to-assume: ${{ secrets.NGINX_ECR_ROLE_TO_ASSUME }}
           aws-region: ${{ vars.NGINX_ECR_REGION }}
 
       - name: Login to ECR
-        if: steps.age_check.outputs.old_enough == 'true' && steps.existing-pr.outputs.count == '0' && inputs.dry_run != true
+        if: inputs.dry_run != true
         uses: aws-actions/amazon-ecr-login@a080f59b057d681bf221f98cbdcd9f0defa1a1a9
 
       - name: Push nginx to ECR
         id: push
-        if: steps.age_check.outputs.old_enough == 'true' && steps.existing-pr.outputs.count == '0' && inputs.dry_run != true
+        if: inputs.dry_run != true
         run: |
-          TAG="${{ steps.metadata.outputs.tag }}"
+          TAG="${{ needs.check.outputs.tag }}"
           ECR_IMAGE="${{ secrets.ECR_REGISTRY_URL }}/${{ vars.NGINX_ECR_REPOSITORY }}:${TAG}"
 
           docker tag \
-            "nginxinc/nginx-unprivileged@${{ steps.metadata.outputs.amd64_digest }}" \
+            "nginxinc/nginx-unprivileged@${{ needs.check.outputs.amd64_digest }}" \
             "${ECR_IMAGE}"
           docker push "${ECR_IMAGE}"
 
@@ -130,13 +163,23 @@ jobs:
             --output text)
           echo "ecr_digest=$ECR_DIGEST" >> "$GITHUB_OUTPUT"
 
-      - name: Update docker-images.env and open PR
+  raise-update-pr:
+    name: Raise update PR
+    needs: [check, scan-and-mirror]
+    if: inputs.dry_run != true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - name: Update docker-images.env
         id: open-pr
-        if: steps.age_check.outputs.old_enough == 'true' && steps.existing-pr.outputs.count == '0' && inputs.dry_run != true
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          TAG="${{ steps.metadata.outputs.tag }}"
+          TAG="${{ needs.check.outputs.tag }}"
+          ECR_DIGEST="${{ needs.scan-and-mirror.outputs.ecr_digest }}" # - deploy.sh SHA-pinned deployments
+          DOCKERHUB_DIGEST="${{ needs.check.outputs.amd64_digest }}" # - SCA image scanning
           BRANCH="chore/mirror-nginx-${TAG}"
 
           git config user.name "github-actions[bot]"
@@ -145,18 +188,24 @@ jobs:
 
           sed -i "s|^NGINX_IMAGE_TAG=.*|NGINX_IMAGE_TAG=${TAG}|" docker-images.env
           sed -i \
-            "s|^NGINX_ECR_IMAGE_DIGEST_AMD64=.*|NGINX_ECR_IMAGE_DIGEST_AMD64=${{ steps.push.outputs.ecr_digest }}|" \
+            "s|^NGINX_ECR_IMAGE_DIGEST_AMD64=.*|NGINX_ECR_IMAGE_DIGEST_AMD64=${ECR_DIGEST}|" \
             docker-images.env
 
-          git add docker-images.env
-          git commit -m "chore: mirror nginx-unprivileged ${TAG} to ECR"
+          jq --arg digest "docker.io/nginxinc/nginx-unprivileged@${DOCKERHUB_DIGEST}" \
+            '(.images[] | select(startswith("docker.io/nginxinc/nginx-unprivileged"))) = $digest' \
+            docker-images.json > docker-images.json.tmp
+          mv docker-images.json.tmp docker-images.json
+
+          git add docker-images.env docker-images.json
+          git commit -m "chore: mirror nginx-unprivileged:alpine@${TAG} to ECR"
           git push origin "$BRANCH"
 
           TAG_URL="https://hub.docker.com/r/nginxinc/nginx-unprivileged/tags?name=${TAG}"
           BODY="Mirrors [nginx-unprivileged:alpine@${TAG}](${TAG_URL}) to ECR."
           BODY+=$'\n\n''Updates `docker-images.env`:'
           BODY+=$'\n- ''`NGINX_IMAGE_TAG` to `'"${TAG}"'`'
-          BODY+=$'\n- ''`NGINX_ECR_IMAGE_DIGEST_AMD64` to `'"${{ steps.push.outputs.ecr_digest }}"'`'
+          BODY+=$'\n- ''`NGINX_ECR_IMAGE_DIGEST_AMD64` to `'"${ECR_DIGEST}"'`'
+          BODY+=$'\n\n''Updates `docker-images.json` nginx entry to `docker.io/nginxinc/nginx-unprivileged@'"${DOCKERHUB_DIGEST}"'`.'
 
           PR_URL=$(gh pr create \
             --head "$BRANCH" \
@@ -166,7 +215,6 @@ jobs:
           echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
 
       - name: Close superseded PRs
-        if: steps.age_check.outputs.old_enough == 'true' && steps.existing-pr.outputs.count == '0' && inputs.dry_run != true
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
