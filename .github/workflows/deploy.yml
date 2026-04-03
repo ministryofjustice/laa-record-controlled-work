@@ -112,6 +112,7 @@ jobs:
   deploy-uat:
     environment: uat
     runs-on: ubuntu-latest
+    if: ${{ !startsWith(github.ref, 'refs/heads/gh-readonly-queue/') }}
     concurrency:
       group: deploy-uat-${{ github.ref }}
       cancel-in-progress: false
