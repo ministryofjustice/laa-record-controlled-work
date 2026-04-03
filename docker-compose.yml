@@ -2,7 +2,7 @@ services:
   rcw:
     build: .
     environment:
-      NODE_ENV: development
+      NODE_ENV: production
       SESSION_SECRET: dev-secret
       SESSION_NAME: sessionId
       RATELIMIT_HEADERS_ENABLED: "false"
@@ -22,7 +22,7 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./deploy/laa-record-controlled-work/files/nginx.conf.template:/etc/nginx/templates/nginx.conf.template:ro
+      - ./deploy/laa-record-controlled-work/files/_nginx.conf.template:/etc/nginx/templates/_nginx.conf.template:ro
     depends_on:
       - rcw
       # - ccq
