@@ -142,3 +142,4 @@ jobs:
           kube-namespace: ${{ secrets.KUBE_NAMESPACE }}
           session_secret: ${{ secrets.SESSION_SECRET }}
           session_encryption_key: ${{ secrets.SESSION_ENCRYPTION_KEY }}
+          nginx-ecr-repository: ${{ vars.NGINX_ECR_REPOSITORY }}
