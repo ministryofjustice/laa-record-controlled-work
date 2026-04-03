@@ -178,7 +178,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           TAG="${{ needs.check.outputs.tag }}"
-          ECR_DIGEST="${{ needs.scan-and-mirror.outputs.ecr_digest }}"
+          ECR_DIGEST="${{ needs.scan-and-mirror.outputs.ecr_digest }}" # - deploy.sh SHA-pinned deployments
+          DOCKERHUB_DIGEST="${{ needs.check.outputs.amd64_digest }}" # - SCA image scanning
           BRANCH="chore/mirror-nginx-${TAG}"
 
           git config user.name "github-actions[bot]"
@@ -190,8 +191,13 @@ jobs:
             "s|^NGINX_ECR_IMAGE_DIGEST_AMD64=.*|NGINX_ECR_IMAGE_DIGEST_AMD64=${ECR_DIGEST}|" \
             docker-images.env
 
-          git add docker-images.env
-          git commit -m "chore: mirror nginx-unprivileged ${TAG} to ECR"
+          jq --arg digest "docker.io/nginxinc/nginx-unprivileged@${DOCKERHUB_DIGEST}" \
+            '(.images[] | select(startswith("docker.io/nginxinc/nginx-unprivileged"))) = $digest' \
+            docker-images.json > docker-images.json.tmp
+          mv docker-images.json.tmp docker-images.json
+
+          git add docker-images.env docker-images.json
+          git commit -m "chore: mirror nginx-unprivileged:alpine@${TAG} to ECR"
           git push origin "$BRANCH"
 
           TAG_URL="https://hub.docker.com/r/nginxinc/nginx-unprivileged/tags?name=${TAG}"
@@ -199,6 +205,7 @@ jobs:
           BODY+=$'\n\n''Updates `docker-images.env`:'
           BODY+=$'\n- ''`NGINX_IMAGE_TAG` to `'"${TAG}"'`'
           BODY+=$'\n- ''`NGINX_ECR_IMAGE_DIGEST_AMD64` to `'"${ECR_DIGEST}"'`'
+          BODY+=$'\n\n''Updates `docker-images.json` nginx entry to `docker.io/nginxinc/nginx-unprivileged@'"${DOCKERHUB_DIGEST}"'`.'
 
           PR_URL=$(gh pr create \
             --head "$BRANCH" \
