@@ -15,8 +15,16 @@ if [ "$PRIOR_BRANCH" = "HEAD" ]; then
 fi
 
 git fetch origin
+echo "---"
+echo "Switching to $BRANCH"
 git checkout "$BRANCH"
+echo "---"
+echo "Pushing empty commit to trigger CI"
 git commit --allow-empty -m "chore: trigger CI"
 git push origin "$BRANCH"
+echo "---"
+echo "Returning to $PRIOR_BRANCH"
 git checkout "$PRIOR_BRANCH"
-git branch -d "$BRANCH"
+git branch -D "$BRANCH"
+echo "---"
+echo "Done"
