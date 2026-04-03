@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "laa-record-controlled-work.fullname" . }}
+  name: {{ include "laa-record-controlled-work.fullname" . }}-rcw
   labels:
     {{- include "laa-record-controlled-work.labels" . | nindent 4 }}
 spec:
