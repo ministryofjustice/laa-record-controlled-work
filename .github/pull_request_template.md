@@ -13,4 +13,4 @@
 
 
 ## Notes
-<!-- Anything extra that needs mentioning. Issues, limitations, dependencies, open questions, etc. -->
+<!-- Anything extra that needs mentioning. Issues, limitations, dependencies, open questions, etc. If there's nothing noteworthy, remove the section. -->
