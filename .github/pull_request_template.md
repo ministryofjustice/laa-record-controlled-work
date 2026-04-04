@@ -1,26 +1,13 @@
-[Jira ticket (if applicable)](https://dsdmoj.atlassian.net/browse/EL-XXX)
+<!-- We use squash rather than merge or rebase. Make sure the PR has a descriptive title. -->
 
-## What changed and Why?
+## What?
+<!-- One liner that describes the change. -->
 
-<!-- EXAMPLE, fill this in
-I have added/removed/altered:
--->
+## Why?
+<!-- Justify the changes. Does it add a feature? Did you use a new pattern? Are there new workflows? -->
 
-## Guidance to review (optional)
+## Changes
+<!-- Bullet points, enough to summarise the changes. -->
 
-<!-- Provide any useful context for the reviewer:  
-- Key areas to focus on in the review
-- Any known issues or limitations  
-- Dependencies or related changes to consider
--->
-
-## Checklist
-
-Before you ask people to review this PR:
-
-- [ ] **Tests and linting** are passing.  
-- [ ] **Branch is up to date** with `main` (no merge conflicts).  
-- [ ] **No unnecessary whitespace changes** (avoid unnecessary diffs).  
-- [ ] **PR description clearly explains** what changed and why, with a JIRA ticket/Trello link.  
-- [ ] **Diff has been checked** for any unexpected changes.  
-- [ ] **Commit messages are clear** and explain what will change, if individual commit, needs to be revisited retroactively.
+## Notes
+<!-- Anything extra that needs mentioning. Issues, limitations, dependencies, open questions, etc. -->
