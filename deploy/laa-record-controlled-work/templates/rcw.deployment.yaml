@@ -50,34 +50,17 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           env:
-            - name: SERVICE_NAME
-              value: "{{ .Values.rcw.env.SERVICE_NAME }}"
-            - name: SERVICE_PHASE
-              value: "{{ .Values.rcw.env.SERVICE_PHASE }}"
-            - name: DEPARTMENT_NAME
-              value: "{{ .Values.rcw.env.DEPARTMENT_NAME }}"
-            - name: DEPARTMENT_URL
-              value: "{{ .Values.rcw.env.DEPARTMENT_URL }}"
-            - name: CONTACT_EMAIL
-              value: "{{ .Values.rcw.env.CONTACT_EMAIL }}"
-            - name: CONTACT_PHONE
-              value: "{{ .Values.rcw.env.CONTACT_PHONE }}"
-            - name: SERVICE_URL
-              value: "{{ .Values.rcw.env.SERVICE_URL }}"
-            - name: SESSION_SECRET
-              value: "{{ .Values.rcw.env.SESSION_SECRET }}"
-            - name: SESSION_NAME
-              value: "{{ .Values.rcw.env.SESSION_NAME }}"
-            - name: RATELIMIT_HEADERS_ENABLED
-              value: "{{ .Values.rcw.env.RATELIMIT_HEADERS_ENABLED }}"
-            - name: RATELIMIT_STORAGE_URI
-              value: "{{ .Values.rcw.env.RATELIMIT_STORAGE_URI }}"
-            - name: RATE_LIMIT_MAX
-              value: "{{ .Values.rcw.env.RATE_LIMIT_MAX }}"
-            - name: RATE_WINDOW_MS
-              value: "{{ .Values.rcw.env.RATE_WINDOW_MS }}"
-            - name: NODE_ENV
-              value: "{{ .Values.rcw.env.NODE_ENV }}"
+            {{- range $key, $val := .Values.rcw.env }}
+            - name: {{ $key }}
+              value: {{ $val | quote }}
+            {{- end }}
+            {{- range .Values.rcw.envSecrets }}
+            - name: {{ . }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $.Values.rcw.envSecretName }}
+                  key: {{ . }}
+            {{- end }}
       {{- with .Values.rcw.volumes }}
       volumes:
         {{- toYaml . | nindent 8 }}
