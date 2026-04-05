@@ -73,12 +73,20 @@ rcw:
     initialDelaySeconds: 30
     periodSeconds: 60
 
-  # these need to be added to the RCW secret step in deploy.sh as well
+  # Secret env vars — stored in a Kubernetes Secret, referenced via secretKeyRef in the deployment template.
+  # envSecretName: the name of the Kubernetes Secret to create/update.
+  # envSecrets: keys to pull from that secret. Each key must also be listed in the env: block of
+  #   deploy-environment.yml so the CI job can pass the value to the kubectl upsert step.
+  # Note: Helm merges maps (env) deeply across values files, but replaces lists (envSecrets) entirely.
+  #   If an environment needs additional secrets, repeat the full list in its values file.
   envSecretName: rcw-env-secrets
   envSecrets:
     - SESSION_SECRET
     - SESSION_ENCRYPTION_KEY
 
+  # Plain env vars - injected directly into the container. Add new vars here only; they are
+  # automatically picked up by the Helm template and test workflows (via yq). Override per
+  # environment by setting the key again in the relevant values/<env>.yaml file (maps deep-merge).
   env:
     SERVICE_NAME: "LAA Record Controlled Work"
     SERVICE_PHASE: "Beta"
