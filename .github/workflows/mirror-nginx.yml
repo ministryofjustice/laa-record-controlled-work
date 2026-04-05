@@ -39,7 +39,7 @@ jobs:
     outputs:
       tag: ${{ steps.fetch_metadata.outputs.tag }}
       amd64_digest: ${{ steps.fetch_metadata.outputs.amd64_digest }}
-      proceed: ${{ steps.pr_check.outputs.count == '0' }}
+      proceed: ${{ steps.pr_check.outputs.no_existing_pr }}
     steps:
       - name: Checkout code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
@@ -105,7 +105,7 @@ jobs:
             --state open \
             --json number \
             --jq 'length')
-          echo "count=$COUNT" >> "$GITHUB_OUTPUT"
+          echo "no_existing_pr=$([ "$COUNT" = "0" ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
 
   scan-and-mirror:
     name: Scan and mirror
