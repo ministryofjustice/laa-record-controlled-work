@@ -57,10 +57,12 @@ runs:
         SESSION_ENCRYPTION_KEY: ${{ inputs.session_encryption_key }}
         K8S_NAMESPACE: ${{ inputs.kube-namespace }}
       run: |
+        readarray -t keys <<< "$(yq '.rcw.envSecrets[]' ./deploy/laa-record-controlled-work/values.yaml)"
+
         args=()
-        while IFS= read -r key; do
+        for key in "${keys[@]}"; do
           args+=(--from-literal="${key}=${!key}")
-        done < <(yq '.rcw.envSecrets[]' ./deploy/laa-record-controlled-work/values.yaml)
+        done
 
         kubectl create secret generic rcw-env-secrets \
           --namespace="$K8S_NAMESPACE" \
