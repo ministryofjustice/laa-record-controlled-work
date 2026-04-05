@@ -2,6 +2,11 @@ name: Playwright Tests
 on:
   workflow_dispatch: # Allow manual triggering only
   workflow_call: # Allow this workflow to be called by other workflows
+    inputs:
+      sha:
+        description: "The commit SHA to check out"
+        type: string
+        default: ''
 
 jobs:
   playwright:
@@ -15,6 +20,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
+          ref: ${{ inputs.sha || github.sha }}
           fetch-depth: 0 # Fetch all history for proper change detection
 
       - name: Setup Node and Dependencies
@@ -75,6 +81,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
+          ref: ${{ inputs.sha || github.sha }}
           fetch-depth: 0
 
       - name: Read Node version from .nvmrc

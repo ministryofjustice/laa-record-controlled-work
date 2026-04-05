@@ -1,0 +1,33 @@
+name: Add ephemeral deployment instructions to PR
+
+on:
+  pull_request:
+    types: [opened]
+
+permissions:
+  contents: read
+
+jobs:
+  post-instructions:
+    name: Post instructions to PR
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Post comment
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          message="To deploy an ephemeral environment for this PR, add the"
+          message+=" \`DEPLOY-EPHEMERAL\` label. The environment will"
+          message+=" redeploy automatically on subsequent pushes while"
+          message+=" the label is present. The deployment URL will be"
+          message+=" posted as a follow-up comment when ready."
+          
+          message+="\n\nRemoving the label stops auto-redeploys but leaves"
+          message+=" the environment running - it will be torn down"
+          message+=" automatically when this PR is closed."
+
+          gh pr comment "$PR_NUMBER" --repo "$GH_REPO" --body "$message"

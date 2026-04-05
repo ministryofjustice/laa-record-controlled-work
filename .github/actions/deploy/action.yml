@@ -27,12 +27,20 @@ inputs:
   session_encryption_key:
     description: "Session encryption key for sensitive data"
     required: true
+  branch-ref:
+    description: "Branch ref for ephemeral deployments"
+    default: ''
+  sha:
+    description: "Commit SHA to deploy"
+    default: ''
 
 runs:
   using: "composite"
   steps:
     - name: Checkout
       uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      with:
+        ref: ${{ inputs.sha }}
 
     - name: Authenticate to the cluster
       uses: ministryofjustice/laa-reusable-github-actions/.github/actions/authenticate_to_cluster@e0b6695b8ec0679ae36920155fd06539c685a096
@@ -56,9 +64,9 @@ runs:
       env:
         REGISTRY: ${{ inputs.ecr-registry_url }}
         REPOSITORY: ${{ inputs.ecr-repository }}
-        IMAGE_TAG: ${{ github.sha }}
-        GITHUB_SHA: ${{ github.sha }}
-        GITHUB_REF_NAME: ${{ github.ref_name }}
+        IMAGE_TAG: ${{ inputs.sha }}
+        GITHUB_SHA: ${{ inputs.sha }}
+        GITHUB_REF_NAME: ${{ inputs.branch-ref || github.ref_name }}
         K8S_NAMESPACE: ${{ inputs.kube-namespace }}
         SESSION_SECRET: ${{ inputs.session_secret }}
         SESSION_ENCRYPTION_KEY: ${{ inputs.session_encryption_key }}
