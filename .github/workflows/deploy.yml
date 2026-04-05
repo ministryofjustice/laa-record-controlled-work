@@ -128,26 +128,26 @@ jobs:
       app-environment: uat
     secrets: inherit
 
-  deploy-staging:
-    if: false
-    concurrency:
-      group: deploy-staging-${{ github.ref }}
-      cancel-in-progress: false
-    needs:
-      - deploy-uat
-    uses: ./.github/workflows/deploy-environment.yml
-    with:
-      app-environment: staging
-    secrets: inherit
+  # deploy-staging:
+  #   if: github.ref == 'refs/heads/main'
+  #   concurrency:
+  #     group: deploy-staging-${{ github.ref }}
+  #     cancel-in-progress: false
+  #   needs:
+  #     - deploy-uat
+  #   uses: ./.github/workflows/deploy-environment.yml
+  #   with:
+  #     app-environment: staging
+  #   secrets: inherit
 
-  deploy-production:
-    if: false
-    concurrency:
-      group: deploy-production-${{ github.ref }}
-      cancel-in-progress: false
-    needs:
-      - deploy-staging
-    uses: ./.github/workflows/deploy-environment.yml
-    with:
-      app-environment: production
-    secrets: inherit
+  # deploy-production:
+  #   if: github.ref == 'refs/heads/main'
+  #   concurrency:
+  #     group: deploy-production-${{ github.ref }}
+  #     cancel-in-progress: false
+  #   needs:
+  #     - deploy-staging
+  #   uses: ./.github/workflows/deploy-environment.yml
+  #   with:
+  #     app-environment: production
+  #   secrets: inherit
