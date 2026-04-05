@@ -26,6 +26,10 @@ on:
         description: "Skip version change detection (e.g. for disaster recovery)"
         type: boolean
         default: false
+      override_tag:
+        description: "Mirror a specific tag instead of latest (e.g. 1.28.0-alpine). Skips version and age checks."
+        type: string
+        default: ""
 
 permissions:
   id-token: write
@@ -39,15 +43,17 @@ jobs:
     outputs:
       tag: ${{ steps.fetch_metadata.outputs.tag }}
       amd64_digest: ${{ steps.fetch_metadata.outputs.amd64_digest }}
-      proceed: ${{ steps.pr_check.outputs.count == '0' }}
+      proceed: ${{ steps.pr_check.outputs.no_existing_pr }}
     steps:
       - name: Checkout code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
       - name: Fetch latest nginx-unprivileged:alpine metadata from Docker Hub
         id: fetch_metadata
+        env:
+          INPUT_TAG: ${{ inputs.override_tag }}
         run: |
-          METADATA=$(skopeo inspect docker://nginxinc/nginx-unprivileged:alpine)
+          METADATA=$(skopeo inspect docker://nginxinc/nginx-unprivileged:${INPUT_TAG:-alpine})
           TAG=$(echo "$METADATA" | jq -r '.Labels["org.opencontainers.image.version"]')
           DIGEST=$(echo "$METADATA" | jq -r '.Digest')
 
@@ -57,7 +63,7 @@ jobs:
       - name: Check if version has changed
         id: version_check
         run: |
-          if [ "${{ inputs.skip_version_check }}" = "true" ]; then
+          if [ "${{ inputs.skip_version_check }}" = "true" ] || [ -n "${{ inputs.override_tag }}" ]; then
             echo "Version check skipped."
             echo "changed=true" >> "$GITHUB_OUTPUT"
             exit 0
@@ -75,7 +81,7 @@ jobs:
         id: age_check
         if: steps.version_check.outputs.changed == 'true'
         run: |
-          if [ "${{ inputs.skip_age_check }}" = "true" ]; then
+          if [ "${{ inputs.skip_age_check }}" = "true" ] || [ -n "${{ inputs.override_tag }}" ]; then
             echo "Age check skipped."
             echo "old_enough=true" >> "$GITHUB_OUTPUT"
             exit 0
@@ -105,7 +111,7 @@ jobs:
             --state open \
             --json number \
             --jq 'length')
-          echo "count=$COUNT" >> "$GITHUB_OUTPUT"
+          echo "no_existing_pr=$([ "$COUNT" = "0" ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
 
   scan-and-mirror:
     name: Scan and mirror
