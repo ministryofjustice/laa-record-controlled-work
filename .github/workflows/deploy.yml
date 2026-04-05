@@ -110,8 +110,6 @@ jobs:
           image_tag: ${{ github.sha }}
 
   deploy-uat:
-    environment: uat
-    runs-on: ubuntu-latest
     if: ${{ !startsWith(github.ref, 'refs/heads/gh-readonly-queue/') }}
     concurrency:
       group: deploy-uat-${{ github.ref }}
@@ -125,20 +123,31 @@ jobs:
       - mocha-unit-tests
       - playwright
       - snyk-infra
+    uses: ./.github/workflows/deploy-environment.yml
+    with:
+      app-environment: uat
+    secrets: inherit
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+  deploy-staging:
+    if: false
+    concurrency:
+      group: deploy-staging-${{ github.ref }}
+      cancel-in-progress: false
+    needs:
+      - deploy-uat
+    uses: ./.github/workflows/deploy-environment.yml
+    with:
+      app-environment: staging
+    secrets: inherit
 
-      - name: Deploy to UAT
-        uses: ./.github/actions/deploy
-        with:
-          app-environment: uat
-          ecr-repository: ${{ vars.ECR_REPOSITORY }}
-          ecr-registry_url: ${{ secrets.ECR_REGISTRY_URL }}
-          kube-cert: ${{ secrets.KUBE_CERT }}
-          kube-token: ${{ secrets.KUBE_TOKEN }}
-          kube-cluster: ${{ secrets.KUBE_CLUSTER }}
-          kube-namespace: ${{ secrets.KUBE_NAMESPACE }}
-          session_secret: ${{ secrets.SESSION_SECRET }}
-          session_encryption_key: ${{ secrets.SESSION_ENCRYPTION_KEY }}
+  deploy-production:
+    if: false
+    concurrency:
+      group: deploy-production-${{ github.ref }}
+      cancel-in-progress: false
+    needs:
+      - deploy-staging
+    uses: ./.github/workflows/deploy-environment.yml
+    with:
+      app-environment: production
+    secrets: inherit
