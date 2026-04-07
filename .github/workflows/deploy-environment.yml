@@ -26,8 +26,9 @@ jobs:
           SESSION_ENCRYPTION_KEY: ${{ secrets.SESSION_ENCRYPTION_KEY }}
         with:
           app-environment: ${{ inputs.app-environment }}
-          ecr-repository: ${{ vars.ECR_REPOSITORY }}
           ecr-registry_url: ${{ secrets.ECR_REGISTRY_URL }}
+          ecr-repository: ${{ vars.ECR_REPOSITORY }}
+          nginx-ecr-repository: ${{ vars.NGINX_ECR_REPOSITORY }}
           kube-cert: ${{ secrets.KUBE_CERT }}
           kube-token: ${{ secrets.KUBE_TOKEN }}
           kube-cluster: ${{ secrets.KUBE_CLUSTER }}
