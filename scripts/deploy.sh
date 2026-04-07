@@ -1,8 +1,7 @@
 #!/bin/bash
 
 ENVIRONMENT=$1
-# Convert the branch name into a string that can be turned into a valid URL
-  BRANCH_RELEASE_NAME=$(echo "$GITHUB_REF_NAME" | tr '[:upper:]' '[:lower:]' | sed 's:^\w*\/::' | tr -s ' _/[]().' '-' | cut -c1-18 | sed 's/-$//')
+BRANCH_RELEASE_NAME=$(./scripts/release-name.sh)
 
 deploy_branch() {
 # Set the deployment host, this will add the prefix of the branch name e.g el-257-deploy-with-circleci or just main
@@ -17,6 +16,7 @@ deploy_branch() {
                 --values ./deploy/laa-record-controlled-work/values/"$ENVIRONMENT".yaml \
                 --set rcw.image.repository="$REGISTRY/$REPOSITORY" \
                 --set rcw.image.tag="$IMAGE_TAG" \
+                --set rcw.envSecretName="$SECRET_NAME" \
                 --set ingress.annotations."external-dns\.alpha\.kubernetes\.io/set-identifier"="$IDENTIFIER" \
                 --set ingress.hosts[0].host="$RELEASE_HOST"
 }

@@ -38,8 +38,7 @@ jobs:
         shell: bash
         run: |
           branch=${{ steps.extract_branch.outputs.branch }}
-          truncated_branch=$(echo $branch | tr '[:upper:]' '[:lower:]' | sed 's:^\w*\/::' | tr -s ' _/[]().' '-' | cut -c1-18 | sed 's/-$//')
-          echo "release=$truncated_branch" >> $GITHUB_OUTPUT
+          echo "release=$(./scripts/release-name.sh "$branch")" >> $GITHUB_OUTPUT
 
       - name: Authenticate to the cluster
         id: authenticate_to_cluster
@@ -60,6 +59,7 @@ jobs:
           if [[ ! -z "$found" ]]
           then
             helm uninstall $release_name
+            kubectl delete secret "${release_name}-env-secrets" --ignore-not-found
 
             if [[ "${DELETE_ALL_PVC}" = "true" ]]
             then

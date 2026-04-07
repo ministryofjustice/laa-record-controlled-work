@@ -75,11 +75,7 @@ rcw:
 
   # Secret env vars — stored in a Kubernetes Secret, referenced via secretKeyRef in the deployment template.
   # envSecretName: the name of the Kubernetes Secret to create/update.
-  # envSecrets: keys to pull from that secret. Each key must also be listed in the env: block of
-  #   deploy-environment.yml so the CI job can pass the value to the kubectl upsert step.
-  # Note: Helm merges maps (env) deeply across values files, but replaces lists (envSecrets) entirely.
-  #   If an environment needs additional secrets, repeat the full list in its values file.
-  envSecretName: rcw-env-secrets
+  envSecretName: env-secrets
   envSecrets:
     - SESSION_SECRET
     - SESSION_ENCRYPTION_KEY
