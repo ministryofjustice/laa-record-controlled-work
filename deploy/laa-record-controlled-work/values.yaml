@@ -89,10 +89,9 @@ rcw:
   #     the kubectl upsert step.
   #
   # Notes: 
-  #   - Helm merges maps (env) deeply across values files, but replaces 
-  #     lists (envSecrets) entirely.
-  #   - If an environment needs additional secrets, repeat the full envSecrets
-  #     list in its values file.
+  #   - Helm merges maps (env:) deeply across values files, but replaces 
+  #     lists (envSecrets:) entirely. If an environment needs additional
+  #     secrets, repeat the full envSecrets: list in its values file.
   envSecretName: env-secrets
   envSecrets:
     - SESSION_SECRET
