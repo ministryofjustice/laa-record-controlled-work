@@ -17,24 +17,26 @@
 		"forceConsistentCasingInFileNames": true, // Disallow inconsistently-cased references to the same file
 		"baseUrl": ".",
 		"paths": {
-			"#*": ["./*"]
+			"#*": [
+				"./*"
+			]
 		}
 	},
 	"include": [
-    "src/**/*",
-    "middleware/**/*",
-    "bootstrap/**/*.ts",
-    "routes/**/*",
-    "scripts/**/*.ts",
-    "index.ts",
-    "esbuild.ts",
-    "start-server.ts",
-    "config.ts",
-    "types/**/*.ts",
-    "playwright.config.ts",
-    "tests/**/*.spec.ts",
-    "tests/**/*.ts"
-  ],
+		"src/**/*",
+		"middleware/**/*",
+		"bootstrap/**/*.ts",
+		"routes/**/*",
+		"scripts/**/*.ts",
+		"index.ts",
+		"esbuild.ts",
+		"start-server.ts",
+		"config.ts",
+		"types/**/*.ts",
+		"playwright.config.ts",
+		"tests/**/*.spec.ts",
+		"tests/**/*.ts"
+	],
 	"exclude": [
 		"node_modules",
 		"public",
