@@ -27,6 +27,9 @@ inputs:
   session_encryption_key:
     description: "Session encryption key for sensitive data"
     required: true
+  nginx-ecr-repository:
+    description: "ECR repository for the mirrored nginx-unprivileged image"
+    required: true
 
 runs:
   using: "composite"
@@ -62,6 +65,7 @@ runs:
         K8S_NAMESPACE: ${{ inputs.kube-namespace }}
         SESSION_SECRET: ${{ inputs.session_secret }}
         SESSION_ENCRYPTION_KEY: ${{ inputs.session_encryption_key }}
+        NGINX_ECR_REPOSITORY: ${{ inputs.nginx-ecr-repository }}
 # TODO set up slack notification
 # - name: Notify deployment failure
 #   shell: bash

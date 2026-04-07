@@ -1,6 +1,12 @@
 #!/bin/bash
 
 ENVIRONMENT=$1
+
+# Load nginx image tag and ECR digest from the checked-in env file.
+# Uses dirname "$0" so the path resolves relative to the script's location, not the caller's working directory.
+# shellcheck source=docker-images.env
+source "$(dirname "$0")/../docker-images.env"
+
 # Convert the branch name into a string that can be turned into a valid URL
   BRANCH_RELEASE_NAME=$(echo "$GITHUB_REF_NAME" | tr '[:upper:]' '[:lower:]' | sed 's:^\w*\/::' | tr -s ' _/[]().' '-' | cut -c1-18 | sed 's/-$//')
 
@@ -17,6 +23,8 @@ deploy_branch() {
                 --values ./deploy/laa-record-controlled-work/values/"$ENVIRONMENT".yaml \
                 --set rcw.image.repository="$REGISTRY/$REPOSITORY" \
                 --set rcw.image.tag="$IMAGE_TAG" \
+                --set nginx.image.repository="$REGISTRY/$NGINX_ECR_REPOSITORY" \
+                --set nginx.image.tag="${NGINX_IMAGE_TAG}@${NGINX_ECR_IMAGE_DIGEST_AMD64}" \
                 --set ingress.annotations."external-dns\.alpha\.kubernetes\.io/set-identifier"="$IDENTIFIER" \
                 --set ingress.hosts[0].host="$RELEASE_HOST" \
                 --set rcw.env.SESSION_SECRET="$SESSION_SECRET" 
@@ -29,6 +37,8 @@ deploy_main() {
                           --values ./deploy/laa-record-controlled-work/values/"$ENVIRONMENT".yaml \
                           --set rcw.image.repository="$REGISTRY/$REPOSITORY" \
                           --set rcw.image.tag="$IMAGE_TAG" \
+                          --set nginx.image.repository="$REGISTRY/$NGINX_ECR_REPOSITORY" \
+                          --set nginx.image.tag="${NGINX_IMAGE_TAG}@${NGINX_ECR_IMAGE_DIGEST_AMD64}" \
                           --set rcw.env.SESSION_SECRET="$SESSION_SECRET" 
 }
 
