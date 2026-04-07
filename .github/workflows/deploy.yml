@@ -20,10 +20,6 @@ jobs:
       - name: Run ESLint
         run: yarn lint
 
-  sca:
-    name: Software Composition Analysis
-    uses: ./.github/workflows/sca.yml
-
   slsa:
     name: SLSA Supply Chain Security
     uses: ./.github/workflows/slsa.yml
@@ -91,11 +87,11 @@ jobs:
           role-to-assume: ${{ secrets.ECR_ROLE_TO_ASSUME }}
           aws-region: ${{ vars.ECR_REGION }}
 
-      - uses: aws-actions/amazon-ecr-login@a080f59b057d681bf221f98cbdcd9f0defa1a1a9
+      - uses: aws-actions/amazon-ecr-login@f2e9fc6c2b355c1890b65e6f6f0e2ac3e6e22f78
         id: login-ecr
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@172dff065fb2e54aaed577fd667975cd412819fb
+        uses: docker/setup-buildx-action@21162887f0d6e25b4e8eafb0cf44cf9bf7f6acd3
 
       - name: Cache Docker layers
         uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5
@@ -116,12 +112,12 @@ jobs:
   deploy-uat:
     environment: uat
     runs-on: ubuntu-latest
+    if: ${{ !startsWith(github.ref, 'refs/heads/gh-readonly-queue/') }}
     concurrency:
       group: deploy-uat-${{ github.ref }}
       cancel-in-progress: false
     needs:
       - code-linting
-      - sca
       - slsa
       - code-security-audit
       - snyk

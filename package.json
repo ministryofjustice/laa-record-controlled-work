@@ -29,7 +29,7 @@
   },
   "dependencies": {
     "@ministryofjustice/frontend": "9.0.0",
-    "axios": "1.13.6",
+    "axios": "1.14.0",
     "body-parser": "^2.2.2",
     "chalk": "^5.6.2",
     "compression": "^1.8.1",
@@ -39,7 +39,7 @@
     "dotenv": "^17.3.1",
     "eslint-plugin-prettier": "^5.5.5",
     "express": "^5.2.1",
-    "express-rate-limit": "^8.3.1",
+    "express-rate-limit": "^8.3.2",
     "express-session": "^1.19.0",
     "express-validator": "^7.3.1",
     "figlet": "^1.11.0",
@@ -47,8 +47,8 @@
     "govuk-frontend": "^6.1.0",
     "helmet": "^8.1.0",
     "http-errors": "~2.0.1",
-    "i18next": "^25.10.5",
-    "libphonenumber-js": "^1.12.40",
+    "i18next": "^25.10.10",
+    "libphonenumber-js": "^1.12.41",
     "middleware-axios": "^3.0.0",
     "moment": "^2.30.1",
     "morgan": "~1.10.1",
@@ -76,9 +76,9 @@
     "@types/sinon": "^21.0.0",
     "@types/supertest": "^7.2.0",
     "@types/validator": "^13.15.10",
-    "@typescript-eslint/eslint-plugin": "^8.57.1",
-    "@typescript-eslint/parser": "^8.57.1",
-    "axe-core": "^4.11.1",
+    "@typescript-eslint/eslint-plugin": "^8.57.2",
+    "@typescript-eslint/parser": "^8.57.2",
+    "axe-core": "^4.11.2",
     "c8": "^11.0.0",
     "chai": "^6.2.2",
     "chokidar": "5.0.0",
@@ -91,7 +91,7 @@
     "eslint": "^10.1.0",
     "eslint-config-love": "^151.0.0",
     "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-jsdoc": "^62.8.0",
+    "eslint-plugin-jsdoc": "^62.8.1",
     "globals": "^17.4.0",
     "husky": "^9.1.7",
     "jsdom": "^28.1.0",
@@ -123,6 +123,7 @@
   "resolutions": {
     "@isaacs/brace-expansion": "5.0.5",
     "brace-expansion": "5.0.5",
-    "serialize-javascript": "7.0.5"
+    "serialize-javascript": "7.0.5",
+    "lodash": "4.18.1"
   }
 }
