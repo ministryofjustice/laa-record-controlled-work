@@ -22,6 +22,14 @@ inputs:
   ecr-registry_url:
     description: "ECR registry url"
     required: true
+  session_secret:
+    description: "Session secret"
+  session_encryption_key:
+    description: "Session encryption key for sensitive data"
+    required: true
+  nginx-ecr-repository:
+    description: "ECR repository for the mirrored nginx-unprivileged image"
+    required: true
 
 runs:
   using: "composite"
@@ -72,6 +80,7 @@ runs:
         GITHUB_SHA: ${{ github.sha }}
         GITHUB_REF_NAME: ${{ github.ref_name }}
         K8S_NAMESPACE: ${{ inputs.kube-namespace }}
+        NGINX_ECR_REPOSITORY: ${{ inputs.nginx-ecr-repository }}
 # TODO set up slack notification
 # - name: Notify deployment failure
 #   shell: bash
