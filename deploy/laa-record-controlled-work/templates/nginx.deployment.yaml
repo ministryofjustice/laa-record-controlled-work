@@ -30,8 +30,8 @@ spec:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
             runAsNonRoot: true
-            runAsUser: 101
-            runAsGroup: 101
+            runAsUser: 10001
+            runAsGroup: 10001
             capabilities:
               drop:
                 - ALL
