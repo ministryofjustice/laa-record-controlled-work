@@ -24,6 +24,10 @@ runs:
     - name: SLSA Supply Chain Security
       uses: ministryofjustice/devsecops-actions/sca/slsa@4cd163be7859cd130800d6719d925318826038ea
 
+    - name: Remove SLSA action eslint config to prevent conflicts
+      run: find . -maxdepth 2 -name "eslint.config.mjs" -path "*/[a-f0-9]*/*" -delete 2>/dev/null || true
+      shell: bash
+
     - name: Install dependencies
       run: yarn install --immutable
       shell: bash
