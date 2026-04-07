@@ -36,9 +36,10 @@ jobs:
       - name: Extract release name
         id: extract_release
         shell: bash
+        env:
+          BRANCH: ${{ steps.extract_branch.outputs.branch }}
         run: |
-          branch=${{ steps.extract_branch.outputs.branch }}
-          echo "release=$(./scripts/release-name.sh "$branch")" >> $GITHUB_OUTPUT
+          echo "release=$(./scripts/release-name.sh "$BRANCH")" >> $GITHUB_OUTPUT
 
       - name: Authenticate to the cluster
         id: authenticate_to_cluster

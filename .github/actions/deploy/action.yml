@@ -48,11 +48,13 @@ runs:
     - name: Set expected name for env-secrets kube secret
       id: secret-name
       shell: bash
+      env:
+        GITHUB_REF_NAME: ${{ github.ref_name }}
       run: |
-        if [[ "${{ github.ref_name }}" == "main" ]]; then
+        if [[ "$GITHUB_REF_NAME" == "main" ]]; then
           echo "value=env-secrets" >> $GITHUB_OUTPUT
         else
-          release_name=$(./scripts/release-name.sh "${{ github.ref_name }}")
+          release_name=$(./scripts/release-name.sh "$GITHUB_REF_NAME")
           echo "value=${release_name}-env-secrets" >> $GITHUB_OUTPUT
         fi
 
