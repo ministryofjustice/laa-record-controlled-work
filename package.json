@@ -13,7 +13,7 @@
     "start:docker": "docker compose --env-file docker-images.env up -d",
     "clean": "rimraf public",
     "build": "yarn clean && yarn build:ts && node public/esbuild.js",
-    "lint": "yarn eslint . --fix",
+    "lint": "yarn eslint . --fix --config eslint.config.js",
     "dev": "yarn build:ts && concurrently \"tsc --watch\" \"node public/esbuild.js --watch\" \"nodemon\"",
     "deploy": "./scripts/deploy.sh",
     "prepare": "husky",
@@ -117,7 +117,7 @@
     }
   },
   "lint-staged": {
-    "*.{js,ts}": "eslint --fix"
+    "*.{js,ts}": "eslint --fix --config eslint.config.js"
   },
   "packageManager": "yarn@4.13.0",
   "resolutions": {
