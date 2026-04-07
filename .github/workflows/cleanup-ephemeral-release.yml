@@ -60,7 +60,6 @@ jobs:
           if [[ ! -z "$found" ]]
           then
             helm uninstall $release_name
-            kubectl delete secret "${release_name}-env-secrets" --ignore-not-found
 
             if [[ "${DELETE_ALL_PVC}" = "true" ]]
             then

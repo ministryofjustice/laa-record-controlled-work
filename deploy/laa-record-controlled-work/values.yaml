@@ -73,25 +73,24 @@ rcw:
     initialDelaySeconds: 30
     periodSeconds: 60
 
-  # Secret env vars stored in a Kubernetes Secret, referenced via 
+  # Secret env vars stored in a Kubernetes Secret, referenced via
   # secretKeyRef in the deployment template.
   #
-  # envSecretName: the name of the Kubernetes Secret to create/update.
-  #   - For named environments (uat/staging/production) this is shared
-  #     across all releases in the namespace.
-  #   - For ephemeral branch releases, deploy.sh overrides this to 
-  #     <release-name>-env-secrets so each branch gets its own secret, 
-  #     which is deleted by the cleanup workflow on PR close.
+  # envSecretName: 
+  #   - The name of the Kubernetes Secret to create/update.
+  #   - Scoped per Kubernetes namespace (one per environment), shared across all releases
+  #     including ephemeral branches - all releases in a namespace use the
+  #     same secret values.
   #
-  # envSecrets: keys to pull from that secret. 
+  # envSecrets: 
+  #   - Keys to pull from that secret.
   #   - Each key must also be listed in the env: block of the deploy step
-  #     in deploy-environment.yml, so the CI job can pass the value to 
+  #     in deploy-environment.yml, so the CI job can pass the value to
   #     the kubectl upsert step.
   #
-  # Notes: 
-  #   - Helm merges maps (env:) deeply across values files, but replaces 
-  #     lists (envSecrets:) entirely. If an environment needs additional
-  #     secrets, repeat the full envSecrets: list in its values file.
+  # Helm merges maps (env:) deeply across values files, but replaces
+  # lists (envSecrets:) entirely. If an environment needs additional
+  # secrets, repeat the full envSecrets: list in its values file.
   envSecretName: env-secrets
   envSecrets:
     - SESSION_SECRET

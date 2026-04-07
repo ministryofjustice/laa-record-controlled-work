@@ -16,7 +16,6 @@ deploy_branch() {
                 --values ./deploy/laa-record-controlled-work/values/"$ENVIRONMENT".yaml \
                 --set rcw.image.repository="$REGISTRY/$REPOSITORY" \
                 --set rcw.image.tag="$IMAGE_TAG" \
-                --set rcw.envSecretName="$SECRET_NAME" \
                 --set ingress.annotations."external-dns\.alpha\.kubernetes\.io/set-identifier"="$IDENTIFIER" \
                 --set ingress.hosts[0].host="$RELEASE_HOST"
 }
