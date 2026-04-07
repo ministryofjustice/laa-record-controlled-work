@@ -37,6 +37,15 @@ jobs:
             echo "authorized=false" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Remove deploy label if actor is not authorised
+        if: steps.check-permissions.outputs.authorized == 'false' && github.event.action == 'labeled'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          gh pr edit "$PR_NUMBER" --repo "$GH_REPO" --remove-label "DEPLOY-EPHEMERAL"
+
       - name: Post acknowledgement comment
         if: steps.check-permissions.outputs.authorized == 'true'
         env:
