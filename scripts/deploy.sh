@@ -37,8 +37,7 @@ deploy_main() {
                           --set rcw.image.repository="$REGISTRY/$REPOSITORY" \
                           --set rcw.image.tag="$IMAGE_TAG" \
                           --set nginx.image.repository="$REGISTRY/$NGINX_ECR_REPOSITORY" \
-                          --set nginx.image.tag="${NGINX_IMAGE_TAG}@${NGINX_ECR_IMAGE_DIGEST_AMD64}" \
-                          --set rcw.env.SESSION_SECRET="$SESSION_SECRET" 
+                          --set nginx.image.tag="${NGINX_IMAGE_TAG}@${NGINX_ECR_IMAGE_DIGEST_AMD64}"
 }
 
 if [[ "$GITHUB_REF_NAME" == "main" ]]; then
