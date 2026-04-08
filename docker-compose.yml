@@ -1,0 +1,28 @@
+services:
+  rcw:
+    build: .
+    environment:
+      NODE_ENV: production
+      SESSION_SECRET: dev-secret
+      SESSION_NAME: sessionId
+      RATELIMIT_HEADERS_ENABLED: "false"
+      RATELIMIT_STORAGE_URI: ""
+      RATE_LIMIT_MAX: "100"
+      RATE_WINDOW_MS: "900000"
+
+  # ccq:
+  #   image:
+  #   expose:
+  #     - "3000"
+
+  nginx:
+    image: nginxinc/nginx-unprivileged:${NGINX_IMAGE_TAG:-alpine}
+    environment:
+      NGINX_UPSTREAM_RCW: rcw:3000
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./deploy/laa-record-controlled-work/nginx/default.conf.template:/etc/nginx/templates/default.conf.template:ro
+    depends_on:
+      - rcw
+      # - ccq

@@ -7,3 +7,9 @@ node_modules
 .DS_Store
 coverage
 .nyc_output
+
+# RCW specific directories
+docs/
+deploy/
+infrastructure/
+public/

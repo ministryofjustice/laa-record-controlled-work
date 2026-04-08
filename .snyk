@@ -1,0 +1,11 @@
+# Snyk (https://snyk.io) policy file
+version: v1.25.0
+
+# See example below to suppress a CVE that cannot yet be fixed.
+#
+# ignore:
+#   SNYK-JS-EXAMPLE-12345678:
+#     - "*":
+#         reason: >
+#           Brief explanation of why the CVE is being ignored and when a fix is expected.
+#         expires: "YYYY-MM-DDT00:00:00.000Z" 

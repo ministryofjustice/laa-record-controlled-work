@@ -1,8 +1,7 @@
 name: Snyk Infrastructure as Code
 
 on:
-  schedule:
-    - cron: "30 21 * * 1" # at 21:30 on Monday evening
+  workflow_call:
   workflow_dispatch:
 
 permissions:
@@ -17,26 +16,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
-      - name: Run Snyk to check infrastructure files for security issues
-        # Snyk can be used to break the build when it detects security issues.
-        # In this case we want to upload the issues to GitHub Code Scanning
-        continue-on-error: true
-        uses: snyk/actions/iac@9adf32b1121593767fc3c057af55b55db032dc04 # v1.0.0
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          file: infrastructure/
-          sarif: false
-          args: --sarif-file-output=snyk-infrastructure.sarif
 
       - name: Set up Helm
         uses: azure/setup-helm@1a275c3b69536ee54be43f2070a358922e12c8d4 # v4
 
       - name: Render Helm templates
         run: |
-          helm template deploy/laa-record-controlled-work \
-            -f deploy/laa-record-controlled-work/values/uat.yaml \
-            > rendered-values.yaml
+          mkdir rendered-templates
+          for env in uat staging production; do
+            helm template deploy/laa-record-controlled-work \
+              -f deploy/laa-record-controlled-work/values/${env}.yaml \
+              > rendered-templates/${env}.yaml
+          done
 
       - name: Run Snyk to check Helm manifests for security issues
         continue-on-error: true
@@ -44,19 +35,16 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          file: rendered-values.yaml
-          sarif: false
-          args: --sarif-file-output=snyk-deploy.sarif
-      - name: Upload infrastructure results to GitHub Code Scanning
-        if: hashFiles('snyk-infrastructure.sarif') != ''
-        uses: github/codeql-action/upload-sarif@38697555549f1db7851b81482ff19f1fa5c4fedc # v4
-        with:
-          sarif_file: snyk-infrastructure.sarif
-          category: snyk-infrastructure-check
+          file: rendered-templates/
 
       - name: Upload deploy results to GitHub Code Scanning
-        if: hashFiles('snyk-deploy.sarif') != ''
-        uses: github/codeql-action/upload-sarif@38697555549f1db7851b81482ff19f1fa5c4fedc # v4
+        uses: github/codeql-action/upload-sarif@c10b8064de6f491fea524254123dbe5e09572f13 # v4
         with:
-          sarif_file: snyk-deploy.sarif
-          category: snyk-deploy-check
+          sarif_file: snyk.sarif
+          category: snyk-infrastructure
+
+      - name: Upload rendered templates for inspection
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7
+        with:
+          name: rendered-templates
+          path: rendered-templates/

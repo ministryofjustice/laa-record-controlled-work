@@ -16,7 +16,6 @@ import indexRouter from "#routes/index.js";
 import { initializeI18nextSync } from "#src/lib/index.js";
 import chalk from "chalk";
 import compression from "compression";
-import livereload from "connect-livereload";
 import type { Request, Response } from "express";
 import express from "express";
 import session from "express-session";
@@ -30,7 +29,7 @@ const TRUST_FIRST_PROXY = 1;
  *
  * @returns {Promise<import('express').Application>} The configured Express application
  */
-const createApp = (): express.Application => {
+const createApp = async (): Promise<express.Application> => {
   // Initialise i18next synchronously before setting up the app
   initializeI18nextSync();
 
@@ -100,6 +99,7 @@ const createApp = (): express.Application => {
 
   // Enable live-reload middleware in development mode
   if (process.env.NODE_ENV === "development") {
+    const { default: livereload } = await import("connect-livereload");
     app.use(livereload());
   }
 

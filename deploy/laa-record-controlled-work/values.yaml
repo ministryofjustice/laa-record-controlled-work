@@ -1,0 +1,149 @@
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: false
+  name: ""
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  hosts:
+    - host: ""
+      paths:
+        - path: /
+          pathType: Prefix
+  annotations:
+    external-dns.alpha.kubernetes.io/set-identifier: ""
+    external-dns.alpha.kubernetes.io/aws-weight: "100"
+
+rcw:
+  replicaCount: 1
+
+  image:
+    repository: nginx
+    pullPolicy: Always
+    tag: ""
+
+  imagePullSecrets: []
+  podAnnotations: {}
+  podLabels: {}
+
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 10001
+    runAsGroup: 10001
+    seccompProfile:
+      type: RuntimeDefault
+
+  securityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 10001
+    runAsGroup: 10001
+    capabilities:
+      drop:
+        - ALL
+    seccompProfile:
+      type: RuntimeDefault
+
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+
+  livenessProbe:
+    httpGet:
+      path: /status
+      port: http
+    initialDelaySeconds: 30
+    periodSeconds: 60
+
+  readinessProbe:
+    httpGet:
+      path: /health
+      port: http
+    initialDelaySeconds: 30
+    periodSeconds: 60
+
+  # Secret env vars stored in a Kubernetes Secret, referenced via
+  # secretKeyRef in the deployment template.
+  #
+  # envSecretName: 
+  #   - The name of the Kubernetes Secret to create/update.
+  #   - Scoped per Kubernetes namespace (one per environment), shared across all releases
+  #     including ephemeral branches - all releases in a namespace use the
+  #     same secret values.
+  #
+  # envSecrets: 
+  #   - Keys to pull from that secret.
+  #   - Each key must also be listed in the env: block of the deploy step
+  #     in deploy-environment.yml, so the CI job can pass the value to
+  #     the kubectl upsert step.
+  #
+  # Helm merges maps (env:) deeply across values files, but replaces
+  # lists (envSecrets:) entirely. If an environment needs additional
+  # secrets, repeat the full envSecrets: list in its values file.
+  envSecretName: env-secrets
+  envSecrets:
+    - SESSION_SECRET
+    - SESSION_ENCRYPTION_KEY
+
+  # Plain env vars injected directly into the container. Add new vars 
+  # here only, they are automatically picked up by the Helm template and 
+  # test workflows (via yq). 
+  # 
+  # Override per environment by setting the key again in the relevant 
+  # values/<env>.yaml file.
+  env:
+    SERVICE_NAME: "LAA Record Controlled Work"
+    SERVICE_PHASE: "Beta"
+    DEPARTMENT_NAME: "Legal Aid Agency"
+    DEPARTMENT_URL: "https://www.gov.uk/government/organisations/legal-aid-agency"
+    CONTACT_EMAIL: "eligibility@justice.gov.uk"
+    CONTACT_PHONE: ""
+    SERVICE_URL: "https://www.gov.uk/legal-aid"
+    SESSION_NAME: "sessionId"
+    RATELIMIT_HEADERS_ENABLED: true
+    RATELIMIT_STORAGE_URI: ""
+    RATE_LIMIT_MAX: 100
+    RATE_WINDOW_MS: 900000
+    NODE_ENV: ""
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+
+  volumes: []
+  volumeMounts: []
+
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+nginx:
+  replicaCount: 1
+
+  image:
+    # Overridden at deploy time to ECR; see deploy.sh and docker-images.env
+    repository: nginxinc/nginx-unprivileged
+    pullPolicy: Always
+    tag: alpine
+
+  resources:
+    limits:
+      cpu: 100m
+      memory: 64Mi
+    requests:
+      cpu: 50m
+      memory: 32Mi

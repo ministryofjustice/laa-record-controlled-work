@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "laa-record-controlled-work.fullname" . }}-rcw
+  labels:
+    {{- include "laa-record-controlled-work.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.rcw.autoscaling.enabled }}
+  replicas: {{ .Values.rcw.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "laa-record-controlled-work.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: rcw
+  template:
+    metadata:
+      {{- with .Values.rcw.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "laa-record-controlled-work.labels" . | nindent 8 }}
+        app.kubernetes.io/component: rcw
+    spec:
+      {{- with .Values.rcw.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "laa-record-controlled-work.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.rcw.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.rcw.securityContext | nindent 12 }}
+          image: "{{ .Values.rcw.image.repository }}:{{ .Values.rcw.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.rcw.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          livenessProbe:
+            {{- toYaml .Values.rcw.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.rcw.readinessProbe | nindent 12 }}
+          resources:
+            {{- toYaml .Values.rcw.resources | nindent 12 }}
+          {{- with .Values.rcw.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          env:
+            {{- range $key, $val := .Values.rcw.env }}
+            - name: {{ $key }}
+              value: {{ $val | quote }}
+            {{- end }}
+            {{- range .Values.rcw.envSecrets }}
+            - name: {{ . }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $.Values.rcw.envSecretName }}
+                  key: {{ . }}
+            {{- end }}
+      {{- with .Values.rcw.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.rcw.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.rcw.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.rcw.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
