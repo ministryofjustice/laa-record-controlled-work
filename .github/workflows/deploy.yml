@@ -135,6 +135,8 @@ jobs:
     uses: ./.github/workflows/deploy-environment.yml
     with:
       app-environment: uat
+      sha: ${{ inputs.sha || github.sha }}
+      branch-ref: ${{ inputs.branch-ref }}
     concurrency:
       group: deploy-uat-${{ github.ref }}
       cancel-in-progress: false

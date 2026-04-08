@@ -6,6 +6,14 @@ on:
       app-environment:
         required: true
         type: string
+      sha:
+        description: "Commit SHA to deploy"
+        type: string
+        default: ''
+      branch-ref:
+        description: "Branch ref for ephemeral deployments"
+        type: string
+        default: ''
 
 jobs:
   deploy:
@@ -13,9 +21,6 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ inputs.app-environment }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
-
       - name: Deploy
         uses: ./.github/actions/deploy
         env:
@@ -25,6 +30,8 @@ jobs:
           SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
           SESSION_ENCRYPTION_KEY: ${{ secrets.SESSION_ENCRYPTION_KEY }}
         with:
+          sha: ${{ inputs.sha || github.sha }}
+          branch-ref: ${{ inputs.branch-ref }}
           app-environment: ${{ inputs.app-environment }}
           ecr-registry_url: ${{ secrets.ECR_REGISTRY_URL }}
           ecr-repository: ${{ vars.ECR_REPOSITORY }}
