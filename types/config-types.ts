@@ -20,6 +20,8 @@ export interface EntraConfig {
 	tenantId: string
 	redirectUri: string
 	authority: string
+	postLogoutRedirectUri: string
+	cloudInstance: string
 }
 
 export interface SessionConfig {

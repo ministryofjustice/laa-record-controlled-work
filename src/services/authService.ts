@@ -38,7 +38,7 @@ export class AuthService {
         };
     }
 
-    protected createAndStoreState(session: SessionData): string {
+    protected createAuthState(session: SessionData): string {
         session.csrfToken = this.cryptoProvider.createNewGuid();
 
         session.authState = this.cryptoProvider.base64Encode(
@@ -53,7 +53,7 @@ export class AuthService {
 
     public async getAuthCodeUrl(session: SessionData): Promise<string> {
         const authCodeUrlRequestParams = {
-            state: this.createAndStoreState(session),
+            state: this.createAuthState(session),
             scopes: []
         };
 
@@ -92,3 +92,7 @@ export class AuthService {
         return `${process.env.CLOUD_INSTANCE}/${process.env.TENANT_ID}/oauth2/v2.0/logout?post_logout_redirect_uri=${process.env.POST_LOGOUT_REDIRECT_URI}`;
     }
 }
+
+// 1: retrurns auth url 
+// 2: trade auth code for bearer token
+// 3: 
