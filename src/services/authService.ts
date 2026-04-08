@@ -2,13 +2,7 @@ import { SessionData } from "#node_modules/@types/express-session/index.js";
 import { ConfidentialClientApplication, Configuration, CryptoProvider, AuthorizationUrlRequest, AuthorizationCodeRequest, AuthenticationResult } from '@azure/msal-node';
 import config from "#config.js";
 import { PKCECodes } from "#types/auth-types.js";
-import { Exception } from "#node_modules/sass/types/exception.js";
 
-export class AuthServiceFactory {
-    public createAuthService(session: SessionData, msalClient: ConfidentialClientApplication): AuthService {
-        return new AuthService(session, msalClient);
-    }
-}
 
 export class AuthService {
     public session: SessionData;
@@ -24,9 +18,13 @@ export class AuthService {
         system: {},
     };
 
-    constructor(sessionData: SessionData, msalClient: ConfidentialClientApplication) {
+    private constructor(sessionData: SessionData, msalClient: ConfidentialClientApplication) {
         this.session = sessionData;
         this.msalClient = msalClient
+    }
+
+    public static create(sessionData: SessionData, msalClient: ConfidentialClientApplication): AuthService {
+        return new AuthService(sessionData, msalClient);
     }
 
     private async getPkceCodes(): Promise<PKCECodes> {

@@ -1,6 +1,6 @@
 import config from '#config.js';
 import { ConfidentialClientApplication } from '#node_modules/@azure/msal-node/dist/client/ConfidentialClientApplication.js';
-import { AuthServiceFactory } from '#src/services/authService.js';
+import { AuthService } from '#src/services/authService.js';
 import { expect } from 'chai';
 import { SessionData } from 'express-session';
 import sinon, { SinonStubbedInstance } from 'sinon';
@@ -17,21 +17,20 @@ import sinon, { SinonStubbedInstance } from 'sinon';
 // })
 
 describe('AuthService', () => {
-    
-    const authServiceFactory = new AuthServiceFactory();
+
     let msalStub: Partial<ConfidentialClientApplication>;
     let sessionData: SessionData;
 
     beforeEach(() => {
-            msalStub = {
-                getAuthCodeUrl: sinon.stub().returns("test"),
-                acquireTokenByCode: sinon.stub().returns("test")
-            };
-            sessionData = {} as SessionData;
+        msalStub = {
+            getAuthCodeUrl: sinon.stub().returns("test"),
+            acquireTokenByCode: sinon.stub().returns("test")
+        };
+        sessionData = {} as SessionData;
     });
 
     afterEach(() => {
-      sinon.restore();
+        sinon.restore();
     });
 
     describe('Returns an Auth Code', () => {
@@ -39,14 +38,14 @@ describe('AuthService', () => {
             process.env.CLOUD_INSTANCE = 'myCloudInstance';
             process.env.TENANT_ID = 'myTenantId';
 
-            const authService = authServiceFactory.createAuthService(sessionData, msalStub as ConfidentialClientApplication);
+            const authService = AuthService.create(sessionData, msalStub as ConfidentialClientApplication);
 
             authService.getAuthCodeUrl(sessionData);
             expect(sessionData.authState).not.to.be.eq('');
         })
 
         it('should return a URL', async () => {
-            const authService = authServiceFactory.createAuthService(sessionData, msalStub as ConfidentialClientApplication);
+            const authService = AuthService.create(sessionData, msalStub as ConfidentialClientApplication);
             const url = await authService.getAuthCodeUrl(sessionData)
             expect(url).to.include('test');
         })
@@ -54,7 +53,7 @@ describe('AuthService', () => {
 
     describe('getTokenByCode returns Token'), () => {
         it('Should return an access token'), () => {
-            const authService = authServiceFactory.createAuthService(sessionData, msalStub as ConfidentialClientApplication);
+            const authService = AuthService.create(sessionData, msalStub as ConfidentialClientApplication);
             const authCode = ""
 
             // const token = authService.getTokenByCode(authCode)
@@ -69,8 +68,7 @@ describe('AuthService', () => {
             process.env.TENANT_ID = 'myTenantId';
             process.env.POST_LOGOUT_REDIRECT_URI = 'myPostLogoutUri';
 
-            const authService = authServiceFactory.createAuthService(sessionData, msalStub as ConfidentialClientApplication);
-
+            const authService = AuthService.create(sessionData, msalStub as ConfidentialClientApplication);
             expect(authService.getLogoutUrl()).to.be.eq('myCloudInstance/myTenantId/oauth2/v2.0/logout?post_logout_redirect_uri=myPostLogoutUri');
         })
     })
