@@ -21,13 +21,18 @@ jobs:
       - name: Setup Node and Dependencies
         uses: ./.github/actions/setup-node
 
+      - name: Set env vars from values
+        run: |
+          yq '.rcw.env | to_entries[] | .key + "=" + (.value | tostring)' \
+            ./deploy/laa-record-controlled-work/values.yaml >> $GITHUB_ENV
+
       - name: Run Mocha unit tests & c8 code coverage
         run: yarn c8 yarn test:unit --check-coverage
         env:
           CI: true
-          # Add session-related environment variables for unit tests
-          SESSION_SECRET: "mocha-test-secret" # Use a simple test secret for Mocha unit tests
-          SESSION_NAME: "sessionId"
+          NODE_ENV: "test"
+          SESSION_SECRET: "mocha-test-secret"
+          SESSION_ENCRYPTION_KEY: "mocha-test-encryption-key"
 
       - name: Upload coverage artifact
         if: always()

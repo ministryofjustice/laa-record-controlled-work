@@ -38,25 +38,19 @@ jobs:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-chromium-${{ hashFiles('**/yarn.lock') }}
 
+      - name: Set env vars from values
+        run: |
+          yq '.rcw.env | to_entries[] | .key + "=" + (.value | tostring)' \
+            ./deploy/laa-record-controlled-work/values.yaml >> $GITHUB_ENV
+
       - name: Run Playwright tests
         run: yarn playwright test --config=tests/playwright/playwright.config.ts --grep-invert @accessibility
         env:
           CI: true
-          PLAYWRIGHT_TRACING: "on" # Enable tracing for all tests
-          # Add session-related environment variables
-          SESSION_SECRET: "playwright-test-secret" # Use a simple test secret for Playwright
-          SESSION_NAME: "sessionId"
+          PLAYWRIGHT_TRACING: "on"
           NODE_ENV: "test"
-          # Add other required environment variables
-          SERVICE_NAME: "Your Service Name"
-          SERVICE_PHASE: "Alpha"
-          DEPARTMENT_NAME: "LAA Digital"
-          DEPARTMENT_URL: "https://www.gov.uk/government/organisations/legal-aid-agency"
-          CONTACT_EMAIL: "your-team@digital.justice.gov.uk"
-          SERVICE_URL: "https://www.gov.uk/legal-aid"
-          RATELIMIT_HEADERS_ENABLED: "true"
-          RATE_LIMIT_MAX: "100"
-          RATE_WINDOW_MS: "900000"
+          SESSION_SECRET: "playwright-test-secret"
+          SESSION_ENCRYPTION_KEY: "playwright-test-encryption-key"
       - name: Upload trace artifacts
         if: always()
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7
@@ -114,22 +108,18 @@ jobs:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-chromium-${{ hashFiles('**/yarn.lock') }}
 
+      - name: Set env vars from values
+        run: |
+          yq '.rcw.env | to_entries[] | .key + "=" + (.value | tostring)' \
+            ./deploy/laa-record-controlled-work/values.yaml >> $GITHUB_ENV
+
       - name: Run Accessibility Tests
         run: yarn playwright test --config=tests/playwright/playwright.config.ts --grep @accessibility
         env:
           CI: true
-          SESSION_SECRET: "accessibility-test-secret"
-          SESSION_NAME: "sessionId"
           NODE_ENV: "test"
-          SERVICE_NAME: "Your Service Name"
-          SERVICE_PHASE: "Alpha"
-          DEPARTMENT_NAME: "LAA Digital"
-          DEPARTMENT_URL: "https://www.gov.uk/government/organisations/legal-aid-agency"
-          CONTACT_EMAIL: "your-team@digital.justice.gov.uk"
-          SERVICE_URL: "https://www.gov.uk/legal-aid"
-          RATELIMIT_HEADERS_ENABLED: "true"
-          RATE_LIMIT_MAX: "100"
-          RATE_WINDOW_MS: "900000"
+          SESSION_SECRET: "accessibility-test-secret"
+          SESSION_ENCRYPTION_KEY: "accessibility-test-encryption-key"
 
       - name: Upload Accessibility Report
         if: always()

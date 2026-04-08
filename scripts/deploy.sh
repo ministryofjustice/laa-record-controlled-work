@@ -1,9 +1,14 @@
 #!/bin/bash
 
 ENVIRONMENT=$1
+
+# Load nginx image tag and ECR digest from the checked-in env file.
+# Uses dirname "$0" so the path resolves relative to the script's location, not the caller's working directory.
+# shellcheck source=docker-images.env
+source "$(dirname "$0")/../docker-images.env"
+
 # Convert the branch name into a string that can be turned into a valid URL
-# duplicated on .github/workflows/deploy-ephemeral.yml:85
-BRANCH_RELEASE_NAME=$(echo "$GITHUB_REF_NAME" | tr '[:upper:]' '[:lower:]' | sed 's:^\w*\/::' | tr -s ' _/[]().' '-' | cut -c1-18 | sed 's/-$//')
+BRANCH_RELEASE_NAME=$(./scripts/release-name.sh)
 
 deploy_branch() {
 # Set the deployment host, this will add the prefix of the branch name e.g el-257-deploy-with-circleci or just main
@@ -18,9 +23,10 @@ deploy_branch() {
                 --values ./deploy/laa-record-controlled-work/values/"$ENVIRONMENT".yaml \
                 --set rcw.image.repository="$REGISTRY/$REPOSITORY" \
                 --set rcw.image.tag="$IMAGE_TAG" \
+                --set nginx.image.repository="$REGISTRY/$NGINX_ECR_REPOSITORY" \
+                --set nginx.image.tag="${NGINX_IMAGE_TAG}@${NGINX_ECR_IMAGE_DIGEST_AMD64}" \
                 --set ingress.annotations."external-dns\.alpha\.kubernetes\.io/set-identifier"="$IDENTIFIER" \
-                --set ingress.hosts[0].host="$RELEASE_HOST" \
-                --set rcw.env.SESSION_SECRET="$SESSION_SECRET" 
+                --set ingress.hosts[0].host="$RELEASE_HOST"
 }
 
 deploy_main() {  
@@ -30,7 +36,8 @@ deploy_main() {
                           --values ./deploy/laa-record-controlled-work/values/"$ENVIRONMENT".yaml \
                           --set rcw.image.repository="$REGISTRY/$REPOSITORY" \
                           --set rcw.image.tag="$IMAGE_TAG" \
-                          --set rcw.env.SESSION_SECRET="$SESSION_SECRET" 
+                          --set nginx.image.repository="$REGISTRY/$NGINX_ECR_REPOSITORY" \
+                          --set nginx.image.tag="${NGINX_IMAGE_TAG}@${NGINX_ECR_IMAGE_DIGEST_AMD64}"
 }
 
 if [[ "$GITHUB_REF_NAME" == "main" ]]; then
@@ -44,7 +51,7 @@ else
       echo "Rollback succeeded. Retrying deploy"
       deploy_branch
     else
-      echo "Rollback failed. Consider manually running 'helm delete $BRANCH_RELEASE_NAME'"
+      echo "Rollback failed. Consider manually running 'helm uninstall $BRANCH_RELEASE_NAME'"
       exit 1
     fi
   fi
