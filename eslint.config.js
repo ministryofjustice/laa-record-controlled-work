@@ -1,9 +1,10 @@
 import tsParser from "@typescript-eslint/parser";
 import love from "eslint-config-love";
 import jsdocPlugin from "eslint-plugin-jsdoc";
+import jsoncPlugin from "eslint-plugin-jsonc";
 import eslintPluginPrettier from "eslint-plugin-prettier/recommended";
 import globals from "globals";
-import fs from "node:fs"
+import fs from "node:fs";
 
 // Alter this config file to meet your project's needs and standards.
 
@@ -112,6 +113,17 @@ export default [
   },
   // Add prettier for automated, standardised formatting
   eslintPluginPrettier,
+  // JSON linting
+  ...jsoncPlugin.configs["flat/recommended-with-json"],
+  // tsconfig and VS Code config files are JSONC (JSON with Comments) — allow comments in them
+  {
+    files: ["**/tsconfig*.json", ".vscode/*.json"],
+    rules: {
+      "jsonc/no-comments": "off",
+    },
+  },
+  // Disable jsonc formatting rules that conflict with Prettier
+  ...jsoncPlugin.configs["flat/prettier"],
   // Ignore patterns
   {
     ignores: [
@@ -131,6 +143,8 @@ export default [
       "eslint.config.js", // Parsing error this file was not found by the project service. Consider either including it in the `tsconfig.json` or including it in `allowDefaultProject`,
       "coverage", // Ignore the code coverage output from linter
       "scripts/e2e_coverage/*", // Route coverage analysis scripts
+      "public/assets/manifest.json", // Build artifact
+      "yarn.lock", // Not JSON
     ],
   },
 ];
