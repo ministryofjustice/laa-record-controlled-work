@@ -3,8 +3,16 @@ import love from "eslint-config-love";
 import jsdocPlugin from "eslint-plugin-jsdoc";
 import eslintPluginPrettier from "eslint-plugin-prettier/recommended";
 import globals from "globals";
+import fs from "node:fs"
 
 // Alter this config file to meet your project's needs and standards.
+
+// Find dir names which are long form commit SHAs so we can ignore them.
+// ministryofjustice/devsecops-actions/sca/slsa installs to a dir within
+// the project root during CI which causes conflicts.
+const shaDirectories = fs.readdirSync("./", { withFileTypes: true })
+  .filter(dir => dir.isDirectory() && /^[0-9a-f]{40}$/.test(dir.name))
+  .map(dir => `${dir.name}/`);
 
 export default [
   {
@@ -107,6 +115,7 @@ export default [
   // Ignore patterns
   {
     ignores: [
+      ...shaDirectories,
       "node_modules/*",
       "public/*",
       "tests/**/*.spec.ts", // Unit test specs (if any remain in tests/)
