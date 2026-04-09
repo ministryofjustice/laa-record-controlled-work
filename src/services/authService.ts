@@ -9,15 +9,6 @@ export class AuthService {
     public msalClient: ConfidentialClientApplication;
     private cryptoProvider: CryptoProvider = new CryptoProvider();
 
-    // private msalConfig: Configuration = {
-    //     auth: {
-    //         clientId: `${config.entra.clientId}`,
-    //         authority: `${config.entra.authority}`,
-    //         clientSecret: `${config.entra.clientSecret}`
-    //     },
-    //     system: {},
-    // };
-
     private constructor(sessionData: SessionData, msalClient: ConfidentialClientApplication) {
         this.session = sessionData;
         this.msalClient = msalClient
@@ -37,19 +28,6 @@ export class AuthService {
             throw error;
         }
     }
-
-    // protected createAuthState(session: SessionData): string {
-    //     session.csrfToken = this.cryptoProvider.createNewGuid();
-
-    //     session.authState = this.cryptoProvider.base64Encode(
-    //         JSON.stringify({
-    //             csrfToken: session.csrfToken,
-    //             redirectTo: '/',
-    //         })
-    //     );
-
-    //     return session.authState;
-    // }
 
     private async getPkceCodes(): Promise<PKCECodes> {
         const { verifier, challenge } = await this.cryptoProvider.generatePkceCodes();
