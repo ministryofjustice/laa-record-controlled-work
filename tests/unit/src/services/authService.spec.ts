@@ -8,33 +8,34 @@ describe('AuthService', () => {
     let msalStub: Partial<ConfidentialClientApplication>;
     let session: SessionData;
     const AUTH_CODE_URL = 'https://login.microsoftonline.com/auth';
+    let service: AuthService;
 
     beforeEach(() => {
         msalStub = {
             getAuthCodeUrl: sinon.stub().resolves(AUTH_CODE_URL),
         };
+
         session = {} as SessionData;
+        service = AuthService.create(session, msalStub as ConfidentialClientApplication);
+
+        sinon.stub(CryptoProvider.prototype, 'generatePkceCodes').resolves({
+            verifier: 'test-verifier',
+            challenge: 'test-challenge',
+        });
+
+        sinon.stub(CryptoProvider.prototype, 'base64Encode').returns('encoded-state');
     });
 
     afterEach(() => sinon.restore());
 
     describe('getAuthCodeUrl()', () => {
-        beforeEach(() => {
-            sinon.stub(CryptoProvider.prototype, 'generatePkceCodes').resolves({
-                verifier: 'test-verifier',
-                challenge: 'test-challenge',
-            });
-            sinon.stub(CryptoProvider.prototype, 'base64Encode').returns('encoded-state');
-        });
 
         it('returns a URL from the MSAL client', async () => {
-            const service = AuthService.create(session, msalStub as ConfidentialClientApplication);
             const url = await service.getAuthCodeUrl(session);
             expect(url).to.equal(AUTH_CODE_URL);
         });
 
         it('stores PKCE codes on session', async () => {
-            const service = AuthService.create(session, msalStub as ConfidentialClientApplication);
             await service.getAuthCodeUrl(session);
             expect(session.pkceCodes).to.exist;
             expect(session.pkceCodes?.verifier).to.equal('test-verifier');
@@ -42,10 +43,22 @@ describe('AuthService', () => {
         });
 
         it('stores authCodeUrlRequest and authCodeRequest on session', async () => {
-            const service = AuthService.create(session, msalStub as ConfidentialClientApplication);
             await service.getAuthCodeUrl(session);
             expect(session.authCodeUrlRequest).to.exist;
             expect(session.authCodeRequest).to.exist;
+        });
+
+        it('encodes successRedirect into the state parameter', async () => {
+            await service.getAuthCodeUrl(session);
+            const base64Encode = CryptoProvider.prototype.base64Encode as sinon.SinonStub;
+            expect(JSON.parse(base64Encode.firstCall.args[0])).to.deep.equal({ successRedirect: '/' });
+        });
+
+        it('passes responseMode: "form_post" and PKCE challenge to MSAL', async () => {
+            await service.getAuthCodeUrl(session);
+            const [requestArg] = (msalStub.getAuthCodeUrl as sinon.SinonStub).args[0];
+            expect(requestArg.responseMode).to.equal('form_post');
+            expect(requestArg.codeChallenge).to.equal('test-challenge');
         });
     });
 });

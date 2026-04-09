@@ -38,18 +38,18 @@ export class AuthService {
         }
     }
 
-    protected createAuthState(session: SessionData): string {
-        session.csrfToken = this.cryptoProvider.createNewGuid();
+    // protected createAuthState(session: SessionData): string {
+    //     session.csrfToken = this.cryptoProvider.createNewGuid();
 
-        session.authState = this.cryptoProvider.base64Encode(
-            JSON.stringify({
-                csrfToken: session.csrfToken,
-                redirectTo: '/',
-            })
-        );
+    //     session.authState = this.cryptoProvider.base64Encode(
+    //         JSON.stringify({
+    //             csrfToken: session.csrfToken,
+    //             redirectTo: '/',
+    //         })
+    //     );
 
-        return session.authState;
-    }
+    //     return session.authState;
+    // }
 
     private async getPkceCodes(): Promise<PKCECodes> {
         const { verifier, challenge } = await this.cryptoProvider.generatePkceCodes();
@@ -60,6 +60,7 @@ export class AuthService {
             challenge: challenge,
         };
     }
+
     private async createAuthCodeRequest(session: SessionData) {
 
         const scopes: string[] = [];
@@ -69,7 +70,10 @@ export class AuthService {
         const { challenge, challengeMethod, verifier } = pkceCodes;
 
         const authCodeUrlRequestParams = {
-            state: this.createAuthState(session),
+            state: this.cryptoProvider.base64Encode(
+                JSON.stringify({
+                    successRedirect: "/",
+                })),
             scopes: scopes
         };
 
