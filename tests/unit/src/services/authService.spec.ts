@@ -40,5 +40,12 @@ describe('AuthService', () => {
             expect(session.pkceCodes?.verifier).to.equal('test-verifier');
             expect(session.pkceCodes?.challenge).to.equal('test-challenge');
         });
+
+        it('stores authCodeUrlRequest and authCodeRequest on session', async () => {
+            const service = AuthService.create(session, msalStub as ConfidentialClientApplication);
+            await service.getAuthCodeUrl(session);
+            expect(session.authCodeUrlRequest).to.exist;
+            expect(session.authCodeRequest).to.exist;
+        });
     });
 });

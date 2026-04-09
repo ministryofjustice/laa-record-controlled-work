@@ -27,14 +27,15 @@ export class AuthService {
         return new AuthService(sessionData, msalClient);
     }
 
-    private async getPkceCodes(): Promise<PKCECodes> {
-        const { verifier, challenge } = await this.cryptoProvider.generatePkceCodes();
+    public async getAuthCodeUrl(session: SessionData): Promise<string> {
 
-        return {
-            challengeMethod: 'S256',
-            verifier: verifier,
-            challenge: challenge,
-        };
+        const authCodeUrlRequest = await this.createAuthCodeRequest(session);
+
+        try {
+            return await this.msalClient.getAuthCodeUrl(authCodeUrlRequest);
+        } catch (error) {
+            throw error;
+        }
     }
 
     protected createAuthState(session: SessionData): string {
@@ -50,28 +51,48 @@ export class AuthService {
         return session.authState;
     }
 
-    public async getAuthCodeUrl(session: SessionData): Promise<string> {
+    private async getPkceCodes(): Promise<PKCECodes> {
+        const { verifier, challenge } = await this.cryptoProvider.generatePkceCodes();
+
+        return {
+            challengeMethod: 'S256',
+            verifier: verifier,
+            challenge: challenge,
+        };
+    }
+    private async createAuthCodeRequest(session: SessionData) {
+
+        const scopes: string[] = [];
+
+        const pkceCodes = await this.getPkceCodes();
+        session.pkceCodes = pkceCodes;
+        const { challenge, challengeMethod, verifier } = pkceCodes;
+
         const authCodeUrlRequestParams = {
             state: this.createAuthState(session),
-            scopes: []
+            scopes: scopes
         };
-
-        session.pkceCodes = await this.getPkceCodes();
 
         const authCodeUrlRequest: AuthorizationUrlRequest = {
             ...authCodeUrlRequestParams,
             redirectUri: config.entra.redirectUri,
             responseMode: 'form_post',
-            codeChallenge: session.pkceCodes.challenge,
-            codeChallengeMethod: session.pkceCodes.challengeMethod,
+            codeChallenge: challenge,
+            codeChallengeMethod: challengeMethod,
         };
 
-        try {
-            return await this.msalClient.getAuthCodeUrl(authCodeUrlRequest);
-        } catch (error) {
-            throw error;
-        }
+        const authCodeRequest: AuthorizationCodeRequest = {
+            code: "",
+            codeVerifier: verifier,
+            scopes: scopes,
+            redirectUri: config.entra.redirectUri,
+        };
+        session.authCodeUrlRequest = authCodeUrlRequest;
+        session.authCodeRequest = authCodeRequest;
+
+        return authCodeUrlRequest;
     }
+
 
     // public async getTokenByCode(session: SessionData, authCode: string): Promise<AuthenticationResult> {
     //     if (!session.pkceCodes) {
@@ -90,7 +111,3 @@ export class AuthService {
         return `${process.env.CLOUD_INSTANCE}/${process.env.TENANT_ID}/oauth2/v2.0/logout?post_logout_redirect_uri=${process.env.POST_LOGOUT_REDIRECT_URI}`;
     }
 }
-
-// 1: retrurns auth url 
-// 2: trade auth code for bearer token
-// 3: 
