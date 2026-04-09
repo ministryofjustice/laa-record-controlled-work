@@ -31,14 +31,13 @@ deploy_branch() {
 
 deploy_main() {  
   helm upgrade laa-record-controlled-work ./deploy/laa-record-controlled-work/. \
-                          --install --wait --rollback-on-failure \
+                          --install --wait --atomic \
                           --namespace="${K8S_NAMESPACE}" \
                           --values ./deploy/laa-record-controlled-work/values/"$ENVIRONMENT".yaml \
                           --set rcw.image.repository="$REGISTRY/$REPOSITORY" \
                           --set rcw.image.tag="$IMAGE_TAG" \
                           --set nginx.image.repository="$REGISTRY/$NGINX_ECR_REPOSITORY" \
-                          --set nginx.image.tag="${NGINX_IMAGE_TAG}@${NGINX_ECR_IMAGE_DIGEST_AMD64}" \
-                          --set rcw.env.SESSION_SECRET="$SESSION_SECRET" 
+                          --set nginx.image.tag="${NGINX_IMAGE_TAG}@${NGINX_ECR_IMAGE_DIGEST_AMD64}"
 }
 
 if [[ "$GITHUB_REF_NAME" == "main" ]]; then
