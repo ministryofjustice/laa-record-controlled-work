@@ -115,6 +115,13 @@ export default [
   eslintPluginPrettier,
   // JSON linting
   ...jsoncPlugin.configs["flat/recommended-with-json"],
+  // tsconfig and VS Code config files are JSONC (JSON with Comments) — allow comments in them
+  {
+    files: ["**/tsconfig*.json", ".vscode/*.json"],
+    rules: {
+      "jsonc/no-comments": "off",
+    },
+  },
   // Disable jsonc formatting rules that conflict with Prettier
   ...jsoncPlugin.configs["flat/prettier"],
   // Ignore patterns
