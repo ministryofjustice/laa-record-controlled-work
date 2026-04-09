@@ -1,75 +1,36 @@
-import config from '#config.js';
-import { ConfidentialClientApplication } from '#node_modules/@azure/msal-node/dist/client/ConfidentialClientApplication.js';
+import { ConfidentialClientApplication, CryptoProvider } from '@azure/msal-node';
 import { AuthService } from '#src/services/authService.js';
 import { expect } from 'chai';
-import { SessionData } from 'express-session';
-import sinon, { SinonStubbedInstance } from 'sinon';
-
-// class TestAuthService extends AuthService {
-
-// }
-// describe('AuthServiceFactory', () => {
-//     describe('createAuthService', () => {
-//         it('should return an authService', () => {
-
-//         })
-//     })
-// })
+import type { SessionData } from 'express-session';
+import sinon from 'sinon';
 
 describe('AuthService', () => {
-
     let msalStub: Partial<ConfidentialClientApplication>;
-    let sessionData: SessionData;
+    let session: SessionData;
+    const AUTH_CODE_URL = 'https://login.microsoftonline.com/auth';
 
     beforeEach(() => {
         msalStub = {
-            getAuthCodeUrl: sinon.stub().returns("test"),
-            acquireTokenByCode: sinon.stub().returns("test")
+            getAuthCodeUrl: sinon.stub().resolves(AUTH_CODE_URL),
         };
-        sessionData = {} as SessionData;
+        session = {} as SessionData;
     });
 
-    afterEach(() => {
-        sinon.restore();
+    afterEach(() => sinon.restore());
+
+    describe('getAuthCodeUrl()', () => {
+        beforeEach(() => {
+            sinon.stub(CryptoProvider.prototype, 'generatePkceCodes').resolves({
+                verifier: 'test-verifier',
+                challenge: 'test-challenge',
+            });
+            sinon.stub(CryptoProvider.prototype, 'base64Encode').returns('encoded-state');
+        });
+
+        it('returns a URL from the MSAL client', async () => {
+            const service = AuthService.create(session, msalStub as ConfidentialClientApplication);
+            const url = await service.getAuthCodeUrl(session);
+            expect(url).to.equal(AUTH_CODE_URL);
+        });
     });
-
-    describe('Returns an Auth Code', () => {
-        it('should store a state in session', () => {
-            process.env.CLOUD_INSTANCE = 'myCloudInstance';
-            process.env.TENANT_ID = 'myTenantId';
-
-            const authService = AuthService.create(sessionData, msalStub as ConfidentialClientApplication);
-
-            authService.getAuthCodeUrl(sessionData);
-            expect(sessionData.authState).not.to.be.eq('');
-        })
-
-        it('should return a URL', async () => {
-            const authService = AuthService.create(sessionData, msalStub as ConfidentialClientApplication);
-            const url = await authService.getAuthCodeUrl(sessionData)
-            expect(url).to.include('test');
-        })
-    })
-
-    // describe('getTokenByCode returns Token'), () => {
-    //     it('Should return an access token'), () => {
-    //         const authService = AuthService.create(sessionData, msalStub as ConfidentialClientApplication);
-    //         const authCode = ""
-
-    //         // const token = authService.getTokenByCode(authCode)
-
-    //         // expect(token).to.eq("accessToken")
-    //     }
-    // }
-
-    describe('Returns a Logout Url', () => {
-        it('should return a Logout Url', () => {
-            process.env.CLOUD_INSTANCE = 'myCloudInstance';
-            process.env.TENANT_ID = 'myTenantId';
-            process.env.POST_LOGOUT_REDIRECT_URI = 'myPostLogoutUri';
-
-            const authService = AuthService.create(sessionData, msalStub as ConfidentialClientApplication);
-            expect(authService.getLogoutUrl()).to.be.eq('myCloudInstance/myTenantId/oauth2/v2.0/logout?post_logout_redirect_uri=myPostLogoutUri');
-        })
-    })
-})
+});
