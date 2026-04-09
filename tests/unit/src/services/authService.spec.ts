@@ -61,4 +61,19 @@ describe('AuthService', () => {
             expect(requestArg.codeChallenge).to.equal('test-challenge');
         });
     });
+
+    describe('handleRedirect()', () => {
+        beforeEach(() => {
+            session.authCodeRequest = { code: '', codeVerifier: 'test-verifier', scopes: [], redirectUri: 'http://localhost/auth/redirect' };
+            session.pkceCodes = { verifier: 'test-verifier', challenge: 'test-challenge', challengeMethod: 'S256' };
+            msalStub.acquireTokenByCode = sinon.stub().resolves({ account: { username: 'user' }, idToken: 'id-token' });
+        });
+
+        it('calls acquireTokenByCode with authCodeRequest from session plus the code', async () => {
+            await service.handleRedirect('auth-code', {});
+            const [requestArg] = (msalStub.acquireTokenByCode as sinon.SinonStub).args[0];
+            expect(requestArg.code).to.equal('auth-code');
+            expect(requestArg.codeVerifier).to.equal('test-verifier');
+        });
+    });
 });
