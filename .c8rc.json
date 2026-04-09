@@ -1,9 +1,5 @@
 {
-  "reporter": [
-    "text",
-    "lcov",
-    "html"
-  ],
+  "reporter": ["text", "lcov", "html"],
   "include": [
     "src/**/*.ts",
     "routes/**/*.ts",
@@ -26,7 +22,7 @@
     "utils/rateLimitSetUp.ts",
     "utils/index.ts",
     "utils/axiosSetup.ts",
-    "utils/nunjucksSetup.ts" 
+    "utils/nunjucksSetup.ts"
   ],
   "all": true,
   "sourceMap": true,

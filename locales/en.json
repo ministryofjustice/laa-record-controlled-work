@@ -65,7 +65,7 @@
         "antarctica": "Antarctica"
       },
       "rowFirstSummit": {
-        "label":"First summit",
+        "label": "First summit",
         "1897": "1897",
         "1913": "1913",
         "1874": "1874",
@@ -145,7 +145,7 @@
     },
     "clientDetails": {
       "name": {
-        "label": "Name", 
+        "label": "Name",
         "title": "Client name",
         "pageTitle": "Client name – {caseReference} – {serviceName} – GOV.UK",
         "validationError": {
