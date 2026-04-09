@@ -9,14 +9,14 @@ export class AuthService {
     public msalClient: ConfidentialClientApplication;
     private cryptoProvider: CryptoProvider = new CryptoProvider();
 
-    private msalConfig: Configuration = {
-        auth: {
-            clientId: `${config.entra.clientId}`,
-            authority: `${config.entra.authority}`,
-            clientSecret: `${config.entra.clientSecret}`
-        },
-        system: {},
-    };
+    // private msalConfig: Configuration = {
+    //     auth: {
+    //         clientId: `${config.entra.clientId}`,
+    //         authority: `${config.entra.authority}`,
+    //         clientSecret: `${config.entra.clientSecret}`
+    //     },
+    //     system: {},
+    // };
 
     private constructor(sessionData: SessionData, msalClient: ConfidentialClientApplication) {
         this.session = sessionData;
@@ -28,7 +28,6 @@ export class AuthService {
     }
 
     private async getPkceCodes(): Promise<PKCECodes> {
-        // Generate PKCE Codes before starting the authorization flow
         const { verifier, challenge } = await this.cryptoProvider.generatePkceCodes();
 
         return {
@@ -57,13 +56,12 @@ export class AuthService {
             scopes: []
         };
 
-        // Set generated PKCE codes and method as session vars
         session.pkceCodes = await this.getPkceCodes();
 
         const authCodeUrlRequest: AuthorizationUrlRequest = {
             ...authCodeUrlRequestParams,
             redirectUri: config.entra.redirectUri,
-            responseMode: 'form_post', // recommended for confidential clients
+            responseMode: 'form_post',
             codeChallenge: session.pkceCodes.challenge,
             codeChallengeMethod: session.pkceCodes.challengeMethod,
         };

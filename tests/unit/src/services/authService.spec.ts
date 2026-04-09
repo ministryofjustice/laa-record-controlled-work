@@ -32,5 +32,13 @@ describe('AuthService', () => {
             const url = await service.getAuthCodeUrl(session);
             expect(url).to.equal(AUTH_CODE_URL);
         });
+
+        it('stores PKCE codes on session', async () => {
+            const service = AuthService.create(session, msalStub as ConfidentialClientApplication);
+            await service.getAuthCodeUrl(session);
+            expect(session.pkceCodes).to.exist;
+            expect(session.pkceCodes?.verifier).to.equal('test-verifier');
+            expect(session.pkceCodes?.challenge).to.equal('test-challenge');
+        });
     });
 });
