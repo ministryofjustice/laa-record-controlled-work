@@ -14,8 +14,6 @@ on:
   pull_request:
     branches: ["main"]
 
-  merge_group:
-
   workflow_dispatch:
   workflow_call:
 
