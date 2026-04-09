@@ -12,6 +12,8 @@ import {
   setupLocaleMiddleware,
   setupMiddlewares,
 } from "#middleware/index.js";
+import { requireAuth } from "#middleware/requireAuth.js";
+import authRouter from "#src/routes/authRoute.js";
 import indexRouter from "#src/routes/index.js";
 import { initializeI18nextSync } from "#src/lib/index.js";
 import chalk from "chalk";
@@ -93,8 +95,12 @@ const createApp = async (): Promise<express.Application> => {
     // Use dev format for development (colored, more readable)
     app.use(morgan("dev"));
   }
+  // Parses incoming request bodies to match the format Entra uses when it POSTs the auth code back
+  app.use(express.urlencoded({ extended: false }));
 
   // Register the main router
+  app.use("/auth", authRouter);
+  app.use(requireAuth);
   app.use("/", indexRouter);
 
   // Enable live-reload middleware in development mode

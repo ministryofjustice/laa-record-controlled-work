@@ -25,6 +25,21 @@ describe('authRoutes', () => {
             expect(response.status).to.equal(302);
             expect(response.headers.location).to.equal(AUTH_CODE_URL);
         });
+
+        it('calls next(error) when getAuthCodeUrl() throws', async () => {
+            const errorMessage = 'MSAL failure'
+            const error = new Error(errorMessage);
+            authServiceStub.getAuthCodeUrl.rejects(error);
+
+            const appWithErrorHandler = createApp();
+            appWithErrorHandler.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+                res.status(500).json({ message: err.message });
+            });
+
+            const response = await request(appWithErrorHandler).get('/auth/signin');
+            expect(response.status).to.equal(500);
+            expect(response.body.message).to.equal(errorMessage);
+        });
     });
 });
 
