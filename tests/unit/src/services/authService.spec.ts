@@ -51,16 +51,16 @@ describe('AuthService', () => {
         })
     })
 
-    describe('getTokenByCode returns Token'), () => {
-        it('Should return an access token'), () => {
-            const authService = AuthService.create(sessionData, msalStub as ConfidentialClientApplication);
-            const authCode = ""
+    // describe('getTokenByCode returns Token'), () => {
+    //     it('Should return an access token'), () => {
+    //         const authService = AuthService.create(sessionData, msalStub as ConfidentialClientApplication);
+    //         const authCode = ""
 
-            // const token = authService.getTokenByCode(authCode)
+    //         // const token = authService.getTokenByCode(authCode)
 
-            // expect(token).to.eq("accessToken")
-        }
-    }
+    //         // expect(token).to.eq("accessToken")
+    //     }
+    // }
 
     describe('Returns a Logout Url', () => {
         it('should return a Logout Url', () => {
