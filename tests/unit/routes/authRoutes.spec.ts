@@ -38,7 +38,10 @@ describe("authRoutes", () => {
 
       expect(authServiceStub.handleRedirect.calledOnce).to.be.true;
       expect(
-        authServiceStub.handleRedirect.calledWith("auth-code-abc", sinon.match.object),
+        authServiceStub.handleRedirect.calledWith(
+          "auth-code-abc",
+          sinon.match.object,
+        ),
       ).to.be.true;
       expect(res.status).to.equal(302);
       expect(res.headers.location).to.equal(SUCCESS_REDIRECT);
@@ -52,6 +55,21 @@ describe("authRoutes", () => {
 
       expect(authServiceStub.handleRedirect.called).to.be.false;
       expect(res.status).to.equal(400);
+    });
+
+    it("calls next(error) when handleRedirect() throws", async () => {
+      const error = new Error("MSAL failure");
+      authServiceStub.handleRedirect.rejects(error);
+
+      const app = createApp();
+
+      const res = await request(app)
+        .post("/auth/redirect")
+        .type("form")
+        .send({ code: "auth-code-abc", state: "encoded-state" });
+
+      expect(res.status).to.equal(500);
+      expect(res.body.message).to.equal("MSAL failure");
     });
   });
 
@@ -67,19 +85,9 @@ describe("authRoutes", () => {
       const error = new Error(errorMessage);
       authServiceStub.getAuthCodeUrl.rejects(error);
 
-      const appWithErrorHandler = createApp();
-      appWithErrorHandler.use(
-        (
-          err: Error,
-          _req: express.Request,
-          res: express.Response,
-          _next: express.NextFunction,
-        ) => {
-          res.status(500).json({ message: err.message });
-        },
-      );
+      const app = createApp();
 
-      const response = await request(appWithErrorHandler).get("/auth/signin");
+      const response = await request(app).get("/auth/signin");
       expect(response.status).to.equal(500);
       expect(response.body.message).to.equal(errorMessage);
     });
@@ -91,5 +99,15 @@ function createApp() {
   app.use(express.urlencoded({ extended: false }));
   app.use(session({ secret: "test", resave: false, saveUninitialized: false }));
   app.use("/auth", authRouter);
+  app.use(
+    (
+      err: Error,
+      _req: express.Request,
+      res: express.Response,
+      _next: express.NextFunction,
+    ) => {
+      res.status(500).json({ message: err.message });
+    },
+  );
   return app;
 }
