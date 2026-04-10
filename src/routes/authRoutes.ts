@@ -16,13 +16,27 @@ router.get(
     try {
       const msalClient = new ConfidentialClientApplication(msalConfig);
       const authService = AuthService.create(req.session, msalClient);
-      const url = await authService.getAuthCodeUrl(req.session);
-      res.redirect(url);
+      const authUrl = await authService.getAuthCodeUrl(req.session);
+      res.redirect(authUrl);
     } catch (error) {
       next(error);
     }
   },
 );
+
+router.get("/signout", (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const msalClient = new ConfidentialClientApplication(msalConfig);
+    const authService = AuthService.create(req.session, msalClient);
+    const logoutUrl = authService.getLogoutUrl();
+
+    req.session.destroy(() => {
+      res.redirect(logoutUrl);
+    });
+  } catch (error) {
+    next(error);
+  }
+});
 
 router.post(
   "/redirect",

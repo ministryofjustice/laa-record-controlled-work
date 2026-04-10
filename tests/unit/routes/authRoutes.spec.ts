@@ -10,10 +10,13 @@ describe("authRoutes", () => {
   let authServiceStub: {
     getAuthCodeUrl: sinon.SinonStub;
     handleRedirect: sinon.SinonStub;
+    getLogoutUrl: sinon.SinonStub;
   };
   let app = createApp();
   const AUTH_CODE_URL = "https://login.microsoftonline.com/auth";
   const SUCCESS_REDIRECT = "/case/123";
+  const LOGOUT_URL =
+    "https://login.microsoftonline.com/tenant/oauth2/v2.0/logout?post_logout_redirect_uri=https://app/signed-out";
 
   beforeEach(() => {
     authServiceStub = {
@@ -21,6 +24,7 @@ describe("authRoutes", () => {
       handleRedirect: sinon
         .stub()
         .resolves({ successRedirect: SUCCESS_REDIRECT }),
+      getLogoutUrl: sinon.stub().returns(LOGOUT_URL),
     };
     sinon
       .stub(AuthService, "create")
@@ -70,6 +74,26 @@ describe("authRoutes", () => {
 
       expect(res.status).to.equal(500);
       expect(res.body.message).to.equal("MSAL failure");
+    });
+  });
+
+  describe("GET /auth/signout", () => {
+    it("redirects to the URL returned by authService.getLogoutUrl()", async () => {
+      const res = await request(app).get("/auth/signout");
+
+      expect(authServiceStub.getLogoutUrl.calledOnce).to.be.true;
+      expect(res.status).to.equal(302);
+      expect(res.headers.location).to.equal(LOGOUT_URL);
+    });
+
+    it("destroys the session before redirecting", async () => {
+      const agent = request.agent(app);
+      await agent.get("/auth/signin"); // establishes a session cookie
+      const res = await agent.get("/auth/signout");
+
+      expect(res.status).to.equal(302);
+      const cookie = res.headers["set-cookie"] as string | undefined;
+      expect(cookie).to.be.undefined;
     });
   });
 

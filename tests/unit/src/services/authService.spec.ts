@@ -3,6 +3,7 @@ import {
   CryptoProvider,
 } from "@azure/msal-node";
 import { AuthService } from "#src/services/authService.js";
+import config from "#config.js";
 import { expect, use } from "chai";
 import chaiAsPromised from "chai-as-promised";
 import type { SessionData } from "express-session";
@@ -151,6 +152,15 @@ describe("AuthService", () => {
 
       await expect(service.handleRedirect("auth-code", {})).to.be.rejectedWith(
         msalError,
+      );
+    });
+  });
+
+  describe("getLogoutUrl()", () => {
+    it("returns the Entra logout URL using config values", () => {
+      const url = service.getLogoutUrl();
+      expect(url).to.equal(
+        `${config.entra.authority}/oauth2/v2.0/logout?post_logout_redirect_uri=${config.entra.postLogoutRedirectUri}`,
       );
     });
   });

@@ -66,6 +66,9 @@ export class AuthService {
     }
   }
 
+  public getLogoutUrl(): string {
+    return `${config.entra.authority}/oauth2/v2.0/logout?post_logout_redirect_uri=${config.entra.postLogoutRedirectUri}`;
+  }
   private async getPkceCodes(): Promise<PKCECodes> {
     const { verifier, challenge } =
       await this.cryptoProvider.generatePkceCodes();
@@ -107,9 +110,5 @@ export class AuthService {
     };
 
     return authCodeUrlRequest;
-  }
-
-  public getLogoutUrl(): string {
-    return `${process.env.CLOUD_INSTANCE}/${process.env.TENANT_ID}/oauth2/v2.0/logout?post_logout_redirect_uri=${process.env.POST_LOGOUT_REDIRECT_URI}`;
   }
 }
