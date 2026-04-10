@@ -91,6 +91,9 @@ describe("AuthService", () => {
       msalStub.getTokenCache = sinon
         .stub()
         .returns({ serialize: sinon.stub().returns("{}") });
+      sinon
+        .stub(CryptoProvider.prototype, "base64Decode")
+        .returns(JSON.stringify({ successRedirect: "/" }));
     });
 
     it("calls acquireTokenByCode with authCodeRequest from session plus the code", async () => {
@@ -118,6 +121,16 @@ describe("AuthService", () => {
       await service.handleRedirect("auth-code", {});
 
       expect(session.isAuthenticated).to.be.true;
+    });
+
+    it("returns decoded state containing successRedirect", async () => {
+      const result = await service.handleRedirect("auth-code", {
+        state: "encoded-state",
+      });
+
+      const base64Decode = CryptoProvider.prototype.base64Decode as sinon.SinonStub;
+      expect(base64Decode.calledWith("encoded-state")).to.be.true;
+      expect(result).to.deep.equal({ successRedirect: "/" });
     });
   });
 });

@@ -62,6 +62,8 @@ export class AuthService {
       this.session.idToken = tokenResponse.idToken;
       this.session.account = tokenResponse.account ?? undefined;
       this.session.isAuthenticated = true;
+
+      return JSON.parse(this.cryptoProvider.base64Decode(requestBody.state));
     } catch (error) {
       throw error;
     }
@@ -82,26 +84,23 @@ export class AuthService {
     const scopes: string[] = [];
 
     const pkceCodes = await this.getPkceCodes();
-    session.pkceCodes = pkceCodes;
     const { challenge, challengeMethod, verifier } = pkceCodes;
-
-    const authCodeUrlRequestParams = {
-      state: this.cryptoProvider.base64Encode(
-        JSON.stringify({
-          successRedirect: "/",
-        }),
-      ),
-      scopes: scopes,
-    };
+    const state = this.cryptoProvider.base64Encode(
+      JSON.stringify({
+        successRedirect: "/",
+      }),
+    );
 
     const authCodeUrlRequest: AuthorizationUrlRequest = {
-      ...authCodeUrlRequestParams,
+      state: state,
+      scopes: scopes,
       redirectUri: config.entra.redirectUri,
       responseMode: "form_post",
       codeChallenge: challenge,
       codeChallengeMethod: challengeMethod,
     };
 
+    session.pkceCodes = pkceCodes;
     session.authCodeUrlRequest = authCodeUrlRequest;
     session.authCodeRequest = {
       code: "",
@@ -112,19 +111,6 @@ export class AuthService {
 
     return authCodeUrlRequest;
   }
-
-  // public async getTokenByCode(session: SessionData, authCode: string): Promise<AuthenticationResult> {
-  //     if (!session.pkceCodes) {
-  //         throw new Error('Missing PKCE codes');
-  //     }
-
-  //     const authCodeRequest: AuthorizationCodeRequest = {
-  //             ...session.authCodeRequest,
-  //             code: authCode,
-  //             codeVerifier: session.pkceCodes.verifier,
-  //         };
-  //     return await this.msalClient.acquireTokenByCode(authCodeRequest, req.body);
-  // }
 
   public getLogoutUrl(): string {
     return `${process.env.CLOUD_INSTANCE}/${process.env.TENANT_ID}/oauth2/v2.0/logout?post_logout_redirect_uri=${process.env.POST_LOGOUT_REDIRECT_URI}`;
