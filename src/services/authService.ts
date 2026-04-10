@@ -1,114 +1,125 @@
 import { SessionData } from "#node_modules/@types/express-session/index.js";
-import { ConfidentialClientApplication, Configuration, CryptoProvider, AuthorizationUrlRequest, AuthorizationCodeRequest, AuthenticationResult } from '@azure/msal-node';
+import {
+  ConfidentialClientApplication,
+  Configuration,
+  CryptoProvider,
+  AuthorizationUrlRequest,
+  AuthorizationCodeRequest,
+  AuthenticationResult,
+} from "@azure/msal-node";
 import config from "#config.js";
 import { PKCECodes } from "#types/auth-types.js";
 import { Request } from "#node_modules/@types/express/index.js";
 
-
 export class AuthService {
-    public session: SessionData;
-    public msalClient: ConfidentialClientApplication;
-    private cryptoProvider: CryptoProvider = new CryptoProvider();
+  public session: SessionData;
+  public msalClient: ConfidentialClientApplication;
+  private cryptoProvider: CryptoProvider = new CryptoProvider();
 
-    private constructor(sessionData: SessionData, msalClient: ConfidentialClientApplication) {
-        this.session = sessionData;
-        this.msalClient = msalClient
+  private constructor(
+    sessionData: SessionData,
+    msalClient: ConfidentialClientApplication,
+  ) {
+    this.session = sessionData;
+    this.msalClient = msalClient;
+  }
+
+  public static create(
+    sessionData: SessionData,
+    msalClient: ConfidentialClientApplication,
+  ): AuthService {
+    return new AuthService(sessionData, msalClient);
+  }
+
+  public async getAuthCodeUrl(session: SessionData): Promise<string> {
+    const authCodeUrlRequest = await this.createAuthCodeRequest(session);
+
+    try {
+      return await this.msalClient.getAuthCodeUrl(authCodeUrlRequest);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  public async handleRedirect(authCode: string, requestBody: Request["body"]) {
+    if (!this.session.authCodeRequest) {
+      throw new Error("Missing auth code request in session");
     }
 
-    public static create(sessionData: SessionData, msalClient: ConfidentialClientApplication): AuthService {
-        return new AuthService(sessionData, msalClient);
-    }
+    this.session.authCodeRequest.code = authCode;
+    this.session.tokenCache = this.msalClient.getTokenCache().serialize();
 
-    public async getAuthCodeUrl(session: SessionData): Promise<string> {
+    try {
+      const tokenResponse = await this.msalClient.acquireTokenByCode(
+        this.session.authCodeRequest,
+        requestBody,
+      );
+      if (!tokenResponse) {
+        throw new Error("Token response is null or undefined");
+      }
+    } catch (error) {}
+  }
 
-        const authCodeUrlRequest = await this.createAuthCodeRequest(session);
+  private async getPkceCodes(): Promise<PKCECodes> {
+    const { verifier, challenge } =
+      await this.cryptoProvider.generatePkceCodes();
 
-        try {
-            return await this.msalClient.getAuthCodeUrl(authCodeUrlRequest);
-        } catch (error) {
-            throw error;
-        }
-    }
+    return {
+      challengeMethod: "S256",
+      verifier: verifier,
+      challenge: challenge,
+    };
+  }
 
-    public async handleRedirect(authCode: string, requestBody: Request["body"]) {
+  private async createAuthCodeRequest(session: SessionData) {
+    const scopes: string[] = [];
 
-        if (!this.session.authCodeRequest) {
-            throw new Error('Missing auth code request in session');
-        }
+    const pkceCodes = await this.getPkceCodes();
+    session.pkceCodes = pkceCodes;
+    const { challenge, challengeMethod, verifier } = pkceCodes;
 
-        this.session.authCodeRequest.code = authCode;
+    const authCodeUrlRequestParams = {
+      state: this.cryptoProvider.base64Encode(
+        JSON.stringify({
+          successRedirect: "/",
+        }),
+      ),
+      scopes: scopes,
+    };
 
-        try {
-            const tokenResponse = await this.msalClient.acquireTokenByCode(this.session.authCodeRequest, requestBody);
-            if (!tokenResponse) {
-                throw new Error('Token response is null or undefined');
-            }
+    const authCodeUrlRequest: AuthorizationUrlRequest = {
+      ...authCodeUrlRequestParams,
+      redirectUri: config.entra.redirectUri,
+      responseMode: "form_post",
+      codeChallenge: challenge,
+      codeChallengeMethod: challengeMethod,
+    };
 
-        } catch (error) {
+    session.authCodeUrlRequest = authCodeUrlRequest;
+    session.authCodeRequest = {
+      code: "",
+      codeVerifier: verifier,
+      scopes: scopes,
+      redirectUri: config.entra.redirectUri,
+    };
 
-        }
-    }
+    return authCodeUrlRequest;
+  }
 
-    private async getPkceCodes(): Promise<PKCECodes> {
-        const { verifier, challenge } = await this.cryptoProvider.generatePkceCodes();
+  // public async getTokenByCode(session: SessionData, authCode: string): Promise<AuthenticationResult> {
+  //     if (!session.pkceCodes) {
+  //         throw new Error('Missing PKCE codes');
+  //     }
 
-        return {
-            challengeMethod: 'S256',
-            verifier: verifier,
-            challenge: challenge,
-        };
-    }
+  //     const authCodeRequest: AuthorizationCodeRequest = {
+  //             ...session.authCodeRequest,
+  //             code: authCode,
+  //             codeVerifier: session.pkceCodes.verifier,
+  //         };
+  //     return await this.msalClient.acquireTokenByCode(authCodeRequest, req.body);
+  // }
 
-    private async createAuthCodeRequest(session: SessionData) {
-
-        const scopes: string[] = [];
-
-        const pkceCodes = await this.getPkceCodes();
-        session.pkceCodes = pkceCodes;
-        const { challenge, challengeMethod, verifier } = pkceCodes;
-
-        const authCodeUrlRequestParams = {
-            state: this.cryptoProvider.base64Encode(
-                JSON.stringify({
-                    successRedirect: "/",
-                })),
-            scopes: scopes
-        };
-
-        const authCodeUrlRequest: AuthorizationUrlRequest = {
-            ...authCodeUrlRequestParams,
-            redirectUri: config.entra.redirectUri,
-            responseMode: 'form_post',
-            codeChallenge: challenge,
-            codeChallengeMethod: challengeMethod,
-        };
-
-        session.authCodeUrlRequest = authCodeUrlRequest;
-        session.authCodeRequest = {
-            code: '',
-            codeVerifier: verifier,
-            scopes: scopes,
-            redirectUri: config.entra.redirectUri,
-        };
-
-        return authCodeUrlRequest;
-    }
-
-
-    // public async getTokenByCode(session: SessionData, authCode: string): Promise<AuthenticationResult> {
-    //     if (!session.pkceCodes) {
-    //         throw new Error('Missing PKCE codes');
-    //     }
-
-    //     const authCodeRequest: AuthorizationCodeRequest = {
-    //             ...session.authCodeRequest,
-    //             code: authCode,
-    //             codeVerifier: session.pkceCodes.verifier,
-    //         };
-    //     return await this.msalClient.acquireTokenByCode(authCodeRequest, req.body);
-    // }
-
-    public getLogoutUrl(): string {
-        return `${process.env.CLOUD_INSTANCE}/${process.env.TENANT_ID}/oauth2/v2.0/logout?post_logout_redirect_uri=${process.env.POST_LOGOUT_REDIRECT_URI}`;
-    }
+  public getLogoutUrl(): string {
+    return `${process.env.CLOUD_INSTANCE}/${process.env.TENANT_ID}/oauth2/v2.0/logout?post_logout_redirect_uri=${process.env.POST_LOGOUT_REDIRECT_URI}`;
+  }
 }
