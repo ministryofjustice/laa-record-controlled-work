@@ -113,5 +113,11 @@ describe("AuthService", () => {
       expect(session.account).to.deep.equal({ username: "user" });
       expect(session.idToken).to.equal("id-token");
     });
+
+    it("sets session.isAuthenticated to true", async () => {
+      await service.handleRedirect("auth-code", {});
+
+      expect(session.isAuthenticated).to.be.true;
+    });
   });
 });

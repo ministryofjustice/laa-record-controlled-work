@@ -61,6 +61,7 @@ export class AuthService {
       this.session.tokenCache = this.msalClient.getTokenCache().serialize();
       this.session.idToken = tokenResponse.idToken;
       this.session.account = tokenResponse.account ?? undefined;
+      this.session.isAuthenticated = true;
     } catch (error) {
       throw error;
     }
