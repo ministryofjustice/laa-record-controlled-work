@@ -3,9 +3,12 @@ import {
   CryptoProvider,
 } from "@azure/msal-node";
 import { AuthService } from "#src/services/authService.js";
-import { expect } from "chai";
+import { expect, use } from "chai";
+import chaiAsPromised from "chai-as-promised";
 import type { SessionData } from "express-session";
 import sinon from "sinon";
+
+use(chaiAsPromised);
 
 describe("AuthService", () => {
   let msalStub: Partial<ConfidentialClientApplication>;
@@ -128,9 +131,27 @@ describe("AuthService", () => {
         state: "encoded-state",
       });
 
-      const base64Decode = CryptoProvider.prototype.base64Decode as sinon.SinonStub;
+      const base64Decode = CryptoProvider.prototype
+        .base64Decode as sinon.SinonStub;
       expect(base64Decode.calledWith("encoded-state")).to.be.true;
       expect(result).to.deep.equal({ successRedirect: "/" });
+    });
+
+    it("throws when authCodeRequest is missing from session", async () => {
+      delete session.authCodeRequest;
+
+      await expect(service.handleRedirect("auth-code", {})).to.be.rejectedWith(
+        "Missing auth code request in session",
+      );
+    });
+
+    it("propagates MSAL errors", async () => {
+      const msalError = new Error("MSAL failure");
+      (msalStub.acquireTokenByCode as sinon.SinonStub).rejects(msalError);
+
+      await expect(service.handleRedirect("auth-code", {})).to.be.rejectedWith(
+        msalError,
+      );
     });
   });
 });

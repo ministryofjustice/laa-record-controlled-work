@@ -1,11 +1,8 @@
 import { SessionData } from "#node_modules/@types/express-session/index.js";
 import {
   ConfidentialClientApplication,
-  Configuration,
   CryptoProvider,
   AuthorizationUrlRequest,
-  AuthorizationCodeRequest,
-  AuthenticationResult,
 } from "@azure/msal-node";
 import config from "#config.js";
 import { PKCECodes } from "#types/auth-types.js";
