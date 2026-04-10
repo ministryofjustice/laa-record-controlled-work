@@ -47,17 +47,23 @@ export class AuthService {
     }
 
     this.session.authCodeRequest.code = authCode;
-    this.session.tokenCache = this.msalClient.getTokenCache().serialize();
 
     try {
       const tokenResponse = await this.msalClient.acquireTokenByCode(
         this.session.authCodeRequest,
         requestBody,
       );
+
       if (!tokenResponse) {
         throw new Error("Token response is null or undefined");
       }
-    } catch (error) {}
+
+      this.session.tokenCache = this.msalClient.getTokenCache().serialize();
+      this.session.idToken = tokenResponse.idToken;
+      this.session.account = tokenResponse.account ?? undefined;
+    } catch (error) {
+      throw error;
+    }
   }
 
   private async getPkceCodes(): Promise<PKCECodes> {

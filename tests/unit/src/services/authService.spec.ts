@@ -106,5 +106,12 @@ describe("AuthService", () => {
 
       expect(session.tokenCache).to.equal("{}");
     });
+
+    it("stores account and idToken on session", async () => {
+      await service.handleRedirect("auth-code", {});
+
+      expect(session.account).to.deep.equal({ username: "user" });
+      expect(session.idToken).to.equal("id-token");
+    });
   });
 });
