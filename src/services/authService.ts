@@ -3,6 +3,7 @@ import {
   ConfidentialClientApplication,
   CryptoProvider,
   AuthorizationUrlRequest,
+  AuthenticationResult,
 } from "@azure/msal-node";
 import config from "#config.js";
 import { PKCECodes } from "#types/auth-types.js";
@@ -29,7 +30,7 @@ export class AuthService {
   }
 
   public async getAuthCodeUrl(session: SessionData): Promise<string> {
-    const authCodeUrlRequest = await this.createAuthCodeRequest(session);
+    const authCodeUrlRequest: AuthorizationUrlRequest = await this.createAuthCodeRequest(session);
 
     try {
       return await this.msalClient.getAuthCodeUrl(authCodeUrlRequest);
@@ -46,7 +47,7 @@ export class AuthService {
     this.session.authCodeRequest.code = authCode;
 
     try {
-      const tokenResponse = await this.msalClient.acquireTokenByCode(
+      const tokenResponse: AuthenticationResult = await this.msalClient.acquireTokenByCode(
         this.session.authCodeRequest,
         requestBody,
       );
@@ -69,6 +70,7 @@ export class AuthService {
   public getLogoutUrl(): string {
     return `${config.entra.authority}/oauth2/v2.0/logout?post_logout_redirect_uri=${config.entra.postLogoutRedirectUri}`;
   }
+  
   private async getPkceCodes(): Promise<PKCECodes> {
     const { verifier, challenge } =
       await this.cryptoProvider.generatePkceCodes();
@@ -80,12 +82,12 @@ export class AuthService {
     };
   }
 
-  private async createAuthCodeRequest(session: SessionData) {
+  private async createAuthCodeRequest(session: SessionData): Promise<AuthorizationUrlRequest> {
     const scopes: string[] = [];
 
-    const pkceCodes = await this.getPkceCodes();
+    const pkceCodes: PKCECodes = await this.getPkceCodes();
     const { challenge, challengeMethod, verifier } = pkceCodes;
-    const state = this.cryptoProvider.base64Encode(
+    const state: string = this.cryptoProvider.base64Encode(
       JSON.stringify({
         successRedirect: "/",
       }),
