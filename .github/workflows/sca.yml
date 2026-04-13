@@ -45,7 +45,7 @@ jobs:
           docker-images-file: ${{ github.workspace }}/docker-images.json
 
           # Dependency Management
-          renovate: "true"
+          renovate: ${{ github.event_name == 'scheduled' || github.event_name == 'workflow_dispatch' }}
 
           # Custom Configurations
           codeql-config-file: ".github/config/codeql.yml"
