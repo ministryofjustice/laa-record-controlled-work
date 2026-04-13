@@ -17,22 +17,22 @@ if (
 if (process.env.SESSION_NAME === undefined || process.env.SESSION_NAME === "") {
   throw new Error("SESSION_NAME must be defined in environment variables.");
 }
-if (process.env.CLIENT_ID == undefined || process.env.CLIENT_ID === '') {
+if (process.env.CLIENT_ID === undefined || process.env.CLIENT_ID === '') {
   throw new Error('CLIENT_ID must be defined in environment variables.');
 }
-if (process.env.CLIENT_SECRET == undefined || process.env.CLIENT_SECRET === '') {
+if (process.env.CLIENT_SECRET === undefined || process.env.CLIENT_SECRET === '') {
   throw new Error('CLIENT_SECRET must be defined in environment variables.');
 }
-if (process.env.TENANT_ID == undefined || process.env.TENANT_ID === '') {
+if (process.env.TENANT_ID === undefined || process.env.TENANT_ID === '') {
   throw new Error('TENANT_ID must be defined in environment variables.');
 }
-if (process.env.REDIRECT_URI == undefined || process.env.REDIRECT_URI === '') {
+if (process.env.REDIRECT_URI === undefined || process.env.REDIRECT_URI === '') {
   throw new Error('REDIRECT_URI must be defined in environment variables.');
 }
-if (process.env.CLOUD_INSTANCE == undefined || process.env.CLOUD_INSTANCE === '') {
+if (process.env.CLOUD_INSTANCE === undefined || process.env.CLOUD_INSTANCE === '') {
   throw new Error('CLOUD_INSTANCE must be defined in environment variables.');
 }
-if (process.env.POST_LOGOUT_REDIRECT_URI == undefined || process.env.POST_LOGOUT_REDIRECT_URI === '') {
+if (process.env.POST_LOGOUT_REDIRECT_URI === undefined || process.env.POST_LOGOUT_REDIRECT_URI === '') {
   throw new Error('POST_LOGOUT_REDIRECT_URI must be defined in environment variables.');
 }
 
