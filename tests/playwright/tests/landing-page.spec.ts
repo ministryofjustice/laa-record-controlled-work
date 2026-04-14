@@ -1,14 +1,15 @@
 import { test, expect } from "../fixtures/index.js";
 
-test("homepage should have the correct title", async ({ page }) => {
-  // Navigate to the homepage
+test("landing page should have the correct title", async ({ page, signIn }) => {
+  await signIn();
   await page.goto("/landing");
 
   // Check for the title of the application
   await expect(page).toHaveTitle(/Test Express Template – GOV.UK/);
 });
 
-test("homepage should display LAA header", async ({ page }) => {
+test("landing page should display LAA header", async ({ page, signIn }) => {
+  await signIn();
   await page.goto("/landing");
 
   // Check for the header with LAA branding
@@ -19,7 +20,11 @@ test("homepage should display LAA header", async ({ page }) => {
   await expect(page.getByRole("link", { name: "GOV.UK" })).toBeVisible();
 });
 
-test("homepage should display Landing page title", async ({ page }) => {
+test("landing page should display Landing page title", async ({
+  page,
+  signIn,
+}) => {
+  await signIn();
   await page.goto("/landing");
 
   // Check for Landing Page title

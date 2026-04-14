@@ -13,10 +13,10 @@ unit:
 	yarn test:unit
 
 e2e:
-	yarn build:ts && yarn test:e2e
+	yarn build && yarn test:e2e
 
 e2e-ui:
-	yarn build:ts && yarn playwright test --ui --config=tests/playwright/playwright.config.ts
+	yarn build && yarn playwright test --ui --config=tests/playwright/playwright.config.ts
 
 docker-build:
 	docker build -t laa-record-controlled-work:latest .

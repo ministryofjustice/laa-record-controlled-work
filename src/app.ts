@@ -100,6 +100,15 @@ const createApp = async (): Promise<express.Application> => {
 
   // Register the main router
   app.use("/auth", authRouter);
+
+  // Test-only route: sets an authenticated session without going through Entra.
+  if (process.env.NODE_ENV === "test") {
+    app.get("/test/signin", (req, res) => {
+      req.session.isAuthenticated = true;
+      res.redirect("/");
+    });
+  }
+
   app.use(requireAuth);
   app.use("/", indexRouter);
 
