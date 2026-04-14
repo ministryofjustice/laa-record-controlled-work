@@ -1,7 +1,6 @@
 import { test, expect } from "../fixtures/index.js";
 
-test("MSW intercepts outbound API calls", async ({ page, signIn }) => {
-  await signIn();
+test("MSW intercepts outbound API calls", async ({ page }) => {
   // Navigate to the users endpoint which makes an outbound API call
   await page.goto("/users");
 
@@ -30,9 +29,8 @@ test("MSW intercepts outbound API calls", async ({ page, signIn }) => {
   }
 });
 
-test("MSW mock data is consistent", async ({ page, signIn }) => {
+test("MSW mock data is consistent", async ({ page }) => {
   // Make the same request twice to ensure consistent mocking
-  await signIn();
   await page.goto("/users");
   await page.waitForLoadState("networkidle");
   const firstResponse = JSON.parse((await page.textContent("body")) || "[]");

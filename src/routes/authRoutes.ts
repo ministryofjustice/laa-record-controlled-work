@@ -14,8 +14,12 @@ router.get(
   "/signin",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const msalClient: ConfidentialClientApplication = new ConfidentialClientApplication(msalConfig);
-      const authService: AuthService = AuthService.create(req.session, msalClient);
+      const msalClient: ConfidentialClientApplication =
+        new ConfidentialClientApplication(msalConfig);
+      const authService: AuthService = AuthService.create(
+        req.session,
+        msalClient,
+      );
       const authUrl: string = await authService.getAuthCodeUrl(req.session);
       res.redirect(authUrl);
     } catch (error) {
@@ -26,8 +30,12 @@ router.get(
 
 router.get("/signout", (req: Request, res: Response, next: NextFunction) => {
   try {
-    const msalClient: ConfidentialClientApplication = new ConfidentialClientApplication(msalConfig);
-    const authService: AuthService = AuthService.create(req.session, msalClient);
+    const msalClient: ConfidentialClientApplication =
+      new ConfidentialClientApplication(msalConfig);
+    const authService: AuthService = AuthService.create(
+      req.session,
+      msalClient,
+    );
     const logoutUrl: string = authService.getLogoutUrl();
 
     req.session.destroy(() => {

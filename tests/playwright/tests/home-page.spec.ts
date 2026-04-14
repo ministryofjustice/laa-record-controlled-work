@@ -1,17 +1,14 @@
 import { test, expect } from "../fixtures/index.js";
 
-test("homepage should have the correct title", async ({ page, signIn }) => {
+test("homepage should have the correct title", async ({ page }) => {
   // Navigate to the homepage
-  await signIn();
-
   await page.goto("/");
 
   // Check for the title of the application
   await expect(page).toHaveTitle(/Test Express Template – GOV.UK/);
 });
 
-test("homepage should display LAA header", async ({ page, signIn }) => {
-  await signIn();
+test("homepage should display LAA header", async ({ page }) => {
   await page.goto("/");
 
   // Check for the header with LAA branding
@@ -23,13 +20,11 @@ test("homepage should display LAA header", async ({ page, signIn }) => {
 });
 
 test("home page displays service name and mountains table", async ({
-  signIn,
   pages,
   checkAccessibility,
 }) => {
   const homePage = pages.homePage;
 
-  await signIn();
   // Navigate to home page
   await homePage.navigate();
   await homePage.waitForLoad();
@@ -61,13 +56,9 @@ test("home page displays service name and mountains table", async ({
   await checkAccessibility();
 });
 
-test("home page table has correct structure", async ({
-  signIn,
-  pages,
-}) => {
+test("home page table has correct structure", async ({ pages }) => {
   const homePage = pages.homePage;
 
-  await signIn();
   await homePage.navigate();
   await homePage.waitForLoad();
 

@@ -1,10 +1,16 @@
-import type { NextFunction, Request, Response } from 'express';
+import type { NextFunction, Request, Response } from "express";
 
-export function requireAuth(req: Request, res: Response, next: NextFunction): void {
+export function requireAuth(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): void {
+  const bypassPaths = ["/health", "/status"];
 
-  const bypassPaths = ['/health', '/status'];
-
-  if (bypassPaths.includes(req.originalUrl) || req.originalUrl.startsWith('/auth/')) {
+  if (
+    bypassPaths.includes(req.originalUrl) ||
+    req.originalUrl.startsWith("/auth/")
+  ) {
     return next();
   }
 
@@ -12,5 +18,5 @@ export function requireAuth(req: Request, res: Response, next: NextFunction): vo
     return next();
   }
   req.session.returnTo = req.originalUrl;
-  res.redirect('/auth/signin');
+  res.redirect("/auth/signin");
 }
