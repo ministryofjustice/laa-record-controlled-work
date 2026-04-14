@@ -17,23 +17,34 @@ if (
 if (process.env.SESSION_NAME === undefined || process.env.SESSION_NAME === "") {
   throw new Error("SESSION_NAME must be defined in environment variables.");
 }
-if (process.env.CLIENT_ID === undefined || process.env.CLIENT_ID === '') {
-  throw new Error('CLIENT_ID must be defined in environment variables.');
+if (process.env.CLIENT_ID === undefined || process.env.CLIENT_ID === "") {
+  throw new Error("CLIENT_ID must be defined in environment variables.");
 }
-if (process.env.CLIENT_SECRET === undefined || process.env.CLIENT_SECRET === '') {
-  throw new Error('CLIENT_SECRET must be defined in environment variables.');
+if (
+  process.env.CLIENT_SECRET === undefined ||
+  process.env.CLIENT_SECRET === ""
+) {
+  throw new Error("CLIENT_SECRET must be defined in environment variables.");
 }
-if (process.env.TENANT_ID === undefined || process.env.TENANT_ID === '') {
-  throw new Error('TENANT_ID must be defined in environment variables.');
+if (process.env.TENANT_ID === undefined || process.env.TENANT_ID === "") {
+  throw new Error("TENANT_ID must be defined in environment variables.");
 }
-if (process.env.REDIRECT_URI === undefined || process.env.REDIRECT_URI === '') {
-  throw new Error('REDIRECT_URI must be defined in environment variables.');
+if (process.env.REDIRECT_URI === undefined || process.env.REDIRECT_URI === "") {
+  throw new Error("REDIRECT_URI must be defined in environment variables.");
 }
-if (process.env.CLOUD_INSTANCE === undefined || process.env.CLOUD_INSTANCE === '') {
-  throw new Error('CLOUD_INSTANCE must be defined in environment variables.');
+if (
+  process.env.CLOUD_INSTANCE === undefined ||
+  process.env.CLOUD_INSTANCE === ""
+) {
+  throw new Error("CLOUD_INSTANCE must be defined in environment variables.");
 }
-if (process.env.POST_LOGOUT_REDIRECT_URI === undefined || process.env.POST_LOGOUT_REDIRECT_URI === '') {
-  throw new Error('POST_LOGOUT_REDIRECT_URI must be defined in environment variables.');
+if (
+  process.env.POST_LOGOUT_REDIRECT_URI === undefined ||
+  process.env.POST_LOGOUT_REDIRECT_URI === ""
+) {
+  throw new Error(
+    "POST_LOGOUT_REDIRECT_URI must be defined in environment variables.",
+  );
 }
 
 // Get environment variables
@@ -48,7 +59,7 @@ const config: Config = {
   // Default rate window: 15 minutes in milliseconds
   RATE_WINDOW_MS: Number(
     process.env.RATE_WINDOW_MS ??
-    String(DEFAULT_RATE_WINDOW_MS_MINUTE * MILLISECONDS_IN_A_MINUTE),
+      String(DEFAULT_RATE_WINDOW_MS_MINUTE * MILLISECONDS_IN_A_MINUTE),
   ),
   SERVICE_NAME: process.env.SERVICE_NAME,
   SERVICE_PHASE: process.env.SERVICE_PHASE,
@@ -71,8 +82,8 @@ const config: Config = {
     httpOnly: true, // Restrict client-side access
   },
   paths: {
-    static: 'public',  // Path for serving static files
-    views: 'src/views',  // Path for Nunjucks views
+    static: "public", // Path for serving static files
+    views: "src/views", // Path for Nunjucks views
   },
   entra: {
     clientId: process.env.CLIENT_ID,
@@ -81,8 +92,8 @@ const config: Config = {
     tenantId: process.env.TENANT_ID,
     redirectUri: process.env.REDIRECT_URI,
     cloudInstance: process.env.CLOUD_INSTANCE,
-    postLogoutRedirectUri: process.env.POST_LOGOUT_REDIRECT_URI
-  }
+    postLogoutRedirectUri: process.env.POST_LOGOUT_REDIRECT_URI,
+  },
 };
 
 export default config;

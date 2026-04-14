@@ -1,5 +1,11 @@
 import type { NextFunction, Request, Response } from "express";
 
+/**
+ *
+ * @param req
+ * @param res
+ * @param next
+ */
 export function requireAuth(
   req: Request,
   res: Response,
@@ -11,11 +17,13 @@ export function requireAuth(
     bypassPaths.includes(req.originalUrl) ||
     req.originalUrl.startsWith("/auth/")
   ) {
-    return next();
+    next();
+    return;
   }
 
   if (req.session?.isAuthenticated) {
-    return next();
+    next();
+    return;
   }
   req.session.returnTo = req.originalUrl;
   res.redirect("/auth/signin");

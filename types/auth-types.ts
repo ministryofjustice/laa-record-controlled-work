@@ -3,7 +3,7 @@ import type {
   AuthorizationCodeRequest,
   AuthorizationUrlRequest,
 } from "@azure/msal-node";
-import session from "express-session";
+import type session from "express-session";
 
 export interface PKCECodes {
   challengeMethod: string;

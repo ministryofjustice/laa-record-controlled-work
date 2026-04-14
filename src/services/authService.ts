@@ -1,19 +1,27 @@
-import { SessionData } from "#node_modules/@types/express-session/index.js";
+import type { SessionData } from "#node_modules/@types/express-session/index.js";
 import {
-  ConfidentialClientApplication,
+  type ConfidentialClientApplication,
   CryptoProvider,
-  AuthorizationUrlRequest,
-  AuthenticationResult,
+  type AuthorizationUrlRequest,
+  type AuthenticationResult,
 } from "@azure/msal-node";
 import config from "#config.js";
-import { PKCECodes } from "#types/auth-types.js";
-import { Request } from "#node_modules/@types/express/index.js";
+import type { PKCECodes } from "#types/auth-types.js";
+import type { Request } from "#node_modules/@types/express/index.js";
 
+/**
+ *
+ */
 export class AuthService {
   public session: SessionData;
   public msalClient: ConfidentialClientApplication;
-  private cryptoProvider: CryptoProvider = new CryptoProvider();
+  private readonly cryptoProvider: CryptoProvider = new CryptoProvider();
 
+  /**
+   *
+   * @param sessionData
+   * @param msalClient
+   */
   private constructor(
     sessionData: SessionData,
     msalClient: ConfidentialClientApplication,
@@ -22,6 +30,11 @@ export class AuthService {
     this.msalClient = msalClient;
   }
 
+  /**
+   *
+   * @param sessionData
+   * @param msalClient
+   */
   public static create(
     sessionData: SessionData,
     msalClient: ConfidentialClientApplication,
@@ -29,8 +42,13 @@ export class AuthService {
     return new AuthService(sessionData, msalClient);
   }
 
+  /**
+   *
+   * @param session
+   */
   public async getAuthCodeUrl(session: SessionData): Promise<string> {
-    const authCodeUrlRequest: AuthorizationUrlRequest = await this.createAuthCodeRequest(session);
+    const authCodeUrlRequest: AuthorizationUrlRequest =
+      await this.createAuthCodeRequest(session);
 
     try {
       return await this.msalClient.getAuthCodeUrl(authCodeUrlRequest);
@@ -39,6 +57,11 @@ export class AuthService {
     }
   }
 
+  /**
+   *
+   * @param authCode
+   * @param requestBody
+   */
   public async handleRedirect(authCode: string, requestBody: Request["body"]) {
     if (!this.session.authCodeRequest) {
       throw new Error("Missing auth code request in session");
@@ -47,10 +70,11 @@ export class AuthService {
     this.session.authCodeRequest.code = authCode;
 
     try {
-      const tokenResponse: AuthenticationResult = await this.msalClient.acquireTokenByCode(
-        this.session.authCodeRequest,
-        requestBody,
-      );
+      const tokenResponse: AuthenticationResult =
+        await this.msalClient.acquireTokenByCode(
+          this.session.authCodeRequest,
+          requestBody,
+        );
 
       if (!tokenResponse) {
         throw new Error("Token response is null or undefined");
@@ -67,22 +91,34 @@ export class AuthService {
     }
   }
 
+  /**
+   *
+   */
   public getLogoutUrl(): string {
     return `${config.entra.authority}/oauth2/v2.0/logout?post_logout_redirect_uri=${config.entra.postLogoutRedirectUri}`;
   }
-  
+
+  /**
+   *
+   */
   private async getPkceCodes(): Promise<PKCECodes> {
     const { verifier, challenge } =
       await this.cryptoProvider.generatePkceCodes();
 
     return {
       challengeMethod: "S256",
-      verifier: verifier,
-      challenge: challenge,
+      verifier,
+      challenge,
     };
   }
 
-  private async createAuthCodeRequest(session: SessionData): Promise<AuthorizationUrlRequest> {
+  /**
+   *
+   * @param session
+   */
+  private async createAuthCodeRequest(
+    session: SessionData,
+  ): Promise<AuthorizationUrlRequest> {
     const scopes: string[] = [];
 
     const pkceCodes: PKCECodes = await this.getPkceCodes();
@@ -94,8 +130,8 @@ export class AuthService {
     );
 
     const authCodeUrlRequest: AuthorizationUrlRequest = {
-      state: state,
-      scopes: scopes,
+      state,
+      scopes,
       redirectUri: config.entra.redirectUri,
       responseMode: "form_post",
       codeChallenge: challenge,
@@ -107,7 +143,7 @@ export class AuthService {
     session.authCodeRequest = {
       code: "",
       codeVerifier: verifier,
-      scopes: scopes,
+      scopes,
       redirectUri: config.entra.redirectUri,
     };
 
