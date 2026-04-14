@@ -89,7 +89,7 @@ export class AuthService {
     const { challenge, challengeMethod, verifier } = pkceCodes;
     const state: string = this.cryptoProvider.base64Encode(
       JSON.stringify({
-        successRedirect: "/",
+        successRedirect: session.returnTo ?? "/",
       }),
     );
 

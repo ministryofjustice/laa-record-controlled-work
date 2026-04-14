@@ -72,9 +72,6 @@ const createApp = async (): Promise<express.Application> => {
   app.set("trust proxy", TRUST_FIRST_PROXY);
   app.use(session(config.session));
 
-  // Set up Cross-Site Request Forgery (CSRF) protection
-  setupCsrf(app);
-
   // Set up locale middleware for internationalization
   app.use(setupLocaleMiddleware);
 
@@ -98,8 +95,12 @@ const createApp = async (): Promise<express.Application> => {
   // Parses incoming request bodies to match the format Entra uses when it POSTs the auth code back
   app.use(express.urlencoded({ extended: false }));
 
-  // Register the main router
+  // Auth routes are mounted before CSRF — the OAuth redirect endpoint is secured
+  // by the PKCE state parameter, not a CSRF token (Entra POSTs to it directly).
   app.use("/auth", authRouter);
+
+  // Set up Cross-Site Request Forgery (CSRF) protection for all other routes
+  setupCsrf(app);
 
   // Test-only route: sets an authenticated session without going through Entra.
   if (process.env.NODE_ENV === "test") {
