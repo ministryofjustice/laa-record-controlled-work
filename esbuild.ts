@@ -48,6 +48,7 @@ const copyAssets = async (): Promise<void> => {
  */
 const externalModules: string[] = [
   ...builtinModules,
+  "@azure/msal-node",
   "express",
   "nunjucks",
   "dotenv",
@@ -155,13 +156,6 @@ const buildAppJs = async (
       ".js": "jsx",
       ".ts": "tsx",
       ".json": "json",
-    },
-    // @azure/msal-node brought in a chain of CommonJS dependencies that use
-    // `require()`, so we need to provide a shim for `require` in the bundled
-    // output. So this injects a real require function at the top of the ESM bundle
-    // using Node's module.createRequire.
-    banner: {
-      js: 'import { createRequire } from "module"; const require = createRequire(import.meta.url);',
     },
     external: externalModules,
     outfile: "public/app.js",
