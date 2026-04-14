@@ -1,9 +1,12 @@
 name: CICD
 
 on:
+  pull_request:
+    types: [opened, synchronize, reopened]
   push:
     branches:
-      - "**"
+      - main
+  merge_group:
   workflow_dispatch: # Allows manual triggering of the workflow
 
 jobs:
@@ -13,6 +16,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Setup Node and Dependencies
         uses: ./.github/actions/setup-node
@@ -26,6 +31,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Setup Node and Dependencies
         uses: ./.github/actions/setup-node
@@ -39,6 +46,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Build local Docker image
         working-directory: ${{ github.workspace }}
@@ -62,10 +71,14 @@ jobs:
   mocha-unit-tests:
     name: Mocha Unit Tests
     uses: ./.github/workflows/mocha.yml
+    with:
+      sha: ${{ github.event.pull_request.head.sha || github.sha }}
 
   playwright:
     name: Playwright Tests
     uses: ./.github/workflows/playwright.yml
+    with:
+      sha: ${{ github.event.pull_request.head.sha || github.sha }}
 
   build-image:
     name: Build Docker Image
@@ -76,6 +89,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Set up AWS credentials for ECR and Kubernetes
         uses: aws-actions/configure-aws-credentials@8df5847569e6427dd6c4fb1cf565c83acfa8afa7 # v6.0.0
@@ -93,7 +108,7 @@ jobs:
         uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5
         with:
           path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          key: ${{ runner.os }}-buildx-${{ github.event.pull_request.head.sha || github.sha }}
           restore-keys: |
             ${{ runner.os }}-buildx-
 
@@ -103,10 +118,15 @@ jobs:
           image_registry: ${{ secrets.ECR_REGISTRY_URL }}
           image_repo: ${{ vars.RCW_ECR_REPOSITORY }}
           dockerfile_path: Dockerfile
-          image_tag: ${{ github.sha }}
+          image_tag: ${{ github.event.pull_request.head.sha || github.sha }}
 
   deploy-uat:
-    if: ${{ !startsWith(github.ref, 'refs/heads/gh-readonly-queue/') }}
+    if: github.event_name != 'merge_group'
+    uses: ./.github/workflows/deploy-environment.yml
+    with:
+      app-environment: uat
+      sha: ${{ github.event.pull_request.head.sha || github.sha }}
+      branch-ref: ${{ github.head_ref }}
     concurrency:
       group: deploy-uat-${{ github.ref }}
       cancel-in-progress: false
@@ -118,9 +138,6 @@ jobs:
       - mocha-unit-tests
       - playwright
       - snyk-infra
-    uses: ./.github/workflows/deploy-environment.yml
-    with:
-      app-environment: uat
     secrets: inherit
 
   # deploy-staging:

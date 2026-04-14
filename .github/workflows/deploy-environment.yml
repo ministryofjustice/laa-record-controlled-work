@@ -6,6 +6,14 @@ on:
       app-environment:
         required: true
         type: string
+      sha:
+        description: "Commit SHA to deploy"
+        type: string
+        required: true
+      branch-ref:
+        description: "Branch ref for ephemeral deployments"
+        type: string
+        default: ''
 
 jobs:
   deploy:
@@ -25,6 +33,8 @@ jobs:
           SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
           SESSION_ENCRYPTION_KEY: ${{ secrets.SESSION_ENCRYPTION_KEY }}
         with:
+          sha: ${{ inputs.sha }}
+          branch-ref: ${{ inputs.branch-ref }}
           app-environment: ${{ inputs.app-environment }}
           ecr-registry_url: ${{ secrets.ECR_REGISTRY_URL }}
           ecr-repository: ${{ vars.ECR_REPOSITORY }}
