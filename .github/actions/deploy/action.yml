@@ -86,7 +86,7 @@ runs:
         REPOSITORY: ${{ inputs.ecr-repository }}
         IMAGE_TAG: ${{ inputs.sha }}
         GITHUB_SHA: ${{ inputs.sha }}
-        BRANCH_NAME: ${{ inputs.branch-ref || github.ref_name }}
+        BRANCH_NAME: ${{ inputs.branch-ref }}
         K8S_NAMESPACE: ${{ inputs.kube-namespace }}
         NGINX_ECR_REPOSITORY: ${{ inputs.nginx-ecr-repository }}
 # TODO set up slack notification
