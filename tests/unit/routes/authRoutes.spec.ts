@@ -10,8 +10,8 @@ describe("authRoutes", () => {
   let authServiceStub: {
     getAuthCodeUrl: sinon.SinonStub;
     handleRedirect: sinon.SinonStub;
-    getLogoutUrl: sinon.SinonStub;
   };
+  let getLogoutUrlStub: sinon.SinonStub;
   let app = createApp();
   const AUTH_CODE_URL = "https://login.microsoftonline.com/auth";
   const SUCCESS_REDIRECT = "/case/123";
@@ -24,11 +24,11 @@ describe("authRoutes", () => {
       handleRedirect: sinon
         .stub()
         .resolves({ successRedirect: SUCCESS_REDIRECT }),
-      getLogoutUrl: sinon.stub().returns(LOGOUT_URL),
     };
     sinon
       .stub(AuthService, "create")
       .returns(authServiceStub as unknown as AuthService);
+    getLogoutUrlStub = sinon.stub(AuthService, "getLogoutUrl").returns(LOGOUT_URL);
   });
 
   afterEach(() => sinon.restore());
@@ -75,7 +75,7 @@ describe("authRoutes", () => {
     it("redirects to the URL returned by authService.getLogoutUrl()", async () => {
       const res = await request(app).get("/auth/signout");
 
-      expect(authServiceStub.getLogoutUrl.calledOnce).to.be.true;
+      expect(getLogoutUrlStub.calledOnce).to.be.true;
       expect(res.status).to.equal(302);
       expect(res.headers.location).to.equal(LOGOUT_URL);
     });

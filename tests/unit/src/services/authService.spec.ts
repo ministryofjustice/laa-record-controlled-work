@@ -64,7 +64,7 @@ describe("AuthService", () => {
       const base64Encode = CryptoProvider.prototype
         .base64Encode as sinon.SinonStub;
       expect(JSON.parse(base64Encode.firstCall.args[0])).to.deep.equal({
-        successRedirect: "/",
+        successRedirect: "/landing",
       });
     });
 
@@ -158,7 +158,7 @@ describe("AuthService", () => {
 
   describe("getLogoutUrl()", () => {
     it("returns the Entra logout URL using config values", () => {
-      const url = service.getLogoutUrl();
+      const url = AuthService.getLogoutUrl();
       expect(url).to.equal(
         `${config.entra.authority}/oauth2/v2.0/logout?post_logout_redirect_uri=${config.entra.postLogoutRedirectUri}`,
       );

@@ -56,10 +56,10 @@ export class AuthService {
   public async getAuthCodeUrl(session: SessionData): Promise<string> {
     const authCodeUrlRequest: AuthorizationUrlRequest =
       await this.createAuthCodeRequest(session);
-
     try {
       return await this.msalClient.getAuthCodeUrl(authCodeUrlRequest);
     } catch (error) {
+      console.error("Failed to generate Entra auth code URL:", error);
       throw error;
     }
   }
@@ -72,31 +72,28 @@ export class AuthService {
   public async handleRedirect(
     requestBody: AuthCodeResponse,
   ): Promise<AuthState> {
-    if (!this.session.authCodeRequest) {
+    if (this.session.authCodeRequest === undefined) {
       throw new Error("Missing auth code request in session");
     }
 
-    this.session.authCodeRequest.code = requestBody.code;
+    const { code } = requestBody;
+    this.session.authCodeRequest.code = code;
 
     try {
-      const tokenResponse: AuthenticationResult =
+      const { idToken, account }: AuthenticationResult =
         await this.msalClient.acquireTokenByCode(
           this.session.authCodeRequest,
           requestBody,
         );
-
-      if (!tokenResponse) {
-        throw new Error("Token response is null or undefined");
-      }
-
       this.session.tokenCache = this.msalClient.getTokenCache().serialize();
-      this.session.idToken = tokenResponse.idToken;
-      this.session.account = tokenResponse.account ?? undefined;
+      this.session.idToken = idToken;
+      this.session.account = account ?? undefined;
       this.session.isAuthenticated = true;
 
       const decoded = this.cryptoProvider.base64Decode(requestBody.state);
       return authStateSchema.parse(JSON.parse(decoded));
     } catch (error) {
+      console.error("Failed to handle Entra auth redirect:", error);
       throw error;
     }
   }
@@ -105,7 +102,7 @@ export class AuthService {
    * Builds the Microsoft Entra ID logout URL including the post-logout redirect URI.
    * @returns {string} The fully-formed Entra logout URL.
    */
-  public getLogoutUrl(): string {
+  public static getLogoutUrl(): string {
     return `${config.entra.authority}/oauth2/v2.0/logout?post_logout_redirect_uri=${config.entra.postLogoutRedirectUri}`;
   }
 

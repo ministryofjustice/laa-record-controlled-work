@@ -32,14 +32,7 @@ router.get(
 
 router.get("/signout", (req: Request, res: Response, next: NextFunction) => {
   try {
-    const msalClient: ConfidentialClientApplication =
-      new ConfidentialClientApplication(msalConfig);
-    const authService: AuthService = AuthService.create(
-      req.session,
-      msalClient,
-    );
-    const logoutUrl: string = authService.getLogoutUrl();
-
+    const logoutUrl: string = AuthService.getLogoutUrl();
     req.session.destroy(() => {
       res.redirect(logoutUrl);
     });
