@@ -19,12 +19,6 @@ runs:
         corepack prepare yarn@4.9.2 --activate
       shell: bash
 
-    - name: Log Yarn version
-      run: |
-        which yarn
-        yarn --version
-      shell: bash
-
     - name: SLSA Supply Chain Security
       uses: ministryofjustice/devsecops-actions/sca/slsa@4cd163be7859cd130800d6719d925318826038ea
 
