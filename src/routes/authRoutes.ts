@@ -1,3 +1,4 @@
+import config from "#config.js";
 import { msalConfig } from "#src/config/authConfig.js";
 import { AuthService } from "#src/services/authService.js";
 import { ConfidentialClientApplication } from "@azure/msal-node";
@@ -52,7 +53,9 @@ router.post(
     try {
       const authCode = req.body.code as string;
       if (!authCode) {
-        return res.status(400).send("Missing auth code");
+        return res
+          .status(config.HTTP_STATUS.BAD_REQUEST)
+          .send("Missing auth code");
       }
 
       const msalClient = new ConfidentialClientApplication(msalConfig);
