@@ -95,6 +95,9 @@ rcw:
   envSecrets:
     - SESSION_SECRET
     - SESSION_ENCRYPTION_KEY
+    - CLIENT_ID
+    - CLIENT_SECRET
+    - TENANT_ID
 
   # Plain env vars injected directly into the container. Add new vars 
   # here only, they are automatically picked up by the Helm template and 
@@ -116,6 +119,9 @@ rcw:
     RATE_LIMIT_MAX: 100
     RATE_WINDOW_MS: 900000
     NODE_ENV: ""
+    CLOUD_INSTANCE: "https://login.microsoftonline.com/"
+    REDIRECT_URI: ""
+    POST_LOGOUT_REDIRECT_URI: ""
 
   autoscaling:
     enabled: false
