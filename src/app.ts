@@ -24,6 +24,8 @@ import session from "express-session";
 import morgan from "morgan";
 
 const TRUST_FIRST_PROXY = 1;
+const ENABLE_PLAYWRIGHT_TEST_SIGNIN =
+  process.env.PLAYWRIGHT_TEST_SIGNIN === "true";
 
 /**
  * Creates and configures an Express application.
@@ -102,8 +104,8 @@ const createApp = async (): Promise<express.Application> => {
   // Set up Cross-Site Request Forgery (CSRF) protection for all other routes
   setupCsrf(app);
 
-  // Test-only route: sets an authenticated session without going through Entra.
-  if (process.env.NODE_ENV === "test") {
+  // Playwright-only route: sets an authenticated session without going through Entra.
+  if (ENABLE_PLAYWRIGHT_TEST_SIGNIN) {
     app.get("/test/signin", (req, res) => {
       req.session.isAuthenticated = true;
       res.redirect("/");

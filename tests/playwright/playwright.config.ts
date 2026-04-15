@@ -54,6 +54,7 @@ export default defineConfig({
     cwd: "../..", // Run from project root since config is now in tests/playwright/ subdirectory
     env: {
       NODE_ENV: "test",
+      PLAYWRIGHT_TEST_SIGNIN: "true",
       PORT: "3000",
       SESSION_SECRET: "test-secret-key-for-playwright-tests",
       SESSION_NAME: "test-session",
