@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers -- Zod schema constraints are self-documenting */
 import { z } from "zod";
 
 export const authCodeResponseSchema = z.object({
