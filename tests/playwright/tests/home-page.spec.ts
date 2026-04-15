@@ -16,7 +16,29 @@ test('homepage should display LAA header', async ({ page }) => {
 	await expect(header).toBeVisible();
 
 	// Check for GOV.UK branding which is typically in the header
-	await expect(page.getByRole('link', { name: 'GOV.UK' })).toBeVisible();
+	await expect(page.getByRole('link', { name: 'Legal Aid Agency' })).toBeVisible();
+});
+
+test('homepage should display navigation', async ({ page }) => {
+	await page.goto('/');
+
+	// Check for the header with LAA branding
+	const navigation = page.locator('.govuk-service-navigation');
+	await expect(navigation).toBeVisible();
+
+	// Check for GOV.UK branding which is typically in the header
+	await expect(page.getByRole('link', { name: 'Your cases' })).toBeVisible();
+});
+
+test('homepage should display phase banner', async ({ page }) => {
+	await page.goto('/');
+
+	// Check for the header with LAA branding
+	const phaseBanner = page.locator('.govuk-phase-banner');
+	await expect(phaseBanner).toBeVisible();
+
+	// Check for GOV.UK branding which is typically in the header
+	await expect(page.getByRole('link', { name: 'give your feedback by email' })).toBeVisible();
 });
 
 test('home page displays service name and mountains table', async ({ pages, checkAccessibility }) => {
