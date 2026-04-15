@@ -1,5 +1,6 @@
 import config from "#config.js";
 import { msalConfig } from "#src/config/authConfig.js";
+import { authCodeResponseSchema } from "#src/config/zod/authSchema.js";
 import { AuthService } from "#src/services/authService.js";
 import { ConfidentialClientApplication } from "@azure/msal-node";
 import {
@@ -51,19 +52,17 @@ router.post(
   "/redirect",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const authCode = req.body.code as string;
-      if (!authCode) {
+      const parseResult = authCodeResponseSchema.safeParse(req.body);
+      if (!parseResult.success) {
         return res
           .status(config.HTTP_STATUS.BAD_REQUEST)
-          .send("Missing auth code");
+          .send("Invalid redirect payload");
       }
 
+      const { data } = parseResult;
       const msalClient = new ConfidentialClientApplication(msalConfig);
       const authService = AuthService.create(req.session, msalClient);
-      const { successRedirect } = await authService.handleRedirect(
-        authCode,
-        req.body,
-      );
+      const { successRedirect } = await authService.handleRedirect(data);
       res.redirect(successRedirect);
     } catch (error) {
       next(error);

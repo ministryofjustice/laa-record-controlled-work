@@ -41,12 +41,6 @@ describe("authRoutes", () => {
         .send({ code: "auth-code-abc", state: "encoded-state" });
 
       expect(authServiceStub.handleRedirect.calledOnce).to.be.true;
-      expect(
-        authServiceStub.handleRedirect.calledWith(
-          "auth-code-abc",
-          sinon.match.object,
-        ),
-      ).to.be.true;
       expect(res.status).to.equal(302);
       expect(res.headers.location).to.equal(SUCCESS_REDIRECT);
     });

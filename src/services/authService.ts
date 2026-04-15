@@ -6,8 +6,12 @@ import {
   type AuthenticationResult,
 } from "@azure/msal-node";
 import config from "#config.js";
+import {
+  authStateSchema,
+  type AuthState,
+  type AuthCodeResponse,
+} from "#src/config/zod/authSchema.js";
 import type { PKCECodes } from "#types/auth-types.js";
-import type { Request } from "#node_modules/@types/express/index.js";
 
 /**
  *
@@ -62,12 +66,14 @@ export class AuthService {
    * @param authCode
    * @param requestBody
    */
-  public async handleRedirect(authCode: string, requestBody: Request["body"]) {
+  public async handleRedirect(
+    requestBody: AuthCodeResponse,
+  ): Promise<AuthState> {
     if (!this.session.authCodeRequest) {
       throw new Error("Missing auth code request in session");
     }
 
-    this.session.authCodeRequest.code = authCode;
+    this.session.authCodeRequest.code = requestBody.code;
 
     try {
       const tokenResponse: AuthenticationResult =
@@ -85,7 +91,8 @@ export class AuthService {
       this.session.account = tokenResponse.account ?? undefined;
       this.session.isAuthenticated = true;
 
-      return JSON.parse(this.cryptoProvider.base64Decode(requestBody.state));
+      const decoded = this.cryptoProvider.base64Decode(requestBody.state);
+      return authStateSchema.parse(JSON.parse(decoded));
     } catch (error) {
       throw error;
     }
