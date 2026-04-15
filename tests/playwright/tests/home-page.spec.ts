@@ -12,7 +12,7 @@ test('homepage should display LAA header', async ({ page }) => {
 	await page.goto('/');
 
 	// Check for the header with LAA branding
-	const header = page.locator('.govuk-header');
+	const header = page.locator('.moj-header');
 	await expect(header).toBeVisible();
 
 	// Check for GOV.UK branding which is typically in the header
