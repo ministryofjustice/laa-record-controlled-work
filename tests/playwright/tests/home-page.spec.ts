@@ -16,7 +16,7 @@ test('homepage should display LAA header', async ({ page }) => {
 	await expect(header).toBeVisible();
 
 	// Check for MoJ branding which is typically in the header
-	await expect(page.getByRole('link', { name: 'Legal Aid Agency' })).toBeVisible();
+	await expect(page.frameLocator('.moj-header').getByRole('link', { name: 'Legal Aid Agency' })).toBeVisible();
 });
 
 test('homepage should display navigation', async ({ page }) => {
