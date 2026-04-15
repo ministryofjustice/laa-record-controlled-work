@@ -51,4 +51,4 @@ jobs:
           codeql-config-file: ".github/config/codeql.yml"
           codeql-upload-findings: "always"
 
-          disable-yarn-audit: true
+          disable-yarn-audit: "true"
