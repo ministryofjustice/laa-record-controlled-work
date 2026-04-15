@@ -7,10 +7,8 @@ ENVIRONMENT=$1
 # shellcheck source=docker-images.env
 source "$(dirname "$0")/../docker-images.env"
 
-# Convert the branch name into a string that can be turned into a valid URL
-BRANCH_RELEASE_NAME=$(./scripts/release-name.sh)
-
 deploy_branch() {
+  BRANCH_RELEASE_NAME=$(./scripts/release-name.sh "$BRANCH_NAME")
 # Set the deployment host, this will add the prefix of the branch name e.g el-257-deploy-with-circleci or just main
   RELEASE_HOST="$BRANCH_RELEASE_NAME-laa-record-controlled-work-uat.cloud-platform.service.justice.gov.uk"
 # Set the ingress name, needs release name, namespace and -green suffix
