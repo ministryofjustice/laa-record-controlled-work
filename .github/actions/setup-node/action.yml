@@ -1,11 +1,6 @@
 name: Setup Node and Dependencies
 description: Setup Node.js, enable Corepack, and install dependencies
 
-inputs:
-  yarn_install:
-    description: Whether to run yarn install
-    default: "true"
-
 runs:
   using: "composite"
   steps:
@@ -18,8 +13,10 @@ runs:
       with:
         node-version: ${{ env.NODE_VERSION }}
 
-    - name: Enable Corepack
-      run: corepack enable
+    - name: Enable Corepack and prepare Yarn
+      run: |
+        corepack enable
+        corepack prepare yarn@4.9.2 --activate
       shell: bash
 
     - name: Log Yarn version
@@ -32,6 +29,5 @@ runs:
       uses: ministryofjustice/devsecops-actions/sca/slsa@4cd163be7859cd130800d6719d925318826038ea
 
     - name: Install dependencies
-      if: ${{ inputs.yarn_install == 'true' }}
       run: yarn install --immutable
       shell: bash
