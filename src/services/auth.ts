@@ -134,7 +134,7 @@ export class AuthService {
     const { challenge, challengeMethod, verifier } = pkceCodes;
     const { returnTo } = session;
     const successRedirect =
-      returnTo?.startsWith("/") === true && !returnTo.startsWith("//")
+      returnTo?.startsWith("/") === true && !returnTo.startsWith("//") && returnTo !== "/"
         ? returnTo
         : "/landing";
     session.returnTo = undefined;

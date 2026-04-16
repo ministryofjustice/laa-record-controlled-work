@@ -95,8 +95,6 @@ const createApp = async (): Promise<express.Application> => {
     // Use dev format for development (colored, more readable)
     app.use(morgan("dev"));
   }
-  // Parses incoming request bodies to match the format Entra uses when it POSTs the auth code back
-  app.use(express.urlencoded({ extended: false }));
 
   // Auth routes are mounted before CSRF — the OAuth redirect endpoint is secured
   // by the PKCE state parameter, not a CSRF token (Entra POSTs to it directly).
