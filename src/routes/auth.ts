@@ -32,9 +32,10 @@ router.get(
 
 router.get("/signout", (req: Request, res: Response, next: NextFunction) => {
   try {
-    req.session.destroy((error) => {
-      if (error) {
-        return next(error);
+    req.session.destroy((error: Error | null) => {
+      if (error !== null) {
+        next(error);
+        return;
       }
 
       res.clearCookie(config.session.name);

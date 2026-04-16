@@ -7,8 +7,8 @@ import {
 } from "@azure/msal-node";
 import config from "#config.js";
 import {
-  AuthCodeResponse,
-  AuthState,
+  type AuthCodeResponse,
+  type AuthState,
   authStateSchema,
   type PKCECodes,
 } from "#types/auth-types.js";
