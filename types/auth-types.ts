@@ -14,7 +14,15 @@ export const authCodeResponseSchema = z.object({
 });
 
 export const authStateSchema = z.object({
-  successRedirect: z.string().min(1),
+  // Allows paths starting with a single "/" (e.g. /dashboard).
+  // The negative lookahead (?!\/) rejects protocol-relative URLs (//bad.com).
+  // Rejects absolute URLs and whitespace.
+  successRedirect: z
+    .string()
+    .regex(
+      /^\/(?!\/)[^\s]*$/,
+      "successRedirect must be an app-internal path starting with a single /",
+    ),
 });
 
 export type AuthCodeResponse = z.infer<typeof authCodeResponseSchema>;
