@@ -49,8 +49,8 @@ describe("AuthService", () => {
     it("stores PKCE codes on session", async () => {
       await service.getAuthCodeUrl(session);
       expect(session.pkceCodes).to.exist;
-      expect(session.pkceCodes?.verifier).to.equal("test-verifier");
-      expect(session.pkceCodes?.challenge).to.equal("test-challenge");
+      expect(session.pkceCodes!.verifier).to.equal("test-verifier");
+      expect(session.pkceCodes!.challenge).to.equal("test-challenge");
     });
 
     it("stores authCodeUrlRequest and authCodeRequest on session", async () => {
