@@ -11,13 +11,13 @@ import {
 } from "express";
 
 const router: Router = Router();
+const msalClient: ConfidentialClientApplication =
+        new ConfidentialClientApplication(msalConfig);
 
 router.get(
   "/signin",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const msalClient: ConfidentialClientApplication =
-        new ConfidentialClientApplication(msalConfig);
       const authService: AuthService = AuthService.create(
         req.session,
         msalClient,
@@ -58,7 +58,6 @@ router.post(
       }
 
       const { data } = parseResult;
-      const msalClient = new ConfidentialClientApplication(msalConfig);
       const authService = AuthService.create(req.session, msalClient);
       const { successRedirect } =
         await authService.processAuthCodeCallback(data);
