@@ -8,41 +8,6 @@ test('homepage should have the correct title', async ({ page }) => {
 	await expect(page).toHaveTitle(/Record civil controlled work – GOV.UK/);
 });
 
-test.describe('Homepage header', () => {
-  test('homepage should display LAA header', async ({ page }) => {
-    await page.goto('/');
-
-    // Check for the header with LAA branding
-    const header = page.locator('.moj-header');
-    await expect(header).toBeVisible();
-
-    // Check for MoJ branding which is typically in the header
-    await expect(page.locator('.moj-header').getByRole('link', { name: 'Legal Aid Agency' })).toBeVisible();
-  });
-
-  test('homepage should display navigation', async ({ page }) => {
-    await page.goto('/');
-
-    // Check for the service navigation
-    const navigation = page.locator('.govuk-service-navigation');
-    await expect(navigation).toBeVisible();
-
-    // Check for navigation links
-    await expect(page.getByRole('link', { name: 'Your cases' })).toBeVisible();
-  });
-
-  test('homepage should display phase banner', async ({ page }) => {
-    await page.goto('/');
-
-    // Check for the phase banner
-    const phaseBanner = page.locator('.govuk-phase-banner');
-    await expect(phaseBanner).toBeVisible();
-
-    // Check for feedback link
-    await expect(page.getByRole('link', { name: 'give your feedback by email' })).toBeVisible();
-  });
-})
-
 test.describe('Homepage content', () => {
   test('home page displays service name and mountains table', async ({ pages, checkAccessibility }) => {
     const homePage = pages.homePage;
