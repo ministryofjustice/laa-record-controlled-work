@@ -100,9 +100,6 @@ const createApp = async (): Promise<express.Application> => {
   // by the PKCE state parameter, not a CSRF token (Entra POSTs to it directly).
   app.use("/auth", createAuthLimiter(config), authRouter);
 
-  // Set up Cross-Site Request Forgery (CSRF) protection for all other routes
-  setupCsrf(app);
-
   // Playwright-only route: sets an authenticated session without going through Entra.
   if (ENABLE_PLAYWRIGHT_TEST_SIGNIN && process.env.NODE_ENV === "test") {
     app.get("/test/signin", (req, res) => {
@@ -112,6 +109,10 @@ const createApp = async (): Promise<express.Application> => {
   }
 
   app.use(requireAuth);
+
+  // Set up Cross-Site Request Forgery (CSRF) protection for all other routes
+  setupCsrf(app);
+
   app.use("/", indexRouter);
 
   // Enable live-reload middleware in development mode
