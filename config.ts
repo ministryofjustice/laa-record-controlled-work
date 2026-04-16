@@ -125,7 +125,6 @@ const config: Config = {
     FORBIDDEN,
     NOT_FOUND,
     INTERNAL_SERVER_ERROR,
-    FOUND,
   },
 };
 

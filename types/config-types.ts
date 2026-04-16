@@ -42,7 +42,6 @@ export interface HttpStatusCodes {
   FORBIDDEN: number;
   NOT_FOUND: number;
   INTERNAL_SERVER_ERROR: number;
-  FOUND: number;
 }
 
 export interface Config {
