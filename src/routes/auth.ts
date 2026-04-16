@@ -32,7 +32,12 @@ router.get(
 
 router.get("/signout", (req: Request, res: Response, next: NextFunction) => {
   try {
-    req.session.destroy(() => {
+    req.session.destroy((error) => {
+      if (error) {
+        return next(error);
+      }
+
+      res.clearCookie(config.session.name);
       res.redirect(AuthService.getLogoutUrl());
     });
   } catch (error) {
