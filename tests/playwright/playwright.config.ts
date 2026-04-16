@@ -1,9 +1,9 @@
 import { defineConfig, devices } from "@playwright/test";
 
 export const ENTRA_TEST_CONFIG = {
-  CLIENT_ID: "00000000-0000-0000-0000-000000000001",
-  CLIENT_SECRET: "test-client-secret",
-  TENANT_ID: "test-tenant-id",
+  ENTRA_CLIENT_ID: "00000000-0000-0000-0000-000000000001",
+  ENTRA_CLIENT_SECRET: "test-client-secret",
+  ENTRA_TENANT_ID: "test-tenant-id",
   CLOUD_INSTANCE: "https://login.microsoftonline.com/",
   REDIRECT_URI: "http://localhost:3000/auth/redirect",
   POST_LOGOUT_REDIRECT_URI: "http://localhost:3000/",
@@ -63,9 +63,9 @@ export default defineConfig({
       // Fake but valid-format Entra credentials for tests.
       // MSAL validates these are HTTPS URIs at startup — op:// references
       // from .env are resolved by 1Password in dev but not in tests.
-      CLIENT_ID: ENTRA_TEST_CONFIG.CLIENT_ID,
-      CLIENT_SECRET: ENTRA_TEST_CONFIG.CLIENT_SECRET,
-      TENANT_ID: ENTRA_TEST_CONFIG.TENANT_ID,
+      ENTRA_CLIENT_ID: ENTRA_TEST_CONFIG.ENTRA_CLIENT_ID,
+      ENTRA_CLIENT_SECRET: ENTRA_TEST_CONFIG.ENTRA_CLIENT_SECRET,
+      ENTRA_TENANT_ID: ENTRA_TEST_CONFIG.ENTRA_TENANT_ID,
       CLOUD_INSTANCE: ENTRA_TEST_CONFIG.CLOUD_INSTANCE,
       REDIRECT_URI: ENTRA_TEST_CONFIG.REDIRECT_URI,
       POST_LOGOUT_REDIRECT_URI: ENTRA_TEST_CONFIG.POST_LOGOUT_REDIRECT_URI,

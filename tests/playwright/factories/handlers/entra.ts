@@ -11,8 +11,8 @@
 import { http, HttpResponse } from "msw";
 import { ENTRA_TEST_CONFIG } from "../../playwright.config.js";
 
-const { TENANT_ID, CLIENT_ID, CLOUD_INSTANCE } = ENTRA_TEST_CONFIG;
-const AUTHORITY_BASE = `${CLOUD_INSTANCE}${TENANT_ID}`;
+const { ENTRA_TENANT_ID, ENTRA_CLIENT_ID, CLOUD_INSTANCE } = ENTRA_TEST_CONFIG;
+const AUTHORITY_BASE = `${CLOUD_INSTANCE}${ENTRA_TENANT_ID}`;
 
 // MSAL only base64-decodes the payload to read claims — it never verifies the
 // signature on tokens received from the token endpoint (back-channel, over TLS).
@@ -22,7 +22,7 @@ function createMockIdToken(): string {
 
   const payload = Buffer.from(
     JSON.stringify({
-      aud: CLIENT_ID,
+      aud: ENTRA_CLIENT_ID,
       iss: `${AUTHORITY_BASE}/v2.0`,
       iat: now,
       nbf: now,
@@ -31,7 +31,7 @@ function createMockIdToken(): string {
       oid: "test-user-oid",
       name: "Test User",
       preferred_username: "testuser@example.com",
-      tid: TENANT_ID,
+      tid: ENTRA_TENANT_ID,
     }),
   ).toString("base64url");
 
@@ -55,7 +55,7 @@ export const entraHandlers = [
       id_token: createMockIdToken(),
       // client_info is a base64url-encoded JSON used by MSAL to build account info.
       client_info: Buffer.from(
-        JSON.stringify({ uid: "test-user-oid", utid: TENANT_ID }),
+        JSON.stringify({ uid: "test-user-oid", utid: ENTRA_TENANT_ID }),
       ).toString("base64url"),
     });
   }),

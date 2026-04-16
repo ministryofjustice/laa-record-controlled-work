@@ -95,9 +95,9 @@ rcw:
   envSecrets:
     - SESSION_SECRET
     - SESSION_ENCRYPTION_KEY
-    - CLIENT_ID
-    - CLIENT_SECRET
-    - TENANT_ID
+    - ENTRA_CLIENT_ID
+    - ENTRA_CLIENT_SECRET
+    - ENTRA_TENANT_ID
 
   # Plain env vars injected directly into the container. Add new vars 
   # here only, they are automatically picked up by the Helm template and 

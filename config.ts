@@ -22,17 +22,25 @@ if (
 if (process.env.SESSION_NAME === undefined || process.env.SESSION_NAME === "") {
   throw new Error("SESSION_NAME must be defined in environment variables.");
 }
-if (process.env.CLIENT_ID === undefined || process.env.CLIENT_ID === "") {
-  throw new Error("CLIENT_ID must be defined in environment variables.");
+if (
+  process.env.ENTRA_CLIENT_ID === undefined ||
+  process.env.ENTRA_CLIENT_ID === ""
+) {
+  throw new Error("ENTRA_CLIENT_ID must be defined in environment variables.");
 }
 if (
-  process.env.CLIENT_SECRET === undefined ||
-  process.env.CLIENT_SECRET === ""
+  process.env.ENTRA_CLIENT_SECRET === undefined ||
+  process.env.ENTRA_CLIENT_SECRET === ""
 ) {
-  throw new Error("CLIENT_SECRET must be defined in environment variables.");
+  throw new Error(
+    "ENTRA_CLIENT_SECRET must be defined in environment variables.",
+  );
 }
-if (process.env.TENANT_ID === undefined || process.env.TENANT_ID === "") {
-  throw new Error("TENANT_ID must be defined in environment variables.");
+if (
+  process.env.ENTRA_TENANT_ID === undefined ||
+  process.env.ENTRA_TENANT_ID === ""
+) {
+  throw new Error("ENTRA_TENANT_ID must be defined in environment variables.");
 }
 if (process.env.REDIRECT_URI === undefined || process.env.REDIRECT_URI === "") {
   throw new Error("REDIRECT_URI must be defined in environment variables.");
@@ -91,10 +99,10 @@ const config: Config = {
     views: "src/views", // Path for Nunjucks views
   },
   entra: {
-    clientId: process.env.CLIENT_ID,
-    clientSecret: process.env.CLIENT_SECRET,
-    authority: `${process.env.CLOUD_INSTANCE}${process.env.TENANT_ID}`,
-    tenantId: process.env.TENANT_ID,
+    clientId: process.env.ENTRA_CLIENT_ID,
+    clientSecret: process.env.ENTRA_CLIENT_SECRET,
+    authority: `${process.env.CLOUD_INSTANCE}${process.env.ENTRA_TENANT_ID}`,
+    tenantId: process.env.ENTRA_TENANT_ID,
     redirectUri: process.env.REDIRECT_URI,
     cloudInstance: process.env.CLOUD_INSTANCE,
     postLogoutRedirectUri: process.env.POST_LOGOUT_REDIRECT_URI,

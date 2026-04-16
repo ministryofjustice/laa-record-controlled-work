@@ -14,7 +14,7 @@ test("unauthenticated user visiting landing page is redirected to microsoft entr
 
   await expect(page).toHaveURL(
     new RegExp(
-      `login\\.microsoftonline\\.com/${ENTRA_TEST_CONFIG.TENANT_ID}/oauth2`,
+      `login\\.microsoftonline\\.com/${ENTRA_TEST_CONFIG.ENTRA_TENANT_ID}/oauth2`,
     ),
   );
 });
