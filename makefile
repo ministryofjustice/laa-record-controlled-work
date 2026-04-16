@@ -1,4 +1,4 @@
-.PHONY: watch dev unit e2e e2e-ui docker-build docker-run
+.PHONY: watch dev unit e2e e2e-ui test docker-build docker-run
 
 # 	op run --env-file=.env uses 1Password to load environment variables securely
 # 	you can --no-masking flag means that varaibles is not masked in the output which can be used for debugging
@@ -17,6 +17,8 @@ e2e:
 
 e2e-ui:
 	yarn build && yarn playwright test --ui --config=tests/playwright/playwright.config.ts
+
+test: unit e2e
 
 docker-build:
 	docker build -t laa-record-controlled-work:latest .

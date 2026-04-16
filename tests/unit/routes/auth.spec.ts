@@ -61,8 +61,6 @@ describe("authRoutes", () => {
       const error = new Error("MSAL failure");
       authServiceStub.processAuthCodeCallback.rejects(error);
 
-      const app = createApp();
-
       const res = await request(app)
         .post("/auth/code/callback")
         .type("form")
@@ -82,14 +80,19 @@ describe("authRoutes", () => {
       expect(res.headers.location).to.equal(LOGOUT_URL);
     });
 
-    it("destroys the session before redirecting", async () => {
+    it("destroys the session and clears the cookie before redirecting", async () => {
       const agent = request.agent(app);
       await agent.get("/auth/signin"); // establishes a session cookie
       const res = await agent.get("/auth/signout");
 
       expect(res.status).to.equal(302);
-      const cookie = res.headers["set-cookie"] as string | undefined;
-      expect(cookie).to.be.undefined;
+      const rawCookies = res.headers["set-cookie"];
+      const cookies: string[] = Array.isArray(rawCookies)
+        ? rawCookies
+        : [rawCookies].filter(Boolean);
+      expect(
+        cookies.some((cookie) => cookie.includes("Expires=Thu, 01 Jan 1970")),
+      ).to.be.true;
     });
   });
 
@@ -105,8 +108,6 @@ describe("authRoutes", () => {
       const error = new Error(errorMessage);
       authServiceStub.getAuthCodeUrl.rejects(error);
 
-      const app = createApp();
-
       const response = await request(app).get("/auth/signin");
       expect(response.status).to.equal(500);
       expect(response.body.message).to.equal(errorMessage);
@@ -117,7 +118,7 @@ describe("authRoutes", () => {
 function createApp() {
   const app = express();
   app.use(express.urlencoded({ extended: false }));
-  app.use(session({ secret: "test", resave: false, saveUninitialized: false }));
+  app.use(session({ secret: "test", resave: false, saveUninitialized: true }));
   app.use("/auth", authRouter);
   app.use(
     (

@@ -1,4 +1,4 @@
-import type { SessionData } from "#node_modules/@types/express-session/index.js";
+import type { SessionData } from "express-session";
 import {
   type ConfidentialClientApplication,
   CryptoProvider,
