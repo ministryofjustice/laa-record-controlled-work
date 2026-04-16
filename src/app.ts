@@ -1,5 +1,6 @@
 import {
   axiosMiddleware,
+  createAuthLimiter,
   displayAsciiBanner,
   helmetSetup,
   nunjucksSetup,
@@ -99,7 +100,7 @@ const createApp = async (): Promise<express.Application> => {
 
   // Auth routes are mounted before CSRF — the OAuth redirect endpoint is secured
   // by the PKCE state parameter, not a CSRF token (Entra POSTs to it directly).
-  app.use("/auth", authRouter);
+  app.use("/auth", createAuthLimiter(config), authRouter);
 
   // Set up Cross-Site Request Forgery (CSRF) protection for all other routes
   setupCsrf(app);

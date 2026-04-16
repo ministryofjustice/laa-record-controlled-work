@@ -32,8 +32,8 @@ router.get(
 
 router.get("/signout", (req: Request, res: Response, next: NextFunction) => {
   try {
-    req.session.destroy((error: Error | null) => {
-      if (error !== null) {
+    req.session.destroy((error: Error | undefined) => {
+      if (error !== undefined) {
         next(error);
         return;
       }
