@@ -119,9 +119,9 @@ rcw:
     RATE_LIMIT_MAX: 100
     RATE_WINDOW_MS: 900000
     NODE_ENV: ""
-    CLOUD_INSTANCE: "https://login.microsoftonline.com/"
-    REDIRECT_URI: ""
-    POST_LOGOUT_REDIRECT_URI: ""
+    ENTRA_AUTHORITY_BASE_URL: "https://login.microsoftonline.com/"
+    ENTRA_REDIRECT_URI: ""
+    ENTRA_POST_LOGOUT_REDIRECT_URI: ""
 
   autoscaling:
     enabled: false

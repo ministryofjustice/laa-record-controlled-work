@@ -11,8 +11,9 @@
 import { http, HttpResponse } from "msw";
 import { ENTRA_TEST_CONFIG } from "../../playwright.config.js";
 
-const { ENTRA_TENANT_ID, ENTRA_CLIENT_ID, CLOUD_INSTANCE } = ENTRA_TEST_CONFIG;
-const AUTHORITY_BASE = `${CLOUD_INSTANCE}${ENTRA_TENANT_ID}`;
+const { ENTRA_TENANT_ID, ENTRA_CLIENT_ID, ENTRA_AUTHORITY_BASE_URL } =
+  ENTRA_TEST_CONFIG;
+const AUTHORITY_BASE = `${ENTRA_AUTHORITY_BASE_URL}${ENTRA_TENANT_ID}`;
 
 // MSAL only base64-decodes the payload to read claims — it never verifies the
 // signature on tokens received from the token endpoint (back-channel, over TLS).

@@ -42,21 +42,28 @@ if (
 ) {
   throw new Error("ENTRA_TENANT_ID must be defined in environment variables.");
 }
-if (process.env.REDIRECT_URI === undefined || process.env.REDIRECT_URI === "") {
-  throw new Error("REDIRECT_URI must be defined in environment variables.");
-}
 if (
-  process.env.CLOUD_INSTANCE === undefined ||
-  process.env.CLOUD_INSTANCE === ""
-) {
-  throw new Error("CLOUD_INSTANCE must be defined in environment variables.");
-}
-if (
-  process.env.POST_LOGOUT_REDIRECT_URI === undefined ||
-  process.env.POST_LOGOUT_REDIRECT_URI === ""
+  process.env.ENTRA_REDIRECT_URI === undefined ||
+  process.env.ENTRA_REDIRECT_URI === ""
 ) {
   throw new Error(
-    "POST_LOGOUT_REDIRECT_URI must be defined in environment variables.",
+    "ENTRA_REDIRECT_URI must be defined in environment variables.",
+  );
+}
+if (
+  process.env.ENTRA_AUTHORITY_BASE_URL === undefined ||
+  process.env.ENTRA_AUTHORITY_BASE_URL === ""
+) {
+  throw new Error(
+    "ENTRA_AUTHORITY_BASE_URL must be defined in environment variables.",
+  );
+}
+if (
+  process.env.ENTRA_POST_LOGOUT_REDIRECT_URI === undefined ||
+  process.env.ENTRA_POST_LOGOUT_REDIRECT_URI === ""
+) {
+  throw new Error(
+    "ENTRA_POST_LOGOUT_REDIRECT_URI must be defined in environment variables.",
   );
 }
 
@@ -101,11 +108,10 @@ const config: Config = {
   entra: {
     clientId: process.env.ENTRA_CLIENT_ID,
     clientSecret: process.env.ENTRA_CLIENT_SECRET,
-    authority: `${process.env.CLOUD_INSTANCE}${process.env.ENTRA_TENANT_ID}`,
+    authority: `${process.env.ENTRA_AUTHORITY_BASE_URL}${process.env.ENTRA_TENANT_ID}`,
     tenantId: process.env.ENTRA_TENANT_ID,
-    redirectUri: process.env.REDIRECT_URI,
-    cloudInstance: process.env.CLOUD_INSTANCE,
-    postLogoutRedirectUri: process.env.POST_LOGOUT_REDIRECT_URI,
+    redirectUri: process.env.ENTRA_REDIRECT_URI,
+    postLogoutRedirectUri: process.env.ENTRA_POST_LOGOUT_REDIRECT_URI,
   },
   HTTP_STATUS: {
     BAD_REQUEST,
