@@ -132,10 +132,15 @@ export class AuthService {
   ): Promise<AuthorizationUrlRequest> {
     const pkceCodes: PKCECodes = await this.getPkceCodes();
     const { challenge, challengeMethod, verifier } = pkceCodes;
+    const { returnTo } = session;
+    const successRedirect =
+      returnTo?.startsWith("/") === true && !returnTo.startsWith("//")
+        ? returnTo
+        : "/landing";
+    session.returnTo = undefined;
+
     const state: string = this.cryptoProvider.base64Encode(
-      JSON.stringify({
-        successRedirect: "/landing",
-      }),
+      JSON.stringify({ successRedirect }),
     );
 
     const authCodeUrlRequest: AuthorizationUrlRequest = {

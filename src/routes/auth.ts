@@ -12,7 +12,7 @@ import {
 
 const router: Router = Router();
 const msalClient: ConfidentialClientApplication =
-        new ConfidentialClientApplication(msalConfig);
+  new ConfidentialClientApplication(msalConfig);
 
 router.get(
   "/signin",
