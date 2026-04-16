@@ -35,10 +35,10 @@ describe("authRoutes", () => {
 
   afterEach(() => sinon.restore());
 
-  describe("POST /auth/redirect", () => {
+  describe("POST /auth/code/callback", () => {
     it("calls processAuthCodeCallback() and redirects to successRedirect", async () => {
       const res = await request(app)
-        .post("/auth/redirect")
+        .post("/auth/code/callback")
         .type("form")
         .send({ code: "auth-code-abc", state: "encoded-state" });
 
@@ -49,7 +49,7 @@ describe("authRoutes", () => {
 
     it("responds with 400 when body.code is missing", async () => {
       const res = await request(app)
-        .post("/auth/redirect")
+        .post("/auth/code/callback")
         .type("form")
         .send({ state: "encoded-state" });
 
@@ -64,7 +64,7 @@ describe("authRoutes", () => {
       const app = createApp();
 
       const res = await request(app)
-        .post("/auth/redirect")
+        .post("/auth/code/callback")
         .type("form")
         .send({ code: "auth-code-abc", state: "encoded-state" });
 

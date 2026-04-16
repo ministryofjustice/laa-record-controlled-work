@@ -84,7 +84,7 @@ describe("AuthService", () => {
         code: "",
         codeVerifier: "test-verifier",
         scopes: [],
-        redirectUri: "http://localhost/auth/redirect",
+        redirectUri: "http://localhost/auth/code/callback",
       };
       session.pkceCodes = {
         verifier: "test-verifier",

@@ -5,7 +5,7 @@ export const ENTRA_TEST_CONFIG = {
   ENTRA_CLIENT_SECRET: "test-client-secret",
   ENTRA_TENANT_ID: "test-tenant-id",
   ENTRA_AUTHORITY_BASE_URL: "https://login.microsoftonline.com/",
-  ENTRA_REDIRECT_URI: "http://localhost:3000/auth/redirect",
+  ENTRA_REDIRECT_URI: "http://localhost:3000/auth/code/callback",
   ENTRA_POST_LOGOUT_REDIRECT_URI: "http://localhost:3000/",
 };
 

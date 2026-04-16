@@ -41,7 +41,7 @@ router.get("/signout", (req: Request, res: Response, next: NextFunction) => {
 });
 
 router.post(
-  "/redirect",
+  "/code/callback",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const parseResult = authCodeResponseSchema.safeParse(req.body);
