@@ -5,7 +5,7 @@ process.env.ENTRA_CLIENT_ID ??= "test-client-id";
 process.env.ENTRA_TENANT_ID ??= "test-tenant-id";
 process.env.ENTRA_CLIENT_SECRET ??= "test-client-secret";
 process.env.ENTRA_REDIRECT_URI ??= "test-redirect-uri";
-process.env.ENTRA_AUTHORITY_BASE_URL ??= "test-cloud-instance";
+process.env.ENTRA_AUTHORITY_BASE_URL ??= "https://login.microsoftonline.com/";
 process.env.ENTRA_POST_LOGOUT_REDIRECT_URI ??= "test-post-logout-redirect-uri";
 // Configure Axios to ignore proxies
 // SLSA uses safe-chain which proxies package managers
