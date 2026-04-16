@@ -119,6 +119,7 @@ const config: Config = {
     postLogoutRedirectUri: process.env.ENTRA_POST_LOGOUT_REDIRECT_URI,
   },
   HTTP_STATUS: {
+    FOUND,
     BAD_REQUEST,
     UNAUTHORIZED,
     FORBIDDEN,
