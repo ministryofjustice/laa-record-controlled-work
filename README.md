@@ -1,12 +1,10 @@
-# Legal Aid Agency - Express with TypeScript template (ETT)
+# LAA Record Controlled Work
 [![Standards Icon]][Standards Link]
-
 ![govuk-frontend 5.10.2](https://img.shields.io/badge/govuk--frontend%20version-5.10.2-005EA5?logo=gov.uk&style=flat)
 
-## Full technical documentation
+## Template
 
-View the [full technical documentation here](https://ministryofjustice.github.io/laa-express-typescript-template/)
-
+This repo was generated from [laa-express-typescript-template](https://ministryofjustice.github.io/laa-express-typescript-template/)
 ## Get Started
 ### Prerequisites
 
@@ -37,9 +35,8 @@ This project uses Yarn 4.9.2 managed by corepack (built into Node.js 16.10+). To
    # Should output: 4.9.2
    ```
 
-**To Note:** 
+**To Note:**
 - Corepack automatically uses the Yarn version specified in the `packageManager` field of `package.json`. No additional setup is required once corepack is enabled
-- Corepack is the preferred `yarn` way, to install the package manager, instead of `npm install -g yarn` in your ci/cd pipeline
 - `yarn install --immutable` ensures that the lockfile (`yarn.lock`) is not modified during the installation process
 
 ### Start the application
@@ -52,22 +49,22 @@ Create your local config file `.env` from the template file:
 cp .env.example .env
 ```
 
-#### Align to the Node Version specified for this project
+#### Align to the Node version specified for this project
 
-If using Node Version Manager (nvm), use the following command to switch to the correct version:
+If using Node Version Manager (nvm):
 
 ```shell
 nvm use
 nvm install
 ```
 
-If using [Mise](https://mise.jdx.dev/), use the following command to switch to the correct version:
+If using [Mise](https://mise.jdx.dev/):
 
 ```shell
 mise install
 ```
 
-#### Install dependencies and run application for development
+#### Install dependencies and run for development
 
 ```shell
 yarn install
@@ -75,21 +72,30 @@ yarn build
 yarn dev
 ```
 
-Then, load http://localhost:3000/ in your browser to access the app.
+Then load http://localhost:3000/ in your browser.
 
-#### Install dependencies and run application for production
+#### Install dependencies and run for production
+
 ```shell
 yarn install
 yarn build
 yarn start
 ```
 
-##### Node Version Manager
+#### Running locally with Docker
 
-You may have to tell your local machine to use the latest version of node already installed on your device, before installing and running the application. Use the following command.
+Prerequisites: Docker Desktop
 
 ```shell
-nvm install node
+# Build the image
+make docker-build
+
+# Run the image (available at http://localhost:8888)
+make docker-run
+
+# Stop the container
+docker ps                      # get container ID
+docker stop {container_id}
 ```
 
 ### 1Password CLI Setup
@@ -98,7 +104,7 @@ nvm install node
 brew install 1password-cli
 ```
 
-1. Open and unlock the [1Password app](https://1password.com/downloads/).
+1. Open and unlock the [1Password app](https://1password.com/downloads/).
 2. Select your account or collection at the top of the sidebar.
 3. Navigate to **Settings** > **[Developer](onepassword://settings/developers)**.
 4. Select **Integrate with 1Password CLI**.
@@ -110,62 +116,64 @@ After you've turned on the app integration, enter any command and you'll be prom
 op vault list
 ```
 
-https://developer.1password.com/docs/cli/get-started/
+See [1Password CLI docs](https://developer.1password.com/docs/cli/get-started/) for more detail.
 
-### Update your .env file with secret references
+### Populating your `.env` with secrets
+
+Secret references in `.env` follow this format:
+
+```
+op://<vault>/<item>[/<section>]/<field-name>
+```
+ - **section** is optional, dependent on whether you have added sections
+
+Example:
 
 ```sh
-MY_SECRET="op://Dev/RCW/MY_SECRET"
-MY_OTHER_SECRET="op://Dev/RCW/MY_OTHER_SECRET"
+ENTRA_CLIENT_ID="op://Dev/RCW/ENTRA_CLIENT_ID"
+ENTRA_CLIENT_SECRET="op://Dev/RCW/ENTRA_CLIENT_SECRET"
 ```
 
-This is the format
-```
-op://<vault>/<item>[/<section>]/<field-name>?attribute=<attribute-value> 
-```
- 
- - **section** and **attribute-value** are both optional dependent on whether you have set them up or not
+See [secret reference syntax](https://developer.1password.com/docs/cli/secret-reference-syntax) for full details.
 
-https://developer.1password.com/docs/cli/secret-reference-syntax#attribute-parameter
+### Running the application with secrets injected
 
-### Running your application
-
-now run the following command to intercept the .env file to add the values
 ```sh
-op run --env-file=.env -- <command>
+op run --env-file=.env -- <your command>
 ```
-- Command is the command for running your app e.g. rails server, npm run dev etc etc
-- As the 1Password CLI will not print out your environment variables into terminal you can add the **--no-masking** flag for debugging purposes.
 
-https://developer.1password.com/docs/cli/reference/commands/run
+Add `--no-masking` to print env var values to the terminal for debugging.
 
-##### Running locally with docker
+### Microsoft Entra ID Authentication
 
-Prerequisites, Docker Desktop
+This application uses [Microsoft Entra](https://learn.microsoft.com/en-us/entra/identity/) for authentication via the [MSAL Node](https://github.com/AzureAD/microsoft-authentication-library-for-js/tree/dev/lib/msal-node) library.
 
-- To build the docker image
+#### Auth flow
 
-  ```shell
-  make docker-build
-  ```
+1. User visits any protected route → `requireAuth` middleware redirects to `/auth/signin`
+2. `/auth/signin` generates a PKCE code verifier/challenge pair, stores them in the session, and redirects the user to the Entra ID login page
+3. After login, Entra POSTs an authorisation code back to `/auth/code/callback`
+4. The callback exchanges the code for tokens via MSAL, stores the token cache and account on the session, and sets `session.isAuthenticated = true`
+5. `/auth/signout` destroys the session and redirects to the Entra logout URL
 
-- To run the docker image
+CSRF protection is not applied to `/auth/code/callback` — it is secured by the PKCE `state` parameter instead.
 
-  ```shell
-  make docker-run
-  ```
-  (The application should be running at http://localhost:8888)
+#### Required environment variables
 
-- To stop the container
+| Variable | Description |
+|---|---|
+| `ENTRA_CLIENT_ID` | Application (client) ID from the Entra app registration |
+| `ENTRA_CLIENT_SECRET` | Client secret from the Entra app registration |
+| `ENTRA_TENANT_ID` | Directory (tenant) ID |
+| `ENTRA_AUTHORITY_BASE_URL` | Authority base URL (e.g. `https://login.microsoftonline.com/`) |
+| `ENTRA_REDIRECT_URI` | Redirect URI registered in Entra for auth code callback |
+| `ENTRA_POST_LOGOUT_REDIRECT_URI` | URI to redirect to after sign-out |
 
-  obtain the container id
-  ```shell
-  docker ps
-  ```
-  stop the container
-  ```shell
-  docker stop {container_id}
-  ```
+These values are stored in 1Password and injected at runtime via the 1Password CLI (see above).
+
+#### Bypassing Entra for local/E2E testing
+
+Set `PLAYWRIGHT_TEST_SIGNIN=true` to enable a `/test/signin` route that sets `session.isAuthenticated = true` without going through Entra. This is used by Playwright E2E tests and should **never** be enabled in production.
 
 ### GitHub Actions
 
