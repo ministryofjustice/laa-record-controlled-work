@@ -36,6 +36,7 @@ export interface PathsConfig {
 }
 
 export interface HttpStatusCodes {
+  FOUND: number;
   BAD_REQUEST: number;
   UNAUTHORIZED: number;
   FORBIDDEN: number;

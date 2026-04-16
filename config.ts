@@ -7,6 +7,7 @@ const DEFAULT_RATE_LIMIT_MAX = 100;
 const DEFAULT_RATE_WINDOW_MS_MINUTE = 15;
 const MILLISECONDS_IN_A_MINUTE = 60000;
 const DEFAULT_PORT = 3000;
+const FOUND = 302;
 const BAD_REQUEST = 400;
 const UNAUTHORIZED = 401;
 const FORBIDDEN = 403;
@@ -118,6 +119,7 @@ const config: Config = {
     postLogoutRedirectUri: process.env.ENTRA_POST_LOGOUT_REDIRECT_URI,
   },
   HTTP_STATUS: {
+    FOUND,
     BAD_REQUEST,
     UNAUTHORIZED,
     FORBIDDEN,
