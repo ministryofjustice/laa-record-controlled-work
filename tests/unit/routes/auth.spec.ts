@@ -9,7 +9,7 @@ import request from "supertest";
 describe("authRoutes", () => {
   let authServiceStub: {
     getAuthCodeUrl: sinon.SinonStub;
-    handleRedirect: sinon.SinonStub;
+    processAuthCodeCallback: sinon.SinonStub;
   };
   let getLogoutUrlStub: sinon.SinonStub;
   let app = createApp();
@@ -21,7 +21,7 @@ describe("authRoutes", () => {
   beforeEach(() => {
     authServiceStub = {
       getAuthCodeUrl: sinon.stub().resolves(AUTH_CODE_URL),
-      handleRedirect: sinon
+      processAuthCodeCallback: sinon
         .stub()
         .resolves({ successRedirect: SUCCESS_REDIRECT }),
     };
@@ -36,13 +36,13 @@ describe("authRoutes", () => {
   afterEach(() => sinon.restore());
 
   describe("POST /auth/redirect", () => {
-    it("calls handleRedirect() and redirects to successRedirect", async () => {
+    it("calls processAuthCodeCallback() and redirects to successRedirect", async () => {
       const res = await request(app)
         .post("/auth/redirect")
         .type("form")
         .send({ code: "auth-code-abc", state: "encoded-state" });
 
-      expect(authServiceStub.handleRedirect.calledOnce).to.be.true;
+      expect(authServiceStub.processAuthCodeCallback.calledOnce).to.be.true;
       expect(res.status).to.equal(302);
       expect(res.headers.location).to.equal(SUCCESS_REDIRECT);
     });
@@ -53,13 +53,13 @@ describe("authRoutes", () => {
         .type("form")
         .send({ state: "encoded-state" });
 
-      expect(authServiceStub.handleRedirect.called).to.be.false;
+      expect(authServiceStub.processAuthCodeCallback.called).to.be.false;
       expect(res.status).to.equal(400);
     });
 
-    it("calls next(error) when handleRedirect() throws", async () => {
+    it("calls next(error) when processAuthCodeCallback() throws", async () => {
       const error = new Error("MSAL failure");
-      authServiceStub.handleRedirect.rejects(error);
+      authServiceStub.processAuthCodeCallback.rejects(error);
 
       const app = createApp();
 

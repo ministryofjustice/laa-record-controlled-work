@@ -76,7 +76,7 @@ describe("AuthService", () => {
     });
   });
 
-  describe("handleRedirect()", () => {
+  describe("processAuthCodeCallback()", () => {
     const requestBody = { code: "auth-code", state: "encoded-state" };
 
     beforeEach(() => {
@@ -103,7 +103,7 @@ describe("AuthService", () => {
     });
 
     it("calls acquireTokenByCode with authCodeRequest from session plus the code", async () => {
-      await service.handleRedirect(requestBody);
+      await service.processAuthCodeCallback(requestBody);
       const [requestArg] = (msalStub.acquireTokenByCode as sinon.SinonStub)
         .args[0];
       expect(requestArg.code).to.equal("auth-code");
@@ -111,26 +111,26 @@ describe("AuthService", () => {
     });
 
     it("stores serialized token cache on session.tokenCache", async () => {
-      await service.handleRedirect(requestBody);
+      await service.processAuthCodeCallback(requestBody);
 
       expect(session.tokenCache).to.equal("{}");
     });
 
     it("stores account and idToken on session", async () => {
-      await service.handleRedirect(requestBody);
+      await service.processAuthCodeCallback(requestBody);
 
       expect(session.account).to.deep.equal({ username: "user" });
       expect(session.idToken).to.equal("id-token");
     });
 
     it("sets session.isAuthenticated to true", async () => {
-      await service.handleRedirect(requestBody);
+      await service.processAuthCodeCallback(requestBody);
 
       expect(session.isAuthenticated).to.be.true;
     });
 
     it("returns decoded state containing successRedirect", async () => {
-      const result = await service.handleRedirect(requestBody);
+      const result = await service.processAuthCodeCallback(requestBody);
 
       const base64Decode = CryptoProvider.prototype
         .base64Decode as sinon.SinonStub;
@@ -141,18 +141,18 @@ describe("AuthService", () => {
     it("throws when authCodeRequest is missing from session", async () => {
       delete session.authCodeRequest;
 
-      await expect(service.handleRedirect(requestBody)).to.be.rejectedWith(
-        "Missing auth code request in session",
-      );
+      await expect(
+        service.processAuthCodeCallback(requestBody),
+      ).to.be.rejectedWith("Missing auth code request in session");
     });
 
     it("propagates MSAL errors", async () => {
       const msalError = new Error("MSAL failure");
       (msalStub.acquireTokenByCode as sinon.SinonStub).rejects(msalError);
 
-      await expect(service.handleRedirect(requestBody)).to.be.rejectedWith(
-        msalError,
-      );
+      await expect(
+        service.processAuthCodeCallback(requestBody),
+      ).to.be.rejectedWith(msalError);
     });
   });
 

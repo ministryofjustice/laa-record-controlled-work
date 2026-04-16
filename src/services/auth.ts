@@ -69,7 +69,7 @@ export class AuthService {
    * @param {AuthCodeResponse} requestBody - The validated redirect payload containing the auth code and state.
    * @returns {Promise<AuthState>} The decoded auth state containing the post-login redirect URL.
    */
-  public async handleRedirect(
+  public async processAuthCodeCallback(
     requestBody: AuthCodeResponse,
   ): Promise<AuthState> {
     if (this.session.authCodeRequest === undefined) {

@@ -54,7 +54,8 @@ router.post(
       const { data } = parseResult;
       const msalClient = new ConfidentialClientApplication(msalConfig);
       const authService = AuthService.create(req.session, msalClient);
-      const { successRedirect } = await authService.handleRedirect(data);
+      const { successRedirect } =
+        await authService.processAuthCodeCallback(data);
       res.redirect(successRedirect);
     } catch (error) {
       next(error);
