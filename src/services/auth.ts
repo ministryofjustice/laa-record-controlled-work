@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import type { SessionData } from "express-session";
 import {
   type ConfidentialClientApplication,
@@ -7,11 +8,10 @@ import {
 } from "@azure/msal-node";
 import config from "#config.js";
 import { authScopes } from "#src/config/auth.js";
-import {
-  type AuthCodeResponse,
-  type AuthState,
-  authStateSchema,
-  type PKCECodes,
+import type {
+  AuthCodeResponse,
+  AuthState,
+  PKCECodes,
 } from "#types/auth-types.js";
 
 /**
@@ -77,6 +77,17 @@ export class AuthService {
       throw new Error("Missing auth code request in session");
     }
 
+    if (
+      this.session.authState === undefined ||
+      requestBody.state !== this.session.authState
+    ) {
+      throw new Error("State mismatch: possible CSRF attack");
+    }
+    this.session.authState = undefined;
+
+    const successRedirect = this.session.returnTo ?? "/landing";
+    this.session.returnTo = undefined;
+
     const { code } = requestBody;
     this.session.authCodeRequest.code = code;
 
@@ -91,8 +102,7 @@ export class AuthService {
       this.session.account = account ?? undefined;
       this.session.isAuthenticated = true;
 
-      const decoded = this.cryptoProvider.base64Decode(requestBody.state);
-      return authStateSchema.parse(JSON.parse(decoded));
+      return { successRedirect };
     } catch (error) {
       console.error("Failed to handle Entra auth redirect:", error);
       throw error;
@@ -133,18 +143,25 @@ export class AuthService {
     const pkceCodes: PKCECodes = await this.getPkceCodes();
     const { challenge, challengeMethod, verifier } = pkceCodes;
     const { returnTo } = session;
-    const successRedirect =
-      returnTo?.startsWith("/") === true && !returnTo.startsWith("//") && returnTo !== "/"
+
+    // Validate the redirect target, then bind it to the session.
+    session.returnTo =
+      returnTo?.startsWith("/") === true &&
+      !returnTo.startsWith("//") &&
+      returnTo !== "/"
         ? returnTo
         : "/landing";
-    session.returnTo = undefined;
 
-    const state: string = this.cryptoProvider.base64Encode(
-      JSON.stringify({ successRedirect }),
+    // Cryptographically random nonce used as the OAuth state parameter for CSRF protection.
+    // Validated against session.authState on callback before any token exchange.
+    // Encoded as base64(JSON) so MSAL's parseRequestState can parse it without throwing invalid_state.
+    const nonce = this.cryptoProvider.base64Encode(
+      JSON.stringify({ id: randomUUID() }),
     );
+    session.authState = nonce;
 
     const authCodeUrlRequest: AuthorizationUrlRequest = {
-      state,
+      state: nonce,
       scopes: authScopes,
       redirectUri: config.entra.redirectUri,
       responseMode: "form_post",

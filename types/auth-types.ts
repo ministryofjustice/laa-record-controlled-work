@@ -13,20 +13,11 @@ export const authCodeResponseSchema = z.object({
   session_state: z.string().optional(),
 });
 
-export const authStateSchema = z.object({
-  // Allows paths starting with a single "/" (e.g. /dashboard).
-  // The negative lookahead (?!\/) rejects protocol-relative URLs (//bad.com).
-  // Rejects absolute URLs and whitespace.
-  successRedirect: z
-    .string()
-    .regex(
-      /^\/(?!\/)[^\s]*$/,
-      "successRedirect must be an app-internal path starting with a single /",
-    ),
-});
-
 export type AuthCodeResponse = z.infer<typeof authCodeResponseSchema>;
-export type AuthState = z.infer<typeof authStateSchema>;
+
+export interface AuthState {
+  successRedirect: string;
+}
 
 export interface PKCECodes {
   challengeMethod: string;
