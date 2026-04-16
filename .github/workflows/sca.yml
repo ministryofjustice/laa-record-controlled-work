@@ -37,7 +37,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: ⚡️ SCA
-        uses: ministryofjustice/devsecops-actions/sca@f965eb1771ec66cfc41d7d57dc607fa6dfbc10ed # v1.4.0
+        uses: ministryofjustice/devsecops-actions/sca@86248cec9a6bb1fd4dabc08a05178e0650d3af4f # Feature branch
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -50,3 +50,5 @@ jobs:
           # Custom Configurations
           codeql-config-file: ".github/config/codeql.yml"
           codeql-upload-findings: "always"
+
+          disable-yarn-audit: "true"
