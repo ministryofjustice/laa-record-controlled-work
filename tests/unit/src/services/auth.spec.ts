@@ -32,10 +32,6 @@ describe("AuthService", () => {
       verifier: "test-verifier",
       challenge: "test-challenge",
     });
-
-    sinon
-      .stub(CryptoProvider.prototype, "base64Encode")
-      .returns("encoded-state");
   });
 
   afterEach(() => sinon.restore());
@@ -59,13 +55,28 @@ describe("AuthService", () => {
       expect(session.authCodeRequest).to.exist;
     });
 
-    it("encodes successRedirect into the state parameter", async () => {
+    it("stores a random nonce as session.authState and passes it as the state parameter", async () => {
       await service.getAuthCodeUrl(session);
-      const base64Encode = CryptoProvider.prototype
-        .base64Encode as sinon.SinonStub;
-      expect(JSON.parse(base64Encode.firstCall.args[0])).to.deep.equal({
-        successRedirect: "/landing",
-      });
+      expect(session.authState).to.be.a("string").with.length.greaterThan(0);
+      const [requestArg] = (msalStub.getAuthCodeUrl as sinon.SinonStub).args[0];
+      expect(requestArg.state).to.equal(session.authState);
+    });
+
+    it("defaults session.returnTo to /landing when no returnTo is set", async () => {
+      await service.getAuthCodeUrl(session);
+      expect(session.returnTo).to.equal("/landing");
+    });
+
+    it("preserves a valid session.returnTo path", async () => {
+      session.returnTo = "/case/123";
+      await service.getAuthCodeUrl(session);
+      expect(session.returnTo).to.equal("/case/123");
+    });
+
+    it("falls back to /landing when session.returnTo is /", async () => {
+      session.returnTo = "/";
+      await service.getAuthCodeUrl(session);
+      expect(session.returnTo).to.equal("/landing");
     });
 
     it('passes responseMode: "form_post" and PKCE challenge to MSAL', async () => {
@@ -77,9 +88,12 @@ describe("AuthService", () => {
   });
 
   describe("processAuthCodeCallback()", () => {
-    const requestBody = { code: "auth-code", state: "encoded-state" };
+    const NONCE = "test-nonce";
+    const requestBody = { code: "auth-code", state: NONCE };
 
     beforeEach(() => {
+      session.authState = NONCE;
+      session.returnTo = "/test/sucess";
       session.authCodeRequest = {
         code: "",
         codeVerifier: "test-verifier",
@@ -97,9 +111,6 @@ describe("AuthService", () => {
       msalStub.getTokenCache = sinon
         .stub()
         .returns({ serialize: sinon.stub().returns("{}") });
-      sinon
-        .stub(CryptoProvider.prototype, "base64Decode")
-        .returns(JSON.stringify({ successRedirect: "/" }));
     });
 
     it("calls acquireTokenByCode with authCodeRequest from session plus the code", async () => {
@@ -129,13 +140,36 @@ describe("AuthService", () => {
       expect(session.isAuthenticated).to.be.true;
     });
 
-    it("returns decoded state containing successRedirect", async () => {
+    it("returns successRedirect from session.returnTo", async () => {
       const result = await service.processAuthCodeCallback(requestBody);
+      expect(result).to.deep.equal({ successRedirect: "/test/sucess" });
+    });
 
-      const base64Decode = CryptoProvider.prototype
-        .base64Decode as sinon.SinonStub;
-      expect(base64Decode.calledWith("encoded-state")).to.be.true;
-      expect(result).to.deep.equal({ successRedirect: "/" });
+    it("defaults successRedirect to /landing when session.returnTo is unset", async () => {
+      delete session.returnTo;
+      const result = await service.processAuthCodeCallback(requestBody);
+      expect(result).to.deep.equal({ successRedirect: "/landing" });
+    });
+
+    it("clears session.authState after successful validation", async () => {
+      await service.processAuthCodeCallback(requestBody);
+      expect(session.authState).to.be.undefined;
+    });
+
+    it("throws when state does not match session.authState", async () => {
+      await expect(
+        service.processAuthCodeCallback({
+          ...requestBody,
+          state: "wrong-nonce",
+        }),
+      ).to.be.rejectedWith("State mismatch: possible CSRF attack");
+    });
+
+    it("throws when session.authState is missing", async () => {
+      delete session.authState;
+      await expect(
+        service.processAuthCodeCallback(requestBody),
+      ).to.be.rejectedWith("State mismatch: possible CSRF attack");
     });
 
     it("throws when authCodeRequest is missing from session", async () => {

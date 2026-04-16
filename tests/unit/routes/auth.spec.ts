@@ -44,7 +44,7 @@ describe("authRoutes", () => {
         .send({ code: "auth-code-abc", state: "encoded-state" });
 
       expect(authServiceStub.processAuthCodeCallback.calledOnce).to.be.true;
-      expect(res.status).to.equal(config.HTTP_STATUS.UNAUTHORIZED);
+      expect(res.status).to.equal(config.HTTP_STATUS.FOUND);
       expect(res.headers.location).to.equal(SUCCESS_REDIRECT);
     });
 
