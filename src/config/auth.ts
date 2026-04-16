@@ -8,3 +8,5 @@ export const msalConfig: Configuration = {
     clientSecret: config.entra.clientSecret,
   },
 };
+
+export const authScopes: string[] = ["openid", "profile"];

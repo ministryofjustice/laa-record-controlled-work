@@ -6,6 +6,7 @@ import {
   type AuthenticationResult,
 } from "@azure/msal-node";
 import config from "#config.js";
+import { authScopes } from "#src/config/auth.js";
 import {
   type AuthCodeResponse,
   type AuthState,
@@ -129,8 +130,6 @@ export class AuthService {
   private async createAuthCodeRequest(
     session: SessionData,
   ): Promise<AuthorizationUrlRequest> {
-    const scopes: string[] = [];
-
     const pkceCodes: PKCECodes = await this.getPkceCodes();
     const { challenge, challengeMethod, verifier } = pkceCodes;
     const state: string = this.cryptoProvider.base64Encode(
@@ -141,7 +140,7 @@ export class AuthService {
 
     const authCodeUrlRequest: AuthorizationUrlRequest = {
       state,
-      scopes,
+      scopes: authScopes,
       redirectUri: config.entra.redirectUri,
       responseMode: "form_post",
       codeChallenge: challenge,
@@ -153,7 +152,7 @@ export class AuthService {
     session.authCodeRequest = {
       code: "",
       codeVerifier: verifier,
-      scopes,
+      scopes: authScopes,
       redirectUri: config.entra.redirectUri,
     };
 
