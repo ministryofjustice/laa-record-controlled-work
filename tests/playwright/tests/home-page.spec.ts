@@ -78,4 +78,14 @@ test('home page table has correct structure', async ({ page, pages }) => {
   for (const mountain of expectedMountains) {
     expect(actualMountains).toContain(mountain);
   }
+
+  test.describe('footer', () => {
+    test('homepage has a footer', async ({ page }) => {
+      await page.goto('/');
+
+      const footer = page.locator('.govuk-footer');
+      await expect(footer).toBeVisible();
+
+    })
+  })
 });
