@@ -1,5 +1,5 @@
-import { AuthService } from "#src/services/authService.js";
-import authRouter from "#src/routes/authRoutes.js";
+import { AuthService } from "#src/services/auth.js";
+import authRouter from "#src/routes/auth.js";
 import { expect } from "chai";
 import express from "express";
 import session from "express-session";
@@ -28,7 +28,9 @@ describe("authRoutes", () => {
     sinon
       .stub(AuthService, "create")
       .returns(authServiceStub as unknown as AuthService);
-    getLogoutUrlStub = sinon.stub(AuthService, "getLogoutUrl").returns(LOGOUT_URL);
+    getLogoutUrlStub = sinon
+      .stub(AuthService, "getLogoutUrl")
+      .returns(LOGOUT_URL);
   });
 
   afterEach(() => sinon.restore());

@@ -2,7 +2,7 @@ import {
   ConfidentialClientApplication,
   CryptoProvider,
 } from "@azure/msal-node";
-import { AuthService } from "#src/services/authService.js";
+import { AuthService } from "#src/services/auth.js";
 import config from "#config.js";
 import { expect, use } from "chai";
 import chaiAsPromised from "chai-as-promised";

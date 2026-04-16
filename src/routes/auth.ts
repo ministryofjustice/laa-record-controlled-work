@@ -1,6 +1,6 @@
 import config from "#config.js";
-import { msalConfig } from "#src/config/authConfig.js";
-import { AuthService } from "#src/services/authService.js";
+import { msalConfig } from "#src/config/auth.js";
+import { AuthService } from "#src/services/auth.js";
 import { authCodeResponseSchema } from "#types/auth-types.js";
 import { ConfidentialClientApplication } from "@azure/msal-node";
 import {

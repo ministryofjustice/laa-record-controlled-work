@@ -13,7 +13,7 @@ import {
   setupMiddlewares,
 } from "#middleware/index.js";
 import { requireAuth } from "#middleware/requireAuth.js";
-import authRouter from "#src/routes/authRoutes.js";
+import authRouter from "#src/routes/auth.js";
 import indexRouter from "#src/routes/index.js";
 import { initializeI18nextSync } from "#src/lib/index.js";
 import chalk from "chalk";
