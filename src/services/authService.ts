@@ -7,11 +7,11 @@ import {
 } from "@azure/msal-node";
 import config from "#config.js";
 import {
+  AuthCodeResponse,
+  AuthState,
   authStateSchema,
-  type AuthState,
-  type AuthCodeResponse,
-} from "#src/config/zod/authSchema.js";
-import type { PKCECodes } from "#types/auth-types.js";
+  type PKCECodes,
+} from "#types/auth-types.js";
 
 /**
  * Handles Microsoft Entra ID (MSAL) authentication flows including

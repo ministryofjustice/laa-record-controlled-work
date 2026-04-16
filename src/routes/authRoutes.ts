@@ -1,7 +1,7 @@
 import config from "#config.js";
 import { msalConfig } from "#src/config/authConfig.js";
-import { authCodeResponseSchema } from "#src/config/zod/authSchema.js";
 import { AuthService } from "#src/services/authService.js";
+import { authCodeResponseSchema } from "#types/auth-types.js";
 import { ConfidentialClientApplication } from "@azure/msal-node";
 import {
   Router,

@@ -1,9 +1,24 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers -- Zod schema constraints are self-documenting */
+import { z } from "zod";
 import type {
   AccountInfo,
   AuthorizationCodeRequest,
   AuthorizationUrlRequest,
 } from "@azure/msal-node";
 import type session from "express-session";
+
+export const authCodeResponseSchema = z.object({
+  code: z.string().min(1),
+  state: z.string().min(1),
+  session_state: z.string().optional(),
+});
+
+export const authStateSchema = z.object({
+  successRedirect: z.string().min(1),
+});
+
+export type AuthCodeResponse = z.infer<typeof authCodeResponseSchema>;
+export type AuthState = z.infer<typeof authStateSchema>;
 
 export interface PKCECodes {
   challengeMethod: string;
