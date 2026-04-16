@@ -21,7 +21,6 @@ export interface EntraConfig {
   redirectUri: string;
   authority: string;
   postLogoutRedirectUri: string;
-  cloudInstance: string;
 }
 
 export interface SessionConfig {
