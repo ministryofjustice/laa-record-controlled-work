@@ -32,9 +32,8 @@ router.get(
 
 router.get("/signout", (req: Request, res: Response, next: NextFunction) => {
   try {
-    const logoutUrl: string = AuthService.getLogoutUrl();
     req.session.destroy(() => {
-      res.redirect(logoutUrl);
+      res.redirect(AuthService.getLogoutUrl());
     });
   } catch (error) {
     next(error);
