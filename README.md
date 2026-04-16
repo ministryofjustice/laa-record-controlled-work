@@ -171,6 +171,22 @@ CSRF protection is not applied to `/auth/code/callback` — it is secured by the
 
 These values are stored in 1Password and injected at runtime via the 1Password CLI (see above).
 
+#### Ephemeral environments and redirect URIs
+
+This project uses ephemeral (per-branch) environments for deployment. Because Entra app registrations require redirect URIs to be explicitly allowlisted, authentication will not work out of the box when a new ephemeral environment is spun up — the dynamically generated URL for your branch will not be registered.
+
+To test authentication on an ephemeral environment:
+
+1. Find the redirect URI for your branch (e.g. `https://<branch-name>.example.com/auth/code/callback`)
+2. Add it to the Entra app registration:
+   - Go to [portal.azure.com](https://portal.azure.com) → **Microsoft Entra ID** → **App registrations** → select the app
+   - Under **Authentication**, add the redirect URI for your branch
+   - Save
+3. Test your branch as normal
+4. **Remove the redirect URI when you are done** — stale entries are a security risk
+
+Do not leave branch-specific redirect URIs in the app registration after the ephemeral environment has been torn down.
+
 #### Bypassing Entra for local/E2E testing
 
 Set `PLAYWRIGHT_TEST_SIGNIN=true` to enable a `/test/signin` route that sets `session.isAuthenticated = true` without going through Entra. This is used by Playwright E2E tests and should **never** be enabled in production.
