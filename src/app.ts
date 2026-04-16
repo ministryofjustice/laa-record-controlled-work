@@ -105,7 +105,7 @@ const createApp = async (): Promise<express.Application> => {
   setupCsrf(app);
 
   // Playwright-only route: sets an authenticated session without going through Entra.
-  if (ENABLE_PLAYWRIGHT_TEST_SIGNIN) {
+  if (ENABLE_PLAYWRIGHT_TEST_SIGNIN && process.env.NODE_ENV === "test") {
     app.get("/test/signin", (req, res) => {
       req.session.isAuthenticated = true;
       res.redirect("/");
