@@ -26,7 +26,7 @@ export interface PKCECodes {
   challenge: string;
 }
 
-// //  INFO: extend Express Request type for MSAL integration of user and tokens and allowing undefiend in session
+// INFO: extend Express Request type for MSAL integration of user and tokens and allowing undefined in session
 declare global {
   namespace Express {
     interface Request {
