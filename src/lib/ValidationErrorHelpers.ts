@@ -1,5 +1,3 @@
-// TODO fix eslint at later date if file is used
-/* eslint-disable no-param-reassign --  Will resolve at a later date if file is used */
 import type {
   Location,
   Meta,
