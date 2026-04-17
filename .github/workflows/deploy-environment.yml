@@ -32,6 +32,9 @@ jobs:
           # should be an input.
           SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
           SESSION_ENCRYPTION_KEY: ${{ secrets.SESSION_ENCRYPTION_KEY }}
+          ENTRA_CLIENT_ID: ${{ secrets.ENTRA_CLIENT_ID }}
+          ENTRA_CLIENT_SECRET: ${{ secrets.ENTRA_CLIENT_SECRET }}
+          ENTRA_TENANT_ID: ${{ secrets.ENTRA_TENANT_ID }}
         with:
           sha: ${{ inputs.sha }}
           branch-ref: ${{ inputs.branch-ref }}

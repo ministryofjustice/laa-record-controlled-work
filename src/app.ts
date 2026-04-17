@@ -1,5 +1,6 @@
 import {
   axiosMiddleware,
+  createAuthLimiter,
   displayAsciiBanner,
   helmetSetup,
   nunjucksSetup,
@@ -12,7 +13,9 @@ import {
   setupLocaleMiddleware,
   setupMiddlewares,
 } from "#middleware/index.js";
-import indexRouter from "#routes/index.js";
+import { requireAuth } from "#middleware/requireAuth.js";
+import authRouter from "#src/routes/auth.js";
+import indexRouter from "#src/routes/index.js";
 import { initializeI18nextSync } from "#src/lib/index.js";
 import chalk from "chalk";
 import compression from "compression";
@@ -22,6 +25,8 @@ import session from "express-session";
 import morgan from "morgan";
 
 const TRUST_FIRST_PROXY = 1;
+const ENABLE_PLAYWRIGHT_TEST_SIGNIN =
+  process.env.PLAYWRIGHT_TEST_SIGNIN === "true";
 
 /**
  * Creates and configures an Express application.
@@ -70,9 +75,6 @@ const createApp = async (): Promise<express.Application> => {
   app.set("trust proxy", TRUST_FIRST_PROXY);
   app.use(session(config.session));
 
-  // Set up Cross-Site Request Forgery (CSRF) protection
-  setupCsrf(app);
-
   // Set up locale middleware for internationalization
   app.use(setupLocaleMiddleware);
 
@@ -94,7 +96,20 @@ const createApp = async (): Promise<express.Application> => {
     app.use(morgan("dev"));
   }
 
-  // Register the main router
+  // CSRF protection applied globally; /auth/code/callback is excluded via
+  // skipCsrfProtection (PKCE state provides the equivalent protection for that endpoint).
+  setupCsrf(app);
+
+  // Playwright-only route: sets an authenticated session without going through Entra.
+  if (ENABLE_PLAYWRIGHT_TEST_SIGNIN && process.env.NODE_ENV === "test") {
+    app.get("/test/signin", (req, res) => {
+      req.session.isAuthenticated = true;
+      res.redirect("/");
+    });
+  }
+
+  app.use("/auth", createAuthLimiter(config), authRouter);
+  app.use(requireAuth);
   app.use("/", indexRouter);
 
   // Enable live-reload middleware in development mode

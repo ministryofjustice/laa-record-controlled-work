@@ -8,6 +8,17 @@
  * import { devLog, safeString, formatDate } from '#src/scripts/helpers';
  */
 
+// HTTP status codes
+export {
+  HTTP_STATUS,
+  FOUND,
+  BAD_REQUEST,
+  UNAUTHORIZED,
+  FORBIDDEN,
+  NOT_FOUND,
+  INTERNAL_SERVER_ERROR,
+} from "../constants/httpStatus.js";
+
 // Development logging utilities
 export {
   devLog,

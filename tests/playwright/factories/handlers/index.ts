@@ -1,21 +1,21 @@
 /**
  * MSW Handlers Index
- * 
+ *
  * Composes all domain-specific handlers into a single array for MSW server.
  * Following MSW best practices for modular handler organization.
- * 
+ *
  * @see https://mswjs.io/docs/best-practices/structuring-handlers
  */
 
-import { http, HttpResponse } from 'msw';
+import { http, HttpResponse } from "msw";
 
 // Import the actual API handlers
-import { apiHandlers } from './api.js';
+import { apiHandlers } from "./api.js";
+import { entraHandlers } from "./entra.js";
 
 // Add debug handler to log all intercepted requests
-const debugHandler = http.all('*', ({ request }) => {
+const debugHandler = http.all("*", ({ request }) => {
   // Return undefined to pass through to actual handlers
-  
 });
 
 /**
@@ -25,11 +25,14 @@ const debugHandler = http.all('*', ({ request }) => {
 export const handlers = [
   debugHandler,
   ...apiHandlers,
-  
+  ...entraHandlers,
+
   // Health check endpoint for testing
-  http.get('/health', () => HttpResponse.json({ 
-      status: 'ok', 
+  http.get("/health", () =>
+    HttpResponse.json({
+      status: "ok",
       timestamp: new Date().toISOString(),
-      msw: 'active'
-    }))
+      msw: "active",
+    }),
+  ),
 ];
