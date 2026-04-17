@@ -34,3 +34,13 @@ test.describe('Layout header', () => {
     await expect(page.getByRole('link', { name: 'give your feedback by email' })).toBeVisible();
   });
 });
+
+test.describe('Layout footer', () => {
+  test('homepage has a footer', async ({ page }) => {
+    await page.goto('/');
+
+    const footer = page.locator('.govuk-footer');
+    await expect(footer).toBeVisible();
+
+  })
+});

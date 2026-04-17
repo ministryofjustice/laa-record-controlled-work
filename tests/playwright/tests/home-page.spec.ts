@@ -70,13 +70,3 @@ test.describe('Homepage content', () => {
     }
   });
 });
-
-test.describe('footer', () => {
-  test('homepage has a footer', async ({ page }) => {
-    await page.goto('/');
-
-    const footer = page.locator('.govuk-footer');
-    await expect(footer).toBeVisible();
-
-  })
-});
