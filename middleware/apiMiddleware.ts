@@ -126,6 +126,7 @@ export function createApiMiddleware(config: ApiMiddlewareConfig = {}) {
       axiosWrapper.axiosInstance.interceptors.request.use(
         async (config: InternalAxiosRequestConfig) => {
           try {
+            // eslint-disable-next-line no-param-reassign -- Axios interceptor pattern requires mutating config
             config.headers.Authorization = await authService.getAuthHeader();
             if (enableLogging) {
               devLog("Added JWT authorization header to API request");
