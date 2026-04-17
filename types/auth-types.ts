@@ -39,11 +39,9 @@ declare global {
 
 declare module "express-session" {
   interface SessionData {
-    msalTokenCache?: string;
     authState?: string;
     returnTo?: string;
     tokenCache?: string;
-    accessToken?: string;
     account?: AccountInfo;
     idToken?: string;
     isAuthenticated?: boolean;

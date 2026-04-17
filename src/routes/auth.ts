@@ -63,7 +63,21 @@ router.post(
       const authService = AuthService.create(req.session, msalClient);
       const { successRedirect } =
         await authService.processAuthCodeCallback(data);
-      res.redirect(successRedirect);
+
+      const {
+        session: { isAuthenticated, idToken, account, tokenCache },
+      } = req;
+      req.session.regenerate((error) => {
+        if (error !== undefined) {
+          next(error);
+          return;
+        }
+        req.session.isAuthenticated = isAuthenticated;
+        req.session.idToken = idToken;
+        req.session.account = account;
+        req.session.tokenCache = tokenCache;
+        res.redirect(successRedirect);
+      });
     } catch (error) {
       next(error);
     }
