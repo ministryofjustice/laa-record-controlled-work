@@ -1,6 +1,6 @@
 import config from "#config.js";
-import { BAD_REQUEST } from "#src/constants/httpStatus.js";
 import { msalConfig } from "#src/config/auth.js";
+import { BAD_REQUEST } from "#src/constants/httpStatus.js";
 import { AuthService } from "#src/services/auth.js";
 import { authCodeResponseSchema } from "#types/auth-types.js";
 import { ConfidentialClientApplication } from "@azure/msal-node";
@@ -64,9 +64,7 @@ router.post(
       const { successRedirect } =
         await authService.processAuthCodeCallback(data);
 
-      const {
-        session: { isAuthenticated, idToken, account, tokenCache },
-      } = req;
+      const { isAuthenticated, idToken, account, tokenCache } = req.session;
       req.session.regenerate((error) => {
         if (error !== undefined) {
           next(error);

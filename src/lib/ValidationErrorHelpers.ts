@@ -1,10 +1,8 @@
-// TODO fix eslint at later date if file is used
-/* eslint-disable no-param-reassign --  Will resolve at a later date if file is used */
 import type {
-  ValidationError,
-  Result,
-  Meta,
   Location,
+  Meta,
+  Result,
+  ValidationError,
 } from "express-validator";
 
 /**
@@ -284,6 +282,7 @@ export function formatValidationErrors(validationResult: Result): {
     (errors, errorItem) => {
       const { fieldName, inlineMessage } = errorItem;
       if (inlineMessage.trim() !== "") {
+        // eslint-disable-next-line no-param-reassign -- reduce accumulator
         errors[fieldName] = inlineMessage;
       }
       return errors;

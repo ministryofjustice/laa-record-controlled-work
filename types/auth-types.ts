@@ -1,11 +1,10 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers -- Zod schema constraints are self-documenting */
-import { z } from "zod";
 import type {
   AccountInfo,
   AuthorizationCodeRequest,
   AuthorizationUrlRequest,
 } from "@azure/msal-node";
-import type session from "express-session";
+import { z } from "zod";
 
 export const authCodeResponseSchema = z.object({
   code: z.string().min(1),
@@ -25,18 +24,7 @@ export interface PKCECodes {
   challenge: string;
 }
 
-// INFO: extend Express Request type for MSAL integration of user and tokens and allowing undefined in session
-declare global {
-  namespace Express {
-    interface Request {
-      accessToken?: string;
-      user?: AccountInfo;
-      session: session.Session & Partial<session.SessionData>;
-    }
-  }
-}
 //  INFO: extend express-session SessionData type for MSAL integration of account and token cache
-
 declare module "express-session" {
   interface SessionData {
     authState?: string;

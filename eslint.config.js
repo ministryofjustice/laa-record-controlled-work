@@ -55,16 +55,38 @@ export default [
       "linebreak-style": "off", // Prettier is handling this
       quotes: "off", // Prettier is handling this
       semi: "off", // Prettier is handling this
-      "no-console": "off", // Stops complaining about putting messages in the console
-      "no-param-reassign": ["error", { "props": true, "ignorePropertyModificationsFor": ["req", "res", "next", "request", "response", "config"] }], // Ignore param reassignment for common Express and axios patterns
+      "no-console": "warn", // TODO: should be using a proper logger like pino or winston
+      "no-param-reassign": [
+        "error",
+        {
+          props: true,
+          ignorePropertyModificationsFor: [
+            "req", // Express request
+            "request", // Express request (alternative name)
+            "res", // Express response
+            "response", // Express response (alternative name)
+          ],
+        },
+      ],
       "no-negated-condition": "off", // Allow negated conditions as they can improve readability in certain contexts
+      "@typescript-eslint/strict-boolean-expressions": [
+        "error",
+        {
+          allowNullableBoolean: true,
+          allowString: true,
+          allowNullableString: true,
+          allowNullableObject: true,
+        },
+      ],
+
+      // JSDoc: structural checks
       "jsdoc/check-alignment": "error",
       "jsdoc/check-param-names": "error",
       "jsdoc/check-tag-names": "error",
-      "jsdoc/check-types": "error",
       "jsdoc/implements-on-classes": "error",
       "jsdoc/newline-after-description": "off",
-      "jsdoc/no-undefined-types": "error",
+
+      // JSDoc: require documentation on declarations (not inline arrows/expressions)
       "jsdoc/require-description": "error",
       "jsdoc/require-jsdoc": [
         "error",
@@ -73,33 +95,38 @@ export default [
             FunctionDeclaration: true,
             MethodDefinition: true,
             ClassDeclaration: true,
-            ArrowFunctionExpression: true,
-            FunctionExpression: true,
+            ArrowFunctionExpression: false,
+            FunctionExpression: false,
           },
         },
       ],
       "jsdoc/require-param": "error",
       "jsdoc/require-param-description": "error",
       "jsdoc/require-param-name": "error",
-      "jsdoc/require-param-type": "error",
       "jsdoc/require-returns": "error",
       "jsdoc/require-returns-check": "error",
       "jsdoc/require-returns-description": "error",
-      "jsdoc/require-returns-type": "error",
-      // TypeScript declaration file best practices
+      // TypeScript best practices
       "@typescript-eslint/consistent-type-definitions": ["error", "interface"],
       "@typescript-eslint/consistent-type-imports": "error",
       "@typescript-eslint/no-extraneous-class": [
         "error",
         { allowStaticOnly: true },
       ],
-      "@typescript-eslint/no-namespace": "off", // Allow namespaces for declaration files
       "@typescript-eslint/triple-slash-reference": [
         "error",
         { path: "never", types: "prefer-import", lib: "never" },
       ],
-      "@typescript-eslint/no-var-requires": "error",
-      "@typescript-eslint/no-explicit-any": "warn",
+      // Allow destructuring from member expressions e.g. const { x } = obj.prop
+      // Accepted tradeoff - this won't error either: const x = obj.prop.x
+      "@typescript-eslint/prefer-destructuring": [
+        "error",
+        { array: true, object: true },
+        {
+          enforceForRenamedProperties: false,
+          enforceForDeclarationWithTypeAnnotation: false,
+        },
+      ],
     },
   },
   // Add a separate config for declaration files

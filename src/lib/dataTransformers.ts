@@ -1,5 +1,3 @@
-// TODO fix eslint at later date if file is used
-/* eslint-disable no-param-reassign --  Will resolve at a later date if file is used */
 /**
  * Data Transformation Helpers
  *
@@ -154,6 +152,7 @@ export function extractFormFields(
   keys: string[],
 ): Record<string, unknown> {
   return keys.reduce<Record<string, unknown>>((acc, key) => {
+    // eslint-disable-next-line no-param-reassign -- reduce accumulator
     acc[key] = safeBodyString(body, key);
     return acc;
   }, {});
@@ -251,11 +250,13 @@ export function extractCurrentFields(
 
     // Set current field value
     const currentKey = currentName ?? `current${capitaliseFirst(field)}`;
+    // eslint-disable-next-line no-param-reassign -- reduce accumulator
     formData[currentKey] = fieldValue;
 
     // Create existing field if requested (for forms that need change detection)
     if (includeExisting) {
       const existingKey = `existing${capitaliseFirst(field)}`;
+      // eslint-disable-next-line no-param-reassign -- reduce accumulator
       formData[existingKey] = fieldValue;
     }
 
@@ -263,6 +264,7 @@ export function extractCurrentFields(
     if (keepOriginal) {
       const originalValue: unknown = getOriginalValue(data, config);
       if (originalValue !== undefined) {
+        // eslint-disable-next-line no-param-reassign -- reduce accumulator
         formData[field] = originalValue;
       }
     }
