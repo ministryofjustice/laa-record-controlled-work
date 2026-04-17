@@ -32,7 +32,9 @@ router.get(
 
 router.post("/signout", (req: Request, res: Response, next: NextFunction) => {
   try {
-    const idToken = req.session.idToken;
+    const {
+      session: { idToken },
+    } = req;
     req.session.destroy((error: Error | undefined) => {
       if (error !== undefined) {
         next(error);

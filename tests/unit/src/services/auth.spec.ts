@@ -194,7 +194,7 @@ describe("AuthService", () => {
     it("returns the Entra logout URL using config values", () => {
       const url = AuthService.getLogoutUrl();
       const params = new URLSearchParams({
-        post_logout_redirect_uri: config.entra.postLogoutRedirectUri ?? "",
+        post_logout_redirect_uri: config.entra.postLogoutRedirectUri,
       });
       expect(url).to.equal(
         `${config.entra.authority}/oauth2/v2.0/logout?${params.toString()}`,
