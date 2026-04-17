@@ -54,11 +54,12 @@ export default defineConfig({
     cwd: "../..", // Run from project root since config is now in tests/playwright/ subdirectory
     env: {
       NODE_ENV: "test",
-      PLAYWRIGHT_TEST_SIGNIN: "true",
       PORT: "3000",
       SESSION_SECRET: "test-secret-key-for-playwright-tests",
       SESSION_NAME: "test-session",
-      SERVICE_NAME: "Test Express Template",
+      SERVICE_NAME: "Record civil controlled work",
+      DEPARTMENT_NAME: "Legal Aid Agency",
+      SERVICE_PHASE: "Beta",
 
       // Fake but valid-format Entra credentials for tests.
       // MSAL validates these are HTTPS URIs at startup — op:// references
