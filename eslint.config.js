@@ -56,7 +56,7 @@ export default [
       quotes: "off", // Prettier is handling this
       semi: "off", // Prettier is handling this
       "no-console": "off", // Stops complaining about putting messages in the console
-      "no-param-reassign": ["error", { props: false }], // Allow modifying properties of function parameters (common in Express middleware and reducers)
+      "no-param-reassign": ["error", { "props": true, "ignorePropertyModificationsFor": ["req", "res", "next", "request", "response", "config"] }], // Ignore param reassignment for common Express and axios patterns
       "no-negated-condition": "off", // Allow negated conditions as they can improve readability in certain contexts
       "jsdoc/check-alignment": "error",
       "jsdoc/check-param-names": "error",

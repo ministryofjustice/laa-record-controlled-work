@@ -38,49 +38,49 @@ describe("AuthService", () => {
 
   describe("getAuthCodeUrl()", () => {
     it("returns a URL from the MSAL client", async () => {
-      const url = await service.getAuthCodeUrl(session);
+      const url = await service.getAuthCodeUrl();
       expect(url).to.equal(AUTH_CODE_URL);
     });
 
     it("stores PKCE codes on session", async () => {
-      await service.getAuthCodeUrl(session);
+      await service.getAuthCodeUrl();
       expect(session.pkceCodes).to.exist;
       expect(session.pkceCodes!.verifier).to.equal("test-verifier");
       expect(session.pkceCodes!.challenge).to.equal("test-challenge");
     });
 
     it("stores authCodeUrlRequest and authCodeRequest on session", async () => {
-      await service.getAuthCodeUrl(session);
+      await service.getAuthCodeUrl();
       expect(session.authCodeUrlRequest).to.exist;
       expect(session.authCodeRequest).to.exist;
     });
 
     it("stores a random nonce as session.authState and passes it as the state parameter", async () => {
-      await service.getAuthCodeUrl(session);
+      await service.getAuthCodeUrl();
       expect(session.authState).to.be.a("string").with.length.greaterThan(0);
       const [requestArg] = (msalStub.getAuthCodeUrl as sinon.SinonStub).args[0];
       expect(requestArg.state).to.equal(session.authState);
     });
 
     it("defaults session.returnTo to /landing when no returnTo is set", async () => {
-      await service.getAuthCodeUrl(session);
+      await service.getAuthCodeUrl();
       expect(session.returnTo).to.equal("/landing");
     });
 
     it("preserves a valid session.returnTo path", async () => {
       session.returnTo = "/case/123";
-      await service.getAuthCodeUrl(session);
+      await service.getAuthCodeUrl();
       expect(session.returnTo).to.equal("/case/123");
     });
 
     it("falls back to /landing when session.returnTo is /", async () => {
       session.returnTo = "/";
-      await service.getAuthCodeUrl(session);
+      await service.getAuthCodeUrl();
       expect(session.returnTo).to.equal("/landing");
     });
 
     it('passes responseMode: "form_post" and PKCE challenge to MSAL', async () => {
-      await service.getAuthCodeUrl(session);
+      await service.getAuthCodeUrl();
       const [requestArg] = (msalStub.getAuthCodeUrl as sinon.SinonStub).args[0];
       expect(requestArg.responseMode).to.equal("form_post");
       expect(requestArg.codeChallenge).to.equal("test-challenge");

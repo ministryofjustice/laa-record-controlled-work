@@ -51,12 +51,11 @@ export class AuthService {
 
   /**
    * Generates the Microsoft Entra ID authorisation URL to begin the PKCE sign-in flow.
-   * @param {SessionData} session - The Express session used to store PKCE codes and auth request state.
    * @returns {Promise<string>} The authorisation URL to redirect the user to.
    */
-  public async getAuthCodeUrl(session: SessionData): Promise<string> {
+  public async getAuthCodeUrl(): Promise<string> {
     const authCodeUrlRequest: AuthorizationUrlRequest =
-      await this.createAuthCodeRequest(session);
+      await this.createAuthCodeRequest();
     try {
       return await this.msalClient.getAuthCodeUrl(authCodeUrlRequest);
     } catch (error) {
@@ -141,18 +140,16 @@ export class AuthService {
 
   /**
    * Builds the MSAL authorisation URL request and stores PKCE state on the session.
-   * @param {SessionData} session - The Express session used to persist PKCE codes and auth request data.
    * @returns {Promise<AuthorizationUrlRequest>} The authorisation URL request object for MSAL.
    */
-  private async createAuthCodeRequest(
-    session: SessionData,
-  ): Promise<AuthorizationUrlRequest> {
+  private async createAuthCodeRequest(): Promise<AuthorizationUrlRequest> {
     const pkceCodes: PKCECodes = await this.getPkceCodes();
     const { challenge, challengeMethod, verifier } = pkceCodes;
-    const { returnTo } = session;
+    // eslint-disable-next-line @typescript-eslint/prefer-destructuring -- rule incorrectly flags destructuring from `this.session` due to enforceForRenamedProperties behaviour with class instance properties
+    const { returnTo } = this.session;
 
     // Validate the redirect target, then bind it to the session.
-    session.returnTo =
+    this.session.returnTo =
       returnTo?.startsWith("/") === true &&
       !returnTo.startsWith("//") &&
       returnTo !== "/"
@@ -165,7 +162,7 @@ export class AuthService {
     const nonce = this.cryptoProvider.base64Encode(
       JSON.stringify({ id: randomUUID() }),
     );
-    session.authState = nonce;
+    this.session.authState = nonce;
 
     const authCodeUrlRequest: AuthorizationUrlRequest = {
       state: nonce,
@@ -176,9 +173,9 @@ export class AuthService {
       codeChallengeMethod: challengeMethod,
     };
 
-    session.pkceCodes = pkceCodes;
-    session.authCodeUrlRequest = authCodeUrlRequest;
-    session.authCodeRequest = {
+    this.session.pkceCodes = pkceCodes;
+    this.session.authCodeUrlRequest = authCodeUrlRequest;
+    this.session.authCodeRequest = {
       code: "",
       codeVerifier: verifier,
       scopes: authScopes,

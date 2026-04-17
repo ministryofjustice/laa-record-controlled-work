@@ -22,7 +22,7 @@ router.get(
         req.session,
         msalClient,
       );
-      const authUrl: string = await authService.getAuthCodeUrl(req.session);
+      const authUrl: string = await authService.getAuthCodeUrl();
       res.redirect(authUrl);
     } catch (error) {
       next(error);
