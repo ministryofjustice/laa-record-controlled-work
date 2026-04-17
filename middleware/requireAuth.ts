@@ -21,7 +21,7 @@ export function requireAuth(
     return;
   }
 
-  if (session.isAuthenticated === true) {
+  if (session.isAuthenticated) {
     next();
     return;
   }

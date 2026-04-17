@@ -69,6 +69,15 @@ export default [
         },
       ],
       "no-negated-condition": "off", // Allow negated conditions as they can improve readability in certain contexts
+      "@typescript-eslint/strict-boolean-expressions": [
+        "error",
+        {
+          allowNullableBoolean: true,
+          allowString: true,
+          allowNullableString: true,
+          allowNullableObject: true,
+        },
+      ],
 
       // JSDoc: structural checks
       "jsdoc/check-alignment": "error",

@@ -1,5 +1,5 @@
-import dotenv from "dotenv";
 import type { Config } from "#types/config-types.js";
+import dotenv from "dotenv";
 dotenv.config();
 
 const DEFAULT_AUTH_RATE_LIMIT_MAX = 20;
@@ -9,55 +9,34 @@ const MILLISECONDS_IN_A_MINUTE = 60000;
 const DEFAULT_PORT = 3000;
 
 // Validate required session env vars
-if (
-  process.env.SESSION_SECRET === undefined ||
-  process.env.SESSION_SECRET === ""
-) {
+if (!process.env.SESSION_SECRET) {
   throw new Error("SESSION_SECRET must be defined in environment variables.");
 }
-if (process.env.SESSION_NAME === undefined || process.env.SESSION_NAME === "") {
+if (!process.env.SESSION_NAME) {
   throw new Error("SESSION_NAME must be defined in environment variables.");
 }
-if (
-  process.env.ENTRA_CLIENT_ID === undefined ||
-  process.env.ENTRA_CLIENT_ID === ""
-) {
+if (!process.env.ENTRA_CLIENT_ID) {
   throw new Error("ENTRA_CLIENT_ID must be defined in environment variables.");
 }
-if (
-  process.env.ENTRA_CLIENT_SECRET === undefined ||
-  process.env.ENTRA_CLIENT_SECRET === ""
-) {
+if (!process.env.ENTRA_CLIENT_SECRET) {
   throw new Error(
     "ENTRA_CLIENT_SECRET must be defined in environment variables.",
   );
 }
-if (
-  process.env.ENTRA_TENANT_ID === undefined ||
-  process.env.ENTRA_TENANT_ID === ""
-) {
+if (!process.env.ENTRA_TENANT_ID) {
   throw new Error("ENTRA_TENANT_ID must be defined in environment variables.");
 }
-if (
-  process.env.ENTRA_REDIRECT_URI === undefined ||
-  process.env.ENTRA_REDIRECT_URI === ""
-) {
+if (!process.env.ENTRA_REDIRECT_URI) {
   throw new Error(
     "ENTRA_REDIRECT_URI must be defined in environment variables.",
   );
 }
-if (
-  process.env.ENTRA_AUTHORITY_BASE_URL === undefined ||
-  process.env.ENTRA_AUTHORITY_BASE_URL === ""
-) {
+if (!process.env.ENTRA_AUTHORITY_BASE_URL) {
   throw new Error(
     "ENTRA_AUTHORITY_BASE_URL must be defined in environment variables.",
   );
 }
-if (
-  process.env.ENTRA_POST_LOGOUT_REDIRECT_URI === undefined ||
-  process.env.ENTRA_POST_LOGOUT_REDIRECT_URI === ""
-) {
+if (!process.env.ENTRA_POST_LOGOUT_REDIRECT_URI) {
   throw new Error(
     "ENTRA_POST_LOGOUT_REDIRECT_URI must be defined in environment variables.",
   );
