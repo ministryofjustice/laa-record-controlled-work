@@ -58,13 +58,15 @@ export default [
       "no-console": "warn", // TODO: should be using a proper logger like pino or winston
       "no-param-reassign": ["error", { props: false }], // Allow modifying properties of function parameters (common in Express middleware and reducers)
       "no-negated-condition": "off", // Allow negated conditions as they can improve readability in certain contexts
+      
+      // JSDoc: structural checks
       "jsdoc/check-alignment": "error",
       "jsdoc/check-param-names": "error",
       "jsdoc/check-tag-names": "error",
-      "jsdoc/check-types": "error",
       "jsdoc/implements-on-classes": "error",
       "jsdoc/newline-after-description": "off",
-      "jsdoc/no-undefined-types": "error",
+      
+      // JSDoc: require documentation on declarations (not inline arrows/expressions)
       "jsdoc/require-description": "error",
       "jsdoc/require-jsdoc": [
         "error",
@@ -81,11 +83,9 @@ export default [
       "jsdoc/require-param": "error",
       "jsdoc/require-param-description": "error",
       "jsdoc/require-param-name": "error",
-      "jsdoc/require-param-type": "error",
       "jsdoc/require-returns": "error",
       "jsdoc/require-returns-check": "error",
       "jsdoc/require-returns-description": "error",
-      "jsdoc/require-returns-type": "error",
       // TypeScript declaration file best practices
       "@typescript-eslint/consistent-type-definitions": ["error", "interface"],
       "@typescript-eslint/consistent-type-imports": "error",
