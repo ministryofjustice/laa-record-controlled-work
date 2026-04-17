@@ -32,6 +32,7 @@ on:
         default: ""
 
 permissions:
+  actions: write
   id-token: write
   contents: write
   pull-requests: write
@@ -208,22 +209,24 @@ jobs:
 
           TAG_URL="https://hub.docker.com/layers/nginxinc/nginx-unprivileged/${TAG}"
           BODY="Mirrors [nginxinc/nginx-unprivileged@${TAG}](${TAG_URL}) to ECR."
-          BODY+=$'\n\n''Updates `docker-images.env`:'
+          BODY+=$'\n\n''Updates `docker-images.env`'
           BODY+=$'\n- ''`NGINX_IMAGE_TAG` to `'"${TAG}"'`'
           BODY+=$'\n- ''`NGINX_ECR_IMAGE_DIGEST_AMD64` to `'"${ECR_DIGEST}"'`'
           BODY+=$'\n\n''Updates `docker-images.json` nginx entry to `docker.io/nginxinc/nginx-unprivileged@'"${DOCKERHUB_DIGEST}"'`.'
-          BODY+=$'\n\n''> [!NOTE]'
-          BODY+=$'\n''> Required workflows will not trigger automatically on this PR. Run the following to trigger them:'
-          BODY+=$'\n''> ```'
-          BODY+=$'\n''> ./scripts/trigger-ci-on-branch.sh '"${BRANCH}"
-          BODY+=$'\n''> ```'
-
           PR_URL=$(gh pr create \
             --head "$BRANCH" \
             --base main \
             --title "Mirror nginx-unprivileged ${TAG} to ECR" \
             --body "$BODY")
           echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
+
+      - name: Trigger required workflows
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          BRANCH="chore/mirror-nginx-${{ needs.check.outputs.tag }}"
+          gh workflow run cicd.yml --ref "$BRANCH"
+          gh workflow run sca.yml --ref "$BRANCH"
 
       - name: Close superseded PRs
         env:
