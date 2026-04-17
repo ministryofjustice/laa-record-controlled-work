@@ -55,7 +55,7 @@ export default [
       "linebreak-style": "off", // Prettier is handling this
       quotes: "off", // Prettier is handling this
       semi: "off", // Prettier is handling this
-      "no-console": "off", // Stops complaining about putting messages in the console
+      "no-console": "warn", // TODO: should be using a proper logger like pino or winston
       "no-param-reassign": ["error", { props: false }], // Allow modifying properties of function parameters (common in Express middleware and reducers)
       "no-negated-condition": "off", // Allow negated conditions as they can improve readability in certain contexts
       "jsdoc/check-alignment": "error",
