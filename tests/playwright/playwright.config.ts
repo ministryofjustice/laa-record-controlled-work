@@ -55,6 +55,7 @@ export default defineConfig({
     env: {
       NODE_ENV: "test",
       PORT: "3000",
+      PLAYWRIGHT_TEST_SIGNIN: "true",
       SESSION_SECRET: "test-secret-key-for-playwright-tests",
       SESSION_NAME: "test-session",
       SERVICE_NAME: "Record civil controlled work",
