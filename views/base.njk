@@ -17,20 +17,7 @@
 {% endblock %}
 
 {% block header %}
-  {{ govukHeader({
-    homepageUrl: "#",
-    serviceName: config.SERVICE_NAME,
-    serviceUrl: "#"
-  }) }}
-{% endblock %}
-
-{% block beforeContent %}
-  {{ govukPhaseBanner({
-    tag: {
-      text: config.SERVICE_PHASE
-    },
-    html: t('components.phaseBanner.feedbackText') + t('components.phaseBanner.feedbackLinkTextHTML')
-  }) }}
+  {% include "./components/header.njk" %}
 {% endblock %}
 
 {% block content %}
