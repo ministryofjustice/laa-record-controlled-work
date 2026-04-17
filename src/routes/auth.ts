@@ -30,7 +30,7 @@ router.get(
   },
 );
 
-router.get("/signout", (req: Request, res: Response, next: NextFunction) => {
+router.post("/signout", (req: Request, res: Response, next: NextFunction) => {
   try {
     req.session.destroy((error: Error | undefined) => {
       if (error !== undefined) {

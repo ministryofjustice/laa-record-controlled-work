@@ -96,9 +96,9 @@ const createApp = async (): Promise<express.Application> => {
     app.use(morgan("dev"));
   }
 
-  // Auth routes are mounted before CSRF — the OAuth redirect endpoint is secured
-  // by the PKCE state parameter, not a CSRF token (Entra POSTs to it directly).
-  app.use("/auth", createAuthLimiter(config), authRouter);
+  // CSRF protection applied globally; /auth/code/callback is excluded via
+  // skipCsrfProtection (PKCE state provides the equivalent protection for that endpoint).
+  setupCsrf(app);
 
   // Playwright-only route: sets an authenticated session without going through Entra.
   if (ENABLE_PLAYWRIGHT_TEST_SIGNIN && process.env.NODE_ENV === "test") {
@@ -108,11 +108,8 @@ const createApp = async (): Promise<express.Application> => {
     });
   }
 
+  app.use("/auth", createAuthLimiter(config), authRouter);
   app.use(requireAuth);
-
-  // Set up Cross-Site Request Forgery (CSRF) protection for all other routes
-  setupCsrf(app);
-
   app.use("/", indexRouter);
 
   // Enable live-reload middleware in development mode

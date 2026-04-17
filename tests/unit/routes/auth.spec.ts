@@ -1,5 +1,6 @@
 import { AuthService } from "#src/services/auth.js";
 import authRouter from "#src/routes/auth.js";
+import { setupCsrf } from "#middleware/setupCsrf.js";
 import { expect } from "chai";
 import express from "express";
 import session from "express-session";
@@ -72,9 +73,16 @@ describe("authRoutes", () => {
     });
   });
 
-  describe("GET /auth/signout", () => {
+  describe("POST /auth/signout", () => {
     it("redirects to the URL returned by authService.getLogoutUrl()", async () => {
-      const res = await request(app).get("/auth/signout");
+      const agent = request.agent(app);
+      const tokenRes = await agent.get("/csrf-token");
+      const csrfToken = tokenRes.body.csrfToken as string;
+
+      const res = await agent
+        .post("/auth/signout")
+        .type("form")
+        .send({ _csrf: csrfToken });
 
       expect(getLogoutUrlStub.calledOnce).to.be.true;
       expect(res.status).to.equal(config.HTTP_STATUS.FOUND);
@@ -84,7 +92,13 @@ describe("authRoutes", () => {
     it("destroys the session and clears the cookie before redirecting", async () => {
       const agent = request.agent(app);
       await agent.get("/auth/signin"); // establishes a session cookie
-      const res = await agent.get("/auth/signout");
+      const tokenRes = await agent.get("/csrf-token");
+      const csrfToken = tokenRes.body.csrfToken as string;
+
+      const res = await agent
+        .post("/auth/signout")
+        .type("form")
+        .send({ _csrf: csrfToken });
 
       expect(res.status).to.equal(config.HTTP_STATUS.FOUND);
       const rawCookies = res.headers["set-cookie"];
@@ -122,7 +136,13 @@ function createApp() {
   const app = express();
   app.use(express.urlencoded({ extended: false }));
   app.use(session({ secret: "test", resave: false, saveUninitialized: true }));
+  setupCsrf(app);
+  // Exposes a CSRF token so tests can make valid POST requests
+  app.get("/csrf-token", (req, res) => {
+    res.json({ csrfToken: req.csrfToken?.() });
+  });
   app.use("/auth", authRouter);
+  // // Catches errors passed to next() so tests can assert on status/message
   app.use(
     (
       err: Error,
