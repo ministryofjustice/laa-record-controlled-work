@@ -97,7 +97,7 @@ export default [
       "jsdoc/require-returns": "error",
       "jsdoc/require-returns-check": "error",
       "jsdoc/require-returns-description": "error",
-      // TypeScript declaration file best practices
+      // TypeScript best practices
       "@typescript-eslint/consistent-type-definitions": ["error", "interface"],
       "@typescript-eslint/consistent-type-imports": "error",
       "@typescript-eslint/no-extraneous-class": [
@@ -107,6 +107,16 @@ export default [
       "@typescript-eslint/triple-slash-reference": [
         "error",
         { path: "never", types: "prefer-import", lib: "never" },
+      ],
+      // Allow destructuring from member expressions e.g. const { x } = obj.prop
+      // Accepted tradeoff - this won't error either: const x = obj.prop.x
+      "@typescript-eslint/prefer-destructuring": [
+        "error",
+        { array: true, object: true },
+        {
+          enforceForRenamedProperties: false,
+          enforceForDeclarationWithTypeAnnotation: false,
+        },
       ],
     },
   },
