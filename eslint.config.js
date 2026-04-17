@@ -93,13 +93,10 @@ export default [
         "error",
         { allowStaticOnly: true },
       ],
-      "@typescript-eslint/no-namespace": "off", // Allow namespaces for declaration files
       "@typescript-eslint/triple-slash-reference": [
         "error",
         { path: "never", types: "prefer-import", lib: "never" },
       ],
-      "@typescript-eslint/no-var-requires": "error",
-      "@typescript-eslint/no-explicit-any": "warn",
     },
   },
   // Add a separate config for declaration files
