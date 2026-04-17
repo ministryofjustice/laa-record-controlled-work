@@ -56,16 +56,27 @@ export default [
       quotes: "off", // Prettier is handling this
       semi: "off", // Prettier is handling this
       "no-console": "warn", // TODO: should be using a proper logger like pino or winston
-      "no-param-reassign": ["error", { props: false }], // Allow modifying properties of function parameters (common in Express middleware and reducers)
+      "no-param-reassign": [
+        "error",
+        {
+          props: true,
+          ignorePropertyModificationsFor: [
+            "req", // Express request
+            "request", // Express request (alternative name)
+            "res", // Express response
+            "response", // Express response (alternative name)
+          ],
+        },
+      ],
       "no-negated-condition": "off", // Allow negated conditions as they can improve readability in certain contexts
-      
+
       // JSDoc: structural checks
       "jsdoc/check-alignment": "error",
       "jsdoc/check-param-names": "error",
       "jsdoc/check-tag-names": "error",
       "jsdoc/implements-on-classes": "error",
       "jsdoc/newline-after-description": "off",
-      
+
       // JSDoc: require documentation on declarations (not inline arrows/expressions)
       "jsdoc/require-description": "error",
       "jsdoc/require-jsdoc": [
