@@ -1,8 +1,8 @@
 import type {
-  ValidationError,
-  Result,
-  Meta,
   Location,
+  Meta,
+  Result,
+  ValidationError,
 } from "express-validator";
 
 /**
@@ -282,6 +282,7 @@ export function formatValidationErrors(validationResult: Result): {
     (errors, errorItem) => {
       const { fieldName, inlineMessage } = errorItem;
       if (inlineMessage.trim() !== "") {
+        // eslint-disable-next-line no-param-reassign -- reduce accumulator
         errors[fieldName] = inlineMessage;
       }
       return errors;
