@@ -21,6 +21,7 @@ export interface EntraConfig {
   redirectUri: string;
   authority: string;
   postLogoutRedirectUri: string;
+  authorityBaseUrl: string;
 }
 
 export interface SessionConfig {

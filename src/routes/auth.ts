@@ -32,6 +32,7 @@ router.get(
 
 router.post("/signout", (req: Request, res: Response, next: NextFunction) => {
   try {
+    const idToken = req.session.idToken;
     req.session.destroy((error: Error | undefined) => {
       if (error !== undefined) {
         next(error);
@@ -39,7 +40,7 @@ router.post("/signout", (req: Request, res: Response, next: NextFunction) => {
       }
 
       res.clearCookie(config.session.name);
-      res.redirect(AuthService.getLogoutUrl());
+      res.redirect(AuthService.getLogoutUrl(idToken));
     });
   } catch (error) {
     next(error);

@@ -113,8 +113,14 @@ export class AuthService {
    * Builds the Microsoft Entra ID logout URL including the post-logout redirect URI.
    * @returns {string} The fully-formed Entra logout URL.
    */
-  public static getLogoutUrl(): string {
-    return `${config.entra.authority}/oauth2/v2.0/logout?post_logout_redirect_uri=${config.entra.postLogoutRedirectUri}`;
+  public static getLogoutUrl(idToken?: string): string {
+    const params = new URLSearchParams({
+      post_logout_redirect_uri: config.entra.postLogoutRedirectUri ?? "",
+    });
+    if (idToken !== undefined) {
+      params.set("id_token_hint", idToken);
+    }
+    return `${config.entra.authority}/oauth2/v2.0/logout?${params.toString()}`;
   }
 
   /**
