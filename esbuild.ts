@@ -48,6 +48,7 @@ const copyAssets = async (): Promise<void> => {
  */
 const externalModules: string[] = [
   ...builtinModules,
+  "@azure/msal-node",
   "express",
   "nunjucks",
   "dotenv",

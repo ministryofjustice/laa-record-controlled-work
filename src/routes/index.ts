@@ -14,6 +14,10 @@ router.get("/", (req: Request, res: Response): void => {
   res.render("main/index");
 });
 
+router.get("/landing", (req: Request, res: Response): void => {
+  res.render("main/landing");
+});
+
 // GET users from external API using BaseApiService pattern
 router.get(
   "/users",

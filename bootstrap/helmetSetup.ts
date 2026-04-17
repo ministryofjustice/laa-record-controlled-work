@@ -7,6 +7,7 @@ import helmet from "helmet";
 import crypto from "node:crypto";
 import type { Request, Response, NextFunction, Application } from "express";
 import type { IncomingMessage, ServerResponse } from "node:http";
+import config from "#config.js";
 
 const RANDOMBYTES = 16;
 
@@ -65,7 +66,7 @@ export const helmetSetup = (app: Application): void => {
           objectSrc: ["'none'"], // Restrict <object>, <embed>, and <applet> elements
           mediaSrc: ["'self'"], // Restrict media
           frameSrc: ["'none'"], // Restrict frames
-          formAction: ["'self'"], // Restrict form submissions
+          formAction: ["'self'", config.entra.authority], // Restrict form submissions but allows redirects to Entra after signout
           baseUri: ["'self'"], // Restrict base URI
           upgradeInsecureRequests: [], // Upgrade HTTP to HTTPS
         },

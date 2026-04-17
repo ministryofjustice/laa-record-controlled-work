@@ -14,6 +14,16 @@ export interface CsrfConfig {
   httpOnly: boolean;
 }
 
+export interface EntraConfig {
+  clientId: string;
+  clientSecret: string;
+  tenantId: string;
+  redirectUri: string;
+  authority: string;
+  postLogoutRedirectUri: string;
+  authorityBaseUrl: string;
+}
+
 export interface SessionConfig {
   secret: string;
   name: string;
@@ -33,6 +43,7 @@ export interface Config {
   DEPARTMENT_URL: string | undefined;
   RATELIMIT_HEADERS_ENABLED: string | undefined;
   RATELIMIT_STORAGE_URI: string | undefined;
+  AUTH_RATE_LIMIT_MAX: number | string;
   RATE_LIMIT_MAX: number | string;
   RATE_WINDOW_MS: number;
   SERVICE_NAME: string | undefined;
@@ -42,4 +53,5 @@ export interface Config {
   csrf: CsrfConfig;
   session: SessionConfig;
   paths: PathsConfig;
+  entra: EntraConfig;
 }

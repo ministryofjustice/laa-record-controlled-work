@@ -1,50 +1,64 @@
-import { test as base, expect } from '@playwright/test';
-import { AxeBuilder } from '@axe-core/playwright';
-import { PageFactory } from '../pages/PageFactory.js';
+import { test as base, expect } from "@playwright/test";
+import { AxeBuilder } from "@axe-core/playwright";
+import { PageFactory } from "../pages/PageFactory.js";
 
 /**
- * Custom test fixture with accessibility testing
+ * Custom test fixture with accessibility testing.
+ *
+ * Authentication behaviour:
+ * - All tests are signed in automatically via /test/signin.
+ * - To test unauthenticated behaviour, use the `unauthenticated` fixture:
+ *     test('redirects to sign in', async ({ unauthenticated: { page } }) => { ... })
  */
 interface TestFixtures {
   checkAccessibility: () => Promise<void>;
-  pages: PageFactory; 
+  pages: PageFactory;
+  unauthenticated: { page: import("@playwright/test").Page };
 }
 
 export const test = base.extend<TestFixtures>({
-    /**
-     * Fixture that provides accessibility testing functionality using axe-core
-     * @param {object} param0 - Playwright test fixtures object
-     * @param {import('@playwright/test').Page} param0.page - Playwright page object for the current test
-     * @param {Function} use - Playwright fixture use function to provide the checkAccessibility function
-     * @returns {Promise<void>} Promise that resolves when the fixture is ready
-     */
-    checkAccessibility: async ({ page }, use): Promise<void> => {
-        /**
-         * Function that performs accessibility scanning on the current page
-         * @returns {Promise<void>} Promise that resolves when accessibility scan is complete
-         */
-        const checkAccessibility = async (): Promise<void> => {
-        const accessibilityScanResults = await new AxeBuilder({ page })
-            .withTags(['wcag22a'])
-            .analyze();
+  /**
+   * Override the default page to sign in automatically before each test.
+   */
+  page: async ({ page }, use): Promise<void> => {
+    await page.goto("/test/signin");
+    await use(page);
+  },
 
-        const { violations } = accessibilityScanResults;
-        expect(violations).toEqual([]);
-        };
-        await use(checkAccessibility);
-    },
+  /**
+   * Provides an unauthenticated page for tests that need to exercise the
+   * auth redirect. Uses a fresh browser context so the signed-in session
+   * from the default `page` fixture doesn't leak through.
+   */
+  unauthenticated: async ({ browser }, use): Promise<void> => {
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    await use({ page });
+    await context.close();
+  },
 
-    /**
-     * Fixture that provides page object factory for creating page instances
-     * @param {object} param0 - Playwright test fixtures object  
-     * @param {import('@playwright/test').Page} param0.page - Playwright page object for the current test
-     * @param {Function} use - Playwright fixture use function to provide the PageFactory instance
-     * @returns {Promise<void>} Promise that resolves when the fixture is ready
-     */
-    pages: async ({ page }, use): Promise<void> => {
+  /**
+   * Fixture that provides accessibility testing functionality using axe-core
+   */
+  checkAccessibility: async ({ page }, use): Promise<void> => {
+    const checkAccessibility = async (): Promise<void> => {
+      const accessibilityScanResults = await new AxeBuilder({ page })
+        .withTags(["wcag22a"])
+        .analyze();
+
+      const { violations } = accessibilityScanResults;
+      expect(violations).toEqual([]);
+    };
+    await use(checkAccessibility);
+  },
+
+  /**
+   * Fixture that provides page object factory for creating page instances
+   */
+  pages: async ({ page }, use): Promise<void> => {
     const pageFactory = new PageFactory(page);
     await use(pageFactory);
-    },
+  },
 });
 
-export { expect } from '@playwright/test';
+export { expect } from "@playwright/test";
