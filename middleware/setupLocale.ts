@@ -34,14 +34,3 @@ export function setupLocaleMiddleware(
 
   next();
 }
-
-/**
- * Type augmentation for Express Request to include locale data
- */
-declare global {
-  namespace Express {
-    interface Request {
-      locale: ExpressLocaleLoader;
-    }
-  }
-}

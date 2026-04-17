@@ -8,7 +8,6 @@
  */
 
 import { devError, devLog } from "#src/lib/index.js";
-import type { AxiosInstanceWrapper } from "#types/axios-instance-wrapper.js";
 import type { AxiosError, InternalAxiosRequestConfig } from "axios";
 import type { NextFunction, Request, Response } from "express";
 import { create } from "middleware-axios";
@@ -32,15 +31,6 @@ export interface ApiMiddlewareConfig {
 export interface AuthServiceInterface {
   getAuthHeader: () => Promise<string>;
   clearTokens: () => void;
-}
-
-// Extend Express Request to include our axiosMiddleware
-declare global {
-  namespace Express {
-    interface Request {
-      axiosMiddleware: AxiosInstanceWrapper;
-    }
-  }
 }
 
 /**
