@@ -145,7 +145,6 @@ export class AuthService {
   private async createAuthCodeRequest(): Promise<AuthorizationUrlRequest> {
     const pkceCodes: PKCECodes = await this.getPkceCodes();
     const { challenge, challengeMethod, verifier } = pkceCodes;
-    // eslint-disable-next-line @typescript-eslint/prefer-destructuring -- rule incorrectly flags destructuring from `this.session` due to enforceForRenamedProperties behaviour with class instance properties
     const { returnTo } = this.session;
 
     // Validate the redirect target, then bind it to the session.
