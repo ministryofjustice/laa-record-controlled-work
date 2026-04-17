@@ -1,4 +1,5 @@
 import config from "#config.js";
+import { BAD_REQUEST } from "#src/constants/httpStatus.js";
 import { msalConfig } from "#src/config/auth.js";
 import { AuthService } from "#src/services/auth.js";
 import { authCodeResponseSchema } from "#types/auth-types.js";
@@ -55,9 +56,7 @@ router.post(
     try {
       const parseResult = authCodeResponseSchema.safeParse(req.body);
       if (!parseResult.success) {
-        return res
-          .status(config.HTTP_STATUS.BAD_REQUEST)
-          .send("Invalid redirect payload");
+        return res.status(BAD_REQUEST).send("Invalid redirect payload");
       }
 
       const { data } = parseResult;

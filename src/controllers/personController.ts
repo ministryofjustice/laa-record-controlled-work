@@ -1,4 +1,5 @@
 import { extractFormFields } from "#src/lib/dataTransformers.js";
+import { BAD_REQUEST } from "#src/constants/httpStatus.js";
 import {
   getSessionData,
   storeOriginalFormData,
@@ -12,9 +13,6 @@ import { validationResult } from "express-validator";
 interface RequestWithCSRF extends Request {
   csrfToken?: () => string;
 }
-
-// HTTP status codes
-const HTTP_STATUS_BAD_REQUEST = 400;
 
 // Default person data (in a real app, this would be from a database)
 const DEFAULT_PERSON_DATA = {
@@ -182,7 +180,7 @@ export function postPerson(
       const currentPersonData = getCurrentPersonData(req);
 
       // Re-render the form with errors and preserve user input
-      res.status(HTTP_STATUS_BAD_REQUEST).render("change-person.njk", {
+      res.status(BAD_REQUEST).render("change-person.njk", {
         currentName: currentPersonData.fullName,
         currentAddress: currentPersonData.address,
         currentContactPreference: currentPersonData.contactPreference,

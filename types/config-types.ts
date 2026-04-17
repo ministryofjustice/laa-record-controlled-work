@@ -36,15 +36,6 @@ export interface PathsConfig {
   views: string;
 }
 
-export interface HttpStatusCodes {
-  FOUND: number;
-  BAD_REQUEST: number;
-  UNAUTHORIZED: number;
-  FORBIDDEN: number;
-  NOT_FOUND: number;
-  INTERNAL_SERVER_ERROR: number;
-}
-
 export interface Config {
   CONTACT_EMAIL: string | undefined;
   CONTACT_PHONE: string | undefined;
@@ -63,5 +54,4 @@ export interface Config {
   session: SessionConfig;
   paths: PathsConfig;
   entra: EntraConfig;
-  HTTP_STATUS: HttpStatusCodes;
 }

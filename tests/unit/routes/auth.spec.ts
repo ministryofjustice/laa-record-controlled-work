@@ -6,7 +6,7 @@ import express from "express";
 import session from "express-session";
 import sinon from "sinon";
 import request from "supertest";
-import config from "#config.js";
+import { FOUND, BAD_REQUEST, INTERNAL_SERVER_ERROR } from "#src/constants/httpStatus.js";
 
 describe("authRoutes", () => {
   let authServiceStub: {
@@ -45,7 +45,7 @@ describe("authRoutes", () => {
         .send({ code: "auth-code-abc", state: "encoded-state" });
 
       expect(authServiceStub.processAuthCodeCallback.calledOnce).to.be.true;
-      expect(res.status).to.equal(config.HTTP_STATUS.FOUND);
+      expect(res.status).to.equal(FOUND);
       expect(res.headers.location).to.equal(SUCCESS_REDIRECT);
     });
 
@@ -56,7 +56,7 @@ describe("authRoutes", () => {
         .send({ state: "encoded-state" });
 
       expect(authServiceStub.processAuthCodeCallback.called).to.be.false;
-      expect(res.status).to.equal(config.HTTP_STATUS.BAD_REQUEST);
+      expect(res.status).to.equal(BAD_REQUEST);
     });
 
     it("calls next(error) when processAuthCodeCallback() throws", async () => {
@@ -68,7 +68,7 @@ describe("authRoutes", () => {
         .type("form")
         .send({ code: "auth-code-abc", state: "encoded-state" });
 
-      expect(res.status).to.equal(config.HTTP_STATUS.INTERNAL_SERVER_ERROR);
+      expect(res.status).to.equal(INTERNAL_SERVER_ERROR);
       expect(res.body.message).to.equal("MSAL failure");
     });
   });
@@ -85,7 +85,7 @@ describe("authRoutes", () => {
         .send({ _csrf: csrfToken });
 
       expect(getLogoutUrlStub.calledOnce).to.be.true;
-      expect(res.status).to.equal(config.HTTP_STATUS.FOUND);
+      expect(res.status).to.equal(FOUND);
       expect(res.headers.location).to.equal(LOGOUT_URL);
     });
 
@@ -100,7 +100,7 @@ describe("authRoutes", () => {
         .type("form")
         .send({ _csrf: csrfToken });
 
-      expect(res.status).to.equal(config.HTTP_STATUS.FOUND);
+      expect(res.status).to.equal(FOUND);
       const rawCookies = res.headers["set-cookie"];
       const cookies: string[] = Array.isArray(rawCookies)
         ? rawCookies
@@ -114,7 +114,7 @@ describe("authRoutes", () => {
   describe("GET /auth/signin", () => {
     it("redirects to the URL returned by authService.getAuthCodeUrl()", async () => {
       const response = await request(app).get("/auth/signin");
-      expect(response.status).to.equal(config.HTTP_STATUS.FOUND);
+      expect(response.status).to.equal(FOUND);
       expect(response.headers.location).to.equal(AUTH_CODE_URL);
     });
 
@@ -125,7 +125,7 @@ describe("authRoutes", () => {
 
       const response = await request(app).get("/auth/signin");
       expect(response.status).to.equal(
-        config.HTTP_STATUS.INTERNAL_SERVER_ERROR,
+        INTERNAL_SERVER_ERROR,
       );
       expect(response.body.message).to.equal(errorMessage);
     });
@@ -151,7 +151,7 @@ function createApp() {
       _next: express.NextFunction,
     ) => {
       res
-        .status(config.HTTP_STATUS.INTERNAL_SERVER_ERROR)
+        .status(INTERNAL_SERVER_ERROR)
         .json({ message: err.message });
     },
   );
