@@ -11,11 +11,11 @@ const UNSUCCESSFUL_REQUEST = 500;
 
 /* GET home page. */
 router.get("/", (req: Request, res: Response): void => {
-  res.render("main/landing");
+  res.render("main/index");
 });
 
-router.get("/index", (req: Request, res: Response): void => {
-  res.render("main/index");
+router.get("/landing", (req: Request, res: Response): void => {
+  res.render("main/landing");
 });
 
 // GET users from external API using BaseApiService pattern
