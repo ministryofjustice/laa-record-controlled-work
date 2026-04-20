@@ -13,7 +13,8 @@
           <nav class="moj-header__navigation" aria-label="Account navigation">
             <ul class="moj-header__navigation-list">
               <li class="moj-header__navigation-item">
-                {{ userEmail }}
+              {# TODO: Add user email from redis cache #}
+                Test@email.com
               </li>
               <li class="moj-header__navigation-item">
                 <a class="moj-header__navigation-link govuk-!-font-weight-bold" href="/logout">{{t('common.signOut')}}</a>

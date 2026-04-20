@@ -1,12 +1,6 @@
 {% extends "base.njk" %}
-{%- from "govuk/components/button/macro.njk" import govukButton -%}
+
 
 {% block content %}
-    <h1 class="govuk-heading-xl">Landing Page</h1>
-
-    <form method="post" action="/auth/signout">
-      <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-      {{ govukButton({ text: "Sign out", classes: "govuk-button--secondary" }) }}
-    </form>
-
+    <h1 class="govuk-heading-xl">Stub Landing Page</h1>
 {% endblock %}
