@@ -24,7 +24,9 @@ deploy_branch() {
                 --set nginx.image.repository="$REGISTRY/$NGINX_ECR_REPOSITORY" \
                 --set nginx.image.tag="${NGINX_IMAGE_TAG}@${NGINX_ECR_IMAGE_DIGEST_AMD64}" \
                 --set ingress.annotations."external-dns\.alpha\.kubernetes\.io/set-identifier"="$IDENTIFIER" \
-                --set ingress.hosts[0].host="$RELEASE_HOST"
+                --set ingress.hosts[0].host="$RELEASE_HOST" \
+                --set rcw.env.ENTRA_REDIRECT_URI="https://$RELEASE_HOST/auth/code/callback" \
+                --set rcw.env.ENTRA_POST_LOGOUT_REDIRECT_URI="https://$RELEASE_HOST/"
 }
 
 deploy_main() {  

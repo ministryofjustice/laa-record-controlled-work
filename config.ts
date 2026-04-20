@@ -1,21 +1,45 @@
-import dotenv from "dotenv";
 import type { Config } from "#types/config-types.js";
+import dotenv from "dotenv";
 dotenv.config();
 
+const DEFAULT_AUTH_RATE_LIMIT_MAX = 20;
 const DEFAULT_RATE_LIMIT_MAX = 100;
 const DEFAULT_RATE_WINDOW_MS_MINUTE = 15;
 const MILLISECONDS_IN_A_MINUTE = 60000;
 const DEFAULT_PORT = 3000;
 
 // Validate required session env vars
-if (
-  process.env.SESSION_SECRET === undefined ||
-  process.env.SESSION_SECRET === ""
-) {
+if (!process.env.SESSION_SECRET) {
   throw new Error("SESSION_SECRET must be defined in environment variables.");
 }
-if (process.env.SESSION_NAME === undefined || process.env.SESSION_NAME === "") {
+if (!process.env.SESSION_NAME) {
   throw new Error("SESSION_NAME must be defined in environment variables.");
+}
+if (!process.env.ENTRA_CLIENT_ID) {
+  throw new Error("ENTRA_CLIENT_ID must be defined in environment variables.");
+}
+if (!process.env.ENTRA_CLIENT_SECRET) {
+  throw new Error(
+    "ENTRA_CLIENT_SECRET must be defined in environment variables.",
+  );
+}
+if (!process.env.ENTRA_TENANT_ID) {
+  throw new Error("ENTRA_TENANT_ID must be defined in environment variables.");
+}
+if (!process.env.ENTRA_REDIRECT_URI) {
+  throw new Error(
+    "ENTRA_REDIRECT_URI must be defined in environment variables.",
+  );
+}
+if (!process.env.ENTRA_AUTHORITY_BASE_URL) {
+  throw new Error(
+    "ENTRA_AUTHORITY_BASE_URL must be defined in environment variables.",
+  );
+}
+if (!process.env.ENTRA_POST_LOGOUT_REDIRECT_URI) {
+  throw new Error(
+    "ENTRA_POST_LOGOUT_REDIRECT_URI must be defined in environment variables.",
+  );
 }
 
 // Get environment variables
@@ -26,6 +50,9 @@ const config: Config = {
   DEPARTMENT_URL: process.env.DEPARTMENT_URL,
   RATELIMIT_HEADERS_ENABLED: process.env.RATELIMIT_HEADERS_ENABLED,
   RATELIMIT_STORAGE_URI: process.env.RATELIMIT_STORAGE_URI,
+  AUTH_RATE_LIMIT_MAX: Number(
+    process.env.AUTH_RATE_LIMIT_MAX ?? DEFAULT_AUTH_RATE_LIMIT_MAX,
+  ),
   RATE_LIMIT_MAX: Number(process.env.RATE_LIMIT_MAX ?? DEFAULT_RATE_LIMIT_MAX),
   // Default rate window: 15 minutes in milliseconds
   RATE_WINDOW_MS: Number(
@@ -55,6 +82,15 @@ const config: Config = {
   paths: {
     static: "public", // Path for serving static files
     views: "src/views", // Path for Nunjucks views
+  },
+  entra: {
+    clientId: process.env.ENTRA_CLIENT_ID,
+    clientSecret: process.env.ENTRA_CLIENT_SECRET,
+    authority: `${process.env.ENTRA_AUTHORITY_BASE_URL}/${process.env.ENTRA_TENANT_ID}`,
+    authorityBaseUrl: process.env.ENTRA_AUTHORITY_BASE_URL,
+    tenantId: process.env.ENTRA_TENANT_ID,
+    redirectUri: process.env.ENTRA_REDIRECT_URI,
+    postLogoutRedirectUri: process.env.ENTRA_POST_LOGOUT_REDIRECT_URI,
   },
 };
 
