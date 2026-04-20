@@ -18,12 +18,14 @@ const msalClient: ConfidentialClientApplication =
 router.get(
   "/signin",
   async (req: Request, res: Response, next: NextFunction) => {
+    const authService: AuthService = AuthService.create(
+      req.session,
+      msalClient,
+    );
+
     try {
-      const authService: AuthService = AuthService.create(
-        req.session,
-        msalClient,
-      );
       const authUrl: string = await authService.getAuthCodeUrl();
+
       res.redirect(authUrl);
     } catch (error) {
       next(error);
@@ -77,7 +79,8 @@ router.post(
         res.redirect(successRedirect);
       });
     } catch (error) {
-      next(error);
+      console.error("Failed to authenticate:", error);
+      res.redirect("/auth/signin");
     }
   },
 );

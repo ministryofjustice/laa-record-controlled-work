@@ -2,6 +2,7 @@ import type { Config } from "#types/config-types.js";
 import dotenv from "dotenv";
 dotenv.config();
 
+// TODO verify appropriate max rate limit for auth routes
 const DEFAULT_AUTH_RATE_LIMIT_MAX = 20;
 const DEFAULT_RATE_LIMIT_MAX = 100;
 const DEFAULT_RATE_WINDOW_MS_MINUTE = 15;
