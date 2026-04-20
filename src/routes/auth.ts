@@ -79,7 +79,6 @@ router.post(
         res.redirect(successRedirect);
       });
     } catch (error) {
-      console.error("Failed to authenticate:", error);
       res.redirect("/auth/signin");
     }
   },
