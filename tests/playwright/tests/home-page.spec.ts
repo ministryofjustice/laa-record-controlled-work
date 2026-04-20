@@ -2,7 +2,7 @@ import { test, expect } from "../fixtures/index.js";
 
 test("homepage should have the correct title", async ({ page }) => {
   // Navigate to the homepage
-  await page.goto("/");
+  await page.goto("/index");
 
   // Check for the title of the application
   await expect(page).toHaveTitle(/Record civil controlled work – GOV.UK/);
