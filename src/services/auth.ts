@@ -51,16 +51,11 @@ export class AuthService {
 
   /**
    * Generates the Microsoft Entra ID authorisation URL to begin the PKCE sign-in flow.
-   * @param {Partial<AuthorizationUrlRequest>} options - Optional overrides for the MSAL AuthorizationUrlRequest parameters.
    * @returns {Promise<string>} The authorisation URL to redirect the user to.
    */
-  public async getAuthCodeUrl(
-    options: Partial<AuthorizationUrlRequest> = {},
-  ): Promise<string> {
-    const authCodeUrlRequest: AuthorizationUrlRequest = {
-      ...(await this.createAuthCodeRequest()),
-      ...options,
-    };
+  public async getAuthCodeUrl(): Promise<string> {
+    const authCodeUrlRequest: AuthorizationUrlRequest =
+      await this.createAuthCodeRequest();
 
     try {
       return await this.msalClient.getAuthCodeUrl(authCodeUrlRequest);
