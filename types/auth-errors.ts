@@ -1,7 +1,7 @@
 import {
-  HTTP_BAD_REQUEST,
-  HTTP_INTERNAL_SERVER_ERROR,
-  HTTP_UNAUTHORIZED,
+  BAD_REQUEST,
+  INTERNAL_SERVER_ERROR,
+  UNAUTHORIZED,
 } from "#src/constants/httpStatus.js";
 
 export type AuthError =
@@ -23,24 +23,24 @@ export function mapAuthErrorToHttp(error: AuthError): {
   switch (error.type) {
     case "MissingAuthCodeRequest":
       return {
-        status: HTTP_BAD_REQUEST,
+        status: BAD_REQUEST,
         message: "Missing auth code request in session",
       };
     case "StateMismatch":
       return {
-        status: HTTP_BAD_REQUEST,
+        status: BAD_REQUEST,
         message: "State mismatch: possible CSRF attack",
       };
     case "TokenAcquisitionFailed":
-      return { status: HTTP_UNAUTHORIZED, message: "Token acquisition failed" };
+      return { status: UNAUTHORIZED, message: "Token acquisition failed" };
     case "PkceChallengeGeneration":
       return {
-        status: HTTP_INTERNAL_SERVER_ERROR,
+        status: INTERNAL_SERVER_ERROR,
         message: "Failed to generate PKCE challenge",
       };
     case "MsalError":
       return {
-        status: HTTP_INTERNAL_SERVER_ERROR,
+        status: INTERNAL_SERVER_ERROR,
         message: "Authentication service error",
       };
   }

@@ -13,7 +13,7 @@ import type { NextFunction, Request, Response } from "express";
 import { create } from "middleware-axios";
 
 const DEFAULT_TIMEOUT = 5000;
-const HTTP_UNAUTHORIZED = 401;
+const UNAUTHORIZED = 401;
 
 // Configuration interface for API middleware
 export interface ApiMiddlewareConfig {
@@ -148,7 +148,7 @@ export function createApiMiddleware(config: ApiMiddlewareConfig = {}) {
         async (error: unknown) => {
           if (
             isAxiosErrorWithResponse(error) &&
-            error.response.status === HTTP_UNAUTHORIZED
+            error.response.status === UNAUTHORIZED
           ) {
             if (enableLogging) {
               devError(

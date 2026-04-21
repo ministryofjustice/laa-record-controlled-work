@@ -8,10 +8,10 @@ import session from "express-session";
 import sinon from "sinon";
 import request from "supertest";
 import {
-  HTTP_BAD_REQUEST,
-  HTTP_FOUND,
-  HTTP_INTERNAL_SERVER_ERROR,
-  HTTP_UNAUTHORIZED,
+  BAD_REQUEST,
+  FOUND,
+  INTERNAL_SERVER_ERROR,
+  UNAUTHORIZED,
 } from "#src/constants/httpStatus.js";
 
 describe("authRoutes", () => {
@@ -51,7 +51,7 @@ describe("authRoutes", () => {
         .send({ code: "auth-code-abc", state: "encoded-state" });
 
       expect(authServiceStub.processAuthCodeCallback.calledOnce).to.be.true;
-      expect(res.status).to.equal(HTTP_FOUND);
+      expect(res.status).to.equal(FOUND);
       expect(res.headers.location).to.equal(SUCCESS_REDIRECT);
     });
 
@@ -62,7 +62,7 @@ describe("authRoutes", () => {
         .send({ state: "encoded-state" });
 
       expect(authServiceStub.processAuthCodeCallback.called).to.be.false;
-      expect(res.status).to.equal(HTTP_BAD_REQUEST);
+      expect(res.status).to.equal(BAD_REQUEST);
     });
 
     it("responds with 400 when processAuthCodeCallback returns MissingAuthCodeRequest", async () => {
@@ -75,7 +75,7 @@ describe("authRoutes", () => {
         .type("form")
         .send({ code: "auth-code-abc", state: "encoded-state" });
 
-      expect(res.status).to.equal(HTTP_BAD_REQUEST);
+      expect(res.status).to.equal(BAD_REQUEST);
     });
 
     it("responds with 400 when processAuthCodeCallback returns StateMismatch", async () => {
@@ -88,7 +88,7 @@ describe("authRoutes", () => {
         .type("form")
         .send({ code: "auth-code-abc", state: "encoded-state" });
 
-      expect(res.status).to.equal(HTTP_BAD_REQUEST);
+      expect(res.status).to.equal(BAD_REQUEST);
     });
 
     it("responds with 401 when processAuthCodeCallback returns TokenAcquisitionFailed", async () => {
@@ -101,7 +101,7 @@ describe("authRoutes", () => {
         .type("form")
         .send({ code: "auth-code-abc", state: "encoded-state" });
 
-      expect(res.status).to.equal(HTTP_UNAUTHORIZED);
+      expect(res.status).to.equal(UNAUTHORIZED);
     });
   });
 
@@ -117,7 +117,7 @@ describe("authRoutes", () => {
         .send({ _csrf: csrfToken });
 
       expect(getLogoutUrlStub.calledOnce).to.be.true;
-      expect(res.status).to.equal(HTTP_FOUND);
+      expect(res.status).to.equal(FOUND);
       expect(res.headers.location).to.equal(LOGOUT_URL);
     });
 
@@ -132,7 +132,7 @@ describe("authRoutes", () => {
         .type("form")
         .send({ _csrf: csrfToken });
 
-      expect(res.status).to.equal(HTTP_FOUND);
+      expect(res.status).to.equal(FOUND);
       const rawCookies = res.headers["set-cookie"];
       const cookies: string[] = Array.isArray(rawCookies)
         ? rawCookies
@@ -146,7 +146,7 @@ describe("authRoutes", () => {
   describe("GET /auth/signin", () => {
     it("redirects to the URL returned by authService.getAuthCodeUrl()", async () => {
       const response = await request(app).get("/auth/signin");
-      expect(response.status).to.equal(HTTP_FOUND);
+      expect(response.status).to.equal(FOUND);
       expect(response.headers.location).to.equal(AUTH_CODE_URL);
     });
 
@@ -156,7 +156,7 @@ describe("authRoutes", () => {
       );
 
       const response = await request(app).get("/auth/signin");
-      expect(response.status).to.equal(HTTP_INTERNAL_SERVER_ERROR);
+      expect(response.status).to.equal(INTERNAL_SERVER_ERROR);
     });
   });
 });
@@ -179,7 +179,7 @@ function createApp() {
       res: express.Response,
       _next: express.NextFunction,
     ) => {
-      res.status(HTTP_INTERNAL_SERVER_ERROR).json({ message: err.message });
+      res.status(INTERNAL_SERVER_ERROR).json({ message: err.message });
     },
   );
   return app;
