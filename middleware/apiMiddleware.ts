@@ -7,13 +7,12 @@
  * Based on MCC's utils/axiosSetup.ts patterns.
  */
 
-import { devError, devLog } from "#src/lib/index.js";
+import { devError, devLog, UNAUTHORIZED } from "#src/lib/index.js";
 import type { AxiosError, InternalAxiosRequestConfig } from "axios";
 import type { NextFunction, Request, Response } from "express";
 import { create } from "middleware-axios";
 
 const DEFAULT_TIMEOUT = 5000;
-const UNAUTHORIZED = 401;
 
 // Configuration interface for API middleware
 export interface ApiMiddlewareConfig {
