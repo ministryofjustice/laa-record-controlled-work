@@ -1,12 +1,18 @@
 import { AuthService } from "#src/services/auth.js";
 import authRouter from "#src/routes/auth.js";
 import { setupCsrf } from "#middleware/setupCsrf.js";
+import { failure, success } from "#src/lib/result.js";
 import { expect } from "chai";
 import express from "express";
 import session from "express-session";
 import sinon from "sinon";
 import request from "supertest";
-import { FOUND, BAD_REQUEST, INTERNAL_SERVER_ERROR } from "#src/constants/httpStatus.js";
+import {
+  HTTP_BAD_REQUEST,
+  HTTP_FOUND,
+  HTTP_INTERNAL_SERVER_ERROR,
+  HTTP_UNAUTHORIZED,
+} from "#src/constants/httpStatus.js";
 
 describe("authRoutes", () => {
   let authServiceStub: {
@@ -22,10 +28,10 @@ describe("authRoutes", () => {
 
   beforeEach(() => {
     authServiceStub = {
-      getAuthCodeUrl: sinon.stub().resolves(AUTH_CODE_URL),
+      getAuthCodeUrl: sinon.stub().resolves(success(AUTH_CODE_URL)),
       processAuthCodeCallback: sinon
         .stub()
-        .resolves({ successRedirect: SUCCESS_REDIRECT }),
+        .resolves(success({ successRedirect: SUCCESS_REDIRECT })),
     };
     sinon
       .stub(AuthService, "create")
@@ -45,7 +51,7 @@ describe("authRoutes", () => {
         .send({ code: "auth-code-abc", state: "encoded-state" });
 
       expect(authServiceStub.processAuthCodeCallback.calledOnce).to.be.true;
-      expect(res.status).to.equal(FOUND);
+      expect(res.status).to.equal(HTTP_FOUND);
       expect(res.headers.location).to.equal(SUCCESS_REDIRECT);
     });
 
@@ -56,20 +62,46 @@ describe("authRoutes", () => {
         .send({ state: "encoded-state" });
 
       expect(authServiceStub.processAuthCodeCallback.called).to.be.false;
-      expect(res.status).to.equal(BAD_REQUEST);
+      expect(res.status).to.equal(HTTP_BAD_REQUEST);
     });
 
-    it("calls next(error) when processAuthCodeCallback() throws", async () => {
-      const error = new Error("MSAL failure");
-      authServiceStub.processAuthCodeCallback.rejects(error);
+    it("responds with 400 when processAuthCodeCallback returns MissingAuthCodeRequest", async () => {
+      authServiceStub.processAuthCodeCallback.resolves(
+        failure({ type: "MissingAuthCodeRequest" }),
+      );
 
       const res = await request(app)
         .post("/auth/code/callback")
         .type("form")
         .send({ code: "auth-code-abc", state: "encoded-state" });
 
-      expect(res.status).to.equal(INTERNAL_SERVER_ERROR);
-      expect(res.body.message).to.equal("MSAL failure");
+      expect(res.status).to.equal(HTTP_BAD_REQUEST);
+    });
+
+    it("responds with 400 when processAuthCodeCallback returns StateMismatch", async () => {
+      authServiceStub.processAuthCodeCallback.resolves(
+        failure({ type: "StateMismatch" }),
+      );
+
+      const res = await request(app)
+        .post("/auth/code/callback")
+        .type("form")
+        .send({ code: "auth-code-abc", state: "encoded-state" });
+
+      expect(res.status).to.equal(HTTP_BAD_REQUEST);
+    });
+
+    it("responds with 401 when processAuthCodeCallback returns TokenAcquisitionFailed", async () => {
+      authServiceStub.processAuthCodeCallback.resolves(
+        failure({ type: "TokenAcquisitionFailed", cause: new Error("MSAL") }),
+      );
+
+      const res = await request(app)
+        .post("/auth/code/callback")
+        .type("form")
+        .send({ code: "auth-code-abc", state: "encoded-state" });
+
+      expect(res.status).to.equal(HTTP_UNAUTHORIZED);
     });
   });
 
@@ -85,7 +117,7 @@ describe("authRoutes", () => {
         .send({ _csrf: csrfToken });
 
       expect(getLogoutUrlStub.calledOnce).to.be.true;
-      expect(res.status).to.equal(FOUND);
+      expect(res.status).to.equal(HTTP_FOUND);
       expect(res.headers.location).to.equal(LOGOUT_URL);
     });
 
@@ -100,7 +132,7 @@ describe("authRoutes", () => {
         .type("form")
         .send({ _csrf: csrfToken });
 
-      expect(res.status).to.equal(FOUND);
+      expect(res.status).to.equal(HTTP_FOUND);
       const rawCookies = res.headers["set-cookie"];
       const cookies: string[] = Array.isArray(rawCookies)
         ? rawCookies
@@ -114,20 +146,17 @@ describe("authRoutes", () => {
   describe("GET /auth/signin", () => {
     it("redirects to the URL returned by authService.getAuthCodeUrl()", async () => {
       const response = await request(app).get("/auth/signin");
-      expect(response.status).to.equal(FOUND);
+      expect(response.status).to.equal(HTTP_FOUND);
       expect(response.headers.location).to.equal(AUTH_CODE_URL);
     });
 
-    it("calls next(error) when getAuthCodeUrl() throws", async () => {
-      const errorMessage = "MSAL failure";
-      const error = new Error(errorMessage);
-      authServiceStub.getAuthCodeUrl.rejects(error);
+    it("responds with 500 when getAuthCodeUrl returns a MsalError", async () => {
+      authServiceStub.getAuthCodeUrl.resolves(
+        failure({ type: "MsalError", cause: new Error("MSAL failure") }),
+      );
 
       const response = await request(app).get("/auth/signin");
-      expect(response.status).to.equal(
-        INTERNAL_SERVER_ERROR,
-      );
-      expect(response.body.message).to.equal(errorMessage);
+      expect(response.status).to.equal(HTTP_INTERNAL_SERVER_ERROR);
     });
   });
 });
@@ -142,7 +171,7 @@ function createApp() {
     res.json({ csrfToken: req.csrfToken?.() });
   });
   app.use("/auth", authRouter);
-  // // Catches errors passed to next() so tests can assert on status/message
+  // Catches errors passed to next() so tests can assert on status/message
   app.use(
     (
       err: Error,
@@ -150,9 +179,7 @@ function createApp() {
       res: express.Response,
       _next: express.NextFunction,
     ) => {
-      res
-        .status(INTERNAL_SERVER_ERROR)
-        .json({ message: err.message });
+      res.status(HTTP_INTERNAL_SERVER_ERROR).json({ message: err.message });
     },
   );
   return app;

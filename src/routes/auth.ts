@@ -10,6 +10,7 @@ import {
   type Request,
   type Response,
 } from "express";
+import { HTTP_BAD_REQUEST } from "#src/constants/httpStatus.js";
 
 const router: Router = Router();
 const msalClient: ConfidentialClientApplication =
@@ -62,7 +63,7 @@ router.post(
     try {
       const parseResult = authCodeResponseSchema.safeParse(req.body);
       if (!parseResult.success) {
-        return res.status(400).send("Invalid redirect payload");
+        return res.status(HTTP_BAD_REQUEST).send("Invalid redirect payload");
       }
 
       const { data } = parseResult;

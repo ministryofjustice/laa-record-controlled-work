@@ -63,7 +63,7 @@ export class AuthService {
       const url = await this.msalClient.getAuthCodeUrl(authCodeUrlRequest);
       return success(url);
     } catch (error) {
-      devError(`Failed to generate Entra auth code URL:  ${error}`);
+      devError(`Failed to generate Entra auth code URL: ${String(error)}`);
       return failure({ type: "MsalError", cause: error });
     }
   }
@@ -107,7 +107,7 @@ export class AuthService {
 
       return success({ successRedirect });
     } catch (error) {
-      devError(`Failed to handle Entra auth redirect: ${error}`);
+      devError(`Failed to handle Entra auth redirect: ${String(error)}`);
       return failure({ type: "TokenAcquisitionFailed", cause: error });
     }
   }

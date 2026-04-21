@@ -4,12 +4,10 @@ import {
 } from "@azure/msal-node";
 import { AuthService } from "#src/services/auth.js";
 import config from "#config.js";
-import { expect, use } from "chai";
-import chaiAsPromised from "chai-as-promised";
+import { expect } from "chai";
 import type { SessionData } from "express-session";
 import sinon from "sinon";
-
-use(chaiAsPromised);
+import { AuthError } from "#types/auth-errors.js";
 
 describe("AuthService", () => {
   let msalStub: Partial<ConfidentialClientApplication>;
@@ -37,9 +35,10 @@ describe("AuthService", () => {
   afterEach(() => sinon.restore());
 
   describe("getAuthCodeUrl()", () => {
-    it("returns a URL from the MSAL client", async () => {
-      const url = await service.getAuthCodeUrl();
-      expect(url).to.equal(AUTH_CODE_URL);
+    it("returns a success with the URL from the MSAL client", async () => {
+      const result = await service.getAuthCodeUrl();
+      expect(result.isSuccess()).to.be.true;
+      expect(result.value).to.equal(AUTH_CODE_URL);
     });
 
     it("stores PKCE codes on session", async () => {
@@ -85,6 +84,15 @@ describe("AuthService", () => {
       expect(requestArg.responseMode).to.equal("form_post");
       expect(requestArg.codeChallenge).to.equal("test-challenge");
     });
+
+    it("returns a MsalError failure when MSAL throws", async () => {
+      (msalStub.getAuthCodeUrl as sinon.SinonStub).rejects(
+        new Error("MSAL failure"),
+      );
+      const result = await service.getAuthCodeUrl();
+      expect(result.isFailure()).to.be.true;
+      expect((result.value as AuthError).type).to.equal("MsalError");
+    });
   });
 
   describe("processAuthCodeCallback()", () => {
@@ -123,32 +131,31 @@ describe("AuthService", () => {
 
     it("stores serialized token cache on session.tokenCache", async () => {
       await service.processAuthCodeCallback(requestBody);
-
       expect(session.tokenCache).to.equal("{}");
     });
 
     it("stores account and idToken on session", async () => {
       await service.processAuthCodeCallback(requestBody);
-
       expect(session.account).to.deep.equal({ username: "user" });
       expect(session.idToken).to.equal("id-token");
     });
 
     it("sets session.isAuthenticated to true", async () => {
       await service.processAuthCodeCallback(requestBody);
-
       expect(session.isAuthenticated).to.be.true;
     });
 
-    it("returns successRedirect from session.returnTo", async () => {
+    it("returns a success with successRedirect from session.returnTo", async () => {
       const result = await service.processAuthCodeCallback(requestBody);
-      expect(result).to.deep.equal({ successRedirect: "/test/sucess" });
+      expect(result.isSuccess()).to.be.true;
+      expect(result.value).to.deep.equal({ successRedirect: "/test/sucess" });
     });
 
     it("defaults successRedirect to /landing when session.returnTo is unset", async () => {
       delete session.returnTo;
       const result = await service.processAuthCodeCallback(requestBody);
-      expect(result).to.deep.equal({ successRedirect: "/landing" });
+      expect(result.isSuccess()).to.be.true;
+      expect(result.value).to.deep.equal({ successRedirect: "/landing" });
     });
 
     it("clears session.authState after successful validation", async () => {
@@ -156,37 +163,40 @@ describe("AuthService", () => {
       expect(session.authState).to.be.undefined;
     });
 
-    it("throws when state does not match session.authState", async () => {
-      await expect(
-        service.processAuthCodeCallback({
-          ...requestBody,
-          state: "wrong-nonce",
-        }),
-      ).to.be.rejectedWith("State mismatch: possible CSRF attack");
+    it("returns a StateMismatch failure when state does not match session.authState", async () => {
+      const result = await service.processAuthCodeCallback({
+        ...requestBody,
+        state: "wrong-nonce",
+      });
+      expect(result.isFailure()).to.be.true;
+      expect((result.value as AuthError).type).to.equal("StateMismatch");
     });
 
-    it("throws when session.authState is missing", async () => {
+    it("returns a StateMismatch failure when session.authState is missing", async () => {
       delete session.authState;
-      await expect(
-        service.processAuthCodeCallback(requestBody),
-      ).to.be.rejectedWith("State mismatch: possible CSRF attack");
+      const result = await service.processAuthCodeCallback(requestBody);
+      expect(result.isFailure()).to.be.true;
+      expect((result.value as AuthError).type).to.equal("StateMismatch");
     });
 
-    it("throws when authCodeRequest is missing from session", async () => {
+    it("returns a MissingAuthCodeRequest failure when authCodeRequest is missing from session", async () => {
       delete session.authCodeRequest;
-
-      await expect(
-        service.processAuthCodeCallback(requestBody),
-      ).to.be.rejectedWith("Missing auth code request in session");
+      const result = await service.processAuthCodeCallback(requestBody);
+      expect(result.isFailure()).to.be.true;
+      expect((result.value as AuthError).type).to.equal(
+        "MissingAuthCodeRequest",
+      );
     });
 
-    it("propagates MSAL errors", async () => {
+    it("returns a TokenAcquisitionFailed failure when MSAL throws", async () => {
       const msalError = new Error("MSAL failure");
       (msalStub.acquireTokenByCode as sinon.SinonStub).rejects(msalError);
 
-      await expect(
-        service.processAuthCodeCallback(requestBody),
-      ).to.be.rejectedWith(msalError);
+      const result = await service.processAuthCodeCallback(requestBody);
+      expect(result.isFailure()).to.be.true;
+      expect((result.value as AuthError).type).to.equal(
+        "TokenAcquisitionFailed",
+      );
     });
   });
 

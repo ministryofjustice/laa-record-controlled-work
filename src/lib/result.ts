@@ -4,7 +4,21 @@
  * Either<E, A> represents a value that is one of two things:
  *   - Failure<E> — something went wrong, holds the error (type E)
  *   - Success<A> — everything worked, holds the result (type A)
- 
+ *
+ * Usage:
+ *   async function doThing(): Promise<Either<MyError, string>> {
+ *     if (bad) return failure({ type: 'SomethingWentWrong' });
+ *     return success('the value');
+ *   }
+ *
+ *   const result = await doThing();
+ *   if (result.isFailure()) {
+ *     // result.value is MyError here
+ *   } else {
+ *     // result.value is string here
+ *   }
+ */
+
 /**
  * Represents a failed outcome. Holds the error value E.
  *
@@ -15,30 +29,31 @@ export class Failure<E, A> {
   readonly value: E;
 
   /**
-   *
-   * @param value
+   * Creates a Failure wrapping the given error value.
+   * @param {E} value - The error value to wrap.
    */
   constructor(value: E) {
     this.value = value;
   }
 
-  // Always true on Failure — calling this narrows the type to Failure<E, A>,
-  // which tells TypeScript that result.value is E (the error type).
-  // "this is Failure<E, A>"" is called a type predicate and says "if this method returns true, treat this as a Failure".
   /**
-   *
+   * Always true on Failure — narrows the type to Failure<E, A> so TypeScript
+   * knows result.value is E (the error type) inside the if block.
+   * "this is Failure<E, A>" is a type predicate: it tells TypeScript what type
+   * this is when the method returns true.
+   * @returns {boolean} Always true.
    */
+  // eslint-disable-next-line @typescript-eslint/class-methods-use-this -- type predicate references `this` in the return type, not the body
   isFailure(): this is Failure<E, A> {
     return true;
   }
 
-  // Always false on Failure — calling this would narrow to Success<E, A>,
-  // which TypeScript uses to rule out this branch.
-  // "this is Success<E, A>"" is called a type predicate and says "if this method returns true, treat this as a Success".
-
   /**
-   *
+   * Always false on Failure — TypeScript uses this to rule out the Success
+   * branch when isFailure() has already returned true.
+   * @returns {boolean} Always false.
    */
+  // eslint-disable-next-line @typescript-eslint/class-methods-use-this -- type predicate references `this` in the return type, not the body
   isSuccess(): this is Success<E, A> {
     return false;
   }
@@ -51,23 +66,27 @@ export class Success<E, A> {
   readonly value: A;
 
   /**
-   *
-   * @param value
+   * Creates a Success wrapping the given value.
+   * @param {A} value - The success value to wrap.
    */
   constructor(value: A) {
     this.value = value;
   }
 
   /**
-   *
+   * Always false on Success — mirrors Failure.isFailure() so the union type works.
+   * @returns {boolean} Always false.
    */
+  // eslint-disable-next-line @typescript-eslint/class-methods-use-this -- type predicate references `this` in the return type, not the body
   isFailure(): this is Failure<E, A> {
     return false;
   }
 
   /**
-   *
+   * Always true on Success — narrows result.value to A (the success type).
+   * @returns {boolean} Always true.
    */
+  // eslint-disable-next-line @typescript-eslint/class-methods-use-this -- type predicate references `this` in the return type, not the body
   isSuccess(): this is Success<E, A> {
     return true;
   }
@@ -78,7 +97,8 @@ export type Either<E, A> = Failure<E, A> | Success<E, A>;
 
 /**
  * Wraps an error value in a Failure.
- * @param e
+ * @param {E} e - The error value.
+ * @returns {Either<E, A>} A Failure containing the error.
  */
 export function failure<E, A>(e: E): Either<E, A> {
   return new Failure(e);
@@ -86,7 +106,8 @@ export function failure<E, A>(e: E): Either<E, A> {
 
 /**
  * Wraps a success value in a Success.
- * @param a
+ * @param {A} a - The success value.
+ * @returns {Either<E, A>} A Success containing the value.
  */
 export function success<E, A>(a: A): Either<E, A> {
   return new Success(a);

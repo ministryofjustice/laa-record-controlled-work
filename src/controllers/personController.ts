@@ -1,5 +1,5 @@
 import { extractFormFields } from "#src/lib/dataTransformers.js";
-import { BAD_REQUEST } from "#src/constants/httpStatus.js";
+import { HTTP_BAD_REQUEST } from "#src/constants/httpStatus.js";
 import {
   getSessionData,
   storeOriginalFormData,
@@ -180,7 +180,7 @@ export function postPerson(
       const currentPersonData = getCurrentPersonData(req);
 
       // Re-render the form with errors and preserve user input
-      res.status(BAD_REQUEST).render("change-person.njk", {
+      res.status(HTTP_BAD_REQUEST).render("change-person.njk", {
         currentName: currentPersonData.fullName,
         currentAddress: currentPersonData.address,
         currentContactPreference: currentPersonData.contactPreference,
