@@ -145,7 +145,7 @@ const buildAppJs = async (
   watch = false,
 ): Promise<esbuild.BuildContext | undefined> => {
   const options: esbuild.BuildOptions = {
-    entryPoints: ["src/app.ts"],
+    entryPoints: ["src/server.ts"],
     bundle: true,
     platform: "node",
     target: "esnext",
