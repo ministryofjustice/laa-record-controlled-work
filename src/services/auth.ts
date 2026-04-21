@@ -57,10 +57,13 @@ export class AuthService {
    * @returns {Promise<Either<AuthError, string>>} The authorisation URL or an auth error.
    */
   public async getAuthCodeUrl(): Promise<Either<AuthError, string>> {
+    const authCodeUrlRequest = await this.createAuthCodeRequest();
+    if (authCodeUrlRequest.isFailure()) {
+      return failure(authCodeUrlRequest.value);
+    }
+
     try {
-      const authCodeUrlRequest: AuthorizationUrlRequest =
-        await this.createAuthCodeRequest();
-      const url = await this.msalClient.getAuthCodeUrl(authCodeUrlRequest);
+      const url = await this.msalClient.getAuthCodeUrl(authCodeUrlRequest.value);
       return success(url);
     } catch (error) {
       devError(`Failed to generate Entra auth code URL: ${String(error)}`);
@@ -146,8 +149,16 @@ export class AuthService {
    * Builds the MSAL authorisation URL request and stores PKCE state on the session.
    * @returns {Promise<AuthorizationUrlRequest>} The authorisation URL request object for MSAL.
    */
-  private async createAuthCodeRequest(): Promise<AuthorizationUrlRequest> {
-    const pkceCodes: PKCECodes = await this.getPkceCodes();
+  private async createAuthCodeRequest(): Promise<
+    Either<AuthError, AuthorizationUrlRequest>
+  > {
+    let pkceCodes: PKCECodes;
+    try {
+      pkceCodes = await this.getPkceCodes();
+    } catch (error) {
+      devError(`Failed to generate PKCE codes: ${String(error)}`);
+      return failure({ type: "PkceChallengeGeneration", cause: error });
+    }
     const { challenge, challengeMethod, verifier } = pkceCodes;
     const { returnTo } = this.session;
 
@@ -186,6 +197,6 @@ export class AuthService {
       redirectUri: authRequestDefaults.redirectUri,
     };
 
-    return authCodeUrlRequest;
+    return success(authCodeUrlRequest);
   }
 }
