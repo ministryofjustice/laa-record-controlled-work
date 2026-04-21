@@ -89,7 +89,7 @@ router.post(
         res.redirect(successRedirect);
       });
     } catch (error) {
-      next(error);
+      res.redirect("/auth/signin");
     }
   },
 );

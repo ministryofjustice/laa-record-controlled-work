@@ -7,7 +7,7 @@ import {
   type AuthenticationResult,
 } from "@azure/msal-node";
 import config from "#config.js";
-import { authScopes } from "#src/config/auth.js";
+import { authRequestDefaults } from "#src/config/auth.js";
 import { failure, success, type Either } from "#src/lib/result.js";
 import type {
   AuthCodeResponse,
@@ -169,11 +169,12 @@ export class AuthService {
 
     const authCodeUrlRequest: AuthorizationUrlRequest = {
       state: nonce,
-      scopes: authScopes,
-      redirectUri: config.entra.redirectUri,
-      responseMode: "form_post",
+      scopes: authRequestDefaults.scopes,
+      redirectUri: authRequestDefaults.redirectUri,
+      responseMode: authRequestDefaults.responseMode,
       codeChallenge: challenge,
       codeChallengeMethod: challengeMethod,
+      prompt: authRequestDefaults.prompt,
     };
 
     this.session.pkceCodes = pkceCodes;
@@ -181,8 +182,8 @@ export class AuthService {
     this.session.authCodeRequest = {
       code: "",
       codeVerifier: verifier,
-      scopes: authScopes,
-      redirectUri: config.entra.redirectUri,
+      scopes: authRequestDefaults.scopes,
+      redirectUri: authRequestDefaults.redirectUri,
     };
 
     return authCodeUrlRequest;

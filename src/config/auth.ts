@@ -9,4 +9,10 @@ export const msalConfig: Configuration = {
   },
 };
 
-export const authScopes: string[] = ["openid", "profile"];
+export const scopes: string[] = ["openid", "profile"];
+export const authRequestDefaults = {
+  responseMode: "form_post",
+  prompt: "select_account",
+  scopes,
+  redirectUri: config.entra.redirectUri,
+} as const;

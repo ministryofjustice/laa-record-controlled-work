@@ -7,6 +7,7 @@ import config from "#config.js";
 import { expect } from "chai";
 import type { SessionData } from "express-session";
 import sinon from "sinon";
+import { authRequestDefaults } from "#src/config/auth.js";
 import { AuthError } from "#types/auth-errors.js";
 
 describe("AuthService", () => {
@@ -14,6 +15,13 @@ describe("AuthService", () => {
   let session: SessionData;
   const AUTH_CODE_URL = "https://login.microsoftonline.com/auth";
   let service: AuthService;
+  const MOCK_NONCE = "test-nonce";
+  const requestBody = { code: "auth-code", state: MOCK_NONCE };
+  const MOCK_CHALLENGE_METHOD = "S256";
+  const MOCK_CHALLENGE = "test-challenge";
+  const MOCK_VERIFIER = "test-verifier";
+  const MOCK_ID_TOKEN = "id-token";
+  const MOCK_ACCOUNT = { username: "user" };
 
   beforeEach(() => {
     msalStub = {
@@ -27,8 +35,8 @@ describe("AuthService", () => {
     );
 
     sinon.stub(CryptoProvider.prototype, "generatePkceCodes").resolves({
-      verifier: "test-verifier",
-      challenge: "test-challenge",
+      verifier: MOCK_VERIFIER,
+      challenge: MOCK_CHALLENGE,
     });
   });
 
@@ -44,8 +52,8 @@ describe("AuthService", () => {
     it("stores PKCE codes on session", async () => {
       await service.getAuthCodeUrl();
       expect(session.pkceCodes).to.exist;
-      expect(session.pkceCodes!.verifier).to.equal("test-verifier");
-      expect(session.pkceCodes!.challenge).to.equal("test-challenge");
+      expect(session.pkceCodes!.verifier).to.equal(MOCK_VERIFIER);
+      expect(session.pkceCodes!.challenge).to.equal(MOCK_CHALLENGE);
     });
 
     it("stores authCodeUrlRequest and authCodeRequest on session", async () => {
@@ -78,11 +86,26 @@ describe("AuthService", () => {
       expect(session.returnTo).to.equal("/landing");
     });
 
-    it('passes responseMode: "form_post" and PKCE challenge to MSAL', async () => {
+    it("passes expected correct params to MSAL", async () => {
       await service.getAuthCodeUrl();
       const [requestArg] = (msalStub.getAuthCodeUrl as sinon.SinonStub).args[0];
-      expect(requestArg.responseMode).to.equal("form_post");
-      expect(requestArg.codeChallenge).to.equal("test-challenge");
+      expect(requestArg.responseMode).to.equal(
+        authRequestDefaults.responseMode,
+      );
+      expect(requestArg.codeChallengeMethod).to.equal(MOCK_CHALLENGE_METHOD);
+      expect(requestArg.codeChallenge).to.equal(MOCK_CHALLENGE);
+      expect(requestArg.prompt).to.equal(authRequestDefaults.prompt);
+      expect(requestArg.scopes).to.deep.equal(authRequestDefaults.scopes);
+      expect(requestArg.redirectUri).to.equal(authRequestDefaults.redirectUri);
+    });
+
+    it("returns a MsalError failure when MSAL throws", async () => {
+      (msalStub.getAuthCodeUrl as sinon.SinonStub).rejects(
+        new Error("MSAL failure"),
+      );
+      const result = await service.getAuthCodeUrl();
+      expect(result.isFailure()).to.be.true;
+      expect((result.value as AuthError).type).to.equal("MsalError");
     });
 
     it("returns a MsalError failure when MSAL throws", async () => {
@@ -96,26 +119,23 @@ describe("AuthService", () => {
   });
 
   describe("processAuthCodeCallback()", () => {
-    const NONCE = "test-nonce";
-    const requestBody = { code: "auth-code", state: NONCE };
-
     beforeEach(() => {
-      session.authState = NONCE;
+      session.authState = MOCK_NONCE;
       session.returnTo = "/test/sucess";
       session.authCodeRequest = {
         code: "",
-        codeVerifier: "test-verifier",
+        codeVerifier: MOCK_VERIFIER,
         scopes: [],
         redirectUri: "http://localhost/auth/code/callback",
       };
       session.pkceCodes = {
-        verifier: "test-verifier",
-        challenge: "test-challenge",
-        challengeMethod: "S256",
+        verifier: MOCK_VERIFIER,
+        challenge: MOCK_CHALLENGE,
+        challengeMethod: MOCK_CHALLENGE_METHOD,
       };
       msalStub.acquireTokenByCode = sinon
         .stub()
-        .resolves({ account: { username: "user" }, idToken: "id-token" });
+        .resolves({ account: MOCK_ACCOUNT, idToken: MOCK_ID_TOKEN });
       msalStub.getTokenCache = sinon
         .stub()
         .returns({ serialize: sinon.stub().returns("{}") });
@@ -126,7 +146,7 @@ describe("AuthService", () => {
       const [requestArg] = (msalStub.acquireTokenByCode as sinon.SinonStub)
         .args[0];
       expect(requestArg.code).to.equal("auth-code");
-      expect(requestArg.codeVerifier).to.equal("test-verifier");
+      expect(requestArg.codeVerifier).to.equal(MOCK_VERIFIER);
     });
 
     it("stores serialized token cache on session.tokenCache", async () => {
@@ -136,8 +156,9 @@ describe("AuthService", () => {
 
     it("stores account and idToken on session", async () => {
       await service.processAuthCodeCallback(requestBody);
-      expect(session.account).to.deep.equal({ username: "user" });
-      expect(session.idToken).to.equal("id-token");
+
+      expect(session.account).to.deep.equal(MOCK_ACCOUNT);
+      expect(session.idToken).to.equal(MOCK_ID_TOKEN);
     });
 
     it("sets session.isAuthenticated to true", async () => {
