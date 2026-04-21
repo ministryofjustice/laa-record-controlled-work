@@ -1,4 +1,5 @@
 // Configuration type definitions
+import type { SessionOptions } from "express-session";
 
 export interface AppConfig {
   port: number;
@@ -49,9 +50,10 @@ export interface Config {
   SERVICE_NAME: string | undefined;
   SERVICE_PHASE: string | undefined;
   SERVICE_URL: string | undefined;
+
   app: AppConfig;
   csrf: CsrfConfig;
-  session: SessionConfig;
+  session: SessionOptions;
   paths: PathsConfig;
   entra: EntraConfig;
 }

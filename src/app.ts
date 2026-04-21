@@ -24,7 +24,6 @@ import express from "express";
 import session from "express-session";
 import morgan from "morgan";
 
-const TRUST_FIRST_PROXY = 1;
 const ENABLE_PLAYWRIGHT_TEST_SIGNIN =
   process.env.PLAYWRIGHT_TEST_SIGNIN === "true";
 
@@ -39,6 +38,16 @@ const createApp = async (): Promise<express.Application> => {
   initializeI18nextSync();
 
   const app = express();
+
+  /* 
+  We're using NGINX as a reverse proxy - this setting is required so that
+  express reads forwarded headers to get client connection details,
+  rather than assuming NGINX is the client.
+    - req.hostname derived from X-Forwarded-Host
+    - req.protocol derived from X-Forwarded-Proto
+    - req.ip derived from X-Forwarded-For
+  */
+  app.enable("trust proxy");
 
   // Set up common middleware for handling cookies, body parsing, etc.
   setupMiddlewares(app);
@@ -72,7 +81,6 @@ const createApp = async (): Promise<express.Application> => {
   app.disable("x-powered-by");
 
   // Set up cookie security for sessions
-  app.set("trust proxy", TRUST_FIRST_PROXY);
   app.use(session(config.session));
 
   // Set up locale middleware for internationalization
