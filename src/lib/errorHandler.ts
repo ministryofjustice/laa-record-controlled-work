@@ -8,19 +8,19 @@
  * - Structured logging
  */
 
-import { devError } from "./index.js";
-
-// HTTP Status Code Constants
-const BAD_REQUEST = 400;
-const UNAUTHORIZED = 401;
-const FORBIDDEN = 403;
-const NOT_FOUND = 404;
-const REQUEST_TIMEOUT = 408;
-const TOO_MANY_REQUESTS = 429;
-const INTERNAL_SERVER_ERROR = 500;
-const BAD_GATEWAY = 502;
-const SERVICE_UNAVAILABLE = 503;
-const GATEWAY_TIMEOUT = 504;
+import {
+  BAD_GATEWAY,
+  BAD_REQUEST,
+  devError,
+  FORBIDDEN,
+  GATEWAY_TIMEOUT,
+  INTERNAL_SERVER_ERROR,
+  NOT_FOUND,
+  REQUEST_TIMEOUT,
+  SERVICE_UNAVAILABLE,
+  TOO_MANY_REQUESTS,
+  UNAUTHORIZED,
+} from "./index.js";
 
 /**
  * Type guard for Axios error with response

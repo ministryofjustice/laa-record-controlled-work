@@ -25,13 +25,13 @@ router.get(
     );
 
     try {
-      const result = await authService.getAuthCodeUrl();
-      if (result.isFailure()) {
-        const { status, message } = mapAuthErrorToHttp(result.value);
+      const authCodeUrl = await authService.getAuthCodeUrl();
+      if (authCodeUrl.isFailure()) {
+        const { status, message } = mapAuthErrorToHttp(authCodeUrl.value);
         return res.status(status).send(message);
       }
 
-      res.redirect(result.value);
+      res.redirect(authCodeUrl.value);
     } catch (error) {
       next(error);
     }
@@ -61,21 +61,20 @@ router.post(
   "/code/callback",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const parseResult = authCodeResponseSchema.safeParse(req.body);
-      if (!parseResult.success) {
+      const parseAuthCodeResponse = authCodeResponseSchema.safeParse(req.body);
+      if (!parseAuthCodeResponse.success) {
         return res.status(BAD_REQUEST).send("Invalid redirect payload");
       }
 
-      const { data } = parseResult;
+      const { data } = parseAuthCodeResponse;
       const authService = AuthService.create(req.session, msalClient);
-      const result = await authService.processAuthCodeCallback(data);
+      const sucessfulRedirect = await authService.processAuthCodeCallback(data);
 
-      if (result.isFailure()) {
-        const { status, message } = mapAuthErrorToHttp(result.value);
+      if (sucessfulRedirect.isFailure()) {
+        const { status, message } = mapAuthErrorToHttp(sucessfulRedirect.value);
         return res.status(status).send(message);
       }
 
-      const { successRedirect } = result.value;
       const { isAuthenticated, idToken, account, tokenCache } = req.session;
       req.session.regenerate((error) => {
         if (error !== undefined) {
@@ -86,7 +85,7 @@ router.post(
         req.session.idToken = idToken;
         req.session.account = account;
         req.session.tokenCache = tokenCache;
-        res.redirect(successRedirect);
+        res.redirect(sucessfulRedirect.value);
       });
     } catch (error) {
       res.redirect("/auth/signin");

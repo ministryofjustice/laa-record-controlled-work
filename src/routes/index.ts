@@ -8,7 +8,6 @@ import express from "express";
 // Create a new router
 const router = express.Router();
 
-
 /* GET home page. */
 router.get("/", (req: Request, res: Response): void => {
   res.render("main/index");

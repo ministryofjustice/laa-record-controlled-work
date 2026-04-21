@@ -31,7 +31,7 @@ describe("authRoutes", () => {
       getAuthCodeUrl: sinon.stub().resolves(success(AUTH_CODE_URL)),
       processAuthCodeCallback: sinon
         .stub()
-        .resolves(success({ successRedirect: SUCCESS_REDIRECT })),
+        .resolves(success(SUCCESS_REDIRECT)),
     };
     sinon
       .stub(AuthService, "create")

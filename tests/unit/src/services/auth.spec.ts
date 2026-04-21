@@ -170,14 +170,14 @@ describe("AuthService", () => {
     it("returns a success with successRedirect from session.returnTo", async () => {
       const result = await service.processAuthCodeCallback(requestBody);
       expect(result.isSuccess()).to.be.true;
-      expect(result.value).to.deep.equal({ successRedirect:  SUCCESS_REDIRECT});
+      expect(result.value).to.equal(SUCCESS_REDIRECT);
     });
 
     it("defaults successRedirect to /landing when session.returnTo is unset", async () => {
       delete session.returnTo;
       const result = await service.processAuthCodeCallback(requestBody);
       expect(result.isSuccess()).to.be.true;
-      expect(result.value).to.deep.equal({ successRedirect: "/landing" });
+      expect(result.value).to.equal("/landing");
     });
 
     it("clears session.authState after successful validation", async () => {

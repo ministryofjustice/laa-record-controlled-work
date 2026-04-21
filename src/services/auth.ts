@@ -9,11 +9,7 @@ import {
 import config from "#config.js";
 import { authRequestDefaults } from "#src/config/auth.js";
 import { failure, success, type Either } from "#src/lib/result.js";
-import type {
-  AuthCodeResponse,
-  AuthState,
-  PKCECodes,
-} from "#types/auth-types.js";
+import type { AuthCodeResponse, PKCECodes } from "#types/auth-types.js";
 import type { AuthError } from "#types/auth-errors.js";
 import { devError } from "#src/lib/devLogger.js";
 
@@ -74,11 +70,11 @@ export class AuthService {
   /**
    * Exchanges the authorisation code from the Entra redirect for tokens and updates the session.
    * @param {AuthCodeResponse} requestBody - The validated redirect payload containing the auth code and state.
-   * @returns {Promise<Either<AuthError, AuthState>>} The decoded auth state or an auth error.
+   * @returns {Promise<Either<AuthError, string>>} The decoded auth state or an auth error.
    */
   public async processAuthCodeCallback(
     requestBody: AuthCodeResponse,
-  ): Promise<Either<AuthError, AuthState>> {
+  ): Promise<Either<AuthError, string>> {
     if (this.session.authCodeRequest === undefined) {
       return failure({ type: "MissingAuthCodeRequest" });
     }
@@ -108,7 +104,7 @@ export class AuthService {
       this.session.account = account ?? undefined;
       this.session.isAuthenticated = true;
 
-      return success({ successRedirect });
+      return success(successRedirect);
     } catch (error) {
       devError(`Failed to handle Entra auth redirect: ${String(error)}`);
       return failure({ type: "TokenAcquisitionFailed", cause: error });
