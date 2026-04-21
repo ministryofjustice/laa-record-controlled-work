@@ -8,11 +8,14 @@ import {
 } from "@azure/msal-node";
 import config from "#config.js";
 import { authScopes } from "#src/config/auth.js";
+import { failure, success, type Either } from "#src/lib/result.js";
 import type {
   AuthCodeResponse,
   AuthState,
   PKCECodes,
 } from "#types/auth-types.js";
+import type { AuthError } from "#types/auth-errors.js";
+import { devError } from "#src/lib/devLogger.js";
 
 /**
  * Handles Microsoft Entra ID (MSAL) authentication flows including
@@ -51,36 +54,37 @@ export class AuthService {
 
   /**
    * Generates the Microsoft Entra ID authorisation URL to begin the PKCE sign-in flow.
-   * @returns {Promise<string>} The authorisation URL to redirect the user to.
+   * @returns {Promise<Either<AuthError, string>>} The authorisation URL or an auth error.
    */
-  public async getAuthCodeUrl(): Promise<string> {
-    const authCodeUrlRequest: AuthorizationUrlRequest =
-      await this.createAuthCodeRequest();
+  public async getAuthCodeUrl(): Promise<Either<AuthError, string>> {
     try {
-      return await this.msalClient.getAuthCodeUrl(authCodeUrlRequest);
+      const authCodeUrlRequest: AuthorizationUrlRequest =
+        await this.createAuthCodeRequest();
+      const url = await this.msalClient.getAuthCodeUrl(authCodeUrlRequest);
+      return success(url);
     } catch (error) {
-      console.error("Failed to generate Entra auth code URL:", error);
-      throw error;
+      devError(`Failed to generate Entra auth code URL:  ${error}`);
+      return failure({ type: "MsalError", cause: error });
     }
   }
 
   /**
    * Exchanges the authorisation code from the Entra redirect for tokens and updates the session.
    * @param {AuthCodeResponse} requestBody - The validated redirect payload containing the auth code and state.
-   * @returns {Promise<AuthState>} The decoded auth state containing the post-login redirect URL.
+   * @returns {Promise<Either<AuthError, AuthState>>} The decoded auth state or an auth error.
    */
   public async processAuthCodeCallback(
     requestBody: AuthCodeResponse,
-  ): Promise<AuthState> {
+  ): Promise<Either<AuthError, AuthState>> {
     if (this.session.authCodeRequest === undefined) {
-      throw new Error("Missing auth code request in session");
+      return failure({ type: "MissingAuthCodeRequest" });
     }
 
     if (
       this.session.authState === undefined ||
       requestBody.state !== this.session.authState
     ) {
-      throw new Error("State mismatch: possible CSRF attack");
+      return failure({ type: "StateMismatch" });
     }
     this.session.authState = undefined;
 
@@ -101,10 +105,10 @@ export class AuthService {
       this.session.account = account ?? undefined;
       this.session.isAuthenticated = true;
 
-      return { successRedirect };
+      return success({ successRedirect });
     } catch (error) {
-      console.error("Failed to handle Entra auth redirect:", error);
-      throw error;
+      devError(`Failed to handle Entra auth redirect: ${error}`);
+      return failure({ type: "TokenAcquisitionFailed", cause: error });
     }
   }
 
