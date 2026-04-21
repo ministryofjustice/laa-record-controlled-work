@@ -77,3 +77,6 @@ export {
   createProcessedError,
   extractAndLogError,
 } from "./errorHandler.js";
+
+// Functional error handling
+export { failure, success, Failure, Success, type Either } from "./result.js";
