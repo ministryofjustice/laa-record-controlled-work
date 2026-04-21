@@ -6,7 +6,11 @@ import express from "express";
 import session from "express-session";
 import sinon from "sinon";
 import request from "supertest";
-import { FOUND, BAD_REQUEST, INTERNAL_SERVER_ERROR } from "#src/constants/httpStatus.js";
+import {
+  FOUND,
+  BAD_REQUEST,
+  INTERNAL_SERVER_ERROR,
+} from "#src/constants/httpStatus.js";
 
 describe("authRoutes", () => {
   let authServiceStub: {
@@ -59,7 +63,7 @@ describe("authRoutes", () => {
       expect(res.status).to.equal(BAD_REQUEST);
     });
 
-    it("calls next(error) when processAuthCodeCallback() throws", async () => {
+    it("redirects to /auth/signin when processAuthCodeCallback() throws", async () => {
       const error = new Error("MSAL failure");
       authServiceStub.processAuthCodeCallback.rejects(error);
 
@@ -68,8 +72,8 @@ describe("authRoutes", () => {
         .type("form")
         .send({ code: "auth-code-abc", state: "encoded-state" });
 
-      expect(res.status).to.equal(INTERNAL_SERVER_ERROR);
-      expect(res.body.message).to.equal("MSAL failure");
+      expect(res.status).to.equal(FOUND);
+      expect(res.headers.location).to.equal("/auth/signin");
     });
   });
 
@@ -124,9 +128,7 @@ describe("authRoutes", () => {
       authServiceStub.getAuthCodeUrl.rejects(error);
 
       const response = await request(app).get("/auth/signin");
-      expect(response.status).to.equal(
-        INTERNAL_SERVER_ERROR,
-      );
+      expect(response.status).to.equal(INTERNAL_SERVER_ERROR);
       expect(response.body.message).to.equal(errorMessage);
     });
   });
@@ -150,9 +152,7 @@ function createApp() {
       res: express.Response,
       _next: express.NextFunction,
     ) => {
-      res
-        .status(INTERNAL_SERVER_ERROR)
-        .json({ message: err.message });
+      res.status(INTERNAL_SERVER_ERROR).json({ message: err.message });
     },
   );
   return app;
