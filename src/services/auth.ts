@@ -57,13 +57,13 @@ export class AuthService {
    * @returns {Promise<Either<AuthError, string>>} The authorisation URL or an auth error.
    */
   public async getAuthCodeUrl(): Promise<Either<AuthError, string>> {
-    const authCodeUrlRequest = await this.createAuthCodeRequest();
-    if (authCodeUrlRequest.isFailure()) {
-      return failure(authCodeUrlRequest.value);
-    }
+    const pkceCodes: Either<AuthError, PKCECodes> = await this.getPkceCodes();
+    if (pkceCodes.isFailure()) return failure(pkceCodes.value);
+
+    const authCodeUrlRequest = this.createAuthCodeRequest(pkceCodes.value);
 
     try {
-      const url = await this.msalClient.getAuthCodeUrl(authCodeUrlRequest.value);
+      const url = await this.msalClient.getAuthCodeUrl(authCodeUrlRequest);
       return success(url);
     } catch (error) {
       devError(`Failed to generate Entra auth code URL: ${String(error)}`);
@@ -134,31 +134,23 @@ export class AuthService {
    * Generates a PKCE code verifier and challenge pair using the S256 method.
    * @returns {Promise<PKCECodes>} The generated PKCE codes.
    */
-  private async getPkceCodes(): Promise<PKCECodes> {
-    const { verifier, challenge } =
-      await this.cryptoProvider.generatePkceCodes();
-
-    return {
-      challengeMethod: "S256",
-      verifier,
-      challenge,
-    };
-  }
-
-  /**
-   * Builds the MSAL authorisation URL request and stores PKCE state on the session.
-   * @returns {Promise<AuthorizationUrlRequest>} The authorisation URL request object for MSAL.
-   */
-  private async createAuthCodeRequest(): Promise<
-    Either<AuthError, AuthorizationUrlRequest>
-  > {
-    let pkceCodes: PKCECodes;
+  private async getPkceCodes(): Promise<Either<AuthError, PKCECodes>> {
     try {
-      pkceCodes = await this.getPkceCodes();
+      const { verifier, challenge } =
+        await this.cryptoProvider.generatePkceCodes();
+      return success({ challengeMethod: "S256", verifier, challenge });
     } catch (error) {
       devError(`Failed to generate PKCE codes: ${String(error)}`);
       return failure({ type: "PkceChallengeGeneration", cause: error });
     }
+  }
+
+  /**
+   * Builds the MSAL authorisation URL request and stores PKCE state on the session.
+   * @param pkceCodes - The PKCE code verifier, challenge, and challenge method.
+   * @returns {AuthorizationUrlRequest} The authorisation URL request object for MSAL.
+   */
+  private createAuthCodeRequest(pkceCodes: PKCECodes): AuthorizationUrlRequest {
     const { challenge, challengeMethod, verifier } = pkceCodes;
     const { returnTo } = this.session;
 
@@ -197,6 +189,6 @@ export class AuthService {
       redirectUri: authRequestDefaults.redirectUri,
     };
 
-    return success(authCodeUrlRequest);
+    return authCodeUrlRequest;
   }
 }

@@ -15,13 +15,14 @@ describe("AuthService", () => {
   let session: SessionData;
   const AUTH_CODE_URL = "https://login.microsoftonline.com/auth";
   let service: AuthService;
-  const MOCK_NONCE = "test-nonce";
-  const requestBody = { code: "auth-code", state: MOCK_NONCE };
-  const MOCK_CHALLENGE_METHOD = "S256";
-  const MOCK_CHALLENGE = "test-challenge";
-  const MOCK_VERIFIER = "test-verifier";
-  const MOCK_ID_TOKEN = "id-token";
-  const MOCK_ACCOUNT = { username: "user" };
+  const NONCE = "test-nonce";
+  const requestBody = { code: "auth-code", state: NONCE };
+  const CHALLENGE_METHOD = "S256";
+  const CHALLENGE = "test-challenge";
+  const VERIFIER = "test-verifier";
+  const ID_TOKEN = "id-token";
+  const ACCOUNT = { username: "user" };
+  const SUCCESS_REDIRECT = "/test/success";
 
   beforeEach(() => {
     msalStub = {
@@ -35,8 +36,8 @@ describe("AuthService", () => {
     );
 
     sinon.stub(CryptoProvider.prototype, "generatePkceCodes").resolves({
-      verifier: MOCK_VERIFIER,
-      challenge: MOCK_CHALLENGE,
+      verifier: VERIFIER,
+      challenge: CHALLENGE,
     });
   });
 
@@ -52,8 +53,8 @@ describe("AuthService", () => {
     it("stores PKCE codes on session", async () => {
       await service.getAuthCodeUrl();
       expect(session.pkceCodes).to.exist;
-      expect(session.pkceCodes!.verifier).to.equal(MOCK_VERIFIER);
-      expect(session.pkceCodes!.challenge).to.equal(MOCK_CHALLENGE);
+      expect(session.pkceCodes!.verifier).to.equal(VERIFIER);
+      expect(session.pkceCodes!.challenge).to.equal(CHALLENGE);
     });
 
     it("stores authCodeUrlRequest and authCodeRequest on session", async () => {
@@ -92,8 +93,8 @@ describe("AuthService", () => {
       expect(requestArg.responseMode).to.equal(
         authRequestDefaults.responseMode,
       );
-      expect(requestArg.codeChallengeMethod).to.equal(MOCK_CHALLENGE_METHOD);
-      expect(requestArg.codeChallenge).to.equal(MOCK_CHALLENGE);
+      expect(requestArg.codeChallengeMethod).to.equal(CHALLENGE_METHOD);
+      expect(requestArg.codeChallenge).to.equal(CHALLENGE);
       expect(requestArg.prompt).to.equal(authRequestDefaults.prompt);
       expect(requestArg.scopes).to.deep.equal(authRequestDefaults.scopes);
       expect(requestArg.redirectUri).to.equal(authRequestDefaults.redirectUri);
@@ -120,22 +121,22 @@ describe("AuthService", () => {
 
   describe("processAuthCodeCallback()", () => {
     beforeEach(() => {
-      session.authState = MOCK_NONCE;
-      session.returnTo = "/test/sucess";
+      session.authState = NONCE;
+      session.returnTo = SUCCESS_REDIRECT;
       session.authCodeRequest = {
         code: "",
-        codeVerifier: MOCK_VERIFIER,
+        codeVerifier: VERIFIER,
         scopes: [],
         redirectUri: "http://localhost/auth/code/callback",
       };
       session.pkceCodes = {
-        verifier: MOCK_VERIFIER,
-        challenge: MOCK_CHALLENGE,
-        challengeMethod: MOCK_CHALLENGE_METHOD,
+        verifier: VERIFIER,
+        challenge: CHALLENGE,
+        challengeMethod: CHALLENGE_METHOD,
       };
       msalStub.acquireTokenByCode = sinon
         .stub()
-        .resolves({ account: MOCK_ACCOUNT, idToken: MOCK_ID_TOKEN });
+        .resolves({ account: ACCOUNT, idToken: ID_TOKEN });
       msalStub.getTokenCache = sinon
         .stub()
         .returns({ serialize: sinon.stub().returns("{}") });
@@ -146,7 +147,7 @@ describe("AuthService", () => {
       const [requestArg] = (msalStub.acquireTokenByCode as sinon.SinonStub)
         .args[0];
       expect(requestArg.code).to.equal("auth-code");
-      expect(requestArg.codeVerifier).to.equal(MOCK_VERIFIER);
+      expect(requestArg.codeVerifier).to.equal(VERIFIER);
     });
 
     it("stores serialized token cache on session.tokenCache", async () => {
@@ -157,8 +158,8 @@ describe("AuthService", () => {
     it("stores account and idToken on session", async () => {
       await service.processAuthCodeCallback(requestBody);
 
-      expect(session.account).to.deep.equal(MOCK_ACCOUNT);
-      expect(session.idToken).to.equal(MOCK_ID_TOKEN);
+      expect(session.account).to.deep.equal(ACCOUNT);
+      expect(session.idToken).to.equal(ID_TOKEN);
     });
 
     it("sets session.isAuthenticated to true", async () => {
@@ -169,7 +170,7 @@ describe("AuthService", () => {
     it("returns a success with successRedirect from session.returnTo", async () => {
       const result = await service.processAuthCodeCallback(requestBody);
       expect(result.isSuccess()).to.be.true;
-      expect(result.value).to.deep.equal({ successRedirect: "/test/sucess" });
+      expect(result.value).to.deep.equal({ successRedirect:  SUCCESS_REDIRECT});
     });
 
     it("defaults successRedirect to /landing when session.returnTo is unset", async () => {
