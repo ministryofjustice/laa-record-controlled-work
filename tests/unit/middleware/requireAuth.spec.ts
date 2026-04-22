@@ -54,7 +54,7 @@ function createMocks(options: { originalUrl?: string; isAuthenticated?: boolean 
     const session = { isAuthenticated: options.isAuthenticated } as Request['session'];
     const req = { originalUrl: options.originalUrl ?? '/', session } as Partial<Request>;
     const redirect = sinon.stub();
-    const res = { redirect } as Partial<Response>;
+    const res = { redirect, locals: {} } as Partial<Response>;
     const next = sinon.stub();
     return { req: req as Request, res: res as Response, next, redirect, session };
 }

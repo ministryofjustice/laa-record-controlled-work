@@ -22,6 +22,8 @@ export function requireAuth(
   }
 
   if (session.isAuthenticated) {
+    res.locals.isAuthenticated = session.isAuthenticated;
+    res.locals.user = session.account;
     next();
     return;
   }
