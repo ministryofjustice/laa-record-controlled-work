@@ -2,7 +2,7 @@ import config from "#config.js";
 import { msalConfig } from "#src/config/auth.js";
 import { AuthService } from "#src/services/auth.js";
 import { authCodeResponseSchema } from "#types/auth-types.js";
-import { mapAuthErrorToHttp } from "#src/lib/authErrors.js";
+import { mapAuthErrorToHttp } from "#src/lib/authErrorHttpResponses.js";
 import { ConfidentialClientApplication } from "@azure/msal-node";
 import {
   Router,

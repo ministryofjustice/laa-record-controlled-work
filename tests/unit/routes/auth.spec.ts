@@ -91,9 +91,9 @@ describe("authRoutes", () => {
       expect(res.status).to.equal(BAD_REQUEST);
     });
 
-    it("responds with 401 when processAuthCodeCallback returns TokenAcquisitionFailed", async () => {
+    it("responds with 401 when processAuthCodeCallback returns TokenAcquisitionError", async () => {
       authServiceStub.processAuthCodeCallback.resolves(
-        failure({ type: "TokenAcquisitionFailed", cause: new Error("MSAL") }),
+        failure({ type: "TokenAcquisitionError", cause: new Error("MSAL") }),
       );
 
       const res = await request(app)

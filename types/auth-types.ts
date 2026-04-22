@@ -14,12 +14,29 @@ export const authCodeResponseSchema = z.object({
 
 export type AuthCodeResponse = z.infer<typeof authCodeResponseSchema>;
 
-export type AuthError =
-  | { type: "MissingAuthCodeRequest" }
-  | { type: "StateMismatch" }
-  | { type: "TokenAcquisitionFailed"; cause: unknown }
-  | { type: "PkceChallengeGeneration"; cause: unknown }
-  | { type: "MsalError"; cause: unknown };
+export interface AuthError {
+  type: string;
+  cause?: unknown;
+}
+
+export interface MissingAuthCodeRequest extends AuthError {
+  type: "MissingAuthCodeRequest";
+}
+export interface StateMismatch extends AuthError {
+  type: "StateMismatch";
+}
+export interface TokenAcquisitionError extends AuthError {
+  type: "TokenAcquisitionError";
+  cause: unknown;
+}
+export interface PkceGenerationError extends AuthError {
+  type: "PkceGenerationError";
+  cause: unknown;
+}
+export interface MsalError extends AuthError {
+  type: "MsalError";
+  cause: unknown;
+}
 
 export interface PKCECodes {
   challengeMethod: string;

@@ -13,6 +13,7 @@ import type {
   AuthCodeResponse,
   AuthError,
   PKCECodes,
+  PkceGenerationError,
 } from "#types/auth-types.js";
 import { devError } from "#src/lib/devLogger.js";
 
@@ -56,7 +57,8 @@ export class AuthService {
    * @returns {Promise<Either<AuthError, string>>} The authorisation URL or an auth error.
    */
   public async getAuthCodeUrl(): Promise<Either<AuthError, string>> {
-    const pkceCodes: Either<AuthError, PKCECodes> = await this.getPkceCodes();
+    const pkceCodes: Either<PkceGenerationError, PKCECodes> =
+      await this.getPkceCodes();
     if (pkceCodes.isFailure()) return failure(pkceCodes.value);
 
     const authCodeUrlRequest = this.createAuthCodeRequest(pkceCodes.value);
@@ -110,7 +112,7 @@ export class AuthService {
       return success(successRedirect);
     } catch (error) {
       devError(`Failed to handle Entra auth redirect: ${String(error)}`);
-      return failure({ type: "TokenAcquisitionFailed", cause: error });
+      return failure({ type: "TokenAcquisitionError", cause: error });
     }
   }
 
@@ -133,14 +135,16 @@ export class AuthService {
    * Generates a PKCE code verifier and challenge pair using the S256 method.
    * @returns {Promise<PKCECodes>} The generated PKCE codes.
    */
-  private async getPkceCodes(): Promise<Either<AuthError, PKCECodes>> {
+  private async getPkceCodes(): Promise<
+    Either<PkceGenerationError, PKCECodes>
+  > {
     try {
       const { verifier, challenge } =
         await this.cryptoProvider.generatePkceCodes();
       return success({ challengeMethod: "S256", verifier, challenge });
     } catch (error) {
       devError(`Failed to generate PKCE codes: ${String(error)}`);
-      return failure({ type: "PkceChallengeGeneration", cause: error });
+      return failure({ type: "PkceGenerationError", cause: error });
     }
   }
 

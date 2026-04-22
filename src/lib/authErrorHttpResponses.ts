@@ -5,7 +5,7 @@ import {
 } from "#src/constants/httpStatus.js";
 import type { AuthError } from "#types/auth-types.js";
 
-export const AUTH_ERROR_MAP: Record<
+const AUTH_ERROR_HTTP_RESPONSES: Record<
   AuthError["type"],
   { status: number; message: string }
 > = {
@@ -17,11 +17,11 @@ export const AUTH_ERROR_MAP: Record<
     status: BAD_REQUEST,
     message: "State mismatch: possible CSRF attack",
   },
-  TokenAcquisitionFailed: {
+  TokenAcquisitionError: {
     status: UNAUTHORIZED,
     message: "Token acquisition failed",
   },
-  PkceChallengeGeneration: {
+  PkceGenerationError: {
     status: INTERNAL_SERVER_ERROR,
     message: "Failed to generate PKCE challenge",
   },
@@ -40,5 +40,5 @@ export function mapAuthErrorToHttp(error: AuthError): {
   status: number;
   message: string;
 } {
-  return AUTH_ERROR_MAP[error.type];
+  return AUTH_ERROR_HTTP_RESPONSES[error.type];
 }

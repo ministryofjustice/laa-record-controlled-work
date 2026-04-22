@@ -201,14 +201,14 @@ describe("AuthService", () => {
       );
     });
 
-    it("returns a TokenAcquisitionFailed failure when MSAL throws", async () => {
+    it("returns a TokenAcquisitionError failure when MSAL throws", async () => {
       const msalError = new Error("MSAL failure");
       (msalStub.acquireTokenByCode as sinon.SinonStub).rejects(msalError);
 
       const result = await service.processAuthCodeCallback(requestBody);
       expect(result.isFailure()).to.be.true;
       expect((result.value as AuthError).type).to.equal(
-        "TokenAcquisitionFailed",
+        "TokenAcquisitionError",
       );
     });
   });
