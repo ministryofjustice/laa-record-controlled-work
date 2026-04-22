@@ -22,6 +22,7 @@ export function requireAuth(
   }
 
   if (session.isAuthenticated) {
+    res.locals.isAuthenticated = session.isAuthenticated
     next();
     return;
   }

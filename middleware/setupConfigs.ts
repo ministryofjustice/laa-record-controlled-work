@@ -21,7 +21,6 @@ export const setupConfig = (app: Application): void => {
     next: NextFunction,
   ): void => {
     res.locals.config = config;
-    res.locals.isAuthenticated = Boolean(req.session?.isAuthenticated);
     next();
   };
   app.use(configMiddleware);
