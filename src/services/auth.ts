@@ -9,8 +9,11 @@ import {
 import config from "#config.js";
 import { authRequestDefaults } from "#src/config/auth.js";
 import { failure, success, type Either } from "#src/lib/result.js";
-import type { AuthCodeResponse, PKCECodes } from "#types/auth-types.js";
-import type { AuthError } from "#types/auth-errors.js";
+import type {
+  AuthCodeResponse,
+  AuthError,
+  PKCECodes,
+} from "#types/auth-types.js";
 import { devError } from "#src/lib/devLogger.js";
 
 /**

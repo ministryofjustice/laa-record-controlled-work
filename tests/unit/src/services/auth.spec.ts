@@ -8,7 +8,7 @@ import { expect } from "chai";
 import type { SessionData } from "express-session";
 import sinon from "sinon";
 import { authRequestDefaults } from "#src/config/auth.js";
-import { AuthError } from "#types/auth-errors.js";
+import type { AuthError } from "#types/auth-types.js";
 
 describe("AuthService", () => {
   let msalStub: Partial<ConfidentialClientApplication>;
