@@ -89,28 +89,3 @@ describe("authRoutes", () => {
     });
   });
 });
-
-// function createApp() {
-//   const app = express();
-//   app.use(express.urlencoded({ extended: false }));
-//   app.use(session({ secret: "test", resave: false, saveUninitialized: true }));
-//   setupCsrf(app);
-//   // Exposes a CSRF token so tests can make valid POST requests
-//   app.get("/csrf-token", (req, res) => {
-//     res.json({ csrfToken: req.csrfToken?.() });
-//   });
-//   app.use("/auth", authRouter);
-//   // // Catches errors passed to next() so tests can assert on status/message
-//   app.use(
-//     (
-//       err: Error,
-//       _req: express.Request,
-//       res: express.Response,
-//       _next: express.NextFunction,
-//     ) => {
-//       res.status(INTERNAL_SERVER_ERROR).json({ message: err.message });
-//     },
-//   );
-//   return app;
-// }
-
