@@ -17,6 +17,7 @@ describe('setupConfig middleware', () => {
     app.get('/test', async (req, res) => {
       const config = (await import('#config.js')).default;
       expect(res.locals.config).to.deep.equal(config);
+      expect(res.locals.isAuthenticated).to.be.false;
       res.sendStatus(200);
     });
 
