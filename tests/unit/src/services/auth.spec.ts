@@ -15,7 +15,7 @@ use(chaiAsPromised);
 describe("AuthService", () => {
   let msalStub: Partial<ConfidentialClientApplication>;
   let session: SessionData;
-  const AUTH_CODE_URL = "https://login.microsoftonline.com/auth";
+  const AUTH_CODE_URL = "https://login.microsoftonline.com/auth/";
   let service: AuthService;
   const MOCK_NONCE = "test-nonce";
   const requestBody = { code: "auth-code", state: MOCK_NONCE };

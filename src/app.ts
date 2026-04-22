@@ -28,7 +28,7 @@ const ENABLE_PLAYWRIGHT_TEST_SIGNIN =
 
 /**
  * Creates and configures an Express application.
- * Then starts the server listening on the configured port.
+ * Server startup is handled separately in src/server.ts.
  *
  * @returns {Promise<import('express').Application>} The configured Express application
  */

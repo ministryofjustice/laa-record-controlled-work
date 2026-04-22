@@ -21,7 +21,7 @@ describe("authRoutes", () => {
     app = await createApp();
   });
 
-  const AUTH_CODE_URL = "https://login.microsoftonline.com/auth";
+  const AUTH_CODE_URL = "https://login.microsoftonline.com/auth/";
   const SUCCESS_REDIRECT = "/case/123";
 
   beforeEach(() => {
