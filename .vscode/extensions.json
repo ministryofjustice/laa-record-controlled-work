@@ -1,0 +1,10 @@
+{
+  "recommendations": [
+    "dbaeumer.vscode-eslint",
+    "1password.op-vscode",
+    "ginfuru.better-nunjucks",
+    "circleci.circleci",
+    "github.vscode-github-actions",
+    "ms-kubernetes-tools.vscode-kubernetes-tools"
+  ]
+}
