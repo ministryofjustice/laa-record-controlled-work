@@ -68,10 +68,10 @@ router.post(
 
       const { data } = parseAuthCodeResponse;
       const authService = AuthService.create(req.session, msalClient);
-      const sucessfulRedirect = await authService.processAuthCodeCallback(data);
+      const successfulRedirect = await authService.processAuthCodeCallback(data);
 
-      if (sucessfulRedirect.isFailure()) {
-        const { status, message } = mapAuthErrorToHttp(sucessfulRedirect.value);
+      if (successfulRedirect.isFailure()) {
+        const { status, message } = mapAuthErrorToHttp(successfulRedirect.value);
         return res.status(status).send(message);
       }
 
@@ -85,7 +85,7 @@ router.post(
         req.session.idToken = idToken;
         req.session.account = account;
         req.session.tokenCache = tokenCache;
-        res.redirect(sucessfulRedirect.value);
+        res.redirect(successfulRedirect.value);
       });
     } catch (error) {
       res.redirect("/auth/signin");
