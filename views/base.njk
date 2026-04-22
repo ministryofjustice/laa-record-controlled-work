@@ -25,25 +25,7 @@
 {% endblock %}
 
 {% block footer %}
-  {{ govukFooter({
-    meta: {
-      items: [
-        {
-          href: "#",
-          text: t('navigation.footer.accessibility')
-        },
-        {
-          href: "#",
-          text: t('navigation.footer.cookiePolicy')
-        },
-        {
-          href: "#",
-          text: t('navigation.footer.privacyPolicy')
-        }
-      ],
-      html: 'Built by <a href="' + config.DEPARTMENT_URL +'" class="govuk-footer__link">' + config.DEPARTMENT_NAME + '</a>'
-    }
-  }) }}
+  {% include "./components/footer.njk" %}
 {% endblock %}
 
 {% block bodyEnd %}

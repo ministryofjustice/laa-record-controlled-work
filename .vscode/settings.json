@@ -1,5 +1,17 @@
 {
   "files.associations": {
     "*.snyk": "yaml"
+  },
+  // force eslint formatting
+  "editor.formatOnSave": false,
+  "[typescript]": {
+    "editor.formatOnSave": false
+  },
+  "[javascript]": {
+    "editor.formatOnSave": false
+  },
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "never"
   }
 }
