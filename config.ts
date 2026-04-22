@@ -63,6 +63,7 @@ const config: Config = {
   SERVICE_NAME: process.env.SERVICE_NAME,
   SERVICE_PHASE: process.env.SERVICE_PHASE,
   SERVICE_URL: process.env.SERVICE_URL,
+  REDIS_URL: process.env.REDIS_URL,
   session: {
     secret: process.env.SESSION_SECRET,
     name: process.env.SESSION_NAME,
