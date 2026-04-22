@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers -- This is a cleaner way to define and destructure variables */
 
 export const HTTP_STATUS = {
-  OK: 302,
+  OK: 200,
   FOUND: 302,
   BAD_REQUEST: 400,
   UNAUTHORIZED: 401,
