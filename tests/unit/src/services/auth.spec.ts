@@ -108,15 +108,6 @@ describe("AuthService", () => {
       expect(result.isFailure()).to.be.true;
       expect((result.value as AuthError).type).to.equal("MsalError");
     });
-
-    it("returns a MsalError failure when MSAL throws", async () => {
-      (msalStub.getAuthCodeUrl as sinon.SinonStub).rejects(
-        new Error("MSAL failure"),
-      );
-      const result = await service.getAuthCodeUrl();
-      expect(result.isFailure()).to.be.true;
-      expect((result.value as AuthError).type).to.equal("MsalError");
-    });
   });
 
   describe("processAuthCodeCallback()", () => {
