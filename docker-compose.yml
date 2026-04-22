@@ -9,6 +9,9 @@ services:
       RATELIMIT_STORAGE_URI: ""
       RATE_LIMIT_MAX: "100"
       RATE_WINDOW_MS: "900000"
+      SESSION_REDIS_URL: redis://redis:6379
+    depends_on:
+      - redis
 
   # ccq:
   #   image:
@@ -26,3 +29,13 @@ services:
     depends_on:
       - rcw
       # - ccq
+
+  redis:
+    container_name: redis
+    image: "redis:7.2-alpine"
+    ports:
+      - "6379:6379"
+    command: redis-server --save "" --appendonly no
+
+  # - --save "" — turns off RDB snapshotting (no periodic dump to disk)                                                                                                                                                                      
+  # - --appendonly no — turns off AOF (append-only file) logging       
