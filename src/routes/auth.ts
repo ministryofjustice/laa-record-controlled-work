@@ -68,10 +68,13 @@ router.post(
 
       const { data } = parseAuthCodeResponse;
       const authService = AuthService.create(req.session, msalClient);
-      const successfulRedirect = await authService.processAuthCodeCallback(data);
+      const successfulRedirect =
+        await authService.processAuthCodeCallback(data);
 
       if (successfulRedirect.isFailure()) {
-        const { status, message } = mapAuthErrorToHttp(successfulRedirect.value);
+        const { status, message } = mapAuthErrorToHttp(
+          successfulRedirect.value,
+        );
         return res.status(status).send(message);
       }
 

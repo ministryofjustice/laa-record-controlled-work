@@ -11,7 +11,6 @@
 import {
   BAD_GATEWAY,
   BAD_REQUEST,
-  devError,
   FORBIDDEN,
   GATEWAY_TIMEOUT,
   INTERNAL_SERVER_ERROR,
@@ -20,7 +19,8 @@ import {
   SERVICE_UNAVAILABLE,
   TOO_MANY_REQUESTS,
   UNAUTHORIZED,
-} from "./index.js";
+} from "#src/constants/httpStatus.js";
+import { devError } from "./devLogger.js";
 
 /**
  * Type guard for Axios error with response
