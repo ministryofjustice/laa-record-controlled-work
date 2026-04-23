@@ -1,7 +1,6 @@
 import {
   axiosMiddleware,
   createAuthLimiter,
-  displayAsciiBanner,
   helmetSetup,
   nunjucksSetup,
   rateLimitSetUp,
@@ -17,7 +16,6 @@ import { requireAuth } from "#middleware/requireAuth.js";
 import authRouter from "#src/routes/auth.js";
 import indexRouter from "#src/routes/index.js";
 import { initializeI18nextSync } from "#src/lib/index.js";
-import chalk from "chalk";
 import compression from "compression";
 import type { Request, Response } from "express";
 import express from "express";
@@ -30,7 +28,7 @@ const ENABLE_PLAYWRIGHT_TEST_SIGNIN =
 
 /**
  * Creates and configures an Express application.
- * Then starts the server listening on the configured port.
+ * Server startup is handled separately in src/server.ts.
  *
  * @returns {Promise<import('express').Application>} The configured Express application
  */
@@ -118,19 +116,7 @@ const createApp = async (): Promise<express.Application> => {
     app.use(livereload());
   }
 
-  // Display ASCII Art banner
-  displayAsciiBanner(config);
-
-  // Starts the Express server on the specified port
-  app.listen(config.app.port, () => {
-    console.log(chalk.yellow(`Listening on port ${config.app.port}...`));
-  });
-
   return app;
 };
 
-// Self-execute the app directly to allow app.js to be executed directly
-void createApp();
-
-// Export the createApp function for testing/import purposes
 export default createApp;
