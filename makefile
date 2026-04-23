@@ -7,7 +7,7 @@ watch:
 	op run --env-file=.env -- yarn build && yarn dev
 
 dev: 
-	op run --env-file=.env -- npx tsx src/app.ts
+	op run --env-file=.env -- npx tsx src/server.ts
 
 unit:
 	yarn test:unit
