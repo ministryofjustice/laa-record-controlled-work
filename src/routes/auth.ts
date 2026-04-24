@@ -1,9 +1,8 @@
 import config from "#config.js";
-import { msalConfig } from "#src/config/auth.js";
+import { msalClient } from "#src/config/auth.js";
 import { BAD_REQUEST } from "#src/constants/httpStatus.js";
 import { AuthService } from "#src/services/auth.js";
 import { authCodeResponseSchema } from "#types/auth-types.js";
-import { ConfidentialClientApplication } from "@azure/msal-node";
 import {
   Router,
   type NextFunction,
@@ -12,8 +11,6 @@ import {
 } from "express";
 
 const router: Router = Router();
-const msalClient: ConfidentialClientApplication =
-  new ConfidentialClientApplication(msalConfig);
 
 router.get(
   "/signin",

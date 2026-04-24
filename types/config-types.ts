@@ -29,6 +29,8 @@ export interface SessionConfig {
   name: string;
   resave: boolean;
   saveUninitialized: boolean;
+  maxAge: number;
+  redis_url?: string;
 }
 
 export interface PathsConfig {

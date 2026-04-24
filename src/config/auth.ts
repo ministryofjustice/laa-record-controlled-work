@@ -1,7 +1,7 @@
 import config from "#config.js";
-import type { Configuration } from "@azure/msal-node";
+import { ConfidentialClientApplication } from "@azure/msal-node";
 
-export const msalConfig: Configuration = {
+export const msalConfig = {
   auth: {
     clientId: config.entra.clientId,
     authority: config.entra.authority,
@@ -16,3 +16,6 @@ export const authRequestDefaults = {
   scopes,
   redirectUri: config.entra.redirectUri,
 } as const;
+
+export const msalClient: ConfidentialClientApplication =
+  new ConfidentialClientApplication(msalConfig)

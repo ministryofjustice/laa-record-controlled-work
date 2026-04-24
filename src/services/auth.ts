@@ -1,4 +1,4 @@
-import { randomUUID } from "node:crypto";
+import crypto from "node:crypto";
 import type { SessionData } from "express-session";
 import {
   type ConfidentialClientApplication,
@@ -160,7 +160,7 @@ export class AuthService {
     // Validated against session.authState on callback before any token exchange.
     // Encoded as base64(JSON) so MSAL's parseRequestState can parse it without throwing invalid_state.
     const nonce = this.cryptoProvider.base64Encode(
-      JSON.stringify({ id: randomUUID() }),
+      JSON.stringify({ id: crypto.randomUUID() }),
     );
     this.session.authState = nonce;
 

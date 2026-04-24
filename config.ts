@@ -1,4 +1,6 @@
+import { MS_IN_A_MINUTE, MS_IN_TWELVE_HOURS } from "#src/constants/timeEnums.js";
 import type { Config } from "#types/config-types.js";
+
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -6,7 +8,6 @@ dotenv.config();
 const DEFAULT_AUTH_RATE_LIMIT_MAX = 20;
 const DEFAULT_RATE_LIMIT_MAX = 100;
 const DEFAULT_RATE_WINDOW_MS_MINUTE = 15;
-const MILLISECONDS_IN_A_MINUTE = 60000;
 const DEFAULT_PORT = 3000;
 
 // Validate required session env vars
@@ -58,7 +59,7 @@ const config: Config = {
   // Default rate window: 15 minutes in milliseconds
   RATE_WINDOW_MS: Number(
     process.env.RATE_WINDOW_MS ??
-      String(DEFAULT_RATE_WINDOW_MS_MINUTE * MILLISECONDS_IN_A_MINUTE),
+      String(DEFAULT_RATE_WINDOW_MS_MINUTE * MS_IN_A_MINUTE),
   ),
   SERVICE_NAME: process.env.SERVICE_NAME,
   SERVICE_PHASE: process.env.SERVICE_PHASE,
@@ -69,6 +70,8 @@ const config: Config = {
     name: process.env.SESSION_NAME,
     resave: false,
     saveUninitialized: false,
+    maxAge: MS_IN_TWELVE_HOURS,
+    redis_url: process.env.SESSION_REDIS_URL,
   },
   app: {
     port: Number(process.env.PORT ?? DEFAULT_PORT),
