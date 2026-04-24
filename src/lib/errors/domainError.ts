@@ -15,7 +15,7 @@ export abstract class DomainError extends Error {
    * @param message error message
    * @param cause root cause (usually type `Error`)
    */
-  constructor(message: string, cause: unknown) {
+  constructor(message: string, cause?: unknown) {
     super(message, { cause });
     // Restores the prototype chain so `instanceof` checks work correctly
     // for classes which extend DomainError.
