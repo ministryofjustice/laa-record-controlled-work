@@ -5,18 +5,18 @@
  * Also provides toJSON for easy serialisation where required.
  */
 export abstract class DomainError extends Error {
+  // bundler can minify class names, enforce setting it explicitly
+  // for scenarios where name matters, like lookups for status codes
+  public abstract readonly name: string;
+
   /**
-   * Abstract constructor, sets Error.name to subclass name and
+   * Abstract constructor, calls Error constructor with message and cause,
    * sets the object prototype to the extending class's prototype
    * @param message error message
    * @param cause root cause (usually type `Error`)
    */
   constructor(message: string, cause: unknown) {
     super(message, { cause });
-
-    // Sets the Error.name to the extending class's name
-    this.name = this.constructor.name;
-
     // Restores the prototype chain so `instanceof` checks work correctly
     // for classes which extend DomainError.
     // "new" exists in the context of the extending class's constructor.
