@@ -1,4 +1,4 @@
-import { INTERNAL_SERVER_ERROR, OK } from "#src/constants/httpStatus.js";
+import { INTERNAL_SERVER_ERROR, OK } from "#src/lib/constants/httpStatus.js";
 import { getPerson, postPerson } from "#src/controllers/personController.js";
 import { validatePerson } from "#src/controllers/personSchema.js";
 import { exampleApiService } from "#src/services/exampleApiService.js";
