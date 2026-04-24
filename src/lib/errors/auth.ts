@@ -3,7 +3,8 @@ import {
   BAD_REQUEST,
   INTERNAL_SERVER_ERROR,
   UNAUTHORIZED,
-} from "#src/constants/httpStatus.js";
+} from "#src/lib/constants/httpStatus.js";
+import { DomainError } from "./domainError.js";
 
 export type AuthError =
   | MissingAuthCodeRequest
@@ -12,7 +13,7 @@ export type AuthError =
   | PkceGenerationError
   | MsalError;
 
-export class MissingAuthCodeRequest extends Error {
+export class MissingAuthCodeRequest extends DomainError {
   readonly status = BAD_REQUEST;
 
   constructor(cause: unknown) {
@@ -21,7 +22,7 @@ export class MissingAuthCodeRequest extends Error {
   }
 }
 
-export class StateMismatch extends Error {
+export class StateMismatch extends DomainError {
   readonly status = BAD_REQUEST;
 
   constructor(cause: unknown) {
@@ -30,7 +31,7 @@ export class StateMismatch extends Error {
   }
 }
 
-export class TokenAcquisitionError extends Error {
+export class TokenAcquisitionError extends DomainError {
   readonly status = UNAUTHORIZED;
 
   constructor(cause: unknown) {
@@ -39,7 +40,7 @@ export class TokenAcquisitionError extends Error {
   }
 }
 
-export class PkceGenerationError extends Error {
+export class PkceGenerationError extends DomainError {
   readonly status = INTERNAL_SERVER_ERROR;
 
   constructor(cause: unknown) {
@@ -48,7 +49,7 @@ export class PkceGenerationError extends Error {
   }
 }
 
-export class MsalError extends Error {
+export class MsalError extends DomainError {
   readonly status = INTERNAL_SERVER_ERROR;
 
   constructor(cause: unknown) {
