@@ -56,5 +56,4 @@ export interface Config {
   session: SessionConfig;
   paths: PathsConfig;
   entra: EntraConfig;
-  REDIS_URL: string | undefined;
 }

@@ -22,7 +22,7 @@ router.get(
 
     try {
       const authUrl: string = await authService.getAuthCodeUrl();
-
+console.log(authUrl);
       res.redirect(authUrl);
     } catch (error) {
       next(error);

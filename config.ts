@@ -64,14 +64,13 @@ const config: Config = {
   SERVICE_NAME: process.env.SERVICE_NAME,
   SERVICE_PHASE: process.env.SERVICE_PHASE,
   SERVICE_URL: process.env.SERVICE_URL,
-  REDIS_URL: process.env.REDIS_URL,
   session: {
     secret: process.env.SESSION_SECRET,
     name: process.env.SESSION_NAME,
     resave: false,
     saveUninitialized: false,
     maxAge: MS_IN_TWELVE_HOURS,
-    redis_url: process.env.SESSION_REDIS_URL,
+    redis_url: process.env.REDIS_URL,
   },
   app: {
     port: Number(process.env.PORT ?? DEFAULT_PORT),

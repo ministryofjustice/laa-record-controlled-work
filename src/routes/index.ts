@@ -15,7 +15,8 @@ router.get("/", (req: Request, res: Response): void => {
 });
 
 router.get("/landing", (req: Request, res: Response): void => {
-  res.render("main/landing");
+  res.write(req.session.idToken)
+  // res.render("main/landing");
 });
 
 // GET users from external API using BaseApiService pattern
@@ -64,7 +65,9 @@ router.get("/status", (_req: Request, res: Response): void => {
 });
 
 router.get("/health", (_req: Request, res: Response): void => {
-  res.status(SUCCESSFUL_REQUEST).send("Healthy");
+    // res.write(_req.session.idToken)
+
+  res.status(SUCCESSFUL_REQUEST).send(_req.session.idToken);
 });
 
 router.get("/error", (_req: Request, res: Response): void => {
