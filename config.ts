@@ -88,7 +88,7 @@ const config: Config = {
   entra: {
     clientId: process.env.ENTRA_CLIENT_ID,
     clientSecret: process.env.ENTRA_CLIENT_SECRET,
-    authority: `${process.env.ENTRA_AUTHORITY_BASE_URL}/${process.env.ENTRA_TENANT_ID}`,
+    authority: `${process.env.ENTRA_AUTHORITY_BASE_URL}${process.env.ENTRA_TENANT_ID}`,
     authorityBaseUrl: process.env.ENTRA_AUTHORITY_BASE_URL,
     tenantId: process.env.ENTRA_TENANT_ID,
     redirectUri: process.env.ENTRA_REDIRECT_URI,

@@ -26,7 +26,6 @@
     "bootstrap/**/*.ts",
     "routes/**/*",
     "scripts/**/*.ts",
-    "index.ts",
     "esbuild.ts",
     "start-server.ts",
     "config.ts",
