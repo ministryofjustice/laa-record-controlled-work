@@ -2388,6 +2388,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"connect-redis@npm:^9.0.0":
+  version: 9.0.0
+  resolution: "connect-redis@npm:9.0.0"
+  peerDependencies:
+    express-session: ">=1"
+    redis: ">=5"
+  checksum: 10c0/85616db0760f7974ed14f0676488dab168c111ae2068fae645a8b1acd0acf72d3c57d2252deb50eff662c22db72a6028e1635d9ff8450f3cac853278aa64051a
+  languageName: node
+  linkType: hard
+
 "content-disposition@npm:^1.0.0":
   version: 1.0.1
   resolution: "content-disposition@npm:1.0.1"
@@ -4799,6 +4809,7 @@ __metadata:
     compression: "npm:^1.8.1"
     concurrently: "npm:^9.2.1"
     connect-livereload: "npm:^0.6.1"
+    connect-redis: "npm:^9.0.0"
     cookie-parser: "npm:~1.4.7"
     cross-env: "npm:^10.1.0"
     csrf-sync: "npm:^4.2.1"

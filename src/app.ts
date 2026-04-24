@@ -46,14 +46,6 @@ const createApp = async (): Promise<express.Application> => {
   // Response compression setup
   app.use(
     compression({
-      /**
-       * Custom filter for compression.
-       * Prevents compression if the 'x-no-compression' header is set in the request.
-       *
-       * @param {import('express').Request} req - The Express request object
-       * @param {import('express').Response} res - The Express response object
-       * @returns {boolean} True if compression should be applied, false otherwise
-       */
       filter: (req: Request, res: Response): boolean => {
         if ("x-no-compression" in req.headers) {
           return false;
