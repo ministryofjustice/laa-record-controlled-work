@@ -16,7 +16,6 @@ import { requireAuth } from "#middleware/requireAuth.js";
 import authRouter from "#src/routes/auth.js";
 import indexRouter from "#src/routes/index.js";
 
-import chalk from "chalk";
 import compression from "compression";
 import type { Request, Response } from "express";
 import express from "express";

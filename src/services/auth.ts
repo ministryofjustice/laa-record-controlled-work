@@ -61,8 +61,7 @@ export class AuthService {
    */
   public async getAuthCodeUrl(): Promise<Either<AuthError, string>> {
     const pkceCodes = await this.getPkceCodes();
-    if (pkceCodes.error !== undefined)
-      return failure(PkceGenerationError, pkceCodes.error);
+    if (pkceCodes.error) return failure(PkceGenerationError, pkceCodes.error);
 
     const authCodeUrlRequest = this.createAuthCodeRequest(pkceCodes.value);
     try {
