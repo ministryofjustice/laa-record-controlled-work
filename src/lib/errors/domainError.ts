@@ -1,5 +1,8 @@
 /**
- * Domain Error introduces a create factory function for typed domain errors
+ * Abstract domain error utility class, enables clean, idiomatic error instantiation
+ * from typed subclasses using Subclass.from(cause)
+ *
+ * Also provides toJSON for easy serialisation where required.
  */
 export abstract class DomainError extends Error {
   /**
@@ -21,17 +24,40 @@ export abstract class DomainError extends Error {
   }
 
   /**
-   * Creates an instance of the SubclassError calling the function
-   * @param args -
-   * @returns -
+   * Creates an instance of the Subclass with specified cause
+   * @param cause the specified cause
+   * @returns Subclass instance
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- required
-  static create<Subclass extends DomainError, SubclassArgs extends any[]>(
-    this: new (...args: SubclassArgs) => Subclass,
-    ...args: SubclassArgs
+  static from<Subclass extends DomainError>(
+    this: new (cause?: unknown) => Subclass,
+    cause?: unknown,
   ): Subclass {
-    // "this" normally points at the DomainError class
-    // redefine it to point at the generic Subclass calling the function
-    return new this(...args);
+    // "this" in a static function would normally point at the DomainError class,
+    // we redefine it using a constructor signature to reference the generic Subclass
+    return new this(cause);
+  }
+
+  /**
+   * Errors and JSON don't mix.
+   * This forces native, non-enumerable properties to be serialized.
+   * Express `res.json()` and `JSON.stringify()` will automatically use this.
+   * @returns json serialised error
+   */
+  toJSON(): Record<string, unknown> {
+    const json = {
+      name: this.name,
+      message: this.message,
+      // stack: this.stack, // omitted for now
+      cause: this.cause,
+    };
+
+    if (this.cause instanceof DomainError) {
+      json.cause = this.cause.toJSON();
+    } else if (this.cause instanceof Error) {
+      const { name, message } = this.cause;
+      json.cause = { name, message };
+    }
+
+    return json;
   }
 }
