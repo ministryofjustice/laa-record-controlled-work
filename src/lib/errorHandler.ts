@@ -19,7 +19,7 @@ import {
   SERVICE_UNAVAILABLE,
   TOO_MANY_REQUESTS,
   UNAUTHORIZED,
-} from "#src/constants/httpStatus.js";
+} from "#src/lib/constants/httpStatus.js";
 import { devError } from "./devLogger.js";
 
 /**

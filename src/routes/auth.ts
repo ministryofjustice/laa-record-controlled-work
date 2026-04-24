@@ -1,5 +1,6 @@
 import config from "#config.js";
 import { msalConfig } from "#src/config/auth.js";
+import { BAD_REQUEST } from "#src/lib/constants/httpStatus.js";
 import { AuthService } from "#src/services/auth.js";
 import { authCodeResponseSchema } from "#types/auth-types.js";
 import { ConfidentialClientApplication } from "@azure/msal-node";
@@ -9,7 +10,6 @@ import {
   type Request,
   type Response,
 } from "express";
-import { BAD_REQUEST } from "#src/constants/httpStatus.js";
 
 const router: Router = Router();
 const msalClient: ConfidentialClientApplication =
