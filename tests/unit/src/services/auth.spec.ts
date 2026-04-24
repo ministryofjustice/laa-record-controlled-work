@@ -14,7 +14,7 @@ import { MissingAuthCodeRequest, StateMismatch, TokenAcquisitionError } from "#s
 describe("AuthService", () => {
   let msalStub: Partial<ConfidentialClientApplication>;
   let session: SessionData;
-  const AUTH_CODE_URL = "https://login.microsoftonline.com/auth";
+  const AUTH_CODE_URL = "https://login.microsoftonline.com/auth/";
   let service: AuthService;
   const NONCE = "test-nonce";
   const requestBody = { code: "auth-code", state: NONCE };
