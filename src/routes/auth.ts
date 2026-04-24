@@ -2,7 +2,6 @@ import config from "#config.js";
 import { msalConfig } from "#src/config/auth.js";
 import { AuthService } from "#src/services/auth.js";
 import { authCodeResponseSchema } from "#types/auth-types.js";
-import { mapAuthErrorToHttp } from "#src/lib/authErrorHttpResponses.js";
 import { ConfidentialClientApplication } from "@azure/msal-node";
 import {
   Router,
@@ -25,13 +24,13 @@ router.get(
     );
 
     try {
-      const authCodeUrl = await authService.getAuthCodeUrl();
-      if (authCodeUrl.isFailure()) {
-        const { status, message } = mapAuthErrorToHttp(authCodeUrl.value);
+      const result = await authService.getAuthCodeUrl();
+      if (result.error) {
+        const { status, message } = result.error;
         return res.status(status).send(message);
       }
 
-      res.redirect(authCodeUrl.value);
+      res.redirect(result.value);
     } catch (error) {
       next(error);
     }
@@ -68,13 +67,9 @@ router.post(
 
       const { data } = parseAuthCodeResponse;
       const authService = AuthService.create(req.session, msalClient);
-      const successfulRedirect =
-        await authService.processAuthCodeCallback(data);
-
-      if (successfulRedirect.isFailure()) {
-        const { status, message } = mapAuthErrorToHttp(
-          successfulRedirect.value,
-        );
+      const result = await authService.processAuthCodeCallback(data);
+      if (result.error) {
+        const { status, message } = result.error;
         return res.status(status).send(message);
       }
 
@@ -84,11 +79,12 @@ router.post(
           next(error);
           return;
         }
+
         req.session.isAuthenticated = isAuthenticated;
         req.session.idToken = idToken;
         req.session.account = account;
         req.session.tokenCache = tokenCache;
-        res.redirect(successfulRedirect.value);
+        res.redirect(result.value);
       });
     } catch (error) {
       res.redirect("/auth/signin");

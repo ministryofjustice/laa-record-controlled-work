@@ -8,14 +8,17 @@ import {
 } from "@azure/msal-node";
 import config from "#config.js";
 import { authRequestDefaults } from "#src/config/auth.js";
-import { failure, success, type Either } from "#src/lib/result.js";
-import type {
-  AuthCodeResponse,
-  AuthError,
-  PKCECodes,
-  PkceGenerationError,
-} from "#types/auth-types.js";
+import { failure, success, type Either } from "#src/lib/either.js";
+import type { AuthCodeResponse, PKCECodes } from "#types/auth-types.js";
 import { devError } from "#src/lib/devLogger.js";
+import {
+  type AuthError,
+  MissingAuthCodeRequest,
+  MsalError,
+  PkceGenerationError,
+  StateMismatch,
+  TokenAcquisitionError,
+} from "#src/errors/auth.js";
 
 /**
  * Handles Microsoft Entra ID (MSAL) authentication flows including
@@ -57,18 +60,17 @@ export class AuthService {
    * @returns {Promise<Either<AuthError, string>>} The authorisation URL or an auth error.
    */
   public async getAuthCodeUrl(): Promise<Either<AuthError, string>> {
-    const pkceCodes: Either<PkceGenerationError, PKCECodes> =
-      await this.getPkceCodes();
-    if (pkceCodes.isFailure()) return failure(pkceCodes.value);
+    const pkceCodes = await this.getPkceCodes();
+    if (pkceCodes.error !== undefined)
+      return failure(PkceGenerationError, pkceCodes.error);
 
     const authCodeUrlRequest = this.createAuthCodeRequest(pkceCodes.value);
-
     try {
       const url = await this.msalClient.getAuthCodeUrl(authCodeUrlRequest);
       return success(url);
     } catch (error) {
       devError(`Failed to generate Entra auth code URL: ${String(error)}`);
-      return failure({ type: "MsalError", cause: error });
+      return failure(MsalError, error);
     }
   }
 
@@ -81,14 +83,14 @@ export class AuthService {
     requestBody: AuthCodeResponse,
   ): Promise<Either<AuthError, string>> {
     if (this.session.authCodeRequest === undefined) {
-      return failure({ type: "MissingAuthCodeRequest" });
+      return failure(MissingAuthCodeRequest);
     }
 
     if (
       this.session.authState === undefined ||
       requestBody.state !== this.session.authState
     ) {
-      return failure({ type: "StateMismatch" });
+      return failure(StateMismatch);
     }
     this.session.authState = undefined;
 
@@ -112,7 +114,7 @@ export class AuthService {
       return success(successRedirect);
     } catch (error) {
       devError(`Failed to handle Entra auth redirect: ${String(error)}`);
-      return failure({ type: "TokenAcquisitionError", cause: error });
+      return failure(TokenAcquisitionError, error);
     }
   }
 
@@ -144,7 +146,7 @@ export class AuthService {
       return success({ challengeMethod: "S256", verifier, challenge });
     } catch (error) {
       devError(`Failed to generate PKCE codes: ${String(error)}`);
-      return failure({ type: "PkceGenerationError", cause: error });
+      return failure(PkceGenerationError, error);
     }
   }
 

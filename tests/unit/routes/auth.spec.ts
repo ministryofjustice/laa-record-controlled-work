@@ -1,7 +1,7 @@
 import { AuthService } from "#src/services/auth.js";
 import authRouter from "#src/routes/auth.js";
 import { setupCsrf } from "#middleware/setupCsrf.js";
-import { failure, success } from "#src/lib/result.js";
+import { failure, success } from "#src/lib/either.js";
 import { expect } from "chai";
 import express from "express";
 import session from "express-session";
@@ -13,6 +13,7 @@ import {
   INTERNAL_SERVER_ERROR,
   UNAUTHORIZED,
 } from "#src/constants/httpStatus.js";
+import { MissingAuthCodeRequest, MsalError, StateMismatch, TokenAcquisitionError } from "#src/errors/auth.js";
 
 describe("authRoutes", () => {
   let authServiceStub: {
@@ -67,7 +68,7 @@ describe("authRoutes", () => {
 
     it("responds with 400 when processAuthCodeCallback returns MissingAuthCodeRequest", async () => {
       authServiceStub.processAuthCodeCallback.resolves(
-        failure({ type: "MissingAuthCodeRequest" }),
+        failure(MissingAuthCodeRequest),
       );
 
       const res = await request(app)
@@ -80,7 +81,7 @@ describe("authRoutes", () => {
 
     it("responds with 400 when processAuthCodeCallback returns StateMismatch", async () => {
       authServiceStub.processAuthCodeCallback.resolves(
-        failure({ type: "StateMismatch" }),
+        failure(StateMismatch),
       );
 
       const res = await request(app)
@@ -93,7 +94,7 @@ describe("authRoutes", () => {
 
     it("responds with 401 when processAuthCodeCallback returns TokenAcquisitionError", async () => {
       authServiceStub.processAuthCodeCallback.resolves(
-        failure({ type: "TokenAcquisitionError", cause: new Error("MSAL") }),
+        failure(TokenAcquisitionError, new Error("MSAL")),
       );
 
       const res = await request(app)
@@ -152,7 +153,7 @@ describe("authRoutes", () => {
 
     it("responds with 500 when getAuthCodeUrl returns a MsalError", async () => {
       authServiceStub.getAuthCodeUrl.resolves(
-        failure({ type: "MsalError", cause: new Error("MSAL failure") }),
+        failure(MsalError, new Error("MSAL failure")),
       );
 
       const response = await request(app).get("/auth/signin");

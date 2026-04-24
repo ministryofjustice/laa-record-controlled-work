@@ -8,7 +8,8 @@ import { expect } from "chai";
 import type { SessionData } from "express-session";
 import sinon from "sinon";
 import { authRequestDefaults } from "#src/config/auth.js";
-import type { AuthError } from "#types/auth-types.js";
+import { Success } from "#src/lib/either.js";
+import { MissingAuthCodeRequest, StateMismatch, TokenAcquisitionError } from "#src/errors/auth.js";
 
 describe("AuthService", () => {
   let msalStub: Partial<ConfidentialClientApplication>;
@@ -45,8 +46,8 @@ describe("AuthService", () => {
 
   describe("getAuthCodeUrl()", () => {
     it("returns a success with the URL from the MSAL client", async () => {
-      const result = await service.getAuthCodeUrl();
-      expect(result.isSuccess()).to.be.true;
+      const result = await service.getAuthCodeUrl() as Success<string>;
+      expect(result.error).to.be.undefined;
       expect(result.value).to.equal(AUTH_CODE_URL);
     });
 
@@ -105,8 +106,10 @@ describe("AuthService", () => {
         new Error("MSAL failure"),
       );
       const result = await service.getAuthCodeUrl();
-      expect(result.isFailure()).to.be.true;
-      expect((result.value as AuthError).type).to.equal("MsalError");
+      expect(result.error).to.exist;
+      expect(result.error?.cause)
+        .to.be.instanceOf(Error)
+        .with.property('message', "MSAL failure")
     });
   });
 
@@ -159,15 +162,15 @@ describe("AuthService", () => {
     });
 
     it("returns a success with successRedirect from session.returnTo", async () => {
-      const result = await service.processAuthCodeCallback(requestBody);
-      expect(result.isSuccess()).to.be.true;
+      const result = await service.processAuthCodeCallback(requestBody) as Success<string>;
+      expect(result.error).to.be.undefined;
       expect(result.value).to.equal(SUCCESS_REDIRECT);
     });
 
     it("defaults successRedirect to /landing when session.returnTo is unset", async () => {
       delete session.returnTo;
-      const result = await service.processAuthCodeCallback(requestBody);
-      expect(result.isSuccess()).to.be.true;
+      const result = await service.processAuthCodeCallback(requestBody) as Success<string>;
+      expect(result.error).to.be.undefined;
       expect(result.value).to.equal("/landing");
     });
 
@@ -181,24 +184,26 @@ describe("AuthService", () => {
         ...requestBody,
         state: "wrong-nonce",
       });
-      expect(result.isFailure()).to.be.true;
-      expect((result.value as AuthError).type).to.equal("StateMismatch");
+      expect(result.error).to.exist;
+      expect(result.error)
+        .to.be.an('error')
+        .and.to.be.instanceOf(StateMismatch)
     });
 
     it("returns a StateMismatch failure when session.authState is missing", async () => {
       delete session.authState;
       const result = await service.processAuthCodeCallback(requestBody);
-      expect(result.isFailure()).to.be.true;
-      expect((result.value as AuthError).type).to.equal("StateMismatch");
+      expect(result.error)
+        .to.be.an('error')
+        .and.to.be.instanceOf(StateMismatch)
     });
 
     it("returns a MissingAuthCodeRequest failure when authCodeRequest is missing from session", async () => {
       delete session.authCodeRequest;
       const result = await service.processAuthCodeCallback(requestBody);
-      expect(result.isFailure()).to.be.true;
-      expect((result.value as AuthError).type).to.equal(
-        "MissingAuthCodeRequest",
-      );
+      expect(result.error)
+        .to.be.an('error')
+        .and.to.be.instanceOf(MissingAuthCodeRequest)
     });
 
     it("returns a TokenAcquisitionError failure when MSAL throws", async () => {
@@ -206,10 +211,9 @@ describe("AuthService", () => {
       (msalStub.acquireTokenByCode as sinon.SinonStub).rejects(msalError);
 
       const result = await service.processAuthCodeCallback(requestBody);
-      expect(result.isFailure()).to.be.true;
-      expect((result.value as AuthError).type).to.equal(
-        "TokenAcquisitionError",
-      );
+      expect(result.error)
+        .to.be.an('error')
+        .and.to.be.instanceOf(TokenAcquisitionError)
     });
   });
 
