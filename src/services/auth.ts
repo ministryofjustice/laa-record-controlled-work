@@ -12,13 +12,12 @@ import { failure, success, type Either } from "#src/lib/either.js";
 import type { AuthCodeResponse, PKCECodes } from "#types/auth-types.js";
 import { devError } from "#src/lib/devLogger.js";
 import {
-  type AuthError,
-  MissingAuthCodeRequest,
+  MissingAuthCodeRequestError,
   MsalError,
   PkceGenerationError,
-  StateMismatch,
+  StateMismatchError,
   TokenAcquisitionError,
-} from "#src/errors/auth.js";
+} from "#src/lib/errors/auth.js";
 
 /**
  * Handles Microsoft Entra ID (MSAL) authentication flows including
@@ -59,17 +58,19 @@ export class AuthService {
    * Generates the Microsoft Entra ID authorisation URL to begin the PKCE sign-in flow.
    * @returns {Promise<Either<AuthError, string>>} The authorisation URL or an auth error.
    */
-  public async getAuthCodeUrl(): Promise<Either<AuthError, string>> {
-    const pkceCodes = await this.getPkceCodes();
-    if (pkceCodes.error) return failure(PkceGenerationError, pkceCodes.error);
+  public async getAuthCodeUrl(): Promise<
+    Either<PkceGenerationError | MsalError, string>
+  > {
+    const result = await this.getPkceCodes();
+    if (result.error) return failure(PkceGenerationError.from(result.error));
 
-    const authCodeUrlRequest = this.createAuthCodeRequest(pkceCodes.value);
+    const authCodeUrlRequest = this.createAuthCodeRequest(result.value);
     try {
       const url = await this.msalClient.getAuthCodeUrl(authCodeUrlRequest);
       return success(url);
     } catch (error) {
       devError(`Failed to generate Entra auth code URL: ${String(error)}`);
-      return failure(MsalError, error);
+      return failure(MsalError.from(error));
     }
   }
 
@@ -80,16 +81,21 @@ export class AuthService {
    */
   public async processAuthCodeCallback(
     requestBody: AuthCodeResponse,
-  ): Promise<Either<AuthError, string>> {
+  ): Promise<
+    Either<
+      MissingAuthCodeRequestError | StateMismatchError | TokenAcquisitionError,
+      string
+    >
+  > {
     if (this.session.authCodeRequest === undefined) {
-      return failure(MissingAuthCodeRequest);
+      return failure(new MissingAuthCodeRequestError());
     }
 
     if (
       this.session.authState === undefined ||
       requestBody.state !== this.session.authState
     ) {
-      return failure(StateMismatch);
+      return failure(new StateMismatchError());
     }
     this.session.authState = undefined;
 
@@ -113,7 +119,7 @@ export class AuthService {
       return success(successRedirect);
     } catch (error) {
       devError(`Failed to handle Entra auth redirect: ${String(error)}`);
-      return failure(TokenAcquisitionError, error);
+      return failure(TokenAcquisitionError.from(error));
     }
   }
 
@@ -145,7 +151,7 @@ export class AuthService {
       return success({ challengeMethod: "S256", verifier, challenge });
     } catch (error) {
       devError(`Failed to generate PKCE codes: ${String(error)}`);
-      return failure(PkceGenerationError, error);
+      return failure(PkceGenerationError.from(error));
     }
   }
 

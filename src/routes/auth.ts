@@ -1,6 +1,11 @@
 import config from "#config.js";
 import { msalConfig } from "#src/config/auth.js";
-import { BAD_REQUEST } from "#src/lib/constants/httpStatus.js";
+import {
+  BAD_REQUEST,
+  INTERNAL_SERVER_ERROR,
+  UNAUTHORIZED,
+} from "#src/lib/constants/httpStatus.js";
+import { TokenAcquisitionError } from "#src/lib/errors/auth.js";
 import { AuthService } from "#src/services/auth.js";
 import { authCodeResponseSchema } from "#types/auth-types.js";
 import { ConfidentialClientApplication } from "@azure/msal-node";
@@ -18,16 +23,13 @@ const msalClient: ConfidentialClientApplication =
 router.get(
   "/signin",
   async (req: Request, res: Response, next: NextFunction) => {
-    const authService: AuthService = AuthService.create(
-      req.session,
-      msalClient,
-    );
+    const authService = AuthService.create(req.session, msalClient);
 
     try {
       const result = await authService.getAuthCodeUrl();
       if (result.error) {
-        const { status, message } = result.error;
-        return res.status(status).send(message);
+        const { message } = result.error;
+        return res.status(INTERNAL_SERVER_ERROR).send(message);
       }
 
       res.redirect(result.value);
@@ -60,17 +62,19 @@ router.post(
   "/code/callback",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const parseAuthCodeResponse = authCodeResponseSchema.safeParse(req.body);
-      if (!parseAuthCodeResponse.success) {
+      const { success, data } = authCodeResponseSchema.safeParse(req.body);
+      if (!success) {
         return res.status(BAD_REQUEST).send("Invalid redirect payload");
       }
 
-      const { data } = parseAuthCodeResponse;
       const authService = AuthService.create(req.session, msalClient);
       const result = await authService.processAuthCodeCallback(data);
+
       if (result.error) {
-        const { status, message } = result.error;
-        return res.status(status).send(message);
+        if (result.error instanceof TokenAcquisitionError) {
+          return res.status(UNAUTHORIZED).send(result.error.message);
+        }
+        return res.status(BAD_REQUEST).send(result.error.message);
       }
 
       const { isAuthenticated, idToken, account, tokenCache } = req.session;

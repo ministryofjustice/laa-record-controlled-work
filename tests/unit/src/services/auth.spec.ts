@@ -9,7 +9,7 @@ import type { SessionData } from "express-session";
 import sinon from "sinon";
 import { authRequestDefaults } from "#src/config/auth.js";
 import { Success } from "#src/lib/either.js";
-import { MissingAuthCodeRequest, StateMismatch, TokenAcquisitionError } from "#src/errors/auth.js";
+import { MissingAuthCodeRequestError, MsalError, StateMismatchError, TokenAcquisitionError } from "#src/lib/errors/auth.js";
 
 describe("AuthService", () => {
   let msalStub: Partial<ConfidentialClientApplication>;
@@ -107,9 +107,11 @@ describe("AuthService", () => {
       );
       const result = await service.getAuthCodeUrl();
       expect(result.error).to.exist;
-      expect(result.error?.cause)
-        .to.be.instanceOf(Error)
-        .with.property('message', "MSAL failure")
+      expect(result.error)
+        .to.be.an("error")
+        .and.to.be.instanceOf(MsalError)
+      expect(result.error?.cause).to.be.an("error")
+        .and.to.have.property("message", "MSAL failure")
     });
   });
 
@@ -179,7 +181,7 @@ describe("AuthService", () => {
       expect(session.authState).to.be.undefined;
     });
 
-    it("returns a StateMismatch failure when state does not match session.authState", async () => {
+    it("returns a StateMismatchError failure when state does not match session.authState", async () => {
       const result = await service.processAuthCodeCallback({
         ...requestBody,
         state: "wrong-nonce",
@@ -187,7 +189,7 @@ describe("AuthService", () => {
       expect(result.error).to.exist;
       expect(result.error)
         .to.be.an('error')
-        .and.to.be.instanceOf(StateMismatch)
+        .and.to.be.instanceOf(StateMismatchError)
     });
 
     it("returns a StateMismatch failure when session.authState is missing", async () => {
@@ -195,7 +197,7 @@ describe("AuthService", () => {
       const result = await service.processAuthCodeCallback(requestBody);
       expect(result.error)
         .to.be.an('error')
-        .and.to.be.instanceOf(StateMismatch)
+        .and.to.be.instanceOf(StateMismatchError)
     });
 
     it("returns a MissingAuthCodeRequest failure when authCodeRequest is missing from session", async () => {
@@ -203,7 +205,7 @@ describe("AuthService", () => {
       const result = await service.processAuthCodeCallback(requestBody);
       expect(result.error)
         .to.be.an('error')
-        .and.to.be.instanceOf(MissingAuthCodeRequest)
+        .and.to.be.instanceOf(MissingAuthCodeRequestError)
     });
 
     it("returns a TokenAcquisitionError failure when MSAL throws", async () => {

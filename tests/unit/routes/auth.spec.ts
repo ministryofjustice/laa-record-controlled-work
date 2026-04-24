@@ -1,6 +1,4 @@
 import { AuthService } from "#src/services/auth.js";
-import authRouter from "#src/routes/auth.js";
-import { setupCsrf } from "#middleware/setupCsrf.js";
 import { failure, success } from "#src/lib/either.js";
 import { expect } from "chai";
 import express from "express";
@@ -11,9 +9,10 @@ import {
   FOUND,
   INTERNAL_SERVER_ERROR,
   UNAUTHORIZED,
-} from "#src/constants/httpStatus.js";
-import { MissingAuthCodeRequest, MsalError, StateMismatch, TokenAcquisitionError } from "#src/errors/auth.js";
+} from "#src/lib/constants/httpStatus.js";
+
 import createApp from "#src/app.js";
+import { MissingAuthCodeRequestError, MsalError, StateMismatchError, TokenAcquisitionError } from "#src/lib/errors/auth.js";
 
 describe("authRoutes", () => {
   let authServiceStub: {
@@ -67,7 +66,7 @@ describe("authRoutes", () => {
 
     it("responds with 400 when processAuthCodeCallback returns MissingAuthCodeRequest", async () => {
       authServiceStub.processAuthCodeCallback.resolves(
-        failure(MissingAuthCodeRequest),
+        failure(MissingAuthCodeRequestError),
       );
 
       const res = await request(app)
@@ -78,9 +77,9 @@ describe("authRoutes", () => {
       expect(res.status).to.equal(BAD_REQUEST);
     });
 
-    it("responds with 400 when processAuthCodeCallback returns StateMismatch", async () => {
+    it("responds with 400 when processAuthCodeCallback returns StateMismatchError", async () => {
       authServiceStub.processAuthCodeCallback.resolves(
-        failure(StateMismatch),
+        failure(StateMismatchError),
       );
 
       const res = await request(app)
@@ -93,7 +92,7 @@ describe("authRoutes", () => {
 
     it("responds with 401 when processAuthCodeCallback returns TokenAcquisitionError", async () => {
       authServiceStub.processAuthCodeCallback.resolves(
-        failure(TokenAcquisitionError, new Error("MSAL")),
+        failure(TokenAcquisitionError.from(new Error("MSAL"))),
       );
 
       const res = await request(app)
@@ -115,7 +114,7 @@ describe("authRoutes", () => {
 
     it("responds with 500 when getAuthCodeUrl returns a MsalError", async () => {
       authServiceStub.getAuthCodeUrl.resolves(
-        failure(MsalError, new Error("MSAL failure")),
+        failure(MsalError.from(new Error("MSAL failure"))),
       );
 
       const response = await request(app).get("/auth/signin");
