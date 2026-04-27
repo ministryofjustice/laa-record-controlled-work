@@ -1,6 +1,5 @@
 export interface Failure<Err> {
   readonly error: Err;
-  readonly value?: never;
 }
 export interface Success<Value> {
   readonly error?: never;
@@ -9,9 +8,9 @@ export interface Success<Value> {
 export type Either<Err, Value> = Failure<Err> | Success<Value>;
 
 /**
- * .
- * @param error .
- * @returns .
+ * Returns an `Either` failure outcome with an error
+ * @param error the error to return
+ * @returns `{ error: Error }`
  */
 export function failure<Err, Value>(error: Err): Either<Err, Value> {
   return { error };
