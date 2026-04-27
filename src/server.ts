@@ -1,4 +1,4 @@
-import { displayAsciiBanner } from "#bootstrap/index.js";
+import { displayAsciiBanner } from "#src/bootstrap/index.js";
 import config from "#config.js";
 import createApp from "#src/app.js";
 import chalk from "chalk";

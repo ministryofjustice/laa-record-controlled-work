@@ -6,7 +6,7 @@
 import {
   generateBuildNumber,
   resolveAsset,
-} from "#bootstrap/assetFingerprint.js";
+} from "#src/bootstrap/assetFingerprint.js";
 import { strict as assert } from "node:assert";
 import fs from "node:fs";
 import sinon from "sinon";

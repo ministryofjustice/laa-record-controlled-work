@@ -6,7 +6,8 @@
   "main": "public/app.js",
   "type": "module",
   "imports": {
-    "#*": "./*"
+    "#*": "./*",
+    "#/bootstrap/*": "./src/bootstrap/*"
   },
   "scripts": {
     "start": "node public/app.js",

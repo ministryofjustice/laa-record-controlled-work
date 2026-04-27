@@ -15,15 +15,15 @@
     "noImplicitAny": true, // Disallow implicit any types
     "strict": true, // Enable all strict type-checking options
     "forceConsistentCasingInFileNames": true, // Disallow inconsistently-cased references to the same file
-    "baseUrl": ".",
     "paths": {
-      "#*": ["./*"]
+      "#*": ["./*"],
+      "#/bootstrap/*": ["./src/bootstrap/*"]
     }
   },
   "include": [
     "src/**/*",
     "middleware/**/*",
-    "bootstrap/**/*.ts",
+    "src/bootstrap/**/*.ts",
     "routes/**/*",
     "scripts/**/*.ts",
     "esbuild.ts",

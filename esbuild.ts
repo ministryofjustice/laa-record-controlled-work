@@ -5,7 +5,7 @@ import { sassPlugin } from "esbuild-sass-plugin";
 import fs from "fs-extra";
 import { builtinModules } from "node:module";
 import path from "node:path";
-import { generateBuildNumber } from "./bootstrap/assetFingerprint.js";
+import { generateBuildNumber } from "./src/bootstrap/assetFingerprint.js";
 import type { SassPluginOptions } from "./types/sass-plugin-types.js";
 
 // Load environment variables
