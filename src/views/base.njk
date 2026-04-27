@@ -1,7 +1,8 @@
 {% extends "govuk/template.njk" %}
 {% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
 
-{% block pageTitle %}{{config.SERVICE_NAME}} – GOV.UK{% endblock %}
+{% block pageTitle %}{{config.SERVICE_NAME}}
+  – GOV.UK{% endblock %}
 
 {% block head %}
   <link rel="stylesheet" href="/css/{{getAsset('main','css')}}">
@@ -12,7 +13,12 @@
 {% endblock %}
 
 {% block bodyStart %}
-  <script nonce="{{ cspNonce }}">document.body.className += ' js-enabled' + ('noModule' in HTMLScriptElement.prototype ? ' govuk-frontend-supported' : '');</script>
+  <script nonce="{{ cspNonce }}">
+    document.body.className += ' js-enabled' + (
+      'noModule' in HTMLScriptElement.prototype
+      ? ' govuk-frontend-supported'
+      : '');
+  </script>
   {# cookie policy #}
 {% endblock %}
 
