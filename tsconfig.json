@@ -18,6 +18,6 @@
       "#/*": ["./src/*"]
     }
   },
-  "include": ["**/**.ts"],
+  "include": ["scripts/**/*.ts", "src/**/*.ts", "tests/**/*.ts", "esbuild.ts"],
   "exclude": ["node_modules", "public", "**/*.js"]
 }
