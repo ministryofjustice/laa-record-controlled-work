@@ -34,7 +34,7 @@ export const resolveAsset = (
  * @param {Application} app - The Express application instance.
  * @returns {void} This function does not return a value; it configures Nunjucks for the provided app.
  */
-export const nunjucksSetup = (app: Application): void => {
+export const setupNunjucks = (app: Application): void => {
   const appInstance = app;
   appInstance.set("view engine", "njk");
 

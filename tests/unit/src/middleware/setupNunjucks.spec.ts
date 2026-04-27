@@ -1,4 +1,4 @@
-import { resolveAsset } from "#/bootstrap/nunjucksSetup.js";
+import { resolveAsset } from "#/middleware/setupNunjucks.js";
 import { strict as assert } from "node:assert";
 import fs from "node:fs";
 import sinon from "sinon";

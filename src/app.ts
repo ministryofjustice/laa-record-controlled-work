@@ -1,9 +1,9 @@
-import { helmetSetup } from "#/bootstrap/helmetSetup.js";
-import { nunjucksSetup } from "#/bootstrap/nunjucksSetup.js";
+import { helmetSetup as setupHelmet } from "#/middleware/setupHelmet.js";
+import { setupNunjucks } from "#/middleware/setupNunjucks.js";
 import {
-  rateLimitSetUp,
+  setupRateLimit,
   createAuthLimiter,
-} from "#/bootstrap/rateLimitSetUp.js";
+} from "#/middleware/setupRateLimit.js";
 import config from "#/config.js";
 import { initializeI18nextSync } from "#/lib/i18nLoader.js";
 import { axiosMiddleware } from "#/middleware/apiMiddleware.js";
@@ -63,7 +63,7 @@ const createApp = async (): Promise<express.Application> => {
   );
 
   // Set up security headers
-  helmetSetup(app);
+  setupHelmet(app);
 
   // Reducing fingerprinting by removing the 'x-powered-by' header
   app.disable("x-powered-by");
@@ -76,10 +76,10 @@ const createApp = async (): Promise<express.Application> => {
   app.use(setupLocaleMiddleware);
 
   // Set up Nunjucks as the template engine
-  nunjucksSetup(app);
+  setupNunjucks(app);
 
   // Set up rate limiting
-  rateLimitSetUp(app, config);
+  setupRateLimit(app, config);
 
   // Set up application-specific configurations
   setupConfig(app);

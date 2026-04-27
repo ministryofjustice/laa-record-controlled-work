@@ -17,7 +17,7 @@ const toNumber = (value: number | string): number =>
  * @param {Application} app - The Express app instance.
  * @param {Config} config - The configuration object containing rate limiting settings.
  */
-export const rateLimitSetUp = (app: Application, config: Config): void => {
+export const setupRateLimit = (app: Application, config: Config): void => {
   app.use(
     rateLimit({
       windowMs: toNumber(config.RATE_WINDOW_MS),
