@@ -7,13 +7,11 @@ import {
 import config from "#/config.js";
 import { initializeI18nextSync } from "#/lib/i18nLoader.js";
 import { axiosMiddleware } from "#/middleware/apiMiddleware.js";
-import {
-  setupConfig,
-  setupCsrf,
-  setupLocaleMiddleware,
-  setupMiddlewares,
-} from "#/middleware/index.js";
+import { setupMiddlewares } from "#/middleware/commonMiddleware.js";
 import { requireAuth } from "#/middleware/requireAuth.js";
+import { setupConfig } from "#/middleware/setupConfigs.js";
+import { setupCsrf } from "#/middleware/setupCsrf.js";
+import { setupLocaleMiddleware } from "#/middleware/setupLocale.js";
 import authRouter from "#/routes/auth.js";
 import indexRouter from "#/routes/index.js";
 
