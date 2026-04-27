@@ -1,4 +1,3 @@
-import { generateBuildNumber, resolveAsset } from "./assetFingerprint.js";
 import { axiosMiddleware } from "./axiosSetup.js";
 import { displayAsciiBanner } from "./displayAsciiBanner.js";
 import { helmetSetup } from "./helmetSetup.js";
@@ -9,8 +8,6 @@ export {
   axiosMiddleware,
   createAuthLimiter,
   displayAsciiBanner,
-  generateBuildNumber as getBuildNumber,
-  resolveAsset as getLatestBuildFile,
   helmetSetup,
   nunjucksSetup,
   rateLimitSetUp,

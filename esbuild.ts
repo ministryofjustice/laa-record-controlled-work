@@ -5,15 +5,18 @@ import { sassPlugin } from "esbuild-sass-plugin";
 import fs from "fs-extra";
 import { builtinModules } from "node:module";
 import path from "node:path";
-import { generateBuildNumber } from "./src/bootstrap/assetFingerprint.js";
 import type { SassPluginOptions } from "./types/sass-plugin-types.js";
 
 // Load environment variables
 dotenv.config();
-const buildNumber = generateBuildNumber();
 const NO_MORE_ASYNC_OPERATIONS = 0;
 const UNCAUGHT_FATAL_EXCEPTION = 1;
 const SECOND_IN_ARRAY = 1;
+const RANDOM_NUMBER_UPPER_BOUND = 10000;
+
+const buildNumber = Math.floor(
+  Math.random() * RANDOM_NUMBER_UPPER_BOUND,
+).toString();
 
 /**
  * Copies GOV.UK (fonts and images from `govuk-frontend`), MOJ Frontend (images from `@ministryofjustice/frontend`) and other assets

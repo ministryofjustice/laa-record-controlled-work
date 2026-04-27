@@ -1,35 +1,9 @@
-/**
- *
- * @description Tests that a random number is created, that can be applied to file assets etc
- */
-
-import {
-  generateBuildNumber,
-  resolveAsset,
-} from "#src/bootstrap/assetFingerprint.js";
+import { resolveAsset } from "#/bootstrap/nunjucksSetup.js";
 import { strict as assert } from "node:assert";
 import fs from "node:fs";
 import sinon from "sinon";
 
-describe("assetFingerprint", () => {
-  describe("generateBuildNumber", () => {
-    const MIN_BUILD_NUMBER = 0;
-    const MAX_BUILD_NUMBER = 9999;
-
-    it("should return a string of digits", () => {
-      const result = generateBuildNumber();
-      assert(/^\d+$/.test(result), "Should be a string of digits");
-    });
-
-    it("should return a number less than 10000", () => {
-      const num = parseInt(generateBuildNumber(), 10);
-      assert(
-        num >= MIN_BUILD_NUMBER && num <= MAX_BUILD_NUMBER,
-        "Should be between 0 and 9999",
-      );
-    });
-  });
-
+describe("nunjucksSetup", () => {
   describe("resolveAsset", () => {
     let readdirStub: sinon.SinonStub = sinon.stub();
 

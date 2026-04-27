@@ -1,8 +1,30 @@
 import type { Application } from "express";
 import path from "node:path";
 import nunjucks from "nunjucks";
-import { resolveAsset } from "./assetFingerprint.js";
 import { nunjucksT } from "#src/lib/i18nLoader.js";
+import fs from "node:fs";
+
+const FIRST_IN_ARRAY = 0;
+
+/**
+ * Get the latest build file from the specified directory.
+ * @param {string} directory - The directory to search in.
+ * @param {string} prefix - The prefix of the build files.
+ * @param {string} extension - The extension of the build files.
+ * @returns {string} - The name of the latest build file or an empty string if none found.
+ */
+export const resolveAsset = (
+  directory: string,
+  prefix: string,
+  extension: string,
+): string => {
+  const files = fs.readdirSync(directory);
+  const pattern = new RegExp(`^${prefix}\\.\\d+\\.${extension}$`);
+  const matchingFiles = files.filter((file) => pattern.test(file));
+  return matchingFiles.length > FIRST_IN_ARRAY
+    ? matchingFiles[FIRST_IN_ARRAY]
+    : "";
+};
 
 /**
  * Sets up Nunjucks as the template engine for the given Express application.
