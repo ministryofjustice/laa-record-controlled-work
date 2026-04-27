@@ -10,7 +10,7 @@ describe('Either Monad', () => {
     it('should return a Success object containing the provided value', () => {
       const value = { id: 1, name: 'Alice' };
       
-      const result = success(value);
+      const result = success(value) as Success<unknown>;
       
       expect(result.error).to.be.undefined;
       expect(result.value).to.equal(value);
@@ -31,7 +31,7 @@ describe('Either Monad', () => {
       
       const result = failure(nativeError);
 
-      expect(result.value).to.be.undefined;
+      expect(result).to.not.have.property("value");
       expect(result.error).to.equal(nativeError);
       expect(result).to.deep.equal({ error: nativeError });
     });
