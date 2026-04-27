@@ -1,6 +1,6 @@
 import rateLimit from "express-rate-limit";
 import type { Application, RequestHandler } from "express";
-import type { Config } from "#types/config-types.js";
+import type { Config } from "#src/types/config-types.js";
 
 /**
  * Coerces a number or numeric string to a number.

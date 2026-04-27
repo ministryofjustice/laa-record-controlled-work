@@ -12,7 +12,7 @@
  */
 
 import { BaseApiService } from "./baseApiService.js";
-import type { AxiosInstanceWrapper } from "#types/axios-instance-wrapper.js";
+import type { AxiosInstanceWrapper } from "#src/types/axios-instance-wrapper.js";
 import type { AxiosResponse } from "axios";
 
 /**

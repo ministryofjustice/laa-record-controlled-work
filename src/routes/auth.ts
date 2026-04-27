@@ -7,7 +7,7 @@ import {
 } from "#src/lib/constants/httpStatus.js";
 import { TokenAcquisitionError } from "#src/lib/errors/auth.js";
 import { AuthService } from "#src/services/auth.js";
-import { authCodeResponseSchema } from "#types/auth-types.js";
+import { authCodeResponseSchema } from "#src/types/auth-types.js";
 import { ConfidentialClientApplication } from "@azure/msal-node";
 import {
   Router,

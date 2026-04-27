@@ -12,7 +12,7 @@
 
 import { devLog } from "#src/lib/devLogger.js";
 import { extractAndLogError } from "#src/lib/errorHandler.js";
-import type { AxiosInstanceWrapper } from "#types/axios-instance-wrapper.js";
+import type { AxiosInstanceWrapper } from "#src/types/axios-instance-wrapper.js";
 import type { AxiosResponse } from "axios";
 
 // Constants to avoid magic numbers

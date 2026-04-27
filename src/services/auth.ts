@@ -9,7 +9,7 @@ import {
 import config from "#src/config.js";
 import { authRequestDefaults } from "#src/config/auth.js";
 import { failure, success, type Either } from "#src/lib/either.js";
-import type { AuthCodeResponse, PKCECodes } from "#types/auth-types.js";
+import type { AuthCodeResponse, PKCECodes } from "#src/types/auth-types.js";
 import { devError } from "#src/lib/devLogger.js";
 import {
   MissingAuthCodeRequestError,

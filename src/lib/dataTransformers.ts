@@ -4,7 +4,7 @@
  * Utility functions for safely transforming and validating data from JSON fixtures
  */
 
-import type { FieldConfig } from "#types/form-controller-types.js";
+import type { FieldConfig } from "#src/types/form-controller-types.js";
 /**
  * Safely extract nested field value using custom path resolution
  * @param {unknown} obj - Object to traverse

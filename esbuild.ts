@@ -5,7 +5,6 @@ import { sassPlugin } from "esbuild-sass-plugin";
 import fs from "fs-extra";
 import { builtinModules } from "node:module";
 import path from "node:path";
-import type { SassPluginOptions } from "./types/sass-plugin-types.js";
 
 // Load environment variables
 dotenv.config();
@@ -17,6 +16,13 @@ const RANDOM_NUMBER_UPPER_BOUND = 10000;
 const buildNumber = Math.floor(
   Math.random() * RANDOM_NUMBER_UPPER_BOUND,
 ).toString();
+
+export interface SassPluginOptions {
+  resolveDir?: string;
+  loadPaths?: string[];
+  transform?: (source: string) => string;
+  // Add other possible options
+}
 
 /**
  * Copies GOV.UK (fonts and images from `govuk-frontend`), MOJ Frontend (images from `@ministryofjustice/frontend`) and other assets
