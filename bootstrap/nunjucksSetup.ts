@@ -1,8 +1,8 @@
-import { nunjucksT } from "#src/lib/index.js";
 import type { Application } from "express";
 import path from "node:path";
 import nunjucks from "nunjucks";
 import { resolveAsset } from "./assetFingerprint.js";
+import { nunjucksT } from "#src/lib/i18nLoader.js";
 
 /**
  * Sets up Nunjucks as the template engine for the given Express application.

@@ -15,12 +15,13 @@ import {
 import { requireAuth } from "#middleware/requireAuth.js";
 import authRouter from "#src/routes/auth.js";
 import indexRouter from "#src/routes/index.js";
-import { initializeI18nextSync } from "#src/lib/index.js";
+
 import compression from "compression";
 import type { Request, Response } from "express";
 import express from "express";
 import session from "express-session";
 import morgan from "morgan";
+import { initializeI18nextSync } from "./lib/i18nLoader.js";
 
 const TRUST_FIRST_PROXY = 1;
 const ENABLE_PLAYWRIGHT_TEST_SIGNIN =

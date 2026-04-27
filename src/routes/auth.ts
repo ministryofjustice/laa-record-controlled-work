@@ -1,6 +1,11 @@
 import config from "#config.js";
 import { msalConfig } from "#src/config/auth.js";
-import { BAD_REQUEST } from "#src/constants/httpStatus.js";
+import {
+  BAD_REQUEST,
+  INTERNAL_SERVER_ERROR,
+  UNAUTHORIZED,
+} from "#src/lib/constants/httpStatus.js";
+import { TokenAcquisitionError } from "#src/lib/errors/auth.js";
 import { AuthService } from "#src/services/auth.js";
 import { authCodeResponseSchema } from "#types/auth-types.js";
 import { ConfidentialClientApplication } from "@azure/msal-node";
@@ -18,15 +23,16 @@ const msalClient: ConfidentialClientApplication =
 router.get(
   "/signin",
   async (req: Request, res: Response, next: NextFunction) => {
-    const authService: AuthService = AuthService.create(
-      req.session,
-      msalClient,
-    );
+    const authService = AuthService.create(req.session, msalClient);
 
     try {
-      const authUrl: string = await authService.getAuthCodeUrl();
+      const result = await authService.getAuthCodeUrl();
+      if (result.error) {
+        const { message } = result.error;
+        return res.status(INTERNAL_SERVER_ERROR).send(message);
+      }
 
-      res.redirect(authUrl);
+      res.redirect(result.value);
     } catch (error) {
       next(error);
     }
@@ -56,15 +62,19 @@ router.post(
   "/code/callback",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const parseResult = authCodeResponseSchema.safeParse(req.body);
-      if (!parseResult.success) {
+      const { success, data } = authCodeResponseSchema.safeParse(req.body);
+      if (!success) {
         return res.status(BAD_REQUEST).send("Invalid redirect payload");
       }
 
-      const { data } = parseResult;
       const authService = AuthService.create(req.session, msalClient);
-      const { successRedirect } =
-        await authService.processAuthCodeCallback(data);
+      const result = await authService.processAuthCodeCallback(data);
+
+      if (result.error instanceof TokenAcquisitionError) {
+        return res.status(UNAUTHORIZED).send(result.error.message);
+      } else if (result.error) {
+        return res.status(BAD_REQUEST).send(result.error.message);
+      }
 
       const { isAuthenticated, idToken, account, tokenCache } = req.session;
       req.session.regenerate((error) => {
@@ -72,11 +82,12 @@ router.post(
           next(error);
           return;
         }
+
         req.session.isAuthenticated = isAuthenticated;
         req.session.idToken = idToken;
         req.session.account = account;
         req.session.tokenCache = tokenCache;
-        res.redirect(successRedirect);
+        res.redirect(result.value);
       });
     } catch (error) {
       res.redirect("/auth/signin");

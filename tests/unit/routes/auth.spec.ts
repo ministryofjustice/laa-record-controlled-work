@@ -1,14 +1,18 @@
 import { AuthService } from "#src/services/auth.js";
+import { failure, success } from "#src/lib/either.js";
 import { expect } from "chai";
 import express from "express";
 import sinon from "sinon";
 import request from "supertest";
 import {
-  FOUND,
   BAD_REQUEST,
+  FOUND,
   INTERNAL_SERVER_ERROR,
-} from "#src/constants/httpStatus.js";
+  UNAUTHORIZED,
+} from "#src/lib/constants/httpStatus.js";
+
 import createApp from "#src/app.js";
+import { MissingAuthCodeRequestError, MsalError, StateMismatchError, TokenAcquisitionError } from "#src/lib/errors/auth.js";
 
 describe("authRoutes", () => {
   let authServiceStub: {
@@ -26,10 +30,10 @@ describe("authRoutes", () => {
 
   beforeEach(() => {
     authServiceStub = {
-      getAuthCodeUrl: sinon.stub().resolves(AUTH_CODE_URL),
+      getAuthCodeUrl: sinon.stub().resolves(success(AUTH_CODE_URL)),
       processAuthCodeCallback: sinon
         .stub()
-        .resolves({ successRedirect: SUCCESS_REDIRECT }),
+        .resolves(success(SUCCESS_REDIRECT)),
     };
     sinon
       .stub(AuthService, "create")
@@ -60,16 +64,43 @@ describe("authRoutes", () => {
       expect(res.status).to.equal(BAD_REQUEST);
     });
 
-    it("redirects to /auth/signin when processAuthCodeCallback() throws", async () => {
-      authServiceStub.processAuthCodeCallback.rejects(new Error("MSAL failure"));
+    it("responds with 400 when processAuthCodeCallback returns MissingAuthCodeRequest", async () => {
+      authServiceStub.processAuthCodeCallback.resolves(
+        failure(MissingAuthCodeRequestError),
+      );
 
       const res = await request(app)
         .post("/auth/code/callback")
         .type("form")
         .send({ code: "auth-code-abc", state: "encoded-state" });
 
-      expect(res.status).to.equal(FOUND);
-      expect(res.headers.location).to.equal("/auth/signin");
+      expect(res.status).to.equal(BAD_REQUEST);
+    });
+
+    it("responds with 400 when processAuthCodeCallback returns StateMismatchError", async () => {
+      authServiceStub.processAuthCodeCallback.resolves(
+        failure(StateMismatchError),
+      );
+
+      const res = await request(app)
+        .post("/auth/code/callback")
+        .type("form")
+        .send({ code: "auth-code-abc", state: "encoded-state" });
+
+      expect(res.status).to.equal(BAD_REQUEST);
+    });
+
+    it("responds with 401 when processAuthCodeCallback returns TokenAcquisitionError", async () => {
+      authServiceStub.processAuthCodeCallback.resolves(
+        failure(TokenAcquisitionError.from(new Error("MSAL"))),
+      );
+
+      const res = await request(app)
+        .post("/auth/code/callback")
+        .type("form")
+        .send({ code: "auth-code-abc", state: "encoded-state" });
+
+      expect(res.status).to.equal(UNAUTHORIZED);
     });
   });
   
@@ -81,8 +112,10 @@ describe("authRoutes", () => {
       expect(response.headers.location).to.equal(AUTH_CODE_URL);
     });
 
-    it("calls next(error) when getAuthCodeUrl() throws", async () => {
-      authServiceStub.getAuthCodeUrl.rejects(new Error("MSAL failure"));
+    it("responds with 500 when getAuthCodeUrl returns a MsalError", async () => {
+      authServiceStub.getAuthCodeUrl.resolves(
+        failure(MsalError.from(new Error("MSAL failure"))),
+      );
 
       const response = await request(app).get("/auth/signin");
       expect(response.status).to.equal(INTERNAL_SERVER_ERROR);

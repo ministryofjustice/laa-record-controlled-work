@@ -11,12 +11,7 @@ export const authCodeResponseSchema = z.object({
   state: z.string().min(1),
   session_state: z.string().optional(),
 });
-
 export type AuthCodeResponse = z.infer<typeof authCodeResponseSchema>;
-
-export interface AuthState {
-  successRedirect: string;
-}
 
 export interface PKCECodes {
   challengeMethod: string;

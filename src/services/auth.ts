@@ -8,11 +8,16 @@ import {
 } from "@azure/msal-node";
 import config from "#config.js";
 import { authRequestDefaults } from "#src/config/auth.js";
-import type {
-  AuthCodeResponse,
-  AuthState,
-  PKCECodes,
-} from "#types/auth-types.js";
+import { failure, success, type Either } from "#src/lib/either.js";
+import type { AuthCodeResponse, PKCECodes } from "#types/auth-types.js";
+import { devError } from "#src/lib/devLogger.js";
+import {
+  MissingAuthCodeRequestError,
+  MsalError,
+  PkceGenerationError,
+  StateMismatchError,
+  TokenAcquisitionError,
+} from "#src/lib/errors/auth.js";
 
 /**
  * Handles Microsoft Entra ID (MSAL) authentication flows including
@@ -51,37 +56,46 @@ export class AuthService {
 
   /**
    * Generates the Microsoft Entra ID authorisation URL to begin the PKCE sign-in flow.
-   * @returns {Promise<string>} The authorisation URL to redirect the user to.
+   * @returns {Promise<Either<AuthError, string>>} The authorisation URL or an auth error.
    */
-  public async getAuthCodeUrl(): Promise<string> {
-    const authCodeUrlRequest: AuthorizationUrlRequest =
-      await this.createAuthCodeRequest();
+  public async getAuthCodeUrl(): Promise<
+    Either<PkceGenerationError | MsalError, string>
+  > {
+    const result = await this.getPkceCodes();
+    if (result.error) return failure(PkceGenerationError.from(result.error));
 
+    const authCodeUrlRequest = this.createAuthCodeRequest(result.value);
     try {
-      return await this.msalClient.getAuthCodeUrl(authCodeUrlRequest);
+      const url = await this.msalClient.getAuthCodeUrl(authCodeUrlRequest);
+      return success(url);
     } catch (error) {
-      console.error("Failed to generate Entra auth code URL:", error);
-      throw error;
+      devError(`Failed to generate Entra auth code URL: ${String(error)}`);
+      return failure(MsalError.from(error));
     }
   }
 
   /**
    * Exchanges the authorisation code from the Entra redirect for tokens and updates the session.
    * @param {AuthCodeResponse} requestBody - The validated redirect payload containing the auth code and state.
-   * @returns {Promise<AuthState>} The decoded auth state containing the post-login redirect URL.
+   * @returns {Promise<Either<AuthError, string>>} The decoded auth state or an auth error.
    */
   public async processAuthCodeCallback(
     requestBody: AuthCodeResponse,
-  ): Promise<AuthState> {
+  ): Promise<
+    Either<
+      MissingAuthCodeRequestError | StateMismatchError | TokenAcquisitionError,
+      string
+    >
+  > {
     if (this.session.authCodeRequest === undefined) {
-      throw new Error("Missing auth code request in session");
+      return failure(new MissingAuthCodeRequestError());
     }
 
     if (
       this.session.authState === undefined ||
       requestBody.state !== this.session.authState
     ) {
-      throw new Error("State mismatch: possible CSRF attack");
+      return failure(new StateMismatchError());
     }
     this.session.authState = undefined;
 
@@ -102,10 +116,10 @@ export class AuthService {
       this.session.account = account ?? undefined;
       this.session.isAuthenticated = true;
 
-      return { successRedirect };
+      return success(successRedirect);
     } catch (error) {
-      console.error("Failed to handle Entra auth redirect:", error);
-      throw error;
+      devError(`Failed to handle Entra auth redirect: ${String(error)}`);
+      return failure(TokenAcquisitionError.from(error));
     }
   }
 
@@ -128,23 +142,25 @@ export class AuthService {
    * Generates a PKCE code verifier and challenge pair using the S256 method.
    * @returns {Promise<PKCECodes>} The generated PKCE codes.
    */
-  private async getPkceCodes(): Promise<PKCECodes> {
-    const { verifier, challenge } =
-      await this.cryptoProvider.generatePkceCodes();
-
-    return {
-      challengeMethod: "S256",
-      verifier,
-      challenge,
-    };
+  private async getPkceCodes(): Promise<
+    Either<PkceGenerationError, PKCECodes>
+  > {
+    try {
+      const { verifier, challenge } =
+        await this.cryptoProvider.generatePkceCodes();
+      return success({ challengeMethod: "S256", verifier, challenge });
+    } catch (error) {
+      devError(`Failed to generate PKCE codes: ${String(error)}`);
+      return failure(PkceGenerationError.from(error));
+    }
   }
 
   /**
    * Builds the MSAL authorisation URL request and stores PKCE state on the session.
-   * @returns {Promise<AuthorizationUrlRequest>} The authorisation URL request object for MSAL.
+   * @param pkceCodes - The PKCE code verifier, challenge, and challenge method.
+   * @returns {AuthorizationUrlRequest} The authorisation URL request object for MSAL.
    */
-  private async createAuthCodeRequest(): Promise<AuthorizationUrlRequest> {
-    const pkceCodes: PKCECodes = await this.getPkceCodes();
+  private createAuthCodeRequest(pkceCodes: PKCECodes): AuthorizationUrlRequest {
     const { challenge, challengeMethod, verifier } = pkceCodes;
     const { returnTo } = this.session;
 
