@@ -1,3 +1,7 @@
 {
-  "extends": ["github>ministryofjustice/devsecops-actions"]
+  "extends": ["github>ministryofjustice/devsecops-actions"],
+  "schedule": ["at any time"],
+  "lockFileMaintenance": {
+    "schedule": ["at any time"]
+  }
 }
