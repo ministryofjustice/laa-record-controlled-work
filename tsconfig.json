@@ -16,23 +16,9 @@
     "strict": true, // Enable all strict type-checking options
     "forceConsistentCasingInFileNames": true, // Disallow inconsistently-cased references to the same file
     "paths": {
-      "#*": ["./*"],
-      "#/bootstrap/*": ["./src/bootstrap/*"]
+      "#*": ["./*"]
     }
   },
-  "include": [
-    "src/**/*",
-    "middleware/**/*",
-    "src/bootstrap/**/*.ts",
-    "routes/**/*",
-    "scripts/**/*.ts",
-    "esbuild.ts",
-    "start-server.ts",
-    "config.ts",
-    "types/**/*.ts",
-    "playwright.config.ts",
-    "tests/**/*.spec.ts",
-    "tests/**/*.ts"
-  ],
+  "include": ["**/**.ts"],
   "exclude": ["node_modules", "public", "**/*.js"]
 }
