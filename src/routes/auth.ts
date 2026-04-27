@@ -1,4 +1,4 @@
-import config from "#config.js";
+import config from "#src/config.js";
 import { msalConfig } from "#src/config/auth.js";
 import {
   BAD_REQUEST,

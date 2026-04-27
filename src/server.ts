@@ -1,5 +1,5 @@
 import { displayAsciiBanner } from "#src/bootstrap/index.js";
-import config from "#config.js";
+import config from "#src/config.js";
 import createApp from "#src/app.js";
 import chalk from "chalk";
 

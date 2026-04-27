@@ -1,4 +1,4 @@
-import config from "#config.js";
+import config from "#src/config.js";
 import type { Configuration } from "@azure/msal-node";
 
 export const msalConfig: Configuration = {

@@ -3,7 +3,7 @@ import {
   CryptoProvider,
 } from "@azure/msal-node";
 import { AuthService } from "#src/services/auth.js";
-import config from "#config.js";
+import config from "#src/config.js";
 import { expect } from "chai";
 import type { SessionData } from "express-session";
 import sinon from "sinon";

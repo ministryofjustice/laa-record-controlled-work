@@ -6,7 +6,7 @@ import {
   type AuthorizationUrlRequest,
   type AuthenticationResult,
 } from "@azure/msal-node";
-import config from "#config.js";
+import config from "#src/config.js";
 import { authRequestDefaults } from "#src/config/auth.js";
 import { failure, success, type Either } from "#src/lib/either.js";
 import type { AuthCodeResponse, PKCECodes } from "#types/auth-types.js";
