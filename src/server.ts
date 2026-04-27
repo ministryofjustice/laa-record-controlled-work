@@ -1,7 +1,7 @@
-import { displayAsciiBanner } from "#/bootstrap/index.js";
 import config from "#/config.js";
 import createApp from "#/app.js";
 import chalk from "chalk";
+import { displayAsciiBanner } from "#/bootstrap/displayAsciiBanner.js";
 
 const app = await createApp();
 

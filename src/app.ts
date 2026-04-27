@@ -1,11 +1,12 @@
+import { helmetSetup } from "#/bootstrap/helmetSetup.js";
+import { nunjucksSetup } from "#/bootstrap/nunjucksSetup.js";
 import {
-  axiosMiddleware,
-  createAuthLimiter,
-  helmetSetup,
-  nunjucksSetup,
   rateLimitSetUp,
-} from "#/bootstrap/index.js";
+  createAuthLimiter,
+} from "#/bootstrap/rateLimitSetUp.js";
 import config from "#/config.js";
+import { initializeI18nextSync } from "#/lib/i18nLoader.js";
+import { axiosMiddleware } from "#/middleware/apiMiddleware.js";
 import {
   setupConfig,
   setupCsrf,
@@ -21,7 +22,6 @@ import type { Request, Response } from "express";
 import express from "express";
 import session from "express-session";
 import morgan from "morgan";
-import { initializeI18nextSync } from "./lib/i18nLoader.js";
 
 const TRUST_FIRST_PROXY = 1;
 const ENABLE_PLAYWRIGHT_TEST_SIGNIN =
