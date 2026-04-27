@@ -6,8 +6,8 @@
  */
 
 import { expect } from 'chai';
-import { BaseApiService } from '#src/services/baseApiService.js';
-import type { AxiosInstanceWrapper } from '#src/types/axios-instance-wrapper.js';
+import { BaseApiService } from '#/services/baseApiService.js';
+import type { AxiosInstanceWrapper } from '#/types/axios-instance-wrapper.js';
 import { create } from 'middleware-axios';
 
 // Test implementation of BaseApiService

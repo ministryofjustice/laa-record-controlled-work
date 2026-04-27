@@ -5,9 +5,9 @@
  * and TypedValidationError for GOV.UK Design System error formatting.
  */
 
-import { validatePerson } from "#src/controllers/personSchema.js";
-import { formatValidationError } from "#src/lib/ValidationErrorHelpers.js";
-import { initializeI18nextSync } from "#src/lib/i18nLoader.js";
+import { validatePerson } from "#/controllers/personSchema.js";
+import { formatValidationError } from "#/lib/ValidationErrorHelpers.js";
+import { initializeI18nextSync } from "#/lib/i18nLoader.js";
 import { expect } from "chai";
 import type { Request } from 'express';
 import { validationResult } from "express-validator";

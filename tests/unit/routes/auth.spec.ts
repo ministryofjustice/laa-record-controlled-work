@@ -1,5 +1,5 @@
-import { AuthService } from "#src/services/auth.js";
-import { failure, success } from "#src/lib/either.js";
+import { AuthService } from "#/services/auth.js";
+import { failure, success } from "#/lib/either.js";
 import { expect } from "chai";
 import express from "express";
 import sinon from "sinon";
@@ -9,10 +9,10 @@ import {
   FOUND,
   INTERNAL_SERVER_ERROR,
   UNAUTHORIZED,
-} from "#src/lib/constants/httpStatus.js";
+} from "#/lib/constants/httpStatus.js";
 
-import createApp from "#src/app.js";
-import { MissingAuthCodeRequestError, MsalError, StateMismatchError, TokenAcquisitionError } from "#src/lib/errors/auth.js";
+import createApp from "#/app.js";
+import { MissingAuthCodeRequestError, MsalError, StateMismatchError, TokenAcquisitionError } from "#/lib/errors/auth.js";
 
 describe("authRoutes", () => {
   let authServiceStub: {

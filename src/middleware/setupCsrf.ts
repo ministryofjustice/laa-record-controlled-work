@@ -1,7 +1,7 @@
 import { csrfSync } from "csrf-sync";
 import type { Application, Request, Response, NextFunction } from "express";
 // Import CSRF token type definitions
-import "#src/types/csrf-types.js";
+import "#/types/csrf-types.js";
 
 /**
  * Type guard to check if an object has a _csrf property

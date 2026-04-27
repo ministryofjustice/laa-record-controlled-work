@@ -1,5 +1,5 @@
 import type { Application, Request, Response, NextFunction } from "express";
-import config from "#src/config.js";
+import config from "#/config.js";
 
 /**
  * Middleware setup function to attach configuration settings to response locals.

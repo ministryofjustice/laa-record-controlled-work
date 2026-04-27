@@ -1,5 +1,5 @@
-import { Either, failure, Success, success } from '#src/lib/either.js';
-import { DomainError } from '#src/lib/errors/domainError.js';
+import { Either, failure, Success, success } from '#/lib/either.js';
+import { DomainError } from '#/lib/errors/domainError.js';
 import { expect } from 'chai';
 
 

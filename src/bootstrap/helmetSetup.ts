@@ -7,7 +7,7 @@ import helmet from "helmet";
 import crypto from "node:crypto";
 import type { Request, Response, NextFunction, Application } from "express";
 import type { IncomingMessage, ServerResponse } from "node:http";
-import config from "#src/config.js";
+import config from "#/config.js";
 
 const RANDOMBYTES = 16;
 

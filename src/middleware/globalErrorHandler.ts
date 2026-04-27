@@ -5,8 +5,8 @@ import {
   NOT_FOUND,
   SERVICE_UNAVAILABLE,
   UNAUTHORIZED,
-} from "#src/lib/constants/httpStatus.js";
-import { DomainError } from "#src/lib/errors/domainError.js";
+} from "#/lib/constants/httpStatus.js";
+import { DomainError } from "#/lib/errors/domainError.js";
 import type { Request, Response } from "express";
 
 const ErrorStatuses: Record<string, number> = {

@@ -5,11 +5,11 @@
 
 import figlet from "figlet";
 import chalk from "chalk";
-import type { Config } from "#src/types/config-types.js";
+import type { Config } from "#/types/config-types.js";
 
 /**
  * Displays an ASCII Art banner with department name in the console.
- * @param {import('#src/types/config-types.js').Config} config - The application config object
+ * @param {import('#/types/config-types.js').Config} config - The application config object
  * @returns {void}
  */
 const displayAsciiBanner = (config: Config): void => {

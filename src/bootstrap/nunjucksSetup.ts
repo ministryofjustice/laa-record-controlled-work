@@ -1,7 +1,7 @@
 import type { Application } from "express";
 import path from "node:path";
 import nunjucks from "nunjucks";
-import { nunjucksT } from "#src/lib/i18nLoader.js";
+import { nunjucksT } from "#/lib/i18nLoader.js";
 import fs from "node:fs";
 
 const FIRST_IN_ARRAY = 0;

@@ -7,8 +7,8 @@
  * Based on MCC's utils/axiosSetup.ts patterns.
  */
 
-import { UNAUTHORIZED } from "#src/lib/constants/httpStatus.js";
-import { devError, devLog } from "#src/lib/devLogger.js";
+import { UNAUTHORIZED } from "#/lib/constants/httpStatus.js";
+import { devError, devLog } from "#/lib/devLogger.js";
 import type { AxiosError, InternalAxiosRequestConfig } from "axios";
 import type { NextFunction, Request, Response } from "express";
 import { create } from "middleware-axios";

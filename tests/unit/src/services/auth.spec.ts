@@ -2,14 +2,14 @@ import {
   ConfidentialClientApplication,
   CryptoProvider,
 } from "@azure/msal-node";
-import { AuthService } from "#src/services/auth.js";
-import config from "#src/config.js";
+import { AuthService } from "#/services/auth.js";
+import config from "#/config.js";
 import { expect } from "chai";
 import type { SessionData } from "express-session";
 import sinon from "sinon";
-import { authRequestDefaults } from "#src/config/auth.js";
-import { Success } from "#src/lib/either.js";
-import { MissingAuthCodeRequestError, MsalError, StateMismatchError, TokenAcquisitionError } from "#src/lib/errors/auth.js";
+import { authRequestDefaults } from "#/config/auth.js";
+import { Success } from "#/lib/either.js";
+import { MissingAuthCodeRequestError, MsalError, StateMismatchError, TokenAcquisitionError } from "#/lib/errors/auth.js";
 
 describe("AuthService", () => {
   let msalStub: Partial<ConfidentialClientApplication>;

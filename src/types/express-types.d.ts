@@ -1,4 +1,4 @@
-import type { ExpressLocaleLoader } from "#src/lib/index.js";
+import type { ExpressLocaleLoader } from "#/lib/index.js";
 import type session from "express-session";
 import type { AxiosInstanceWrapper } from "./axios-instance-wrapper.js";
 

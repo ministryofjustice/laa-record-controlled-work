@@ -4,17 +4,17 @@ import {
   helmetSetup,
   nunjucksSetup,
   rateLimitSetUp,
-} from "#src/bootstrap/index.js";
-import config from "#src/config.js";
+} from "#/bootstrap/index.js";
+import config from "#/config.js";
 import {
   setupConfig,
   setupCsrf,
   setupLocaleMiddleware,
   setupMiddlewares,
-} from "#src/middleware/index.js";
-import { requireAuth } from "#src/middleware/requireAuth.js";
-import authRouter from "#src/routes/auth.js";
-import indexRouter from "#src/routes/index.js";
+} from "#/middleware/index.js";
+import { requireAuth } from "#/middleware/requireAuth.js";
+import authRouter from "#/routes/auth.js";
+import indexRouter from "#/routes/index.js";
 
 import compression from "compression";
 import type { Request, Response } from "express";

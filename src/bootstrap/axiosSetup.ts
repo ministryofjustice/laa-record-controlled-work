@@ -8,8 +8,8 @@
 export {
   axiosMiddleware,
   createApiMiddleware,
-} from "#src/middleware/apiMiddleware.js";
+} from "#/middleware/apiMiddleware.js";
 export type {
   ApiMiddlewareConfig,
   AuthServiceInterface,
-} from "#src/middleware/apiMiddleware.js";
+} from "#/middleware/apiMiddleware.js";

@@ -1,4 +1,4 @@
-import { requireAuth } from '#src/middleware/requireAuth.js';
+import { requireAuth } from '#/middleware/requireAuth.js';
 import { expect } from 'chai';
 import type { Request, Response } from 'express';
 import sinon from 'sinon';

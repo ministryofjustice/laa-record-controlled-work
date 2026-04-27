@@ -1,7 +1,7 @@
-import { INTERNAL_SERVER_ERROR, OK } from "#src/lib/constants/httpStatus.js";
-import { getPerson, postPerson } from "#src/controllers/personController.js";
-import { validatePerson } from "#src/controllers/personSchema.js";
-import { exampleApiService } from "#src/services/exampleApiService.js";
+import { INTERNAL_SERVER_ERROR, OK } from "#/lib/constants/httpStatus.js";
+import { getPerson, postPerson } from "#/controllers/personController.js";
+import { validatePerson } from "#/controllers/personSchema.js";
+import { exampleApiService } from "#/services/exampleApiService.js";
 import type { NextFunction, Request, Response } from "express";
 import express from "express";
 
