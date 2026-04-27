@@ -1,24 +1,38 @@
+import type { SessionConfig } from "#types/config-types.js";
 import { RedisStore } from "connect-redis";
 import type { SessionOptions } from "express-session";
 import { createClient, type RedisClientType } from "redis";
-import { SessionConfig } from "#types/config-types.js";
 
+/**
+ * TODO
+ */
 export default class SessionManager {
   clientFactory: (options: object) => RedisClientType;
   redisStoreFactory:
     | ((sessionConfig: SessionConfig) => Promise<RedisStore>)
     | undefined;
 
+  /**
+   * TODO
+   */
   constructor() {
     this.clientFactory = createClient;
   }
 
+  /**
+   * TODO
+   * @param clientFactory - TODO
+   */
   public setClientFactory(
     clientFactory: (options: object) => RedisClientType,
   ): void {
     this.clientFactory = clientFactory;
   }
 
+  /**
+   * TODO
+   * @param redisStoreFactory - TODO
+   */
   public setRedisStoreFactory(
     redisStoreFactory: (sessionConfig: SessionConfig) => Promise<RedisStore>,
   ): void {

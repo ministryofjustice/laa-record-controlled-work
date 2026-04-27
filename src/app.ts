@@ -34,7 +34,6 @@ const ENABLE_PLAYWRIGHT_TEST_SIGNIN =
  * @returns {Promise<import('express').Application>} The configured Express application
  */
 const createApp = async (): Promise<express.Application> => {
-
   // Initialise i18next synchronously before setting up the app
   initializeI18nextSync();
 
@@ -42,7 +41,6 @@ const createApp = async (): Promise<express.Application> => {
 
   const sessionManager = new SessionManager();
   const sessionConfig = await sessionManager.getSessionConfig(config.session);
-
   // Set up common middleware for handling cookies, body parsing, etc.
   setupMiddlewares(app);
 

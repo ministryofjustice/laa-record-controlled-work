@@ -1,4 +1,7 @@
-import { MS_IN_A_MINUTE, MS_IN_TWELVE_HOURS } from "#src/constants/timeEnums.js";
+import {
+  MS_IN_A_MINUTE,
+  MS_IN_TWELVE_HOURS,
+} from "#src/constants/timeEnums.js";
 import type { Config } from "#types/config-types.js";
 
 import dotenv from "dotenv";
