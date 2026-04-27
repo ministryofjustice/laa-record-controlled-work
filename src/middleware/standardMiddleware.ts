@@ -10,7 +10,7 @@ import config from "#/config.js";
  * @param {Application} app - The Express application instance.
  * @returns {void} Sets up various middleware on the provided app instance.
  */
-export const setupMiddlewares = (app: Application): void => {
+export const standardMiddleware = (app: Application): void => {
   // Parses cookies and adds them to req.cookies
   app.use(cookieParser());
 

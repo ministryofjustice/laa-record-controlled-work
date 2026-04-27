@@ -7,7 +7,7 @@ import {
 import config from "#/config.js";
 import { initializeI18nextSync } from "#/lib/i18nLoader.js";
 import { axiosMiddleware } from "#/middleware/apiMiddleware.js";
-import { setupMiddlewares } from "#/middleware/commonMiddleware.js";
+import { standardMiddleware } from "#/middleware/standardMiddleware.js";
 import { requireAuth } from "#/middleware/requireAuth.js";
 import { setupConfig } from "#/middleware/setupConfigs.js";
 import { setupCsrf } from "#/middleware/setupCsrf.js";
@@ -38,7 +38,7 @@ const createApp = async (): Promise<express.Application> => {
   const app = express();
 
   // Set up common middleware for handling cookies, body parsing, etc.
-  setupMiddlewares(app);
+  standardMiddleware(app);
 
   app.use(axiosMiddleware);
 
