@@ -6,7 +6,7 @@ import { createClient, type RedisClientType } from "redis";
 /**
  * TODO
  */
-export default class SessionManager {
+export default class SessionService {
   clientFactory: (options: object) => RedisClientType;
   redisStoreFactory:
     | ((sessionConfig: SessionConfig) => Promise<RedisStore>)
@@ -15,8 +15,16 @@ export default class SessionManager {
   /**
    * TODO
    */
-  constructor() {
+  private constructor() {
     this.clientFactory = createClient;
+  }
+
+  /**
+   * Factory method to create a new SessionService instance.
+   * @returns {SessionService} A new SessionService instance.
+   */
+  public static create(): SessionService {
+    return new SessionService();
   }
 
   /**
