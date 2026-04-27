@@ -10,7 +10,8 @@ dev:
 	op run --env-file=.env -- npx tsx src/server.ts
 
 unit:
-	yarn test:unit
+	./node_modules/.bin/mocha
+	
 
 e2e:
 	yarn build && yarn test:e2e

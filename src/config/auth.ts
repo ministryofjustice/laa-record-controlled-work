@@ -18,4 +18,4 @@ export const authRequestDefaults = {
 } as const;
 
 export const msalClient: ConfidentialClientApplication =
-  new ConfidentialClientApplication(msalConfig)
+  new ConfidentialClientApplication(msalConfig);

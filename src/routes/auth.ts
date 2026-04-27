@@ -72,8 +72,9 @@ router.post(
         req.session.idToken = idToken;
         req.session.account = account;
         req.session.tokenCache = tokenCache;
-        res.redirect(successRedirect);
       });
+
+      res.redirect(successRedirect);
     } catch (error) {
       res.redirect("/auth/signin");
     }
