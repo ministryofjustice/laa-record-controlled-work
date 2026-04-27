@@ -51,6 +51,16 @@ const copyAssets = async (): Promise<void> => {
   }
 };
 
+const copyViews = async (): Promise<void> => {
+  try {
+    await fs.copy(path.resolve("./src/views"), path.resolve("./public/views"));
+    console.log("✅ Nunjucks views copied successfully.");
+  } catch (error) {
+    console.error("❌ Failed to copy views:", error);
+    process.exit(UNCAUGHT_FATAL_EXCEPTION);
+  }
+};
+
 /**
  * List of external dependencies that should not be bundled.
  * @constant {string[]}
@@ -262,6 +272,7 @@ const watchBuild = async (): Promise<void> => {
   try {
     // Copy assets initially
     await copyAssets();
+    await copyViews();
 
     // Start all watchers
     const contexts = await Promise.all([
@@ -283,6 +294,10 @@ const watchBuild = async (): Promise<void> => {
       },
     );
 
+    const viewsWatcher = chokidar.watch(["/src/views/**/*"], {
+      persistent: true,
+    });
+
     /**
      * Handles asset file changes by copying assets.
      * @returns {void}
@@ -293,7 +308,14 @@ const watchBuild = async (): Promise<void> => {
       });
     };
 
+    const handleViewsChange = (): void => {
+      copyViews().catch((error: unknown) => {
+        console.error("❌ Failed to copy views on change:", error);
+      });
+    };
+
     assetWatcher.on("change", handleAssetChange);
+    viewsWatcher.on("change", handleViewsChange);
 
     console.log(
       "✅ Watch mode started successfully. Watching for file changes...",
@@ -343,6 +365,7 @@ const build = async (): Promise<void> => {
 
     // Copy assets
     await copyAssets();
+    await copyViews();
 
     // Build all files
     await Promise.all([

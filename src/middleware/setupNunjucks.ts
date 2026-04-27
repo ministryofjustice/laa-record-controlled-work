@@ -1,8 +1,8 @@
 import type { Application } from "express";
-import path from "node:path";
 import nunjucks from "nunjucks";
 import { nunjucksT } from "#/lib/i18nLoader.js";
 import fs from "node:fs";
+import path from "node:path";
 
 const FIRST_IN_ARRAY = 0;
 
@@ -58,7 +58,7 @@ export const setupNunjucks = (app: Application): void => {
   // Tell Nunjucks where to look for njk files
   const nunjucksEnv = nunjucks.configure(
     [
-      path.join(path.resolve(), "views"), // Main views directory
+      path.join(process.cwd(), "public", "views"), // Main views directory
       "node_modules/govuk-frontend/dist", // GOV.UK Frontend templates
       "node_modules/govuk-frontend/dist/components/", // GOV.UK components
       "node_modules/@ministryofjustice/frontend", // MoJ Design System components
