@@ -9,3 +9,10 @@ version: v1.25.0
 #         reason: >
 #           Brief explanation of why the CVE is being ignored and when a fix is expected.
 #         expires: "YYYY-MM-DDT00:00:00.000Z" 
+
+ignore:
+  SNYK-JS-FOLLOWREDIRECTS-16032162:
+    - "*":
+        reason: >
+          Axios 1.15.2 vulnerabilities fixed in 1.16.0 which isn't released yet.
+        expires: "2026-05-04T12:00:00.000Z"
