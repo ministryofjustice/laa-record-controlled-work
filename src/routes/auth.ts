@@ -70,10 +70,9 @@ router.post(
       const authService = AuthService.create(req.session, msalClient);
       const result = await authService.processAuthCodeCallback(data);
 
-      if (result.error) {
-        if (result.error instanceof TokenAcquisitionError) {
-          return res.status(UNAUTHORIZED).send(result.error.message);
-        }
+      if (result.error instanceof TokenAcquisitionError) {
+        return res.status(UNAUTHORIZED).send(result.error.message);
+      } else if (result.error) {
         return res.status(BAD_REQUEST).send(result.error.message);
       }
 
