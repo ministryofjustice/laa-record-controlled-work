@@ -2,7 +2,7 @@
  * @description Test that the config was attached to the application set up
  */
 
-import { setupConfig } from '#middleware/setupConfigs.js';
+import { setupConfig } from '#src/middleware/setupConfigs.js';
 import express from 'express';
 import { expect } from 'chai';
 import http from 'http';

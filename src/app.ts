@@ -11,8 +11,8 @@ import {
   setupCsrf,
   setupLocaleMiddleware,
   setupMiddlewares,
-} from "#middleware/index.js";
-import { requireAuth } from "#middleware/requireAuth.js";
+} from "#src/middleware/index.js";
+import { requireAuth } from "#src/middleware/requireAuth.js";
 import authRouter from "#src/routes/auth.js";
 import indexRouter from "#src/routes/index.js";
 
