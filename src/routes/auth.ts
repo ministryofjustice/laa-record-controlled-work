@@ -34,8 +34,8 @@ router.post("/signout", (req: Request, res: Response, next: NextFunction) => {
     const {
       session: { idToken },
     } = req;
-    req.session.destroy((error: Error | undefined) => {
-      if (error !== undefined) {
+    req.session.destroy((error) => {
+      if (error !== undefined && error !== null) {
         next(error);
         return;
       }
@@ -64,7 +64,7 @@ router.post(
 
       const { isAuthenticated, idToken, account, tokenCache } = req.session;
       req.session.regenerate((error) => {
-        if (error !== undefined) {
+        if (error !== undefined && error !== null) {
           next(error);
           return;
         }
@@ -72,9 +72,8 @@ router.post(
         req.session.idToken = idToken;
         req.session.account = account;
         req.session.tokenCache = tokenCache;
+        res.redirect(successRedirect);
       });
-
-      res.redirect(successRedirect);
     } catch (error) {
       res.redirect("/auth/signin");
     }
