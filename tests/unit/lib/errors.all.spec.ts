@@ -11,24 +11,26 @@ describe('Domain Errors >', () => {
 
   files.forEach(file => {
     describe(`${file} >`, () => {
-      const moduleImports = require(path.join(dir, file));
+      const modules = require(path.join(dir, file));
 
-      Object.values(moduleImports).forEach((ExportedEntity: any) => {
-        // classes are typed as function
-        if (typeof ExportedEntity !== 'function') return;
+      Object.values(modules).forEach((Export: any) => {
+        // classes are typed as function in JS
+        if (typeof Export !== 'function') return;
 
-        // 2. Walk up the prototype chain safely by string name
-        let prototype = Object.getPrototypeOf(ExportedEntity);
+        // get export prototype (parent class)
+        // loop through prototypes, break at top of JS prototype chain (Function.prototype)
+        let prototype = Object.getPrototypeOf(Export);
         while (prototype && prototype !== Function.prototype) {
-          // if the exported entity is a DomainError, test it
+          // if export prototype (parent class) is DomainError, test it
           if (prototype.name === 'DomainError') {
-            it(`${ExportedEntity.name} class name should match instance property 'name'`, () => {
-              const instance = new ExportedEntity();
-              expect(instance.name).to.equal(ExportedEntity.name);
+            it(`${Export.name} class name should match instance property 'name'`, () => {
+              const instance = new Export();
+              expect(instance.name).to.equal(Export.name);
             });
             break;
           }
           
+          // if export is not DomainError, walk up the chain
           prototype = Object.getPrototypeOf(prototype);
         }
       });
