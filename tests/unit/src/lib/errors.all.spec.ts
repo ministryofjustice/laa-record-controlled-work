@@ -1,12 +1,16 @@
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import { expect } from 'chai';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // loop through all the exports in lib/errors
 // find export entities that extend DomainError
 // test that their class names and name properties are matching
 describe('Domain Errors >', () => {
-  const dir = path.join(__dirname, '../../../src/lib/errors');
+  const dir = path.join(__dirname, '../../../../src/lib/errors');
 
   // Get all files, excluding the base class and types
   const files = fs.readdirSync(dir)
