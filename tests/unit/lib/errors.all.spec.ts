@@ -2,6 +2,9 @@ import fs from 'fs';
 import path from 'path';
 import { expect } from 'chai';
 
+// loop through all the exports in lib/errors
+// find export entities that extend DomainError
+// test that their class names and name properties are matching
 describe('Domain Errors >', () => {
   const dir = path.join(__dirname, '../../../src/lib/errors');
 
