@@ -27,6 +27,7 @@ permissions:
   issues: write
   security-events: write
   statuses: write
+  actions: read
   # documentation confirms vulnerability-alerts is valid at the workflow level
   vulnerability-alerts: read 
 
