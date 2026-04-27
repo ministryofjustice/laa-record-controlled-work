@@ -4,8 +4,8 @@ import {
   helmetSetup,
   nunjucksSetup,
   rateLimitSetUp,
-} from "#/bootstrap/index.js";
-import config from "#config.js";
+} from "#src/bootstrap/index.js";
+import config from "#src/config.js";
 import {
   setupConfig,
   setupCsrf,
