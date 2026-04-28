@@ -8,14 +8,7 @@ import {
 import { TokenAcquisitionError } from "#/lib/errors/auth.js";
 import { AuthService } from "#/services/auth.js";
 import { authCodeResponseSchema } from "#/types/auth-types.js";
-import {
-  Router,
-  type NextFunction,
-  type Request,
-  type Response,
-} from "express";
-
-const router: Router = Router();
+import type { NextFunction, Request, Response } from "express";
 
 export const signIn = async (
   req: Request,
@@ -102,5 +95,3 @@ export const processAuthCodeCallback = async (
     res.redirect("/auth/signin");
   }
 };
-
-export default router;
