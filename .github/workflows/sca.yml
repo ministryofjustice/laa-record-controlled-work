@@ -14,6 +14,8 @@ on:
   pull_request:
     branches: ["main"]
 
+  merge_group:
+
   workflow_dispatch:
   workflow_call:
 
@@ -29,10 +31,16 @@ jobs:
       security-events: write
       actions: read
     steps:
+      - name: Skip in merge queue
+        if: github.event_name == 'merge_group'
+        run: echo "Skipping SCA in merge queue"
+
       - name: Repository
+        if: github.event_name != 'merge_group'
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: ⚡️ SCA
+        if: github.event_name != 'merge_group'
         uses: ministryofjustice/devsecops-actions/sca@86248cec9a6bb1fd4dabc08a05178e0650d3af4f # Feature branch
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
