@@ -4414,7 +4414,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"i18next@npm:^26.0.1":
+"i18next@npm:^26.0.8":
   version: 26.0.8
   resolution: "i18next@npm:26.0.8"
   peerDependencies:
@@ -4882,7 +4882,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jsdom@npm:^29.0.1":
+"jsdom@npm:^29.0.2":
   version: 29.0.2
   resolution: "jsdom@npm:29.0.2"
   dependencies:
@@ -5085,8 +5085,8 @@ __metadata:
     helmet: "npm:^8.1.0"
     http-errors: "npm:~2.0.1"
     husky: "npm:^9.1.7"
-    i18next: "npm:^26.0.1"
-    jsdom: "npm:^29.0.1"
+    i18next: "npm:^26.0.8"
+    jsdom: "npm:^29.0.2"
     libphonenumber-js: "npm:^1.12.42"
     lint-staged: "npm:^16.4.0"
     livereload: "npm:^0.10.3"
@@ -5106,7 +5106,7 @@ __metadata:
     supertest: "npm:^7.2.2"
     ts-node: "npm:^10.9.2"
     tsx: "npm:^4.21.0"
-    typescript: "npm:^6.0.2"
+    typescript: "npm:^6.0.3"
     validator: "npm:^13.15.35"
     zod: "npm:^4.3.6"
   languageName: unknown
@@ -7559,7 +7559,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:^6.0.2":
+"typescript@npm:^6.0.3":
   version: 6.0.3
   resolution: "typescript@npm:6.0.3"
   bin:
@@ -7569,7 +7569,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@npm%3A^6.0.2#optional!builtin<compat/typescript>":
+"typescript@patch:typescript@npm%3A^6.0.3#optional!builtin<compat/typescript>":
   version: 6.0.3
   resolution: "typescript@patch:typescript@npm%3A6.0.3#optional!builtin<compat/typescript>::version=6.0.3&hash=5786d5"
   bin:
