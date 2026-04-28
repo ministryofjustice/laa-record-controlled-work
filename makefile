@@ -31,3 +31,8 @@ docker-run:
 	op inject -i .env -o .env.resolved && \
 	docker run -d -p 8888:3000 --env-file=.env.resolved laa-record-controlled-work:latest && \
 	rm .env.resolved  
+
+docker-up:
+	op inject -i .env -o .env.resolved && \
+	docker compose up && \
+	rm .env.resolved  
