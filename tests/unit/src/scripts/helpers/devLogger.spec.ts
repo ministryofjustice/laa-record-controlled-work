@@ -8,7 +8,7 @@ import {
   devLog,
   devWarn,
   isDevelopment,
-} from "#src/lib/devLogger.js";
+} from "#/lib/devLogger.js";
 import { expect } from "chai";
 import sinon from "sinon";
 

@@ -4,7 +4,7 @@
  * @description Tests for the ASCII art banner display functionality
  */
 
-import { displayConsoleBanner } from "#src/browser/asciiArt.js";
+import { displayConsoleBanner } from "#/browser/asciiArt.js";
 import { equal, ok } from "assert";
 import sinon from "sinon";
 

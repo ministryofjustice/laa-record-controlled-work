@@ -2,8 +2,8 @@
   "recommendations": [
     "dbaeumer.vscode-eslint",
     "1password.op-vscode",
-    "ginfuru.better-nunjucks",
     "github.vscode-github-actions",
-    "ms-kubernetes-tools.vscode-kubernetes-tools"
+    "ms-kubernetes-tools.vscode-kubernetes-tools",
+    "douglaszaltron.nunjucks-vscode-extensionpack"
   ]
 }

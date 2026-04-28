@@ -34,7 +34,6 @@ RUN addgroup -g 1001 -S appuser && \
     adduser -u 1001 -G appuser -S appuser
 
 COPY --from=builder --chown=1001:1001 /app/public ./public
-COPY --from=builder --chown=1001:1001 /app/views ./views
 COPY --from=builder --chown=1001:1001 /app/locales ./locales
 COPY --from=builder --chown=1001:1001 /app/node_modules ./node_modules
 COPY --from=builder --chown=1001:1001 /app/package.json ./package.json

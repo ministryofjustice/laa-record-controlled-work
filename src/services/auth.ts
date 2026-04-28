@@ -6,18 +6,18 @@ import {
   type AuthorizationUrlRequest,
   type AuthenticationResult,
 } from "@azure/msal-node";
-import config from "#config.js";
-import { authRequestDefaults } from "#src/config/auth.js";
-import { failure, success, type Either } from "#src/lib/either.js";
-import type { AuthCodeResponse, PKCECodes } from "#types/auth-types.js";
-import { devError } from "#src/lib/devLogger.js";
+import config from "#/config.js";
+import { authRequestDefaults } from "#/config/auth.js";
+import { failure, success, type Either } from "#/lib/either.js";
+import type { AuthCodeResponse, PKCECodes } from "#/types/auth-types.js";
+import { devError } from "#/lib/devLogger.js";
 import {
   MissingAuthCodeRequestError,
   MsalError,
   PkceGenerationError,
   StateMismatchError,
   TokenAcquisitionError,
-} from "#src/lib/errors/auth.js";
+} from "#/lib/errors/auth.js";
 
 /**
  * Handles Microsoft Entra ID (MSAL) authentication flows including

@@ -1,4 +1,4 @@
-import type { ExpressSessionConfig } from "#types/config-types.js";
+import type { ExpressSessionConfig } from "#/types/config-types.js";
 import { RedisStore } from "connect-redis";
 import type { SessionOptions } from "express-session";
 import { createClient, type RedisClientType } from "redis";

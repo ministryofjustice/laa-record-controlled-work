@@ -108,13 +108,6 @@ export const t = (key: string, options?: Record<string, unknown>): string => {
 };
 
 /**
- * Express locale loader interface for backwards compatibility
- */
-export interface ExpressLocaleLoader {
-  t: (key: string, options?: Record<string, unknown>) => string;
-}
-
-/**
  * Nunjucks global function for templates
  * Usage in templates: {{ t("common.back") }} or {{ t("pages.caseDetails.tabs.clientDetails") }}
  * @param {string} key - Translation key

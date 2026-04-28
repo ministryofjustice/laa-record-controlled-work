@@ -16,7 +16,7 @@ import {
   getSessionData,
   storeOriginalFormData,
   storeSessionData,
-} from "#src/lib/sessionHelpers.js";
+} from "#/lib/sessionHelpers.js";
 import { expect } from 'chai';
 import type { Request } from 'express';
 import { describe, it } from "mocha";

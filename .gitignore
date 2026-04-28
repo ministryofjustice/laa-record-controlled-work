@@ -30,3 +30,4 @@ coverage/
 
 # Local workspace
 .local/
+**/*.cjs

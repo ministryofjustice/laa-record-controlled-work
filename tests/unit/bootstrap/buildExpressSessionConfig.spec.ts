@@ -1,9 +1,9 @@
-import config from "#config.js";
 import sinon from "sinon";
 import { MemoryStore } from "express-session";
-import { Config } from "#types/config-types.js";
-import { buildExpressSessionConfig } from "#bootstrap/buildExpressSessionConfig.js";
 import assert from "node:assert";
+import { buildExpressSessionConfig } from "#/middleware/buildExpressSessionConfig.js";
+import { Config } from "#/types/config-types.js";
+import config from "#/config.js";
 
 describe('buildSessionConfig', () => {
   afterEach(() => {
