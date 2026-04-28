@@ -6,9 +6,7 @@
     "before 5am every weekday"
   ],
   "timezone": "Europe/London",
-  "lockFileMaintenance": {
-    "schedule": ["every weekend"]
-  },
+
   "packageRules": [
     {
       "description": "Ungroup NPM updates to enforce minimum release age rules",
