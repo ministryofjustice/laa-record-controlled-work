@@ -3,18 +3,21 @@ services:
     build: .
     container_name: rcw-front-end
     env_file:
-      - .env.resolved
+      - .env
     ports:
       - "3000:3000"
     environment:
-      NODE_ENV: production
-      SESSION_SECRET: dev-secret
-      SESSION_NAME: sessionId
-      RATELIMIT_HEADERS_ENABLED: "false"
-      RATELIMIT_STORAGE_URI: ""
-      RATE_LIMIT_MAX: "100"
-      RATE_WINDOW_MS: "900000"
-      REDIS_URL: redis://redis:6379
+      - NODE_ENV=docker
+      - REDIS_URL=redis://redis:6379
+
+      # secrets injected by 1Password CLI
+      # op run --env-file=.env -- docker compose up -d
+      - ENTRA_CLIENT_ID
+      - ENTRA_TENANT_ID
+      - ENTRA_CLIENT_SECRET
+      - ENTRA_REDIRECT_URI
+      - ENTRA_AUTHORITY_BASE_URL
+      - ENTRA_POST_LOGOUT_REDIRECT_URI
     depends_on:
       - redis
 
@@ -26,8 +29,6 @@ services:
   nginx:
     image: nginxinc/nginx-unprivileged:${NGINX_IMAGE_TAG:-alpine}
     container_name: nginx-reverse-proxy
-    env_file:
-      - docker-images.env
     environment:
       NGINX_UPSTREAM_RCW: rcw:3000
     ports:

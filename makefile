@@ -1,4 +1,7 @@
-.PHONY: watch dev unit e2e e2e-ui test lint docker-build docker-run
+include docker-images.env
+export
+
+.PHONY: watch dev unit e2e e2e-ui test lint docker-up
 
 # 	op run --env-file=.env uses 1Password to load environment variables securely
 # 	you can --no-masking flag means that varaibles is not masked in the output which can be used for debugging
@@ -12,7 +15,6 @@ dev:
 unit:
 	./node_modules/.bin/mocha
 	
-
 e2e:
 	yarn build && yarn test:e2e
 
@@ -24,15 +26,5 @@ test: unit e2e lint
 lint: 
 	yarn lint
 
-docker-build:
-	docker build -t laa-record-controlled-work:latest .
-
-docker-run:
-	op inject -i .env -o .env.resolved && \
-	docker run -d -p 8888:3000 --env-file=.env.resolved laa-record-controlled-work:latest && \
-	rm .env.resolved  
-
 docker-up:
-	op inject -i .env -o .env.resolved && \
-	docker compose up && \
-	rm .env.resolved  
+	op run --env-file=.env -- docker compose up -d
