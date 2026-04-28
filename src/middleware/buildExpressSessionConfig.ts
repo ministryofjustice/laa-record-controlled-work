@@ -1,6 +1,6 @@
 import { createRedisClient } from "#/lib/redis.js";
 import type { Config } from "#/types/config-types.js";
-import type { RedisClientFactory } from "#/types/redis.js";
+import type { RedisClientFactory } from "#/types/redis-types.js";
 import { RedisStore } from "connect-redis";
 import type session from "express-session";
 import { MemoryStore } from "express-session";

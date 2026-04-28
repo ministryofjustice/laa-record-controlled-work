@@ -1,7 +1,7 @@
 import { createClient } from "redis";
 import { SECOND } from "./constants/time.js";
 import type { RedisConfig } from "#/types/config-types.js";
-import type { RedisClientType } from "#/types/redis.js";
+import type { RedisClientType } from "#/types/redis-types.js";
 
 /**
  * Create and configure Redis client
