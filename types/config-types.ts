@@ -24,13 +24,24 @@ export interface EntraConfig {
   authorityBaseUrl: string;
 }
 
-export interface SessionConfig {
+export interface ExpressSessionConfig {
   secret: string;
   name: string;
   resave: boolean;
   saveUninitialized: boolean;
   maxAge: number;
-  redis_url?: string;
+  redisUrl: string;
+}
+
+export interface RedisConfig {
+  host: string;
+  enabled: boolean;
+  authToken?: string;
+  port?: number;
+  tlsEnabled?: boolean;
+  url: string;
+  socketConnectionTimeout: number;
+  maxRetryAttempts: number;
 }
 
 export interface PathsConfig {
@@ -52,8 +63,9 @@ export interface Config {
   SERVICE_PHASE: string | undefined;
   SERVICE_URL: string | undefined;
   app: AppConfig;
+  redis: RedisConfig;
   csrf: CsrfConfig;
-  session: SessionConfig;
+  expressSession: ExpressSessionConfig;
   paths: PathsConfig;
   entra: EntraConfig;
 }

@@ -12,6 +12,8 @@ const DEFAULT_AUTH_RATE_LIMIT_MAX = 20;
 const DEFAULT_RATE_LIMIT_MAX = 100;
 const DEFAULT_RATE_WINDOW_MS_MINUTE = 15;
 const DEFAULT_PORT = 3000;
+const DEFAULT_SOCKET_CONNECTION_TIMEOUT = 10000;
+const DEFAULT_MAX_RETRY_ATTEMPTS = 10;
 
 // Validate required session env vars
 if (!process.env.SESSION_SECRET) {
@@ -67,13 +69,24 @@ const config: Config = {
   SERVICE_NAME: process.env.SERVICE_NAME,
   SERVICE_PHASE: process.env.SERVICE_PHASE,
   SERVICE_URL: process.env.SERVICE_URL,
-  session: {
+  expressSession: {
     secret: process.env.SESSION_SECRET,
     name: process.env.SESSION_NAME,
     resave: false,
     saveUninitialized: false,
     maxAge: MS_IN_TWELVE_HOURS,
-    redis_url: process.env.REDIS_URL,
+    redisUrl: process.env.REDIS_URL ?? "redis://localhost:6379",
+  },
+  redis: {
+    host: process.env.REDIS_HOST ?? "localhost",
+    port: Number(process.env.REDIS_PORT ?? "6379"),
+    enabled: process.env.REDIS_ENABLED === "true",
+    authToken: process.env.REDIS_AUTH_TOKEN,
+    tlsEnabled: process.env.REDIS_TLS_ENABLED === "true",
+    url: process.env.REDIS_URL ?? "redis://localhost:6379",
+    socketConnectionTimeout: DEFAULT_SOCKET_CONNECTION_TIMEOUT,
+    maxRetryAttempts: DEFAULT_MAX_RETRY_ATTEMPTS,
+    // TODO verify these variables
   },
   app: {
     port: Number(process.env.PORT ?? DEFAULT_PORT),

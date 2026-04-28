@@ -34,13 +34,14 @@ router.post("/signout", (req: Request, res: Response, next: NextFunction) => {
     const {
       session: { idToken },
     } = req;
+
     req.session.destroy((error) => {
       if (error !== undefined && error !== null) {
         next(error);
         return;
       }
 
-      res.clearCookie(config.session.name);
+      res.clearCookie(config.expressSession.name);
       res.redirect(AuthService.getLogoutUrl(idToken));
     });
   } catch (error) {

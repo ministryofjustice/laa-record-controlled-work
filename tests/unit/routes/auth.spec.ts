@@ -9,15 +9,37 @@ import {
   INTERNAL_SERVER_ERROR,
 } from "#src/constants/httpStatus.js";
 import createApp from "#src/app.js";
+import SessionService from "#src/services/sessionService.js";
+import { MS_IN_TWELVE_HOURS } from "#src/constants/timeEnums.js";
 
 describe("authRoutes", () => {
   let authServiceStub: {
     getAuthCodeUrl: sinon.SinonStub;
     processAuthCodeCallback: sinon.SinonStub;
   };
+  let sessionServiceStub: {
+    getSessionConfig: sinon.SinonStub;
+  };
   let app: express.Application;
 
   before(async () => {
+    sessionServiceStub = {
+      getSessionConfig: sinon.stub().resolves({
+        secret: "test-secret-3",
+        resave: false,
+        saveUninitialized: false,
+        cookie: {
+          secure: false,
+          httpOnly: true,
+          maxAge: MS_IN_TWELVE_HOURS,
+        }, // NO REDIS
+      }),
+    };
+
+    sinon
+      .stub(SessionService, "create")
+      .returns(sessionServiceStub as unknown as SessionService);
+
     app = await createApp();
   });
 
@@ -61,7 +83,9 @@ describe("authRoutes", () => {
     });
 
     it("redirects to /auth/signin when processAuthCodeCallback() throws", async () => {
-      authServiceStub.processAuthCodeCallback.rejects(new Error("MSAL failure"));
+      authServiceStub.processAuthCodeCallback.rejects(
+        new Error("MSAL failure"),
+      );
 
       const res = await request(app)
         .post("/auth/code/callback")
@@ -72,7 +96,6 @@ describe("authRoutes", () => {
       expect(res.headers.location).to.equal("/auth/signin");
     });
   });
-  
 
   describe("GET /auth/signin", () => {
     it("redirects to the URL returned by authService.getAuthCodeUrl()", async () => {

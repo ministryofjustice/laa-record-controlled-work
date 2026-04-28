@@ -9,7 +9,7 @@ services:
       RATELIMIT_STORAGE_URI: ""
       RATE_LIMIT_MAX: "100"
       RATE_WINDOW_MS: "900000"
-      SESSION_REDIS_URL: redis://redis:6379
+      REDIS_URL: redis://redis:6379
     depends_on:
       - redis
 

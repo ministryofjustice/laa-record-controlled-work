@@ -1,16 +1,18 @@
-import type { SessionConfig } from "#types/config-types.js";
+import type { ExpressSessionConfig } from "#types/config-types.js";
 import { RedisStore } from "connect-redis";
 import type { SessionOptions } from "express-session";
 import { createClient, type RedisClientType } from "redis";
+
+// TODO convert this to more functional and move to bootstrap, make you inject createClient from redis, move tests to integration directory
 
 /**
  * TODO
  */
 export default class SessionService {
   clientFactory: (options: object) => RedisClientType;
-  redisStoreFactory:
-    | ((sessionConfig: SessionConfig) => Promise<RedisStore>)
-    | undefined;
+  redisStoreFactory?: (
+    sessionConfig: ExpressSessionConfig,
+  ) => Promise<RedisStore>;
 
   /**
    * TODO
@@ -42,13 +44,15 @@ export default class SessionService {
    * @param redisStoreFactory - TODO
    */
   public setRedisStoreFactory(
-    redisStoreFactory: (sessionConfig: SessionConfig) => Promise<RedisStore>,
+    redisStoreFactory: (
+      sessionConfig: ExpressSessionConfig,
+    ) => Promise<RedisStore>,
   ): void {
     this.redisStoreFactory = redisStoreFactory;
   }
 
   public getSessionConfig = async (
-    envConfig: SessionConfig,
+    envConfig: ExpressSessionConfig,
   ): Promise<SessionOptions> => {
     const baseConfig = {
       secret: envConfig.secret,
@@ -61,7 +65,7 @@ export default class SessionService {
       },
     };
 
-    if (envConfig.redis_url) {
+    if (envConfig.redisUrl) {
       const factory = this.redisStoreFactory ?? this.getRedisStore;
       const redisStore = await factory(envConfig);
       return { ...baseConfig, store: redisStore };
@@ -71,9 +75,9 @@ export default class SessionService {
   };
 
   public getRedisStore = async (
-    envConfig: SessionConfig,
+    envConfig: ExpressSessionConfig,
   ): Promise<RedisStore> => {
-    const redisClient = this.clientFactory({ url: envConfig.redis_url });
+    const redisClient = this.clientFactory({ url: envConfig.redisUrl });
     await redisClient.connect();
     return new RedisStore({ client: redisClient });
   };

@@ -40,7 +40,9 @@ const createApp = async (): Promise<express.Application> => {
   const app = express();
 
   const sessionService = SessionService.create();
-  const sessionConfig = await sessionService.getSessionConfig(config.session);
+  const sessionConfig = await sessionService.getSessionConfig(
+    config.expressSession,
+  );
   // Set up common middleware for handling cookies, body parsing, etc.
   setupMiddlewares(app);
 
