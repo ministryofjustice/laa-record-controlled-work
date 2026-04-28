@@ -1,11 +1,11 @@
-import { extractFormFields } from "#src/lib/dataTransformers.js";
-import { BAD_REQUEST } from "#src/lib/constants/httpStatus.js";
+import { extractFormFields } from "#/lib/dataTransformers.js";
+import { BAD_REQUEST } from "#/lib/constants/httpStatus.js";
 import {
   getSessionData,
   storeOriginalFormData,
   storeSessionData,
-} from "#src/lib/sessionHelpers.js";
-import { formatValidationErrors } from "#src/lib/ValidationErrorHelpers.js";
+} from "#/lib/sessionHelpers.js";
+import { formatValidationErrors } from "#/lib/ValidationErrorHelpers.js";
 import type { NextFunction, Request, Response } from "express";
 import { validationResult } from "express-validator";
 

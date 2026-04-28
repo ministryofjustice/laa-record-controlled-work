@@ -2,7 +2,7 @@
  * @description Tests for the utility function formatDate works as expected
  */
 
-import { formatDate } from "#src/lib/dateFormatter.js";
+import { formatDate } from "#/lib/dateFormatter.js";
 import { expect } from "chai";
 
 describe('formatDate()', () => {

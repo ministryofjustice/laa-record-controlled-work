@@ -10,7 +10,7 @@ import { expect } from 'chai';
 import { setupServer } from 'msw/node';
 import { http, HttpResponse } from 'msw';
 import { create } from 'middleware-axios';
-import { ExampleApiService } from '#src/services/exampleApiService.js';
+import { ExampleApiService } from '#/services/exampleApiService.js';
 
 describe('API Connections Smoke Test', function() {
   let server: ReturnType<typeof setupServer>;

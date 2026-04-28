@@ -6,7 +6,7 @@
   "main": "public/app.js",
   "type": "module",
   "imports": {
-    "#*": "./*"
+    "#/*": "./src/*"
   },
   "scripts": {
     "start": "node public/app.js",

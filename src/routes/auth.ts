@@ -1,13 +1,13 @@
-import config from "#config.js";
-import { msalConfig } from "#src/config/auth.js";
+import config from "#/config.js";
+import { msalConfig } from "#/config/auth.js";
 import {
   BAD_REQUEST,
   INTERNAL_SERVER_ERROR,
   UNAUTHORIZED,
-} from "#src/lib/constants/httpStatus.js";
-import { TokenAcquisitionError } from "#src/lib/errors/auth.js";
-import { AuthService } from "#src/services/auth.js";
-import { authCodeResponseSchema } from "#types/auth-types.js";
+} from "#/lib/constants/httpStatus.js";
+import { TokenAcquisitionError } from "#/lib/errors/auth.js";
+import { AuthService } from "#/services/auth.js";
+import { authCodeResponseSchema } from "#/types/auth-types.js";
 import { ConfidentialClientApplication } from "@azure/msal-node";
 import {
   Router,

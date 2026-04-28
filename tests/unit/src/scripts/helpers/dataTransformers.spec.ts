@@ -8,7 +8,7 @@ import {
   safeOptionalString,
   safeString,
   safeStringFromRecord,
-} from "#src/lib/dataTransformers.js";
+} from "#/lib/dataTransformers.js";
 import { expect } from "chai";
 
 describe('Data Transformation Helpers', () => {

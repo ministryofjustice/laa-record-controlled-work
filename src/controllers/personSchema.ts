@@ -1,9 +1,9 @@
-import { t } from "#src/lib/i18nLoader.js";
+import { t } from "#/lib/i18nLoader.js";
 import { checkSchema, type Meta } from "express-validator";
 import validator from "validator";
 import { TypedValidationError } from "../lib/ValidationErrorHelpers.js";
-import { isRecord, safeBodyString } from "#src/lib/dataTransformers.js";
-import { dateStringFromThreeFields } from "#src/lib/dateFormatter.js";
+import { isRecord, safeBodyString } from "#/lib/dataTransformers.js";
+import { dateStringFromThreeFields } from "#/lib/dateFormatter.js";
 
 // Constants for validation boundaries
 const MIN_DAY = 1;
