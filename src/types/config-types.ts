@@ -1,5 +1,7 @@
 // Configuration type definitions
 
+import type { SessionOptions } from "express-session";
+
 export interface AppConfig {
   port: number;
   environment: string;
@@ -24,12 +26,7 @@ export interface EntraConfig {
   authorityBaseUrl: string;
 }
 
-export interface ExpressSessionConfig {
-  secret: string;
-  name: string;
-  resave: boolean;
-  saveUninitialized: boolean;
-  maxAge: number;
+export interface ExpressSessionConfig extends SessionOptions {
   redisUrl: string;
 }
 

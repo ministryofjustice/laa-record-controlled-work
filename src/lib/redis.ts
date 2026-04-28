@@ -1,5 +1,5 @@
 import { createClient } from "redis";
-import { HUNDRED_MS, MS_IN_THREE_SECONDS } from "./constants/timeEnums.js";
+import { SECOND } from "./constants/time.js";
 import type { RedisConfig } from "#/types/config-types.js";
 import type { RedisClientType } from "#/types/redis.js";
 
@@ -23,7 +23,8 @@ export const createRedisClient = (config: RedisConfig): RedisClientType => {
           );
           return new Error("Redis reconnection limit exceeded");
         }
-        const delay = Math.min(retries * HUNDRED_MS, MS_IN_THREE_SECONDS);
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- time values are intuitive here
+        const delay = Math.min(retries * (SECOND / 10), 3 * SECOND);
         console.log(
           `Redis reconnecting... attempt ${retries}, waiting ${delay}ms`,
         );
