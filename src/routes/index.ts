@@ -1,3 +1,4 @@
+import { INTERNAL_SERVER_ERROR, OK } from "#src/lib/constants/httpStatus.js";
 import { getPerson, postPerson } from "#src/controllers/personController.js";
 import { validatePerson } from "#src/controllers/personSchema.js";
 import { exampleApiService } from "#src/services/exampleApiService.js";
@@ -6,8 +7,6 @@ import express from "express";
 
 // Create a new router
 const router = express.Router();
-const SUCCESSFUL_REQUEST = 200;
-const UNSUCCESSFUL_REQUEST = 500;
 
 /* GET home page. */
 router.get("/", (req: Request, res: Response): void => {
@@ -60,20 +59,18 @@ router.get(
 
 // liveness and readiness probes for Helm deployments
 router.get("/status", (_req: Request, res: Response): void => {
-  res.status(SUCCESSFUL_REQUEST).send("OK");
+  res.status(OK).send("OK");
 });
 
 router.get("/health", (_req: Request, res: Response): void => {
-  // res.write(_req.session.idToken)
-
-  res.status(SUCCESSFUL_REQUEST).send(_req.session.idToken);
+  res.status(OK).send("Healthy");
 });
 
 router.get("/error", (_req: Request, res: Response): void => {
   // Simulate an error
   res
     .set("X-Error-Tag", "TEST_500_ALERT")
-    .status(UNSUCCESSFUL_REQUEST)
+    .status(INTERNAL_SERVER_ERROR)
     .send("Internal Server Error");
 });
 

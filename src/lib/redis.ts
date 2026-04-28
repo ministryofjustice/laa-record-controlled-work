@@ -1,7 +1,7 @@
 import { createClient } from "redis";
 import type { RedisConfig } from "#types/config-types.js";
-import { HUNDRED_MS, MS_IN_THREE_SECONDS } from "#src/constants/timeEnums.js";
 import type { RedisClientType } from "#types/redis.js";
+import { HUNDRED_MS, MS_IN_THREE_SECONDS } from "./constants/timeEnums.js";
 
 /**
  * Create and configure Redis client
