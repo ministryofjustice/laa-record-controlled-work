@@ -1,6 +1,10 @@
 {
   "extends": ["github>ministryofjustice/devsecops-actions"],
-  "schedule": ["after 10pm and before 5am every weekday", "every weekend"],
+  "schedule": [
+    "after 10pm every weekday",
+    "every weekend",
+    "before 5am every weekday"
+  ],
   "timezone": "Europe/London",
   "lockFileMaintenance": {
     "schedule": ["every weekend"]
@@ -23,7 +27,6 @@
       "rebaseWhen": "conflicted",
       "automerge": true,
 
-      "stabilityDays": 0,
       "minimumReleaseAge": null
     }
   ]
