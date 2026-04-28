@@ -4,36 +4,6 @@ import { MemoryStore } from "express-session";
 import { Config } from "#types/config-types.js";
 import { buildExpressSessionConfig } from "#bootstrap/buildExpressSessionConfig.js";
 import assert from "node:assert";
-import { RedisClientFactory } from "#types/redis.js";
-
-// const createMockConfig = (redisEnabled: boolean): Config => ({
-//   session: {
-//     secret: 'session-secret',
-//     name: 'session-id',
-//     resave: false,
-//     saveUninitialized: false,
-//     encryptionKey: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef',
-//     cookie: {
-//       secure: false,
-//       httpOnly: true,
-//       sameSite: 'lax',
-//       maxAge: 3600000
-//     }
-//   },
-//   redis: {
-//     host: 'localhost',
-//     enabled: redisEnabled,
-//     port: 6379,
-//     auth_token: 'redis-token',
-//     tls_enabled: false
-//   }
-// } as Config);
-const createMockConfig = (redisEnabled: boolean, ): Config => {
-  config.redis.enabled = redisEnabled
-  config.redis.authToken = "redis-token"
-  config.redis.tlsEnabled = false
-  return config
-};
 
 describe('buildSessionConfig', () => {
   afterEach(() => {
@@ -88,3 +58,11 @@ describe('buildSessionConfig', () => {
     assert.equal(result.name, config.expressSession.name, 'Session name should be preserved');
   });
 });
+
+
+const createMockConfig = (redisEnabled: boolean, ): Config => {
+  config.redis.enabled = redisEnabled
+  config.redis.authToken = "redis-token"
+  config.redis.tlsEnabled = false
+  return config
+};
