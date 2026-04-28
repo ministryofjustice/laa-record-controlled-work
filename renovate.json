@@ -1,7 +1,30 @@
 {
   "extends": ["github>ministryofjustice/devsecops-actions"],
-  "schedule": ["at any time"],
+  "schedule": ["after 10pm and before 5am every weekday", "every weekend"],
+  "timezone": "Europe/London",
   "lockFileMaintenance": {
-    "schedule": ["at any time"]
-  }
+    "schedule": ["every weekend"]
+  },
+  "packageRules": [
+    {
+      "description": "Ungroup NPM updates to enforce minimum release age rules",
+      "matchDatasources": ["npm"],
+      "groupName": null
+    },
+    {
+      "description": "Automerge patch and minor updates to reduce noise",
+      "matchUpdateTypes": ["patch", "minor"],
+      "automerge": true
+    },
+    {
+      "description": "Daily lockfile maintenance. Age gating is handled natively by Yarn's npmMinimalAgeGate:3d in .yarnrc",
+      "matchUpdateTypes": ["lockFileMaintenance"],
+      "schedule": ["before 5am every weekday"],
+      "rebaseWhen": "conflicted",
+      "automerge": true,
+
+      "stabilityDays": 0,
+      "minimumReleaseAge": null
+    }
+  ]
 }
