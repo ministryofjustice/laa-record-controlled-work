@@ -20,7 +20,7 @@ import type { Request, Response } from "express";
 import express from "express";
 import session from "express-session";
 import morgan from "morgan";
-import SessionService from "./services/sessionService.js";
+import { buildExpressSessionConfig } from "#/middleware/buildExpressSessionConfig.js";
 
 const TRUST_FIRST_PROXY = 1;
 const ENABLE_PLAYWRIGHT_TEST_SIGNIN =
@@ -38,10 +38,6 @@ const createApp = async (): Promise<express.Application> => {
 
   const app = express();
 
-  const sessionService = SessionService.create();
-  const sessionConfig = await sessionService.getSessionConfig(
-    config.expressSession,
-  );
   // Set up common middleware for handling cookies, body parsing, etc.
   standardMiddleware(app);
 
@@ -67,7 +63,9 @@ const createApp = async (): Promise<express.Application> => {
 
   // Set up cookie security for sessions
   app.set("trust proxy", TRUST_FIRST_PROXY);
-  app.use(session(sessionConfig));
+
+  // Set up express session with redis client
+  app.use(session(await buildExpressSessionConfig(config)));
 
   // Set up locale middleware for internationalization
   app.use(setupLocaleMiddleware);
