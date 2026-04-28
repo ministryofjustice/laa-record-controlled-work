@@ -2,9 +2,7 @@
   "extends": ["github>ministryofjustice/devsecops-actions"],
   "schedule": ["after 10pm and before 5am every weekday", "every weekend"],
   "timezone": "Europe/London",
-  "lockFileMaintenance": {
-    "schedule": ["every weekend"]
-  },
+
   "packageRules": [
     {
       "description": "Ungroup NPM updates to enforce minimum release age rules",
