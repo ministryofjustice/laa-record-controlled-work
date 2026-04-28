@@ -83,7 +83,6 @@ const config: Config = {
     port: Number(process.env.REDIS_PORT ?? "6379"),
     enabled: process.env.REDIS_ENABLED === "true",
     authToken: process.env.REDIS_AUTH_TOKEN,
-    tlsEnabled: process.env.REDIS_TLS_ENABLED === "true",
     url: process.env.REDIS_URL ?? "redis://localhost:6379",
     socketConnectionTimeout: DEFAULT_SOCKET_CONNECTION_TIMEOUT,
     maxRetryAttempts: DEFAULT_MAX_RETRY_ATTEMPTS,

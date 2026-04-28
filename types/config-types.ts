@@ -38,7 +38,6 @@ export interface RedisConfig {
   enabled: boolean;
   authToken?: string;
   port?: number;
-  tlsEnabled?: boolean;
   url: string;
   socketConnectionTimeout: number;
   maxRetryAttempts: number;

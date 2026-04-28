@@ -63,6 +63,5 @@ describe('buildSessionConfig', () => {
 const createMockConfig = (redisEnabled: boolean, ): Config => {
   config.redis.enabled = redisEnabled
   config.redis.authToken = "redis-token"
-  config.redis.tlsEnabled = false
   return config
 };
