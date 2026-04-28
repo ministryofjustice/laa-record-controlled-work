@@ -17,7 +17,7 @@ export const buildExpressSessionConfig = async (
 ): Promise<session.SessionOptions> => {
   if (config.redis.enabled) {
     const client = redisClientFactory(config.redis);
-
+    console.log(client);
     if (!client.isOpen) await client.connect();
 
     return {

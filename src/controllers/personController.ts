@@ -50,7 +50,7 @@ function safeDateOfBirth(value: unknown): {
     "month" in value &&
     "year" in value
   ) {
-    const dob = value as { day: unknown; month: unknown; year: unknown };
+    const dob = value;
     return {
       day:
         typeof dob.day === "string"
