@@ -7,7 +7,6 @@
     "allowJs": true, // Allow JavaScript files
     "checkJs": false, // Don't type-check JS initially
     "outDir": "public", // Preserve folder structure in the output directory
-    "rootDir": ".", // Changed from "src" to "." to include all source files
     "sourceMap": true,
     "skipLibCheck": true, // Skip type checking of declaration files
     "resolveJsonModule": true,
@@ -15,24 +14,10 @@
     "noImplicitAny": true, // Disallow implicit any types
     "strict": true, // Enable all strict type-checking options
     "forceConsistentCasingInFileNames": true, // Disallow inconsistently-cased references to the same file
-    "baseUrl": ".",
     "paths": {
-      "#*": ["./*"]
+      "#/*": ["./src/*"]
     }
   },
-  "include": [
-    "src/**/*",
-    "middleware/**/*",
-    "bootstrap/**/*.ts",
-    "routes/**/*",
-    "scripts/**/*.ts",
-    "esbuild.ts",
-    "start-server.ts",
-    "config.ts",
-    "types/**/*.ts",
-    "playwright.config.ts",
-    "tests/**/*.spec.ts",
-    "tests/**/*.ts"
-  ],
+  "include": ["scripts/**/*.ts", "src/**/*.ts", "tests/**/*.ts", "esbuild.ts"],
   "exclude": ["node_modules", "public", "**/*.js"]
 }

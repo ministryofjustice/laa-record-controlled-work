@@ -10,8 +10,9 @@
  * Based on MCC's production-tested patterns from src/services/apiService.ts
  */
 
-import { devLog, extractAndLogError } from "#src/lib/index.js";
-import type { AxiosInstanceWrapper } from "#types/axios-instance-wrapper.js";
+import { devLog } from "#/lib/devLogger.js";
+import { extractAndLogError } from "#/lib/errorHandler.js";
+import type { AxiosInstanceWrapper } from "#/types/axios-instance-wrapper.js";
 import type { AxiosResponse } from "axios";
 
 // Constants to avoid magic numbers

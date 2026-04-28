@@ -1,21 +1,20 @@
+import { helmetSetup as setupHelmet } from "#/middleware/setupHelmet.js";
+import { setupNunjucks } from "#/middleware/setupNunjucks.js";
 import {
-  axiosMiddleware,
+  setupRateLimit,
   createAuthLimiter,
-  helmetSetup,
-  nunjucksSetup,
-  rateLimitSetUp,
-} from "#bootstrap/index.js";
-import config from "#config.js";
-import {
-  setupConfig,
-  setupCsrf,
-  setupLocaleMiddleware,
-  setupMiddlewares,
-} from "#middleware/index.js";
-import { requireAuth } from "#middleware/requireAuth.js";
-import authRouter from "#src/routes/auth.js";
-import indexRouter from "#src/routes/index.js";
-import { initializeI18nextSync } from "#src/lib/index.js";
+} from "#/middleware/setupRateLimit.js";
+import config from "#/config.js";
+import { initializeI18nextSync } from "#/lib/i18nLoader.js";
+import { axiosMiddleware } from "#/middleware/apiMiddleware.js";
+import { standardMiddleware } from "#/middleware/standardMiddleware.js";
+import { requireAuth } from "#/middleware/requireAuth.js";
+import { setupConfig } from "#/middleware/setupConfigs.js";
+import { setupCsrf } from "#/middleware/setupCsrf.js";
+import { setupLocaleMiddleware } from "#/middleware/setupLocale.js";
+import authRouter from "#/routes/auth.js";
+import indexRouter from "#/routes/index.js";
+
 import compression from "compression";
 import type { Request, Response } from "express";
 import express from "express";
@@ -39,7 +38,7 @@ const createApp = async (): Promise<express.Application> => {
   const app = express();
 
   // Set up common middleware for handling cookies, body parsing, etc.
-  setupMiddlewares(app);
+  standardMiddleware(app);
 
   app.use(axiosMiddleware);
 
@@ -64,7 +63,7 @@ const createApp = async (): Promise<express.Application> => {
   );
 
   // Set up security headers
-  helmetSetup(app);
+  setupHelmet(app);
 
   // Reducing fingerprinting by removing the 'x-powered-by' header
   app.disable("x-powered-by");
@@ -77,10 +76,10 @@ const createApp = async (): Promise<express.Application> => {
   app.use(setupLocaleMiddleware);
 
   // Set up Nunjucks as the template engine
-  nunjucksSetup(app);
+  setupNunjucks(app);
 
   // Set up rate limiting
-  rateLimitSetUp(app, config);
+  setupRateLimit(app, config);
 
   // Set up application-specific configurations
   setupConfig(app);

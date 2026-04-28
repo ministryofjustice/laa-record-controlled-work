@@ -1,0 +1,31 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers -- This is a cleaner way to define and destructure variables */
+
+export const HTTP_STATUS = {
+  OK: 200,
+  FOUND: 302,
+  BAD_REQUEST: 400,
+  UNAUTHORIZED: 401,
+  FORBIDDEN: 403,
+  NOT_FOUND: 404,
+  REQUEST_TIMEOUT: 408,
+  TOO_MANY_REQUESTS: 429,
+  INTERNAL_SERVER_ERROR: 500,
+  BAD_GATEWAY: 502,
+  SERVICE_UNAVAILABLE: 503,
+  GATEWAY_TIMEOUT: 504,
+} as const;
+
+export const {
+  OK,
+  FOUND,
+  BAD_REQUEST,
+  UNAUTHORIZED,
+  FORBIDDEN,
+  NOT_FOUND,
+  REQUEST_TIMEOUT,
+  TOO_MANY_REQUESTS,
+  INTERNAL_SERVER_ERROR,
+  BAD_GATEWAY,
+  SERVICE_UNAVAILABLE,
+  GATEWAY_TIMEOUT,
+} = HTTP_STATUS;

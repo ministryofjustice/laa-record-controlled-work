@@ -1,4 +1,8 @@
 {
+  // force vscode to resolve imports using path aliases
+  "js/ts.preferences.importModuleSpecifier": "non-relative",
+  "js/ts.preferences.importModuleSpecifierEnding": "js",
+
   "files.associations": {
     "*.snyk": "yaml"
   },

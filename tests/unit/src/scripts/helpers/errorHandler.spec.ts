@@ -10,7 +10,7 @@ import {
   isForbiddenError,
   isNotFoundError,
   isServerError,
-} from "#src/lib/errorHandler.js";
+} from "#/lib/errorHandler.js";
 import { strict as assert } from "assert";
 import sinon from "sinon";
 

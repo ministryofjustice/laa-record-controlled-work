@@ -127,6 +127,7 @@ export default [
           enforceForDeclarationWithTypeAnnotation: false,
         },
       ],
+      "@typescript-eslint/init-declarations": "off", // Allow uninitialised declarations e.g. before try/catch
     },
   },
   // Add a separate config for declaration files
