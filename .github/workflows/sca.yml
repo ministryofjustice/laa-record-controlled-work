@@ -26,6 +26,7 @@ permissions:
   pull-requests: write
   issues: write
   security-events: write
+  actions: read
 
 # This workflow should always only have one job.
 jobs:
