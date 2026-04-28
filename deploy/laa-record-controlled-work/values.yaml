@@ -26,7 +26,7 @@ rcw:
   image:
     repository: nginx
     pullPolicy: Always
-    tag: ""
+    tag: "@sha256:6e23479198b998e5e25921dff8455837c7636a67111a04a635cf1bb363d199dc"
 
   imagePullSecrets: []
   podAnnotations: {}
@@ -145,7 +145,7 @@ nginx:
     # Overridden at deploy time to ECR; see deploy.sh and docker-images.env
     repository: nginxinc/nginx-unprivileged
     pullPolicy: Always
-    tag: alpine
+    tag: alpine@sha256:f35982400455b4f359083ba9d1ef573fbbe4221a6a8a194dc7a14beb4e2cd3dc
 
   resources:
     limits:
