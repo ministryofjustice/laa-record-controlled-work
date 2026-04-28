@@ -86,7 +86,6 @@ const config: Config = {
     url: process.env.REDIS_URL ?? "redis://localhost:6379",
     socketConnectionTimeout: DEFAULT_SOCKET_CONNECTION_TIMEOUT,
     maxRetryAttempts: DEFAULT_MAX_RETRY_ATTEMPTS,
-    // TODO verify these variables
   },
   app: {
     port: Number(process.env.PORT ?? DEFAULT_PORT),
