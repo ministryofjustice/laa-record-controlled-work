@@ -19,6 +19,8 @@ import {
   TokenAcquisitionError,
 } from "#/lib/errors/auth.js";
 
+// TODO - consider if this is an EntraService rather than an AuthService
+
 /**
  * Handles Microsoft Entra ID (MSAL) authentication flows including
  * PKCE code exchange, token acquisition, and logout URL generation.

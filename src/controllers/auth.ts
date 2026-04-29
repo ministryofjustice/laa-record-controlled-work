@@ -20,14 +20,55 @@ export const signIn = async (
   try {
     const result = await authService.getAuthCodeUrl();
     if (result.error) {
-      const { message } = result.error;
-      res.status(INTERNAL_SERVER_ERROR).send(message);
+      res.status(INTERNAL_SERVER_ERROR).send(result.error.message);
       return;
     }
 
     res.redirect(result.value);
   } catch (error) {
     next(error);
+  }
+};
+
+export const processAuthCodeCallback = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const { success, data } = authCodeResponseSchema.safeParse(req.body);
+    if (!success) {
+      res.status(BAD_REQUEST).send("Invalid redirect payload");
+      return;
+    }
+
+    const authService = AuthService.create(req.session, msalClient);
+    const result = await authService.processAuthCodeCallback(data);
+    console.log(result);
+    if (result.error instanceof TokenAcquisitionError) {
+      res.status(UNAUTHORIZED).send(result.error.message);
+      return;
+    } else if (result.error) {
+      res.status(BAD_REQUEST).send(result.error.message);
+      return;
+    }
+
+    const { isAuthenticated, idToken, account, tokenCache } = req.session;
+    req.session.regenerate((error: Error | undefined | null) => {
+      if (error) {
+        next(error);
+        return;
+      }
+
+      req.session.isAuthenticated = isAuthenticated;
+      req.session.idToken = idToken;
+      req.session.account = account;
+      req.session.tokenCache = tokenCache;
+      res.redirect(result.value);
+    });
+  } catch (error) {
+    next(error);
+    // TODO how to handle??
   }
 };
 
@@ -52,46 +93,5 @@ export const signOut = (
     });
   } catch (error) {
     next(error);
-  }
-};
-
-export const processAuthCodeCallback = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> => {
-  try {
-    const { success, data } = authCodeResponseSchema.safeParse(req.body);
-    if (!success) {
-      res.status(BAD_REQUEST).send("Invalid redirect payload");
-      return;
-    }
-
-    const authService = AuthService.create(req.session, msalClient);
-    const result = await authService.processAuthCodeCallback(data);
-
-    if (result.error instanceof TokenAcquisitionError) {
-      res.status(UNAUTHORIZED).send(result.error.message);
-      return;
-    } else if (result.error) {
-      res.status(BAD_REQUEST).send(result.error.message);
-      return;
-    }
-
-    const { isAuthenticated, idToken, account, tokenCache } = req.session;
-    req.session.regenerate((error) => {
-      if (error !== undefined && error !== null) {
-        next(error);
-        return;
-      }
-
-      req.session.isAuthenticated = isAuthenticated;
-      req.session.idToken = idToken;
-      req.session.account = account;
-      req.session.tokenCache = tokenCache;
-      res.redirect(result.value);
-    });
-  } catch (error) {
-    res.redirect("/auth/signin");
   }
 };
