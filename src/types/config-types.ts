@@ -26,10 +26,6 @@ export interface EntraConfig {
   authorityBaseUrl: string;
 }
 
-export interface ExpressSessionConfig extends SessionOptions {
-  redisUrl: string;
-}
-
 export interface RedisConfig {
   host: string;
   enabled: boolean;
@@ -61,7 +57,7 @@ export interface Config {
   app: AppConfig;
   redis: RedisConfig;
   csrf: CsrfConfig;
-  expressSession: ExpressSessionConfig;
+  session: SessionOptions;
   paths: PathsConfig;
   entra: EntraConfig;
 }

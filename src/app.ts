@@ -18,9 +18,8 @@ import indexRouter from "#/routes/index.js";
 import compression from "compression";
 import type { Request, Response } from "express";
 import express from "express";
-import session from "express-session";
 import morgan from "morgan";
-import { buildExpressSessionConfig } from "#/middleware/buildExpressSessionConfig.js";
+import { sessionMiddleWare } from "#/middleware/session.js";
 
 const TRUST_FIRST_PROXY = 1;
 const ENABLE_PLAYWRIGHT_TEST_SIGNIN =
@@ -65,7 +64,7 @@ const createApp = async (): Promise<express.Application> => {
   app.set("trust proxy", TRUST_FIRST_PROXY);
 
   // Set up express session with redis client
-  app.use(session(await buildExpressSessionConfig(config)));
+  app.use(sessionMiddleWare);
 
   // Set up locale middleware for internationalization
   app.use(setupLocaleMiddleware);

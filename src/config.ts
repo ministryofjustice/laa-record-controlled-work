@@ -5,18 +5,19 @@ import type {
   Config,
   CsrfConfig,
   EntraConfig,
-  ExpressSessionConfig,
   PathsConfig,
   RedisConfig,
 } from "#/types/config-types.js";
 import { HOUR, MINUTE, SECOND } from "#/lib/constants/time.js";
 import { optional, required } from "#/lib/env.js";
+import type { SessionOptions } from "express-session";
 
 const DEFAULT_AUTH_RATE_LIMIT_MAX = 20;
 const DEFAULT_RATE_LIMIT_MAX = 100;
 const DEFAULT_PORT = 3000;
 const REDIS_MAX_RETRY_ATTEMPTS = 10;
 const DEFAULT_REDIS_PORT = 6379;
+const DEFAULT_REDIS_HOST = "localhost";
 
 /* eslint-disable @typescript-eslint/no-magic-numbers -- time constants are intuitive */
 const REDIS_SOCKET_CONNECTION_TIMEOUT = 10 * SECOND;
@@ -49,10 +50,9 @@ export default {
     useHttps: optional.NODE_ENV === "production", // Use HTTPS in production
   } satisfies AppConfig,
 
-  expressSession: {
+  session: {
     secret: required.SESSION_SECRET,
 
-    redisUrl: optional.REDIS_URL ?? "redis://localhost:6379",
     name: "__Host-rcw-sid",
     resave: false,
     saveUninitialized: false,
@@ -62,14 +62,16 @@ export default {
       sameSite: "lax",
       maxAge: SESSION_AGE_MAX,
     },
-  } satisfies ExpressSessionConfig,
+  } satisfies SessionOptions,
 
   redis: {
     authToken: optional.REDIS_AUTH_TOKEN,
-    host: optional.REDIS_HOST ?? "localhost",
+    host: optional.REDIS_HOST ?? DEFAULT_REDIS_HOST,
     port: optional.REDIS_PORT ?? DEFAULT_REDIS_PORT,
     enabled: optional.REDIS_ENABLED === "true",
-    url: optional.REDIS_URL ?? "redis://localhost:6379",
+    url:
+      optional.REDIS_URL ??
+      `redis://${DEFAULT_REDIS_HOST}:${DEFAULT_REDIS_PORT}`,
 
     socketConnectionTimeout: REDIS_SOCKET_CONNECTION_TIMEOUT,
     maxRetryAttempts: REDIS_MAX_RETRY_ATTEMPTS,

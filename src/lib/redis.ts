@@ -2,6 +2,7 @@ import { createClient } from "redis";
 import { SECOND } from "./constants/time.js";
 import type { RedisConfig } from "#/types/config-types.js";
 import type { RedisClientType } from "#/types/redis-types.js";
+import { RedisStore } from "connect-redis";
 
 /**
  * Create and configure Redis client
@@ -55,3 +56,15 @@ export const createRedisClient = (config: RedisConfig): RedisClientType => {
 
   return client;
 };
+
+/**
+ * Connects and creates RedisStore
+ * @param  client - Redis client
+ * @returns RedisStore
+ */
+export async function createRedisStore(
+  client: RedisClientType,
+): Promise<RedisStore> {
+  await client.connect();
+  return new RedisStore({ client });
+}
