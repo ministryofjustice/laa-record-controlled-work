@@ -19,7 +19,7 @@
       "automerge": true
     },
     {
-      "description": "Daily lockfile maintenance. Age gating is handled natively by Yarn's npmMinimalAgeGate:3d in .yarnrc",
+      "description": "Daily lockfile maintenance. Age gating is handled natively by Yarn's npmMinimalAgeGate:7d in .yarnrc",
       "matchUpdateTypes": ["lockFileMaintenance"],
       "schedule": ["before 5am every weekday"],
       "rebaseWhen": "conflicted",
