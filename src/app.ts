@@ -1,10 +1,11 @@
+import config from "#/config.js";
+
 import { helmetSetup as setupHelmet } from "#/middleware/setupHelmet.js";
 import { setupNunjucks } from "#/middleware/setupNunjucks.js";
 import {
   setupRateLimit,
   createAuthLimiter,
 } from "#/middleware/setupRateLimit.js";
-import config from "#/config.js";
 import { initializeI18nextSync } from "#/lib/i18nLoader.js";
 import { axiosMiddleware } from "#/middleware/apiMiddleware.js";
 import { standardMiddleware } from "#/middleware/standardMiddleware.js";
@@ -19,7 +20,8 @@ import compression from "compression";
 import type { Request, Response } from "express";
 import express from "express";
 import morgan from "morgan";
-import { sessionMiddleWare } from "#/middleware/session.js";
+import { createSession } from "#/lib/session.js";
+import session from "express-session";
 
 const TRUST_FIRST_PROXY = 1;
 const ENABLE_PLAYWRIGHT_TEST_SIGNIN =
@@ -63,8 +65,7 @@ const createApp = async (): Promise<express.Application> => {
   // Set up cookie security for sessions
   app.set("trust proxy", TRUST_FIRST_PROXY);
 
-  // Set up express session with redis client
-  app.use(sessionMiddleWare);
+  app.use(session(await createSession(config)));
 
   // Set up locale middleware for internationalization
   app.use(setupLocaleMiddleware);
