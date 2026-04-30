@@ -30,9 +30,13 @@ describe("Auth Controller", () => {
 
   before(() => {
     mockApp = createMockApp();
+
   });
 
   beforeEach(() => {
+    // adding console.error stub to hide purposely thrown errors from terminal
+    sinon.stub(console, "error");
+
     authServiceStub = {
       getAuthCodeUrl: sinon.stub().resolves(success(AUTH_CODE_URL)),
       processAuthCodeCallback: sinon.stub().resolves(success(SUCCESS_REDIRECT)),
@@ -112,7 +116,7 @@ describe("Auth Controller", () => {
     });
 
     it("responds with 400 when other errors are thrown", async () => {
-      const errorMessage = "Random Error"
+      const errorMessage = "Random Error";
       const error = new Error(errorMessage);
       authServiceStub.processAuthCodeCallback.resolves(failure(error));
 

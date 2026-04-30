@@ -44,7 +44,6 @@ export const processAuthCodeCallback = async (
 
     const authService = AuthService.create(req.session, msalClient);
     const result = await authService.processAuthCodeCallback(data);
-    console.log(result);
     if (result.error instanceof TokenAcquisitionError) {
       res.status(UNAUTHORIZED).send(result.error.message);
       return;
@@ -88,7 +87,7 @@ export const signOut = (
         return;
       }
 
-      res.clearCookie(config.expressSession.name);
+      res.clearCookie(config.session.name);
       res.redirect(AuthService.getLogoutUrl(idToken));
     });
   } catch (error) {
