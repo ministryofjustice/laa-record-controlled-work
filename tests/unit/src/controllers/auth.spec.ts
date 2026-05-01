@@ -1,8 +1,5 @@
-import { setupCsrf } from "#/middleware/setupCsrf.js";
 import express from "express";
 import request from "supertest";
-import session from "express-session";
-import authRouter from "#/routes/auth.js";
 import {
   BAD_REQUEST,
   FOUND,
@@ -14,6 +11,7 @@ import { AuthService } from "#/services/auth.js";
 import { failure, success } from "#/lib/either.js";
 import { expect } from "chai";
 import { TokenAcquisitionError } from "#/lib/errors/auth.js";
+import { createMockApp } from "../../utils.js";
 
 const AUTH_CODE_URL = "https://login.microsoftonline.com/auth";
 const SUCCESS_REDIRECT = "/case/123";
@@ -168,31 +166,3 @@ describe("Auth Controller", () => {
     });
   });
 });
-
-/**
- * Creates a mock app for test auth routes against
- * @returns a sandbox express app
- */
-function createMockApp(): express.Application {
-  const app = express();
-  app.use(express.urlencoded({ extended: false }));
-  app.use(session({ secret: "test", resave: false, saveUninitialized: true }));
-  setupCsrf(app);
-  // Exposes a CSRF token so tests can make valid POST requests
-  app.get("/csrf-token", (req, res) => {
-    res.json({ csrfToken: req.csrfToken?.() });
-  });
-  app.use("/auth", authRouter);
-  // // Catches errors passed to next() so tests can assert on status/message
-  app.use(
-    (
-      err: Error,
-      _req: express.Request,
-      res: express.Response,
-      _next: express.NextFunction,
-    ) => {
-      res.status(INTERNAL_SERVER_ERROR).json({ message: err.message });
-    },
-  );
-  return app;
-}

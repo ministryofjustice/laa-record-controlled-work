@@ -5,6 +5,12 @@ import { strict as assert } from "assert";
 import { expect } from "chai";
 import sinon from "sinon";
 
+const createMockConfig = (): RedisConfig => {
+  config.redis.enabled = true;
+  config.redis.authToken = "secret-token";
+  return config.redis;
+};
+
 describe("Redis", () => {
   describe("createRedisClient()", () => {
     let consoleLogStub: sinon.SinonStub;
@@ -120,8 +126,3 @@ describe("Redis", () => {
   });
 });
 
-const createMockConfig = (): RedisConfig => {
-  config.redis.enabled = true;
-  config.redis.authToken = "secret-token";
-  return config.redis;
-};
