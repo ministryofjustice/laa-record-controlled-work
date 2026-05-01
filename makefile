@@ -69,6 +69,3 @@ ifdef file
 else
 	$(MOCHA) --recursive '$(TEST_DIR)/**/*.spec.ts'
 endif
-
-test:
-	$(MOCHA) $(file)

@@ -1,6 +1,5 @@
 // TODO: this is a handlers module, rather than controller
 import config from "#/config.js";
-import { msalClient } from "#/config/auth.js";
 import {
   BAD_REQUEST,
   INTERNAL_SERVER_ERROR,
@@ -16,7 +15,7 @@ export const signIn = async (
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
-  const authService = AuthService.create(req.session, msalClient);
+  const authService = AuthService.create(req.session);
   try {
     const result = await authService.getAuthCodeUrl();
     if (result.error) {
@@ -49,7 +48,7 @@ export const processAuthCodeCallback = async (
       return;
     }
 
-    const authService = AuthService.create(req.session, msalClient);
+    const authService = AuthService.create(req.session);
     const result = await authService.processAuthCodeCallback(data);
 
     if (result.error instanceof TokenAcquisitionError) {
