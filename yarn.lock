@@ -3448,7 +3448,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"express-rate-limit@npm:^8.3.2":
+"express-rate-limit@npm:^8.4.1":
   version: 8.4.1
   resolution: "express-rate-limit@npm:8.4.1"
   dependencies:
@@ -4835,7 +4835,7 @@ __metadata:
     eslint-plugin-jsonc: "npm:^3.1.2"
     eslint-plugin-prettier: "npm:^5.5.5"
     express: "npm:^5.2.1"
-    express-rate-limit: "npm:^8.3.2"
+    express-rate-limit: "npm:^8.4.1"
     express-session: "npm:^1.19.0"
     express-validator: "npm:^7.3.2"
     figlet: "npm:^1.11.0"
