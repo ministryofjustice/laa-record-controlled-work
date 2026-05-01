@@ -16,7 +16,6 @@ export const signIn = async (
   next: NextFunction,
 ): Promise<void> => {
   const authService = AuthService.create(req.session, msalClient);
-
   try {
     const result = await authService.getAuthCodeUrl();
     if (result.error) {
@@ -24,7 +23,13 @@ export const signIn = async (
       return;
     }
 
-    res.redirect(result.value);
+    req.session.save((err: Error | undefined) => {
+      if (err) {
+        next(err);
+        return;
+      }
+      res.redirect(result.value);
+    });
   } catch (error) {
     next(error);
   }
@@ -37,6 +42,7 @@ export const processAuthCodeCallback = async (
 ): Promise<void> => {
   try {
     const { success, data } = authCodeResponseSchema.safeParse(req.body);
+
     if (!success) {
       res.status(BAD_REQUEST).send("Invalid redirect payload");
       return;
@@ -44,6 +50,7 @@ export const processAuthCodeCallback = async (
 
     const authService = AuthService.create(req.session, msalClient);
     const result = await authService.processAuthCodeCallback(data);
+
     if (result.error instanceof TokenAcquisitionError) {
       res.status(UNAUTHORIZED).send(result.error.message);
       return;
@@ -53,6 +60,7 @@ export const processAuthCodeCallback = async (
     }
 
     const { isAuthenticated, idToken, account, tokenCache } = req.session;
+
     req.session.regenerate((error: Error | undefined | null) => {
       if (error) {
         next(error);

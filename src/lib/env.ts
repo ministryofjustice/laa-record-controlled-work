@@ -15,7 +15,6 @@ const optionalEnvSchema = z.object({
   SERVICE_PHASE: z.string().optional(),
   SERVICE_URL: z.url().optional(),
   PORT: z.coerce.number().optional(),
-  NODE_ENV: z.string().optional(),
   REDIS_URL: z.url().optional(),
   REDIS_HOST: z.string().optional(),
   REDIS_PORT: z.coerce.number().optional(),
@@ -29,6 +28,14 @@ const injected = z.string().refine((val) => !val.startsWith("op://"), {
 });
 
 const requiredEnvSchema = z.object({
+  NODE_ENV: z.literal([
+    "test",
+    "docker",
+    "development",
+    "uat",
+    "staging",
+    "production",
+  ]),
   SESSION_SECRET: z.string().nonempty(),
 
   ENTRA_CLIENT_ID: injected.nonempty(),

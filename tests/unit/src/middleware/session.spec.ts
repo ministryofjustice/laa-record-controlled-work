@@ -34,6 +34,7 @@ describe("session Middleware", () => {
     });
     it("and app environment is production, throws RedisExpected error", async () => {
       config.redis.enabled = false;
+      // TODO: this works, but should be true for all deployed envs
       config.app.environment = "production";
       await expect(
         createSession(

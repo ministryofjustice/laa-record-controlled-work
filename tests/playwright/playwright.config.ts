@@ -71,7 +71,7 @@ export default defineConfig({
       ENTRA_REDIRECT_URI: ENTRA_TEST_CONFIG.ENTRA_REDIRECT_URI,
       ENTRA_POST_LOGOUT_REDIRECT_URI:
         ENTRA_TEST_CONFIG.ENTRA_POST_LOGOUT_REDIRECT_URI,
-
+      REDIS_ENABLED: "false",
       // Configure Axios to ignore proxies
       // SLSA uses safe-chain which proxies package managers
       // and sets HTTPS_PROXY on the environment, which breaks

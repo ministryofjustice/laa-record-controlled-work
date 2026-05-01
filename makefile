@@ -25,9 +25,6 @@ watch:
 dev: 
 	op run --env-file=.env -- npx tsx src/server.ts
 
-# unit:
-# 	./node_modules/.bin/mocha
-	
 e2e:
 	yarn build && yarn test:e2e
 
@@ -40,15 +37,20 @@ lint:
 	yarn lint
 
 docker-up:
-	op run --env-file=.env -- docker compose up -d
+	op run --env-file=.env -- docker compose up
 
+docker-down:
+	docker compose down
+
+docker-build:
+	op run --env-file=.env -- docker compose up --build 
 
 # Run unit tests.
 #
 # Usage:
 #   make unit                        - run all unit tests
 #   make unit file=either            - run a specific test by filename (with or without .spec.ts)
-#   make unit file=services/auth      - When multiple files share the same name
+#   make unit file=services/auth     - When multiple files share the same name
 
 unit:
 ifdef file
@@ -68,4 +70,5 @@ else
 	$(MOCHA) --recursive '$(TEST_DIR)/**/*.spec.ts'
 endif
 
-# TODO mocha partials? match filter??
+test:
+	$(MOCHA) $(file)

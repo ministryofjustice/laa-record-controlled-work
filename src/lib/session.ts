@@ -26,6 +26,7 @@ export async function createSession(
     };
   }
 
+  // TODO: this should be for deployed envs - maybe add a "deployed" config predicate
   if (config.app.environment === "production") {
     throw new Error("Redis expected in production");
   }

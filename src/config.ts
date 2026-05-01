@@ -8,7 +8,7 @@ import type {
   PathsConfig,
   RedisConfig,
 } from "#/types/config-types.js";
-import { HOUR, MINUTE, SECOND } from "#/lib/constants/time.js";
+import { MINUTE, SECOND } from "#/lib/constants/time.js";
 import { optional, required } from "#/lib/env.js";
 import type { SessionOptions } from "express-session";
 
@@ -21,9 +21,11 @@ const DEFAULT_REDIS_HOST = "localhost";
 
 /* eslint-disable @typescript-eslint/no-magic-numbers -- time constants are intuitive */
 const REDIS_SOCKET_CONNECTION_TIMEOUT = 10 * SECOND;
-const SESSION_AGE_MAX = 18 * HOUR;
+// const SESSION_AGE_MAX = 18 * HOUR;
 const DEFAULT_RATE_WINDOW = 15 * MINUTE;
 /* eslint-enable @typescript-eslint/no-magic-numbers */
+
+const useHttps = ["uat", "staging", "production"].includes(required.NODE_ENV);
 
 export default {
   CONTACT_EMAIL: optional.CONTACT_EMAIL,
@@ -45,23 +47,23 @@ export default {
 
   app: {
     port: optional.PORT ?? DEFAULT_PORT,
-    environment: optional.NODE_ENV ?? "development",
+    environment: required.NODE_ENV,
     appName: optional.SERVICE_NAME ?? "Your service name",
-    useHttps: optional.NODE_ENV === "production", // Use HTTPS in production
+    useHttps, // Use HTTPS in production
   } satisfies AppConfig,
 
   session: {
     secret: required.SESSION_SECRET,
-
-    name: "__Host-rcw-sid",
+    name: "rcw.sid",
     resave: false,
     saveUninitialized: false,
-    cookie: {
-      secure: true,
-      httpOnly: true,
-      sameSite: "lax",
-      maxAge: SESSION_AGE_MAX,
-    },
+    // TODO: this requires an auth refactor to use entra response_mode=query
+    // cookie: {
+    //   secure: useHttps,
+    //   httpOnly: true,
+    //   sameSite: "lax",
+    //   maxAge: SESSION_AGE_MAX,
+    // },
   } satisfies SessionOptions,
 
   redis: {
@@ -78,7 +80,7 @@ export default {
   } satisfies RedisConfig,
 
   csrf: {
-    secure: optional.NODE_ENV === "production", // Only secure in production
+    secure: useHttps, // Only secure in production
     cookieName: "_csrf",
     httpOnly: true, // Restrict client-side access
   } satisfies CsrfConfig,
