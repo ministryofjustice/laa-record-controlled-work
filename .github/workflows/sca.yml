@@ -14,34 +14,33 @@ on:
   pull_request:
     branches: ["main"]
 
+  merge_group:
+
   workflow_dispatch:
   workflow_call:
 
-# Workflow level permissions are generally not good practice,
-# as it gives every job the same permissions.
-#
-# This workflow should always only have one job.
-permissions:
-  contents: write
-  pull-requests: write
-  issues: write
-  security-events: write
-  statuses: write
-  actions: read
-  # documentation confirms vulnerability-alerts is valid at the workflow level
-  vulnerability-alerts: read 
-
-# This workflow should always only have one job.
 jobs:
   sca:
     name: Software Composition Analysis
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      security-events: write
+      actions: read
     steps:
+      - name: Skip in merge queue
+        if: github.event_name == 'merge_group'
+        run: echo "Skipping SCA in merge queue"
+
       - name: Repository
+        if: github.event_name != 'merge_group'
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: ⚡️ SCA
+        if: github.event_name != 'merge_group'
         uses: ministryofjustice/devsecops-actions/sca@86248cec9a6bb1fd4dabc08a05178e0650d3af4f # Feature branch
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -50,7 +49,7 @@ jobs:
           docker-images-file: ${{ github.workspace }}/docker-images.json
 
           # Dependency Management
-          renovate: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
+          renovate: "false"
 
           # Custom Configurations
           codeql-config-file: ".github/config/codeql.yml"
