@@ -1,7 +1,12 @@
+# Injected secrets need to pull the env var from the host machine
+# This happens automatically if you provide only the env var name.
 services:
   rcw:
     build: .
     container_name: rcw-front-end
+    depends_on:
+      redis:
+        condition: service_healthy
     env_file:
       - .env
     ports:
@@ -18,8 +23,6 @@ services:
       - ENTRA_REDIRECT_URI
       - ENTRA_AUTHORITY_BASE_URL
       - ENTRA_POST_LOGOUT_REDIRECT_URI
-    depends_on:
-      - redis
 
   # ccq:
   #   image:
@@ -44,7 +47,15 @@ services:
     image: "redis:7.2-alpine"
     ports:
       - "6379:6379"
-    command: redis-server --save "" --appendonly no
-
-  # - --save "" — turns off RDB snapshotting (no periodic dump to disk)                                                                                                                                                                      
-  # - --appendonly no — turns off AOF (append-only file) logging       
+    command: >
+      redis-server 
+      --protected-mode no 
+      --maxmemory 256mb 
+      --maxmemory-policy allkeys-lru
+      --save ""
+      --appendonly no
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
