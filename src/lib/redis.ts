@@ -14,7 +14,6 @@ export const createRedisClient = (config: RedisConfig): RedisClientType => {
 
   const client = createClient({
     url: config.url,
-    password: config.authToken,
     socket: {
       connectTimeout: config.socketConnectionTimeout,
       reconnectStrategy: (retries: number) => {

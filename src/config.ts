@@ -67,9 +67,6 @@ export default {
   } satisfies SessionOptions,
 
   redis: {
-    authToken: optional.REDIS_AUTH_TOKEN,
-    host: optional.REDIS_HOST ?? DEFAULT_REDIS_HOST,
-    port: optional.REDIS_PORT ?? DEFAULT_REDIS_PORT,
     enabled: optional.REDIS_ENABLED === "true",
     url:
       optional.REDIS_URL ??

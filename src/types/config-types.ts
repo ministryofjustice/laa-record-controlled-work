@@ -27,10 +27,7 @@ export interface EntraConfig {
 }
 
 export interface RedisConfig {
-  host: string;
   enabled: boolean;
-  authToken?: string;
-  port?: number;
   url: string;
   socketConnectionTimeout: number;
   maxRetryAttempts: number;

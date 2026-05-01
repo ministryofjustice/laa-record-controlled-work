@@ -12,4 +12,3 @@ process.env.ENTRA_POST_LOGOUT_REDIRECT_URI ??=
 // and sets HTTPS_PROXY on the environment, which breaks
 // tests.
 process.env.NO_PROXY ??= "*";
-process.env.REDIS_AUTH_TOKEN ??= "test-token";
