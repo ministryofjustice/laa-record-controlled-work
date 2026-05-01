@@ -20,6 +20,10 @@ import {
 } from "#/lib/errors/auth.js";
 
 // TODO - consider if this is an EntraService rather than an AuthService
+//
+// TODO - this service is modifying the express-session by reference.
+//        should probably consider pulling session mutation up and out
+//        into a different module
 
 /**
  * Handles Microsoft Entra ID (MSAL) authentication flows including
