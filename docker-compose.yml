@@ -13,7 +13,9 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=docker
+      - REDIS_ENABLED=true
       - REDIS_URL=redis://redis:6379
+      - REDIS_AUTH_TOKEN=${REDIS_AUTH_TOKEN:-redis_password}
 
       # secrets injected by 1Password CLI
       # op run --env-file=.env -- docker compose up -d
@@ -30,8 +32,8 @@ services:
   #     - "3000"
 
   nginx:
+    container_name: nginx-reverse-proxy  
     image: nginxinc/nginx-unprivileged:${NGINX_IMAGE_TAG:-alpine}
-    container_name: nginx-reverse-proxy
     environment:
       NGINX_UPSTREAM_RCW: rcw:3000
     ports:
@@ -49,7 +51,7 @@ services:
       - "6379:6379"
     command: >
       redis-server 
-      --protected-mode no 
+      --requirepass ${REDIS_AUTH_TOKEN:-redis_password}
       --maxmemory 256mb 
       --maxmemory-policy allkeys-lru
       --save ""
