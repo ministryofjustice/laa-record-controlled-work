@@ -7,6 +7,7 @@ import {
   createAuthLimiter,
 } from "#/middleware/setupRateLimit.js";
 import { initializeI18nextSync } from "#/lib/i18nLoader.js";
+import { createSession } from "#/lib/session.js";
 import { axiosMiddleware } from "#/middleware/apiMiddleware.js";
 import { standardMiddleware } from "#/middleware/standardMiddleware.js";
 import { requireAuth } from "#/middleware/requireAuth.js";
@@ -15,12 +16,12 @@ import { setupCsrf } from "#/middleware/setupCsrf.js";
 import { setupLocaleMiddleware } from "#/middleware/setupLocale.js";
 import authRouter from "#/routes/auth.js";
 import indexRouter from "#/routes/index.js";
+import testRouter from "#/routes/test.js";
 
 import compression from "compression";
 import type { Request, Response } from "express";
 import express from "express";
 import morgan from "morgan";
-import { createSession } from "#/lib/session.js";
 import session from "express-session";
 
 const TRUST_FIRST_PROXY = 1;
@@ -94,10 +95,7 @@ const createApp = async (): Promise<express.Application> => {
 
   // Playwright-only route: sets an authenticated session without going through Entra.
   if (ENABLE_PLAYWRIGHT_TEST_SIGNIN && process.env.NODE_ENV === "test") {
-    app.get("/test/signin", (req, res) => {
-      req.session.isAuthenticated = true;
-      res.redirect("/");
-    });
+    app.use("/test", testRouter);
   }
 
   app.use("/auth", createAuthLimiter(config), authRouter);
