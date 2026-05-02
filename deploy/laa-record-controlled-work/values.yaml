@@ -123,7 +123,7 @@ rcw:
     ENTRA_REDIRECT_URI: ""
     ENTRA_POST_LOGOUT_REDIRECT_URI: ""
     REDIS_ENABLED: true  
-    REDIS_SECRETS_NAME: elasticache_redis
+    REDIS_SECRET_NAME: elasticache_redis
 
   autoscaling:
     enabled: false
