@@ -1,6 +1,6 @@
 # LAA Record Controlled Work
 [![Standards Icon]][Standards Link]
-![govuk-frontend 5.10.2](https://img.shields.io/badge/govuk--frontend%20version-5.10.2-005EA5?logo=gov.uk&style=flat)
+![govuk-frontend 6.1.0](https://img.shields.io/badge/govuk--frontend%20version-6.1.0-005EA5?logo=gov.uk&style=flat)
 
 ## Template
 
@@ -8,13 +8,11 @@ This repo was generated from [laa-express-typescript-template](https://ministryo
 ## Get Started
 ### Prerequisites
 
-- [Node 25.6.1](https://nodejs.org/en/blog/release/v25.6.1/)
-- [Yarn 4.9.2](https://yarnpkg.com/) package manager (see installation instructions below)
-- TypeScript 5.8.3
+- [Node 25.9.0](https://nodejs.org/en/blog/release/v25.9.0/)
 
 #### Installing Yarn
 
-This project uses Yarn 4.9.2 managed by corepack (built into Node.js 16.10+). To ensure all team members use the same version, follow these installation steps:
+This project uses Yarn 4.14.1 managed by corepack (built into Node.js 16.10+). To ensure all team members use the same version, follow these installation steps:
 
 1. **Enable corepack (if not already enabled):**
 
@@ -32,7 +30,7 @@ This project uses Yarn 4.9.2 managed by corepack (built into Node.js 16.10+). To
 
    ```shell
    yarn --version
-   # Should output: 4.9.2
+   # Should output: 4.14.1
    ```
 
 **To Note:**
