@@ -7,7 +7,6 @@ import sinon from "sinon";
 
 const createMockConfig = (): RedisConfig => {
   config.redis.enabled = true;
-  config.redis.authToken = "secret-token";
   return config.redis;
 };
 
@@ -36,9 +35,9 @@ describe("Redis", () => {
         "Should not connect inside createRedisClient",
       );
       assert.equal(
-        clientOptions.password,
-        "secret-token",
-        "Should pass auth token as password",
+        clientOptions.url,
+        "redis://localhost:6379",
+        "Should pass auth redis url",
       );
       assert.equal(
         clientOptions.socket.connectTimeout,
