@@ -100,7 +100,7 @@
     "eslint-plugin-jsonc": "^3.1.2",
     "globals": "^17.5.0",
     "husky": "^9.1.7",
-    "jsdom": "^29.0.2",
+    "jsdom": "^29.1.0",
     "lint-staged": "^16.4.0",
     "livereload": "^0.10.3",
     "mocha": "^11.7.5",
