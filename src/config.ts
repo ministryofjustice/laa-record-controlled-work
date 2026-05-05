@@ -1,98 +1,99 @@
-import type { Config } from "#/types/config-types.js";
-import dotenv from "dotenv";
-dotenv.config();
+import "dotenv/config";
 
-// TODO verify appropriate max rate limit for auth routes
+import type {
+  AppConfig,
+  Config,
+  CsrfConfig,
+  EntraConfig,
+  PathsConfig,
+  RedisConfig,
+} from "#/types/config-types.js";
+import { MINUTE, SECOND } from "#/lib/constants/time.js";
+import { optional, required } from "#/lib/env.js";
+import type { SessionOptions } from "express-session";
+
 const DEFAULT_AUTH_RATE_LIMIT_MAX = 20;
 const DEFAULT_RATE_LIMIT_MAX = 100;
-const DEFAULT_RATE_WINDOW_MS_MINUTE = 15;
-const MILLISECONDS_IN_A_MINUTE = 60000;
 const DEFAULT_PORT = 3000;
+const REDIS_MAX_RETRY_ATTEMPTS = 10;
+const DEFAULT_REDIS_PORT = 6379;
+const DEFAULT_REDIS_HOST = "localhost";
 
-// Validate required session env vars
-if (!process.env.SESSION_SECRET) {
-  throw new Error("SESSION_SECRET must be defined in environment variables.");
-}
-if (!process.env.SESSION_NAME) {
-  throw new Error("SESSION_NAME must be defined in environment variables.");
-}
-if (!process.env.ENTRA_CLIENT_ID) {
-  throw new Error("ENTRA_CLIENT_ID must be defined in environment variables.");
-}
-if (!process.env.ENTRA_CLIENT_SECRET) {
-  throw new Error(
-    "ENTRA_CLIENT_SECRET must be defined in environment variables.",
-  );
-}
-if (!process.env.ENTRA_TENANT_ID) {
-  throw new Error("ENTRA_TENANT_ID must be defined in environment variables.");
-}
-if (!process.env.ENTRA_REDIRECT_URI) {
-  throw new Error(
-    "ENTRA_REDIRECT_URI must be defined in environment variables.",
-  );
-}
-if (!process.env.ENTRA_AUTHORITY_BASE_URL) {
-  throw new Error(
-    "ENTRA_AUTHORITY_BASE_URL must be defined in environment variables.",
-  );
-}
-if (!process.env.ENTRA_POST_LOGOUT_REDIRECT_URI) {
-  throw new Error(
-    "ENTRA_POST_LOGOUT_REDIRECT_URI must be defined in environment variables.",
-  );
-}
+/* eslint-disable @typescript-eslint/no-magic-numbers -- time constants are intuitive */
+const REDIS_SOCKET_CONNECTION_TIMEOUT = 10 * SECOND;
+// const SESSION_AGE_MAX = 18 * HOUR;
+const DEFAULT_RATE_WINDOW = 15 * MINUTE;
+/* eslint-enable @typescript-eslint/no-magic-numbers */
 
-// Get environment variables
-const config: Config = {
-  CONTACT_EMAIL: process.env.CONTACT_EMAIL,
-  CONTACT_PHONE: process.env.CONTACT_PHONE,
-  DEPARTMENT_NAME: process.env.DEPARTMENT_NAME,
-  DEPARTMENT_URL: process.env.DEPARTMENT_URL,
-  RATELIMIT_HEADERS_ENABLED: process.env.RATELIMIT_HEADERS_ENABLED,
-  RATELIMIT_STORAGE_URI: process.env.RATELIMIT_STORAGE_URI,
-  AUTH_RATE_LIMIT_MAX: Number(
-    process.env.AUTH_RATE_LIMIT_MAX ?? DEFAULT_AUTH_RATE_LIMIT_MAX,
-  ),
-  RATE_LIMIT_MAX: Number(process.env.RATE_LIMIT_MAX ?? DEFAULT_RATE_LIMIT_MAX),
-  // Default rate window: 15 minutes in milliseconds
-  RATE_WINDOW_MS: Number(
-    process.env.RATE_WINDOW_MS ??
-      String(DEFAULT_RATE_WINDOW_MS_MINUTE * MILLISECONDS_IN_A_MINUTE),
-  ),
-  SERVICE_NAME: process.env.SERVICE_NAME,
-  SERVICE_PHASE: process.env.SERVICE_PHASE,
-  SERVICE_URL: process.env.SERVICE_URL,
+const useHttps = ["uat", "staging", "production"].includes(required.NODE_ENV);
+
+export default {
+  CONTACT_EMAIL: optional.CONTACT_EMAIL,
+  CONTACT_PHONE: optional.CONTACT_PHONE,
+  DEPARTMENT_NAME: optional.DEPARTMENT_NAME,
+  DEPARTMENT_URL: optional.DEPARTMENT_URL,
+
+  RATELIMIT_HEADERS_ENABLED: optional.RATELIMIT_HEADERS_ENABLED,
+  RATELIMIT_STORAGE_URI: optional.RATELIMIT_STORAGE_URI,
+
+  SERVICE_NAME: optional.SERVICE_NAME,
+  SERVICE_PHASE: optional.SERVICE_PHASE,
+  SERVICE_URL: optional.SERVICE_URL,
+
+  AUTH_RATE_LIMIT_MAX:
+    optional.AUTH_RATE_LIMIT_MAX ?? DEFAULT_AUTH_RATE_LIMIT_MAX,
+  RATE_LIMIT_MAX: optional.RATE_LIMIT_MAX ?? DEFAULT_RATE_LIMIT_MAX,
+  RATE_WINDOW_MS: optional.RATE_WINDOW_MS ?? DEFAULT_RATE_WINDOW,
+
+  app: {
+    port: optional.PORT ?? DEFAULT_PORT,
+    environment: required.NODE_ENV,
+    appName: optional.SERVICE_NAME ?? "Your service name",
+    useHttps, // Use HTTPS in production
+  } satisfies AppConfig,
+
   session: {
-    secret: process.env.SESSION_SECRET,
-    name: process.env.SESSION_NAME,
+    secret: required.SESSION_SECRET,
+    name: "rcw.sid",
     resave: false,
     saveUninitialized: false,
-  },
-  app: {
-    port: Number(process.env.PORT ?? DEFAULT_PORT),
-    environment: process.env.NODE_ENV ?? "development",
-    appName: process.env.SERVICE_NAME ?? "Your service name",
-    useHttps: process.env.NODE_ENV === "production", // Use HTTPS in production
-  },
+    // TODO: this requires an auth refactor to use entra response_mode=query
+    // cookie: {
+    //   secure: useHttps,
+    //   httpOnly: true,
+    //   sameSite: "lax",
+    //   maxAge: SESSION_AGE_MAX,
+    // },
+  } satisfies SessionOptions,
+
+  redis: {
+    enabled: optional.REDIS_ENABLED === "true",
+    url:
+      optional.REDIS_URL ??
+      `redis://${DEFAULT_REDIS_HOST}:${DEFAULT_REDIS_PORT}`,
+
+    socketConnectionTimeout: REDIS_SOCKET_CONNECTION_TIMEOUT,
+    maxRetryAttempts: REDIS_MAX_RETRY_ATTEMPTS,
+  } satisfies RedisConfig,
+
   csrf: {
+    secure: useHttps, // Only secure in production
     cookieName: "_csrf",
-    secure: process.env.NODE_ENV === "production", // Only secure in production
     httpOnly: true, // Restrict client-side access
-  },
+  } satisfies CsrfConfig,
+
   paths: {
     static: "public", // Path for serving static files
     views: "src/views", // Path for Nunjucks views
-  },
-  entra: {
-    clientId: process.env.ENTRA_CLIENT_ID,
-    clientSecret: process.env.ENTRA_CLIENT_SECRET,
-    authority: `${process.env.ENTRA_AUTHORITY_BASE_URL}${process.env.ENTRA_TENANT_ID}`,
-    authorityBaseUrl: process.env.ENTRA_AUTHORITY_BASE_URL,
-    tenantId: process.env.ENTRA_TENANT_ID,
-    redirectUri: process.env.ENTRA_REDIRECT_URI,
-    postLogoutRedirectUri: process.env.ENTRA_POST_LOGOUT_REDIRECT_URI,
-  },
-};
+  } satisfies PathsConfig,
 
-export default config;
+  entra: {
+    clientId: required.ENTRA_CLIENT_ID,
+    clientSecret: required.ENTRA_CLIENT_SECRET,
+    authority: `${required.ENTRA_AUTHORITY_BASE_URL}${required.ENTRA_TENANT_ID}`,
+    authorityBaseUrl: required.ENTRA_AUTHORITY_BASE_URL,
+    tenantId: required.ENTRA_TENANT_ID,
+    redirectUri: required.ENTRA_REDIRECT_URI,
+    postLogoutRedirectUri: required.ENTRA_POST_LOGOUT_REDIRECT_URI,
+  } satisfies EntraConfig,
+} satisfies Config;

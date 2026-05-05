@@ -1,11 +1,13 @@
+import config from "#/config.js";
+
 import { helmetSetup as setupHelmet } from "#/middleware/setupHelmet.js";
 import { setupNunjucks } from "#/middleware/setupNunjucks.js";
 import {
   setupRateLimit,
   createAuthLimiter,
 } from "#/middleware/setupRateLimit.js";
-import config from "#/config.js";
 import { initializeI18nextSync } from "#/lib/i18nLoader.js";
+import { createSession } from "#/lib/session.js";
 import { axiosMiddleware } from "#/middleware/apiMiddleware.js";
 import { standardMiddleware } from "#/middleware/standardMiddleware.js";
 import { requireAuth } from "#/middleware/requireAuth.js";
@@ -14,12 +16,13 @@ import { setupCsrf } from "#/middleware/setupCsrf.js";
 import { setupLocaleMiddleware } from "#/middleware/setupLocale.js";
 import authRouter from "#/routes/auth.js";
 import indexRouter from "#/routes/index.js";
+import testRouter from "#/routes/test.js";
 
 import compression from "compression";
 import type { Request, Response } from "express";
 import express from "express";
-import session from "express-session";
 import morgan from "morgan";
+import session from "express-session";
 
 const TRUST_FIRST_PROXY = 1;
 const ENABLE_PLAYWRIGHT_TEST_SIGNIN =
@@ -45,14 +48,6 @@ const createApp = async (): Promise<express.Application> => {
   // Response compression setup
   app.use(
     compression({
-      /**
-       * Custom filter for compression.
-       * Prevents compression if the 'x-no-compression' header is set in the request.
-       *
-       * @param {import('express').Request} req - The Express request object
-       * @param {import('express').Response} res - The Express response object
-       * @returns {boolean} True if compression should be applied, false otherwise
-       */
       filter: (req: Request, res: Response): boolean => {
         if ("x-no-compression" in req.headers) {
           return false;
@@ -70,7 +65,8 @@ const createApp = async (): Promise<express.Application> => {
 
   // Set up cookie security for sessions
   app.set("trust proxy", TRUST_FIRST_PROXY);
-  app.use(session(config.session));
+
+  app.use(session(await createSession(config)));
 
   // Set up locale middleware for internationalization
   app.use(setupLocaleMiddleware);
@@ -99,10 +95,7 @@ const createApp = async (): Promise<express.Application> => {
 
   // Playwright-only route: sets an authenticated session without going through Entra.
   if (ENABLE_PLAYWRIGHT_TEST_SIGNIN && process.env.NODE_ENV === "test") {
-    app.get("/test/signin", (req, res) => {
-      req.session.isAuthenticated = true;
-      res.redirect("/");
-    });
+    app.use("/test", testRouter);
   }
 
   app.use("/auth", createAuthLimiter(config), authRouter);

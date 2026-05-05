@@ -113,7 +113,6 @@ rcw:
     CONTACT_EMAIL: "eligibility@justice.gov.uk"
     CONTACT_PHONE: ""
     SERVICE_URL: "https://www.gov.uk/legal-aid"
-    SESSION_NAME: "sessionId"
     RATELIMIT_HEADERS_ENABLED: true
     RATELIMIT_STORAGE_URI: ""
     AUTH_RATE_LIMIT_MAX: 20
@@ -123,6 +122,8 @@ rcw:
     ENTRA_AUTHORITY_BASE_URL: "https://login.microsoftonline.com/"
     ENTRA_REDIRECT_URI: ""
     ENTRA_POST_LOGOUT_REDIRECT_URI: ""
+    REDIS_ENABLED: true  
+    REDIS_SECRET_NAME: elasticache-redis
 
   autoscaling:
     enabled: false

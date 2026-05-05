@@ -1,14 +1,29 @@
+# Injected secrets need to pull the env var from the host machine
+# This happens automatically if you provide only the env var name.
 services:
   rcw:
     build: .
+    container_name: rcw-front-end
+    depends_on:
+      redis:
+        condition: service_healthy
+    env_file:
+      - .env
+    ports:
+      - "3000:3000"
     environment:
-      NODE_ENV: production
-      SESSION_SECRET: dev-secret
-      SESSION_NAME: sessionId
-      RATELIMIT_HEADERS_ENABLED: "false"
-      RATELIMIT_STORAGE_URI: ""
-      RATE_LIMIT_MAX: "100"
-      RATE_WINDOW_MS: "900000"
+      - NODE_ENV=docker
+      - REDIS_ENABLED=true
+      - REDIS_URL=redis://redis:6379
+
+      # secrets injected by 1Password CLI
+      # op run --env-file=.env -- docker compose up -d
+      - ENTRA_CLIENT_ID
+      - ENTRA_TENANT_ID
+      - ENTRA_CLIENT_SECRET
+      - ENTRA_REDIRECT_URI
+      - ENTRA_AUTHORITY_BASE_URL
+      - ENTRA_POST_LOGOUT_REDIRECT_URI
 
   # ccq:
   #   image:
@@ -16,6 +31,7 @@ services:
   #     - "3000"
 
   nginx:
+    container_name: nginx-reverse-proxy  
     image: nginxinc/nginx-unprivileged:${NGINX_IMAGE_TAG:-alpine}
     environment:
       NGINX_UPSTREAM_RCW: rcw:3000
@@ -26,3 +42,20 @@ services:
     depends_on:
       - rcw
       # - ccq
+
+  redis:
+    container_name: rcw-redis-session
+    image: "redis:7.2-alpine"
+    ports:
+      - "6379:6379"
+    command: >
+      redis-server 
+      --maxmemory 256mb 
+      --maxmemory-policy allkeys-lru
+      --save ""
+      --appendonly no
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5

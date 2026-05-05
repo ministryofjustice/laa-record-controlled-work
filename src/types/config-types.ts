@@ -1,5 +1,7 @@
 // Configuration type definitions
 
+import type { SessionOptions } from "express-session";
+
 export interface AppConfig {
   port: number;
   environment: string;
@@ -24,11 +26,11 @@ export interface EntraConfig {
   authorityBaseUrl: string;
 }
 
-export interface SessionConfig {
-  secret: string;
-  name: string;
-  resave: boolean;
-  saveUninitialized: boolean;
+export interface RedisConfig {
+  enabled: boolean;
+  url: string;
+  socketConnectionTimeout: number;
+  maxRetryAttempts: number;
 }
 
 export interface PathsConfig {
@@ -43,15 +45,16 @@ export interface Config {
   DEPARTMENT_URL: string | undefined;
   RATELIMIT_HEADERS_ENABLED: string | undefined;
   RATELIMIT_STORAGE_URI: string | undefined;
-  AUTH_RATE_LIMIT_MAX: number | string;
-  RATE_LIMIT_MAX: number | string;
+  AUTH_RATE_LIMIT_MAX: number;
+  RATE_LIMIT_MAX: number;
   RATE_WINDOW_MS: number;
   SERVICE_NAME: string | undefined;
   SERVICE_PHASE: string | undefined;
   SERVICE_URL: string | undefined;
   app: AppConfig;
+  redis: RedisConfig;
   csrf: CsrfConfig;
-  session: SessionConfig;
+  session: SessionOptions;
   paths: PathsConfig;
   entra: EntraConfig;
 }
