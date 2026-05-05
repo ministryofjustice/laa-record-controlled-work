@@ -5,7 +5,7 @@ services:
     image: nginxinc/nginx-unprivileged:${NGINX_IMAGE_TAG:-alpine}
     container_name: rcw-nginx
     ports:
-      - 8080
+      - 8080:8080
     volumes:
       - ./deploy/laa-record-controlled-work/nginx/default.conf.template:/etc/nginx/templates/default.conf.template:ro
       - ./deploy/laa-record-controlled-work/nginx/proxy.conf:/etc/nginx/proxy.conf:ro
@@ -64,7 +64,7 @@ services:
     container_name: rcw-session-redis
     image: "redis:7.2-alpine"
     ports:
-      - 6379
+      - 6379:6379
     command: >
       redis-server 
       --maxmemory 256mb 
@@ -81,7 +81,7 @@ services:
     container_name: rcw-ccq-cache-redis
     image: "redis:7.2-alpine"
     ports:
-      - "6380:6379"
+      - 6380:6379
     command: >
       redis-server
       --maxmemory 256mb 
