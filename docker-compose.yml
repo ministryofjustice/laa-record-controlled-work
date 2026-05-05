@@ -15,7 +15,6 @@ services:
       - NODE_ENV=docker
       - REDIS_ENABLED=true
       - REDIS_URL=redis://redis:6379
-      - REDIS_AUTH_TOKEN=${REDIS_AUTH_TOKEN:-redis_password}
 
       # secrets injected by 1Password CLI
       # op run --env-file=.env -- docker compose up -d
@@ -51,7 +50,6 @@ services:
       - "6379:6379"
     command: >
       redis-server 
-      --requirepass ${REDIS_AUTH_TOKEN:-redis_password}
       --maxmemory 256mb 
       --maxmemory-policy allkeys-lru
       --save ""

@@ -16,10 +16,7 @@ const optionalEnvSchema = z.object({
   SERVICE_URL: z.url().optional(),
   PORT: z.coerce.number().optional(),
   REDIS_URL: z.url().optional(),
-  REDIS_HOST: z.string().optional(),
-  REDIS_PORT: z.coerce.number().optional(),
   REDIS_ENABLED: z.string().optional(),
-  REDIS_AUTH_TOKEN: z.string().optional(),
 });
 
 const injected = z.string().refine((val) => !val.startsWith("op://"), {

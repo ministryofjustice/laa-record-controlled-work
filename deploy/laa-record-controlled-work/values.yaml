@@ -122,6 +122,8 @@ rcw:
     ENTRA_AUTHORITY_BASE_URL: "https://login.microsoftonline.com/"
     ENTRA_REDIRECT_URI: ""
     ENTRA_POST_LOGOUT_REDIRECT_URI: ""
+    REDIS_ENABLED: true  
+    REDIS_SECRET_NAME: elasticache-redis
 
   autoscaling:
     enabled: false

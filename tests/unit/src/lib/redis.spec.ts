@@ -5,11 +5,11 @@ import { strict as assert } from "assert";
 import { expect } from "chai";
 import sinon from "sinon";
 
-const createMockConfig = (): RedisConfig => {
-  config.redis.enabled = true;
-  config.redis.authToken = "secret-token";
-  return config.redis;
-};
+const createMockConfig = (): RedisConfig => ({
+  ...config.redis,
+  enabled: true,
+  url: "redis://testurl",
+});
 
 describe("Redis", () => {
   describe("createRedisClient()", () => {
@@ -36,9 +36,9 @@ describe("Redis", () => {
         "Should not connect inside createRedisClient",
       );
       assert.equal(
-        clientOptions.password,
-        "secret-token",
-        "Should pass auth token as password",
+        clientOptions.url,
+        "redis://testurl",
+        "Should pass auth redis url",
       );
       assert.equal(
         clientOptions.socket.connectTimeout,
@@ -125,4 +125,3 @@ describe("Redis", () => {
     });
   });
 });
-
