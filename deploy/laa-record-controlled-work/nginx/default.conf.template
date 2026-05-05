@@ -14,48 +14,30 @@ server {
   real_ip_recursive on;
 
   location / {
+    include                proxy.conf;
+
     proxy_pass             http://${NGINX_UPSTREAM_RCW};
-
-    # Use HTTP/1.1 upstream so nginx controls request framing; partially mitigates HTTP desync attacks
-    proxy_http_version     1.1;
-
-    # Clear hop-by-hop headers before forwarding to prevent connection state ambiguity
-    proxy_set_header       Connection        "";
-
-    # Strip Transfer-Encoding to prevent TE.CL request smuggling
-    proxy_set_header       Transfer-Encoding "";
-
-    # Node/Express sets this header; suppress it to avoid leaking implementation details
-    proxy_hide_header      X-Powered-By;
-
-    proxy_set_header       Host              $host;
-    proxy_set_header       X-Real-IP         $remote_addr;
-    proxy_set_header       X-Forwarded-For   $proxy_add_x_forwarded_for;
-    proxy_set_header       X-Forwarded-Proto $scheme;
-
-    proxy_connect_timeout  10s;
-    proxy_send_timeout     60s;
-    proxy_read_timeout     60s;
   }
 
-  location /ccq/assets {
-    proxy_pass             http://${NGINX_UPSTREAM_CCQ};
-    proxy_set_header       Host              $host;
+  location ~ ^/(ccq_assets|ccq_static)/ {
+    include                proxy.conf;
 
-    # Assets are static and should be cacheable by the browser and any intermediate caches
-    proxy_cache_valid      200 1d;
+    proxy_pass             http://${NGINX_UPSTREAM_CCQ};
+    
+    # Strip session cookies from assets for performance
+    proxy_hide_header Set-Cookie;
+    proxy_ignore_headers Set-Cookie;
+
+    # Force browser caching
+    expires 30d;
+    add_header Cache-Control "public, max-age=2592000";
+    access_log off;
   }
 
   location ~ /eligibility/ {
-    proxy_pass             http://${NGINX_UPSTREAM_CCQ};
-    proxy_set_header       Host              $host;
-    proxy_set_header       X-Real-IP         $remote_addr;
-    proxy_set_header       X-Forwarded-For   $proxy_add_x_forwarded_for;
-    proxy_set_header       X-Forwarded-Proto $scheme;
+    include                proxy.conf;
 
-    proxy_http_version     1.1;
-    proxy_set_header       Connection        "";
-    proxy_set_header       Transfer-Encoding "";
+    proxy_pass             http://${NGINX_UPSTREAM_CCQ};
   }
 
 }
