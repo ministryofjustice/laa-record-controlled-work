@@ -1,0 +1,31 @@
+# For 
+name: Renovate Auto Approval (patch, minor, lockfile)
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, labeled]
+
+jobs:
+  approve:
+    if: github.actor == 'renovate[bot]'
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: write
+    steps:
+      - name: Approve patch, minor or lockfile maintenance PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          WORKFLOW_URL: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        run: |
+          LABELS=$(gh pr view "$PR_URL" --json labels --jq '.labels.[].name')
+          if [[ "$LABELS" =~ "patch" || "$LABELS" =~ "minor" || "$LABELS" =~ "lockfileMaintenance" ]]; then
+            echo "Detected patch/minor/lockfile update ..."
+            APPROVAL_COMMENT="Patch upgrades, minor upgrades and lockfile maintenance PRs can be automerged."
+            APPROVAL_COMMENT+=$'\n'"Approved by [Renovate Auto Approval workflow #${{ github.run_id }}]($RUN_URL)"
+
+            gh pr review "$PR_URL" --approve --body "$APPROVAL_COMMENT"
+          else
+            echo "Major update or unknown type detected. Manual review required."
+          fi
