@@ -17,6 +17,7 @@ import { setupLocaleMiddleware } from "#/middleware/setupLocale.js";
 import authRouter from "#/routes/auth.js";
 import indexRouter from "#/routes/index.js";
 import testRouter from "#/routes/test.js";
+import healthRouter from "#/routes/health.js";
 
 import compression from "compression";
 import type { Request, Response } from "express";
@@ -39,6 +40,8 @@ const createApp = async (): Promise<express.Application> => {
   initializeI18nextSync();
 
   const app = express();
+
+  app.use("/", healthRouter);
 
   // Set up common middleware for handling cookies, body parsing, etc.
   standardMiddleware(app);
@@ -66,8 +69,6 @@ const createApp = async (): Promise<express.Application> => {
   // Set up cookie security for sessions
   app.set("trust proxy", TRUST_FIRST_PROXY);
 
-  app.use(session(await createSession(config)));
-
   // Set up locale middleware for internationalization
   app.use(setupLocaleMiddleware);
 
@@ -88,6 +89,9 @@ const createApp = async (): Promise<express.Application> => {
     // Use dev format for development (colored, more readable)
     app.use(morgan("dev"));
   }
+
+  // Setup express-session using redis
+  app.use(session(await createSession(config)));
 
   // CSRF protection applied globally; /auth/code/callback is excluded via
   // skipCsrfProtection (PKCE state provides the equivalent protection for that endpoint).
