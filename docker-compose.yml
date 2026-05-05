@@ -61,7 +61,7 @@ services:
       REDIS_URL: redis://redis-ccq:6379
 
   redis-rcw:
-    container_name: redis-rcw-session
+    container_name: rcw-session-redis
     image: "redis:7.2-alpine"
     ports:
       - 6379
@@ -78,7 +78,7 @@ services:
       retries: 5
 
   redis-ccq:
-    container_name: redis-ccq-journey-data
+    container_name: rcw-ccq-cache-redis
     image: "redis:7.2-alpine"
     ports:
       - "6380:6379"
