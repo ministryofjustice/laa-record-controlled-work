@@ -5,10 +5,11 @@ import { strict as assert } from "assert";
 import { expect } from "chai";
 import sinon from "sinon";
 
-const createMockConfig = (): RedisConfig => {
-  config.redis.enabled = true;
-  return config.redis;
-};
+const createMockConfig = (): RedisConfig => ({
+  ...config.redis,
+  enabled: true,
+  url: "redis://testurl",
+});
 
 describe("Redis", () => {
   describe("createRedisClient()", () => {
@@ -36,7 +37,7 @@ describe("Redis", () => {
       );
       assert.equal(
         clientOptions.url,
-        "redis://localhost:6379",
+        "redis://testurl",
         "Should pass auth redis url",
       );
       assert.equal(
@@ -124,4 +125,3 @@ describe("Redis", () => {
     });
   });
 });
-
