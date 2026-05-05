@@ -20,6 +20,14 @@ import type { Request, Response } from "express";
 import express from "express";
 import session from "express-session";
 import morgan from "morgan";
+import { Forge } from "@ministryofjustice/hmpps-forge/core";
+import {
+  ExpressFrameworkAdapter,
+  nunjucksFunctions,
+} from "@ministryofjustice/hmpps-forge/express-nunjucks";
+import { govukComponents } from "@ministryofjustice/hmpps-forge/govuk-components";
+import { mojComponents } from "@ministryofjustice/hmpps-forge/moj-components";
+import clientJourney from "#/journeys/client-details/index.js";
 
 const TRUST_FIRST_PROXY = 1;
 const ENABLE_PLAYWRIGHT_TEST_SIGNIN =
@@ -76,7 +84,17 @@ const createApp = async (): Promise<express.Application> => {
   app.use(setupLocaleMiddleware);
 
   // Set up Nunjucks as the template engine
-  setupNunjucks(app);
+  const nunjucksEnv = setupNunjucks(app);
+
+  const forge = new Forge({
+    frameworkAdapter: ExpressFrameworkAdapter.configure({ nunjucksEnv }),
+  });
+
+  forge
+    .registerGlobalComponents(govukComponents)
+    .registerGlobalComponents(mojComponents)
+    .registerGlobalFunctions(nunjucksFunctions)
+    .registerPackage(clientJourney);
 
   // Set up rate limiting
   setupRateLimit(app, config);
@@ -114,6 +132,9 @@ const createApp = async (): Promise<express.Application> => {
     const { default: livereload } = await import("connect-livereload");
     app.use(livereload());
   }
+
+  app.use(express.urlencoded({ extended: true }));
+  app.use("/", forge.getRouter() as express.Router);
 
   return app;
 };

@@ -57,23 +57,6 @@ router.get(
   },
 );
 
-// liveness and readiness probes for Helm deployments
-router.get("/status", (_req: Request, res: Response): void => {
-  res.status(OK).send("OK");
-});
-
-router.get("/health", (_req: Request, res: Response): void => {
-  res.status(OK).send("Healthy");
-});
-
-router.get("/error", (_req: Request, res: Response): void => {
-  // Simulate an error
-  res
-    .set("X-Error-Tag", "TEST_500_ALERT")
-    .status(INTERNAL_SERVER_ERROR)
-    .send("Internal Server Error");
-});
-
 // GET endpoint to render the person change form
 router.get("/change/person", getPerson);
 

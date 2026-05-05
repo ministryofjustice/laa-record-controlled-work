@@ -34,7 +34,7 @@ export const resolveAsset = (
  * @param {Application} app - The Express application instance.
  * @returns {void} This function does not return a value; it configures Nunjucks for the provided app.
  */
-export const setupNunjucks = (app: Application): void => {
+export const setupNunjucks = (app: Application): nunjucks.Environment => {
   const appInstance = app;
   appInstance.set("view engine", "njk");
 
@@ -58,10 +58,12 @@ export const setupNunjucks = (app: Application): void => {
   // Tell Nunjucks where to look for njk files
   const nunjucksEnv = nunjucks.configure(
     [
-      path.join(process.cwd(), "public", "views"), // Main views directory
+      path.join(process.cwd(), "src", "views"), // Main views directory
       "node_modules/govuk-frontend/dist", // GOV.UK Frontend templates
       "node_modules/govuk-frontend/dist/components/", // GOV.UK components
       "node_modules/@ministryofjustice/frontend", // MoJ Design System components
+      "node_modules/@ministryofjustice/hmpps-forge/dist/govuk-components/",
+      "node_modules/@ministryofjustice/hmpps-forge/dist/moj-components/",
     ],
     {
       autoescape: true, // Enable auto escaping to prevent XSS attacks
@@ -72,4 +74,6 @@ export const setupNunjucks = (app: Application): void => {
 
   // Add global variables
   nunjucksEnv.addGlobal("t", nunjucksT);
+
+  return nunjucksEnv;
 };
