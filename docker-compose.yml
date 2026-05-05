@@ -4,11 +4,8 @@ services:
   nginx:
     image: nginxinc/nginx-unprivileged:${NGINX_IMAGE_TAG:-alpine}
     container_name: rcw-nginx
-    environment:
-      NGINX_UPSTREAM_RCW: rcw:3000
-      NGINX_UPSTREAM_CCQ: ccq:3000
     ports:
-      - "8080:8080"
+      - 8080
     volumes:
       - ./deploy/laa-record-controlled-work/nginx/default.conf.template:/etc/nginx/templates/default.conf.template:ro
       - ./deploy/laa-record-controlled-work/nginx/proxy.conf:/etc/nginx/proxy.conf:ro
@@ -16,18 +13,21 @@ services:
     depends_on:
       - rcw
       - ccq
+    environment:
+      NGINX_UPSTREAM_RCW: rcw:3000
+      NGINX_UPSTREAM_CCQ: ccq:3000
 
   rcw:
     build: .
     container_name: rcw-front-end
+    expose:
+      - 3000
     depends_on:
       redis-rcw:
         condition: service_healthy
     env_file:
-      - .env
-    ports:
-      - 3000
-    environment:
+      - .env # load from .env first
+    environment: # set overrides
       - NODE_ENV=docker
       - REDIS_ENABLED=true
       - REDIS_URL=redis://redis-rcw:6379
@@ -46,25 +46,25 @@ services:
     image: laa-check-client-qualifies:latest
     container_name: rcw-ccq
     pull_policy: never # clone laa-check-client-qualifies, `make build`
+    expose:
+      - 3000
+    depends_on:
+      redis-ccq:
+        condition: service_healthy
     environment:
       RAILS_ENV: production
       RAILS_SERVE_STATIC_FILES: true # won't serve assets without this
       RAILS_LOG_TO_STDOUT: true # logs to a file without this
+      SECRET_KEY_BASE: dev-secret # doesn't work without it
 
       CCQ_MODE: embedded
       REDIS_URL: redis://redis-ccq:6379
-      SECRET_KEY_BASE: dev-secret
-    depends_on:
-      redis-ccq:
-        condition: service_healthy
-    expose:
-      - 3000
 
   redis-rcw:
     container_name: redis-rcw-session
     image: "redis:7.2-alpine"
     ports:
-      - "6379:6379"
+      - 6379
     command: >
       redis-server 
       --maxmemory 256mb 
