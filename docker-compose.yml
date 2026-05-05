@@ -1,11 +1,25 @@
 # Injected secrets need to pull the env var from the host machine
 # This happens automatically if you provide only the env var name.
 services:
+  nginx:
+    image: nginxinc/nginx-unprivileged:${NGINX_IMAGE_TAG:-alpine}
+    container_name: rcw-nginx
+    environment:
+      NGINX_UPSTREAM_RCW: rcw:3000
+      NGINX_UPSTREAM_CCQ: ccq:3000
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./deploy/laa-record-controlled-work/nginx/default.conf.template:/etc/nginx/templates/default.conf.template:ro
+    depends_on:
+      - rcw
+      - ccq
+
   rcw:
     build: .
     container_name: rcw-front-end
     depends_on:
-      redis:
+      redis-rcw:
         condition: service_healthy
     env_file:
       - .env
@@ -14,7 +28,7 @@ services:
     environment:
       - NODE_ENV=docker
       - REDIS_ENABLED=true
-      - REDIS_URL=redis://redis:6379
+      - REDIS_URL=redis://redis-rcw:6379
       - REDIS_AUTH_TOKEN=${REDIS_AUTH_TOKEN:-redis_password}
 
       # secrets injected by 1Password CLI
@@ -33,7 +47,6 @@ services:
     environment:
       RAILS_ENV: production
       CCQ_MODE: embedded
-      RAILS_RELATIVE_URL_ROOT: /ccq
       REDIS_URL: redis://redis-ccq:6379
       SECRET_KEY_BASE: dev-secret
     depends_on:
@@ -42,7 +55,7 @@ services:
     expose:
       - "3000"
 
-  redis:
+  redis-rcw:
     container_name: redis-rcw-session
     image: "redis:7.2-alpine"
     ports:
@@ -75,17 +88,3 @@ services:
       interval: 5s
       timeout: 3s
       retries: 5
-
-  nginx:
-    image: nginxinc/nginx-unprivileged:${NGINX_IMAGE_TAG:-alpine}
-    container_name: rcw-nginx
-    environment:
-      NGINX_UPSTREAM_RCW: rcw:3000
-      NGINX_UPSTREAM_CCQ: ccq:3000
-    ports:
-      - "8080:8080"
-    volumes:
-      - ./deploy/laa-record-controlled-work/nginx/default.conf.template:/etc/nginx/templates/default.conf.template:ro
-    depends_on:
-      - rcw
-      - ccq

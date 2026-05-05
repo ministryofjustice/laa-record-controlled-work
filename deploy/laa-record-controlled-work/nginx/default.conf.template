@@ -32,13 +32,20 @@ server {
     proxy_read_timeout     60s;
   }
 
-  location /ccq/ {
-    proxy_pass             http://${NGINX_UPSTREAM_CCQ}/;
+  location /ccq/assets {
+    proxy_pass             http://${NGINX_UPSTREAM_CCQ};
+    proxy_set_header       Host              $host;
+
+    # Assets are static and should be cacheable by the browser and any intermediate caches
+    proxy_cache_valid      200 1d;
+  }
+
+  location ~ /eligibility/ {
+    proxy_pass             http://${NGINX_UPSTREAM_CCQ};
     proxy_set_header       Host              $host;
     proxy_set_header       X-Real-IP         $remote_addr;
     proxy_set_header       X-Forwarded-For   $proxy_add_x_forwarded_for;
     proxy_set_header       X-Forwarded-Proto $scheme;
-    proxy_set_header       Cookie            $http_cookie;
 
     proxy_http_version     1.1;
     proxy_set_header       Connection        "";
