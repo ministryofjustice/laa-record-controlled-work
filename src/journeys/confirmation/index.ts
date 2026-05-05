@@ -1,6 +1,6 @@
 import { createForgePackage } from '@ministryofjustice/hmpps-forge/core/authoring'
-import { clientJourney } from '#/journeys/client-details/journey.js'
+import { confirmationJourney } from '#/journeys/confirmation/journey.js'
 
 export default createForgePackage({
-  journey: clientJourney,
+  journey: confirmationJourney,
 })

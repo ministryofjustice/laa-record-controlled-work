@@ -1,6 +1,6 @@
 import { createForgePackage } from '@ministryofjustice/hmpps-forge/core/authoring'
-import { feedbackJourney } from '#/journeys/test-journey/journey.js'
+import { splitJourney } from '#/journeys/split/journey.js'
 
 export default createForgePackage({
-  journey: feedbackJourney,
+  journey: splitJourney,
 })

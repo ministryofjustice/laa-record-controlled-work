@@ -165,7 +165,7 @@ const confirmationStep = step({
   blocks: [GovUKPanel({ titleText: "Feedback sent" })],
 });
 
-export const feedbackJourney = journey({
+export const confirmationJourney = journey({
   code: "feedback",
   title: "Give feedback",
   path: "/feedback",

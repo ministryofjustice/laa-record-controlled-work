@@ -5,7 +5,6 @@ import {
   redirect,
   Answer,
   Condition,
-  Query,
   validation,
   Self,
   block,
@@ -15,9 +14,6 @@ import {
   GovUKButton,
   GovUKRadioInput,
   GovUKPanel,
-  GovUKHeading,
-  GovUKSummaryList,
-  GovUKBody,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
 const ecfStep = step({
@@ -62,105 +58,75 @@ const ecfStep = step({
       validate: true,
       onValid: {
         next: [
-          redirect({
-            when: Query("returnTo").match(Condition.Equals("check-answers")),
-            goto: "check-answers",
-          }),
-          redirect({ goto: "your-feedback" }),
+      redirect({
+        when: Answer('ecf').match(Condition.Equals('yes')),
+        goto: 'yes',
+      }),
+      redirect({ goto: 'no' }),
         ],
       },
     }),
   ],
 });
 
-const feedbackStep = step({
-  path: "/your-feedback",
-  title: "Your feedback",
+const yesStep = step({
+  path: "/yes",
+  title: "Yes option",
   blocks: [
     GovUKTextareaInput({
-      code: "feedback",
+      code: "yes",
       label: {
-        text: "Your feedback",
+        text: "You picked yes",
         isPageHeading: true,
         classes: "govuk-label--l",
       },
-      hint: { text: "Tell us what you think of this service." },
       validWhen: [
         validation({
           condition: Self().match(Condition.IsRequired()),
-          message: "Enter feedback",
+          message: "Enter some text",
         }),
       ],
     }),
-    GovUKButton({ text: "Send feedback" }),
+    GovUKButton({ text: "Send" }),
   ],
   onSubmission: [
     submit({
       validate: true,
       onValid: {
         next: [
-          redirect({
-            when: Query("returnTo").match(Condition.Equals("check-answers")),
-            goto: "check-answers",
-          }),
-          redirect({ goto: "check-answers" }),
+          redirect({ goto: "confirmation" }),
         ],
       },
     }),
   ],
 });
 
-const checkAnswersStep = step({
-  code: "check-answers",
-  path: "/check-answers",
-  title: "Check your answers",
+const noStep = step({
+  path: "/no",
+  title: "No option",
   blocks: [
-    GovUKHeading({
-      text: "Check your answers",
-    }),
-    GovUKSummaryList({
-      rows: [
-        {
-          key: { text: "Name" },
-          value: { text: Answer("fullName") },
-          actions: {
-            items: [
-              {
-                href: "your-name?returnTo=check-answers",
-                text: "Change",
-                visuallyHiddenText: "name",
-              },
-            ],
-          },
-        },
-        {
-          key: { text: "Feedback" },
-          value: { text: Answer("feedback") },
-          actions: {
-            items: [
-              {
-                href: "your-feedback?returnTo=check-answers",
-                text: "Change",
-                visuallyHiddenText: "role",
-              },
-            ],
-          },
-        },
+    GovUKTextareaInput({
+      code: "no",
+      label: {
+        text: "You picked no",
+        isPageHeading: true,
+        classes: "govuk-label--l",
+      },
+      validWhen: [
+        validation({
+          condition: Self().match(Condition.IsRequired()),
+          message: "Enter some text",
+        }),
       ],
     }),
-    GovUKBody({
-      text: 'Selecting "Confirm" will save your answers.',
-    }),
-    GovUKButton({ text: "Done" }),
+    GovUKButton({ text: "Send" }),
   ],
   onSubmission: [
     submit({
-      validate: false,
-      onAlways: {
+      validate: true,
+      onValid: {
         next: [
-          redirect({
-            goto: "confirmation",
-          }),
+          redirect({ goto: "confirmation" }),
         ],
       },
     }),
@@ -169,15 +135,15 @@ const checkAnswersStep = step({
 
 const confirmationStep = step({
   path: "/confirmation",
-  title: "Feedback sent",
+  title: "Form sent",
   blocks: [GovUKPanel({ titleText: "Feedback sent" })],
 });
 
-export const clientJourney = journey({
+export const splitJourney = journey({
   code: "feedback",
   title: "Give feedback",
-  path: "/form",
+  path: "/split-form",
   reachability: { disableReachabilityChecks: true },
   view: { template: "partials/form-step" },
-  steps: [ecfStep, feedbackStep, checkAnswersStep, confirmationStep],
+  steps: [ecfStep, yesStep, noStep, confirmationStep ],
 });
