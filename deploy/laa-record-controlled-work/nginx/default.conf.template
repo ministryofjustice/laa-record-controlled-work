@@ -1,4 +1,4 @@
-include               maps.conf
+include               /etc/nginx/maps.conf
 # Do not include nginx version in error pages or Server header
 server_tokens         off;
 # Prevent oversized request bodies; sufficient for all expected form submissions
@@ -14,13 +14,13 @@ server {
   real_ip_recursive on;
 
   location / {
-    include                proxy.conf;
+    include                /etc/nginx/proxy.conf;
 
     proxy_pass             http://${NGINX_UPSTREAM_RCW};
   }
 
   location ~ ^/(ccq_assets|ccq_static)/ {
-    include                proxy.conf;
+    include                /etc/nginx/proxy.conf;
 
     proxy_pass             http://${NGINX_UPSTREAM_CCQ};
     
@@ -35,7 +35,7 @@ server {
   }
 
   location ~ /eligibility/ {
-    include                proxy.conf;
+    include                /etc/nginx/proxy.conf;
 
     proxy_pass             http://${NGINX_UPSTREAM_CCQ};
   }

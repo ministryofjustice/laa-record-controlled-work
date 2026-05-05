@@ -11,6 +11,8 @@ services:
       - "8080:8080"
     volumes:
       - ./deploy/laa-record-controlled-work/nginx/default.conf.template:/etc/nginx/templates/default.conf.template:ro
+      - ./deploy/laa-record-controlled-work/nginx/proxy.conf:/etc/nginx/proxy.conf:ro
+      - ./deploy/laa-record-controlled-work/nginx/maps.conf:/etc/nginx/maps.conf:ro
     depends_on:
       - rcw
       - ccq
