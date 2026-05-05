@@ -1,4 +1,4 @@
-include               /etc/nginx/maps.conf
+include               /etc/nginx/maps.conf;
 # Do not include nginx version in error pages or Server header
 server_tokens         off;
 # Prevent oversized request bodies; sufficient for all expected form submissions
