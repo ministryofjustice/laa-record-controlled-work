@@ -20,8 +20,8 @@ const toNumber = (value: number | string): number =>
 export const setupRateLimit = (app: Application, config: Config): void => {
   app.use(
     rateLimit({
-      windowMs: toNumber(config.RATE_WINDOW_MS),
-      max: toNumber(config.RATE_LIMIT_MAX),
+      windowMs: config.RATE_WINDOW_MS,
+      max: config.RATE_LIMIT_MAX,
       message: "Too many requests, please try again later.",
     }),
   );

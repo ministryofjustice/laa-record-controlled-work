@@ -209,6 +209,9 @@ describe("AuthService", () => {
     });
 
     it("returns a TokenAcquisitionError failure when MSAL throws", async () => {
+      // TODO remove stub once we remove console.error from the catch blocks in AuthService 
+      sinon.stub(console, "error");
+
       const msalError = new Error("MSAL failure");
       (msalStub.acquireTokenByCode as sinon.SinonStub).rejects(msalError);
 

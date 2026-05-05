@@ -113,7 +113,6 @@ rcw:
     CONTACT_EMAIL: "eligibility@justice.gov.uk"
     CONTACT_PHONE: ""
     SERVICE_URL: "https://www.gov.uk/legal-aid"
-    SESSION_NAME: "sessionId"
     RATELIMIT_HEADERS_ENABLED: true
     RATELIMIT_STORAGE_URI: ""
     AUTH_RATE_LIMIT_MAX: 20
@@ -123,6 +122,8 @@ rcw:
     ENTRA_AUTHORITY_BASE_URL: "https://login.microsoftonline.com/"
     ENTRA_REDIRECT_URI: ""
     ENTRA_POST_LOGOUT_REDIRECT_URI: ""
+    REDIS_ENABLED: true  
+    REDIS_SECRET_NAME: elasticache-redis
 
   autoscaling:
     enabled: false
@@ -145,7 +146,7 @@ nginx:
     # Overridden at deploy time to ECR; see deploy.sh and docker-images.env
     repository: nginxinc/nginx-unprivileged
     pullPolicy: Always
-    tag: alpine@sha256:f35982400455b4f359083ba9d1ef573fbbe4221a6a8a194dc7a14beb4e2cd3dc
+    tag: alpine@sha256:53ffe9cc959fc72aeed04a85d517099a42bfcc5f5f0b07a2b1048e08abf2f1eb
 
   resources:
     limits:

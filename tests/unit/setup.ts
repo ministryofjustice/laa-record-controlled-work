@@ -1,5 +1,4 @@
 process.env.SESSION_SECRET ??= "test-secret";
-process.env.SESSION_NAME ??= "test-session";
 process.env.NODE_ENV ??= "test";
 process.env.ENTRA_CLIENT_ID ??= "test-client-id";
 process.env.ENTRA_TENANT_ID ??= "test-tenant-id";

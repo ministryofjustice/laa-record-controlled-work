@@ -4,6 +4,7 @@
     "1password.op-vscode",
     "github.vscode-github-actions",
     "ms-kubernetes-tools.vscode-kubernetes-tools",
-    "douglaszaltron.nunjucks-vscode-extensionpack"
+    "douglaszaltron.nunjucks-vscode-extensionpack",
+    "gruntfuggly.todo-tree"
   ]
 }

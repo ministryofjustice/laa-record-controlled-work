@@ -1,4 +1,4 @@
-import { INTERNAL_SERVER_ERROR, OK } from "#/lib/constants/httpStatus.js";
+import { INTERNAL_SERVER_ERROR } from "#/lib/constants/httpStatus.js";
 import { getPerson, postPerson } from "#/controllers/personController.js";
 import { validatePerson } from "#/controllers/personSchema.js";
 import { exampleApiService } from "#/services/exampleApiService.js";
@@ -56,15 +56,6 @@ router.get(
     }
   },
 );
-
-// liveness and readiness probes for Helm deployments
-router.get("/status", (_req: Request, res: Response): void => {
-  res.status(OK).send("OK");
-});
-
-router.get("/health", (_req: Request, res: Response): void => {
-  res.status(OK).send("Healthy");
-});
 
 router.get("/error", (_req: Request, res: Response): void => {
   // Simulate an error

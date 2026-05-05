@@ -6,6 +6,7 @@ import { setupConfig } from '#/middleware/setupConfigs.js';
 import express from 'express';
 import { expect } from 'chai';
 import http from 'http';
+import config from '#/config.js';
 
 describe('setupConfig middleware', () => {
   it('should attach config to res.locals', (done) => {
@@ -15,7 +16,6 @@ describe('setupConfig middleware', () => {
 
     // Simulate a route to trigger middleware
     app.get('/test', async (req, res) => {
-      const config = (await import('#/config.js')).default;
       expect(res.locals.config).to.deep.equal(config);
       res.sendStatus(200);
     });

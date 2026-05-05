@@ -1,13 +1,13 @@
 import { randomUUID } from "node:crypto";
 import type { SessionData } from "express-session";
 import {
-  type ConfidentialClientApplication,
+  ConfidentialClientApplication,
   CryptoProvider,
   type AuthorizationUrlRequest,
   type AuthenticationResult,
 } from "@azure/msal-node";
 import config from "#/config.js";
-import { authRequestDefaults } from "#/config/auth.js";
+import { authRequestDefaults, msalConfig } from "#/config/auth.js";
 import { failure, success, type Either } from "#/lib/either.js";
 import type { AuthCodeResponse, PKCECodes } from "#/types/auth-types.js";
 import { devError } from "#/lib/devLogger.js";
@@ -18,6 +18,12 @@ import {
   StateMismatchError,
   TokenAcquisitionError,
 } from "#/lib/errors/auth.js";
+
+// TODO - consider if this is an EntraService rather than an AuthService
+//
+// TODO - this service is modifying the express-session by reference.
+//        should probably consider pulling session mutation up and out
+//        into a different module
 
 /**
  * Handles Microsoft Entra ID (MSAL) authentication flows including
@@ -35,10 +41,11 @@ export class AuthService {
    */
   private constructor(
     sessionData: SessionData,
-    msalClient: ConfidentialClientApplication,
+    msalClient?: ConfidentialClientApplication,
   ) {
     this.session = sessionData;
-    this.msalClient = msalClient;
+    this.msalClient =
+      msalClient ?? new ConfidentialClientApplication(msalConfig);
   }
 
   /**
@@ -49,7 +56,7 @@ export class AuthService {
    */
   public static create(
     sessionData: SessionData,
-    msalClient: ConfidentialClientApplication,
+    msalClient?: ConfidentialClientApplication,
   ): AuthService {
     return new AuthService(sessionData, msalClient);
   }

@@ -1,3 +1,5 @@
+# Injected secrets need to pull the env var from the host machine
+# This happens automatically if you provide only the env var name.
 services:
   rcw:
     build: .
