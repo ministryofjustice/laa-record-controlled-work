@@ -136,7 +136,7 @@ const noStep = step({
 const confirmationStep = step({
   path: "/confirmation",
   title: "Form sent",
-  blocks: [GovUKPanel({ titleText: "Feedback sent" })],
+  blocks: [GovUKPanel({ titleText: "Data sent" })],
 });
 
 export const splitJourney = journey({

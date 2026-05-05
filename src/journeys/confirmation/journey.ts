@@ -19,6 +19,9 @@ import {
   GovUKSummaryList,
   GovUKBody,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
+import { PatternEffects } from '../effects.js'
+
+
 
 const nameStep = step({
   path: "/your-name",
@@ -45,6 +48,10 @@ const nameStep = step({
           condition: Self().match(Condition.String.HasMaxLength(100)),
           message: "Full name must be 100 characters or less",
         }),
+        validation({
+          condition: Self().match(Condition.String.LettersOnly()),
+          message: "Full name must contain only letters",
+        }),
       ],
     }),
     GovUKButton({ text: "Continue" }),
@@ -53,6 +60,7 @@ const nameStep = step({
     submit({
       validate: true,
       onValid: {
+        effects: [PatternEffects.SaveDraftAnswers()],
         next: [
           redirect({
             when: Query("returnTo").match(Condition.Equals("check-answers")),
@@ -90,6 +98,7 @@ const feedbackStep = step({
     submit({
       validate: true,
       onValid: {
+        effects: [PatternEffects.SaveDraftAnswers()],
         next: [
           redirect({
             when: Query("returnTo").match(Condition.Equals("check-answers")),
