@@ -40,6 +40,7 @@ const createApp = async (): Promise<express.Application> => {
   initializeI18nextSync();
 
   const app = express();
+
   app.use("/", healthRouter);
 
   // Set up common middleware for handling cookies, body parsing, etc.
@@ -89,11 +90,12 @@ const createApp = async (): Promise<express.Application> => {
     app.use(morgan("dev"));
   }
 
+  // Setup express-session using redis
+  app.use(session(await createSession(config)));
+
   // CSRF protection applied globally; /auth/code/callback is excluded via
   // skipCsrfProtection (PKCE state provides the equivalent protection for that endpoint).
   setupCsrf(app);
-
-  app.use(session(await createSession(config)));
 
   // Playwright-only route: sets an authenticated session without going through Entra.
   if (ENABLE_PLAYWRIGHT_TEST_SIGNIN && process.env.NODE_ENV === "test") {
