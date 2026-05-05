@@ -16,7 +16,7 @@ export interface PatternEffectShape {
 export const {
   effects: PatternEffects,
   implementations: PatternEffectsImplementations,
-} = defineEffectFunctions<PatternEffectShape, MyDeps>({
+} = defineEffectFunctions<PatternEffectShape>({
   LoadDraftAnswers:
     () => (context: PatternEffectContext, patternCode: string) => {
       const stored = context.getSession()?.patternDrafts?.[patternCode];

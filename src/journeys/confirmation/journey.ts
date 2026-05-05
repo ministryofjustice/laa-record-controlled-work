@@ -9,6 +9,7 @@ import {
   validation,
   Self,
   block,
+  access,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 import {
   GovUKTextInput,
@@ -19,9 +20,7 @@ import {
   GovUKSummaryList,
   GovUKBody,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
-import { PatternEffects } from '../effects.js'
-
-
+import { PatternEffects } from "../effects.js";
 
 const nameStep = step({
   path: "/your-name",
@@ -178,6 +177,11 @@ export const confirmationJourney = journey({
   code: "feedback",
   title: "Give feedback",
   path: "/feedback",
+  onAccess: [
+    access({
+      effects: [PatternEffects.LoadDraftAnswers()],
+    }),
+  ],
   reachability: { disableReachabilityChecks: true },
   view: { template: "partials/form-step" },
   steps: [nameStep, feedbackStep, checkAnswersStep, confirmationStep],
