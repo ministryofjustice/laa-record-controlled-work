@@ -31,6 +31,20 @@ server {
     proxy_send_timeout     60s;
     proxy_read_timeout     60s;
   }
+
+  location /ccq/ {
+    proxy_pass             http://${NGINX_UPSTREAM_CCQ}/;
+    proxy_set_header       Host              $host;
+    proxy_set_header       X-Real-IP         $remote_addr;
+    proxy_set_header       X-Forwarded-For   $proxy_add_x_forwarded_for;
+    proxy_set_header       X-Forwarded-Proto $scheme;
+    proxy_set_header       Cookie            $http_cookie;
+
+    proxy_http_version     1.1;
+    proxy_set_header       Connection        "";
+    proxy_set_header       Transfer-Encoding "";
+  }
+
 }
 
 # Health endpoint on a separate port so it is never reachable via the ingress
