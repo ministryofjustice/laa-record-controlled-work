@@ -32,7 +32,8 @@ server {
     access_log               off;
   }
 
-  location ~ /eligibility/ {
+  # match anything with `/eligibility` and forward the whole thing to CCQ
+  location ~ /eligibility(/|$) {
     include     /etc/nginx/proxy.conf;
     proxy_pass  http://${NGINX_UPSTREAM_CCQ};
   }
