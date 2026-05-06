@@ -17,7 +17,9 @@
       "description": "Automerge patch and minor updates to reduce noise",
       "matchUpdateTypes": ["patch", "minor"],
       "minimumReleaseAge": "7 days",
-      "automerge": true
+      "automerge": true,
+      "platformAutomerge": true,
+      "automergeType": "pr"
     },
     {
       "matchUpdateTypes": ["patch"],
@@ -34,6 +36,8 @@
       "schedule": ["before 5am every weekday"],
       "rebaseWhen": "conflicted",
       "automerge": true,
+      "platformAutomerge": true,
+      "automergeType": "pr",
 
       "minimumReleaseAge": null
     }
