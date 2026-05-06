@@ -19,22 +19,14 @@
       "minimumReleaseAge": "7 days",
       "automerge": true,
       "platformAutomerge": true,
-      "automergeType": "pr"
-    },
-    {
-      "matchUpdateTypes": ["patch"],
-      "addLabels": ["patch"]
-    },
-    {
-      "matchUpdateTypes": ["minor"],
-      "addLabels": ["minor"]
+      "automergeType": "pr",
+      "rebaseWhen": "behind-base-branch"
     },
     {
       "description": "Daily lockfile maintenance. Age gating is handled natively by Yarn's npmMinimalAgeGate:7d in .yarnrc",
       "matchUpdateTypes": ["lockFileMaintenance"],
-      "addLabels": ["lockFileMaintenance"],
       "schedule": ["before 5am every weekday"],
-      "rebaseWhen": "conflicted",
+      "rebaseWhen": "behind-base-branch",
       "automerge": true,
       "platformAutomerge": true,
       "automergeType": "pr",
