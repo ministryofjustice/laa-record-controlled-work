@@ -29,7 +29,7 @@
     "node": "25.9.0"
   },
   "dependencies": {
-    "@azure/msal-node": "^5.1.4",
+    "@azure/msal-node": "^5.1.5",
     "@ministryofjustice/frontend": "9.0.0",
     "axios": "1.15.2",
     "body-parser": "^2.2.2",
