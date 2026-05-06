@@ -121,7 +121,7 @@ jobs:
           image_tag: ${{ github.event.pull_request.head.sha || github.sha }}
 
   deploy-uat:
-    if: github.event_name != 'merge_group'
+    if: github.event_name != 'merge_group' && github.actor != 'renovate[bot]'
     uses: ./.github/workflows/deploy-environment.yml
     with:
       app-environment: uat
