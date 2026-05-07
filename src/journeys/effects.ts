@@ -22,7 +22,6 @@ export const {
       const stored = context.getSession()?.patternDrafts?.[patternCode];
 
       if (!stored) {
-        console.log("nothing stored");
         return;
       }
 
@@ -38,7 +37,6 @@ export const {
       const session = context.getSession();
 
       if (!session) {
-        console.log("no session");
         return;
       }
 

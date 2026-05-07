@@ -19,6 +19,9 @@ import {
   GovUKBody,
   GovUKBackLink,
   GovUKSummaryList,
+  GovUKTextInput,
+  GovUKDateInputFull,
+  GovUKUtilityClasses,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
 const startStep = step({
@@ -93,12 +96,13 @@ const ecfStep = step({
     submit({
       validate: true,
       onValid: {
+        effects: [PatternEffects.SaveDraftAnswers()],
         next: [
           redirect({
             when: Answer("ecf").match(Condition.Equals("yes")),
             goto: "ecf-dropout",
           }),
-          redirect({ goto: "no" }),
+          redirect({ goto: "legal-aid-before" }),
         ],
       },
     }),
@@ -117,10 +121,10 @@ const ineligibleStep = step({
       level: 1,
     }),
     GovUKBody({
-      text: '<p>Continue to complete the <a href="/government/publications/legal-aid-exceptional-case-funding-form-and-guidance">ECF application form CIV ECF 1</a> and <a href="/government/publications/cw1-financial-eligibility-for-legal-aid-clients">form CW1</a> for your client.</p>',
+      text: 'Continue to complete the <a href="/government/publications/legal-aid-exceptional-case-funding-form-and-guidance">ECF application form CIV ECF 1</a> and <a href="/government/publications/cw1-financial-eligibility-for-legal-aid-clients">form CW1</a> for your client.',
     }),
     GovUKBody({
-      text: '<p>Send completed forms to: <a href="mailto:contactECC@justice.gov.uk">contactECC@justice.gov.uk</a></p>',
+      text: 'Send completed forms to: <a href="mailto:contactECC@justice.gov.uk">contactECC@justice.gov.uk</a>',
     }),
   ],
 });
@@ -171,13 +175,145 @@ const legalAidBeforeStep = step({
     submit({
       validate: true,
       onValid: {
+        effects: [PatternEffects.SaveDraftAnswers()],
         next: [
           redirect({
-            when: Answer("legalAidBefore").match(Condition.Equals("yesSameMatter")),
+            when: Answer("legalAidBefore").match(
+              Condition.Equals("yesSameMatter"),
+            ),
             goto: "legal-aid-before-2",
           }),
           redirect({ goto: "client-details" }),
         ],
+      },
+    }),
+  ],
+});
+
+const legalAidBefore6MonthsStep = step({
+  path: "/legal-aid-before-2",
+  title: "Did your client get legal help for this matter in the last 6 months?",
+  blocks: [
+    GovUKBackLink({
+      href: "/new-case/legal-aid-before",
+    }),
+    HtmlBlock({
+      content: '<span class="govuk-caption-l">Client and case details</span>',
+    }),
+    GovUKRadioInput({
+      code: "legalAidBefore6Months",
+      fieldset: {
+        legend: {
+          text: "Did your client get legal help for this matter in the last 6 months?",
+          isPageHeading: true,
+          classes: "govuk-fieldset__legend--l",
+        },
+      },
+      items: [
+        {
+          value: "yes",
+          text: "Yes",
+          block: GovUKTextInput({
+            code: "reasonForYes",
+            label:
+              "Explain the reason for creating a new case for the same matter",
+            dependentWhen: Answer("legalAidBefore6Months").match(
+              Condition.Equals("yes"),
+            ),
+            validWhen: [
+              validation({
+                condition: Self().match(Condition.IsRequired()),
+                message:
+                  "Explain the reason for creating a new case for the same matter",
+              }),
+            ],
+          }),
+        },
+        {
+          value: "no",
+          text: "No",
+        },
+      ],
+      validWhen: [
+        validation({
+          condition: Self().match(Condition.IsRequired()),
+          message: "Please select an option",
+        }),
+      ],
+    }),
+    GovUKButton({ text: "Continue" }),
+  ],
+  onSubmission: [
+    submit({
+      validate: true,
+      onValid: {
+        effects: [PatternEffects.SaveDraftAnswers()],
+        next: [
+          redirect({ goto: "client-details" }),
+        ],
+      },
+    }),
+  ],
+});
+
+const clientDetailsStep = step({
+  path: "/client-details",
+  title: "Your client's details",
+  blocks: [
+    GovUKBackLink({
+      href: "/new-case/legal-aid-before",
+    }),
+    HtmlBlock({
+      content: '<span class="govuk-caption-l">Client and case details</span>',
+    }),
+    GovUKHeading({
+      text: "Your client's details",
+    }),
+    GovUKTextInput({
+      code: "fullName",
+      label: {
+        text: "Full name",
+        isPageHeading: false,
+        classes: "govuk-label--m",
+      },
+      validWhen: [
+        validation({
+          condition: Self().match(Condition.IsRequired()),
+          message: "Enter your full name",
+        }),
+        validation({
+          condition: Self().match(Condition.String.HasMinLength(2)),
+          message: "Full name must be 2 characters or more",
+        }),
+      ],
+    }),
+    GovUKDateInputFull({
+      code: "dateOfBirth",
+      fieldset: {
+        legend: {
+          text: "Date of birth",
+          isPageHeading: false,
+          classes: GovUKUtilityClasses.Fieldset.MediumLabel,
+        },
+      },
+      hint: {
+        text: "For example, 31 3 1980",
+      },
+      validWhen: [
+        validation({
+          condition: Self().match(Condition.Date.IsPastDate()),
+          message: "Date must be in the past",
+        }),
+      ],
+    }),
+    GovUKButton({ text: "Continue" }),
+  ],
+  onSubmission: [
+    submit({
+      validate: true,
+      onValid: {
+        effects: [PatternEffects.SaveDraftAnswers()],
+        next: [redirect({ goto: "check-answers" })],
       },
     }),
   ],
@@ -215,6 +351,64 @@ const checkAnswersStep = step({
                 href: "legal-aid-before?returnTo=check-answers",
                 text: "Change",
                 visuallyHiddenText: "received legal aid before",
+              },
+            ],
+          },
+        },
+        {
+          key: { text: "Legal help within 6 months" },
+          value: { text: Answer("legalAidBefore6Months") },
+          actions: {
+            items: [
+              {
+                href: "legal-aid-before-2?returnTo=check-answers",
+                text: "Change",
+                visuallyHiddenText: "Legal help within 6 months",
+              },
+            ],
+          },
+          visibleWhen: Answer("legalAidBefore").match(
+            Condition.Equals("yesSameMatter"),
+          ),
+        },
+        {
+          key: { text: "Reason for reapply" },
+          value: { text: Answer("reasonForYes") },
+          actions: {
+            items: [
+              {
+                href: "legal-aid-before-2?returnTo=check-answers",
+                text: "Change",
+                visuallyHiddenText: "Reason for reapply",
+              },
+            ],
+          },
+          visibleWhen: Answer("legalAidBefore6Months").match(
+            Condition.Equals("yes"),
+          ),
+        },
+        {
+          key: { text: "Full name" },
+          value: { text: Answer("fullName") },
+          actions: {
+            items: [
+              {
+                href: "client-details?returnTo=check-answers",
+                text: "Change",
+                visuallyHiddenText: "Full name",
+              },
+            ],
+          },
+        },
+        {
+          key: { text: "Date of Birth" },
+          value: { text: Answer("dateOfBirth") },
+          actions: {
+            items: [
+              {
+                href: "client-details?returnTo=check-answers",
+                text: "Change",
+                visuallyHiddenText: "Date of birth",
               },
             ],
           },
@@ -262,6 +456,8 @@ export const newCaseJourney = journey({
     ecfStep,
     ineligibleStep,
     legalAidBeforeStep,
+    legalAidBefore6MonthsStep,
+    clientDetailsStep,
     checkAnswersStep,
     confirmationStep,
   ],
