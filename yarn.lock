@@ -45,32 +45,31 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@axe-core/playwright@npm:^4.11.2":
-  version: 4.11.2
-  resolution: "@axe-core/playwright@npm:4.11.2"
+"@axe-core/playwright@npm:^4.11.3":
+  version: 4.11.3
+  resolution: "@axe-core/playwright@npm:4.11.3"
   dependencies:
-    axe-core: "npm:~4.11.3"
+    axe-core: "npm:~4.11.4"
   peerDependencies:
     playwright-core: ">= 1.0.0"
-  checksum: 10c0/cb6f259c969668ae41b1c56e9fbf8d380d4b9440ef76f3037faa615fdcd36a748f53451116bb53b101dae52c6adc9183ce8de7f62819beb3866989849a9834b6
+  checksum: 10c0/da1854726dbc461a71ac25e0435f5dd9b7d143dc9142f53b1aeb4a8d7edcb4533eddb59949e8a07c4f4e3dce85ae43b7f249b3801e8b255f605fc974b94616fe
   languageName: node
   linkType: hard
 
-"@azure/msal-common@npm:16.5.1":
-  version: 16.5.1
-  resolution: "@azure/msal-common@npm:16.5.1"
-  checksum: 10c0/7fddcb342572dab5956a639fe1c2b921beaeff1bec025208e317c803a9efe72e74b124a76f3248e02e495b012721023127efb92507f99b8535ee994e08c181c6
+"@azure/msal-common@npm:16.5.2":
+  version: 16.5.2
+  resolution: "@azure/msal-common@npm:16.5.2"
+  checksum: 10c0/e7c55eea2563adb6561f663b4a649ee62823102eeb5e4632b2ec1062071619900910015625b2465781c57d986384c05186afc82560cb7ea879526319e8626bb2
   languageName: node
   linkType: hard
 
-"@azure/msal-node@npm:^5.1.4":
-  version: 5.1.4
-  resolution: "@azure/msal-node@npm:5.1.4"
+"@azure/msal-node@npm:^5.1.5":
+  version: 5.1.5
+  resolution: "@azure/msal-node@npm:5.1.5"
   dependencies:
-    "@azure/msal-common": "npm:16.5.1"
+    "@azure/msal-common": "npm:16.5.2"
     jsonwebtoken: "npm:^9.0.0"
-    uuid: "npm:^8.3.0"
-  checksum: 10c0/6bf6d8668509c1fa35787be23a14fd37149c102819d8fc68d00f0a7f2a5d4fabf207365868e0e3f6352f7536cf119aebb02a9e41bc2f9b2655e9c163bf0f400c
+  checksum: 10c0/476690a23931349281e9226ecb1a2124e45af7a8c1415315c9bf7f7e1f75dab8a7e33190cb58fa057f3128839733eec53e8bd9133a5123e774721f890efabe88
   languageName: node
   linkType: hard
 
@@ -844,8 +843,8 @@ __metadata:
   linkType: hard
 
 "@mswjs/interceptors@npm:^0.41.3":
-  version: 0.41.6
-  resolution: "@mswjs/interceptors@npm:0.41.6"
+  version: 0.41.7
+  resolution: "@mswjs/interceptors@npm:0.41.7"
   dependencies:
     "@open-draft/deferred-promise": "npm:^2.2.0"
     "@open-draft/logger": "npm:^0.3.0"
@@ -853,7 +852,7 @@ __metadata:
     is-node-process: "npm:^1.2.0"
     outvariant: "npm:^1.4.3"
     strict-event-emitter: "npm:^0.5.1"
-  checksum: 10c0/abedbd64c7602dd358ded2a92e0a84b0d21cc0d15cb9d6a8d73283f46938f2a5adb69d9be8124c5c5c3394cc980e758a34bd77de1aa2677b7b2b399d34c148ce
+  checksum: 10c0/10ff5ed50ee48c665e3639381f4e3624e1dd088a8955c12506de9db331a41169f753bd5e64f2ad47a46b549686d361d3da036d87505cc4eb99b6127b4e2f970e
   languageName: node
   linkType: hard
 
@@ -1600,7 +1599,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@typescript-eslint/parser@npm:8.59.1, @typescript-eslint/parser@npm:^8.59.0":
+"@typescript-eslint/parser@npm:8.59.1, @typescript-eslint/parser@npm:^8.59.1":
   version: 8.59.1
   resolution: "@typescript-eslint/parser@npm:8.59.1"
   dependencies:
@@ -1979,10 +1978,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axe-core@npm:^4.11.3, axe-core@npm:~4.11.3":
-  version: 4.11.3
-  resolution: "axe-core@npm:4.11.3"
-  checksum: 10c0/bc757775ef41396faf6470752a12e96f3972d0d97cae4ec28e99cec7bca2c5aaa6d040b97e7f0278e8d1ea354fa0b0bf7fcaa51775a725d7ed0a0834e7ea13d7
+"axe-core@npm:^4.11.4, axe-core@npm:~4.11.4":
+  version: 4.11.4
+  resolution: "axe-core@npm:4.11.4"
+  checksum: 10c0/c4aa83fc3eac5f7a0d0cb1a28f9d073acf0c06ce8daacc38608faa278c57ce084c028c850746b98817ae4c101c30c1a32e95ea34748c4b4c7419b9b81221ef84
   languageName: node
   linkType: hard
 
@@ -4854,8 +4853,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "laa-record-controlled-work@workspace:."
   dependencies:
-    "@axe-core/playwright": "npm:^4.11.2"
-    "@azure/msal-node": "npm:^5.1.4"
+    "@axe-core/playwright": "npm:^4.11.3"
+    "@azure/msal-node": "npm:^5.1.5"
     "@eslint/js": "npm:^10.0.1"
     "@ministryofjustice/frontend": "npm:9.0.0"
     "@playwright/test": "npm:^1.59.1"
@@ -4878,8 +4877,8 @@ __metadata:
     "@types/supertest": "npm:^7.2.0"
     "@types/validator": "npm:^13.15.10"
     "@typescript-eslint/eslint-plugin": "npm:^8.59.1"
-    "@typescript-eslint/parser": "npm:^8.59.0"
-    axe-core: "npm:^4.11.3"
+    "@typescript-eslint/parser": "npm:^8.59.1"
+    axe-core: "npm:^4.11.4"
     axios: "npm:1.15.2"
     body-parser: "npm:^2.2.2"
     c8: "npm:^11.0.0"
@@ -4925,7 +4924,7 @@ __metadata:
     mocha: "npm:^11.7.5"
     moment: "npm:^2.30.1"
     morgan: "npm:~1.10.1"
-    msw: "npm:^2.13.6"
+    msw: "npm:^2.14.2"
     nodemon: "npm:^3.1.14"
     nunjucks: "npm:^3.2.4"
     playwright-core: "npm:^1.59.1"
@@ -4940,7 +4939,7 @@ __metadata:
     tsx: "npm:^4.21.0"
     typescript: "npm:^6.0.3"
     validator: "npm:^13.15.35"
-    zod: "npm:^4.3.6"
+    zod: "npm:^4.4.1"
   languageName: unknown
   linkType: soft
 
@@ -5355,9 +5354,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"msw@npm:^2.13.6":
-  version: 2.13.6
-  resolution: "msw@npm:2.13.6"
+"msw@npm:^2.14.2":
+  version: 2.14.2
+  resolution: "msw@npm:2.14.2"
   dependencies:
     "@inquirer/confirm": "npm:^6.0.11"
     "@mswjs/interceptors": "npm:^0.41.3"
@@ -5384,7 +5383,7 @@ __metadata:
       optional: true
   bin:
     msw: cli/index.js
-  checksum: 10c0/33f4c3b16aa290d2820cb2f0b33e05d414516b6a6e2cc15f7a8068e3b61247992985371719a9fb75a433c2b6455cb2d0a1d93446b8610a17601ab28cd3a8a9a2
+  checksum: 10c0/85dcf819047167b925fcb55b19a38533697e2ea27f341f637a21d311482478ee568d87ccf4a65c388fb7e90c238976b6ae06db3271f53dbc99add2cbc6719b44
   languageName: node
   linkType: hard
 
@@ -7014,9 +7013,9 @@ __metadata:
   linkType: hard
 
 "tinyexec@npm:^1.0.4":
-  version: 1.1.1
-  resolution: "tinyexec@npm:1.1.1"
-  checksum: 10c0/48433cb32573a767e2b63bb92343cbbae4240d05a19a63f7869f9447491305e7bd82d11daccb79b2628b596ad703a25798226c50bfd1d8e63477fb42af6a5b35
+  version: 1.1.2
+  resolution: "tinyexec@npm:1.1.2"
+  checksum: 10c0/9e0ef6c001ce54688cf16833a02f70a339276219ca947b88930b124267de2cffc764ff44e87e7369384b1d75ab63491465412cbbdf06f2437956b9ab66ab4491
   languageName: node
   linkType: hard
 
@@ -7030,21 +7029,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tldts-core@npm:^7.0.28":
-  version: 7.0.28
-  resolution: "tldts-core@npm:7.0.28"
-  checksum: 10c0/1fde2a2806c758d13c7eb2bd285a9482bf905829b38c060d66127e9e0682a103c42e181509f0d3c6da046e9aa2f71fe9d61afadb1b85a6b6c557cb98d6b7dede
+"tldts-core@npm:^7.0.29":
+  version: 7.0.29
+  resolution: "tldts-core@npm:7.0.29"
+  checksum: 10c0/14fbd1806c8eb04cd08951feeaf463b4f280a00bc343c2a33b72cad1c4e7881eda7f30629cefcf443486ea4adfe058529ecacdb0c167723e85935dedc15b8a9b
   languageName: node
   linkType: hard
 
 "tldts@npm:^7.0.5":
-  version: 7.0.28
-  resolution: "tldts@npm:7.0.28"
+  version: 7.0.29
+  resolution: "tldts@npm:7.0.29"
   dependencies:
-    tldts-core: "npm:^7.0.28"
+    tldts-core: "npm:^7.0.29"
   bin:
     tldts: bin/cli.js
-  checksum: 10c0/37f92481bc7276f60f06d93d2671a67fd94dc8e245c232a50c69b8704d34c908658968f7298810e1b4df68a84be9ff6248867981d1cc7ddb08755565edd3f496
+  checksum: 10c0/f2999cba3060a36af7c72f2b756a4c00edb0aa8b0885a368810a1c7ddc52aac6130cc63f2260821ed8cdda104b31434b896d9e9aafbb723ba985d6657160e6a5
   languageName: node
   linkType: hard
 
@@ -7420,15 +7419,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"uuid@npm:^8.3.0":
-  version: 8.3.2
-  resolution: "uuid@npm:8.3.2"
-  bin:
-    uuid: dist/bin/uuid
-  checksum: 10c0/bcbb807a917d374a49f475fae2e87fdca7da5e5530820ef53f65ba1d12131bd81a92ecf259cc7ce317cbe0f289e7d79fdfebcef9bfa3087c8c8a2fa304c9be54
-  languageName: node
-  linkType: hard
-
 "v8-compile-cache-lib@npm:^3.0.1":
   version: 3.0.1
   resolution: "v8-compile-cache-lib@npm:3.0.1"
@@ -7739,9 +7729,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zod@npm:^4.3.6":
-  version: 4.3.6
-  resolution: "zod@npm:4.3.6"
-  checksum: 10c0/860d25a81ab41d33aa25f8d0d07b091a04acb426e605f396227a796e9e800c44723ed96d0f53a512b57be3d1520f45bf69c0cb3b378a232a00787a2609625307
+"zod@npm:^4.4.1":
+  version: 4.4.1
+  resolution: "zod@npm:4.4.1"
+  checksum: 10c0/55714c4bea81f7851ac46bf9edfde7c63ed6677a6cc8971ed3a526a079de3ffbe2bd56160327d22e070f72854fc4485b98ab7373255b6b69d64d9067caec864e
   languageName: node
   linkType: hard

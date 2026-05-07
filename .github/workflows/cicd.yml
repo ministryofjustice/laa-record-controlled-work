@@ -56,7 +56,7 @@ jobs:
           docker save laa-record-controlled-work -o image.tar
 
       - name: Run Snyk to scan Docker image from tarball
-        uses: snyk/actions/docker@9adf32b1121593767fc3c057af55b55db032dc04 # master
+        uses: snyk/actions/docker@9cf6ca713d71123d2d229cc3d7f145b96ea3c518 # master
         with:
           image: image.tar
           args: --docker --severity-threshold=high --policy-path=.snyk
@@ -121,7 +121,7 @@ jobs:
           image_tag: ${{ github.event.pull_request.head.sha || github.sha }}
 
   deploy-uat:
-    if: github.event_name != 'merge_group'
+    if: github.event_name != 'merge_group' && github.actor != 'renovate[bot]'
     uses: ./.github/workflows/deploy-environment.yml
     with:
       app-environment: uat
