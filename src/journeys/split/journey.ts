@@ -1,3 +1,4 @@
+import { PatternEffects } from "#/journeys/effects.js";
 import {
   journey,
   step,
@@ -8,7 +9,9 @@ import {
   validation,
   Self,
   block,
+  access,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
+import { HtmlBlock } from "@ministryofjustice/hmpps-forge/core/components";
 import {
   GovUKTextareaInput,
   GovUKButton,
@@ -21,8 +24,7 @@ const ecfStep = step({
   title: "Does this case require Exceptional Case Funding?",
   reachability: { entryWhen: true },
   blocks: [
-    block({
-      variant: "html",
+    HtmlBlock({
       content: '<span class="govuk-caption-l">Client and case details</span>',
     }),
     GovUKRadioInput({
@@ -58,11 +60,11 @@ const ecfStep = step({
       validate: true,
       onValid: {
         next: [
-      redirect({
-        when: Answer('ecf').match(Condition.Equals('yes')),
-        goto: 'yes',
-      }),
-      redirect({ goto: 'no' }),
+          redirect({
+            when: Answer("ecf").match(Condition.Equals("yes")),
+            goto: "yes",
+          }),
+          redirect({ goto: "no" }),
         ],
       },
     }),
@@ -93,9 +95,7 @@ const yesStep = step({
     submit({
       validate: true,
       onValid: {
-        next: [
-          redirect({ goto: "confirmation" }),
-        ],
+        next: [redirect({ goto: "confirmation" })],
       },
     }),
   ],
@@ -125,9 +125,7 @@ const noStep = step({
     submit({
       validate: true,
       onValid: {
-        next: [
-          redirect({ goto: "confirmation" }),
-        ],
+        next: [redirect({ goto: "confirmation" })],
       },
     }),
   ],
@@ -143,7 +141,12 @@ export const splitJourney = journey({
   code: "feedback",
   title: "Give feedback",
   path: "/split-form",
+  onAccess: [
+    access({
+      effects: [PatternEffects.LoadDraftAnswers()],
+    }),
+  ],
   reachability: { disableReachabilityChecks: true },
   view: { template: "partials/form-step" },
-  steps: [ecfStep, yesStep, noStep, confirmationStep ],
+  steps: [ecfStep, yesStep, noStep, confirmationStep],
 });

@@ -8,7 +8,6 @@ import {
   Query,
   validation,
   Self,
-  block,
   access,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 import {
@@ -19,16 +18,17 @@ import {
   GovUKHeading,
   GovUKSummaryList,
   GovUKBody,
+  GovUKBackLink,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 import { PatternEffects } from "../effects.js";
+import { HtmlBlock } from "@ministryofjustice/hmpps-forge/core/components";
 
 const nameStep = step({
   path: "/your-name",
   title: "What is your name?",
   reachability: { entryWhen: true },
   blocks: [
-    block({
-      variant: "html",
+    HtmlBlock({
       content: '<span class="govuk-caption-l">Client and case details</span>',
     }),
     GovUKTextInput({
@@ -48,7 +48,7 @@ const nameStep = step({
           message: "Full name must be 100 characters or less",
         }),
         validation({
-          condition: Self().match(Condition.String.LettersOnly()),
+          condition: Self().match(Condition.String.LettersWithSpaceDashApostrophe()),
           message: "Full name must contain only letters",
         }),
       ],
@@ -76,6 +76,7 @@ const feedbackStep = step({
   path: "/your-feedback",
   title: "Your feedback",
   blocks: [
+    GovUKBackLink({ href: '/feedback/your-name' }),
     GovUKTextareaInput({
       code: "feedback",
       label: {
