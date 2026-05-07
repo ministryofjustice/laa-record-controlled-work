@@ -843,8 +843,8 @@ __metadata:
   linkType: hard
 
 "@mswjs/interceptors@npm:^0.41.3":
-  version: 0.41.6
-  resolution: "@mswjs/interceptors@npm:0.41.6"
+  version: 0.41.7
+  resolution: "@mswjs/interceptors@npm:0.41.7"
   dependencies:
     "@open-draft/deferred-promise": "npm:^2.2.0"
     "@open-draft/logger": "npm:^0.3.0"
@@ -852,7 +852,7 @@ __metadata:
     is-node-process: "npm:^1.2.0"
     outvariant: "npm:^1.4.3"
     strict-event-emitter: "npm:^0.5.1"
-  checksum: 10c0/abedbd64c7602dd358ded2a92e0a84b0d21cc0d15cb9d6a8d73283f46938f2a5adb69d9be8124c5c5c3394cc980e758a34bd77de1aa2677b7b2b399d34c148ce
+  checksum: 10c0/10ff5ed50ee48c665e3639381f4e3624e1dd088a8955c12506de9db331a41169f753bd5e64f2ad47a46b549686d361d3da036d87505cc4eb99b6127b4e2f970e
   languageName: node
   linkType: hard
 
@@ -1978,17 +1978,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axe-core@npm:^4.11.4":
+"axe-core@npm:^4.11.4, axe-core@npm:~4.11.3":
   version: 4.11.4
   resolution: "axe-core@npm:4.11.4"
   checksum: 10c0/c4aa83fc3eac5f7a0d0cb1a28f9d073acf0c06ce8daacc38608faa278c57ce084c028c850746b98817ae4c101c30c1a32e95ea34748c4b4c7419b9b81221ef84
-  languageName: node
-  linkType: hard
-
-"axe-core@npm:~4.11.3":
-  version: 4.11.3
-  resolution: "axe-core@npm:4.11.3"
-  checksum: 10c0/bc757775ef41396faf6470752a12e96f3972d0d97cae4ec28e99cec7bca2c5aaa6d040b97e7f0278e8d1ea354fa0b0bf7fcaa51775a725d7ed0a0834e7ea13d7
   languageName: node
   linkType: hard
 
@@ -7020,9 +7013,9 @@ __metadata:
   linkType: hard
 
 "tinyexec@npm:^1.0.4":
-  version: 1.1.1
-  resolution: "tinyexec@npm:1.1.1"
-  checksum: 10c0/48433cb32573a767e2b63bb92343cbbae4240d05a19a63f7869f9447491305e7bd82d11daccb79b2628b596ad703a25798226c50bfd1d8e63477fb42af6a5b35
+  version: 1.1.2
+  resolution: "tinyexec@npm:1.1.2"
+  checksum: 10c0/9e0ef6c001ce54688cf16833a02f70a339276219ca947b88930b124267de2cffc764ff44e87e7369384b1d75ab63491465412cbbdf06f2437956b9ab66ab4491
   languageName: node
   linkType: hard
 
