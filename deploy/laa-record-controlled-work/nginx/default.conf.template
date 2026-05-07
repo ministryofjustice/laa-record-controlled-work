@@ -18,7 +18,7 @@ server {
     proxy_pass  http://${NGINX_UPSTREAM_RCW};
   }
 
-  location ~ ^/(ccq_assets|ccq_static)/ {
+  location /ccq/assets/ {
     include     /etc/nginx/proxy.conf;
     proxy_pass  http://${NGINX_UPSTREAM_CCQ};
     
@@ -37,7 +37,6 @@ server {
     include     /etc/nginx/proxy.conf;
     proxy_pass  http://${NGINX_UPSTREAM_CCQ};
   }
-
 }
 
 # Health endpoint on a separate port so it is never reachable via the ingress
