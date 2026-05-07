@@ -106,7 +106,7 @@
     "lint-staged": "^16.4.0",
     "livereload": "^0.10.3",
     "mocha": "^11.7.5",
-    "msw": "^2.13.6",
+    "msw": "^2.14.2",
     "nodemon": "^3.1.14",
     "playwright-core": "^1.59.1",
     "prettier": "^3.8.3",
