@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: pods-dashboard
-  namespace: record-controlled-work-uat
+  namespace: laa-record-controlled-work-uat
   labels:
     grafana_dashboard: ""
 data:
