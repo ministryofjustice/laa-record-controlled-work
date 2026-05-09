@@ -4042,7 +4042,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"globals@npm:^17.5.0":
+"globals@npm:^17.6.0":
   version: 17.6.0
   resolution: "globals@npm:17.6.0"
   checksum: 10c0/cf94fb4329cc5c68cf81018fd68324f413181ee169f0235b0b33b82bc93fe7825a21beea951f83a80e8e4bbdad9c0c80515a145b5fd4b5cb52f2a80db899a93f
@@ -4910,7 +4910,7 @@ __metadata:
     express-validator: "npm:^7.3.2"
     figlet: "npm:^1.11.0"
     fs-extra: "npm:^11.3.4"
-    globals: "npm:^17.5.0"
+    globals: "npm:^17.6.0"
     govuk-frontend: "npm:^6.1.0"
     helmet: "npm:^8.1.0"
     http-errors: "npm:~2.0.1"
