@@ -58,7 +58,7 @@
     "nunjucks": "^3.2.4",
     "redis": "^5.12.1",
     "validator": "^13.15.35",
-    "zod": "^4.4.1"
+    "zod": "^4.4.2"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.3",
