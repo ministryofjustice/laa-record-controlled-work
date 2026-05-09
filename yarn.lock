@@ -1689,7 +1689,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@typescript-eslint/utils@npm:8.59.1, @typescript-eslint/utils@npm:^8.53.0":
+"@typescript-eslint/utils@npm:8.59.1, @typescript-eslint/utils@npm:^8.58.1":
   version: 8.59.1
   resolution: "@typescript-eslint/utils@npm:8.59.1"
   dependencies:
@@ -3181,20 +3181,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-config-love@npm:^151.0.0":
-  version: 151.0.0
-  resolution: "eslint-config-love@npm:151.0.0"
+"eslint-config-love@npm:^152.0.0":
+  version: 152.0.0
+  resolution: "eslint-config-love@npm:152.0.0"
   dependencies:
     "@eslint-community/eslint-plugin-eslint-comments": "npm:^4.0.0"
-    "@typescript-eslint/utils": "npm:^8.53.0"
+    "@typescript-eslint/utils": "npm:^8.58.1"
     eslint-plugin-import: "npm:^2.32.0"
     eslint-plugin-n: "npm:^17.0.0"
     eslint-plugin-promise: "npm:^7.0.0"
-    typescript-eslint: "npm:^8.53.0"
+    typescript-eslint: "npm:^8.58.1"
   peerDependencies:
     eslint: ^9.35.0
     typescript: "*"
-  checksum: 10c0/8f30618d091c61c41998b55e500dd823283d7e62a269f3a87bd136eebfffee7908a3c72827c2cf00642aab1556dd60cd1ca6e17341df5ab46ff99b09a5538f70
+  checksum: 10c0/73222aaff1c92e4371d60ac79ad93368390b60d6023f750969ffcdef33a342e57723862203ab2b035570d908efe4509eadb3330ffa489d1adedf9f2e1d4df998
   languageName: node
   linkType: hard
 
@@ -4899,7 +4899,7 @@ __metadata:
     esbuild-plugin-copy: "npm:^2.1.1"
     esbuild-sass-plugin: "npm:^3.7.0"
     eslint: "npm:^10.3.0"
-    eslint-config-love: "npm:^151.0.0"
+    eslint-config-love: "npm:^152.0.0"
     eslint-config-prettier: "npm:^10.1.8"
     eslint-plugin-jsdoc: "npm:^62.9.0"
     eslint-plugin-jsonc: "npm:^3.1.2"
@@ -7298,7 +7298,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript-eslint@npm:^8.53.0":
+"typescript-eslint@npm:^8.58.1":
   version: 8.59.1
   resolution: "typescript-eslint@npm:8.59.1"
   dependencies:
