@@ -95,7 +95,7 @@
     "esbuild": "^0.28.0",
     "esbuild-plugin-copy": "^2.1.1",
     "esbuild-sass-plugin": "^3.7.0",
-    "eslint": "^10.2.1",
+    "eslint": "^10.3.0",
     "eslint-config-love": "^151.0.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-jsdoc": "^62.9.0",
