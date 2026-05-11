@@ -9,6 +9,9 @@ import {
   validation,
   Self,
   access,
+  match,
+  Transformer,
+  Query,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 import { HtmlBlock } from "@ministryofjustice/hmpps-forge/core/components";
 import {
@@ -22,6 +25,9 @@ import {
   GovUKTextInput,
   GovUKDateInputFull,
   GovUKUtilityClasses,
+  GovUKValidations,
+  GovUKTextareaInput,
+  GovUKCharacterCount,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
 const startStep = step({
@@ -98,6 +104,10 @@ const ecfStep = step({
       onValid: {
         effects: [PatternEffects.SaveDraftAnswers()],
         next: [
+          redirect({
+            when: Query("returnTo").match(Condition.Equals("check-answers")),
+            goto: "check-answers",
+          }),
           redirect({
             when: Answer("ecf").match(Condition.Equals("yes")),
             goto: "ecf-dropout",
@@ -178,6 +188,10 @@ const legalAidBeforeStep = step({
         effects: [PatternEffects.SaveDraftAnswers()],
         next: [
           redirect({
+            when: Query("returnTo").match(Condition.Equals("check-answers")),
+            goto: "check-answers",
+          }),
+          redirect({
             when: Answer("legalAidBefore").match(
               Condition.Equals("yesSameMatter"),
             ),
@@ -213,10 +227,11 @@ const legalAidBefore6MonthsStep = step({
         {
           value: "yes",
           text: "Yes",
-          block: GovUKTextInput({
+          block: GovUKCharacterCount({
             code: "reasonForYes",
             label:
               "Explain the reason for creating a new case for the same matter",
+            maxLength: 500,
             dependentWhen: Answer("legalAidBefore6Months").match(
               Condition.Equals("yes"),
             ),
@@ -249,6 +264,10 @@ const legalAidBefore6MonthsStep = step({
       onValid: {
         effects: [PatternEffects.SaveDraftAnswers()],
         next: [
+          redirect({
+            when: Query("returnTo").match(Condition.Equals("check-answers")),
+            goto: "check-answers",
+          }),
           redirect({ goto: "client-details" }),
         ],
       },
@@ -281,10 +300,6 @@ const clientDetailsStep = step({
           condition: Self().match(Condition.IsRequired()),
           message: "Enter your full name",
         }),
-        validation({
-          condition: Self().match(Condition.String.HasMinLength(2)),
-          message: "Full name must be 2 characters or more",
-        }),
       ],
     }),
     GovUKDateInputFull({
@@ -300,9 +315,16 @@ const clientDetailsStep = step({
         text: "For example, 31 3 1980",
       },
       validWhen: [
-        validation({
-          condition: Self().match(Condition.Date.IsPastDate()),
-          message: "Date must be in the past",
+        ...GovUKValidations.DateInputFull({
+          empty: { message: "Enter your date of birth" },
+          missingDay: { message: "Date of birth must include a day" },
+          missingMonth: { message: "Date of birth must include a month" },
+          missingYear: { message: "Date of birth must include a year" },
+          invalid: { message: "Date of birth must be a real date" },
+          mustBePast: {
+            message: "Date of birth must be in the past",
+            submissionOnly: true,
+          },
         }),
       ],
     }),
@@ -313,11 +335,38 @@ const clientDetailsStep = step({
       validate: true,
       onValid: {
         effects: [PatternEffects.SaveDraftAnswers()],
-        next: [redirect({ goto: "check-answers" })],
+        next: [
+          redirect({
+            when: Query("returnTo").match(Condition.Equals("check-answers")),
+            goto: "check-answers",
+          }),
+          redirect({ goto: "check-answers" }),
+        ],
       },
     }),
   ],
 });
+
+const ecfLabel = match(Answer("ecf"))
+  .branch(Condition.Equals("yes"), "Yes")
+  .branch(Condition.Equals("no"), "No");
+
+const legalAidBeforeLabel = match(Answer("legalAidBefore"))
+  .branch(Condition.Equals("yesSameMatter"), "Yes, about the same matter")
+  .branch(
+    Condition.Equals("yesDifferentMatter"),
+    "Yes, about a different matter",
+  )
+  .branch(Condition.Equals("no"), "No");
+
+const legalAidBefore6MonthsLabel = match(Answer("legalAidBefore6Months"))
+  .branch(Condition.Equals("yes"), "Yes")
+  .branch(Condition.Equals("no"), "No");
+
+const dateOfBirthDisplay = Answer("dateOfBirth").pipe(
+  Transformer.String.ToDate(),
+  Transformer.Date.Format("D MMMM YYYY"),
+);
 
 const checkAnswersStep = step({
   code: "check-answers",
@@ -331,7 +380,7 @@ const checkAnswersStep = step({
       rows: [
         {
           key: { text: "ECF" },
-          value: { text: Answer("ecf") },
+          value: { text: ecfLabel },
           actions: {
             items: [
               {
@@ -344,7 +393,7 @@ const checkAnswersStep = step({
         },
         {
           key: { text: "Received Legal Aid before" },
-          value: { text: Answer("legalAidBefore") },
+          value: { text: legalAidBeforeLabel },
           actions: {
             items: [
               {
@@ -357,7 +406,7 @@ const checkAnswersStep = step({
         },
         {
           key: { text: "Legal help within 6 months" },
-          value: { text: Answer("legalAidBefore6Months") },
+          value: { text: legalAidBefore6MonthsLabel },
           actions: {
             items: [
               {
@@ -383,9 +432,9 @@ const checkAnswersStep = step({
               },
             ],
           },
-          visibleWhen: Answer("legalAidBefore6Months").match(
-            Condition.Equals("yes"),
-          ),
+          visibleWhen:
+            Answer("legalAidBefore6Months").match(Condition.Equals("yes")) &&
+            Answer("legalAidBefore").match(Condition.Equals("yesSameMatter")),
         },
         {
           key: { text: "Full name" },
@@ -402,7 +451,7 @@ const checkAnswersStep = step({
         },
         {
           key: { text: "Date of Birth" },
-          value: { text: Answer("dateOfBirth") },
+          value: { text: dateOfBirthDisplay },
           actions: {
             items: [
               {
