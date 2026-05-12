@@ -1619,7 +1619,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@typescript-eslint/parser@npm:8.59.1, @typescript-eslint/parser@npm:^8.59.1":
+"@typescript-eslint/parser@npm:8.59.1":
   version: 8.59.1
   resolution: "@typescript-eslint/parser@npm:8.59.1"
   dependencies:
@@ -1632,6 +1632,22 @@ __metadata:
     eslint: ^8.57.0 || ^9.0.0 || ^10.0.0
     typescript: ">=4.8.4 <6.1.0"
   checksum: 10c0/a20271b96e35fa5a8deea11ec40b30f7987daa5c3402e6e763e474517a25af20749a620490af159c2a65048065dea8a6d5fa3527ccc7a3716c2cd648a05ebc55
+  languageName: node
+  linkType: hard
+
+"@typescript-eslint/parser@npm:^8.59.2":
+  version: 8.59.2
+  resolution: "@typescript-eslint/parser@npm:8.59.2"
+  dependencies:
+    "@typescript-eslint/scope-manager": "npm:8.59.2"
+    "@typescript-eslint/types": "npm:8.59.2"
+    "@typescript-eslint/typescript-estree": "npm:8.59.2"
+    "@typescript-eslint/visitor-keys": "npm:8.59.2"
+    debug: "npm:^4.4.3"
+  peerDependencies:
+    eslint: ^8.57.0 || ^9.0.0 || ^10.0.0
+    typescript: ">=4.8.4 <6.1.0"
+  checksum: 10c0/baf8da8ad233908f00bdfe5835c1e03fd7c9256f675a27b0d10d40d0245c158efc847dee1331c61992fbb152d55bfda3111795f8422e9d341f09ec9729364800
   languageName: node
   linkType: hard
 
@@ -4996,7 +5012,7 @@ __metadata:
     "@types/supertest": "npm:^7.2.0"
     "@types/validator": "npm:^13.15.10"
     "@typescript-eslint/eslint-plugin": "npm:^8.59.2"
-    "@typescript-eslint/parser": "npm:^8.59.1"
+    "@typescript-eslint/parser": "npm:^8.59.2"
     axe-core: "npm:^4.11.4"
     axios: "npm:1.16.0"
     body-parser: "npm:^2.2.2"
