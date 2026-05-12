@@ -42,7 +42,7 @@
     "dotenv": "^17.4.2",
     "eslint-plugin-prettier": "^5.5.5",
     "express": "^5.2.1",
-    "express-rate-limit": "^8.4.1",
+    "express-rate-limit": "^8.5.0",
     "express-session": "^1.19.0",
     "express-validator": "^7.3.2",
     "figlet": "^1.11.0",
