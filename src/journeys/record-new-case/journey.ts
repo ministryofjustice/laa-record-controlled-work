@@ -498,7 +498,7 @@ export const newCaseJourney = journey({
       effects: [PatternEffects.LoadDraftAnswers()],
     }),
   ],
-  reachability: { disableReachabilityChecks: true },
+  reachability: { disableReachabilityChecks: false },
   view: { template: "partials/form-step" },
   steps: [
     startStep,

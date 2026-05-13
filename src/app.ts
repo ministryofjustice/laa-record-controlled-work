@@ -27,8 +27,6 @@ import {
 } from "@ministryofjustice/hmpps-forge/express-nunjucks";
 import { govukComponents } from "@ministryofjustice/hmpps-forge/govuk-components";
 import { mojComponents } from "@ministryofjustice/hmpps-forge/moj-components";
-import confirmationJourney from "#/journeys/confirmation/index.js";
-import splitJourney from "#/journeys/split/index.js";
 import recordNewCase from "#/journeys/record-new-case/index.js";
 
 const TRUST_FIRST_PROXY = 1;
@@ -96,8 +94,6 @@ const createApp = async (): Promise<express.Application> => {
     .registerGlobalComponents(govukComponents)
     .registerGlobalComponents(mojComponents)
     .registerGlobalFunctions(nunjucksFunctions)
-    .registerPackage(confirmationJourney)
-    .registerPackage(splitJourney)
     .registerPackage(recordNewCase);
 
   // Set up rate limiting
