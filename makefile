@@ -2,10 +2,14 @@ include docker-images.env
 export
 
 MOCHA    := ./node_modules/.bin/mocha
-TEST_DIR := tests/unit
+TEST_DIR := tests/integration
+# INTEGRATION_DIR := tests/integration
+# DEBUG=testcontainers* 
+
 
 # Mirrors .mocharc.json options (excluding spec) which allows single file runs in local without impacting CICD
 MOCHA_OPTS := --no-config \
+	--exit \
 	--require tests/unit/setup.ts \
 	--node-option no-warnings \
 	--node-option import=tsx \
@@ -69,3 +73,6 @@ ifdef file
 else
 	$(MOCHA) --recursive '$(TEST_DIR)/**/*.spec.ts'
 endif
+
+integration:
+	$(MOCHA) '$(INTEGRATION_DIR)/**/*.spec.ts'

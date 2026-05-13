@@ -20,7 +20,6 @@ export function requireAuth(
     next();
     return;
   }
-
   if (session.isAuthenticated) {
     res.locals.isAuthenticated = session.isAuthenticated;
     res.locals.user = session.account;

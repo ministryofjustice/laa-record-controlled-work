@@ -24,10 +24,6 @@ import express from "express";
 import morgan from "morgan";
 import session from "express-session";
 
-const TRUST_FIRST_PROXY = 1;
-const ENABLE_PLAYWRIGHT_TEST_SIGNIN =
-  process.env.PLAYWRIGHT_TEST_SIGNIN === "true";
-
 /**
  * Creates and configures an Express application.
  * Server startup is handled separately in src/server.ts.
@@ -35,6 +31,9 @@ const ENABLE_PLAYWRIGHT_TEST_SIGNIN =
  * @returns {Promise<import('express').Application>} The configured Express application
  */
 const createApp = async (): Promise<express.Application> => {
+  const TRUST_FIRST_PROXY = 1;
+  const ENABLE_PLAYWRIGHT_TEST_SIGNIN =
+    process.env.PLAYWRIGHT_TEST_SIGNIN === "true";
   // Initialise i18next synchronously before setting up the app
   initializeI18nextSync();
 
