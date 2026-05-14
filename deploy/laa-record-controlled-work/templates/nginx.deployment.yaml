@@ -57,7 +57,7 @@ spec:
               subPath: proxy.conf
               readOnly: true
             - name: nginx-config
-              mountPath: /etc/nginx/proxy.conf
+              mountPath: /etc/nginx/maps.conf
               subPath: maps.conf
               readOnly: true
             - name: cache
