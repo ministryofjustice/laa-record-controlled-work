@@ -46,7 +46,7 @@
     "express-session": "^1.19.0",
     "express-validator": "^7.3.2",
     "figlet": "^1.11.0",
-    "fs-extra": "^11.3.4",
+    "fs-extra": "^11.3.5",
     "govuk-frontend": "^6.1.0",
     "helmet": "^8.1.0",
     "http-errors": "~2.0.1",
