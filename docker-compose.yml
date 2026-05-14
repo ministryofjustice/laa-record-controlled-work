@@ -46,6 +46,7 @@ services:
     image: laa-check-client-qualifies:latest
     container_name: rcw-ccq
     pull_policy: never # clone laa-check-client-qualifies, `make build`
+    platform: linux/amd64 # puppeteer doesn't work properly on ARM
     expose:
       - 3000
     depends_on:
