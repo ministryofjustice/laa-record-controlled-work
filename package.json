@@ -50,7 +50,7 @@
     "govuk-frontend": "^6.1.0",
     "helmet": "^8.1.0",
     "http-errors": "~2.0.1",
-    "i18next": "^26.0.8",
+    "i18next": "^26.0.10",
     "libphonenumber-js": "^1.12.42",
     "middleware-axios": "^3.0.0",
     "moment": "^2.30.1",
