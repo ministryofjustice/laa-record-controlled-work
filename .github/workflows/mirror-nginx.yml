@@ -1,9 +1,10 @@
 name: Mirror nginx-unprivileged to ECR
 #
-#  Checks daily for a new version of nginxinc/nginx-unprivileged:alpine on Docker Hub.
-#  If a new version is found and it's at least 3 days old (to give CVEs time to surface),
-#  it pulls the image, scans it with Snyk, pushes it to our private ECR and then opens a
-#  PR updating docker-images.env with the new tag and ECR digest.
+#  Checks daily for the newest version of nginxinc/nginx-unprivileged that has an
+#  alpine tag at least 3 days old (to give CVEs time to surface). If a newer version
+#  is found than the one stored in docker-images.env, it pulls the image, scans it
+#  with Snyk, pushes it to our private ECR and then opens a PR updating
+#  docker-images.env with the new tag and ECR digest.
 #
 #  Since this workflow runs on an AMD64 runner, skopeo and docker both resolve to the
 #  AMD64 image. NGINX_ECR_IMAGE_DIGEST_AMD64 holds the AMD64 digest as ECR recorded it,
@@ -48,21 +49,60 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
-      - name: Fetch latest nginx-unprivileged:alpine metadata from Docker Hub
+      - name: Find newest eligible nginx-unprivileged version
         id: fetch_metadata
         env:
           INPUT_TAG: ${{ inputs.override_tag }}
+          SKIP_AGE_CHECK: ${{ inputs.skip_age_check }}
         run: |
-          METADATA=$(skopeo inspect docker://nginxinc/nginx-unprivileged:${INPUT_TAG:-alpine})
-          TAG=$(echo "$METADATA" | jq -r '.Labels["org.opencontainers.image.version"]')
-          DIGEST=$(echo "$METADATA" | jq -r '.Digest')
+          # If an override tag is specified, inspect it directly, exit early
+          if [ -n "$INPUT_TAG" ]; then
+            METADATA=$(skopeo inspect "docker://nginxinc/nginx-unprivileged:${INPUT_TAG}")
+            echo "tag=$(echo "$METADATA" | jq -r '.Labels["org.opencontainers.image.version"]')" >> "$GITHUB_OUTPUT"
+            echo "amd64_digest=$(echo "$METADATA" | jq -r '.Digest')" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
 
+          # If age check is skipped, use the floating :alpine tag directly, exit early
+          if [ "$SKIP_AGE_CHECK" = "true" ]; then
+            METADATA=$(skopeo inspect "docker://nginxinc/nginx-unprivileged:alpine")
+            echo "tag=$(echo "$METADATA" | jq -r '.Labels["org.opencontainers.image.version"]')" >> "$GITHUB_OUTPUT"
+            echo "amd64_digest=$(echo "$METADATA" | jq -r '.Digest')" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+
+          # Fetch X.Y.Z-alpine tags from Docker Hub and find the newest one that's >3 days old
+          CUTOFF=$(date -u -d '3 days ago' '+%s')
+          TAG=$(curl -s "https://hub.docker.com/v2/repositories/nginxinc/nginx-unprivileged/tags?page_size=100&ordering=-last_updated" \
+            | jq -r --argjson cutoff "$CUTOFF" '
+                .results[]
+                | select(.name | test("^[0-9]+\\.[0-9]+\\.[0-9]+-alpine$"))
+                | select((.last_updated[:19] + "Z" | fromdateiso8601) <= $cutoff)
+                | .name
+              ' | sort -V | tail -1)
+
+          if [ -z "$TAG" ] || [ "$TAG" = "null" ]; then
+            echo "No eligible version found (all candidates are less than 3 days old)."
+            echo "tag=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          DIGEST=$(skopeo inspect "docker://nginxinc/nginx-unprivileged:${TAG}" | jq -r '.Digest')
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
           echo "amd64_digest=$DIGEST" >> "$GITHUB_OUTPUT"
 
       - name: Check if version has changed
         id: version_check
         run: |
+          TAG="${{ steps.fetch_metadata.outputs.tag }}"
+
+          if [ -z "$TAG" ]; then
+            echo "No eligible version found."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
           if [ "${{ inputs.skip_version_check }}" = "true" ] || [ -n "${{ inputs.override_tag }}" ]; then
             echo "Version check skipped."
             echo "changed=true" >> "$GITHUB_OUTPUT"
@@ -71,38 +111,15 @@ jobs:
 
           source docker-images.env
 
-          if [ "$NGINX_IMAGE_TAG" = "${{ steps.fetch_metadata.outputs.tag }}" ]; then
+          if [ "$NGINX_IMAGE_TAG" = "$TAG" ]; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Check image is at least 3 days old
-        id: age_check
-        if: steps.version_check.outputs.changed == 'true'
-        run: |
-          if [ "${{ inputs.skip_age_check }}" = "true" ] || [ -n "${{ inputs.override_tag }}" ]; then
-            echo "Age check skipped."
-            echo "old_enough=true" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          LAST_UPDATED=$(curl -s \
-            "https://hub.docker.com/v2/repositories/nginxinc/nginx-unprivileged/tags/alpine" \
-            | jq -r '.last_updated')
-          LAST_UPDATED_EPOCH=$(date -u -d "$LAST_UPDATED" '+%s')
-          CUTOFF_EPOCH=$(date -u -d '3 days ago' '+%s')
-
-          if [ "$LAST_UPDATED_EPOCH" -gt "$CUTOFF_EPOCH" ]; then
-            echo "old_enough=false" >> "$GITHUB_OUTPUT"
-            echo "Image was published less than 3 days ago, skipping to allow time for CVE detection."
-          else
-            echo "old_enough=true" >> "$GITHUB_OUTPUT"
-          fi
-
       - name: Check for existing PR
         id: pr_check
-        if: steps.age_check.outputs.old_enough == 'true'
+        if: steps.version_check.outputs.changed == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
