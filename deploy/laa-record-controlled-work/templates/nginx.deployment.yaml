@@ -41,7 +41,7 @@ spec:
             - name: NGINX_UPSTREAM_RCW
               value: {{ include "laa-record-controlled-work.fullname" . }}-rcw:3000
             - name: NGINX_UPSTREAM_CCQ
-              value: {{ include "laa-record-controlled-work.fullname" . }}-ccq:3000
+              value: {{ include "laa-record-controlled-work.fullname" . }}-rcw:3000
           ports:
             - name: http
               containerPort: 8080
