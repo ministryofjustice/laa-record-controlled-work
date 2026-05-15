@@ -6,8 +6,8 @@ metadata:
     {{- include "laa-record-controlled-work.labels" . | nindent 4 }}
 data:
   default.conf.template: |
-{{ .Files.Get "nginx/default.conf.template" | indent 4 -}}
+{{ .Files.Get "nginx/default.conf.template" | indent 4 }}
   proxy.conf: |
-{{ .Files.Get "nginx/proxy.conf" | indent 4 -}}
+{{ .Files.Get "nginx/proxy.conf" | indent 4 }}
   maps.conf: |
-{{ .Files.Get "nginx/maps.conf" | indent 4 -}}
+{{ .Files.Get "nginx/maps.conf" | indent 4 }}
