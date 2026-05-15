@@ -56,9 +56,11 @@ jobs:
           METADATA=$(skopeo inspect docker://nginxinc/nginx-unprivileged:${INPUT_TAG:-alpine})
           TAG=$(echo "$METADATA" | jq -r '.Labels["org.opencontainers.image.version"]')
           DIGEST=$(echo "$METADATA" | jq -r '.Digest')
+          CREATED=$(echo "$METADATA" | jq -r '.Labels["org.opencontainers.image.created"]')
 
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
           echo "amd64_digest=$DIGEST" >> "$GITHUB_OUTPUT"
+          echo "created=$CREATED" >> "$GITHUB_OUTPUT"
 
       - name: Check if version has changed
         id: version_check
@@ -87,9 +89,7 @@ jobs:
             exit 0
           fi
 
-          LAST_UPDATED=$(curl -s \
-            "https://hub.docker.com/v2/repositories/nginxinc/nginx-unprivileged/tags/alpine" \
-            | jq -r '.last_updated')
+          LAST_UPDATED="${{ steps.fetch_metadata.outputs.created }}"
           LAST_UPDATED_EPOCH=$(date -u -d "$LAST_UPDATED" '+%s')
           CUTOFF_EPOCH=$(date -u -d '3 days ago' '+%s')
 
