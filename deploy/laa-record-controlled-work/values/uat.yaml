@@ -3,17 +3,17 @@ serviceAccount:
 
 ingress:
   hosts:
-    - host: record-controlled-work-uat.cloud-platform.service.justice.gov.uk
+    - host: laa-record-controlled-work-uat.cloud-platform.service.justice.gov.uk
       paths:
         - path: /
           pathType: Prefix
   annotations:
-    external-dns.alpha.kubernetes.io/set-identifier: "laa-record-controlled-work-record-controlled-work-uat-green"
+    external-dns.alpha.kubernetes.io/set-identifier: "laa-record-controlled-work-laa-record-controlled-work-uat-green"
 
 rcw:
   replicaCount: 1
 
   env:
     NODE_ENV: "uat"
-    ENTRA_REDIRECT_URI: "https://record-controlled-work-uat.cloud-platform.service.justice.gov.uk/auth/code/callback"      
-    ENTRA_POST_LOGOUT_REDIRECT_URI: "https://record-controlled-work-uat.cloud-platform.service.justice.gov.uk/"  
+    ENTRA_REDIRECT_URI: "https://laa-record-controlled-work-uat.cloud-platform.service.justice.gov.uk/auth/code/callback"      
+    ENTRA_POST_LOGOUT_REDIRECT_URI: "https://laa-record-controlled-work-uat.cloud-platform.service.justice.gov.uk/"  

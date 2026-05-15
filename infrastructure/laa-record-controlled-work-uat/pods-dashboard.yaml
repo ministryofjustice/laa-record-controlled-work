@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: pods-dashboard
-  namespace: record-controlled-work-uat
+  namespace: laa-record-controlled-work-uat
   labels:
     grafana_dashboard: ""
 data:
@@ -451,6 +451,6 @@ data:
       },
       "timezone": "browser",
       "title": "laa-record-controlled-work Pods",
-      "uid": "b1d0fb88-ff1e-4286-b5d2-1bd23d151763",
+      "uid": "b1d0fb88-ff1e-4286-b5d2-1bd23d151863",
       "version": 1
     }
