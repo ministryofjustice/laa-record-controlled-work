@@ -56,20 +56,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@azure/msal-common@npm:16.5.2":
-  version: 16.5.2
-  resolution: "@azure/msal-common@npm:16.5.2"
-  checksum: 10c0/e7c55eea2563adb6561f663b4a649ee62823102eeb5e4632b2ec1062071619900910015625b2465781c57d986384c05186afc82560cb7ea879526319e8626bb2
+"@azure/msal-common@npm:16.6.0":
+  version: 16.6.0
+  resolution: "@azure/msal-common@npm:16.6.0"
+  checksum: 10c0/6ac735f759bde30c9f1e29f8279a6b826a7ca3f674ee620edd91b2dae413256e89ef9af01c19a06ca57c131083928a95ad86929f118339be021a0011910ca0d2
   languageName: node
   linkType: hard
 
-"@azure/msal-node@npm:^5.1.5":
-  version: 5.1.5
-  resolution: "@azure/msal-node@npm:5.1.5"
+"@azure/msal-node@npm:^5.2.0":
+  version: 5.2.0
+  resolution: "@azure/msal-node@npm:5.2.0"
   dependencies:
-    "@azure/msal-common": "npm:16.5.2"
+    "@azure/msal-common": "npm:16.6.0"
     jsonwebtoken: "npm:^9.0.0"
-  checksum: 10c0/476690a23931349281e9226ecb1a2124e45af7a8c1415315c9bf7f7e1f75dab8a7e33190cb58fa057f3128839733eec53e8bd9133a5123e774721f890efabe88
+  checksum: 10c0/19ffb90727e6e584f26a3b2fc78cd0899e2552a2347e8fb8e8df825fd76735bc47fa504ec8dbef4fdd210aff506d7811b61738cabcb46c1e60768cb9365d9c6b
   languageName: node
   linkType: hard
 
@@ -1317,9 +1317,9 @@ __metadata:
   linkType: hard
 
 "@types/estree@npm:^1.0.6, @types/estree@npm:^1.0.8":
-  version: 1.0.8
-  resolution: "@types/estree@npm:1.0.8"
-  checksum: 10c0/39d34d1afaa338ab9763f37ad6066e3f349444f9052b9676a7cc0252ef9485a41c6d81c9c4e0d26e9077993354edf25efc853f3224dd4b447175ef62bdcc86a5
+  version: 1.0.9
+  resolution: "@types/estree@npm:1.0.9"
+  checksum: 10c0/3ad3286ca2988cd550dafb8f2ad599c8474868e954fa601a36655bdfefd8039f7c714b8c1c7f2ae219ffbd58bd4660e66fa7479a0120fc02d4777057d4865387
   languageName: node
   linkType: hard
 
@@ -1453,12 +1453,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:^25.6.0":
-  version: 25.6.0
-  resolution: "@types/node@npm:25.6.0"
+"@types/node@npm:*, @types/node@npm:^25.6.2":
+  version: 25.6.2
+  resolution: "@types/node@npm:25.6.2"
   dependencies:
     undici-types: "npm:~7.19.0"
-  checksum: 10c0/d2d2015630ff098a201407f55f5077a20270ae4f465c739b40865cd9933b91b9c5d2b85568eadaf3db0801b91e267333ca7eb39f007428b173d1cdab4b339ac5
+  checksum: 10c0/7f540331aa3ab88c285aeaf2eb43e3992f54f0cdb7f3593d156af67b199d4eaf56590fa1c310a00aa58ff69dba668cb3915a157fe83cd6b40a73bb338a12f09a
   languageName: node
   linkType: hard
 
@@ -1470,9 +1470,9 @@ __metadata:
   linkType: hard
 
 "@types/qs@npm:*":
-  version: 6.15.0
-  resolution: "@types/qs@npm:6.15.0"
-  checksum: 10c0/1b104cac50e655fc41d7fc1de2c2aba2908c4cf833a555b6808fb4c96752662b439238f2392a15d2590a7a6ca75dbd40e42d9378ac2be0d548ee484954363688
+  version: 6.15.1
+  resolution: "@types/qs@npm:6.15.1"
+  checksum: 10c0/1dfdbcb4cf2a8f66d57f0b9a9fe6b1c7091cb816687b6698c1351eaf31f62e412cea9b7453a9637b570cd5fad8dced527e5a9e69b4fcc6e318daacd8b749f094
   languageName: node
   linkType: hard
 
@@ -2790,12 +2790,12 @@ __metadata:
   linkType: hard
 
 "enhanced-resolve@npm:^5.17.1":
-  version: 5.21.0
-  resolution: "enhanced-resolve@npm:5.21.0"
+  version: 5.21.1
+  resolution: "enhanced-resolve@npm:5.21.1"
   dependencies:
     graceful-fs: "npm:^4.2.4"
     tapable: "npm:^2.3.3"
-  checksum: 10c0/8d25b9eb7cbaaf6bac7ca52cefb6aa8a723a3cea754aa3c52f269bdae3b6d5f3219fadbaf4362ed7d53f027e0b83bfbeb4c646640123cf62e6dbe52f28604c77
+  checksum: 10c0/272b365bb7573fe05384e28e9738a41828a71558bf651683aa194aad79a64a4c19e08857d9fb2f476e3481758c92b2cacf77ba9fa950250fe2e39954a0ac5bc4
   languageName: node
   linkType: hard
 
@@ -3933,9 +3933,9 @@ __metadata:
   linkType: hard
 
 "get-east-asian-width@npm:^1.0.0, get-east-asian-width@npm:^1.3.1, get-east-asian-width@npm:^1.5.0":
-  version: 1.5.0
-  resolution: "get-east-asian-width@npm:1.5.0"
-  checksum: 10c0/bff8bbc8d81790b9477f7aa55b1806b9f082a8dc1359fff7bd8b96939622c86b729685afc2bfeb22def1fc6ef1e5228e4d87dd4e6da60bc43a5edfb03c4ee167
+  version: 1.6.0
+  resolution: "get-east-asian-width@npm:1.6.0"
+  checksum: 10c0/7e72e9550fd49ca5b246f9af6bb2afc129c96412845ff6556b3274fd44817a381702ca17028efe9866b261a3d44254cbf21e6c90cf05b4b61675630af776d431
   languageName: node
   linkType: hard
 
@@ -4102,9 +4102,9 @@ __metadata:
   linkType: hard
 
 "graphql@npm:^16.13.2":
-  version: 16.13.2
-  resolution: "graphql@npm:16.13.2"
-  checksum: 10c0/64e822a0a0e4398781e4bc9765b88d370c08261498b517add4b878038ef7be2005b6b394a79a5102b9379d57052f60bc7f23fec8f39808d101984a74772ebd9d
+  version: 16.14.0
+  resolution: "graphql@npm:16.14.0"
+  checksum: 10c0/baaa368fcfeb7bf2cdf94b9f31bf916e97eaa9e7e82148a7046f31cbd49b760b38190f22393b024cbdd9ca0f4f46287515de0136b6a0cc164074b36ad7b50618
   languageName: node
   linkType: hard
 
@@ -4854,7 +4854,7 @@ __metadata:
   resolution: "laa-record-controlled-work@workspace:."
   dependencies:
     "@axe-core/playwright": "npm:^4.11.3"
-    "@azure/msal-node": "npm:^5.1.5"
+    "@azure/msal-node": "npm:^5.2.0"
     "@eslint/js": "npm:^10.0.1"
     "@ministryofjustice/frontend": "npm:9.0.0"
     "@playwright/test": "npm:^1.59.1"
@@ -4871,7 +4871,7 @@ __metadata:
     "@types/livereload": "npm:^0.9.5"
     "@types/mocha": "npm:^10.0.10"
     "@types/morgan": "npm:^1.9.10"
-    "@types/node": "npm:^25.6.0"
+    "@types/node": "npm:^25.6.2"
     "@types/nunjucks": "npm:^3.2.6"
     "@types/sinon": "npm:^21.0.1"
     "@types/supertest": "npm:^7.2.0"
@@ -4917,14 +4917,14 @@ __metadata:
     husky: "npm:^9.1.7"
     i18next: "npm:^26.0.10"
     jsdom: "npm:^29.1.1"
-    libphonenumber-js: "npm:^1.12.42"
+    libphonenumber-js: "npm:^1.12.43"
     lint-staged: "npm:^16.4.0"
     livereload: "npm:^0.10.3"
     middleware-axios: "npm:^3.0.0"
     mocha: "npm:^11.7.5"
     moment: "npm:^2.30.1"
     morgan: "npm:~1.10.1"
-    msw: "npm:^2.14.3"
+    msw: "npm:^2.14.5"
     nodemon: "npm:^3.1.14"
     nunjucks: "npm:^3.2.4"
     playwright-core: "npm:^1.59.1"
@@ -4953,10 +4953,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"libphonenumber-js@npm:^1.12.42":
-  version: 1.12.42
-  resolution: "libphonenumber-js@npm:1.12.42"
-  checksum: 10c0/55c1ac5ab2657868d84e85f426e8c17d33ffccbdefc8eff1248641d2d390377b566e024833374921549008466a3d8c796e767f066749c0d7f37c3c5b32561e29
+"libphonenumber-js@npm:^1.12.43":
+  version: 1.12.43
+  resolution: "libphonenumber-js@npm:1.12.43"
+  checksum: 10c0/b082dbe60091a68399e543031298e53ba9efd6b170e42f4962c61b115da458cda42bbf1caae49db490bde0cf1fbd7e23a4faaf2e77e395781bd74da526d45d40
   languageName: node
   linkType: hard
 
@@ -5354,9 +5354,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"msw@npm:^2.14.3":
-  version: 2.14.3
-  resolution: "msw@npm:2.14.3"
+"msw@npm:^2.14.5":
+  version: 2.14.5
+  resolution: "msw@npm:2.14.5"
   dependencies:
     "@inquirer/confirm": "npm:^6.0.11"
     "@mswjs/interceptors": "npm:^0.41.3"
@@ -5383,7 +5383,7 @@ __metadata:
       optional: true
   bin:
     msw: cli/index.js
-  checksum: 10c0/c2b6c20ed1993e4a9ca4ba860bf543248800e7af213c16225a0b40cce172b83faf704e83a8822f079ed16b8c6a09361ac92cbeeb7dc2f3c3d7b9af638390c545
+  checksum: 10c0/eff50e2d7c6c8b597994b2c7476d1c60c990ac026b459cbb101cec18f751254e6b1962c86a75328bc4fef939cc887db5e990fdb10dbe042186b46d3280014b0a
   languageName: node
   linkType: hard
 
@@ -6989,15 +6989,15 @@ __metadata:
   linkType: hard
 
 "tar@npm:^7.5.4":
-  version: 7.5.14
-  resolution: "tar@npm:7.5.14"
+  version: 7.5.15
+  resolution: "tar@npm:7.5.15"
   dependencies:
     "@isaacs/fs-minipass": "npm:^4.0.0"
     chownr: "npm:^3.0.0"
     minipass: "npm:^7.1.2"
     minizlib: "npm:^3.1.0"
     yallist: "npm:^5.0.0"
-  checksum: 10c0/619573265fa45295ff0b378f1097ab43187ab7b66e9483d3ad8f467c287674fb182ec878ef50a08761b8ab487863cb429902cf65fe361d47e330a95bfc4ca9e8
+  checksum: 10c0/8f039edb1d12fdd7df6c6f9877d125afe9f3da3f5f9317df326fdd090d48793d6998cede1506a1471f3e3a250db270a89dace28005eb5e99c5a9132d704ac956
   languageName: node
   linkType: hard
 
