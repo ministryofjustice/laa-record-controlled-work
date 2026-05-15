@@ -41,7 +41,7 @@ jobs:
 
       - name: ⚡️ SCA
         if: github.event_name != 'merge_group'
-        uses: ministryofjustice/devsecops-actions/sca@86248cec9a6bb1fd4dabc08a05178e0650d3af4f # Feature branch
+        uses: ministryofjustice/devsecops-actions/sca@7dc13c20e2bf541b8a77fa1320a04983b18846f6 # v1.6.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
