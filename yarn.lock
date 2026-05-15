@@ -63,7 +63,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@azure/msal-node@npm:^5.1.5":
+"@azure/msal-node@npm:^5.2.0":
   version: 5.2.0
   resolution: "@azure/msal-node@npm:5.2.0"
   dependencies:
@@ -4854,7 +4854,7 @@ __metadata:
   resolution: "laa-record-controlled-work@workspace:."
   dependencies:
     "@axe-core/playwright": "npm:^4.11.3"
-    "@azure/msal-node": "npm:^5.1.5"
+    "@azure/msal-node": "npm:^5.2.0"
     "@eslint/js": "npm:^10.0.1"
     "@ministryofjustice/frontend": "npm:9.0.0"
     "@playwright/test": "npm:^1.59.1"
