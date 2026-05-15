@@ -40,6 +40,8 @@ spec:
           env:
             - name: NGINX_UPSTREAM_RCW
               value: {{ include "laa-record-controlled-work.fullname" . }}-rcw:3000
+            - name: NGINX_UPSTREAM_CCQ
+              value: {{ include "laa-record-controlled-work.fullname" . }}-rcw:3000
           ports:
             - name: http
               containerPort: 8080
@@ -51,6 +53,14 @@ spec:
             - name: nginx-config
               mountPath: /etc/nginx/templates/default.conf.template
               subPath: default.conf.template
+              readOnly: true
+            - name: nginx-config
+              mountPath: /etc/nginx/proxy.conf
+              subPath: proxy.conf
+              readOnly: true
+            - name: nginx-config
+              mountPath: /etc/nginx/maps.conf
+              subPath: maps.conf
               readOnly: true
             - name: cache
               mountPath: /var/cache/nginx

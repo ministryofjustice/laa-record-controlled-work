@@ -1,20 +1,37 @@
 # Injected secrets need to pull the env var from the host machine
 # This happens automatically if you provide only the env var name.
 services:
+  nginx:
+    image: nginxinc/nginx-unprivileged:${NGINX_IMAGE_TAG:-alpine}
+    container_name: rcw-nginx
+    ports:
+      - 8080:8080
+    volumes:
+      - ./deploy/laa-record-controlled-work/nginx/default.conf.template:/etc/nginx/templates/default.conf.template:ro
+      - ./deploy/laa-record-controlled-work/nginx/proxy.conf:/etc/nginx/proxy.conf:ro
+      - ./deploy/laa-record-controlled-work/nginx/maps.conf:/etc/nginx/maps.conf:ro
+    depends_on:
+      - rcw
+      - ccq
+    environment:
+      NGINX_UPSTREAM_RCW: rcw:3000
+      NGINX_UPSTREAM_CCQ: ccq:3000
+
   rcw:
     build: .
     container_name: rcw-front-end
+    expose:
+      - 3000
     depends_on:
-      redis:
+      redis-rcw:
         condition: service_healthy
     env_file:
-      - .env
-    ports:
-      - "3000:3000"
-    environment:
+      - .env # load from .env first
+    environment: # set overrides
       - NODE_ENV=docker
       - REDIS_ENABLED=true
-      - REDIS_URL=redis://redis:6379
+      - REDIS_URL=redis://redis-rcw:6379
+      - REDIS_AUTH_TOKEN=${REDIS_AUTH_TOKEN:-redis_password}
 
       # secrets injected by 1Password CLI
       # op run --env-file=.env -- docker compose up -d
@@ -25,31 +42,49 @@ services:
       - ENTRA_AUTHORITY_BASE_URL
       - ENTRA_POST_LOGOUT_REDIRECT_URI
 
-  # ccq:
-  #   image:
-  #   expose:
-  #     - "3000"
-
-  nginx:
-    container_name: nginx-reverse-proxy  
-    image: nginxinc/nginx-unprivileged:${NGINX_IMAGE_TAG:-alpine}
-    environment:
-      NGINX_UPSTREAM_RCW: rcw:3000
-    ports:
-      - "8080:8080"
-    volumes:
-      - ./deploy/laa-record-controlled-work/nginx/default.conf.template:/etc/nginx/templates/default.conf.template:ro
+  ccq:
+    image: laa-check-client-qualifies:latest
+    container_name: rcw-ccq
+    pull_policy: never # clone laa-check-client-qualifies, `make build`
+    platform: linux/amd64 # puppeteer doesn't work properly on ARM
+    expose:
+      - 3000
     depends_on:
-      - rcw
-      # - ccq
+      redis-ccq:
+        condition: service_healthy
+    environment:
+      RAILS_ENV: production
+      RAILS_SERVE_STATIC_FILES: true # won't serve assets without this
+      RAILS_LOG_TO_STDOUT: true # logs to a file without this
+      SECRET_KEY_BASE: dev-secret # doesn't work without it
 
-  redis:
-    container_name: rcw-redis-session
+      CCQ_MODE: embedded
+      REDIS_URL: redis://redis-ccq:6379
+
+  redis-rcw:
+    container_name: rcw-session-redis
     image: "redis:7.4-alpine@sha256:6ab0b6e7381779332f97b8ca76193e45b0756f38d4c0dcda72dbb3c32061ab99"
     ports:
-      - "6379:6379"
+      - 6379:6379
     command: >
       redis-server 
+      --maxmemory 256mb 
+      --maxmemory-policy allkeys-lru
+      --save ""
+      --appendonly no
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  redis-ccq:
+    container_name: rcw-ccq-cache-redis
+    image: "redis:7.4-alpine@sha256:6ab0b6e7381779332f97b8ca76193e45b0756f38d4c0dcda72dbb3c32061ab99"
+    ports:
+      - 6380:6379
+    command: >
+      redis-server
       --maxmemory 256mb 
       --maxmemory-policy allkeys-lru
       --save ""
