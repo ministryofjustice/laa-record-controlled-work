@@ -52,83 +52,31 @@ jobs:
       - name: Find newest eligible nginx-unprivileged version
         id: fetch_metadata
         env:
-          INPUT_TAG: ${{ inputs.override_tag }}
+          OVERRIDE_TAG: ${{ inputs.override_tag }}
           SKIP_AGE_CHECK: ${{ inputs.skip_age_check }}
-        run: |
-          # If an override tag is specified, inspect it directly, exit early
-          if [ -n "$INPUT_TAG" ]; then
-            METADATA=$(skopeo inspect "docker://nginxinc/nginx-unprivileged:${INPUT_TAG}")
-            echo "tag=$(echo "$METADATA" | jq -r '.Labels["org.opencontainers.image.version"]')" >> "$GITHUB_OUTPUT"
-            echo "amd64_digest=$(echo "$METADATA" | jq -r '.Digest')" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          # If age check is skipped, use the floating :alpine tag directly, exit early
-          if [ "$SKIP_AGE_CHECK" = "true" ]; then
-            METADATA=$(skopeo inspect "docker://nginxinc/nginx-unprivileged:alpine")
-            echo "tag=$(echo "$METADATA" | jq -r '.Labels["org.opencontainers.image.version"]')" >> "$GITHUB_OUTPUT"
-            echo "amd64_digest=$(echo "$METADATA" | jq -r '.Digest')" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-
-          # Fetch X.Y.Z-alpine tags from Docker Hub and find the newest one that's >3 days old
-          CUTOFF=$(date -u -d '3 days ago' '+%s')
-          TAG=$(curl -s "https://hub.docker.com/v2/repositories/nginxinc/nginx-unprivileged/tags?page_size=100&ordering=-last_updated" \
-            | jq -r --argjson cutoff "$CUTOFF" '
-                .results[]
-                | select(.name | test("^[0-9]+\\.[0-9]+\\.[0-9]+-alpine$"))
-                | select((.last_updated[:19] + "Z" | fromdateiso8601) <= $cutoff)
-                | .name
-              ' | sort -V | tail -1)
-
-          if [ -z "$TAG" ] || [ "$TAG" = "null" ]; then
-            echo "No eligible version found (all candidates are less than 3 days old)."
-            echo "tag=" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          DIGEST=$(skopeo inspect "docker://nginxinc/nginx-unprivileged:${TAG}" | jq -r '.Digest')
-          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
-          echo "amd64_digest=$DIGEST" >> "$GITHUB_OUTPUT"
-
-      - name: Check if version has changed
-        id: version_check
-        run: |
-          TAG="${{ steps.fetch_metadata.outputs.tag }}"
-
-          if [ -z "$TAG" ]; then
-            echo "No eligible version found."
-            echo "changed=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          if [ "${{ inputs.skip_version_check }}" = "true" ] || [ -n "${{ inputs.override_tag }}" ]; then
-            echo "Version check skipped."
-            echo "changed=true" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          source docker-images.env
-
-          if [ "$NGINX_IMAGE_TAG" = "$TAG" ]; then
-            echo "changed=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "changed=true" >> "$GITHUB_OUTPUT"
-          fi
+          SKIP_VERSION_CHECK: ${{ inputs.skip_version_check }}
+        run: ./scripts/find-nginx-update.sh
 
       - name: Check for existing PR
         id: pr_check
-        if: steps.version_check.outputs.changed == 'true'
+        if: steps.fetch_metadata.outputs.tag != ''
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          BRANCH="chore/mirror-nginx-${{ steps.fetch_metadata.outputs.tag }}"
           COUNT=$(gh pr list \
-            --head "chore/mirror-nginx-${{ steps.fetch_metadata.outputs.tag }}" \
+            --head "$BRANCH" \
             --state open \
             --json number \
             --jq 'length')
-          echo "no_existing_pr=$([ "$COUNT" = "0" ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+
+          if [ "$COUNT" = "0" ]; then
+            echo "No existing PR for branch \'$BRANCH\'. Proceeding." >> "$GITHUB_STEP_SUMMARY"
+            echo "no_existing_pr=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "PR already open for branch \'$BRANCH\'. Skipping." >> "$GITHUB_STEP_SUMMARY"
+            echo "no_existing_pr=false" >> "$GITHUB_OUTPUT"
+          fi
 
   scan-and-mirror:
     name: Scan and mirror
