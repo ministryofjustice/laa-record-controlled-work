@@ -58,7 +58,7 @@ runs:
       run: |
         if [ ${{ inputs.app-environment }} == 'uat' ]
         then
-          kubectl apply --record=false -f ./infrastructure/laa-record-controlled-work-uat/
+          kubectl apply --record=false -f ./deploy/infrastructure/laa-record-controlled-work-uat/
         fi
 
     - name: Update env-secrets kube secret
