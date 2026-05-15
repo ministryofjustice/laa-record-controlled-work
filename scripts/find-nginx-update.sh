@@ -25,6 +25,10 @@ summary() {
   fi
 }
 
+format_date() {
+  date -u -d "$1" '+%-d %B %Y at %H:%M UTC'
+}
+
 inspect_tag() {
   local tag="$1"
   METADATA=$(skopeo inspect "docker://${REPO}:${tag}")
@@ -62,9 +66,12 @@ CANDIDATES=$(skopeo list-tags "docker://${REPO}" \
   | tail -"${CANDIDATE_COUNT}" \
   | tac)
 
+CANDIDATES_FORMATTED=$(echo "$CANDIDATES" | sed 's/.*$/`&`/' | paste -sd ', ')
+
 summary "### Version discovery"
-summary "Current version: **${CURRENT_TAG}**"
-summary "Top candidates: $(echo $CANDIDATES | tr '\n' ', ')"
+summary "Current version: \`${CURRENT_TAG}\`"
+summary ""
+summary "Top candidates: ${CANDIDATES_FORMATTED}"
 summary ""
 
 # skip immediately if the highest candidate is not newer than what we have
@@ -72,7 +79,7 @@ HIGHEST_TAG=$(echo "$CANDIDATES" | head -1)
 
 if [ "${SKIP_VERSION_CHECK:-}" != "true" ]; then
   if [ "$HIGHEST_TAG" = "$CURRENT_TAG" ]; then
-    summary "Already on the latest version **${CURRENT_TAG}**."
+    summary "Already on the latest version \`${CURRENT_TAG}\`."
     output "tag" ""
     exit 0
   fi
@@ -80,7 +87,7 @@ if [ "${SKIP_VERSION_CHECK:-}" != "true" ]; then
   # verify the highest candidate is actually newer, not just different
   NEWER=$(printf '%s\n%s\n' "$CURRENT_TAG" "$HIGHEST_TAG" | sort -V | tail -1)
   if [ "$NEWER" = "$CURRENT_TAG" ]; then
-    summary "Current version **${CURRENT_TAG}** is already ahead of all candidates."
+    summary "Current version \`${CURRENT_TAG}\` is already ahead of all candidates."
     output "tag" ""
     exit 0
   fi
@@ -95,25 +102,26 @@ for CANDIDATE in $CANDIDATES; do
   if [ "${SKIP_VERSION_CHECK:-}" != "true" ]; then
     NEWER=$(printf '%s\n%s\n' "$CURRENT_TAG" "$CANDIDATE" | sort -V | tail -1)
     if [ "$NEWER" = "$CURRENT_TAG" ]; then
-      summary "- Skipped ${CANDIDATE} (not newer than current ${CURRENT_TAG})"
+      summary "- Skipped \`${CANDIDATE}\` (not newer than current \`${CURRENT_TAG}\`)"
       continue
     fi
   fi
 
   LAST_UPDATED=$(curl -s "${DOCKERHUB_API}/${CANDIDATE}" | jq -r '.last_updated')
   LAST_UPDATED_EPOCH=$(date -u -d "$LAST_UPDATED" '+%s')
+  LAST_UPDATED_PRETTY=$(format_date "$LAST_UPDATED")
 
   if [ "$LAST_UPDATED_EPOCH" -le "$CUTOFF" ]; then
     SELECTED="$CANDIDATE"
-    summary "Selected **${CANDIDATE}** (last updated ${LAST_UPDATED})."
+    summary "Selected **${CANDIDATE}** (last updated ${LAST_UPDATED_PRETTY})."
     break
   fi
-  summary "- Skipped ${CANDIDATE} (last updated ${LAST_UPDATED}, less than ${AGE_DAYS} days ago)"
+  summary "- Skipped \`${CANDIDATE}\` (last updated ${LAST_UPDATED_PRETTY}, less than ${AGE_DAYS} days ago)"
 done
 
 if [ -z "$SELECTED" ]; then
   summary ""
-  summary "**No eligible version found** — all candidates newer than ${CURRENT_TAG} are less than ${AGE_DAYS} days old."
+  summary "**No eligible version found** — all candidates newer than \`${CURRENT_TAG}\` are less than ${AGE_DAYS} days old."
   output "tag" ""
   exit 0
 fi

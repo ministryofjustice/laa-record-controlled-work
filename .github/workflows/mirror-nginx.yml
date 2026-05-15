@@ -71,10 +71,10 @@ jobs:
             --jq 'length')
 
           if [ "$COUNT" = "0" ]; then
-            echo "No existing PR for branch \'$BRANCH\'. Proceeding." >> "$GITHUB_STEP_SUMMARY"
+            echo "No existing PR for branch \`${BRANCH}\` - proceeding." >> "$GITHUB_STEP_SUMMARY"
             echo "no_existing_pr=true" >> "$GITHUB_OUTPUT"
           else
-            echo "PR already open for branch \'$BRANCH\'. Skipping." >> "$GITHUB_STEP_SUMMARY"
+            echo "PR already open for branch \`${BRANCH}\` - skipping." >> "$GITHUB_STEP_SUMMARY"
             echo "no_existing_pr=false" >> "$GITHUB_OUTPUT"
           fi
 
