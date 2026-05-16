@@ -4917,7 +4917,7 @@ __metadata:
     husky: "npm:^9.1.7"
     i18next: "npm:^26.0.10"
     jsdom: "npm:^29.1.1"
-    libphonenumber-js: "npm:^1.12.43"
+    libphonenumber-js: "npm:^1.13.0"
     lint-staged: "npm:^16.4.0"
     livereload: "npm:^0.10.3"
     middleware-axios: "npm:^3.0.0"
@@ -4953,10 +4953,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"libphonenumber-js@npm:^1.12.43":
-  version: 1.12.43
-  resolution: "libphonenumber-js@npm:1.12.43"
-  checksum: 10c0/b082dbe60091a68399e543031298e53ba9efd6b170e42f4962c61b115da458cda42bbf1caae49db490bde0cf1fbd7e23a4faaf2e77e395781bd74da526d45d40
+"libphonenumber-js@npm:^1.13.0":
+  version: 1.13.0
+  resolution: "libphonenumber-js@npm:1.13.0"
+  checksum: 10c0/2fb92c76a3e09a3566d5ac9632747ca582d6bd02b03d3c32fb19983aa4a32bfcf651751c0c3c465d808f0d38d1b6619a1fa41c9607687425304cfbb9d9736478
   languageName: node
   linkType: hard
 
