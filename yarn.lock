@@ -3181,20 +3181,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-config-love@npm:^152.0.0":
-  version: 152.0.0
-  resolution: "eslint-config-love@npm:152.0.0"
+"eslint-config-love@npm:^153.0.0":
+  version: 153.0.0
+  resolution: "eslint-config-love@npm:153.0.0"
   dependencies:
     "@eslint-community/eslint-plugin-eslint-comments": "npm:^4.0.0"
     "@typescript-eslint/utils": "npm:^8.58.1"
     eslint-plugin-import: "npm:^2.32.0"
     eslint-plugin-n: "npm:^17.0.0"
-    eslint-plugin-promise: "npm:^7.0.0"
+    eslint-plugin-promise: "npm:^7.2.0"
     typescript-eslint: "npm:^8.58.1"
   peerDependencies:
     eslint: ^9.35.0
     typescript: "*"
-  checksum: 10c0/73222aaff1c92e4371d60ac79ad93368390b60d6023f750969ffcdef33a342e57723862203ab2b035570d908efe4509eadb3330ffa489d1adedf9f2e1d4df998
+  checksum: 10c0/cca9f97ba580cb8b9d63c5c13cd2181bb7e66af0764afd620f6fe88e7c1e69e8ce0e5a0030ee5a7bdd763572ed045c8df0ace5c698c16a83e8d31602a9144536
   languageName: node
   linkType: hard
 
@@ -3371,7 +3371,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-promise@npm:^7.0.0":
+"eslint-plugin-promise@npm:^7.2.0":
   version: 7.3.0
   resolution: "eslint-plugin-promise@npm:7.3.0"
   dependencies:
@@ -4899,7 +4899,7 @@ __metadata:
     esbuild-plugin-copy: "npm:^2.1.1"
     esbuild-sass-plugin: "npm:^3.7.0"
     eslint: "npm:^10.3.0"
-    eslint-config-love: "npm:^152.0.0"
+    eslint-config-love: "npm:^153.0.0"
     eslint-config-prettier: "npm:^10.1.8"
     eslint-plugin-jsdoc: "npm:^62.9.0"
     eslint-plugin-jsonc: "npm:^3.1.2"
