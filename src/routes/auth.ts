@@ -1,9 +1,10 @@
+import { Router } from "express";
+
 import {
   processAuthCodeCallback,
   signIn,
   signOut,
 } from "#/controllers/auth.js";
-import { Router } from "express";
 
 const router: Router = Router();
 

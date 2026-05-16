@@ -45,17 +45,17 @@ export abstract class DomainError extends Error {
    */
   toJSON(): Record<string, unknown> {
     const json = {
-      name: this.name,
-      message: this.message,
       // stack: this.stack, // omitted for now
       cause: this.cause,
+      message: this.message,
+      name: this.name,
     };
 
     if (this.cause instanceof DomainError) {
       json.cause = this.cause.toJSON();
     } else if (this.cause instanceof Error) {
-      const { name, message } = this.cause;
-      json.cause = { name, message };
+      const { message, name } = this.cause;
+      json.cause = { message, name };
     }
 
     return json;

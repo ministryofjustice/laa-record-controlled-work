@@ -5,19 +5,8 @@
  */
 
 import i18next from "i18next";
-import path from "node:path";
 import { readFileSync } from "node:fs";
-
-/**
- * Type guard for locale data
- * @param {unknown} value - The value to check
- * @returns {boolean} True if the value is a valid locale data structure
- */
-function isLocaleData(
-  value: unknown,
-): value is Record<string, Record<string, string>> {
-  return typeof value === "object" && value !== null;
-}
+import path from "node:path";
 
 /**
  * Initialise i18next synchronously using Node.js fs methods
@@ -36,21 +25,21 @@ export function initializeI18nextSync(): void {
 
       // Initialise synchronously (blocks until complete)
       void i18next.init({
-        lng: "en",
-        fallbackLng: "en",
         debug: process.env.NODE_ENV === "development",
-
-        // Use namespaces from the JSON structure - each top-level key becomes a namespace
-        ns: Object.keys(localeData),
         defaultNS: "common",
-        nsSeparator: ".", // Use dot instead of colon for namespace separation
-        keySeparator: ".", // Keep dot for nested keys
+        fallbackLng: "en",
 
         interpolation: {
           escapeValue: false, // Modern frameworks handle XSS
           prefix: "{",
           suffix: "}",
         },
+        keySeparator: ".", // Keep dot for nested keys
+        lng: "en",
+        // Use namespaces from the JSON structure - each top-level key becomes a namespace
+        ns: Object.keys(localeData),
+
+        nsSeparator: ".", // Use dot instead of colon for namespace separation
 
         resources: {
           en: localeData,
@@ -59,13 +48,13 @@ export function initializeI18nextSync(): void {
     } catch (fileError) {
       console.warn("Locale file not found, initializing with empty resources");
       void i18next.init({
-        lng: "en",
         fallbackLng: "en",
         interpolation: {
           escapeValue: false,
           prefix: "{",
           suffix: "}",
         },
+        lng: "en",
         resources: { en: {} },
       });
     }
@@ -73,16 +62,27 @@ export function initializeI18nextSync(): void {
     console.error("Failed to initialise i18next synchronously:", error);
     // Initialise with empty resources as fallback
     void i18next.init({
-      lng: "en",
       fallbackLng: "en",
       interpolation: {
         escapeValue: false,
         prefix: "{",
         suffix: "}",
       },
+      lng: "en",
       resources: { en: {} },
     });
   }
+}
+
+/**
+ * Type guard for locale data
+ * @param {unknown} value - The value to check
+ * @returns {boolean} True if the value is a valid locale data structure
+ */
+function isLocaleData(
+  value: unknown,
+): value is Record<string, Record<string, string>> {
+  return typeof value === "object" && value !== null;
 }
 
 /**

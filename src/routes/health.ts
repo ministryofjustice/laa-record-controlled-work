@@ -1,6 +1,8 @@
-import { OK } from "#/lib/constants/httpStatus.js";
-import express from "express";
 import type { Request, Response } from "express";
+
+import express from "express";
+
+import { OK } from "#/lib/constants/httpStatus.js";
 
 const router = express.Router();
 

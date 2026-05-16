@@ -1,8 +1,7 @@
-// Import GOV.UK Frontend
-import { initAll as initGOVUK } from "govuk-frontend";
-
 // Import MOJ Frontend
 import { initAll as initMOJ } from "@ministryofjustice/frontend";
+// Import GOV.UK Frontend
+import { initAll as initGOVUK } from "govuk-frontend";
 
 /**
  * Initialises both GOV.UK Frontend and MOJ Frontend packages.

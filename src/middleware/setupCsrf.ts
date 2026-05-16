@@ -1,5 +1,7 @@
+import type { Application, NextFunction, Request, Response } from "express";
+
 import { csrfSync } from "csrf-sync";
-import type { Application, Request, Response, NextFunction } from "express";
+
 // Import CSRF token type definitions
 import "#/types/csrf-types.js";
 
@@ -25,14 +27,6 @@ const hasCSRFToken = (body: unknown): body is { _csrf: unknown } =>
 export const setupCsrf = (app: Application): void => {
   const { csrfSynchronisedProtection } = csrfSync({
     /**
-     * Skips CSRF validation for the Entra auth code callback — Entra POSTs
-     * directly to this endpoint without a token; PKCE state provides equivalent protection.
-     *
-     * @param {Request} req - The incoming request object.
-     * @returns {boolean} True if CSRF validation should be skipped.
-     */
-    skipCsrfProtection: (req: Request) => req.path === "/auth/code/callback",
-    /**
      * Extracts the CSRF token from the request body.
      *
      * @param {Request} req - The incoming request object.
@@ -45,6 +39,14 @@ export const setupCsrf = (app: Application): void => {
       }
       return undefined;
     },
+    /**
+     * Skips CSRF validation for the Entra auth code callback — Entra POSTs
+     * directly to this endpoint without a token; PKCE state provides equivalent protection.
+     *
+     * @param {Request} req - The incoming request object.
+     * @returns {boolean} True if CSRF validation should be skipped.
+     */
+    skipCsrfProtection: (req: Request) => req.path === "/auth/code/callback",
   });
 
   /**

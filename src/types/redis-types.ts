@@ -1,6 +1,7 @@
-import type { RedisConfig } from "./config-types.js";
 import type { createClient } from "redis";
 
-export type RedisClientType = ReturnType<typeof createClient>;
+import type { RedisConfig } from "./config-types.js";
 
 export type RedisClientFactory = (options: RedisConfig) => RedisClientType;
+
+export type RedisClientType = ReturnType<typeof createClient>;

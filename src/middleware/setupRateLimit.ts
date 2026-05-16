@@ -1,5 +1,7 @@
-import rateLimit from "express-rate-limit";
 import type { Application, RequestHandler } from "express";
+
+import rateLimit from "express-rate-limit";
+
 import type { Config } from "#/types/config-types.js";
 
 /**
@@ -20,9 +22,9 @@ const toNumber = (value: number | string): number =>
 export const setupRateLimit = (app: Application, config: Config): void => {
   app.use(
     rateLimit({
-      windowMs: config.RATE_WINDOW_MS,
       max: config.RATE_LIMIT_MAX,
       message: "Too many requests, please try again later.",
+      windowMs: config.RATE_WINDOW_MS,
     }),
   );
 };
@@ -35,7 +37,7 @@ export const setupRateLimit = (app: Application, config: Config): void => {
  */
 export const createAuthLimiter = (config: Config): RequestHandler =>
   rateLimit({
-    windowMs: toNumber(config.RATE_WINDOW_MS),
     max: toNumber(config.AUTH_RATE_LIMIT_MAX),
     message: "Too many attempts, please try again later.",
+    windowMs: toNumber(config.RATE_WINDOW_MS),
   });

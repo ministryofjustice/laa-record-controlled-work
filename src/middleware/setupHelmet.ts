@@ -1,3 +1,6 @@
+import type { Application, NextFunction, Request, Response } from "express";
+import type { IncomingMessage, ServerResponse } from "node:http";
+
 /**
  * Sets up Helmet middleware for the Express application to configure Content Security Policy (CSP).
  *
@@ -5,8 +8,7 @@
  */
 import helmet from "helmet";
 import crypto from "node:crypto";
-import type { Request, Response, NextFunction, Application } from "express";
-import type { IncomingMessage, ServerResponse } from "node:http";
+
 import config from "#/config.js";
 
 const RANDOMBYTES = 16;
@@ -39,7 +41,15 @@ export const helmetSetup = (app: Application): void => {
     helmet({
       contentSecurityPolicy: {
         directives: {
+          baseUri: ["'self'"], // Restrict base URI
+          connectSrc: ["'self'"],
           defaultSrc: ["'self'"],
+          fontSrc: ["'self'", "data:"], // Allow data: URIs for fonts
+          formAction: ["'self'", config.entra.authority], // Restrict form submissions but allows redirects to Entra after signout
+          frameSrc: ["'none'"], // Restrict frames
+          imgSrc: ["'self'", "data:"], // Allow data: URIs for images
+          mediaSrc: ["'self'"], // Restrict media
+          objectSrc: ["'none'"], // Restrict <object>, <embed>, and <applet> elements
           scriptSrc: [
             "'self'",
             // Dynamic nonce function for CSP - using the correct helmet function signature
@@ -60,14 +70,6 @@ export const helmetSetup = (app: Application): void => {
             },
           ],
           styleSrc: ["'self'", "'unsafe-inline'"], // Allow inline styles if needed
-          fontSrc: ["'self'", "data:"], // Allow data: URIs for fonts
-          imgSrc: ["'self'", "data:"], // Allow data: URIs for images
-          connectSrc: ["'self'"],
-          objectSrc: ["'none'"], // Restrict <object>, <embed>, and <applet> elements
-          mediaSrc: ["'self'"], // Restrict media
-          frameSrc: ["'none'"], // Restrict frames
-          formAction: ["'self'", config.entra.authority], // Restrict form submissions but allows redirects to Entra after signout
-          baseUri: ["'self'"], // Restrict base URI
           upgradeInsecureRequests: [], // Upgrade HTTP to HTTPS
         },
       },

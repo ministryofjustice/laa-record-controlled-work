@@ -1,4 +1,6 @@
 /* eslint-disable jsdoc/require-jsdoc -- not needed */
+import type { Request, Response } from "express";
+
 import {
   BAD_REQUEST,
   INTERNAL_SERVER_ERROR,
@@ -7,11 +9,10 @@ import {
   UNAUTHORIZED,
 } from "#/lib/constants/httpStatus.js";
 import { DomainError } from "#/lib/errors/domainError.js";
-import type { Request, Response } from "express";
 
 const ErrorStatuses: Record<string, number> = {
-  OAuthFailureError: UNAUTHORIZED,
   DatabaseTimeoutError: SERVICE_UNAVAILABLE,
+  OAuthFailureError: UNAUTHORIZED,
   UserNotFoundError: NOT_FOUND,
   ValidationFailureError: BAD_REQUEST,
 };
@@ -40,7 +41,7 @@ export function globalErrorHandler(
   }
 
   res.status(statusCode).json({
-    name: err.name,
     message: "Something went wrong.",
+    name: err.name,
   });
 }
