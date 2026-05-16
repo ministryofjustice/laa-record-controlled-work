@@ -2,7 +2,8 @@ import tsParser from "@typescript-eslint/parser";
 import love from "eslint-config-love";
 import jsdocPlugin from "eslint-plugin-jsdoc";
 import jsoncPlugin from "eslint-plugin-jsonc";
-import eslintPluginPrettier from "eslint-plugin-prettier/recommended";
+import prettier from "eslint-plugin-prettier/recommended";
+import perfectionist from "eslint-plugin-perfectionist";
 import globals from "globals";
 import fs from "node:fs";
 
@@ -139,8 +140,9 @@ export default [
       "@typescript-eslint/no-namespace": "off", // Namespaces are allowed in d.ts
     },
   },
+  perfectionist.configs["recommended-natural"],
   // Add prettier for automated, standardised formatting
-  eslintPluginPrettier,
+  prettier,
   // JSON linting
   ...jsoncPlugin.configs["flat/recommended-with-json"],
   // tsconfig and VS Code config files are JSONC (JSON with Comments) — allow comments in them
