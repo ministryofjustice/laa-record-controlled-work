@@ -74,13 +74,8 @@ describe("Auth Integration", () => {
   });
 
   after(async () => {
-    const closeAppSessionRedisClient =
-      appSessionRedisClient?.isOpen === true
-        ? appSessionRedisClient.quit()
-        : Promise.resolve();
-
     await Promise.all([
-      closeAppSessionRedisClient,
+      await appSessionRedisClient.quit(),
       redisContainer?.stop() ?? Promise.resolve(),
       idpContainer?.stop() ?? Promise.resolve(),
     ]);
