@@ -68,8 +68,6 @@ const createApp = async (): Promise<express.Application> => {
   // Set up cookie security for sessions
   app.set("trust proxy", TRUST_FIRST_PROXY);
 
-  app.use(session(await createSession(config)));
-
   // Set up locale middleware for internationalization
   app.use(setupLocaleMiddleware);
 
@@ -98,7 +96,6 @@ const createApp = async (): Promise<express.Application> => {
 
   // Playwright-only route: sets an authenticated session without going through Entra.
   if (ENABLE_PLAYWRIGHT_TEST_SIGNIN && process.env.NODE_ENV === "test") {
-    app.use("/test", testRouter);
     app.use("/test", testRouter);
   }
 
