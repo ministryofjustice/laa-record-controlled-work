@@ -2,8 +2,8 @@ include docker-images.env
 export
 
 MOCHA    := ./node_modules/.bin/mocha
-TEST_DIR := tests/integration
-# INTEGRATION_DIR := tests/integration
+TEST_DIR := tests/unit
+INTEGRATION_DIR := tests/integration
 # DEBUG=testcontainers* 
 
 
@@ -75,4 +75,4 @@ else
 endif
 
 integration:
-	$(MOCHA) '$(INTEGRATION_DIR)/**/*.spec.ts'
+	$(MOCHA) $(MOCHA_OPTS) '$(INTEGRATION_DIR)/**/*.spec.ts'
