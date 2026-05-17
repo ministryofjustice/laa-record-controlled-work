@@ -89,9 +89,7 @@ describe("Auth Integration", () => {
   });
 
   afterEach(async () => {
-    if (appSessionRedisClient?.isOpen === true) {
       await appSessionRedisClient.flushAll();
-    }
   });
 
   describe("GET /health", () => {
