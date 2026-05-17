@@ -93,8 +93,6 @@ const createApp = async (): Promise<express.Application> => {
   // Setup express-session using redis
   app.use(session(await createSession(config)));
 
-  // CSRF protection applied globally; /auth/code/callback is excluded via
-  // skipCsrfProtection (PKCE state provides the equivalent protection for that endpoint).
   setupCsrf(app);
 
   // Playwright-only route: sets an authenticated session without going through Entra.

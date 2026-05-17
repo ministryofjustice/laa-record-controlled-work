@@ -41,7 +41,7 @@ export const processAuthCodeCallback = async (
   next: NextFunction,
 ): Promise<void> => {
   try {
-    const { success, data } = authCodeResponseSchema.safeParse(req.body);
+    const { success, data } = authCodeResponseSchema.safeParse(req.query);
 
     if (!success) {
       res.status(BAD_REQUEST).send("Invalid redirect payload");

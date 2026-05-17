@@ -11,7 +11,7 @@ export const msalConfig = {
 
 export const scopes: string[] = ["openid", "profile"];
 export const authRequestDefaults = {
-  responseMode: "form_post",
+  responseMode: "query",
   prompt: "select_account",
   scopes,
   redirectUri: config.entra.redirectUri,
