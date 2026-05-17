@@ -14,8 +14,9 @@ router.get("/signin", (req, res, next) => {
     name: "Test User",
     idTokenClaims: {},
   };
-  req.session.save((err: Error | undefined | null) => {
-    if (err) {
+
+  req.session.save((err: unknown) => {
+    if (err !== undefined) {
       next(err);
       return;
     }

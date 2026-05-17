@@ -11,6 +11,6 @@ router.get("/signin", signIn);
 
 router.post("/signout", signOut);
 
-router.post("/code/callback", processAuthCodeCallback);
+router.get("/code/callback", processAuthCodeCallback);
 
 export default router;

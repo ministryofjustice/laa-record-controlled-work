@@ -74,13 +74,12 @@ describe("Auth Controller", () => {
   });
 
   describe("processAuthCodeCallback()", () => {
-    const REQUEST_BODY = { code: "auth-code-abc", state: "encoded-state" };
+    const QUERY_PARAMS = { code: "auth-code-abc", state: "encoded-state" };
 
     it("redirects to successRedirect on success", async () => {
       const res = await request(mockApp)
-        .post("/auth/code/callback")
-        .type("form")
-        .send(REQUEST_BODY);
+        .get("/auth/code/callback")
+        .query(QUERY_PARAMS);
 
       expect(authServiceStub.processAuthCodeCallback.calledOnce).to.be.true;
       expect(res.status).to.equal(FOUND);
@@ -88,12 +87,11 @@ describe("Auth Controller", () => {
     });
 
     it("responds with 400 when auth request body doesn't match schema", async () => {
-      const wrongRequestBody = { missing: "property" };
+      const wrongQueryParams = { missing: "property" };
 
       const res = await request(mockApp)
-        .post("/auth/code/callback")
-        .type("form")
-        .send(wrongRequestBody);
+        .get("/auth/code/callback")
+        .query(wrongQueryParams);
 
       expect(authServiceStub.processAuthCodeCallback.called).to.be.false;
       expect(res.status).to.equal(BAD_REQUEST);
@@ -105,9 +103,8 @@ describe("Auth Controller", () => {
       authServiceStub.processAuthCodeCallback.resolves(failure(error));
 
       const res = await request(mockApp)
-        .post("/auth/code/callback")
-        .type("form")
-        .send(REQUEST_BODY);
+        .get("/auth/code/callback")
+        .query(QUERY_PARAMS);
 
       expect(res.status).to.equal(UNAUTHORIZED);
       expect(res.text).to.equal("Token acquisition failed");
@@ -119,9 +116,8 @@ describe("Auth Controller", () => {
       authServiceStub.processAuthCodeCallback.resolves(failure(error));
 
       const res = await request(mockApp)
-        .post("/auth/code/callback")
-        .type("form")
-        .send(REQUEST_BODY);
+        .get("/auth/code/callback")
+        .query(QUERY_PARAMS);
 
       expect(res.status).to.equal(BAD_REQUEST);
       expect(res.text).to.equal(errorMessage);

@@ -56,7 +56,7 @@ jobs:
           docker save laa-record-controlled-work -o image.tar
 
       - name: Run Snyk to scan Docker image from tarball
-        uses: snyk/actions/docker@9adf32b1121593767fc3c057af55b55db032dc04 # master
+        uses: snyk/actions/docker@9cf6ca713d71123d2d229cc3d7f145b96ea3c518 # master
         with:
           image: image.tar
           args: --docker --severity-threshold=high --policy-path=.snyk
@@ -93,7 +93,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Set up AWS credentials for ECR and Kubernetes
-        uses: aws-actions/configure-aws-credentials@ec61189d14ec14c8efccab744f656cffd0e33f37 # v6.1.0
+        uses: aws-actions/configure-aws-credentials@d979d5b3a71173a29b74b5b88418bfda9437d885 # v6.1.1
         with:
           role-to-assume: ${{ secrets.ECR_ROLE_TO_ASSUME }}
           aws-region: ${{ vars.ECR_REGION }}
@@ -121,7 +121,7 @@ jobs:
           image_tag: ${{ github.event.pull_request.head.sha || github.sha }}
 
   deploy-uat:
-    if: github.event_name != 'merge_group'
+    if: github.event_name != 'merge_group' && !(github.event_name == 'pull_request' && github.actor == 'renovate[bot]')
     uses: ./.github/workflows/deploy-environment.yml
     with:
       app-environment: uat

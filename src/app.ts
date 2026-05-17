@@ -17,6 +17,7 @@ import { setupLocaleMiddleware } from "#/middleware/setupLocale.js";
 import authRouter from "#/routes/auth.js";
 import indexRouter from "#/routes/index.js";
 import testRouter from "#/routes/test.js";
+import healthRouter from "#/routes/health.js";
 
 import compression from "compression";
 import type { Request, Response } from "express";
@@ -38,6 +39,8 @@ const createApp = async (): Promise<express.Application> => {
   initializeI18nextSync();
 
   const app = express();
+
+  app.use("/", healthRouter);
 
   // Set up common middleware for handling cookies, body parsing, etc.
   standardMiddleware(app);
@@ -88,12 +91,14 @@ const createApp = async (): Promise<express.Application> => {
     app.use(morgan("dev"));
   }
 
-  // CSRF protection applied globally; /auth/code/callback is excluded via
-  // skipCsrfProtection (PKCE state provides the equivalent protection for that endpoint).
+  // Setup express-session using redis
+  app.use(session(await createSession(config)));
+
   setupCsrf(app);
 
   // Playwright-only route: sets an authenticated session without going through Entra.
   if (ENABLE_PLAYWRIGHT_TEST_SIGNIN && process.env.NODE_ENV === "test") {
+    app.use("/test", testRouter);
     app.use("/test", testRouter);
   }
 

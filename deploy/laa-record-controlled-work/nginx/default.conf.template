@@ -1,35 +1,41 @@
+include               /etc/nginx/maps.conf;
 # Do not include nginx version in error pages or Server header
-server_tokens off;
-
+server_tokens         off;
 # Prevent oversized request bodies; sufficient for all expected form submissions
-client_max_body_size 10m;
+client_max_body_size  10m;
 
 server {
   listen 8080;
 
+  # MoJ CP/EKS ranges
+  set_real_ip_from   10.0.0.0/8;
+  set_real_ip_from   172.16.0.0/12;
+  real_ip_header     X-Forwarded-For;
+  real_ip_recursive  on;
+
   location / {
-    proxy_pass             http://${NGINX_UPSTREAM_RCW};
+    include     /etc/nginx/proxy.conf;
+    proxy_pass  http://${NGINX_UPSTREAM_RCW};
+  }
 
-    # Use HTTP/1.1 upstream so nginx controls request framing; partially mitigates HTTP desync attacks
-    proxy_http_version     1.1;
+  location /ccq/assets/ {
+    include     /etc/nginx/proxy.conf;
+    proxy_pass  http://${NGINX_UPSTREAM_CCQ};
+    
+    # Strip session cookies from assets for performance
+    proxy_hide_header        Set-Cookie;
+    proxy_ignore_headers     Set-Cookie;
 
-    # Clear hop-by-hop headers before forwarding to prevent connection state ambiguity
-    proxy_set_header       Connection        "";
+    # Force browser caching
+    expires                  30d;
+    add_header Cache-Control "public, max-age=2592000";
+    access_log               off;
+  }
 
-    # Strip Transfer-Encoding to prevent TE.CL request smuggling
-    proxy_set_header       Transfer-Encoding "";
-
-    # Node/Express sets this header; suppress it to avoid leaking implementation details
-    proxy_hide_header      X-Powered-By;
-
-    proxy_set_header       Host              $host;
-    proxy_set_header       X-Real-IP         $remote_addr;
-    proxy_set_header       X-Forwarded-For   $proxy_add_x_forwarded_for;
-    proxy_set_header       X-Forwarded-Proto $scheme;
-
-    proxy_connect_timeout  10s;
-    proxy_send_timeout     60s;
-    proxy_read_timeout     60s;
+  # match anything with `/eligibility` and forward the whole thing to CCQ
+  location ~ /eligibility(/|$) {
+    include     /etc/nginx/proxy.conf;
+    proxy_pass  http://${NGINX_UPSTREAM_CCQ};
   }
 }
 
@@ -39,7 +45,7 @@ server {
 
   location /nginx-health {
     access_log off;
-    return 200 "ok";
     add_header Content-Type text/plain;
+    return 200 "ok";
   }
 }
