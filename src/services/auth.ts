@@ -10,7 +10,6 @@ import { randomUUID } from "node:crypto";
 
 import type { AuthCodeResponse, PKCECodes } from "#/types/auth-types.js";
 
-import config from "#/config.js";
 import { authRequestDefaults, msalConfig } from "#/config/auth.js";
 import { devError } from "#/lib/devLogger.js";
 import { type Either, failure, success } from "#/lib/either.js";
@@ -62,21 +61,6 @@ export class AuthService {
     msalClient?: ConfidentialClientApplication,
   ): AuthService {
     return new AuthService(sessionData, msalClient);
-  }
-
-  /**
-   * Builds the Microsoft Entra ID logout URL including the post-logout redirect URI.
-   * @param {string} [idToken] - The ID token to include as a hint for Entra to end the correct session.
-   * @returns {string} The fully-formed Entra logout URL.
-   */
-  public static getLogoutUrl(idToken?: string): string {
-    const params = new URLSearchParams({
-      post_logout_redirect_uri: config.entra.postLogoutRedirectUri,
-    });
-    if (idToken !== undefined) {
-      params.set("id_token_hint", idToken);
-    }
-    return `${config.entra.authority}/oauth2/v2.0/logout?${params.toString()}`;
   }
 
   /**

@@ -86,18 +86,14 @@ export const signOut = (
   next: NextFunction,
 ): void => {
   try {
-    const {
-      session: { idToken },
-    } = req;
-
-    req.session.destroy((error) => {
-      if (error !== undefined && error !== null) {
+    req.session.destroy((error: Error | null) => {
+      if (error) {
         next(error);
         return;
       }
 
       res.clearCookie(config.session.name);
-      res.redirect(AuthService.getLogoutUrl(idToken));
+      res.redirect("/");
     });
   } catch (error) {
     next(error);
