@@ -9,26 +9,15 @@ import {
   validation,
   Self,
   access,
-  match,
-  Transformer,
   Query,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 import { HtmlBlock } from "@ministryofjustice/hmpps-forge/core/components";
 import {
   GovUKButton,
   GovUKRadioInput,
-  GovUKPanel,
   GovUKHeading,
   GovUKBody,
   GovUKBackLink,
-  GovUKSummaryList,
-  GovUKTextInput,
-  GovUKDateInputFull,
-  GovUKUtilityClasses,
-  GovUKValidations,
-  GovUKTextareaInput,
-  GovUKCharacterCount,
-  GovUKLinkButton,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
 const patternCode = "newCase";
