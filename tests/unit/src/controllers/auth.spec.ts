@@ -123,14 +123,7 @@ describe("Auth Controller", () => {
 
   describe("signOut()", () => {
     it("redirects to /", async () => {
-      const agent = request.agent(mockApp);
-      const tokenRes = await agent.get("/csrf-token");
-      const csrfToken = tokenRes.body.csrfToken as string;
-
-      const res = await agent
-        .post("/auth/signout")
-        .type("form")
-        .send({ _csrf: csrfToken });
+      const res = await request(mockApp).get("/auth/signout");
 
       expect(res.status).to.equal(FOUND);
       expect(res.headers.location).to.equal("/");
@@ -139,13 +132,8 @@ describe("Auth Controller", () => {
     it("destroys the session and clears the cookie before redirecting", async () => {
       const agent = request.agent(mockApp);
       await agent.get("/auth/signin"); // establishes a session cookie
-      const tokenRes = await agent.get("/csrf-token");
-      const csrfToken = tokenRes.body.csrfToken as string;
 
-      const res = await agent
-        .post("/auth/signout")
-        .type("form")
-        .send({ _csrf: csrfToken });
+      const res = await agent.get("/auth/signout");
 
       expect(res.status).to.equal(FOUND);
       const rawCookies = res.headers["set-cookie"];
