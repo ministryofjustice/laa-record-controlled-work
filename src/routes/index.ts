@@ -1,9 +1,11 @@
-import { INTERNAL_SERVER_ERROR } from "#/lib/constants/httpStatus.js";
+import type { NextFunction, Request, Response } from "express";
+
+import express from "express";
+
 import { getPerson, postPerson } from "#/controllers/personController.js";
 import { validatePerson } from "#/controllers/personSchema.js";
+import { INTERNAL_SERVER_ERROR } from "#/lib/constants/httpStatus.js";
 import { exampleApiService } from "#/services/exampleApiService.js";
-import type { NextFunction, Request, Response } from "express";
-import express from "express";
 
 // Create a new router
 const router = express.Router();
@@ -24,8 +26,8 @@ router.get(
     try {
       // Use the BaseApiService - returns raw axios response (no domain transformation)
       const response = await exampleApiService.getUsers(req.axiosMiddleware, {
-        _page: typeof req.query.page === "string" ? req.query.page : "1",
         _limit: typeof req.query.limit === "string" ? req.query.limit : "10",
+        _page: typeof req.query.page === "string" ? req.query.page : "1",
       });
 
       // Template users add their own response handling here

@@ -9,6 +9,22 @@ export class MissingAuthCodeRequestError extends DomainError {
   }
 }
 
+export class MsalError extends DomainError {
+  public readonly name = "MsalError";
+
+  constructor(cause?: unknown) {
+    super("Authentication service error", cause);
+  }
+}
+
+export class PkceGenerationError extends DomainError {
+  public readonly name = "PkceGenerationError";
+
+  constructor(cause?: unknown) {
+    super("Failed to generate PKCE challenge", cause);
+  }
+}
+
 export class StateMismatchError extends DomainError {
   public readonly name = "StateMismatchError";
 
@@ -22,21 +38,5 @@ export class TokenAcquisitionError extends DomainError {
 
   constructor(cause?: unknown) {
     super("Token acquisition failed", cause);
-  }
-}
-
-export class PkceGenerationError extends DomainError {
-  public readonly name = "PkceGenerationError";
-
-  constructor(cause?: unknown) {
-    super("Failed to generate PKCE challenge", cause);
-  }
-}
-
-export class MsalError extends DomainError {
-  public readonly name = "MsalError";
-
-  constructor(cause?: unknown) {
-    super("Authentication service error", cause);
   }
 }

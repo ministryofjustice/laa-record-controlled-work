@@ -6,6 +6,7 @@
  */
 
 import { setupServer } from "msw/node";
+
 import { handlers } from "../tests/playwright/factories/handlers/index.js";
 
 // Initialize MSW before importing the app

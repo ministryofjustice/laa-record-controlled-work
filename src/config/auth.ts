@@ -1,20 +1,21 @@
-import config from "#/config.js";
 import { ConfidentialClientApplication } from "@azure/msal-node";
+
+import config from "#/config.js";
 
 export const msalConfig = {
   auth: {
-    clientId: config.entra.clientId,
     authority: config.entra.authority,
+    clientId: config.entra.clientId,
     clientSecret: config.entra.clientSecret,
   },
 };
 
 export const scopes: string[] = ["openid", "profile"];
 export const authRequestDefaults = {
-  responseMode: "form_post",
   prompt: "select_account",
-  scopes,
   redirectUri: config.entra.redirectUri,
+  responseMode: "form_post",
+  scopes,
 } as const;
 
 export const msalClient: ConfidentialClientApplication =

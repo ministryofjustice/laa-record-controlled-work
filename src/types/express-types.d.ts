@@ -1,4 +1,5 @@
 import type session from "express-session";
+
 import type { AxiosInstanceWrapper } from "./axios-instance-wrapper.js";
 
 /**
@@ -11,13 +12,13 @@ export interface ExpressLocaleLoader {
 declare global {
   namespace Express {
     interface Request {
-      axiosMiddleware: AxiosInstanceWrapper;
-      locale: ExpressLocaleLoader;
-
       // INFO: extend Express Request type for MSAL integration of user and tokens and allowing undefined in session
       accessToken?: string;
+      axiosMiddleware: AxiosInstanceWrapper;
+
+      locale: ExpressLocaleLoader;
+      session: Partial<session.SessionData> & session.Session;
       user?: AccountInfo;
-      session: session.Session & Partial<session.SessionData>;
     }
   }
 }
