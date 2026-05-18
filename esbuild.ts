@@ -18,8 +18,8 @@ const buildNumber = Math.floor(
 ).toString();
 
 export interface SassPluginOptions {
-  resolveDir?: string;
   loadPaths?: string[];
+  resolveDir?: string;
   transform?: (source: string) => string;
   // Add other possible options
 }
@@ -100,9 +100,8 @@ const buildScss = async (
   watch = false,
 ): Promise<esbuild.BuildContext | undefined> => {
   const options: esbuild.BuildOptions = {
-    entryPoints: ["src/scss/main.scss"],
     bundle: true,
-    outfile: `public/css/main.${buildNumber}.css`,
+    entryPoints: ["src/scss/main.scss"],
     external: [
       "*.woff",
       "*.woff2",
@@ -112,6 +111,12 @@ const buildScss = async (
       "*.jpeg",
       "*.gif",
     ],
+    loader: {
+      ".css": "css",
+      ".scss": "css",
+    },
+    minify: process.env.NODE_ENV === "production",
+    outfile: `public/css/main.${buildNumber}.css`,
     plugins: [
       sassPlugin({
         loadPaths: [
@@ -135,11 +140,6 @@ const buildScss = async (
             ),
       } satisfies SassPluginOptions),
     ],
-    loader: {
-      ".scss": "css",
-      ".css": "css",
-    },
-    minify: process.env.NODE_ENV === "production",
     sourcemap: process.env.NODE_ENV !== "production",
   };
 
@@ -166,20 +166,20 @@ const buildAppJs = async (
   watch = false,
 ): Promise<esbuild.BuildContext | undefined> => {
   const options: esbuild.BuildOptions = {
-    entryPoints: ["src/server.ts"],
     bundle: true,
-    platform: "node",
-    target: "esnext",
+    entryPoints: ["src/server.ts"],
+    external: externalModules,
     format: "esm",
-    sourcemap: process.env.NODE_ENV !== "production",
-    minify: process.env.NODE_ENV === "production",
     loader: {
       ".js": "jsx",
-      ".ts": "tsx",
       ".json": "json",
+      ".ts": "tsx",
     },
-    external: externalModules,
+    minify: process.env.NODE_ENV === "production",
     outfile: "public/app.js",
+    platform: "node",
+    sourcemap: process.env.NODE_ENV !== "production",
+    target: "esnext",
   };
 
   if (watch) {
@@ -205,14 +205,14 @@ const buildCustomJs = async (
   watch = false,
 ): Promise<esbuild.BuildContext | undefined> => {
   const options: esbuild.BuildOptions = {
-    entryPoints: ["src/browser/custom.ts"],
     bundle: true,
-    platform: "browser",
-    target: "esnext",
+    entryPoints: ["src/browser/custom.ts"],
     format: "esm",
-    sourcemap: process.env.NODE_ENV !== "production",
     minify: process.env.NODE_ENV === "production",
     outfile: `public/js/custom.${buildNumber}.min.js`,
+    platform: "browser",
+    sourcemap: process.env.NODE_ENV !== "production",
+    target: "esnext",
   };
 
   if (watch) {
@@ -238,15 +238,15 @@ const buildFrontendPackages = async (
   watch = false,
 ): Promise<esbuild.BuildContext | undefined> => {
   const options: esbuild.BuildOptions = {
-    entryPoints: ["src/browser/frontendPackagesEntry.ts"],
     bundle: true,
-    platform: "browser",
-    target: "esnext",
+    entryPoints: ["src/browser/frontendPackagesEntry.ts"],
     format: "esm",
-    sourcemap: process.env.NODE_ENV !== "production",
     minify: process.env.NODE_ENV === "production",
-    treeShaking: false, // Disable tree shaking to preserve side-effect imports
     outfile: `public/js/frontend-packages.${buildNumber}.min.js`,
+    platform: "browser",
+    sourcemap: process.env.NODE_ENV !== "production",
+    target: "esnext",
+    treeShaking: false, // Disable tree shaking to preserve side-effect imports
   };
 
   if (watch) {

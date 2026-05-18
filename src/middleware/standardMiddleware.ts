@@ -1,7 +1,9 @@
 import type { Application } from "express";
-import express from "express";
-import cookieParser from "cookie-parser";
+
 import bodyParser from "body-parser";
+import cookieParser from "cookie-parser";
+import express from "express";
+
 import config from "#/config.js";
 
 /**

@@ -1,7 +1,9 @@
-import * as redis from "#/lib/redis.js";
-import type { Config } from "#/types/config-types.js";
 import type { RedisStore } from "connect-redis";
 import type { SessionOptions } from "express-session";
+
+import type { Config } from "#/types/config-types.js";
+
+import * as redis from "#/lib/redis.js";
 
 /**
  * Express middleware to set up session store instance

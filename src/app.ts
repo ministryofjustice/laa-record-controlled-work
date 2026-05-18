@@ -1,29 +1,29 @@
-import config from "#/config.js";
+import type { Request, Response } from "express";
 
-import { helmetSetup as setupHelmet } from "#/middleware/setupHelmet.js";
-import { setupNunjucks } from "#/middleware/setupNunjucks.js";
-import {
-  setupRateLimit,
-  createAuthLimiter,
-} from "#/middleware/setupRateLimit.js";
+import compression from "compression";
+import express from "express";
+import session from "express-session";
+import morgan from "morgan";
+
+import config from "#/config.js";
 import { initializeI18nextSync } from "#/lib/i18nLoader.js";
 import { createSession } from "#/lib/session.js";
 import { axiosMiddleware } from "#/middleware/apiMiddleware.js";
-import { standardMiddleware } from "#/middleware/standardMiddleware.js";
 import { requireAuth } from "#/middleware/requireAuth.js";
 import { setupConfig } from "#/middleware/setupConfigs.js";
 import { setupCsrf } from "#/middleware/setupCsrf.js";
+import { helmetSetup as setupHelmet } from "#/middleware/setupHelmet.js";
 import { setupLocaleMiddleware } from "#/middleware/setupLocale.js";
+import { setupNunjucks } from "#/middleware/setupNunjucks.js";
+import {
+  createAuthLimiter,
+  setupRateLimit,
+} from "#/middleware/setupRateLimit.js";
+import { standardMiddleware } from "#/middleware/standardMiddleware.js";
 import authRouter from "#/routes/auth.js";
+import healthRouter from "#/routes/health.js";
 import indexRouter from "#/routes/index.js";
 import testRouter from "#/routes/test.js";
-import healthRouter from "#/routes/health.js";
-
-import compression from "compression";
-import type { Request, Response } from "express";
-import express from "express";
-import morgan from "morgan";
-import session from "express-session";
 
 /**
  * Creates and configures an Express application.

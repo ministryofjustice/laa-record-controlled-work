@@ -1,8 +1,10 @@
+import { RedisStore } from "connect-redis";
 import { createClient } from "redis";
-import { SECOND } from "./constants/time.js";
+
 import type { RedisConfig } from "#/types/config-types.js";
 import type { RedisClientType } from "#/types/redis-types.js";
-import { RedisStore } from "connect-redis";
+
+import { SECOND } from "./constants/time.js";
 
 /**
  * Create and configure Redis client
@@ -13,7 +15,6 @@ export const createRedisClient = (config: RedisConfig): RedisClientType => {
   console.log("Connecting to Redis at, ", config.url);
 
   const client = createClient({
-    url: config.url,
     socket: {
       connectTimeout: config.socketConnectionTimeout,
       reconnectStrategy: (retries: number) => {
@@ -31,6 +32,7 @@ export const createRedisClient = (config: RedisConfig): RedisClientType => {
         return delay;
       },
     },
+    url: config.url,
   });
 
   client.on("error", (err) => {

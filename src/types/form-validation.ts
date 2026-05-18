@@ -2,12 +2,12 @@
  * Common types and interfaces for form validation and error handling.
  */
 
-export interface InputError {
-  fieldName: string;
+export interface ErrorSummary {
+  href?: string;
   text: string;
 }
 
-export interface ErrorSummary {
+export interface InputError {
+  fieldName: string;
   text: string;
-  href?: string;
 }
