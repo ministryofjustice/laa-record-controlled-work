@@ -10,7 +10,7 @@ const router: Router = Router();
 
 router.get("/signin", signIn);
 
-router.post("/signout", signOut);
+router.get("/signout", signOut);
 
 router.get("/code/callback", processAuthCodeCallback);
 

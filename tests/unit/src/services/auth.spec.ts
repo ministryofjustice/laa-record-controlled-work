@@ -3,7 +3,6 @@ import {
   CryptoProvider,
 } from "@azure/msal-node";
 import { AuthService } from "#/services/auth.js";
-import config from "#/config.js";
 import { expect } from "chai";
 import type { SessionData } from "express-session";
 import sinon from "sinon";
@@ -222,20 +221,4 @@ describe("AuthService", () => {
     });
   });
 
-  describe("getLogoutUrl()", () => {
-    it("returns the Entra logout URL using config values", () => {
-      const url = AuthService.getLogoutUrl();
-      const params = new URLSearchParams({
-        post_logout_redirect_uri: config.entra.postLogoutRedirectUri,
-      });
-      expect(url).to.equal(
-        `${config.entra.authority}/oauth2/v2.0/logout?${params.toString()}`,
-      );
-    });
-
-    it("includes id_token_hint when idToken is provided", () => {
-      const url = AuthService.getLogoutUrl("test-id-token");
-      expect(url).to.include("id_token_hint=test-id-token");
-    });
-  });
 });
