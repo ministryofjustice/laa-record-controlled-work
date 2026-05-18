@@ -842,6 +842,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@ministryofjustice/hmpps-forge@npm:^0.1.0-alpha.14":
+  version: 0.1.0-alpha.14
+  resolution: "@ministryofjustice/hmpps-forge@npm:0.1.0-alpha.14"
+  dependencies:
+    express: "npm:^4.21.0 || ^5.0.0"
+    http-errors: "npm:^2.0.0"
+    nunjucks: "npm:^3.2.4"
+    zod: "npm:^4.1.5"
+  checksum: 10c0/0e9fc52e1374cffdfa793901360f9aaf42848679cdb158a1fc32c92b31c8faafe339fbf677a62cacceb9cc181c66b1b5e5809a587d842131ef543216d66bfe4d
+  languageName: node
+  linkType: hard
+
 "@mswjs/interceptors@npm:^0.41.3":
   version: 0.41.9
   resolution: "@mswjs/interceptors@npm:0.41.9"
@@ -3576,7 +3588,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"express@npm:^5.2.1":
+"express@npm:^4.21.0 || ^5.0.0, express@npm:^5.2.1":
   version: 5.2.1
   resolution: "express@npm:5.2.1"
   dependencies:
@@ -4889,7 +4901,8 @@ __metadata:
     "@azure/msal-node": "npm:^5.2.1"
     "@eslint/js": "npm:^10.0.1"
     "@ministryofjustice/frontend": "npm:9.0.0"
-    "@playwright/test": "npm:^1.60.0"
+    "@ministryofjustice/hmpps-forge": "npm:^0.1.0-alpha.14"
+    "@playwright/test": "npm:^1.59.1"
     "@types/chai": "npm:^5.2.3"
     "@types/chai-as-promised": "npm:^8.0.2"
     "@types/compression": "npm:^1.8.1"
@@ -7760,7 +7773,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zod@npm:^4.4.3":
+"zod@npm:^4.1.5, zod@npm:^4.4.3":
   version: 4.4.3
   resolution: "zod@npm:4.4.3"
   checksum: 10c0/7ea31b558e88f9faf44f31dd185e2e1cbf51fed3081787fb96cc2534749b50c0acfc6da7f0922a7353ed092dd358c7d50c28ea96c94d04af64191bd33152eca3

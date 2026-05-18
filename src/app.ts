@@ -25,6 +25,15 @@ import healthRouter from "#/routes/health.js";
 import indexRouter from "#/routes/index.js";
 import testRouter from "#/routes/test.js";
 
+import { Forge } from "@ministryofjustice/hmpps-forge/core";
+import {
+  ExpressFrameworkAdapter,
+  nunjucksFunctions,
+} from "@ministryofjustice/hmpps-forge/express-nunjucks";
+import { govukComponents } from "@ministryofjustice/hmpps-forge/govuk-components";
+import { mojComponents } from "@ministryofjustice/hmpps-forge/moj-components";
+import recordNewCase from "#/journeys/record-new-case/index.js";
+
 const TRUST_FIRST_PROXY = 1;
 const ENABLE_PLAYWRIGHT_TEST_SIGNIN =
   process.env.PLAYWRIGHT_TEST_SIGNIN === "true";
@@ -73,7 +82,18 @@ const createApp = async (): Promise<express.Application> => {
   app.use(setupLocaleMiddleware);
 
   // Set up Nunjucks as the template engine
-  setupNunjucks(app);
+  // Set up Nunjucks as the template engine
+  const nunjucksEnv = setupNunjucks(app);
+
+  const forge = new Forge({
+    frameworkAdapter: ExpressFrameworkAdapter.configure({ nunjucksEnv }),
+  });
+
+  forge
+    .registerGlobalComponents(govukComponents)
+    .registerGlobalComponents(mojComponents)
+    .registerGlobalFunctions(nunjucksFunctions)
+    .registerPackage(recordNewCase);
 
   // Set up rate limiting
   setupRateLimit(app, config);
@@ -109,6 +129,9 @@ const createApp = async (): Promise<express.Application> => {
     const { default: livereload } = await import("connect-livereload");
     app.use(livereload());
   }
+
+  app.use(express.urlencoded({ extended: true }));
+  app.use("/", forge.getRouter() as express.Router);
 
   return app;
 };
