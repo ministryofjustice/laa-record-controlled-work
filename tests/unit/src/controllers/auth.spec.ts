@@ -15,11 +15,8 @@ import { createMockApp } from "../../utils.js";
 
 const AUTH_CODE_URL = "https://login.microsoftonline.com/auth";
 const SUCCESS_REDIRECT = "/case/123";
-const LOGOUT_URL =
-  "https://login.microsoftonline.com/tenant/oauth2/v2.0/logout?post_logout_redirect_uri=https://app/signed-out";
 
 describe("Auth Controller", () => {
-  let getLogoutUrlStub: sinon.SinonStub;
   let authServiceStub: {
     getAuthCodeUrl: sinon.SinonStub;
     processAuthCodeCallback: sinon.SinonStub;
@@ -43,10 +40,6 @@ describe("Auth Controller", () => {
     sinon
       .stub(AuthService, "create")
       .returns(authServiceStub as unknown as AuthService);
-
-    getLogoutUrlStub = sinon
-      .stub(AuthService, "getLogoutUrl")
-      .returns(LOGOUT_URL);
   });
 
   afterEach(() => {
@@ -125,31 +118,18 @@ describe("Auth Controller", () => {
   });
 
   describe("signOut()", () => {
-    it("redirects to the URL returned by authService.getLogoutUrl()", async () => {
-      const agent = request.agent(mockApp);
-      const tokenRes = await agent.get("/csrf-token");
-      const csrfToken = tokenRes.body.csrfToken as string;
+    it("redirects to /", async () => {
+      const res = await request(mockApp).get("/auth/signout");
 
-      const res = await agent
-        .post("/auth/signout")
-        .type("form")
-        .send({ _csrf: csrfToken });
-
-      expect(getLogoutUrlStub.calledOnce).to.be.true;
       expect(res.status).to.equal(FOUND);
-      expect(res.headers.location).to.equal(LOGOUT_URL);
+      expect(res.headers.location).to.equal("/");
     });
 
     it("destroys the session and clears the cookie before redirecting", async () => {
       const agent = request.agent(mockApp);
       await agent.get("/auth/signin"); // establishes a session cookie
-      const tokenRes = await agent.get("/csrf-token");
-      const csrfToken = tokenRes.body.csrfToken as string;
 
-      const res = await agent
-        .post("/auth/signout")
-        .type("form")
-        .send({ _csrf: csrfToken });
+      const res = await agent.get("/auth/signout");
 
       expect(res.status).to.equal(FOUND);
       const rawCookies = res.headers["set-cookie"];
