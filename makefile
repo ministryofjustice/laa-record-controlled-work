@@ -7,17 +7,6 @@ INTEGRATION_DIR := tests/integration
 # DEBUG=testcontainers* 
 
 
-# Mirrors .mocharc.json options (excluding spec) which allows single file runs in local without impacting CICD
-MOCHA_OPTS := --no-config \
-	--exit \
-	--require tests/unit/setup.ts \
-	--node-option no-warnings \
-	--node-option import=tsx \
-	--extension ts \
-	--extension tsx \
-	--reporter list
-
-
 .PHONY: watch dev unit e2e e2e-ui test-all lint docker-up
 
 # 	op run --env-file=.env uses 1Password to load environment variables securely
@@ -69,10 +58,10 @@ ifdef file
 		echo "$$MATCHES"; \
 		exit 1; \
 	fi; \
-	$(MOCHA) $(MOCHA_OPTS) "$$MATCHES"
+	$(MOCHA) "$$MATCHES"
 else
 	$(MOCHA) --recursive '$(TEST_DIR)/**/*.spec.ts'
 endif
 
 integration:
-	$(MOCHA) $(MOCHA_OPTS) '$(INTEGRATION_DIR)/**/*.spec.ts'
+	$(MOCHA) --recursive '$(INTEGRATION_DIR)/**/*.spec.ts'
