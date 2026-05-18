@@ -20,115 +20,42 @@ import {
   TOO_MANY_REQUESTS,
   UNAUTHORIZED,
 } from "#/lib/constants/httpStatus.js";
+
 import { devError } from "./devLogger.js";
 
 /**
- * Type guard for Axios error with response
- * @param {unknown} error - Error to check
- * @returns {boolean} True if error is an Axios error with response
+ * Create a processed error with user-friendly message for global error handler
+ * @param {unknown} originalError - Original error object
+ * @param {string} context - Context description for logging (e.g., "loading cases", "fetching client details")
+ * @returns {Error} Processed error with user-friendly message
  */
-function isAxiosError(error: unknown): error is {
-  response: { status: number; data?: unknown; statusText?: string };
-} {
-  return (
-    error !== null &&
-    error !== undefined &&
-    typeof error === "object" &&
-    "response" in error &&
-    error.response !== null &&
-    typeof error.response === "object" &&
-    "status" in error.response &&
-    typeof error.response.status === "number"
-  );
+export function createProcessedError(
+  originalError: unknown,
+  context: string,
+): Error {
+  // Extract user-friendly message
+  const userFriendlyMessage = extractErrorMessage(originalError);
+
+  // Log the error with context
+  devError(`Error ${context}: ${userFriendlyMessage}`);
+
+  // Create processed error with user-friendly message
+  const processedError = new Error(userFriendlyMessage);
+  processedError.cause = originalError; // Preserve original error for debugging
+
+  return processedError;
 }
 
 /**
- * Type guard for network error
- * @param {unknown} error - Error to check
- * @returns {boolean} True if error is a network error
- */
-function isNetworkError(
-  error: unknown,
-): error is { code: string; message?: string } {
-  return (
-    error !== null &&
-    error !== undefined &&
-    typeof error === "object" &&
-    "code" in error &&
-    typeof error.code === "string"
-  );
-}
-
-/**
- * Get user-friendly message for HTTP status codes
- * @param {number} status - HTTP status code
+ * Extract error message and log it with context (for API services)
+ * @param {unknown} error - Original error object
+ * @param {string} context - Context description for logging (e.g., "API error", "Database error")
  * @returns {string} User-friendly error message
  */
-function getHttpErrorMessage(status: number): string {
-  switch (status) {
-    case BAD_REQUEST:
-      return "Invalid request. Please check your input and try again.";
-    case UNAUTHORIZED:
-      return "Authentication failed. Please log in again.";
-    case FORBIDDEN:
-      return "You do not have permission to access this resource.";
-    case NOT_FOUND:
-      return "The requested information could not be found.";
-    case REQUEST_TIMEOUT:
-      return "Request timed out. Please try again.";
-    case TOO_MANY_REQUESTS:
-      return "Too many requests. Please wait a moment and try again.";
-    case INTERNAL_SERVER_ERROR:
-      return "Internal server error. Please try again later.";
-    case BAD_GATEWAY:
-      return "Service temporarily unavailable. Please try again later.";
-    case SERVICE_UNAVAILABLE:
-      return "Service unavailable. Please try again later.";
-    case GATEWAY_TIMEOUT:
-      return "Request timed out. Please try again later.";
-    default:
-      return `Service error (${status}). Please try again later.`;
-  }
-}
-
-/**
- * Get user-friendly message for network errors
- * @param {string} code - Network error code
- * @returns {string} User-friendly error message
- */
-function getNetworkErrorMessage(code: string): string {
-  switch (code) {
-    case "ECONNREFUSED":
-      return "Unable to connect to the service. Please try again later.";
-    case "ENOTFOUND":
-      return "Service not found. Please check your connection and try again.";
-    case "ETIMEDOUT":
-      return "Request timed out. Please try again.";
-    case "ECONNRESET":
-      return "Connection was reset. Please try again.";
-    default:
-      return "Network error. Please check your connection and try again.";
-  }
-}
-
-/**
- * Extract error message from response data
- * @param {unknown} data - Response data
- * @returns {string | null} Extracted message or null
- */
-function extractResponseMessage(data: unknown): string | null {
-  if (
-    data !== null &&
-    data !== undefined &&
-    typeof data === "object" &&
-    "message" in data
-  ) {
-    const responseData = data;
-    return typeof responseData.message === "string"
-      ? responseData.message
-      : null;
-  }
-  return null;
+export function extractAndLogError(error: unknown, context: string): string {
+  const userFriendlyMessage = extractErrorMessage(error);
+  devError(`${context}: ${userFriendlyMessage}`);
+  return userFriendlyMessage;
 }
 
 /**
@@ -177,16 +104,6 @@ export function extractErrorMessage(error: unknown): string {
 }
 
 /**
- * Check if an error is a specific HTTP status code
- * @param {unknown} error - Error to check
- * @param {number} status - HTTP status code to check for
- * @returns {boolean} True if error is an HTTP error with the specified status
- */
-export function isHttpError(error: unknown, status: number): boolean {
-  return isAxiosError(error) && error.response.status === status;
-}
-
-/**
  * Check if an error is an authentication error (401)
  * @param {unknown} error - Error to check
  * @returns {boolean} True if error is a 401 authentication error
@@ -202,6 +119,16 @@ export function isAuthError(error: unknown): boolean {
  */
 export function isForbiddenError(error: unknown): boolean {
   return isHttpError(error, FORBIDDEN);
+}
+
+/**
+ * Check if an error is a specific HTTP status code
+ * @param {unknown} error - Error to check
+ * @param {number} status - HTTP status code to check for
+ * @returns {boolean} True if error is an HTTP error with the specified status
+ */
+export function isHttpError(error: unknown, status: number): boolean {
+  return isAxiosError(error) && error.response.status === status;
 }
 
 /**
@@ -223,36 +150,110 @@ export function isServerError(error: unknown): boolean {
 }
 
 /**
- * Create a processed error with user-friendly message for global error handler
- * @param {unknown} originalError - Original error object
- * @param {string} context - Context description for logging (e.g., "loading cases", "fetching client details")
- * @returns {Error} Processed error with user-friendly message
+ * Extract error message from response data
+ * @param {unknown} data - Response data
+ * @returns {string | null} Extracted message or null
  */
-export function createProcessedError(
-  originalError: unknown,
-  context: string,
-): Error {
-  // Extract user-friendly message
-  const userFriendlyMessage = extractErrorMessage(originalError);
-
-  // Log the error with context
-  devError(`Error ${context}: ${userFriendlyMessage}`);
-
-  // Create processed error with user-friendly message
-  const processedError = new Error(userFriendlyMessage);
-  processedError.cause = originalError; // Preserve original error for debugging
-
-  return processedError;
+function extractResponseMessage(data: unknown): null | string {
+  if (
+    data !== null &&
+    data !== undefined &&
+    typeof data === "object" &&
+    "message" in data
+  ) {
+    const responseData = data;
+    return typeof responseData.message === "string"
+      ? responseData.message
+      : null;
+  }
+  return null;
 }
 
 /**
- * Extract error message and log it with context (for API services)
- * @param {unknown} error - Original error object
- * @param {string} context - Context description for logging (e.g., "API error", "Database error")
+ * Get user-friendly message for HTTP status codes
+ * @param {number} status - HTTP status code
  * @returns {string} User-friendly error message
  */
-export function extractAndLogError(error: unknown, context: string): string {
-  const userFriendlyMessage = extractErrorMessage(error);
-  devError(`${context}: ${userFriendlyMessage}`);
-  return userFriendlyMessage;
+function getHttpErrorMessage(status: number): string {
+  switch (status) {
+    case BAD_GATEWAY:
+      return "Service temporarily unavailable. Please try again later.";
+    case BAD_REQUEST:
+      return "Invalid request. Please check your input and try again.";
+    case FORBIDDEN:
+      return "You do not have permission to access this resource.";
+    case GATEWAY_TIMEOUT:
+      return "Request timed out. Please try again later.";
+    case INTERNAL_SERVER_ERROR:
+      return "Internal server error. Please try again later.";
+    case NOT_FOUND:
+      return "The requested information could not be found.";
+    case REQUEST_TIMEOUT:
+      return "Request timed out. Please try again.";
+    case SERVICE_UNAVAILABLE:
+      return "Service unavailable. Please try again later.";
+    case TOO_MANY_REQUESTS:
+      return "Too many requests. Please wait a moment and try again.";
+    case UNAUTHORIZED:
+      return "Authentication failed. Please log in again.";
+    default:
+      return `Service error (${status}). Please try again later.`;
+  }
+}
+
+/**
+ * Get user-friendly message for network errors
+ * @param {string} code - Network error code
+ * @returns {string} User-friendly error message
+ */
+function getNetworkErrorMessage(code: string): string {
+  switch (code) {
+    case "ECONNREFUSED":
+      return "Unable to connect to the service. Please try again later.";
+    case "ECONNRESET":
+      return "Connection was reset. Please try again.";
+    case "ENOTFOUND":
+      return "Service not found. Please check your connection and try again.";
+    case "ETIMEDOUT":
+      return "Request timed out. Please try again.";
+    default:
+      return "Network error. Please check your connection and try again.";
+  }
+}
+
+/**
+ * Type guard for Axios error with response
+ * @param {unknown} error - Error to check
+ * @returns {boolean} True if error is an Axios error with response
+ */
+function isAxiosError(error: unknown): error is {
+  response: { data?: unknown; status: number; statusText?: string };
+} {
+  return (
+    error !== null &&
+    error !== undefined &&
+    typeof error === "object" &&
+    "response" in error &&
+    error.response !== null &&
+    typeof error.response === "object" &&
+    "status" in error.response &&
+    typeof error.response.status === "number"
+  );
+}
+
+/**
+ * Type guard for network error
+ * @param {unknown} error - Error to check
+ * @returns {boolean} True if error is a network error
+ */
+function isNetworkError(
+  error: unknown,
+): error is { code: string; message?: string } {
+  return (
+    error !== null &&
+    error !== undefined &&
+    typeof error === "object" &&
+    "code" in error &&
+    typeof error.code === "string"
+  );
 }

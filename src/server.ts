@@ -1,6 +1,7 @@
-import config from "#/config.js";
-import createApp from "#/app.js";
 import chalk from "chalk";
+
+import createApp from "#/app.js";
+import config from "#/config.js";
 import { displayAsciiBanner } from "#/lib/displayAsciiBanner.js";
 
 const app = await createApp();

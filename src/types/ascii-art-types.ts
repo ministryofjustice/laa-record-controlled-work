@@ -6,8 +6,8 @@
  * Interface for the messages displayed in the console
  */
 export interface AsciiArtMessages {
-  messages: string[];
   getFormattedMessage: () => string;
+  messages: string[];
 }
 
 /**

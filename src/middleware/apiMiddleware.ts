@@ -7,58 +7,32 @@
  * Based on MCC's utils/axiosSetup.ts patterns.
  */
 
-import { UNAUTHORIZED } from "#/lib/constants/httpStatus.js";
-import { devError, devLog } from "#/lib/devLogger.js";
 import type { AxiosError, InternalAxiosRequestConfig } from "axios";
 import type { NextFunction, Request, Response } from "express";
+
 import { create } from "middleware-axios";
+
+import { UNAUTHORIZED } from "#/lib/constants/httpStatus.js";
+import { devError, devLog } from "#/lib/devLogger.js";
 
 const DEFAULT_TIMEOUT = 5000;
 
 // Configuration interface for API middleware
 export interface ApiMiddlewareConfig {
-  /** Default timeout for requests */
-  timeout?: number;
+  /** Optional auth service for JWT handling */
+  authService?: AuthServiceInterface | null;
   /** Default headers to include with all requests */
   defaultHeaders?: Record<string, string>;
   /** Whether to enable request/response logging */
   enableLogging?: boolean;
-  /** Optional auth service for JWT handling */
-  authService?: AuthServiceInterface | null;
+  /** Default timeout for requests */
+  timeout?: number;
 }
 
 // Auth service interface - compatible with MCC's auth service
 export interface AuthServiceInterface {
-  getAuthHeader: () => Promise<string>;
   clearTokens: () => void;
-}
-
-/**
- * Convert unknown error to Error instance
- * @param {unknown} error Error to convert
- * @returns {Error} Error instance
- */
-function toError(error: unknown): Error {
-  return error instanceof Error ? error : new Error(String(error));
-}
-
-/**
- * Type guard for axios error with response
- * @param {unknown} error Error to check
- * @returns {boolean} True if error has response with status
- */
-function isAxiosErrorWithResponse(
-  error: unknown,
-): error is AxiosError & { response: { status: number } } {
-  return (
-    error !== null &&
-    typeof error === "object" &&
-    "response" in error &&
-    error.response !== null &&
-    typeof error.response === "object" &&
-    "status" in error.response &&
-    typeof error.response.status === "number"
-  );
+  getAuthHeader: () => Promise<string>;
 }
 
 /**
@@ -68,20 +42,20 @@ function isAxiosErrorWithResponse(
  */
 export function createApiMiddleware(config: ApiMiddlewareConfig = {}) {
   const {
-    timeout = DEFAULT_TIMEOUT,
+    authService = null,
     defaultHeaders = {},
     enableLogging = true,
-    authService = null,
+    timeout = DEFAULT_TIMEOUT,
   } = config;
 
   return (req: Request, res: Response, next: NextFunction): void => {
     // Create axios instance with default config (based on MCC pattern)
     const axiosWrapper = create({
-      timeout,
       headers: {
         "Content-Type": "application/json",
         ...defaultHeaders,
       },
+      timeout,
     });
 
     // Add request logging interceptor if enabled
@@ -165,6 +139,34 @@ export function createApiMiddleware(config: ApiMiddlewareConfig = {}) {
     req.axiosMiddleware = axiosWrapper;
     next();
   };
+}
+
+/**
+ * Type guard for axios error with response
+ * @param {unknown} error Error to check
+ * @returns {boolean} True if error has response with status
+ */
+function isAxiosErrorWithResponse(
+  error: unknown,
+): error is AxiosError & { response: { status: number } } {
+  return (
+    error !== null &&
+    typeof error === "object" &&
+    "response" in error &&
+    error.response !== null &&
+    typeof error.response === "object" &&
+    "status" in error.response &&
+    typeof error.response.status === "number"
+  );
+}
+
+/**
+ * Convert unknown error to Error instance
+ * @param {unknown} error Error to convert
+ * @returns {Error} Error instance
+ */
+function toError(error: unknown): Error {
+  return error instanceof Error ? error : new Error(String(error));
 }
 
 /**

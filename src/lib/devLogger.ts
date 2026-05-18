@@ -6,6 +6,32 @@
  */
 
 /**
+ * Development-only debug helper
+ * @param {string} message Debug message to output in development mode
+ */
+export function devDebug(message: string): void {
+  if (
+    process.env.NODE_ENV === "development" ||
+    process.env.NODE_ENV === undefined
+  ) {
+    console.debug(message);
+  }
+}
+
+/**
+ * Development-only error helper
+ * @param {string} message Error message to output in development mode
+ */
+export function devError(message: string): void {
+  if (
+    process.env.NODE_ENV === "development" ||
+    process.env.NODE_ENV === undefined
+  ) {
+    console.error(message);
+  }
+}
+
+/**
  * Development-only logging helper
  * @param {string} message Log message to output in development mode
  */
@@ -28,32 +54,6 @@ export function devWarn(message: string): void {
     process.env.NODE_ENV === undefined
   ) {
     console.warn(message);
-  }
-}
-
-/**
- * Development-only error helper
- * @param {string} message Error message to output in development mode
- */
-export function devError(message: string): void {
-  if (
-    process.env.NODE_ENV === "development" ||
-    process.env.NODE_ENV === undefined
-  ) {
-    console.error(message);
-  }
-}
-
-/**
- * Development-only debug helper
- * @param {string} message Debug message to output in development mode
- */
-export function devDebug(message: string): void {
-  if (
-    process.env.NODE_ENV === "development" ||
-    process.env.NODE_ENV === undefined
-  ) {
-    console.debug(message);
   }
 }
 

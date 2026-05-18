@@ -1,8 +1,9 @@
-import { setupCsrf } from "#/middleware/setupCsrf.js";
 import express, { type Application } from "express";
 import session from "express-session";
-import authRouter from "#/routes/auth.js";
+
 import { INTERNAL_SERVER_ERROR } from "#/lib/constants/httpStatus.js";
+import { setupCsrf } from "#/middleware/setupCsrf.js";
+import authRouter from "#/routes/auth.js";
 
 /**
  * Creates a mock app for test auth routes against
@@ -11,7 +12,7 @@ import { INTERNAL_SERVER_ERROR } from "#/lib/constants/httpStatus.js";
 export function createMockApp(): Application {
   const app = express();
   app.use(express.urlencoded({ extended: false }));
-  app.use(session({ secret: "test", resave: false, saveUninitialized: true }));
+  app.use(session({ resave: false, saveUninitialized: true, secret: "test" }));
   setupCsrf(app);
   // Exposes a CSRF token so tests can make valid POST requests
   app.get("/csrf-token", (req, res) => {

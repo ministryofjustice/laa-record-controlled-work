@@ -1,16 +1,19 @@
-import { randomUUID } from "node:crypto";
 import type { SessionData } from "express-session";
+
 import {
+  type AuthenticationResult,
+  type AuthorizationUrlRequest,
   ConfidentialClientApplication,
   CryptoProvider,
-  type AuthorizationUrlRequest,
-  type AuthenticationResult,
 } from "@azure/msal-node";
+import { randomUUID } from "node:crypto";
+
+import type { AuthCodeResponse, PKCECodes } from "#/types/auth-types.js";
+
 import config from "#/config.js";
 import { authRequestDefaults, msalConfig } from "#/config/auth.js";
-import { failure, success, type Either } from "#/lib/either.js";
-import type { AuthCodeResponse, PKCECodes } from "#/types/auth-types.js";
 import { devError } from "#/lib/devLogger.js";
+import { type Either, failure, success } from "#/lib/either.js";
 import {
   MissingAuthCodeRequestError,
   MsalError,
@@ -30,8 +33,8 @@ import {
  * PKCE code exchange, token acquisition, and logout URL generation.
  */
 export class AuthService {
-  public session: SessionData;
   public msalClient: ConfidentialClientApplication;
+  public session: SessionData;
   private readonly cryptoProvider: CryptoProvider = new CryptoProvider();
 
   /**
@@ -62,11 +65,26 @@ export class AuthService {
   }
 
   /**
+   * Builds the Microsoft Entra ID logout URL including the post-logout redirect URI.
+   * @param {string} [idToken] - The ID token to include as a hint for Entra to end the correct session.
+   * @returns {string} The fully-formed Entra logout URL.
+   */
+  public static getLogoutUrl(idToken?: string): string {
+    const params = new URLSearchParams({
+      post_logout_redirect_uri: config.entra.postLogoutRedirectUri,
+    });
+    if (idToken !== undefined) {
+      params.set("id_token_hint", idToken);
+    }
+    return `${config.entra.authority}/oauth2/v2.0/logout?${params.toString()}`;
+  }
+
+  /**
    * Generates the Microsoft Entra ID authorisation URL to begin the PKCE sign-in flow.
    * @returns {Promise<Either<AuthError, string>>} The authorisation URL or an auth error.
    */
   public async getAuthCodeUrl(): Promise<
-    Either<PkceGenerationError | MsalError, string>
+    Either<MsalError | PkceGenerationError, string>
   > {
     const result = await this.getPkceCodes();
     if (result.error) return failure(PkceGenerationError.from(result.error));
@@ -113,7 +131,7 @@ export class AuthService {
     this.session.authCodeRequest.code = code;
 
     try {
-      const { idToken, account }: AuthenticationResult =
+      const { account, idToken }: AuthenticationResult =
         await this.msalClient.acquireTokenByCode(
           this.session.authCodeRequest,
           requestBody,
@@ -127,38 +145,6 @@ export class AuthService {
     } catch (error) {
       devError(`Failed to handle Entra auth redirect: ${String(error)}`);
       return failure(TokenAcquisitionError.from(error));
-    }
-  }
-
-  /**
-   * Builds the Microsoft Entra ID logout URL including the post-logout redirect URI.
-   * @param {string} [idToken] - The ID token to include as a hint for Entra to end the correct session.
-   * @returns {string} The fully-formed Entra logout URL.
-   */
-  public static getLogoutUrl(idToken?: string): string {
-    const params = new URLSearchParams({
-      post_logout_redirect_uri: config.entra.postLogoutRedirectUri,
-    });
-    if (idToken !== undefined) {
-      params.set("id_token_hint", idToken);
-    }
-    return `${config.entra.authority}/oauth2/v2.0/logout?${params.toString()}`;
-  }
-
-  /**
-   * Generates a PKCE code verifier and challenge pair using the S256 method.
-   * @returns {Promise<PKCECodes>} The generated PKCE codes.
-   */
-  private async getPkceCodes(): Promise<
-    Either<PkceGenerationError, PKCECodes>
-  > {
-    try {
-      const { verifier, challenge } =
-        await this.cryptoProvider.generatePkceCodes();
-      return success({ challengeMethod: "S256", verifier, challenge });
-    } catch (error) {
-      devError(`Failed to generate PKCE codes: ${String(error)}`);
-      return failure(PkceGenerationError.from(error));
     }
   }
 
@@ -188,13 +174,13 @@ export class AuthService {
     this.session.authState = nonce;
 
     const authCodeUrlRequest: AuthorizationUrlRequest = {
-      state: nonce,
-      scopes: authRequestDefaults.scopes,
-      redirectUri: authRequestDefaults.redirectUri,
-      responseMode: authRequestDefaults.responseMode,
       codeChallenge: challenge,
       codeChallengeMethod: challengeMethod,
       prompt: authRequestDefaults.prompt,
+      redirectUri: authRequestDefaults.redirectUri,
+      responseMode: authRequestDefaults.responseMode,
+      scopes: authRequestDefaults.scopes,
+      state: nonce,
     };
 
     this.session.pkceCodes = pkceCodes;
@@ -202,10 +188,27 @@ export class AuthService {
     this.session.authCodeRequest = {
       code: "",
       codeVerifier: verifier,
-      scopes: authRequestDefaults.scopes,
       redirectUri: authRequestDefaults.redirectUri,
+      scopes: authRequestDefaults.scopes,
     };
 
     return authCodeUrlRequest;
+  }
+
+  /**
+   * Generates a PKCE code verifier and challenge pair using the S256 method.
+   * @returns {Promise<PKCECodes>} The generated PKCE codes.
+   */
+  private async getPkceCodes(): Promise<
+    Either<PkceGenerationError, PKCECodes>
+  > {
+    try {
+      const { challenge, verifier } =
+        await this.cryptoProvider.generatePkceCodes();
+      return success({ challenge, challengeMethod: "S256", verifier });
+    } catch (error) {
+      devError(`Failed to generate PKCE codes: ${String(error)}`);
+      return failure(PkceGenerationError.from(error));
+    }
   }
 }

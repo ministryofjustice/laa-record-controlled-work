@@ -1,9 +1,11 @@
-import { t } from "#/lib/i18nLoader.js";
 import { checkSchema, type Meta } from "express-validator";
 import validator from "validator";
-import { TypedValidationError } from "../lib/ValidationErrorHelpers.js";
+
 import { isRecord, safeBodyString } from "#/lib/dataTransformers.js";
 import { dateStringFromThreeFields } from "#/lib/dateFormatter.js";
+import { t } from "#/lib/i18nLoader.js";
+
+import { TypedValidationError } from "../lib/ValidationErrorHelpers.js";
 
 // Constants for validation boundaries
 const MIN_DAY = 1;
@@ -13,6 +15,48 @@ const MAX_MONTH = 12;
 const YEAR_LENGTH = 4;
 const MIN_COMMUNICATION_METHODS = 1;
 const EMPTY = 0;
+
+/**
+ * Helper function to create date validation error messages
+ * @param {string} field - Field name (day, month, year)
+ * @param {string} errorType - Type of error (notEmpty, isLength, etc)
+ * @returns {TypedValidationError} Structured error object
+ */
+function createDateValidationError(
+  field: string,
+  errorType: string,
+): TypedValidationError {
+  const messageKey = `forms.dateOfBirth.validationError.${field}.${errorType}`;
+  return new TypedValidationError({
+    inlineMessage: t(messageKey),
+    summaryMessage: t(messageKey),
+  });
+}
+
+/**
+ * Helper function to get safe date field values from request body
+ * @param {unknown} body - Request body object
+ * @returns {object} Object with day, month, year values
+ */
+function getDateFields(body: unknown): {
+  day: string;
+  month: string;
+  year: string;
+} {
+  if (!isRecord(body)) {
+    return { day: "", month: "", year: "" };
+  }
+
+  const dayValue = safeBodyString(body, "dateOfBirth-day");
+  const monthValue = safeBodyString(body, "dateOfBirth-month");
+  const yearValue = safeBodyString(body, "dateOfBirth-year");
+
+  return {
+    day: typeof dayValue === "string" ? dayValue : "",
+    month: typeof monthValue === "string" ? monthValue : "",
+    year: typeof yearValue === "string" ? yearValue : "",
+  };
+}
 
 /**
  * Helper function to check if any date field has a value
@@ -38,6 +82,15 @@ function hasPartialDateFields(body: unknown): boolean {
   if (!isRecord(body)) return false;
   const { day, month, year } = getDateFields(body);
   return hasAnyDateField(day, month, year);
+}
+
+/**
+ * Type guard to safely check if a value is a valid record
+ * @param {unknown} value - The value to check
+ * @returns {boolean} True if value is a non-null object
+ */
+function isValidRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
 }
 
 /**
@@ -90,102 +143,13 @@ function validateYearField(value: string, body: unknown): boolean {
 }
 
 /**
- * Helper function to get safe date field values from request body
- * @param {unknown} body - Request body object
- * @returns {object} Object with day, month, year values
- */
-function getDateFields(body: unknown): {
-  day: string;
-  month: string;
-  year: string;
-} {
-  if (!isRecord(body)) {
-    return { day: "", month: "", year: "" };
-  }
-
-  const dayValue = safeBodyString(body, "dateOfBirth-day");
-  const monthValue = safeBodyString(body, "dateOfBirth-month");
-  const yearValue = safeBodyString(body, "dateOfBirth-year");
-
-  return {
-    day: typeof dayValue === "string" ? dayValue : "",
-    month: typeof monthValue === "string" ? monthValue : "",
-    year: typeof yearValue === "string" ? yearValue : "",
-  };
-}
-
-/**
- * Helper function to create date validation error messages
- * @param {string} field - Field name (day, month, year)
- * @param {string} errorType - Type of error (notEmpty, isLength, etc)
- * @returns {TypedValidationError} Structured error object
- */
-function createDateValidationError(
-  field: string,
-  errorType: string,
-): TypedValidationError {
-  const messageKey = `forms.dateOfBirth.validationError.${field}.${errorType}`;
-  return new TypedValidationError({
-    summaryMessage: t(messageKey),
-    inlineMessage: t(messageKey),
-  });
-}
-
-/**
- * Type guard to safely check if a value is a valid record
- * @param {unknown} value - The value to check
- * @returns {boolean} True if value is a non-null object
- */
-function isValidRecord(value: unknown): value is Record<string, unknown> {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
-}
-
-/**
  * Validation middleware for person input (name and address).
  * Ensures both fields are strings and meet basic requirements.
  * @returns {Error} Validation schema for express-validator
  */
 export const validatePerson = (): ReturnType<typeof checkSchema> =>
   checkSchema({
-    fullName: {
-      in: ["body"],
-      customSanitizer: {
-        /**
-         * Custom sanitizer for fullName field - preserves null/undefined for validation
-         * @param {unknown} value - The input value to sanitize
-         * @returns {unknown} Sanitized value
-         */
-        options: (value: unknown) => {
-          // Preserve undefined and null to allow proper validation
-          if (value === undefined || value === null) {
-            return value;
-          }
-          // Convert any non-string value to string for consistent processing
-          if (typeof value !== "string") {
-            if (typeof value === "object") return "";
-            if (typeof value === "number" || typeof value === "boolean") {
-              return String(value);
-            }
-            return "";
-          }
-          return value;
-        },
-      },
-      trim: true,
-      notEmpty: {
-        /**
-         * Custom error message for empty name field using i18n
-         * @returns {TypedValidationError} Returns TypedValidationError with structured error data
-         */
-        errorMessage: () =>
-          new TypedValidationError({
-            summaryMessage: t("forms.name.validationError.notEmpty"),
-            inlineMessage: t("forms.name.validationError.notEmpty"),
-          }),
-      },
-    },
     address: {
-      in: ["body"],
       customSanitizer: {
         /**
          * Custom sanitizer for address field - preserves null/undefined for validation
@@ -208,7 +172,7 @@ export const validatePerson = (): ReturnType<typeof checkSchema> =>
           return value;
         },
       },
-      trim: true,
+      in: ["body"],
       notEmpty: {
         /**
          * Custom error message for empty address field using i18n
@@ -216,45 +180,46 @@ export const validatePerson = (): ReturnType<typeof checkSchema> =>
          */
         errorMessage: () =>
           new TypedValidationError({
-            summaryMessage: t("forms.address.validationError.notEmpty"),
             inlineMessage: t("forms.address.validationError.notEmpty"),
+            summaryMessage: t("forms.address.validationError.notEmpty"),
           }),
+      },
+      trim: true,
+    },
+    communicationMethods: {
+      in: ["body"],
+      isArray: {
+        /**
+         * Custom error message for empty communication methods array using i18n
+         * @returns {TypedValidationError} Returns TypedValidationError with structured error data
+         */
+        errorMessage: () =>
+          new TypedValidationError({
+            inlineMessage: t(
+              "forms.communicationMethods.validationError.notEmpty",
+            ),
+            summaryMessage: t(
+              "forms.communicationMethods.validationError.notEmpty",
+            ),
+          }),
+        options: { min: MIN_COMMUNICATION_METHODS },
       },
     },
     contactPreference: {
-      in: ["body"],
-      notEmpty: {
-        /**
-         * Custom error message for empty contact preference field using i18n
-         * @returns {TypedValidationError} Returns TypedValidationError with structured error data
-         */
-        errorMessage: () =>
-          new TypedValidationError({
-            summaryMessage: t(
-              "forms.contactPreference.validationError.notEmpty",
-            ),
-            inlineMessage: t(
-              "forms.contactPreference.validationError.notEmpty",
-            ),
-          }),
-      },
-      isIn: {
-        options: [["email", "phone", "post"]],
-        /**
-         * Custom error message for invalid contact preference using i18n
-         * @returns {TypedValidationError} Returns TypedValidationError with structured error data
-         */
-        errorMessage: () =>
-          new TypedValidationError({
-            summaryMessage: t(
-              "forms.contactPreference.validationError.invalidOption",
-            ),
-            inlineMessage: t(
-              "forms.contactPreference.validationError.invalidOption",
-            ),
-          }),
-      },
       custom: {
+        /**
+         * Custom error message for unchanged contact preference using i18n
+         * @returns {TypedValidationError} Returns TypedValidationError with structured error data
+         */
+        errorMessage: () =>
+          new TypedValidationError({
+            inlineMessage: t(
+              "forms.contactPreference.validationError.notChanged",
+            ),
+            summaryMessage: t(
+              "forms.contactPreference.validationError.notChanged",
+            ),
+          }),
         /**
          * Validates that the contact preference has been changed from the original value
          * Following MCC pattern for change validation
@@ -284,114 +249,42 @@ export const validatePerson = (): ReturnType<typeof checkSchema> =>
           // Return true if the value has changed, false if it's the same
           return value !== originalContactPreference;
         },
+      },
+      in: ["body"],
+      isIn: {
         /**
-         * Custom error message for unchanged contact preference using i18n
+         * Custom error message for invalid contact preference using i18n
          * @returns {TypedValidationError} Returns TypedValidationError with structured error data
          */
         errorMessage: () =>
           new TypedValidationError({
-            summaryMessage: t(
-              "forms.contactPreference.validationError.notChanged",
-            ),
             inlineMessage: t(
-              "forms.contactPreference.validationError.notChanged",
+              "forms.contactPreference.validationError.invalidOption",
+            ),
+            summaryMessage: t(
+              "forms.contactPreference.validationError.invalidOption",
             ),
           }),
+        options: [["email", "phone", "post"]],
       },
-    },
-    priority: {
-      in: ["body"],
       notEmpty: {
         /**
-         * Custom error message for empty priority field using i18n
+         * Custom error message for empty contact preference field using i18n
          * @returns {TypedValidationError} Returns TypedValidationError with structured error data
          */
         errorMessage: () =>
           new TypedValidationError({
-            summaryMessage: t("forms.priority.validationError.notEmpty"),
-            inlineMessage: t("forms.priority.validationError.notEmpty"),
-          }),
-      },
-      isIn: {
-        options: [["low", "medium", "high", "urgent"]],
-        /**
-         * Custom error message for invalid priority using i18n
-         * @returns {TypedValidationError} Returns TypedValidationError with structured error data
-         */
-        errorMessage: () =>
-          new TypedValidationError({
-            summaryMessage: t("forms.priority.validationError.invalidOption"),
-            inlineMessage: t("forms.priority.validationError.invalidOption"),
-          }),
-      },
-      custom: {
-        /**
-         * Validates that the priority has been changed from the original value
-         * Following MCC pattern for change validation
-         * @param {string} value - The priority value from the form
-         * @param {Meta} meta - express-validator metadata containing request object
-         * @returns {boolean} True if the value has changed from original or no original exists
-         */
-        options: (value: string, { req }: Meta): boolean => {
-          // Get original form data from session following MCC pattern
-          const { session } = req;
-          if (!isRecord(session) || !isValidRecord(session.personOriginal)) {
-            return true; // No original data to compare against
-          }
-
-          const { personOriginal: originalData } = session;
-
-          const { priority: originalPriority } = originalData;
-          if (originalPriority === undefined || originalPriority === null) {
-            return true; // No original priority to compare against
-          }
-
-          // Return true if the value has changed, false if it's the same
-          return value !== originalPriority;
-        },
-        /**
-         * Custom error message for unchanged priority using i18n
-         * @returns {TypedValidationError} Returns TypedValidationError with structured error data
-         */
-        errorMessage: () =>
-          new TypedValidationError({
-            summaryMessage: t("forms.priority.validationError.notChanged"),
-            inlineMessage: t("forms.priority.validationError.notChanged"),
-          }),
-      },
-    },
-    communicationMethods: {
-      in: ["body"],
-      isArray: {
-        options: { min: MIN_COMMUNICATION_METHODS },
-        /**
-         * Custom error message for empty communication methods array using i18n
-         * @returns {TypedValidationError} Returns TypedValidationError with structured error data
-         */
-        errorMessage: () =>
-          new TypedValidationError({
-            summaryMessage: t(
-              "forms.communicationMethods.validationError.notEmpty",
-            ),
             inlineMessage: t(
-              "forms.communicationMethods.validationError.notEmpty",
+              "forms.contactPreference.validationError.notEmpty",
+            ),
+            summaryMessage: t(
+              "forms.contactPreference.validationError.notEmpty",
             ),
           }),
       },
     },
     "dateOfBirth-day": {
-      in: ["body"],
-      trim: true,
       custom: {
-        /**
-         * Validate day field in date of birth - requires all or none
-         * @param {string} value - The day value to validate
-         * @param {object} root0 - Metadata object
-         * @param {object} root0.req - Express request object
-         * @returns {boolean} True if validation passes, false otherwise
-         */
-        options: (value: string, { req }: Meta): boolean =>
-          validateDayField(value, req.body),
         /**
          * Custom error message for dateOfBirth day field validation
          * @param {string} value - The day value from the form
@@ -417,21 +310,21 @@ export const validatePerson = (): ReturnType<typeof checkSchema> =>
 
           return createDateValidationError("day", "isInt");
         },
-      },
-    },
-    "dateOfBirth-month": {
-      in: ["body"],
-      trim: true,
-      custom: {
         /**
-         * Validates dateOfBirth month field - requires all date fields if any are provided
-         * @param {string} value - The month value from the form
-         * @param {object} root0 - Meta object from express-validator
+         * Validate day field in date of birth - requires all or none
+         * @param {string} value - The day value to validate
+         * @param {object} root0 - Metadata object
          * @param {object} root0.req - Express request object
          * @returns {boolean} True if validation passes, false otherwise
          */
         options: (value: string, { req }: Meta): boolean =>
-          validateMonthField(value, req.body),
+          validateDayField(value, req.body),
+      },
+      in: ["body"],
+      trim: true,
+    },
+    "dateOfBirth-month": {
+      custom: {
         /**
          * Generates error message for dateOfBirth month field validation
          * @param {string} value - The month value from the form
@@ -457,21 +350,21 @@ export const validatePerson = (): ReturnType<typeof checkSchema> =>
 
           return createDateValidationError("month", "isInt");
         },
-      },
-    },
-    "dateOfBirth-year": {
-      in: ["body"],
-      trim: true,
-      custom: {
         /**
-         * Validates dateOfBirth year field - requires all date fields if any are provided
-         * @param {string} value - The year value from the form
+         * Validates dateOfBirth month field - requires all date fields if any are provided
+         * @param {string} value - The month value from the form
          * @param {object} root0 - Meta object from express-validator
          * @param {object} root0.req - Express request object
          * @returns {boolean} True if validation passes, false otherwise
          */
         options: (value: string, { req }: Meta): boolean =>
-          validateYearField(value, req.body),
+          validateMonthField(value, req.body),
+      },
+      in: ["body"],
+      trim: true,
+    },
+    "dateOfBirth-year": {
+      custom: {
         /**
          * Generates error message for dateOfBirth year field validation
          * @param {string} value - The year value from the form
@@ -482,10 +375,10 @@ export const validatePerson = (): ReturnType<typeof checkSchema> =>
         errorMessage: (value: string, { req }: Meta) => {
           if (!isRecord(req.body)) {
             return new TypedValidationError({
-              summaryMessage: t(
+              inlineMessage: t(
                 "forms.dateOfBirth.validationError.year.notEmpty",
               ),
-              inlineMessage: t(
+              summaryMessage: t(
                 "forms.dateOfBirth.validationError.year.notEmpty",
               ),
             });
@@ -509,11 +402,129 @@ export const validatePerson = (): ReturnType<typeof checkSchema> =>
 
           return createDateValidationError("year", "isInt");
         },
+        /**
+         * Validates dateOfBirth year field - requires all date fields if any are provided
+         * @param {string} value - The year value from the form
+         * @param {object} root0 - Meta object from express-validator
+         * @param {object} root0.req - Express request object
+         * @returns {boolean} True if validation passes, false otherwise
+         */
+        options: (value: string, { req }: Meta): boolean =>
+          validateYearField(value, req.body),
+      },
+      in: ["body"],
+      trim: true,
+    },
+    fullName: {
+      customSanitizer: {
+        /**
+         * Custom sanitizer for fullName field - preserves null/undefined for validation
+         * @param {unknown} value - The input value to sanitize
+         * @returns {unknown} Sanitized value
+         */
+        options: (value: unknown) => {
+          // Preserve undefined and null to allow proper validation
+          if (value === undefined || value === null) {
+            return value;
+          }
+          // Convert any non-string value to string for consistent processing
+          if (typeof value !== "string") {
+            if (typeof value === "object") return "";
+            if (typeof value === "number" || typeof value === "boolean") {
+              return String(value);
+            }
+            return "";
+          }
+          return value;
+        },
+      },
+      in: ["body"],
+      notEmpty: {
+        /**
+         * Custom error message for empty name field using i18n
+         * @returns {TypedValidationError} Returns TypedValidationError with structured error data
+         */
+        errorMessage: () =>
+          new TypedValidationError({
+            inlineMessage: t("forms.name.validationError.notEmpty"),
+            summaryMessage: t("forms.name.validationError.notEmpty"),
+          }),
+      },
+      trim: true,
+    },
+    priority: {
+      custom: {
+        /**
+         * Custom error message for unchanged priority using i18n
+         * @returns {TypedValidationError} Returns TypedValidationError with structured error data
+         */
+        errorMessage: () =>
+          new TypedValidationError({
+            inlineMessage: t("forms.priority.validationError.notChanged"),
+            summaryMessage: t("forms.priority.validationError.notChanged"),
+          }),
+        /**
+         * Validates that the priority has been changed from the original value
+         * Following MCC pattern for change validation
+         * @param {string} value - The priority value from the form
+         * @param {Meta} meta - express-validator metadata containing request object
+         * @returns {boolean} True if the value has changed from original or no original exists
+         */
+        options: (value: string, { req }: Meta): boolean => {
+          // Get original form data from session following MCC pattern
+          const { session } = req;
+          if (!isRecord(session) || !isValidRecord(session.personOriginal)) {
+            return true; // No original data to compare against
+          }
+
+          const { personOriginal: originalData } = session;
+
+          const { priority: originalPriority } = originalData;
+          if (originalPriority === undefined || originalPriority === null) {
+            return true; // No original priority to compare against
+          }
+
+          // Return true if the value has changed, false if it's the same
+          return value !== originalPriority;
+        },
+      },
+      in: ["body"],
+      isIn: {
+        /**
+         * Custom error message for invalid priority using i18n
+         * @returns {TypedValidationError} Returns TypedValidationError with structured error data
+         */
+        errorMessage: () =>
+          new TypedValidationError({
+            inlineMessage: t("forms.priority.validationError.invalidOption"),
+            summaryMessage: t("forms.priority.validationError.invalidOption"),
+          }),
+        options: [["low", "medium", "high", "urgent"]],
+      },
+      notEmpty: {
+        /**
+         * Custom error message for empty priority field using i18n
+         * @returns {TypedValidationError} Returns TypedValidationError with structured error data
+         */
+        errorMessage: () =>
+          new TypedValidationError({
+            inlineMessage: t("forms.priority.validationError.notEmpty"),
+            summaryMessage: t("forms.priority.validationError.notEmpty"),
+          }),
       },
     },
     validDate: {
-      in: ["body"],
       custom: {
+        bail: true, // Stop validation if date format is invalid
+        /**
+         * Custom error message for invalid date combinations
+         * @returns {TypedValidationError} Returns TypedValidationError with structured error data
+         */
+        errorMessage: () =>
+          new TypedValidationError({
+            inlineMessage: t("forms.dateOfBirth.validationError.validDate"),
+            summaryMessage: t("forms.dateOfBirth.validationError.validDate"),
+          }),
         /**
          * Schema to check if the day/month/year combination forms a valid date.
          * Only validates if at least one date field is provided.
@@ -563,16 +574,7 @@ export const validatePerson = (): ReturnType<typeof checkSchema> =>
 
           return validator.isDate(dateString);
         },
-        /**
-         * Custom error message for invalid date combinations
-         * @returns {TypedValidationError} Returns TypedValidationError with structured error data
-         */
-        errorMessage: () =>
-          new TypedValidationError({
-            summaryMessage: t("forms.dateOfBirth.validationError.validDate"),
-            inlineMessage: t("forms.dateOfBirth.validationError.validDate"),
-          }),
-        bail: true, // Stop validation if date format is invalid
       },
+      in: ["body"],
     },
   });

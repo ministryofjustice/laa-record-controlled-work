@@ -1,3 +1,5 @@
+import type { NextFunction, Request, Response } from "express";
+
 // TODO: this is a handlers module, rather than controller
 import config from "#/config.js";
 import {
@@ -8,7 +10,6 @@ import {
 import { TokenAcquisitionError } from "#/lib/errors/auth.js";
 import { AuthService } from "#/services/auth.js";
 import { authCodeResponseSchema } from "#/types/auth-types.js";
-import type { NextFunction, Request, Response } from "express";
 
 export const signIn = async (
   req: Request,
@@ -59,9 +60,9 @@ export const processAuthCodeCallback = async (
       return;
     }
 
-    const { isAuthenticated, idToken, account, tokenCache } = req.session;
+    const { account, idToken, isAuthenticated, tokenCache } = req.session;
 
-    req.session.regenerate((error: Error | undefined | null) => {
+    req.session.regenerate((error: Error | null | undefined) => {
       if (error) {
         next(error);
         return;
