@@ -15,11 +15,8 @@ import { createMockApp } from "../../utils.js";
 
 const AUTH_CODE_URL = "https://login.microsoftonline.com/auth";
 const SUCCESS_REDIRECT = "/case/123";
-const LOGOUT_URL =
-  "https://login.microsoftonline.com/tenant/oauth2/v2.0/logout?post_logout_redirect_uri=https://app/signed-out";
 
 describe("Auth Controller", () => {
-  let getLogoutUrlStub: sinon.SinonStub;
   let authServiceStub: {
     getAuthCodeUrl: sinon.SinonStub;
     processAuthCodeCallback: sinon.SinonStub;
@@ -43,10 +40,6 @@ describe("Auth Controller", () => {
     sinon
       .stub(AuthService, "create")
       .returns(authServiceStub as unknown as AuthService);
-
-    getLogoutUrlStub = sinon
-      .stub(AuthService, "getLogoutUrl")
-      .returns(LOGOUT_URL);
   });
 
   afterEach(() => {
@@ -129,7 +122,7 @@ describe("Auth Controller", () => {
   });
 
   describe("signOut()", () => {
-    it("redirects to the URL returned by authService.getLogoutUrl()", async () => {
+    it("redirects to /", async () => {
       const agent = request.agent(mockApp);
       const tokenRes = await agent.get("/csrf-token");
       const csrfToken = tokenRes.body.csrfToken as string;
@@ -139,9 +132,8 @@ describe("Auth Controller", () => {
         .type("form")
         .send({ _csrf: csrfToken });
 
-      expect(getLogoutUrlStub.calledOnce).to.be.true;
       expect(res.status).to.equal(FOUND);
-      expect(res.headers.location).to.equal(LOGOUT_URL);
+      expect(res.headers.location).to.equal("/");
     });
 
     it("destroys the session and clears the cookie before redirecting", async () => {
