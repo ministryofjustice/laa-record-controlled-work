@@ -32,7 +32,6 @@ services:
       - REDIS_ENABLED=true
       - REDIS_URL=redis://redis-rcw:6379
       - REDIS_AUTH_TOKEN=${REDIS_AUTH_TOKEN:-redis_password}
-      - ENTRA_AUTHORITY_BASE_URL=https://login.microsoftonline.com/
       - ENTRA_REDIRECT_URI=http://localhost:8080/auth/code/callback
       # secrets injected by 1Password CLI
       # op run --env-file=.env -- docker compose up -d
