@@ -11,7 +11,7 @@ import type {
   RedisConfig,
 } from "#/types/config-types.js";
 
-import { MINUTE, SECOND } from "#/lib/constants/time.js";
+import { HOUR, MINUTE, SECOND } from "#/lib/constants/time.js";
 import { optional, required } from "#/lib/env.js";
 
 const DEFAULT_AUTH_RATE_LIMIT_MAX = 20;
@@ -23,7 +23,7 @@ const DEFAULT_REDIS_HOST = "localhost";
 
 /* eslint-disable @typescript-eslint/no-magic-numbers -- time constants are intuitive */
 const REDIS_SOCKET_CONNECTION_TIMEOUT = 10 * SECOND;
-// const SESSION_AGE_MAX = 18 * HOUR;
+const SESSION_AGE_MAX = 18 * HOUR;
 const DEFAULT_RATE_WINDOW = 15 * MINUTE;
 /* eslint-enable @typescript-eslint/no-magic-numbers */
 
@@ -54,7 +54,6 @@ export default {
     authorityBaseUrl: required.ENTRA_AUTHORITY_BASE_URL,
     clientId: required.ENTRA_CLIENT_ID,
     clientSecret: required.ENTRA_CLIENT_SECRET,
-    postLogoutRedirectUri: required.ENTRA_POST_LOGOUT_REDIRECT_URI,
     redirectUri: required.ENTRA_REDIRECT_URI,
     tenantId: required.ENTRA_TENANT_ID,
   } satisfies EntraConfig,
@@ -86,16 +85,15 @@ export default {
   SERVICE_URL: optional.SERVICE_URL,
 
   session: {
+    cookie: {
+      httpOnly: true,
+      maxAge: SESSION_AGE_MAX,
+      sameSite: "lax",
+      secure: useHttps,
+    },
     name: "rcw.sid",
     resave: false,
     saveUninitialized: false,
     secret: required.SESSION_SECRET,
-    // TODO: this requires an auth refactor to use entra response_mode=query
-    // cookie: {
-    //   secure: useHttps,
-    //   httpOnly: true,
-    //   sameSite: "lax",
-    //   maxAge: SESSION_AGE_MAX,
-    // },
   } satisfies SessionOptions,
 } satisfies Config;

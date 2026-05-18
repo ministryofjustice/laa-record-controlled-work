@@ -42,7 +42,6 @@ export interface EntraConfig {
   authorityBaseUrl: string;
   clientId: string;
   clientSecret: string;
-  postLogoutRedirectUri: string;
   redirectUri: string;
   tenantId: string;
 }

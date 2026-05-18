@@ -26,7 +26,6 @@ deploy_branch() {
                 --set ingress.annotations."external-dns\.alpha\.kubernetes\.io/set-identifier"="$IDENTIFIER" \
                 --set ingress.hosts[0].host="$RELEASE_HOST" \
                 --set rcw.env.ENTRA_REDIRECT_URI="https://$RELEASE_HOST/auth/code/callback" \
-                --set rcw.env.ENTRA_POST_LOGOUT_REDIRECT_URI="https://$RELEASE_HOST/"
 }
 
 deploy_main() {  
