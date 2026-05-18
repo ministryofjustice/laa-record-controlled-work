@@ -11,6 +11,7 @@ import { FOUND, OK } from "#/lib/constants/httpStatus.js";
 import config from "#/config.js";
 import { SessionData } from "express-session";
 import type { RedisClientType } from "#/types/redis-types.js";
+import { Agent, request as undiciRequest, setGlobalDispatcher } from "undici";
 
 const REDIS_PORT = 6379;
 const IDP_PORT = 8080;
@@ -28,7 +29,18 @@ const createAppWithSessionStoreClientExposure = async (
 ): Promise<Application> => {
 
   // Override config to point to testcontainers instances
-  config.entra.authority = `http://localhost:${identityProviderContainer.getMappedPort(IDP_PORT)}/default`;
+  const idpPort = identityProviderContainer.getMappedPort(IDP_PORT);
+  config.entra.authority = `https://localhost:${idpPort}/default`;
+  config.entra.redirectUri = "http://localhost/auth/code/callback";
+  config.entra.cloudDiscoveryMetadata = JSON.stringify({
+    "tenant_discovery_endpoint": `https://localhost:${idpPort}/default/.well-known/openid-configuration`,
+    "api-version": "1.1",
+    "metadata": [{
+      "preferred_network": `localhost:${idpPort}`,
+      "preferred_cache": `localhost:${idpPort}`,
+      "aliases": [`localhost:${idpPort}`],
+    }],
+  });
   config.redis.enabled = true;
   config.redis.url = `redis://localhost:${redisStoreContainer.getMappedPort(REDIS_PORT)}`;
   process.env.PLAYWRIGHT_TEST_SIGNIN = "true";
@@ -48,8 +60,13 @@ const createAppWithSessionStoreClientExposure = async (
   return app;
 };
 
+
 describe("Auth Integration", () => {
   before(async () => {
+    // MSAL Node uses native fetch (backed by undici). setGlobalDispatcher patches
+    // undici's default dispatcher so fetch accepts the mock IdP's self-signed TLS cert.
+    setGlobalDispatcher(new Agent({ connect: { rejectUnauthorized: false } }));
+
     // Start Redis and IdP containers in parallel
     [redisContainer, idpContainer] = await Promise.all([
       new GenericContainer("redis:7-alpine")
@@ -59,8 +76,14 @@ describe("Auth Integration", () => {
 
       new GenericContainer("ghcr.io/navikt/mock-oauth2-server:3.0.1")
         .withExposedPorts(IDP_PORT)
+        .withEnvironment({
+          JSON_CONFIG: JSON.stringify({
+            interactiveLogin: true,
+            httpServer: { type: "NettyWrapper", ssl: {} },
+          }),
+        })
         .withWaitStrategy(
-          Wait.forHttp("/default/.well-known/openid-configuration", IDP_PORT),
+          Wait.forHttp("/isalive", IDP_PORT).usingTls().allowInsecure(),
         )
         .start(),
     ]);
@@ -75,9 +98,9 @@ describe("Auth Integration", () => {
 
   after(async () => {
     await Promise.all([
-      await appSessionRedisClient.quit(),
-      redisContainer?.stop() ?? Promise.resolve(),
-      idpContainer?.stop() ?? Promise.resolve(),
+      appSessionRedisClient.quit(),
+      redisContainer?.stop(),
+      idpContainer?.stop()
     ]);
   });
 
@@ -89,7 +112,7 @@ describe("Auth Integration", () => {
   });
 
   afterEach(async () => {
-      await appSessionRedisClient.flushAll();
+    await appSessionRedisClient.flushAll();
   });
 
   describe("GET /health", () => {
@@ -122,6 +145,40 @@ describe("Auth Integration", () => {
       expect(session.account?.homeAccountId).to.equal(
         "test-uid.test-tenant-id",
       );
+    });
+  });
+
+  describe("OAuth2 Authorization Code Flow", () => {
+    it("unauthenticated user can complete full login flow via mock IdP", async () => {
+
+      const signinRes = await unauthenticatedUser.get("/auth/signin");
+      expect(signinRes.status).to.equal(FOUND);
+
+      // Extract the authorize URL from the redirect to send the next request to the IdP
+      const authorizeUrl = signinRes.headers.location as string;
+
+      // Bypass the mock server's login form by POSTing directly to the
+      // authorize endpoint with a username.
+      const postBody = new URLSearchParams({ username: "testuser" }).toString();
+      const idpResponse = await undiciRequest(authorizeUrl, {
+        method: "POST",
+        body: postBody,
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      });
+ 
+      // The mock server redirects to our app's callback with code & state.
+      // Extract the path+query so we can send it to the app via supertest
+      const { pathname, search } = new URL(idpResponse.headers.location as string);
+    
+      // Complete the OAuth2 callback by sending the code and state to callback endpoint
+      const callbackRes = await unauthenticatedUser.get(pathname + search);
+      expect(callbackRes.status).to.equal(FOUND);
+      expect(callbackRes.headers.location).to.equal("/landing");
+
+      // Verify the user is now authenticated and can reach the landing page
+      const landingRes = await unauthenticatedUser.get("/landing");
+      expect(landingRes.status).to.equal(OK);
+      expect(landingRes.text).to.include("Stub Landing Page");
     });
   });
 });

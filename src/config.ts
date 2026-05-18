@@ -54,6 +54,7 @@ export default {
     authorityBaseUrl: required.ENTRA_AUTHORITY_BASE_URL,
     clientId: required.ENTRA_CLIENT_ID,
     clientSecret: required.ENTRA_CLIENT_SECRET,
+    cloudDiscoveryMetadata: optional.ENTRA_CLOUD_DISCOVERY_METADATA,
     postLogoutRedirectUri: required.ENTRA_POST_LOGOUT_REDIRECT_URI,
     redirectUri: required.ENTRA_REDIRECT_URI,
     tenantId: required.ENTRA_TENANT_ID,

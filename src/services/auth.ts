@@ -11,7 +11,7 @@ import { randomUUID } from "node:crypto";
 import type { AuthCodeResponse, PKCECodes } from "#/types/auth-types.js";
 
 import config from "#/config.js";
-import { authRequestDefaults, msalConfig } from "#/config/auth.js";
+import { authRequestDefaults } from "#/config/auth.js";
 import { devError } from "#/lib/devLogger.js";
 import { type Either, failure, success } from "#/lib/either.js";
 import {
@@ -48,7 +48,15 @@ export class AuthService {
   ) {
     this.session = sessionData;
     this.msalClient =
-      msalClient ?? new ConfidentialClientApplication(msalConfig);
+      msalClient ??
+      new ConfidentialClientApplication({
+        auth: {
+          authority: config.entra.authority,
+          clientId: config.entra.clientId,
+          clientSecret: config.entra.clientSecret,
+          cloudDiscoveryMetadata: config.entra.cloudDiscoveryMetadata,
+        },
+      });
   }
 
   /**
@@ -177,7 +185,7 @@ export class AuthService {
       codeChallenge: challenge,
       codeChallengeMethod: challengeMethod,
       prompt: authRequestDefaults.prompt,
-      redirectUri: authRequestDefaults.redirectUri,
+      redirectUri: config.entra.redirectUri,
       responseMode: authRequestDefaults.responseMode,
       scopes: authRequestDefaults.scopes,
       state: nonce,
@@ -188,7 +196,7 @@ export class AuthService {
     this.session.authCodeRequest = {
       code: "",
       codeVerifier: verifier,
-      redirectUri: authRequestDefaults.redirectUri,
+      redirectUri: config.entra.redirectUri,
       scopes: authRequestDefaults.scopes,
     };
 
