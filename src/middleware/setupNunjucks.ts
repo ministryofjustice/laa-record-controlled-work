@@ -21,7 +21,7 @@ export const resolveAsset = (
   extension: string,
 ): string => {
   const files = fs.readdirSync(directory);
-  const pattern = new RegExp(`^${prefix}\\.\\d+\\.${extension}$`);
+  const pattern = new RegExp(`^${prefix}\\.[a-zA-Z0-9]+\\.${extension}$`);
   const matchingFiles = files.filter((file) => pattern.test(file));
   return matchingFiles.length > FIRST_IN_ARRAY
     ? matchingFiles[FIRST_IN_ARRAY]
