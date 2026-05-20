@@ -4255,7 +4255,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"i18next@npm:^26.0.10":
+"i18next@npm:^26.1.0":
   version: 26.1.0
   resolution: "i18next@npm:26.1.0"
   peerDependencies:
@@ -4928,7 +4928,7 @@ __metadata:
     helmet: "npm:^8.1.0"
     http-errors: "npm:~2.0.1"
     husky: "npm:^9.1.7"
-    i18next: "npm:^26.0.10"
+    i18next: "npm:^26.1.0"
     jsdom: "npm:^29.1.1"
     libphonenumber-js: "npm:^1.13.1"
     lint-staged: "npm:^16.4.0"
