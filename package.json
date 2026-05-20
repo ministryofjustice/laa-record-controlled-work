@@ -88,7 +88,6 @@
     "c8": "^11.0.0",
     "chai": "^6.2.2",
     "chai-as-promised": "^8.0.2",
-    "chokidar": "5.0.0",
     "concurrently": "^9.2.1",
     "connect-livereload": "^0.6.1",
     "cross-env": "^10.1.0",

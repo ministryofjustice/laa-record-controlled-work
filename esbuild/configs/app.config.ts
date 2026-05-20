@@ -1,5 +1,6 @@
 import type { BuildOptions } from "esbuild";
 
+import { copy } from "esbuild-plugin-copy";
 import { builtinModules } from "node:module";
 
 const externalModules: string[] = [
@@ -27,7 +28,7 @@ const externalModules: string[] = [
   "redis",
 ];
 
-export const appConfig = (): BuildOptions => ({
+export const appConfig = (watch = false): BuildOptions => ({
   bundle: true,
   entryPoints: ["src/server.ts"],
   external: externalModules,
@@ -36,6 +37,12 @@ export const appConfig = (): BuildOptions => ({
   minify: process.env.NODE_ENV === "production",
   outfile: "public/app.js",
   platform: "node",
+  plugins: [
+    copy({
+      assets: [{ from: "src/views/**/*", to: "public/views", watch }],
+      resolveFrom: "cwd",
+    }),
+  ],
   sourcemap: process.env.NODE_ENV !== "production",
   target: "esnext",
 });

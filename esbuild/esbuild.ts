@@ -1,8 +1,8 @@
 import dotenv from "dotenv";
 import esbuild from "esbuild";
 
-import { copyAssets, copyViews } from "./assets.js";
 import { appConfig } from "./configs/app.config.js";
+import { assetsConfig } from "./configs/assets.config.js";
 import { browserConfigs } from "./configs/browser.config.js";
 import { scssConfig } from "./configs/scss.config.js";
 import { startWatchers } from "./watcher.js";
@@ -11,10 +11,12 @@ dotenv.config();
 
 const isWatch = process.argv.includes("--watch");
 
-const configs = [appConfig(), scssConfig(), ...browserConfigs()];
-
-await copyAssets();
-await copyViews();
+const configs = [
+  appConfig(isWatch),
+  assetsConfig(isWatch),
+  scssConfig(),
+  ...browserConfigs(),
+];
 
 if (isWatch) {
   await startWatchers(configs);

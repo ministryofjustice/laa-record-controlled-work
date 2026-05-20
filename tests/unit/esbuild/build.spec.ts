@@ -10,9 +10,11 @@ import { scssConfig } from "../../../esbuild/configs/scss.config.js";
 
 const BUILD_TIMEOUT = 30_000;
 
-const withoutCleanPlugin = (config: BuildOptions): BuildOptions => ({
+const SIDE_EFFECT_PLUGINS = new Set(["clean", "copy"]);
+
+const withoutSideEffects = (config: BuildOptions): BuildOptions => ({
   ...config,
-  plugins: config.plugins?.filter((p) => p.name !== "clean"),
+  plugins: config.plugins?.filter((p) => !SIDE_EFFECT_PLUGINS.has(p.name)),
 });
 
 describe("esbuild build", function () {
@@ -20,7 +22,7 @@ describe("esbuild build", function () {
 
   it("should build the server app to public/app.js", async () => {
     const result = await esbuild.build({
-      ...withoutCleanPlugin(appConfig()),
+      ...withoutSideEffects(appConfig()),
       metafile: true,
       write: false,
     });
@@ -34,7 +36,7 @@ describe("esbuild build", function () {
 
   it("should build SCSS with a content-hashed filename", async () => {
     const result = await esbuild.build({
-      ...withoutCleanPlugin(scssConfig()),
+      ...withoutSideEffects(scssConfig()),
       metafile: true,
       write: false,
     });
@@ -49,7 +51,7 @@ describe("esbuild build", function () {
   it("should build custom.js with a content-hashed filename", async () => {
     const [customConfig] = browserConfigs();
     const result = await esbuild.build({
-      ...withoutCleanPlugin(customConfig),
+      ...withoutSideEffects(customConfig),
       metafile: true,
       write: false,
     });
@@ -66,7 +68,7 @@ describe("esbuild build", function () {
   it("should build frontend-packages.js with a content-hashed filename", async () => {
     const [, frontendConfig] = browserConfigs();
     const result = await esbuild.build({
-      ...withoutCleanPlugin(frontendConfig),
+      ...withoutSideEffects(frontendConfig),
       metafile: true,
       write: false,
     });
@@ -82,7 +84,7 @@ describe("esbuild build", function () {
 
   it("should include source maps in non-production mode", async () => {
     const result = await esbuild.build({
-      ...withoutCleanPlugin(scssConfig()),
+      ...withoutSideEffects(scssConfig()),
       metafile: true,
       write: false,
     });
