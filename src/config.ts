@@ -9,7 +9,7 @@ import type {
   EntraConfig,
   PathsConfig,
   RedisConfig,
-} from "#/types/config-types.js";
+} from "#/config.types.js";
 
 import { MINUTE, SECOND } from "#/lib/constants/time.js";
 import { optional, required } from "#/lib/env.js";

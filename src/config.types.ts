@@ -1,5 +1,3 @@
-// Configuration type definitions
-
 import type { SessionOptions } from "express-session";
 
 export interface AppConfig {
@@ -7,7 +5,6 @@ export interface AppConfig {
   environment: string;
   port: number;
   useHttps: boolean;
-  // Add any other app configuration properties
 }
 
 export interface Config {

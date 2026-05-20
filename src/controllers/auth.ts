@@ -9,7 +9,7 @@ import {
 } from "#/lib/constants/httpStatus.js";
 import { TokenAcquisitionError } from "#/lib/errors/auth.js";
 import { AuthService } from "#/services/auth.js";
-import { authCodeResponseSchema } from "#/types/auth-types.js";
+import { authCodeResponseSchema } from "#/services/auth.types.js";
 
 export const signIn = async (
   req: Request,
@@ -42,7 +42,7 @@ export const processAuthCodeCallback = async (
   next: NextFunction,
 ): Promise<void> => {
   try {
-    const { success, data } = authCodeResponseSchema.safeParse(req.query);
+    const { data, success } = authCodeResponseSchema.safeParse(req.query);
 
     if (!success) {
       res.status(BAD_REQUEST).send("Invalid redirect payload");

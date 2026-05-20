@@ -4,7 +4,7 @@
  * Utility functions for safely transforming and validating data from JSON fixtures
  */
 
-import type { FieldConfig } from "#/types/form-controller-types.js";
+import type { FieldConfig } from "#/controllers/form.types.js";
 /**
  * Helper function to convert boolean to string for radio buttons
  * @param {unknown} value - Boolean value from API
