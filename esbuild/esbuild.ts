@@ -9,16 +9,16 @@ import { startWatchers } from "./watcher.js";
 
 dotenv.config();
 
-const isWatch = process.argv.includes("--watch");
+const watch = process.argv.includes("--watch");
 
 const configs = [
-  appConfig(isWatch),
-  assetsConfig(isWatch),
+  appConfig(watch),
+  assetsConfig(watch),
   scssConfig(),
   ...browserConfigs(),
 ];
 
-if (isWatch) {
+if (watch) {
   await startWatchers(configs);
 } else {
   console.log("🚀 Starting build process...");
