@@ -1,5 +1,7 @@
 import "dotenv/config";
 
+import "#/lib/zodExtensions.js";
+
 import type { SessionOptions } from "express-session";
 
 import type {

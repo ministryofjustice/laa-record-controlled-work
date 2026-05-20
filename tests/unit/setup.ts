@@ -1,3 +1,5 @@
+import "#/lib/zodExtensions.js";
+
 process.env.SESSION_SECRET ??= "test-secret";
 process.env.NODE_ENV ??= "test";
 process.env.ENTRA_CLIENT_ID ??= "test-client-id";
