@@ -73,7 +73,7 @@
     "@types/express-session": "^1.19.0",
     "@types/figlet": "^1.7.0",
     "@types/fs-extra": "^11.0.4",
-    "@types/jsdom": "^28.0.2",
+    "@types/jsdom": "^28.0.3",
     "@types/livereload": "^0.9.5",
     "@types/mocha": "^10.0.10",
     "@types/morgan": "^1.9.10",
