@@ -18,8 +18,11 @@ services:
       NGINX_UPSTREAM_CCQ: ccq:3000
 
   rcw:
-    build: .
+    build:
+      context: .
+      target: dev
     container_name: rcw-front-end
+    command: yarn start:dev
     expose:
       - 3000
     depends_on:
@@ -38,6 +41,27 @@ services:
       - ENTRA_CLIENT_ID
       - ENTRA_TENANT_ID
       - ENTRA_CLIENT_SECRET
+    develop:
+      watch:
+        - action: sync
+          path: ./src
+          target: /app/src
+        - action: sync
+          path: ./src/views
+          target: /app/public/views
+        - action: sync
+          path: ./esbuild
+          target: /app/esbuild
+        - action: sync
+          path: ./locales
+          target: /app/locales
+        - action: sync
+          path: ./tsconfig.json
+          target: /app/tsconfig.json
+        - action: rebuild
+          path: package.json
+        - action: rebuild
+          path: yarn.lock
 
   ccq:
     image: laa-check-client-qualifies:latest
