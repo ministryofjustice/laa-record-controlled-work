@@ -78,8 +78,8 @@ export const setupNunjucks = (app: Application): nunjucks.Environment => {
   nunjucksEnv.addGlobal("t", nunjucksT);
 
   interface ValidationError {
-    message: string;
     blockCode?: string;
+    message: string;
   }
 
   nunjucksEnv.addGlobal(
@@ -88,21 +88,23 @@ export const setupNunjucks = (app: Application): nunjucks.Environment => {
       const allErrors = [...(domainErrors ?? []), ...(fieldErrors ?? [])];
       const seen = new Set<string>();
 
-      return allErrors.flatMap((error): { text: string; href?: string }[] => {
-        const key = error.blockCode ?? error.message;
+      return allErrors.flatMap(
+        (error): Array<{ href?: string; text: string }> => {
+          const key = error.blockCode ?? error.message;
 
-        if (seen.has(key)) {
-          return [];
-        }
+          if (seen.has(key)) {
+            return [];
+          }
 
-        seen.add(key);
+          seen.add(key);
 
-        return [
-          error.blockCode
-            ? { text: error.message, href: `#${error.blockCode}` }
-            : { text: error.message },
-        ];
-      });
+          return [
+            error.blockCode
+              ? { href: `#${error.blockCode}`, text: error.message }
+              : { text: error.message },
+          ];
+        },
+      );
     },
   );
   return nunjucksEnv;

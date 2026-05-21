@@ -1,11 +1,19 @@
 import type { Request, Response } from "express";
 
+import { Forge } from "@ministryofjustice/hmpps-forge/core";
+import {
+  ExpressFrameworkAdapter,
+  nunjucksFunctions,
+} from "@ministryofjustice/hmpps-forge/express-nunjucks";
+import { govukComponents } from "@ministryofjustice/hmpps-forge/govuk-components";
+import { mojComponents } from "@ministryofjustice/hmpps-forge/moj-components";
 import compression from "compression";
 import express from "express";
 import session from "express-session";
 import morgan from "morgan";
 
 import config from "#/config.js";
+import recordNewCase from "#/journeys/record-new-case/index.js";
 import { initializeI18nextSync } from "#/lib/i18nLoader.js";
 import { createSession } from "#/lib/session.js";
 import { axiosMiddleware } from "#/middleware/apiMiddleware.js";
@@ -24,15 +32,6 @@ import authRouter from "#/routes/auth.js";
 import healthRouter from "#/routes/health.js";
 import indexRouter from "#/routes/index.js";
 import testRouter from "#/routes/test.js";
-
-import { Forge } from "@ministryofjustice/hmpps-forge/core";
-import {
-  ExpressFrameworkAdapter,
-  nunjucksFunctions,
-} from "@ministryofjustice/hmpps-forge/express-nunjucks";
-import { govukComponents } from "@ministryofjustice/hmpps-forge/govuk-components";
-import { mojComponents } from "@ministryofjustice/hmpps-forge/moj-components";
-import recordNewCase from "#/journeys/record-new-case/index.js";
 
 const TRUST_FIRST_PROXY = 1;
 const ENABLE_PLAYWRIGHT_TEST_SIGNIN =
@@ -131,7 +130,9 @@ const createApp = async (): Promise<express.Application> => {
   }
 
   app.use(express.urlencoded({ extended: true }));
-  app.use("/", forge.getRouter() as express.Router);
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Forge.getRouter returns unknown but will always be an express.Router.
+  const forgeRouter = forge.getRouter() as express.Router;
+  app.use("/", forgeRouter);
 
   return app;
 };

@@ -1,31 +1,29 @@
-import { PatternEffects } from "#/journeys/effects.js";
 import {
-  journey,
-  step,
-  submit,
-  redirect,
+  access,
   Answer,
   Condition,
-  validation,
-  Self,
-  access,
+  journey,
   Query,
+  redirect,
+  Self,
+  step,
+  submit,
+  validation,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 import { HtmlBlock } from "@ministryofjustice/hmpps-forge/core/components";
 import {
-  GovUKButton,
-  GovUKRadioInput,
-  GovUKHeading,
-  GovUKBody,
   GovUKBackLink,
+  GovUKBody,
+  GovUKButton,
+  GovUKHeading,
+  GovUKRadioInput,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
+
+import { PatternEffects } from "#/journeys/effects.js";
 
 const patternCode = "newCase";
 
 const ecfStep = step({
-  path: "/ecf",
-  title: "Does this case require Exceptional Case Funding?",
-  reachability: { entryWhen: true },
   blocks: [
     GovUKBackLink({
       href: "/",
@@ -37,19 +35,19 @@ const ecfStep = step({
       code: "ecf",
       fieldset: {
         legend: {
-          text: "Does this case require Exceptional Case Funding?",
-          isPageHeading: true,
           classes: "govuk-fieldset__legend--l",
+          isPageHeading: true,
+          text: "Does this case require Exceptional Case Funding?",
         },
       },
       items: [
         {
-          value: "yes",
           text: "Yes",
+          value: "yes",
         },
         {
-          value: "no",
           text: "No",
+          value: "no",
         },
       ],
       validWhen: [
@@ -63,35 +61,37 @@ const ecfStep = step({
   ],
   onSubmission: [
     submit({
-      validate: true,
       onValid: {
         effects: [PatternEffects.SaveDraftAnswers(patternCode)],
         next: [
           redirect({
-            when: Query("returnTo").match(Condition.Equals("check-answers")),
             goto: "check-answers",
+            when: Query("returnTo").match(Condition.Equals("check-answers")),
           }),
           redirect({
-            when: Answer("ecf").match(Condition.Equals("yes")),
             goto: "ecf-dropout",
+            when: Answer("ecf").match(Condition.Equals("yes")),
           }),
           redirect({ goto: "legal-aid-before" }),
         ],
       },
+      validate: true,
     }),
   ],
+  path: "/ecf",
+  reachability: { entryWhen: true },
+  title: "Does this case require Exceptional Case Funding?",
 });
 
 const ineligibleStep = step({
-  path: "/ecf-dropout",
-  title: "You are ineligible",
   blocks: [
     GovUKBackLink({
       href: "/new-case/ecf",
     }),
     GovUKHeading({
-      text: "You cannot use this service for this type of case",
+      // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- this is not a magic number
       level: 1,
+      text: "You cannot use this service for this type of case",
     }),
     GovUKBody({
       text: 'Continue to complete the <a href="/government/publications/legal-aid-exceptional-case-funding-form-and-guidance">ECF application form CIV ECF 1</a> and <a href="/government/publications/cw1-financial-eligibility-for-legal-aid-clients">form CW1</a> for your client.',
@@ -105,27 +105,27 @@ const ineligibleStep = step({
   ],
   onSubmission: [
     submit({
-      validate: true,
       onValid: {
         effects: [PatternEffects.ClearDraftAnswers(patternCode)],
-        next: [
-          redirect({ goto: "/" }),
-        ],
+        next: [redirect({ goto: "/" })],
       },
+      validate: true,
     }),
   ],
+  path: "/ecf-dropout",
+  title: "You are ineligible",
 });
 
 export const newCaseJourney = journey({
   code: "newCase",
-  title: "Record new case",
-  path: "/new-case",
   onAccess: [
     access({
       effects: [PatternEffects.LoadDraftAnswers(patternCode)],
     }),
   ],
+  path: "/new-case",
   reachability: { disableReachabilityChecks: false },
-  view: { template: "partials/form-step" },
   steps: [ecfStep, ineligibleStep],
+  title: "Record new case",
+  view: { template: "partials/form-step" },
 });
