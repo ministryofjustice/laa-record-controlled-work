@@ -4,6 +4,9 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 import type { PatternSession } from "./context.type.ts";
 
+const isPatternSession = (value: unknown): value is PatternSession =>
+  typeof value === "object" && value !== null;
+
 export interface PatternEffectShape {
   /** Copies previously stored draft answers for this pattern into the form context on access. */
   LoadDraftAnswers: (patternCode: string) => EffectFunctionExpr;
@@ -19,8 +22,13 @@ export const {
 } = defineEffectFunctions<PatternEffectShape>({
   LoadDraftAnswers:
     () => (context, patternCode: string) => {
-      const stored = (context.getSession() as PatternSession | undefined)
-        ?.patternDrafts?.[patternCode];
+      const session = context.getSession();
+
+      if (!isPatternSession(session)) {
+        return;
+      }
+
+      const stored = session.patternDrafts?.[patternCode];
 
       if (!stored) {
         return;
@@ -35,15 +43,13 @@ export const {
 
   SaveDraftAnswers:
     () => (context, patternCode: string) => {
-      const session = context.getSession() as PatternSession | undefined;
+      const session = context.getSession();
 
-      if (!session) {
+      if (!isPatternSession(session)) {
         return;
       }
 
-      if (!session.patternDrafts) {
-        session.patternDrafts = {};
-      }
+      session.patternDrafts ??= {};
 
       session.patternDrafts[patternCode] = {
         ...session.patternDrafts[patternCode],
@@ -53,10 +59,16 @@ export const {
 
   ClearDraftAnswers: () => {
     return (context, patternCode: string) => {
-      const session = context.getSession() as PatternSession | undefined;
+      const session = context.getSession();
 
-      if (session?.patternDrafts) {
-        delete session.patternDrafts[patternCode];
+      if (!isPatternSession(session)) {
+        return;
+      }
+
+      if (session.patternDrafts) {
+        const { [patternCode]: _removed, ...remainingDrafts } =
+          session.patternDrafts;
+        session.patternDrafts = remainingDrafts;
       }
 
       for (const key of Object.keys(context.getAllAnswers())) {
