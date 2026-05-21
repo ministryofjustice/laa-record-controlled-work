@@ -17,32 +17,5 @@
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit",
     "source.organizeImports": "never"
-  },
-  "files.exclude": {
-    "**/.git": true,
-    "**/.svn": true,
-    "**/.hg": true,
-    "**/.DS_Store": true,
-    "**/Thumbs.db": true,
-    "**/CVS": true,
-    "**/.ruby-lsp": true,
-    "**/node_modules": true,
-    ".yarn/cache": true,
-    ".yarn/install-state.gz": true,
-    ".yarn/build-state.yml": true,
-    ".yarn/unplugged": true,
-    "**/.idea": true,
-    "**/.trunk": true,
-    "**/public": true,
-    "**/.env": true,
-    "**/.env.resolved": true,
-    "test-results": true,
-    "playwright-report": true,
-    "blob-report": true,
-    "tests/playwright/.cache": true,
-    "**/coverage": true,
-    "**/.local": true,
-    "**/*.cjs": true
-  },
-  "gitignoreToggle.hidden": true
+  }
 }
