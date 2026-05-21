@@ -23,7 +23,7 @@ const DEFAULT_REDIS_HOST = "localhost";
 
 /* eslint-disable @typescript-eslint/no-magic-numbers -- time constants are intuitive */
 const REDIS_SOCKET_CONNECTION_TIMEOUT = 10 * SECOND;
-const SESSION_AGE_MAX = 18 * HOUR;
+const SESSION_AGE_MAX = 12 * HOUR;
 const DEFAULT_RATE_WINDOW = 15 * MINUTE;
 /* eslint-enable @typescript-eslint/no-magic-numbers */
 
