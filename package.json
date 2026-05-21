@@ -10,6 +10,7 @@
   },
   "scripts": {
     "start": "node public/app.js",
+    "start:dev": "yarn build && concurrently \"tsc --watch\" \"node public/esbuild/esbuild.js --watch\" \"nodemon\"",
     "start:docker": "docker compose --env-file docker-images.env up -d",
     "clean": "rimraf public",
     "build": "yarn clean && yarn build:ts && node public/esbuild/esbuild.js",
