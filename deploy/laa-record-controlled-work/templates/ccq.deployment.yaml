@@ -28,9 +28,10 @@ spec:
           imagePullPolicy: {{ .Values.ccq.image.pullPolicy }}
           securityContext:
             allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
             runAsNonRoot: true
-            runAsUser: 10001
-            runAsGroup: 10001
+            runAsUser: 1000
+            runAsGroup: 1000
             capabilities:
               drop:
                 - ALL
