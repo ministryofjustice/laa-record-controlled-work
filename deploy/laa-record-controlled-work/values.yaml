@@ -149,6 +149,8 @@ ccq:
     tag: latest
 
   envSecretName: env-secrets
+  envSecrets:
+    - SECRET_KEY_BASE
 
   env:
     REDIS_URL: ""
