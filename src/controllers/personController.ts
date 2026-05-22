@@ -1,13 +1,15 @@
-import { extractFormFields } from "#/lib/dataTransformers.js";
+import type { NextFunction, Request, Response } from "express";
+
+import { validationResult } from "express-validator";
+
 import { BAD_REQUEST } from "#/lib/constants/httpStatus.js";
+import { extractFormFields } from "#/lib/dataTransformers.js";
 import {
   getSessionData,
   storeOriginalFormData,
   storeSessionData,
 } from "#/lib/sessionHelpers.js";
 import { formatValidationErrors } from "#/lib/ValidationErrorHelpers.js";
-import type { NextFunction, Request, Response } from "express";
-import { validationResult } from "express-validator";
 
 // Extend Request interface for CSRF token support
 interface RequestWithCSRF extends Request {
@@ -16,21 +18,179 @@ interface RequestWithCSRF extends Request {
 
 // Default person data (in a real app, this would be from a database)
 const DEFAULT_PERSON_DATA = {
-  fullName: "John Smith",
   address: "123 Example Street\nExample City\nEX1 2MP",
   contactPreference: "email",
-  priority: "medium",
   dateOfBirth: { day: "27", month: "3", year: "1986" },
+  fullName: "John Smith",
+  priority: "medium",
 };
 
 /**
- * Safely gets a string value from session data or returns default
- * @param {unknown} value - The value to check
- * @param {string} defaultValue - The default value to use
- * @returns {string} The safe string value
+ * GET controller for rendering the person change form
+ * @param {RequestWithCSRF} req - Express request object
+ * @param {Response} res - Express response object
+ * @param {NextFunction} next - Express next function
  */
-function safeStringValue(value: unknown, defaultValue: string): string {
-  return typeof value === "string" && value !== "" ? value : defaultValue;
+export function getPerson(
+  req: RequestWithCSRF,
+  res: Response,
+  next: NextFunction,
+): void {
+  try {
+    const csrfToken =
+      typeof req.csrfToken === "function" ? req.csrfToken() : undefined;
+    const currentPersonData = getCurrentPersonData(req);
+
+    // Store original form data for comparison (following MCC pattern)
+    const originalFormData = {
+      address: currentPersonData.address,
+      contactPreference: currentPersonData.contactPreference,
+      "dateOfBirth-day": currentPersonData.dateOfBirth.day,
+      "dateOfBirth-month": currentPersonData.dateOfBirth.month,
+      "dateOfBirth-year": currentPersonData.dateOfBirth.year,
+      fullName: currentPersonData.fullName,
+      priority: currentPersonData.priority,
+    };
+    storeOriginalFormData(req, "personOriginal", originalFormData);
+
+    res.render("change-person.njk", {
+      csrfToken,
+      currentAddress: currentPersonData.address,
+      currentContactPreference: currentPersonData.contactPreference,
+      currentDateOfBirth: currentPersonData.dateOfBirth,
+      currentName: currentPersonData.fullName,
+      currentPriority: currentPersonData.priority,
+      error: null,
+      formData: {},
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * POST controller for handling person change requests
+ * Processes validation results and formats errors for GOV.UK component display
+ * @param {RequestWithCSRF} req - Express request object
+ * @param {Response} res - Express response object
+ * @param {NextFunction} next - Express next function
+ */
+export function postPerson(
+  req: RequestWithCSRF,
+  res: Response,
+  next: NextFunction,
+): void {
+  try {
+    const csrfToken =
+      typeof req.csrfToken === "function" ? req.csrfToken() : undefined;
+
+    // Extract form fields for consistent handling
+    const formFields = extractFormFields(req.body, [
+      "fullName",
+      "address",
+      "contactPreference",
+      "priority",
+      "dateOfBirth-day",
+      "dateOfBirth-month",
+      "dateOfBirth-year",
+    ]);
+
+    // Check for validation errors
+    const validationErrors = validationResult(req);
+
+    if (!validationErrors.isEmpty()) {
+      // Use the new formatValidationErrors helper
+      const { errorSummaryList, inputErrors } =
+        formatValidationErrors(validationErrors);
+      const currentPersonData = getCurrentPersonData(req);
+
+      // Re-render the form with errors and preserve user input
+      res.status(BAD_REQUEST).render("change-person.njk", {
+        csrfToken,
+        currentAddress: currentPersonData.address,
+        currentContactPreference: currentPersonData.contactPreference,
+        currentDateOfBirth: currentPersonData.dateOfBirth,
+        currentName: currentPersonData.fullName,
+        currentPriority: currentPersonData.priority,
+        error: {
+          errorSummaryList,
+          inputErrors,
+        },
+        formData: formFields,
+      });
+      return;
+    }
+
+    // Success case - update the stored person data and show success
+    const updatedPersonData = {
+      address: String(formFields.address),
+      contactPreference: String(formFields.contactPreference),
+      "dateOfBirth-day": String(formFields["dateOfBirth-day"]),
+      "dateOfBirth-month": String(formFields["dateOfBirth-month"]),
+      "dateOfBirth-year": String(formFields["dateOfBirth-year"]),
+      fullName: String(formFields.fullName),
+    };
+
+    // Store the updated data in session
+    storeSessionData(req, "currentPerson", updatedPersonData);
+
+    // Get the updated data for display
+    const currentPersonData = getCurrentPersonData(req);
+
+    // Render the form again with the updated data and success state
+    res.render("change-person.njk", {
+      csrfToken,
+      currentAddress: currentPersonData.address,
+      currentContactPreference: currentPersonData.contactPreference,
+      currentDateOfBirth: currentPersonData.dateOfBirth,
+      currentName: currentPersonData.fullName,
+      currentPriority: currentPersonData.priority,
+      error: null,
+      formData: {
+        address: "",
+        contactPreference: "",
+        "dateOfBirth-day": "",
+        "dateOfBirth-month": "",
+        "dateOfBirth-year": "",
+        fullName: "",
+        priority: "",
+      }, // Clear the form
+      successMessage: "Person details updated successfully",
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * Get current person data from session or return defaults
+ * @param {Request} req - Express request object with session
+ * @returns {object} Current person data matching DEFAULT_PERSON_DATA structure
+ */
+function getCurrentPersonData(req: Request): typeof DEFAULT_PERSON_DATA {
+  const sessionData = getSessionData(req, "currentPerson");
+  if (sessionData !== null) {
+    return {
+      address: safeStringValue(
+        sessionData.address,
+        DEFAULT_PERSON_DATA.address,
+      ),
+      contactPreference: safeStringValue(
+        sessionData.contactPreference,
+        DEFAULT_PERSON_DATA.contactPreference,
+      ),
+      dateOfBirth: safeDateOfBirth(sessionData.dateOfBirth),
+      fullName: safeStringValue(
+        sessionData.fullName,
+        DEFAULT_PERSON_DATA.fullName,
+      ),
+      priority: safeStringValue(
+        sessionData.priority,
+        DEFAULT_PERSON_DATA.priority,
+      ),
+    };
+  }
+  return DEFAULT_PERSON_DATA;
 }
 
 /**
@@ -70,169 +230,11 @@ function safeDateOfBirth(value: unknown): {
 }
 
 /**
- * Get current person data from session or return defaults
- * @param {Request} req - Express request object with session
- * @returns {object} Current person data matching DEFAULT_PERSON_DATA structure
+ * Safely gets a string value from session data or returns default
+ * @param {unknown} value - The value to check
+ * @param {string} defaultValue - The default value to use
+ * @returns {string} The safe string value
  */
-function getCurrentPersonData(req: Request): typeof DEFAULT_PERSON_DATA {
-  const sessionData = getSessionData(req, "currentPerson");
-  if (sessionData !== null) {
-    return {
-      fullName: safeStringValue(
-        sessionData.fullName,
-        DEFAULT_PERSON_DATA.fullName,
-      ),
-      address: safeStringValue(
-        sessionData.address,
-        DEFAULT_PERSON_DATA.address,
-      ),
-      contactPreference: safeStringValue(
-        sessionData.contactPreference,
-        DEFAULT_PERSON_DATA.contactPreference,
-      ),
-      priority: safeStringValue(
-        sessionData.priority,
-        DEFAULT_PERSON_DATA.priority,
-      ),
-      dateOfBirth: safeDateOfBirth(sessionData.dateOfBirth),
-    };
-  }
-  return DEFAULT_PERSON_DATA;
-}
-
-/**
- * GET controller for rendering the person change form
- * @param {RequestWithCSRF} req - Express request object
- * @param {Response} res - Express response object
- * @param {NextFunction} next - Express next function
- */
-export function getPerson(
-  req: RequestWithCSRF,
-  res: Response,
-  next: NextFunction,
-): void {
-  try {
-    const csrfToken =
-      typeof req.csrfToken === "function" ? req.csrfToken() : undefined;
-    const currentPersonData = getCurrentPersonData(req);
-
-    // Store original form data for comparison (following MCC pattern)
-    const originalFormData = {
-      fullName: currentPersonData.fullName,
-      address: currentPersonData.address,
-      contactPreference: currentPersonData.contactPreference,
-      priority: currentPersonData.priority,
-      "dateOfBirth-day": currentPersonData.dateOfBirth.day,
-      "dateOfBirth-month": currentPersonData.dateOfBirth.month,
-      "dateOfBirth-year": currentPersonData.dateOfBirth.year,
-    };
-    storeOriginalFormData(req, "personOriginal", originalFormData);
-
-    res.render("change-person.njk", {
-      currentName: currentPersonData.fullName,
-      currentAddress: currentPersonData.address,
-      currentContactPreference: currentPersonData.contactPreference,
-      currentPriority: currentPersonData.priority,
-      currentDateOfBirth: currentPersonData.dateOfBirth,
-      csrfToken,
-      formData: {},
-      error: null,
-    });
-  } catch (error) {
-    next(error);
-  }
-}
-
-/**
- * POST controller for handling person change requests
- * Processes validation results and formats errors for GOV.UK component display
- * @param {RequestWithCSRF} req - Express request object
- * @param {Response} res - Express response object
- * @param {NextFunction} next - Express next function
- */
-export function postPerson(
-  req: RequestWithCSRF,
-  res: Response,
-  next: NextFunction,
-): void {
-  try {
-    const csrfToken =
-      typeof req.csrfToken === "function" ? req.csrfToken() : undefined;
-
-    // Extract form fields for consistent handling
-    const formFields = extractFormFields(req.body, [
-      "fullName",
-      "address",
-      "contactPreference",
-      "priority",
-      "dateOfBirth-day",
-      "dateOfBirth-month",
-      "dateOfBirth-year",
-    ]);
-
-    // Check for validation errors
-    const validationErrors = validationResult(req);
-
-    if (!validationErrors.isEmpty()) {
-      // Use the new formatValidationErrors helper
-      const { inputErrors, errorSummaryList } =
-        formatValidationErrors(validationErrors);
-      const currentPersonData = getCurrentPersonData(req);
-
-      // Re-render the form with errors and preserve user input
-      res.status(BAD_REQUEST).render("change-person.njk", {
-        currentName: currentPersonData.fullName,
-        currentAddress: currentPersonData.address,
-        currentContactPreference: currentPersonData.contactPreference,
-        currentPriority: currentPersonData.priority,
-        currentDateOfBirth: currentPersonData.dateOfBirth,
-        csrfToken,
-        formData: formFields,
-        error: {
-          inputErrors,
-          errorSummaryList,
-        },
-      });
-      return;
-    }
-
-    // Success case - update the stored person data and show success
-    const updatedPersonData = {
-      fullName: String(formFields.fullName),
-      address: String(formFields.address),
-      contactPreference: String(formFields.contactPreference),
-      "dateOfBirth-day": String(formFields["dateOfBirth-day"]),
-      "dateOfBirth-month": String(formFields["dateOfBirth-month"]),
-      "dateOfBirth-year": String(formFields["dateOfBirth-year"]),
-    };
-
-    // Store the updated data in session
-    storeSessionData(req, "currentPerson", updatedPersonData);
-
-    // Get the updated data for display
-    const currentPersonData = getCurrentPersonData(req);
-
-    // Render the form again with the updated data and success state
-    res.render("change-person.njk", {
-      currentName: currentPersonData.fullName,
-      currentAddress: currentPersonData.address,
-      currentContactPreference: currentPersonData.contactPreference,
-      currentPriority: currentPersonData.priority,
-      currentDateOfBirth: currentPersonData.dateOfBirth,
-      csrfToken,
-      formData: {
-        fullName: "",
-        address: "",
-        contactPreference: "",
-        priority: "",
-        "dateOfBirth-day": "",
-        "dateOfBirth-month": "",
-        "dateOfBirth-year": "",
-      }, // Clear the form
-      error: null,
-      successMessage: "Person details updated successfully",
-    });
-  } catch (error) {
-    next(error);
-  }
+function safeStringValue(value: unknown, defaultValue: string): string {
+  return typeof value === "string" && value !== "" ? value : defaultValue;
 }

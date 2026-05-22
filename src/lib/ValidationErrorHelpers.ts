@@ -9,9 +9,9 @@ import type {
  * Interface for validation error data structure
  */
 export interface ValidationErrorData {
-  summaryMessage: string;
-  inlineMessage: string;
   fieldPath?: string; // Add field path from express-validator
+  inlineMessage: string;
+  summaryMessage: string;
 }
 
 /**
@@ -33,15 +33,6 @@ export class TypedValidationError extends Error {
 }
 
 /**
- * Type guard to check if value is a record object
- * @param {unknown} value Value to check
- * @returns {boolean} True if value is a record object
- */
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
-/**
  * Check if an object has a specific property (type guard)
  * @param {unknown} obj - Object to check
  * @param {string} key - Key to check for
@@ -54,99 +45,18 @@ function hasProperty(
   return isRecord(obj) && key in obj;
 }
 
+/**
+ * Type guard to check if value is a record object
+ * @param {unknown} value Value to check
+ * @returns {boolean} True if value is a record object
+ */
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
 // Constants for magic numbers
 const EMPTY_OBJECT_LENGTH = 0;
 const ZERO_VALUE = 0;
-
-/**
- * Check if value should return empty string
- * @param {unknown} value Value to check
- * @returns {boolean} True if should return empty string
- */
-function shouldReturnEmptyString(value: unknown): boolean {
-  return (
-    value === null ||
-    value === undefined ||
-    value === "" ||
-    value === ZERO_VALUE ||
-    value === false
-  );
-}
-
-/**
- * Safely get string value from unknown data
- * @param {unknown} value Value to convert
- * @returns {string} String value or empty string
- */
-function safeString(value: unknown): string {
-  // Handle null, undefined, empty string, zero, and false
-  if (shouldReturnEmptyString(value)) {
-    return "";
-  }
-
-  // Handle string type
-  if (typeof value === "string") {
-    return value;
-  }
-
-  // Handle number and boolean types
-  if (typeof value === "number" || typeof value === "boolean") {
-    return String(value);
-  }
-
-  // Handle objects - avoid unsafe toString operations
-  if (typeof value === "object" && value !== null) {
-    // Handle empty objects specifically
-    if (Object.keys(value).length === EMPTY_OBJECT_LENGTH) {
-      return "";
-    }
-
-    // For objects, use JSON.stringify as it's safer than toString
-    try {
-      return JSON.stringify(value);
-    } catch {
-      return "[object Object]";
-    }
-  }
-
-  // Fallback to String conversion
-  return String(value);
-}
-
-/**
- * Custom error formatter for express-validator that preserves type safety
- * This is the express-validator recommended approach using formatWith()
- * @param {ValidationError} error - The express-validator error object
- * @returns {ValidationErrorData} Typed error data object
- */
-export function formatValidationError(
-  error: ValidationError,
-): ValidationErrorData {
-  // Handle TypedValidationError instances
-  if (error.msg instanceof TypedValidationError) {
-    return error.msg.errorData;
-  }
-
-  // Handle the case where the error message is already our ValidationErrorData
-  if (
-    isRecord(error.msg) &&
-    hasProperty(error.msg, "summaryMessage") &&
-    hasProperty(error.msg, "inlineMessage")
-  ) {
-    return {
-      summaryMessage: safeString(error.msg.summaryMessage),
-      inlineMessage: safeString(error.msg.inlineMessage),
-    };
-  }
-
-  // Fallback: treat the message as both summary and inline
-  const safeMessage = safeString(error.msg);
-  const message = safeMessage !== "" ? safeMessage : "Invalid value";
-  return {
-    summaryMessage: message,
-    inlineMessage: message,
-  };
-}
 
 /**
  * Creates a change detection validator that checks if any of the specified field pairs have changed
@@ -159,19 +69,35 @@ export function formatValidationError(
 export function createChangeDetectionValidator(
   fieldMappings: Array<{ current: string; original: string }>,
   errorMessage: {
-    summaryMessage: string | (() => string);
-    inlineMessage: string | (() => string);
+    inlineMessage: (() => string) | string;
+    summaryMessage: (() => string) | string;
   },
 ): {
-  in: Location[];
   custom: {
-    options: (_value: string, meta: Meta) => boolean;
     errorMessage: () => TypedValidationError;
+    options: (_value: string, meta: Meta) => boolean;
   };
+  in: Location[];
 } {
   return {
-    in: ["body"] as Location[],
     custom: {
+      /**
+       * Custom error message for when no changes are made
+       * @returns {TypedValidationError} Returns TypedValidationError with structured error data
+       */
+      errorMessage: () => {
+        /**
+         * Resolve possibly lazy string value.
+         * @param {string | (() => string)} val - Value or thunk
+         * @returns {string} Resolved string
+         */
+        const resolve = (val: (() => string) | string): string =>
+          typeof val === "function" ? val() : val;
+        const summaryMessage = resolve(errorMessage.summaryMessage);
+        const inlineMessage = resolve(errorMessage.inlineMessage);
+
+        return new TypedValidationError({ inlineMessage, summaryMessage });
+      },
       /**
        * Schema to check if any of the specified field values have been unchanged.
        * @param {string} _value - Placeholder value (unused)
@@ -231,24 +157,43 @@ export function createChangeDetectionValidator(
 
         return hasChanges;
       },
-      /**
-       * Custom error message for when no changes are made
-       * @returns {TypedValidationError} Returns TypedValidationError with structured error data
-       */
-      errorMessage: () => {
-        /**
-         * Resolve possibly lazy string value.
-         * @param {string | (() => string)} val - Value or thunk
-         * @returns {string} Resolved string
-         */
-        const resolve = (val: string | (() => string)): string =>
-          typeof val === "function" ? val() : val;
-        const summaryMessage = resolve(errorMessage.summaryMessage);
-        const inlineMessage = resolve(errorMessage.inlineMessage);
-
-        return new TypedValidationError({ summaryMessage, inlineMessage });
-      },
     },
+    in: ["body"] as Location[],
+  };
+}
+
+/**
+ * Custom error formatter for express-validator that preserves type safety
+ * This is the express-validator recommended approach using formatWith()
+ * @param {ValidationError} error - The express-validator error object
+ * @returns {ValidationErrorData} Typed error data object
+ */
+export function formatValidationError(
+  error: ValidationError,
+): ValidationErrorData {
+  // Handle TypedValidationError instances
+  if (error.msg instanceof TypedValidationError) {
+    return error.msg.errorData;
+  }
+
+  // Handle the case where the error message is already our ValidationErrorData
+  if (
+    isRecord(error.msg) &&
+    hasProperty(error.msg, "summaryMessage") &&
+    hasProperty(error.msg, "inlineMessage")
+  ) {
+    return {
+      inlineMessage: safeString(error.msg.inlineMessage),
+      summaryMessage: safeString(error.msg.summaryMessage),
+    };
+  }
+
+  // Fallback: treat the message as both summary and inline
+  const safeMessage = safeString(error.msg);
+  const message = safeMessage !== "" ? safeMessage : "Invalid value";
+  return {
+    inlineMessage: message,
+    summaryMessage: message,
   };
 }
 
@@ -258,8 +203,8 @@ export function createChangeDetectionValidator(
  * @returns {object} Formatted errors for GOV.UK error summary and field display
  */
 export function formatValidationErrors(validationResult: Result): {
+  errorSummaryList: Array<{ href: string; text: string }>;
   inputErrors: Record<string, string>;
-  errorSummaryList: Array<{ text: string; href: string }>;
 } {
   const rawErrors = validationResult.array();
 
@@ -292,14 +237,69 @@ export function formatValidationErrors(validationResult: Result): {
 
   // Build error summary list for GOV.UK error summary component
   const errorSummaryList = formattedErrors.map(
-    ({ summaryMessage, fieldName }) => ({
-      text: summaryMessage,
+    ({ fieldName, summaryMessage }) => ({
       href: `#${fieldName}`,
+      text: summaryMessage,
     }),
   );
 
   return {
-    inputErrors,
     errorSummaryList,
+    inputErrors,
   };
+}
+
+/**
+ * Safely get string value from unknown data
+ * @param {unknown} value Value to convert
+ * @returns {string} String value or empty string
+ */
+function safeString(value: unknown): string {
+  // Handle null, undefined, empty string, zero, and false
+  if (shouldReturnEmptyString(value)) {
+    return "";
+  }
+
+  // Handle string type
+  if (typeof value === "string") {
+    return value;
+  }
+
+  // Handle number and boolean types
+  if (typeof value === "number" || typeof value === "boolean") {
+    return String(value);
+  }
+
+  // Handle objects - avoid unsafe toString operations
+  if (typeof value === "object" && value !== null) {
+    // Handle empty objects specifically
+    if (Object.keys(value).length === EMPTY_OBJECT_LENGTH) {
+      return "";
+    }
+
+    // For objects, use JSON.stringify as it's safer than toString
+    try {
+      return JSON.stringify(value);
+    } catch {
+      return "[object Object]";
+    }
+  }
+
+  // Fallback to String conversion
+  return String(value);
+}
+
+/**
+ * Check if value should return empty string
+ * @param {unknown} value Value to check
+ * @returns {boolean} True if should return empty string
+ */
+function shouldReturnEmptyString(value: unknown): boolean {
+  return (
+    value === null ||
+    value === undefined ||
+    value === "" ||
+    value === ZERO_VALUE ||
+    value === false
+  );
 }

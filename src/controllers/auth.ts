@@ -1,3 +1,5 @@
+import type { NextFunction, Request, Response } from "express";
+
 // TODO: this is a handlers module, rather than controller
 import config from "#/config.js";
 import {
@@ -8,7 +10,6 @@ import {
 import { TokenAcquisitionError } from "#/lib/errors/auth.js";
 import { AuthService } from "#/services/auth.js";
 import { authCodeResponseSchema } from "#/types/auth-types.js";
-import type { NextFunction, Request, Response } from "express";
 
 export const signIn = async (
   req: Request,
@@ -41,7 +42,7 @@ export const processAuthCodeCallback = async (
   next: NextFunction,
 ): Promise<void> => {
   try {
-    const { success, data } = authCodeResponseSchema.safeParse(req.body);
+    const { data, success } = authCodeResponseSchema.safeParse(req.query);
 
     if (!success) {
       res.status(BAD_REQUEST).send("Invalid redirect payload");
@@ -59,9 +60,9 @@ export const processAuthCodeCallback = async (
       return;
     }
 
-    const { isAuthenticated, idToken, account, tokenCache } = req.session;
+    const { account, idToken, isAuthenticated, tokenCache } = req.session;
 
-    req.session.regenerate((error: Error | undefined | null) => {
+    req.session.regenerate((error: Error | null | undefined) => {
       if (error) {
         next(error);
         return;
@@ -85,18 +86,14 @@ export const signOut = (
   next: NextFunction,
 ): void => {
   try {
-    const {
-      session: { idToken },
-    } = req;
-
-    req.session.destroy((error) => {
-      if (error !== undefined && error !== null) {
+    req.session.destroy((error: Error | null) => {
+      if (error) {
         next(error);
         return;
       }
 
       res.clearCookie(config.session.name);
-      res.redirect(AuthService.getLogoutUrl(idToken));
+      res.redirect("/");
     });
   } catch (error) {
     next(error);

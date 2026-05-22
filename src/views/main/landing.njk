@@ -1,12 +1,6 @@
 {% extends "base.njk" %}
-{%- from "govuk/components/button/macro.njk" import govukButton -%}
 
 {% block content %}
     <h1 class="govuk-heading-xl">Stub Landing Page</h1>
-{# TODO move to header when landing page ticket is created #}
-    <form method="post" action="/auth/signout">
-      <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-      {{ govukButton({ text: "Sign out", classes: "govuk-button--secondary" }) }}
-    </form>
 
 {% endblock %}

@@ -1,3 +1,4 @@
+export type Either<Err, Value> = Failure<Err> | Success<Value>;
 export interface Failure<Err> {
   readonly error: Err;
 }
@@ -5,7 +6,6 @@ export interface Success<Value> {
   readonly error?: never;
   readonly value: Value;
 }
-export type Either<Err, Value> = Failure<Err> | Success<Value>;
 
 /**
  * Returns an `Either` failure outcome with an error
