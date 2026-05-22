@@ -1,11 +1,9 @@
-import {
-  access,
-  journey,
-} from "@ministryofjustice/hmpps-forge/core/authoring";
+import { access, journey } from "@ministryofjustice/hmpps-forge/core/authoring";
 
 import { JourneyEffects } from "#/journeys/effects.js";
-import { ecfStep } from "./steps/1-ecf.step.js";
+
 import { ineligibleStep } from "./steps/1-ecf-dropout.step.js";
+import { ecfStep } from "./steps/1-ecf.step.js";
 
 const journeyCode = "createApplication";
 
