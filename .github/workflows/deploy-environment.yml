@@ -41,6 +41,7 @@ jobs:
           app-environment: ${{ inputs.app-environment }}
           ecr-registry_url: ${{ secrets.ECR_REGISTRY_URL }}
           ecr-repository: ${{ vars.ECR_REPOSITORY }}
+          ccq-ecr-repository: ${{ vars.CCQ_ECR_REPOSITORY }}
           nginx-ecr-repository: ${{ vars.NGINX_ECR_REPOSITORY }}
           kube-cert: ${{ secrets.KUBE_CERT }}
           kube-token: ${{ secrets.KUBE_TOKEN }}

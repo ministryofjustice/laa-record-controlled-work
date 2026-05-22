@@ -30,6 +30,9 @@ inputs:
   nginx-ecr-repository:
     description: "ECR repository for the mirrored nginx-unprivileged image"
     required: true
+  ccq-ecr-repository:
+    description: "ECR repository for CCQ"
+    required: true
   sha:
     description: "Commit SHA to deploy"
     required: true
@@ -88,6 +91,7 @@ runs:
         GITHUB_SHA: ${{ inputs.sha }}
         BRANCH_NAME: ${{ inputs.branch-ref }}
         K8S_NAMESPACE: ${{ inputs.kube-namespace }}
+        CCQ_ECR_REPOSITORY: ${{ inputs.ccq-ecr-repository }}
         NGINX_ECR_REPOSITORY: ${{ inputs.nginx-ecr-repository }}
 # TODO set up slack notification
 # - name: Notify deployment failure
