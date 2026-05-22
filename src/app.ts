@@ -13,7 +13,7 @@ import session from "express-session";
 import morgan from "morgan";
 
 import config from "#/config.js";
-import recordNewCase from "#/journeys/create-application/index.js";
+import createApplication from "#/journeys/create-application/index.js";
 import { initializeI18nextSync } from "#/lib/i18nLoader.js";
 import { createSession } from "#/lib/session.js";
 import { axiosMiddleware } from "#/middleware/apiMiddleware.js";
@@ -92,7 +92,7 @@ const createApp = async (): Promise<express.Application> => {
     .registerGlobalComponents(govukComponents)
     .registerGlobalComponents(mojComponents)
     .registerGlobalFunctions(nunjucksFunctions)
-    .registerPackage(recordNewCase);
+    .registerPackage(createApplication);
 
   // Set up rate limiting
   setupRateLimit(app, config);
