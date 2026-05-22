@@ -41,7 +41,7 @@ deploy_main() {
                           --set ccq.image.repository="$REGISTRY/$CCQ_ECR_REPOSITORY" \
                           --set ccq.image.tag="$CCQ_IMAGE_TAG" \
                           --set nginx.image.repository="$REGISTRY/$NGINX_ECR_REPOSITORY" \
-                          --set nginx.image.tag="${NGINX_IMAGE_TAG}@${NGINX_ECR_IMAGE_DIGEST_AMD64}" \
+                          --set nginx.image.tag="${NGINX_IMAGE_TAG}@${NGINX_ECR_IMAGE_DIGEST_AMD64}"
 }
 
 if [[ "$GITHUB_REF_NAME" == "main" ]]; then
