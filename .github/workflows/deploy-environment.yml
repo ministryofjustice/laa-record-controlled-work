@@ -35,6 +35,7 @@ jobs:
           ENTRA_CLIENT_ID: ${{ secrets.ENTRA_CLIENT_ID }}
           ENTRA_CLIENT_SECRET: ${{ secrets.ENTRA_CLIENT_SECRET }}
           ENTRA_TENANT_ID: ${{ secrets.ENTRA_TENANT_ID }}
+          SECRET_KEY_BASE: ${{ secrets.SECRET_KEY_BASE }}
         with:
           sha: ${{ inputs.sha }}
           branch-ref: ${{ inputs.branch-ref }}
