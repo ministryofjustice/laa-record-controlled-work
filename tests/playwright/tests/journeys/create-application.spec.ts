@@ -2,7 +2,7 @@ import { test, expect } from "../../fixtures/index.js";
 
 test("ecf step", async ({ page }) => {
   // Navigate to the ECF page
-  await page.goto("/new-case/ecf");
+  await page.goto("/create-application/ecf");
 
   // Check for the question
   await expect(
@@ -28,14 +28,14 @@ test("ecf step", async ({ page }) => {
   await yesOption.check();
   await page.click('button[type="submit"]');
   // Verify redirection to the ECF dropout page
-  await expect(page).toHaveURL("/new-case/ecf-dropout");
+  await expect(page).toHaveURL("/create-application/ecf-dropout");
 
   // Navigate back to the ECF page
-  await page.goto("/new-case/ecf");
+  await page.goto("/create-application/ecf");
 
   // Select "No" and submit
   await noOption.check();
   await page.click('button[type="submit"]');
   // Verify redirection to the legal aid before page
-  await expect(page).toHaveURL("/new-case/legal-aid-before");
+  await expect(page).toHaveURL("/create-application/legal-aid-before");
 });
