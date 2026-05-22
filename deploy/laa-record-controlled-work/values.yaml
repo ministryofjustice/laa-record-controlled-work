@@ -148,7 +148,7 @@ ccq:
     pullPolicy: Always
     tag: latest
 
-  envSecretName: env-secrets
+  envSecretName: ccq-env-secrets
   envSecrets:
     - SECRET_KEY_BASE
 
