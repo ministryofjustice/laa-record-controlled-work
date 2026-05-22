@@ -9,12 +9,10 @@ import {
   GovUKButton,
   GovUKHeading,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
-
 import { headerLevels } from "#/journeys/journey.type.js";
-import { PatternEffects } from "#/journeys/effects.js";
-const patternCode = "createApplication";
+import { JourneyEffects } from "#/journeys/effects.js";
 
-export const ineligibleStep = step({
+export const ineligibleStep = (journeyCode: string) => step({
   blocks: [
     GovUKBackLink({
       href: "/create-application/ecf",
@@ -36,7 +34,7 @@ export const ineligibleStep = step({
   onSubmission: [
     submit({
       onValid: {
-        effects: [PatternEffects.ClearDraftAnswers(patternCode)],
+        effects: [JourneyEffects.ClearDraftAnswers(journeyCode)],
         next: [redirect({ goto: "/" })],
       },
       validate: true,

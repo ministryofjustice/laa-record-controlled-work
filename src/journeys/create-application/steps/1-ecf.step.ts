@@ -14,11 +14,9 @@ import {
   GovUKButton,
   GovUKRadioInput,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
+import { JourneyEffects } from "#/journeys/effects.js";
 
-import { PatternEffects } from "#/journeys/effects.js";
-const patternCode = "createApplication";
-
-export const ecfStep = step({
+export const ecfStep = (journeyCode: string) => step({
   blocks: [
     GovUKBackLink({
       href: "/",
@@ -57,7 +55,7 @@ export const ecfStep = step({
   onSubmission: [
     submit({
       onValid: {
-        effects: [PatternEffects.SaveDraftAnswers(patternCode)],
+        effects: [JourneyEffects.SaveDraftAnswers(journeyCode)],
         next: [
           redirect({
             goto: "check-answers",
