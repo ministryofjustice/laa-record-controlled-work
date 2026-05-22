@@ -47,9 +47,6 @@ services:
           path: ./src
           target: /app/src
         - action: sync
-          path: ./src/views
-          target: /app/public/views
-        - action: sync
           path: ./esbuild
           target: /app/esbuild
         - action: sync
