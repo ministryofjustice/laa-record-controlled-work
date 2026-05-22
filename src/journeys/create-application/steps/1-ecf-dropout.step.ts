@@ -12,7 +12,7 @@ import {
 import { headerLevels } from "#/journeys/journey.type.js";
 import { JourneyEffects } from "#/journeys/effects.js";
 
-export const ineligibleStep = (journeyCode: string) => step({
+export const ineligibleStep = (journeyCode: string): ReturnType<typeof step> => step({
   blocks: [
     GovUKBackLink({
       href: "/create-application/ecf",

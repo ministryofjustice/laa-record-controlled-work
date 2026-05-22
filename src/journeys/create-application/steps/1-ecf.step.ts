@@ -16,7 +16,7 @@ import {
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 import { JourneyEffects } from "#/journeys/effects.js";
 
-export const ecfStep = (journeyCode: string) => step({
+export const ecfStep = (journeyCode: string): ReturnType<typeof step> => step({
   blocks: [
     GovUKBackLink({
       href: "/",
