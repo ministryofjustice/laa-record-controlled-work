@@ -22,9 +22,9 @@ const toNumber = (value: number | string): number =>
 export const setupRateLimit = (app: Application, config: Config): void => {
   app.use(
     rateLimit({
-      max: config.RATE_LIMIT_MAX,
+      max: config.app.rateLimit.max,
       message: "Too many requests, please try again later.",
-      windowMs: config.RATE_WINDOW_MS,
+      windowMs: config.app.rateLimit.windowMs,
     }),
   );
 };
@@ -37,7 +37,7 @@ export const setupRateLimit = (app: Application, config: Config): void => {
  */
 export const createAuthLimiter = (config: Config): RequestHandler =>
   rateLimit({
-    max: toNumber(config.AUTH_RATE_LIMIT_MAX),
+    max: toNumber(config.app.rateLimit.authMax),
     message: "Too many attempts, please try again later.",
-    windowMs: toNumber(config.RATE_WINDOW_MS),
+    windowMs: toNumber(config.app.rateLimit.windowMs),
   });

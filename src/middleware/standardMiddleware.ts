@@ -20,7 +20,7 @@ export const standardMiddleware = (app: Application): void => {
   app.use(bodyParser.urlencoded({ extended: true }));
 
   // Serve static files from the specified public directory
-  app.use(express.static(config.paths.static));
+  app.use(express.static(config.app.paths.static));
 
   // Parses JSON request bodies
   app.use(express.json());
