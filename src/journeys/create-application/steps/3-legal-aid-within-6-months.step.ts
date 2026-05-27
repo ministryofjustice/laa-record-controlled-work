@@ -44,6 +44,7 @@ export const legalAidBefore6MonthsStep = (journeyCode: string): ReturnType<typeo
             code: "reasonForYes",
             label:
               "Explain the reason for creating a new case for the same matter",
+            /* eslint-disable-next-line @typescript-eslint/no-magic-numbers -- this is the max character length for the reason field */
             maxLength: 500,
             dependentWhen: Answer("legalAidLast6Months").match(
               Condition.Equals("yes"),
