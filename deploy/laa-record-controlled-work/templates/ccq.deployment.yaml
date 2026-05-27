@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "laa-record-controlled-work.fullname" . }}-ccq
+  labels:
+    {{- include "laa-record-controlled-work.labels" . | nindent 4 }}
+    app.kubernetes.io/component: ccq
+spec:
+  replicas: {{ .Values.ccq.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "laa-record-controlled-work.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: ccq
+  template:
+    metadata:
+      labels:
+        {{- include "laa-record-controlled-work.labels" . | nindent 8 }}
+        app.kubernetes.io/component: ccq
+    spec:
+      serviceAccountName: {{ include "laa-record-controlled-work.serviceAccountName" . }}
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: ccq
+          image: "{{ .Values.ccq.image.repository }}:{{ .Values.ccq.image.tag }}"
+          imagePullPolicy: {{ .Values.ccq.image.pullPolicy }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+          env:
+            - name: RAILS_ENV
+              value: production
+            - name: RAILS_SERVE_STATIC_FILES
+              value: "true"
+            - name: RAILS_LOG_TO_STDOUT
+              value: "true"
+            - name: CCQ_MODE
+              value: embedded
+            - name: REDIS_URL
+              value: {{ .Values.ccq.env.REDIS_URL | quote }}
+            - name: SECRET_KEY_BASE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.ccq.envSecretName }}
+                  key: SECRET_KEY_BASE
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.ccq.resources | nindent 12 }}

@@ -138,6 +138,30 @@ rcw:
   tolerations: []
   affinity: {}
 
+ccq:
+  replicaCount: 1
+
+  image:
+    # Overridden at deploy time to ECR; see deploy.sh and docker-images.env
+    repository: laa-check-client-qualifies
+    pullPolicy: Always
+    tag: latest
+
+  envSecretName: ccq-env-secrets
+  envSecrets:
+    - SECRET_KEY_BASE
+
+  env:
+    REDIS_URL: ""
+
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1Gi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+
 nginx:
   replicaCount: 1
 
