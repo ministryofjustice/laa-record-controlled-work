@@ -56,7 +56,7 @@ jobs:
           docker save laa-record-controlled-work -o image.tar
 
       - name: Run Snyk to scan Docker image from tarball
-        uses: snyk/actions/docker@9cf6ca713d71123d2d229cc3d7f145b96ea3c518 # master
+        uses: snyk/actions/docker@8e119fbb6c251787721d34ba683ed48eba792766 # master
         with:
           image: image.tar
           args: --docker --severity-threshold=high --policy-path=.snyk
