@@ -45,7 +45,7 @@ export const legalAidBefore6MonthsStep = (journeyCode: string): ReturnType<typeo
             label:
               "Explain the reason for creating a new case for the same matter",
             maxLength: 500,
-            dependentWhen: Answer("legalAidBefore6Months").match(
+            dependentWhen: Answer("legalAidLast6Months").match(
               Condition.Equals("yes"),
             ),
             validWhen: [

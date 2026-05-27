@@ -72,7 +72,7 @@ export const legalAidBeforeStep= (journeyCode: string): ReturnType<typeof step> 
             when: Answer("legalAidBefore").match(
               Condition.Equals("yesSameMatter"),
             ),
-            goto: "legal-aid-before-2",
+            goto: "legal-aid-last-6-months",
           }),
           redirect({ goto: "client-details" }),
         ],
