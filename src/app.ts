@@ -100,13 +100,15 @@ const createApp = async (): Promise<express.Application> => {
   // Set up application-specific configurations
   setupConfig(app);
 
-  // Set up request logging based on environment
+  // Set up request logging based on environment.
+  // Skip logging on the OAuth callback to keep auth codes out of logs.
+  const skipAuthCallback = (req: Request): boolean =>
+    req.path === "/auth/code/callback";
+
   if (process.env.NODE_ENV === "production") {
-    // Use combined format for production (more structured, less verbose)
-    app.use(morgan("combined"));
+    app.use(morgan("combined", { skip: skipAuthCallback }));
   } else {
-    // Use dev format for development (colored, more readable)
-    app.use(morgan("dev"));
+    app.use(morgan("dev", { skip: skipAuthCallback }));
   }
 
   // Setup express-session using redis
