@@ -14,35 +14,49 @@ import {
   GovUKButton,
   GovUKRadioInput,
   GovUKBackLink,
+  GovUKCharacterCount,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
-export const legalAidBeforeStep= (journeyCode: string): ReturnType<typeof step> => step({
-  path: "/legal-aid-before",
-  title: "Has your client accessed legal aid before?",
+export const legalAidBefore6MonthsStep = (journeyCode: string): ReturnType<typeof step> => step({
+  path: "/legal-aid-last-6-months",
+  title: "Did your client get legal help for this matter in the last 6 months?",
   blocks: [
     GovUKBackLink({
-      href: "/new-case/ecf",
+      href: "/new-case/legal-aid-before",
     }),
     HtmlBlock({
       content: '<span class="govuk-caption-l">Client and case details</span>',
     }),
     GovUKRadioInput({
-      code: "legalAidBefore",
+      code: "legalAidLast6Months",
       fieldset: {
         legend: {
-          text: "Has your client accessed legal aid before?",
+          text: "Did your client get legal help for this matter in the last 6 months?",
           isPageHeading: true,
           classes: "govuk-fieldset__legend--l",
         },
       },
       items: [
         {
-          value: "yesSameMatter",
-          text: "Yes, about the same matter",
-        },
-        {
-          value: "yesDifferentMatter",
-          text: "Yes, about a different matter",
+          value: "yes",
+          text: "Yes",
+          block: GovUKCharacterCount({
+            code: "reasonForYes",
+            label:
+              "Explain the reason for creating a new case for the same matter",
+            /* eslint-disable-next-line @typescript-eslint/no-magic-numbers -- this is the max character length for the reason field */
+            maxLength: 500,
+            dependentWhen: Answer("legalAidLast6Months").match(
+              Condition.Equals("yes"),
+            ),
+            validWhen: [
+              validation({
+                condition: Self().match(Condition.IsRequired()),
+                message:
+                  "Enter the reason you’re creating a new case for the same matter",
+              }),
+            ],
+          }),
         },
         {
           value: "no",
@@ -52,7 +66,7 @@ export const legalAidBeforeStep= (journeyCode: string): ReturnType<typeof step> 
       validWhen: [
         validation({
           condition: Self().match(Condition.IsRequired()),
-          message: "Please select an option",
+          message: "Select if your client got legal help for this matter in the last 6 months",
         }),
       ],
     }),
@@ -67,12 +81,6 @@ export const legalAidBeforeStep= (journeyCode: string): ReturnType<typeof step> 
           redirect({
             when: Query("returnTo").match(Condition.Equals("check-answers")),
             goto: "check-answers",
-          }),
-          redirect({
-            when: Answer("legalAidBefore").match(
-              Condition.Equals("yesSameMatter"),
-            ),
-            goto: "legal-aid-last-6-months",
           }),
           redirect({ goto: "client-details" }),
         ],

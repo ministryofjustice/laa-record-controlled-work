@@ -72,8 +72,43 @@ test("create application flow", async ({ page }) => {
   // Select "Yes, about the same matter" and submit
   await yesSameMatterOption.check();
   await page.click('button[type="submit"]');
-  // Verify redirection to the legal aid before 2 page
-  await expect(page).toHaveURL("/create-application/legal-aid-before-2");
+  // Verify redirection to the legal aid before 6 months page
+  await expect(page).toHaveURL("/create-application/legal-aid-last-6-months");
+
+  const yesLast6MonthsOption = page.locator(
+    'input[type="radio"][value="yes"]',
+  );
+  const noLast6MonthsOption = page.locator(
+    'input[type="radio"][value="no"]',
+  );
+  await expect(yesLast6MonthsOption).toBeVisible();
+  await expect(noLast6MonthsOption).toBeVisible();
+
+  await page.click('button[type="submit"]');
+  await expect(page.locator(".govuk-error-message")).toHaveText(
+    /Select if your client got legal help for this matter in the last 6 months/,
+  );
+
+  const reasonForYesField = page.locator('textarea[name="reasonForYes"]');
+  // Check that the reason field is not visible when "Yes, about the same matter" is not selected
+  await expect(reasonForYesField).toBeHidden();
+
+  await yesLast6MonthsOption.check();
+
+  // Check that the reason field is visible when "Yes, about the same matter" is selected
+  await expect(reasonForYesField).toBeVisible();
+
+  // Check for validation message when reason field is empty
+  await page.click('button[type="submit"]');
+  await expect(page.locator(".govuk-error-message")).toHaveText(
+    /Enter the reason you’re creating a new case for the same matter/,
+  );
+
+  // Fill in the reason field and submit
+  await reasonForYesField.fill("Client's circumstances have changed");
+  await page.click('button[type="submit"]');
+  // Verify redirection to the client details page
+  await expect(page).toHaveURL("/create-application/client-details");
 
   // Navigate back to the legal aid before page
   await page.goto("/create-application/legal-aid-before");
