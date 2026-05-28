@@ -169,7 +169,7 @@ export class AuthService {
 
     const state = isRelay
       ? createRelayState(nonce, this.requestOrigin, config.session.secret)
-      : this.cryptoProvider.base64Encode(JSON.stringify({ id: nonce }));
+      : this.cryptoProvider.base64Encode(JSON.stringify({ nonce }));
 
     this.session.authState = state;
 
