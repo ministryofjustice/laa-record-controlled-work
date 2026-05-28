@@ -15,7 +15,7 @@ import type { Config } from "#/config.types.js";
  */
 const displayAsciiBanner = (config: Config): void => {
   try {
-    const data = figlet.textSync(config.SERVICE_NAME ?? "Service");
+    const data = figlet.textSync(config.app.service.name);
     if (data === "") {
       console.error("❌ No ASCII art data generated");
       return;

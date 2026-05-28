@@ -14,8 +14,6 @@ export type RedisClientType = ReturnType<typeof createClient>;
  * @returns Configured Redis client
  */
 export const createRedisClient = (config: RedisConfig): RedisClientType => {
-  console.log("Connecting to Redis at, ", config.url);
-
   const client = createClient({
     socket: {
       connectTimeout: config.socketConnectionTimeout,

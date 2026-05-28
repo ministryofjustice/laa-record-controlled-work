@@ -32,15 +32,12 @@ services:
       - REDIS_ENABLED=true
       - REDIS_URL=redis://redis-rcw:6379
       - REDIS_AUTH_TOKEN=${REDIS_AUTH_TOKEN:-redis_password}
-
+      - ENTRA_REDIRECT_URI=http://localhost:8080/auth/code/callback
       # secrets injected by 1Password CLI
       # op run --env-file=.env -- docker compose up -d
       - ENTRA_CLIENT_ID
       - ENTRA_TENANT_ID
       - ENTRA_CLIENT_SECRET
-      - ENTRA_REDIRECT_URI
-      - ENTRA_AUTHORITY_BASE_URL
-      - ENTRA_POST_LOGOUT_REDIRECT_URI
 
   ccq:
     image: laa-check-client-qualifies:latest
@@ -63,7 +60,7 @@ services:
 
   redis-rcw:
     container_name: rcw-session-redis
-    image: "redis:8.0-alpine@sha256:5f61955be8ab2ccee9372b84ae4d4da2e2b156f87281e3f218544055e7ee04d4"
+    image: "redis:8.6-alpine@sha256:d146f83b1e0f02fc27c26a50cee39338c736674c5959db84363e6ae3cd9e02d2"
     ports:
       - 6379:6379
     command: >
@@ -80,7 +77,7 @@ services:
 
   redis-ccq:
     container_name: rcw-ccq-cache-redis
-    image: "redis:8.0-alpine@sha256:5f61955be8ab2ccee9372b84ae4d4da2e2b156f87281e3f218544055e7ee04d4"
+    image: "redis:8.6-alpine@sha256:d146f83b1e0f02fc27c26a50cee39338c736674c5959db84363e6ae3cd9e02d2"
     ports:
       - 6380:6379
     command: >

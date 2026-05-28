@@ -1,30 +1,39 @@
 import type { SessionOptions } from "express-session";
 
 export interface AppConfig {
-  appName: string;
+  contact: {
+    email: string | undefined;
+    phone: string | undefined;
+  };
+  department: {
+    name: string | undefined;
+    url: string | undefined;
+  };
   environment: string;
+  paths: {
+    static: string;
+  };
   port: number;
+  rateLimit: {
+    authMax: number | string;
+    headersEnabled: string | undefined;
+    max: number;
+    storageUri: string | undefined;
+    windowMs: number;
+  };
+  service: {
+    name: string;
+    phase: string | undefined;
+    url: string | undefined;
+  };
   useHttps: boolean;
 }
 
 export interface Config {
   app: AppConfig;
-  AUTH_RATE_LIMIT_MAX: number;
-  CONTACT_EMAIL: string | undefined;
-  CONTACT_PHONE: string | undefined;
   csrf: CsrfConfig;
-  DEPARTMENT_NAME: string | undefined;
-  DEPARTMENT_URL: string | undefined;
   entra: EntraConfig;
-  paths: PathsConfig;
-  RATE_LIMIT_MAX: number;
-  RATE_WINDOW_MS: number;
-  RATELIMIT_HEADERS_ENABLED: string | undefined;
-  RATELIMIT_STORAGE_URI: string | undefined;
   redis: RedisConfig;
-  SERVICE_NAME: string | undefined;
-  SERVICE_PHASE: string | undefined;
-  SERVICE_URL: string | undefined;
   session: SessionOptions;
 }
 
@@ -36,17 +45,9 @@ export interface CsrfConfig {
 
 export interface EntraConfig {
   authority: string;
-  authorityBaseUrl: string;
   clientId: string;
   clientSecret: string;
-  postLogoutRedirectUri: string;
   redirectUri: string;
-  tenantId: string;
-}
-
-export interface PathsConfig {
-  static: string;
-  views: string;
 }
 
 export interface RedisConfig {
