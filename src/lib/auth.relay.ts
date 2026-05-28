@@ -115,7 +115,7 @@ export function verifyRelayState(state: RelayState, secret: string): boolean {
  * @param secret - The HMAC signing key.
  * @returns A hex-encoded HMAC-SHA256 digest.
  */
-function sign(state: Omit<RelayState, "sig">, secret: string): string {
+function sign(state: Omit<RelayState, "signature">, secret: string): string {
   return createHmac("sha256", secret)
     .update(`${state.nonce}:${state.target}`)
     .digest("hex");
