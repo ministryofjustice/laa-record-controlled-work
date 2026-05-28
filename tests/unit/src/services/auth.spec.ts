@@ -25,8 +25,8 @@ describe("AuthService", () => {
   const ACCOUNT = { username: "user" };
   const SUCCESS_REDIRECT = "/test/success";
   const SESSION_SECRET = process.env.SESSION_SECRET as string;
-  const REDIRECT_URI_ORIGIN = new URL(authRequestDefaults.redirectUri).origin;
-  const EPHEMERAL_ORIGIN = "https://el-257-laa-record-controlled-work-uat.cloud-platform.service.justice.gov.uk";
+  const REDIRECT_URI_HOSTNAME = new URL(authRequestDefaults.redirectUri).hostname;
+  const EPHEMERAL_HOSTNAME = "el-257-laa-record-controlled-work-uat.cloud-platform.service.justice.gov.uk";
 
   beforeEach(() => {
     msalStub = {
@@ -36,7 +36,7 @@ describe("AuthService", () => {
     session = {} as SessionData;
     service = AuthService.create(
       session,
-      REDIRECT_URI_ORIGIN,
+      REDIRECT_URI_HOSTNAME,
       msalStub as ConfidentialClientApplication,
     );
 
@@ -118,22 +118,22 @@ describe("AuthService", () => {
         .and.to.have.property("message", "MSAL failure")
     });
 
-    it("creates a plain state when requestOrigin matches the redirect URI origin", async () => {
+    it("creates a plain state when requestHostname matches the redirect URI hostname", async () => {
       await service.getAuthCodeUrl();
       const parsed = parseRelayState(session.authState!);
       expect(parsed).to.be.null;
     });
 
-    it("creates a relay state with target and sig when requestOrigin differs from redirect URI origin", async () => {
+    it("creates a relay state with target and sig when requestHostname differs from redirect URI hostname", async () => {
       const ephemeralService = AuthService.create(
         session,
-        EPHEMERAL_ORIGIN,
+        EPHEMERAL_HOSTNAME,
         msalStub as ConfidentialClientApplication,
       );
       await ephemeralService.getAuthCodeUrl();
       const parsed = parseRelayState(session.authState!);
       expect(parsed).to.not.be.null;
-      expect(parsed!.target).to.equal(EPHEMERAL_ORIGIN);
+      expect(parsed!.target).to.equal(`https://${EPHEMERAL_HOSTNAME}`);
       expect(verifyRelayState(parsed!, SESSION_SECRET)).to.be.true;
     });
   });
