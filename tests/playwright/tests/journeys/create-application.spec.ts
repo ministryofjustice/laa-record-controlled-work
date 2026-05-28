@@ -111,7 +111,7 @@ test("create application flow", async ({ page }) => {
   await expect(page).toHaveURL("/create-application/client-details");
 
   // Navigate back to the legal aid before page
-  await page.goto("/create-application/legal-aid-before");
+  await page.goto("/create-application/legal-aid-last-6-months");
 
   // Select "Yes, about a different matter" and submit
   await yesDifferentMatterOption.check();
@@ -120,10 +120,10 @@ test("create application flow", async ({ page }) => {
   await expect(page).toHaveURL("/create-application/client-details");
 
   // Navigate back to the legal aid before page
-  await page.goto("/create-application/legal-aid-before");
+  await page.goto("/create-application/legal-aid-last-6-months");
 
   // Select "No" and submit
-  await noMatterOption.check();
+  await noLast6MonthsOption.check();
   await page.click('button[type="submit"]');
   // Verify redirection to the client details page
   await expect(page).toHaveURL("/create-application/client-details");
