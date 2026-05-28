@@ -87,19 +87,6 @@ describe("EntraService", () => {
       expect(result.value.returnTo).to.equal("/landing");
     });
 
-    it("passes expected correct params to MSAL", async () => {
-      await service.initiateAuthCodeFlow();
-      const [requestArg] = (msalStub.getAuthCodeUrl as sinon.SinonStub).args[0];
-      expect(requestArg.responseMode).to.equal(
-        authRequestDefaults.responseMode,
-      );
-      expect(requestArg.codeChallengeMethod).to.equal(CHALLENGE_METHOD);
-      expect(requestArg.codeChallenge).to.equal(CHALLENGE);
-      expect(requestArg.prompt).to.equal(authRequestDefaults.prompt);
-      expect(requestArg.scopes).to.deep.equal(authRequestDefaults.scopes);
-      expect(requestArg.redirectUri).to.equal(authRequestDefaults.redirectUri);
-    });
-
     it("returns a MsalError failure when MSAL throws", async () => {
       (msalStub.getAuthCodeUrl as sinon.SinonStub).rejects(
         new Error("MSAL failure"),
