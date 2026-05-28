@@ -119,7 +119,7 @@ describe("Auth Controller", () => {
     });
 
     describe("relay behavior", () => {
-      const SESSION_SECRET = "test-secret";
+      const SESSION_SECRET = process.env.SESSION_SECRET as string;
       const VALID_EPHEMERAL_TARGET =
         "https://mem-257-xyz-laa-record-controlled-work-uat.cloud-platform.service.justice.gov.uk";
 

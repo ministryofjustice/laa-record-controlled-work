@@ -24,7 +24,7 @@ describe("AuthService", () => {
   const ID_TOKEN = "id-token";
   const ACCOUNT = { username: "user" };
   const SUCCESS_REDIRECT = "/test/success";
-  const SESSION_SECRET = "test-secret";
+  const SESSION_SECRET = process.env.SESSION_SECRET as string;
   const REDIRECT_URI_ORIGIN = new URL(authRequestDefaults.redirectUri).origin;
   const EPHEMERAL_ORIGIN = "https://el-257-laa-record-controlled-work-uat.cloud-platform.service.justice.gov.uk";
 
