@@ -21,8 +21,6 @@ import {
   TokenAcquisitionError,
 } from "#/lib/errors/auth.js";
 
-// TODO - this service has a lot of mixed responsibilities and needs refactoring.
-
 export interface AuthCodeFlowState {
   authCodeRequest: AuthorizationCodeRequest;
   authCodeUrl: string;
