@@ -2,13 +2,14 @@ import {
   ConfidentialClientApplication,
   CryptoProvider,
 } from "@azure/msal-node";
-import { type AuthCodeFlowState, type TokenExchangeResult, EntraService } from "#/services/auth.js";
+import { EntraService } from "#/auth/auth.service.js";
+import type { AuthCodeFlowState, TokenExchangeResult } from "#/auth/auth.types.js";
 import { expect } from "chai";
 import sinon from "sinon";
-import { authRequestDefaults } from "#/config/auth.js";
-import { parseRelayState, verifyRelayState } from "#/lib/auth.relay.js";
+import { authRequestDefaults } from "#/auth/auth.config.js";
+import { parseRelayState, verifyRelayState } from "#/auth/auth.relay.js";
 import { Success } from "#/lib/either.js";
-import { MsalError, TokenAcquisitionError } from "#/lib/errors/auth.js";
+import { MsalError, TokenAcquisitionError } from "#/auth/auth.errors.js";
 
 describe("EntraService", () => {
   let msalStub: Partial<ConfidentialClientApplication>;

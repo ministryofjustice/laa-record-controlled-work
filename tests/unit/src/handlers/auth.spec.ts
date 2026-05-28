@@ -7,11 +7,11 @@ import {
   UNAUTHORIZED,
 } from "#/lib/constants/httpStatus.js";
 import sinon from "sinon";
-import { EntraService } from "#/services/auth.js";
-import { createRelayState } from "#/lib/auth.relay.js";
+import { EntraService } from "#/auth/auth.service.js";
+import { createRelayState } from "#/auth/auth.relay.js";
 import { failure, success } from "#/lib/either.js";
 import { expect } from "chai";
-import { TokenAcquisitionError } from "#/lib/errors/auth.js";
+import { TokenAcquisitionError } from "#/auth/auth.errors.js";
 import { createMockApp } from "../../utils.js";
 
 const AUTH_CODE_URL = "https://login.microsoftonline.com/auth";

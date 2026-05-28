@@ -4,7 +4,7 @@ import type {
   AuthorizationUrlRequest,
 } from "@azure/msal-node";
 
-import type { PKCECodes } from "#/services/auth.types.js";
+import type { PKCECodes } from "#/auth/auth.types.js";
 
 declare module "express-session" {
   interface SessionData {

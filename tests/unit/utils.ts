@@ -1,9 +1,9 @@
 import express, { type Application, type Request } from "express";
 import session from "express-session";
 
+import authRouter from "#/auth/auth.routes.js";
 import { INTERNAL_SERVER_ERROR } from "#/lib/constants/httpStatus.js";
 import { setupCsrf } from "#/middleware/setupCsrf.js";
-import authRouter from "#/routes/auth.js";
 
 /**
  * Creates a mock app for test auth routes against

@@ -1,22 +1,22 @@
 import type { NextFunction, Request, Response } from "express";
 
-import config from "#/config.js";
+import {
+  MissingAuthCodeRequestError,
+  StateMismatchError,
+} from "#/auth/auth.errors.js";
 import {
   isAllowedRelayTarget,
   parseRelayState,
   verifyRelayState,
-} from "#/lib/auth.relay.js";
+} from "#/auth/auth.relay.js";
+import { EntraService } from "#/auth/auth.service.js";
+import { authCodeCallbackSchema } from "#/auth/auth.types.js";
+import config from "#/config.js";
 import {
   BAD_REQUEST,
   INTERNAL_SERVER_ERROR,
   UNAUTHORIZED,
 } from "#/lib/constants/httpStatus.js";
-import {
-  MissingAuthCodeRequestError,
-  StateMismatchError,
-} from "#/lib/errors/auth.js";
-import { EntraService } from "#/services/auth.js";
-import { authCodeCallbackSchema } from "#/types/auth-types.js";
 
 /**
  * Handles the Entra auth code callback, exchanging the code for tokens.

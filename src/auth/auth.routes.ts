@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { authCodeCallback, signIn, signOut } from "#/handlers/auth.js";
+import { authCodeCallback, signIn, signOut } from "#/auth/auth.handlers.js";
 
 const router: Router = Router();
 

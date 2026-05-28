@@ -1,5 +1,4 @@
 import {
-  type AccountInfo,
   type AuthenticationResult,
   type AuthorizationCodeRequest,
   type AuthorizationUrlRequest,
@@ -8,33 +7,22 @@ import {
 } from "@azure/msal-node";
 import { randomUUID } from "node:crypto";
 
-import type { PKCECodes } from "#/types/auth-types.js";
+import type {
+  AuthCodeFlowState,
+  PKCECodes,
+  TokenExchangeResult,
+} from "#/auth/auth.types.js";
 
-import config from "#/config.js";
-import { authRequestDefaults, msalConfig } from "#/config/auth.js";
-import { createRelayState } from "#/lib/auth.relay.js";
-import { devError } from "#/lib/devLogger.js";
-import { type Either, failure, success } from "#/lib/either.js";
+import { authRequestDefaults, msalConfig } from "#/auth/auth.config.js";
 import {
   MsalError,
   PkceGenerationError,
   TokenAcquisitionError,
-} from "#/lib/errors/auth.js";
-
-export interface AuthCodeFlowState {
-  authCodeRequest: AuthorizationCodeRequest;
-  authCodeUrl: string;
-  authCodeUrlRequest: AuthorizationUrlRequest;
-  authState: string;
-  pkceCodes: PKCECodes;
-  returnTo: string;
-}
-
-export interface TokenExchangeResult {
-  account: AccountInfo | undefined;
-  idToken: string | undefined;
-  tokenCache: string;
-}
+} from "#/auth/auth.errors.js";
+import { createRelayState } from "#/auth/auth.relay.js";
+import config from "#/config.js";
+import { devError } from "#/lib/devLogger.js";
+import { type Either, failure, success } from "#/lib/either.js";
 
 /**
  * Handles Microsoft Entra ID (MSAL) authentication flows including

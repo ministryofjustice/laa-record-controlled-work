@@ -11,6 +11,7 @@ import compression from "compression";
 import express from "express";
 import session from "express-session";
 
+import authRouter from "#/auth/auth.routes.js";
 import config from "#/config.js";
 import createApplication from "#/journeys/create-application/index.js";
 import { initializeI18nextSync } from "#/lib/i18nLoader.js";
@@ -28,7 +29,6 @@ import {
 } from "#/middleware/setupRateLimit.js";
 import { setupRequestLogging } from "#/middleware/setupRequestLogging.js";
 import { standardMiddleware } from "#/middleware/standardMiddleware.js";
-import authRouter from "#/routes/auth.js";
 import healthRouter from "#/routes/health.js";
 import indexRouter from "#/routes/index.js";
 import testRouter from "#/routes/test.js";

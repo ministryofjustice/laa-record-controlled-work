@@ -6,7 +6,7 @@ import {
   isAllowedRelayTarget,
   parseRelayState,
   verifyRelayState,
-} from "#/lib/auth.relay.js";
+} from "#/auth/auth.relay.js";
 
 const SECRET = "test-session-secret";
 const NONCE = "550e8400-e29b-41d4-a716-446655440000";
