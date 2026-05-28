@@ -28,7 +28,7 @@ spec:
           imagePullPolicy: {{ .Values.ccq.image.pullPolicy }}
           securityContext:
             allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: false
+            readOnlyRootFilesystem: true
             runAsNonRoot: true
             runAsUser: 1000
             runAsGroup: 1000
@@ -53,9 +53,19 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.ccq.envSecretName }}
                   key: SECRET_KEY_BASE
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+            - name: app-tmp
+              mountPath: /app/tmp
           ports:
             - name: http
               containerPort: 3000
               protocol: TCP
           resources:
             {{- toYaml .Values.ccq.resources | nindent 12 }}
+      volumes:
+        - name: tmp
+          emptyDir: {}
+        - name: app-tmp
+          emptyDir: {}
