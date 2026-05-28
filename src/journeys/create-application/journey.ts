@@ -18,7 +18,12 @@ export const createApplicationJourney = journey({
   ],
   path: "/create-application",
   reachability: { disableReachabilityChecks: false },
-  steps: [ecfStep(journeyCode), ineligibleStep(journeyCode), legalAidBeforeStep(journeyCode), legalAidBefore6MonthsStep(journeyCode)],
+  steps: [
+    ecfStep(journeyCode),
+    ineligibleStep(journeyCode),
+    legalAidBeforeStep(journeyCode),
+    legalAidBefore6MonthsStep(journeyCode),
+  ],
   title: "Record new case",
   view: { template: "partials/form-step" },
 });
