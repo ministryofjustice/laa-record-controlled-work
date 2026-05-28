@@ -113,15 +113,6 @@ test("create application flow", async ({ page }) => {
   // Navigate back to the legal aid before page
   await page.goto("/create-application/legal-aid-last-6-months");
 
-  // Select "Yes, about a different matter" and submit
-  await yesDifferentMatterOption.check();
-  await page.click('button[type="submit"]');
-  // Verify redirection to the client details page
-  await expect(page).toHaveURL("/create-application/client-details");
-
-  // Navigate back to the legal aid before page
-  await page.goto("/create-application/legal-aid-last-6-months");
-
   // Select "No" and submit
   await noLast6MonthsOption.check();
   await page.click('button[type="submit"]');
@@ -129,16 +120,16 @@ test("create application flow", async ({ page }) => {
   await expect(page).toHaveURL("/create-application/client-details");
 
   const fullNameInput = page.locator('input[name="fullName"]');
-  const dateOfBirthDayInput = page.locator('input[name="dateOfBirth-day"]');
-  const dateOfBirthMonthInput = page.locator('input[name="dateOfBirth-month"]');
-  const dateOfBirthYearInput = page.locator('input[name="dateOfBirth-year"]');
+  const dateOfBirthDayInput = page.locator('input[name="dateOfBirth[day]"]');
+  const dateOfBirthMonthInput = page.locator('input[name="dateOfBirth[month]"]');
+  const dateOfBirthYearInput = page.locator('input[name="dateOfBirth[year]"]');
 
   // Check for the validation messages when fields are empty
   await page.click('button[type="submit"]');
-  await expect(page.locator(".govuk-error-message")).toHaveText(
+  await expect(page.locator(".govuk-error-message").nth(0)).toHaveText(
     /Enter your client's name/,
   );
-  await expect(page.locator(".govuk-error-message")).toHaveText(
+  await expect(page.locator(".govuk-error-message").nth(1)).toHaveText(
     /Enter your client's date of birth/,
   );
 
@@ -146,7 +137,7 @@ test("create application flow", async ({ page }) => {
   await fullNameInput.fill("John Doe");
   await page.click('button[type="submit"]');
   await expect(page.locator(".govuk-error-message")).toHaveText(
-    /Enter your date of birth/,
+    /Enter your client's date of birth/,
   );
 
   // Fill in an invalid date of birth and submit

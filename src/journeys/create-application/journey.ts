@@ -6,6 +6,7 @@ import { ineligibleStep } from "./steps/1-ecf-dropout.step.js";
 import { ecfStep } from "./steps/1-ecf.step.js";
 import { legalAidBeforeStep } from "./steps/2-legal-aid-before.step.js";
 import { legalAidBefore6MonthsStep } from "./steps/3-legal-aid-within-6-months.step.js";
+import { clientDetailsStep } from "#/journeys/create-application/steps/4-client-details.step.js";
 
 const journeyCode = "createApplication";
 
@@ -18,12 +19,7 @@ export const createApplicationJourney = journey({
   ],
   path: "/create-application",
   reachability: { disableReachabilityChecks: false },
-  steps: [
-    ecfStep(journeyCode),
-    ineligibleStep(journeyCode),
-    legalAidBeforeStep(journeyCode),
-    legalAidBefore6MonthsStep(journeyCode),
-  ],
+  steps: [ecfStep(journeyCode), ineligibleStep(journeyCode), legalAidBeforeStep(journeyCode), legalAidBefore6MonthsStep(journeyCode), clientDetailsStep(journeyCode)],
   title: "Record new case",
   view: { template: "partials/form-step" },
 });

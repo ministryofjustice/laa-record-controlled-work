@@ -60,7 +60,7 @@ export const clientDetailsStep = (journeyCode: string): ReturnType<typeof step> 
       },
       validWhen: [
         ...GovUKValidations.DateInputFull({
-          empty: { message: "Enter your client'sdate of birth" },
+          empty: { message: "Enter your client's date of birth" },
           missingDay: { message: "Date of birth must include a day" },
           missingMonth: { message: "Date of birth must include a month" },
           missingYear: { message: "Date of birth must include a year" },
