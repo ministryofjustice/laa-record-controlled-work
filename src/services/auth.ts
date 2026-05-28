@@ -23,8 +23,6 @@ import {
   TokenAcquisitionError,
 } from "#/lib/errors/auth.js";
 
-// TODO - consider if this is an EntraService rather than an AuthService
-//
 // TODO - this service is modifying the express-session by reference.
 //        should probably consider pulling session mutation up and out
 //        into a different module
@@ -34,14 +32,14 @@ import {
  * Handles Microsoft Entra ID (MSAL) authentication flows including
  * PKCE code exchange, token acquisition, and logout URL generation.
  */
-export class AuthService {
+export class EntraService {
   public msalClient: ConfidentialClientApplication;
   public session: SessionData;
   private readonly cryptoProvider: CryptoProvider = new CryptoProvider();
   private readonly requestHostname: string;
 
   /**
-   * Creates an AuthService instance with the given session and MSAL client.
+   * Creates an EntraService instance with the given session and MSAL client.
    * @param {SessionData} sessionData - The Express session data object.
    * @param {string} requestHostname - The hostname of the incoming request (e.g. "my-host.example.com").
    * @param {ConfidentialClientApplication} msalClient - The MSAL confidential client application.
@@ -58,18 +56,18 @@ export class AuthService {
   }
 
   /**
-   * Factory method to create a new AuthService instance.
+   * Factory method to create a new EntraService instance.
    * @param {SessionData} sessionData - The Express session data object.
    * @param {string} requestHostname - The hostname of the incoming request (e.g. "my-host.example.com").
    * @param {ConfidentialClientApplication} msalClient - The MSAL confidential client application.
-   * @returns {AuthService} A new AuthService instance.
+   * @returns {EntraService} A new EntraService instance.
    */
   public static create(
     sessionData: SessionData,
     requestHostname: string,
     msalClient?: ConfidentialClientApplication,
-  ): AuthService {
-    return new AuthService(sessionData, requestHostname, msalClient);
+  ): EntraService {
+    return new EntraService(sessionData, requestHostname, msalClient);
   }
 
   /**

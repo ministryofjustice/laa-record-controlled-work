@@ -7,7 +7,7 @@ import {
   UNAUTHORIZED,
 } from "#/lib/constants/httpStatus.js";
 import sinon from "sinon";
-import { AuthService } from "#/services/auth.js";
+import { EntraService } from "#/services/auth.js";
 import { createRelayState } from "#/lib/auth.relay.js";
 import { failure, success } from "#/lib/either.js";
 import { expect } from "chai";
@@ -40,8 +40,8 @@ describe("Auth Controller", () => {
     };
 
     sinon
-      .stub(AuthService, "create")
-      .returns(authServiceStub as unknown as AuthService);
+      .stub(EntraService, "create")
+      .returns(authServiceStub as unknown as EntraService);
   });
 
   afterEach(() => {

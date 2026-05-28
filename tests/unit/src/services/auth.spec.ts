@@ -2,7 +2,7 @@ import {
   ConfidentialClientApplication,
   CryptoProvider,
 } from "@azure/msal-node";
-import { AuthService } from "#/services/auth.js";
+import { EntraService } from "#/services/auth.js";
 import { expect } from "chai";
 import type { SessionData } from "express-session";
 import sinon from "sinon";
@@ -11,11 +11,11 @@ import { parseRelayState, verifyRelayState } from "#/lib/auth.relay.js";
 import { Success } from "#/lib/either.js";
 import { MissingAuthCodeRequestError, MsalError, StateMismatchError, TokenAcquisitionError } from "#/lib/errors/auth.js";
 
-describe("AuthService", () => {
+describe("EntraService", () => {
   let msalStub: Partial<ConfidentialClientApplication>;
   let session: SessionData;
   const AUTH_CODE_URL = "https://login.microsoftonline.com/auth/";
-  let service: AuthService;
+  let service: EntraService;
   const NONCE = "test-nonce";
   const requestBody = { code: "auth-code", state: NONCE };
   const CHALLENGE_METHOD = "S256";
@@ -34,7 +34,7 @@ describe("AuthService", () => {
     };
 
     session = {} as SessionData;
-    service = AuthService.create(
+    service = EntraService.create(
       session,
       REDIRECT_URI_HOSTNAME,
       msalStub as ConfidentialClientApplication,
@@ -125,7 +125,7 @@ describe("AuthService", () => {
     });
 
     it("creates a relay state with target and sig when requestHostname differs from redirect URI hostname", async () => {
-      const ephemeralService = AuthService.create(
+      const ephemeralService = EntraService.create(
         session,
         EPHEMERAL_HOSTNAME,
         msalStub as ConfidentialClientApplication,

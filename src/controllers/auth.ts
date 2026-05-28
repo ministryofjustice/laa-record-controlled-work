@@ -13,7 +13,7 @@ import {
   UNAUTHORIZED,
 } from "#/lib/constants/httpStatus.js";
 import { TokenAcquisitionError } from "#/lib/errors/auth.js";
-import { AuthService } from "#/services/auth.js";
+import { EntraService } from "#/services/auth.js";
 import { authCodeResponseSchema } from "#/types/auth-types.js";
 
 export const signIn = async (
@@ -21,9 +21,9 @@ export const signIn = async (
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
-  const authService = AuthService.create(req.session, req.hostname);
+  const entra = EntraService.create(req.session, req.hostname);
   try {
-    const result = await authService.getAuthCodeUrl();
+    const result = await entra.getAuthCodeUrl();
     if (result.error) {
       res.status(INTERNAL_SERVER_ERROR).send(result.error.message);
       return;
@@ -79,8 +79,8 @@ export const processAuthCodeCallback = async (
       }
     }
 
-    const authService = AuthService.create(req.session, req.hostname);
-    const result = await authService.processAuthCodeCallback(data);
+    const entra = EntraService.create(req.session, req.hostname);
+    const result = await entra.processAuthCodeCallback(data);
     if (result.error instanceof TokenAcquisitionError) {
       res.status(UNAUTHORIZED).send(result.error.message);
       return;
