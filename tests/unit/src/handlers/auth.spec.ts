@@ -17,7 +17,7 @@ import { createMockApp } from "../../utils.js";
 const AUTH_CODE_URL = "https://login.microsoftonline.com/auth";
 const SUCCESS_REDIRECT = "/case/123";
 
-describe("Auth Controller", () => {
+describe("Auth Handlers", () => {
   let authServiceStub: {
     getAuthCodeUrl: sinon.SinonStub;
     processAuthCodeCallback: sinon.SinonStub;

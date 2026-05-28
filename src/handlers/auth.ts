@@ -1,6 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
 
-// TODO: this is a handlers module, rather than controller
 import config from "#/config.js";
 import {
   isAllowedRelayTarget,
