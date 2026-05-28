@@ -11,7 +11,7 @@ const relayStateSchema = z.object({
   /** Cryptographically random nonce, used for CSRF protection and state matching. */
   nonce: z.string(),
   /** HMAC-SHA256 hex signature over `nonce` and `target`. */
-  sig: z.string(),
+  signature: z.string(),
   /** The HTTPS origin of the ephemeral environment that initiated the sign-in. */
   target: z.string(),
 });
@@ -96,7 +96,7 @@ export function parseRelayState(stateString: string): null | RelayState {
 export function verifyRelayState(state: RelayState, secret: string): boolean {
   const signed = sign(state, secret);
   const expected = Buffer.from(signed);
-  const actual = Buffer.from(state.sig);
+  const actual = Buffer.from(state.signature);
 
   if (expected.length !== actual.length) {
     return false;

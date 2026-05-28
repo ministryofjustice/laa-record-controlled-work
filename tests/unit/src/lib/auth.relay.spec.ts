@@ -22,7 +22,7 @@ describe("authRelay", () => {
       expect(parsed).to.not.be.null;
       expect(parsed!.nonce).to.equal(NONCE);
       expect(parsed!.target).to.equal(VALID_TARGET);
-      expect(parsed!.sig).to.be.a("string").with.length.greaterThan(0);
+      expect(parsed!.signature).to.be.a("string").with.length.greaterThan(0);
     });
 
     it("is decodable by MSAL CryptoProvider.base64Decode without error", () => {
@@ -72,7 +72,7 @@ describe("authRelay", () => {
     it("returns false when the signature has been tampered with", () => {
       const state = createRelayState(NONCE, VALID_TARGET, SECRET);
       const parsed = parseRelayState(state)!;
-      parsed.sig = "0".repeat(parsed.sig.length);
+      parsed.signature = "0".repeat(parsed.signature.length);
       expect(verifyRelayState(parsed, SECRET)).to.be.false;
     });
 
@@ -92,7 +92,7 @@ describe("authRelay", () => {
     it("returns false when the signature length differs", () => {
       const state = createRelayState(NONCE, VALID_TARGET, SECRET);
       const parsed = parseRelayState(state)!;
-      parsed.sig = "short";
+      parsed.signature = "short";
       expect(verifyRelayState(parsed, SECRET)).to.be.false;
     });
   });
