@@ -7,12 +7,11 @@ import type {
 
 import { z } from "zod";
 
-export const authCodeResponseSchema = z.object({
+export const authCodeCallbackSchema = z.object({
   code: z.string().min(1),
   session_state: z.string().optional(),
   state: z.string().min(1),
 });
-export type AuthCodeResponse = z.infer<typeof authCodeResponseSchema>;
 
 export interface PKCECodes {
   challenge: string;

@@ -15,12 +15,11 @@ import { TokenAcquisitionError } from "#/lib/errors/auth.js";
 import { createMockApp } from "../../utils.js";
 
 const AUTH_CODE_URL = "https://login.microsoftonline.com/auth";
-const SUCCESS_REDIRECT = "/case/123";
 
 describe("Auth Handlers", () => {
   let authServiceStub: {
-    getAuthCodeUrl: sinon.SinonStub;
-    processAuthCodeCallback: sinon.SinonStub;
+    initiateAuthCodeFlow: sinon.SinonStub;
+    exchangeAuthCode: sinon.SinonStub;
   };
   let mockApp: express.Application;
 
@@ -35,8 +34,19 @@ describe("Auth Handlers", () => {
     sinon.stub(console, "info");
 
     authServiceStub = {
-      getAuthCodeUrl: sinon.stub().resolves(success(AUTH_CODE_URL)),
-      processAuthCodeCallback: sinon.stub().resolves(success(SUCCESS_REDIRECT)),
+      initiateAuthCodeFlow: sinon.stub().resolves(success({
+        authCodeUrl: AUTH_CODE_URL,
+        authState: "test-state",
+        returnTo: "/landing",
+        pkceCodes: {},
+        authCodeUrlRequest: {},
+        authCodeRequest: {},
+      })),
+      exchangeAuthCode: sinon.stub().resolves(success({
+        tokenCache: "{}",
+        idToken: "id-token",
+        account: undefined,
+      })),
     };
 
     sinon
@@ -49,17 +59,17 @@ describe("Auth Handlers", () => {
   });
 
   describe("signin()", () => {
-    it("redirects to the URL returned by authService.getAuthCodeUrl()", async () => {
+    it("redirects to the auth code URL returned by initiateAuthCodeFlow()", async () => {
       const res = await request(mockApp).get("/auth/signin");
 
       expect(res.status).to.equal(FOUND);
       expect(res.headers.location).to.equal(AUTH_CODE_URL);
     });
 
-    it("calls next(error) when getAuthCodeUrl() throws", async () => {
+    it("calls next(error) when initiateAuthCodeFlow() throws", async () => {
       const errorMessage = "MSAL failure";
       const error = new Error(errorMessage);
-      authServiceStub.getAuthCodeUrl.resolves(failure(error));
+      authServiceStub.initiateAuthCodeFlow.resolves(failure(error));
 
       const res = await request(mockApp).get("/auth/signin");
 
@@ -68,17 +78,17 @@ describe("Auth Handlers", () => {
     });
   });
 
-  describe("processAuthCodeCallback()", () => {
+  describe("authCodeCallback()", () => {
     const QUERY_PARAMS = { code: "auth-code-abc", state: "encoded-state" };
 
-    it("redirects to successRedirect on success", async () => {
+    it("redirects to returnTo on success", async () => {
       const res = await request(mockApp)
         .get("/auth/code/callback")
         .query(QUERY_PARAMS);
 
-      expect(authServiceStub.processAuthCodeCallback.calledOnce).to.be.true;
+      expect(authServiceStub.exchangeAuthCode.calledOnce).to.be.true;
       expect(res.status).to.equal(FOUND);
-      expect(res.headers.location).to.equal(SUCCESS_REDIRECT);
+      expect(res.headers.location).to.equal("/landing");
     });
 
     it("responds with 400 when auth request body doesn't match schema", async () => {
@@ -88,14 +98,14 @@ describe("Auth Handlers", () => {
         .get("/auth/code/callback")
         .query(wrongQueryParams);
 
-      expect(authServiceStub.processAuthCodeCallback.called).to.be.false;
+      expect(authServiceStub.exchangeAuthCode.called).to.be.false;
       expect(res.status).to.equal(BAD_REQUEST);
       expect(res.text).to.equal("Invalid redirect payload");
     });
 
-    it("responds with 401 unathorised when TokenAcquisitionError is thrown", async () => {
+    it("responds with 401 when token exchange fails", async () => {
       const error = new TokenAcquisitionError();
-      authServiceStub.processAuthCodeCallback.resolves(failure(error));
+      authServiceStub.exchangeAuthCode.resolves(failure(error));
 
       const res = await request(mockApp)
         .get("/auth/code/callback")
@@ -103,19 +113,6 @@ describe("Auth Handlers", () => {
 
       expect(res.status).to.equal(UNAUTHORIZED);
       expect(res.text).to.equal("Token acquisition failed");
-    });
-
-    it("responds with 400 when other errors are thrown", async () => {
-      const errorMessage = "Random Error";
-      const error = new Error(errorMessage);
-      authServiceStub.processAuthCodeCallback.resolves(failure(error));
-
-      const res = await request(mockApp)
-        .get("/auth/code/callback")
-        .query(QUERY_PARAMS);
-
-      expect(res.status).to.equal(BAD_REQUEST);
-      expect(res.text).to.equal(errorMessage);
     });
 
     describe("relay behavior", () => {
@@ -137,7 +134,7 @@ describe("Auth Handlers", () => {
         expect(res.headers.location).to.include("code=auth-code");
         expect(res.headers.location).to.include(`state=${encodeURIComponent(state)}`);
         expect(res.headers["cache-control"]).to.equal("no-store");
-        expect(authServiceStub.processAuthCodeCallback.called).to.be.false;
+        expect(authServiceStub.exchangeAuthCode.called).to.be.false;
       });
 
       it("responds with 400 when the relay signature is invalid", async () => {
@@ -171,9 +168,9 @@ describe("Auth Handlers", () => {
           .set("Host", ephemeralHost)
           .query({ code: "auth-code", state });
 
-        expect(authServiceStub.processAuthCodeCallback.calledOnce).to.be.true;
+        expect(authServiceStub.exchangeAuthCode.calledOnce).to.be.true;
         expect(res.status).to.equal(FOUND);
-        expect(res.headers.location).to.equal(SUCCESS_REDIRECT);
+        expect(res.headers.location).to.equal("/landing");
       });
 
       it("processes the callback normally when state has no relay target", async () => {
@@ -181,9 +178,9 @@ describe("Auth Handlers", () => {
           .get("/auth/code/callback")
           .query(QUERY_PARAMS);
 
-        expect(authServiceStub.processAuthCodeCallback.calledOnce).to.be.true;
+        expect(authServiceStub.exchangeAuthCode.calledOnce).to.be.true;
         expect(res.status).to.equal(FOUND);
-        expect(res.headers.location).to.equal(SUCCESS_REDIRECT);
+        expect(res.headers.location).to.equal("/landing");
       });
     });
   });

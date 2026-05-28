@@ -2,22 +2,20 @@ import {
   ConfidentialClientApplication,
   CryptoProvider,
 } from "@azure/msal-node";
-import { EntraService } from "#/services/auth.js";
+import { type AuthCodeFlowState, type TokenExchangeResult, EntraService } from "#/services/auth.js";
 import { expect } from "chai";
-import type { SessionData } from "express-session";
 import sinon from "sinon";
 import { authRequestDefaults } from "#/config/auth.js";
 import { parseRelayState, verifyRelayState } from "#/lib/auth.relay.js";
 import { Success } from "#/lib/either.js";
-import { MissingAuthCodeRequestError, MsalError, StateMismatchError, TokenAcquisitionError } from "#/lib/errors/auth.js";
+import { MsalError, TokenAcquisitionError } from "#/lib/errors/auth.js";
 
 describe("EntraService", () => {
   let msalStub: Partial<ConfidentialClientApplication>;
-  let session: SessionData;
   const AUTH_CODE_URL = "https://login.microsoftonline.com/auth/";
   let service: EntraService;
   const NONCE = "test-nonce";
-  const requestBody = { code: "auth-code", state: NONCE };
+  const AUTH_CODE = "auth-code";
   const CHALLENGE_METHOD = "S256";
   const CHALLENGE = "test-challenge";
   const VERIFIER = "test-verifier";
@@ -33,9 +31,7 @@ describe("EntraService", () => {
       getAuthCodeUrl: sinon.stub().resolves(AUTH_CODE_URL),
     };
 
-    session = {} as SessionData;
     service = EntraService.create(
-      session,
       REDIRECT_URI_HOSTNAME,
       msalStub as ConfidentialClientApplication,
     );
@@ -48,52 +44,50 @@ describe("EntraService", () => {
 
   afterEach(() => sinon.restore());
 
-  describe("getAuthCodeUrl()", () => {
+  describe("initiateAuthCodeFlow()", () => {
     it("returns a success with the URL from the MSAL client", async () => {
-      const result = await service.getAuthCodeUrl() as Success<string>;
+      const result = await service.initiateAuthCodeFlow() as Success<AuthCodeFlowState>;
       expect(result.error).to.be.undefined;
-      expect(result.value).to.equal(AUTH_CODE_URL);
+      expect(result.value.authCodeUrl).to.equal(AUTH_CODE_URL);
     });
 
-    it("stores PKCE codes on session", async () => {
-      await service.getAuthCodeUrl();
-      expect(session.pkceCodes).to.exist;
-      expect(session.pkceCodes!.verifier).to.equal(VERIFIER);
-      expect(session.pkceCodes!.challenge).to.equal(CHALLENGE);
+    it("returns PKCE codes", async () => {
+      const result = await service.initiateAuthCodeFlow() as Success<AuthCodeFlowState>;
+      expect(result.value.pkceCodes).to.exist;
+      expect(result.value.pkceCodes.verifier).to.equal(VERIFIER);
+      expect(result.value.pkceCodes.challenge).to.equal(CHALLENGE);
     });
 
-    it("stores authCodeUrlRequest and authCodeRequest on session", async () => {
-      await service.getAuthCodeUrl();
-      expect(session.authCodeUrlRequest).to.exist;
-      expect(session.authCodeRequest).to.exist;
+    it("returns authCodeUrlRequest and authCodeRequest", async () => {
+      const result = await service.initiateAuthCodeFlow() as Success<AuthCodeFlowState>;
+      expect(result.value.authCodeUrlRequest).to.exist;
+      expect(result.value.authCodeRequest).to.exist;
     });
 
-    it("stores a random nonce as session.authState and passes it as the state parameter", async () => {
-      await service.getAuthCodeUrl();
-      expect(session.authState).to.be.a("string").with.length.greaterThan(0);
+    it("returns a random authState and passes it as the state parameter", async () => {
+      const result = await service.initiateAuthCodeFlow() as Success<AuthCodeFlowState>;
+      expect(result.value.authState).to.be.a("string").with.length.greaterThan(0);
       const [requestArg] = (msalStub.getAuthCodeUrl as sinon.SinonStub).args[0];
-      expect(requestArg.state).to.equal(session.authState);
+      expect(requestArg.state).to.equal(result.value.authState);
     });
 
-    it("defaults session.returnTo to /landing when no returnTo is set", async () => {
-      await service.getAuthCodeUrl();
-      expect(session.returnTo).to.equal("/landing");
+    it("defaults returnTo to /landing when no returnTo is provided", async () => {
+      const result = await service.initiateAuthCodeFlow() as Success<AuthCodeFlowState>;
+      expect(result.value.returnTo).to.equal("/landing");
     });
 
-    it("preserves a valid session.returnTo path", async () => {
-      session.returnTo = "/case/123";
-      await service.getAuthCodeUrl();
-      expect(session.returnTo).to.equal("/case/123");
+    it("preserves a valid returnTo path", async () => {
+      const result = await service.initiateAuthCodeFlow("/case/123") as Success<AuthCodeFlowState>;
+      expect(result.value.returnTo).to.equal("/case/123");
     });
 
-    it("falls back to /landing when session.returnTo is /", async () => {
-      session.returnTo = "/";
-      await service.getAuthCodeUrl();
-      expect(session.returnTo).to.equal("/landing");
+    it("falls back to /landing when returnTo is /", async () => {
+      const result = await service.initiateAuthCodeFlow("/") as Success<AuthCodeFlowState>;
+      expect(result.value.returnTo).to.equal("/landing");
     });
 
     it("passes expected correct params to MSAL", async () => {
-      await service.getAuthCodeUrl();
+      await service.initiateAuthCodeFlow();
       const [requestArg] = (msalStub.getAuthCodeUrl as sinon.SinonStub).args[0];
       expect(requestArg.responseMode).to.equal(
         authRequestDefaults.responseMode,
@@ -109,7 +103,7 @@ describe("EntraService", () => {
       (msalStub.getAuthCodeUrl as sinon.SinonStub).rejects(
         new Error("MSAL failure"),
       );
-      const result = await service.getAuthCodeUrl();
+      const result = await service.initiateAuthCodeFlow();
       expect(result.error).to.exist;
       expect(result.error)
         .to.be.an("error")
@@ -119,39 +113,33 @@ describe("EntraService", () => {
     });
 
     it("creates a plain state when requestHostname matches the redirect URI hostname", async () => {
-      await service.getAuthCodeUrl();
-      const parsed = parseRelayState(session.authState!);
+      const result = await service.initiateAuthCodeFlow() as Success<AuthCodeFlowState>;
+      const parsed = parseRelayState(result.value.authState);
       expect(parsed).to.be.null;
     });
 
     it("creates a relay state with target and sig when requestHostname differs from redirect URI hostname", async () => {
       const ephemeralService = EntraService.create(
-        session,
         EPHEMERAL_HOSTNAME,
         msalStub as ConfidentialClientApplication,
       );
-      await ephemeralService.getAuthCodeUrl();
-      const parsed = parseRelayState(session.authState!);
+      const result = await ephemeralService.initiateAuthCodeFlow() as Success<AuthCodeFlowState>;
+      const parsed = parseRelayState(result.value.authState);
       expect(parsed).to.not.be.null;
       expect(parsed!.target).to.equal(`https://${EPHEMERAL_HOSTNAME}`);
       expect(verifyRelayState(parsed!, SESSION_SECRET)).to.be.true;
     });
   });
 
-  describe("processAuthCodeCallback()", () => {
+  describe("exchangeAuthCode()", () => {
+    let authCodeRequest: { code: string; codeVerifier: string; scopes: string[]; redirectUri: string };
+
     beforeEach(() => {
-      session.authState = NONCE;
-      session.returnTo = SUCCESS_REDIRECT;
-      session.authCodeRequest = {
+      authCodeRequest = {
         code: "",
         codeVerifier: VERIFIER,
         scopes: [],
         redirectUri: "http://localhost/auth/code/callback",
-      };
-      session.pkceCodes = {
-        verifier: VERIFIER,
-        challenge: CHALLENGE,
-        challengeMethod: CHALLENGE_METHOD,
       };
       msalStub.acquireTokenByCode = sinon
         .stub()
@@ -161,84 +149,33 @@ describe("EntraService", () => {
         .returns({ serialize: sinon.stub().returns("{}") });
     });
 
-    it("calls acquireTokenByCode with authCodeRequest from session plus the code", async () => {
-      await service.processAuthCodeCallback(requestBody);
+    it("calls acquireTokenByCode with authCodeRequest plus the code", async () => {
+      await service.exchangeAuthCode(AUTH_CODE, authCodeRequest);
       const [requestArg] = (msalStub.acquireTokenByCode as sinon.SinonStub)
         .args[0];
-      expect(requestArg.code).to.equal("auth-code");
+      expect(requestArg.code).to.equal(AUTH_CODE);
       expect(requestArg.codeVerifier).to.equal(VERIFIER);
     });
 
-    it("stores serialized token cache on session.tokenCache", async () => {
-      await service.processAuthCodeCallback(requestBody);
-      expect(session.tokenCache).to.equal("{}");
+    it("returns tokenCache from the serialized MSAL cache", async () => {
+      const result = await service.exchangeAuthCode(AUTH_CODE, authCodeRequest) as Success<TokenExchangeResult>;
+      expect(result.value.tokenCache).to.equal("{}");
     });
 
-    it("stores account and idToken on session", async () => {
-      await service.processAuthCodeCallback(requestBody);
-
-      expect(session.account).to.deep.equal(ACCOUNT);
-      expect(session.idToken).to.equal(ID_TOKEN);
-    });
-
-    it("sets session.isAuthenticated to true", async () => {
-      await service.processAuthCodeCallback(requestBody);
-      expect(session.isAuthenticated).to.be.true;
-    });
-
-    it("returns a success with successRedirect from session.returnTo", async () => {
-      const result = await service.processAuthCodeCallback(requestBody) as Success<string>;
-      expect(result.error).to.be.undefined;
-      expect(result.value).to.equal(SUCCESS_REDIRECT);
-    });
-
-    it("defaults successRedirect to /landing when session.returnTo is unset", async () => {
-      delete session.returnTo;
-      const result = await service.processAuthCodeCallback(requestBody) as Success<string>;
-      expect(result.error).to.be.undefined;
-      expect(result.value).to.equal("/landing");
-    });
-
-    it("clears session.authState after successful validation", async () => {
-      await service.processAuthCodeCallback(requestBody);
-      expect(session.authState).to.be.undefined;
-    });
-
-    it("returns a StateMismatchError failure when state does not match session.authState", async () => {
-      const result = await service.processAuthCodeCallback({
-        ...requestBody,
-        state: "wrong-nonce",
-      });
-      expect(result.error).to.exist;
-      expect(result.error)
-        .to.be.an('error')
-        .and.to.be.instanceOf(StateMismatchError)
-    });
-
-    it("returns a StateMismatch failure when session.authState is missing", async () => {
-      delete session.authState;
-      const result = await service.processAuthCodeCallback(requestBody);
-      expect(result.error)
-        .to.be.an('error')
-        .and.to.be.instanceOf(StateMismatchError)
-    });
-
-    it("returns a MissingAuthCodeRequest failure when authCodeRequest is missing from session", async () => {
-      delete session.authCodeRequest;
-      const result = await service.processAuthCodeCallback(requestBody);
-      expect(result.error)
-        .to.be.an('error')
-        .and.to.be.instanceOf(MissingAuthCodeRequestError)
+    it("returns account and idToken", async () => {
+      const result = await service.exchangeAuthCode(AUTH_CODE, authCodeRequest) as Success<TokenExchangeResult>;
+      expect(result.value.account).to.deep.equal(ACCOUNT);
+      expect(result.value.idToken).to.equal(ID_TOKEN);
     });
 
     it("returns a TokenAcquisitionError failure when MSAL throws", async () => {
-      // TODO remove stub once we remove console.error from the catch blocks in AuthService 
+      // TODO remove stub once we remove console.error from the catch blocks in EntraService 
       sinon.stub(console, "error");
 
       const msalError = new Error("MSAL failure");
       (msalStub.acquireTokenByCode as sinon.SinonStub).rejects(msalError);
 
-      const result = await service.processAuthCodeCallback(requestBody);
+      const result = await service.exchangeAuthCode(AUTH_CODE, authCodeRequest);
       expect(result.error)
         .to.be.an('error')
         .and.to.be.instanceOf(TokenAcquisitionError)

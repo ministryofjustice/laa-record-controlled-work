@@ -1,14 +1,14 @@
-import type { SessionData } from "express-session";
-
 import {
+  type AccountInfo,
   type AuthenticationResult,
+  type AuthorizationCodeRequest,
   type AuthorizationUrlRequest,
   ConfidentialClientApplication,
   CryptoProvider,
 } from "@azure/msal-node";
 import { randomUUID } from "node:crypto";
 
-import type { AuthCodeResponse, PKCECodes } from "#/types/auth-types.js";
+import type { PKCECodes } from "#/types/auth-types.js";
 
 import config from "#/config.js";
 import { authRequestDefaults, msalConfig } from "#/config/auth.js";
@@ -16,17 +16,27 @@ import { createRelayState } from "#/lib/auth.relay.js";
 import { devError } from "#/lib/devLogger.js";
 import { type Either, failure, success } from "#/lib/either.js";
 import {
-  MissingAuthCodeRequestError,
   MsalError,
   PkceGenerationError,
-  StateMismatchError,
   TokenAcquisitionError,
 } from "#/lib/errors/auth.js";
 
-// TODO - this service is modifying the express-session by reference.
-//        should probably consider pulling session mutation up and out
-//        into a different module
 // TODO - this service has a lot of mixed responsibilities and needs refactoring.
+
+export interface AuthCodeFlowState {
+  authCodeRequest: AuthorizationCodeRequest;
+  authCodeUrl: string;
+  authCodeUrlRequest: AuthorizationUrlRequest;
+  authState: string;
+  pkceCodes: PKCECodes;
+  returnTo: string;
+}
+
+export interface TokenExchangeResult {
+  account: AccountInfo | undefined;
+  idToken: string | undefined;
+  tokenCache: string;
+}
 
 /**
  * Handles Microsoft Entra ID (MSAL) authentication flows including
@@ -34,22 +44,18 @@ import {
  */
 export class EntraService {
   public msalClient: ConfidentialClientApplication;
-  public session: SessionData;
   private readonly cryptoProvider: CryptoProvider = new CryptoProvider();
   private readonly requestHostname: string;
 
   /**
-   * Creates an EntraService instance with the given session and MSAL client.
-   * @param {SessionData} sessionData - The Express session data object.
+   * Creates an EntraService instance.
    * @param {string} requestHostname - The hostname of the incoming request (e.g. "my-host.example.com").
    * @param {ConfidentialClientApplication} msalClient - The MSAL confidential client application.
    */
   private constructor(
-    sessionData: SessionData,
     requestHostname: string,
     msalClient?: ConfidentialClientApplication,
   ) {
-    this.session = sessionData;
     this.requestHostname = requestHostname;
     this.msalClient =
       msalClient ?? new ConfidentialClientApplication(msalConfig);
@@ -57,82 +63,39 @@ export class EntraService {
 
   /**
    * Factory method to create a new EntraService instance.
-   * @param {SessionData} sessionData - The Express session data object.
    * @param {string} requestHostname - The hostname of the incoming request (e.g. "my-host.example.com").
    * @param {ConfidentialClientApplication} msalClient - The MSAL confidential client application.
    * @returns {EntraService} A new EntraService instance.
    */
   public static create(
-    sessionData: SessionData,
     requestHostname: string,
     msalClient?: ConfidentialClientApplication,
   ): EntraService {
-    return new EntraService(sessionData, requestHostname, msalClient);
+    return new EntraService(requestHostname, msalClient);
   }
 
   /**
-   * Generates the Microsoft Entra ID authorisation URL to begin the PKCE sign-in flow.
-   * @returns {Promise<Either<AuthError, string>>} The authorisation URL or an auth error.
+   * Exchanges the authorisation code from the Entra redirect for tokens.
+   * @param code - The authorisation code to exchange.
+   * @param authCodeRequest - The stored MSAL code request from the sign-in initiation.
+   * @returns {Promise<Either<TokenAcquisitionError, TokenExchangeResult>>} The acquired tokens or an auth error.
    */
-  public async getAuthCodeUrl(): Promise<
-    Either<MsalError | PkceGenerationError, string>
-  > {
-    const result = await this.getPkceCodes();
-    if (result.error) return failure(PkceGenerationError.from(result.error));
-
-    const authCodeUrlRequest = this.createAuthCodeRequest(result.value);
-    try {
-      const url = await this.msalClient.getAuthCodeUrl(authCodeUrlRequest);
-      return success(url);
-    } catch (error) {
-      devError(`Failed to generate Entra auth code URL: ${String(error)}`);
-      return failure(MsalError.from(error));
-    }
-  }
-
-  /**
-   * Exchanges the authorisation code from the Entra redirect for tokens and updates the session.
-   * @param {AuthCodeResponse} requestBody - The validated redirect payload containing the auth code and state.
-   * @returns {Promise<Either<AuthError, string>>} The decoded auth state or an auth error.
-   */
-  public async processAuthCodeCallback(
-    requestBody: AuthCodeResponse,
-  ): Promise<
-    Either<
-      MissingAuthCodeRequestError | StateMismatchError | TokenAcquisitionError,
-      string
-    >
-  > {
-    if (this.session.authCodeRequest === undefined) {
-      return failure(new MissingAuthCodeRequestError());
-    }
-
-    if (
-      this.session.authState === undefined ||
-      requestBody.state !== this.session.authState
-    ) {
-      return failure(new StateMismatchError());
-    }
-    this.session.authState = undefined;
-
-    const successRedirect = this.session.returnTo ?? "/landing";
-    this.session.returnTo = undefined;
-
-    const { code } = requestBody;
-    this.session.authCodeRequest.code = code;
+  public async exchangeAuthCode(
+    code: string,
+    authCodeRequest: AuthorizationCodeRequest,
+  ): Promise<Either<TokenAcquisitionError, TokenExchangeResult>> {
+    const tokenRequest = { ...authCodeRequest, code };
 
     try {
+      const tokenCache = this.msalClient.getTokenCache().serialize();
       const { account, idToken }: AuthenticationResult =
-        await this.msalClient.acquireTokenByCode(
-          this.session.authCodeRequest,
-          requestBody,
-        );
-      this.session.tokenCache = this.msalClient.getTokenCache().serialize();
-      this.session.idToken = idToken;
-      this.session.account = account ?? undefined;
-      this.session.isAuthenticated = true;
+        await this.msalClient.acquireTokenByCode(tokenRequest);
 
-      return success(successRedirect);
+      return success({
+        account: account ?? undefined,
+        idToken,
+        tokenCache,
+      });
     } catch (error) {
       devError(`Failed to handle Entra auth redirect: ${String(error)}`);
       return failure(TokenAcquisitionError.from(error));
@@ -140,18 +103,50 @@ export class EntraService {
   }
 
   /**
-   * Builds the MSAL authorisation URL request and stores PKCE state on the session.
-   * When the request origin differs from the configured redirect URI origin (ephemeral environments),
+   * Generates the Microsoft Entra ID authorisation URL to begin the PKCE sign-in flow.
+   * @param {string} [returnTo] - The path to redirect to after successful authentication.
+   * @returns {Promise<Either<AuthError, AuthCodeFlowState>>} The auth flow initialisation data or an auth error.
+   */
+  public async initiateAuthCodeFlow(
+    returnTo?: string,
+  ): Promise<Either<MsalError | PkceGenerationError, AuthCodeFlowState>> {
+    let pkceCodes: PKCECodes;
+    try {
+      const { challenge, verifier } =
+        await this.cryptoProvider.generatePkceCodes();
+      pkceCodes = { challenge, challengeMethod: "S256", verifier };
+    } catch (error) {
+      devError(`Failed to generate PKCE codes: ${String(error)}`);
+      return failure(PkceGenerationError.from(error));
+    }
+
+    const prepared = this.prepareFlowState(pkceCodes, returnTo);
+    try {
+      const authCodeUrl = await this.msalClient.getAuthCodeUrl(
+        prepared.authCodeUrlRequest,
+      );
+      return success({ authCodeUrl, ...prepared });
+    } catch (error) {
+      devError(`Failed to generate Entra auth code URL: ${String(error)}`);
+      return failure(MsalError.from(error));
+    }
+  }
+
+  /**
+   * Builds the MSAL authorisation URL request and related auth flow state.
+   * When the request hostname differs from the configured redirect URI hostname (ephemeral environments),
    * the state parameter includes a signed relay target so UAT can forward the callback.
    * @param pkceCodes - The PKCE code verifier, challenge, and challenge method.
-   * @returns {AuthorizationUrlRequest} The authorisation URL request object for MSAL.
+   * @param returnTo - The post-authentication redirect path to validate.
+   * @returns The auth flow state (excluding the auth code URL, which requires an MSAL call).
    */
-  private createAuthCodeRequest(pkceCodes: PKCECodes): AuthorizationUrlRequest {
+  private prepareFlowState(
+    pkceCodes: PKCECodes,
+    returnTo?: string,
+  ): Omit<AuthCodeFlowState, "authCodeUrl"> {
     const { challenge, challengeMethod, verifier } = pkceCodes;
-    const { returnTo } = this.session;
 
-    // Validate the redirect target, then bind it to the session.
-    this.session.returnTo =
+    const validReturnTo =
       returnTo?.startsWith("/") === true &&
       !returnTo.startsWith("//") &&
       returnTo !== "/"
@@ -165,7 +160,7 @@ export class EntraService {
     const redirectHostname = new URL(authRequestDefaults.redirectUri).hostname;
     const isRelay = this.requestHostname !== redirectHostname;
 
-    const state = isRelay
+    const authState = isRelay
       ? createRelayState(
           nonce,
           `https://${this.requestHostname}`,
@@ -173,44 +168,27 @@ export class EntraService {
         )
       : this.cryptoProvider.base64Encode(JSON.stringify({ nonce }));
 
-    this.session.authState = state;
+    return {
+      authCodeRequest: {
+        code: "",
+        codeVerifier: verifier,
+        redirectUri: authRequestDefaults.redirectUri,
+        scopes: authRequestDefaults.scopes,
+      } satisfies AuthorizationCodeRequest,
 
-    const authCodeUrlRequest: AuthorizationUrlRequest = {
-      codeChallenge: challenge,
-      codeChallengeMethod: challengeMethod,
-      prompt: authRequestDefaults.prompt,
-      redirectUri: authRequestDefaults.redirectUri,
-      responseMode: authRequestDefaults.responseMode,
-      scopes: authRequestDefaults.scopes,
-      state,
+      authCodeUrlRequest: {
+        codeChallenge: challenge,
+        codeChallengeMethod: challengeMethod,
+        prompt: authRequestDefaults.prompt,
+        redirectUri: authRequestDefaults.redirectUri,
+        responseMode: authRequestDefaults.responseMode,
+        scopes: authRequestDefaults.scopes,
+        state: authState,
+      } satisfies AuthorizationUrlRequest,
+
+      authState,
+      pkceCodes,
+      returnTo: validReturnTo,
     };
-
-    this.session.pkceCodes = pkceCodes;
-    this.session.authCodeUrlRequest = authCodeUrlRequest;
-    this.session.authCodeRequest = {
-      code: "",
-      codeVerifier: verifier,
-      redirectUri: authRequestDefaults.redirectUri,
-      scopes: authRequestDefaults.scopes,
-    };
-
-    return authCodeUrlRequest;
-  }
-
-  /**
-   * Generates a PKCE code verifier and challenge pair using the S256 method.
-   * @returns {Promise<PKCECodes>} The generated PKCE codes.
-   */
-  private async getPkceCodes(): Promise<
-    Either<PkceGenerationError, PKCECodes>
-  > {
-    try {
-      const { challenge, verifier } =
-        await this.cryptoProvider.generatePkceCodes();
-      return success({ challenge, challengeMethod: "S256", verifier });
-    } catch (error) {
-      devError(`Failed to generate PKCE codes: ${String(error)}`);
-      return failure(PkceGenerationError.from(error));
-    }
   }
 }
