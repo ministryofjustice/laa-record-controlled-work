@@ -38,21 +38,21 @@ export class AuthService {
   public msalClient: ConfidentialClientApplication;
   public session: SessionData;
   private readonly cryptoProvider: CryptoProvider = new CryptoProvider();
-  private readonly requestOrigin: string;
+  private readonly requestHostname: string;
 
   /**
    * Creates an AuthService instance with the given session and MSAL client.
    * @param {SessionData} sessionData - The Express session data object.
-   * @param {string} requestOrigin - The origin of the incoming request (e.g. "https://host").
+   * @param {string} requestHostname - The hostname of the incoming request (e.g. "my-host.example.com").
    * @param {ConfidentialClientApplication} msalClient - The MSAL confidential client application.
    */
   private constructor(
     sessionData: SessionData,
-    requestOrigin: string,
+    requestHostname: string,
     msalClient?: ConfidentialClientApplication,
   ) {
     this.session = sessionData;
-    this.requestOrigin = requestOrigin;
+    this.requestHostname = requestHostname;
     this.msalClient =
       msalClient ?? new ConfidentialClientApplication(msalConfig);
   }
@@ -60,16 +60,16 @@ export class AuthService {
   /**
    * Factory method to create a new AuthService instance.
    * @param {SessionData} sessionData - The Express session data object.
-   * @param {string} requestOrigin - The origin of the incoming request (e.g. "https://host").
+   * @param {string} requestHostname - The hostname of the incoming request (e.g. "my-host.example.com").
    * @param {ConfidentialClientApplication} msalClient - The MSAL confidential client application.
    * @returns {AuthService} A new AuthService instance.
    */
   public static create(
     sessionData: SessionData,
-    requestOrigin: string,
+    requestHostname: string,
     msalClient?: ConfidentialClientApplication,
   ): AuthService {
-    return new AuthService(sessionData, requestOrigin, msalClient);
+    return new AuthService(sessionData, requestHostname, msalClient);
   }
 
   /**
@@ -164,11 +164,15 @@ export class AuthService {
     // Validated against session.authState on callback before any token exchange.
     // Encoded as base64(JSON) so MSAL's parseRequestState can parse it without throwing invalid_state.
     const nonce = randomUUID();
-    const redirectOrigin = new URL(authRequestDefaults.redirectUri).origin;
-    const isRelay = this.requestOrigin !== redirectOrigin;
+    const redirectHostname = new URL(authRequestDefaults.redirectUri).hostname;
+    const isRelay = this.requestHostname !== redirectHostname;
 
     const state = isRelay
-      ? createRelayState(nonce, this.requestOrigin, config.session.secret)
+      ? createRelayState(
+          nonce,
+          `https://${this.requestHostname}`,
+          config.session.secret,
+        )
       : this.cryptoProvider.base64Encode(JSON.stringify({ nonce }));
 
     this.session.authState = state;

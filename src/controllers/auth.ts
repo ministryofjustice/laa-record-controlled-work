@@ -21,8 +21,7 @@ export const signIn = async (
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
-  const requestOrigin = `${req.protocol}://${req.hostname}`;
-  const authService = AuthService.create(req.session, requestOrigin);
+  const authService = AuthService.create(req.session, req.hostname);
   try {
     const result = await authService.getAuthCodeUrl();
     if (result.error) {
@@ -80,10 +79,7 @@ export const processAuthCodeCallback = async (
       }
     }
 
-    const authService = AuthService.create(
-      req.session,
-      `${req.protocol}://${req.hostname}`,
-    );
+    const authService = AuthService.create(req.session, req.hostname);
     const result = await authService.processAuthCodeCallback(data);
     if (result.error instanceof TokenAcquisitionError) {
       res.status(UNAUTHORIZED).send(result.error.message);
