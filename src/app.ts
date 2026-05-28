@@ -10,7 +10,6 @@ import { mojComponents } from "@ministryofjustice/hmpps-forge/moj-components";
 import compression from "compression";
 import express from "express";
 import session from "express-session";
-import morgan from "morgan";
 
 import config from "#/config.js";
 import createApplication from "#/journeys/create-application/index.js";
@@ -27,6 +26,7 @@ import {
   createAuthLimiter,
   setupRateLimit,
 } from "#/middleware/setupRateLimit.js";
+import { setupRequestLogging } from "#/middleware/setupRequestLogging.js";
 import { standardMiddleware } from "#/middleware/standardMiddleware.js";
 import authRouter from "#/routes/auth.js";
 import healthRouter from "#/routes/health.js";
@@ -100,16 +100,8 @@ const createApp = async (): Promise<express.Application> => {
   // Set up application-specific configurations
   setupConfig(app);
 
-  // Set up request logging based on environment.
-  // Skip logging on the OAuth callback to keep auth codes out of logs.
-  const skipAuthCallback = (req: Request): boolean =>
-    req.path === "/auth/code/callback";
-
-  if (process.env.NODE_ENV === "production") {
-    app.use(morgan("combined", { skip: skipAuthCallback }));
-  } else {
-    app.use(morgan("dev", { skip: skipAuthCallback }));
-  }
+  // Set up request logging based on environment
+  setupRequestLogging(app);
 
   // Setup express-session using redis
   app.use(session(await createSession(config)));
