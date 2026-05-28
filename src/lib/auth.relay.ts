@@ -28,15 +28,17 @@ export type RelayState = z.infer<typeof relayStateSchema>;
  * @param nonce - A cryptographically random UUID to prevent CSRF attacks.
  * @param target - The HTTPS origin of the ephemeral environment
  * @param secret - The session secret used to sign the.
- * @returns A base64-encoded JSON string containing `{ nonce, sig, target }`.
+ * @returns A base64-encoded JSON string containing `{ nonce, signature, target }`.
  */
 export function createRelayState(
   nonce: string,
   target: string,
   secret: string,
 ): string {
-  const sig = sign({ nonce, target }, secret);
-  return Buffer.from(JSON.stringify({ nonce, sig, target })).toString("base64");
+  const signature = sign({ nonce, target }, secret);
+  return Buffer.from(JSON.stringify({ nonce, signature, target })).toString(
+    "base64",
+  );
 }
 
 /**
@@ -86,7 +88,7 @@ export function parseRelayState(stateString: string): null | RelayState {
  * Verifies the HMAC-SHA256 signature of a relay state.
  *
  * Recomputes the expected signature from `state.nonce` and `state.target` using the
- * provided secret, then compares it against `state.sig` using a timing-safe equality
+ * provided secret, then compares it against `state.signature` using a timing-safe equality
  * check to prevent timing attacks.
  *
  * @param state - The decoded relay state to verify.

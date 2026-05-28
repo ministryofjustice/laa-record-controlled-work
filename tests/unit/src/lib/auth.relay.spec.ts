@@ -33,7 +33,7 @@ describe("authRelay", () => {
 
       expect(parsed).to.have.property("nonce", NONCE);
       expect(parsed).to.have.property("target", VALID_TARGET);
-      expect(parsed).to.have.property("sig");
+      expect(parsed).to.have.property("signature");
     });
   });
 
@@ -56,7 +56,7 @@ describe("authRelay", () => {
 
     it("returns null when fields have wrong types", () => {
       const state = Buffer.from(
-        JSON.stringify({ nonce: 123, sig: true, target: null }),
+        JSON.stringify({ nonce: 123, signature: true, target: null }),
       ).toString("base64");
       expect(parseRelayState(state)).to.be.null;
     });
