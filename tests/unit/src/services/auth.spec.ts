@@ -7,6 +7,7 @@ import { expect } from "chai";
 import type { SessionData } from "express-session";
 import sinon from "sinon";
 import { authRequestDefaults } from "#/config/auth.js";
+import { parseRelayState, verifyRelayState } from "#/lib/auth.relay.js";
 import { Success } from "#/lib/either.js";
 import { MissingAuthCodeRequestError, MsalError, StateMismatchError, TokenAcquisitionError } from "#/lib/errors/auth.js";
 
@@ -23,6 +24,9 @@ describe("AuthService", () => {
   const ID_TOKEN = "id-token";
   const ACCOUNT = { username: "user" };
   const SUCCESS_REDIRECT = "/test/success";
+  const SESSION_SECRET = process.env.SESSION_SECRET as string;
+  const REDIRECT_URI_ORIGIN = new URL(authRequestDefaults.redirectUri).origin;
+  const EPHEMERAL_ORIGIN = "https://el-257-laa-record-controlled-work-uat.cloud-platform.service.justice.gov.uk";
 
   beforeEach(() => {
     msalStub = {
@@ -32,6 +36,7 @@ describe("AuthService", () => {
     session = {} as SessionData;
     service = AuthService.create(
       session,
+      REDIRECT_URI_ORIGIN,
       msalStub as ConfidentialClientApplication,
     );
 
@@ -111,6 +116,25 @@ describe("AuthService", () => {
         .and.to.be.instanceOf(MsalError)
       expect(result.error?.cause).to.be.an("error")
         .and.to.have.property("message", "MSAL failure")
+    });
+
+    it("creates a plain state when requestOrigin matches the redirect URI origin", async () => {
+      await service.getAuthCodeUrl();
+      const parsed = parseRelayState(session.authState!);
+      expect(parsed).to.be.null;
+    });
+
+    it("creates a relay state with target and sig when requestOrigin differs from redirect URI origin", async () => {
+      const ephemeralService = AuthService.create(
+        session,
+        EPHEMERAL_ORIGIN,
+        msalStub as ConfidentialClientApplication,
+      );
+      await ephemeralService.getAuthCodeUrl();
+      const parsed = parseRelayState(session.authState!);
+      expect(parsed).to.not.be.null;
+      expect(parsed!.target).to.equal(EPHEMERAL_ORIGIN);
+      expect(verifyRelayState(parsed!, SESSION_SECRET)).to.be.true;
     });
   });
 

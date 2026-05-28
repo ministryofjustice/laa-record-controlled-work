@@ -3,6 +3,11 @@ import type { NextFunction, Request, Response } from "express";
 // TODO: this is a handlers module, rather than controller
 import config from "#/config.js";
 import {
+  isAllowedRelayTarget,
+  parseRelayState,
+  verifyRelayState,
+} from "#/lib/auth.relay.js";
+import {
   BAD_REQUEST,
   INTERNAL_SERVER_ERROR,
   UNAUTHORIZED,
@@ -16,7 +21,8 @@ export const signIn = async (
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
-  const authService = AuthService.create(req.session);
+  const requestOrigin = `${req.protocol}://${req.hostname}`;
+  const authService = AuthService.create(req.session, requestOrigin);
   try {
     const result = await authService.getAuthCodeUrl();
     if (result.error) {
@@ -43,15 +49,42 @@ export const processAuthCodeCallback = async (
 ): Promise<void> => {
   try {
     const { data, success } = authCodeResponseSchema.safeParse(req.query);
-
     if (!success) {
       res.status(BAD_REQUEST).send("Invalid redirect payload");
       return;
     }
 
-    const authService = AuthService.create(req.session);
-    const result = await authService.processAuthCodeCallback(data);
+    // Relay detection: if the state encodes a callback target for an ephemeral host,
+    // validate the signature and forward the callback to that ephemeral environment.
+    const relayState = parseRelayState(data.state);
+    if (relayState !== null) {
+      const { target } = relayState;
+      if (
+        !verifyRelayState(relayState, config.session.secret) ||
+        !isAllowedRelayTarget(target)
+      ) {
+        res.status(BAD_REQUEST).send("Invalid relay target");
+        return;
+      }
 
+      const targetUrl = new URL(target);
+      if (targetUrl.hostname !== req.hostname) {
+        targetUrl.pathname = "/auth/code/callback";
+        targetUrl.searchParams.set("code", data.code);
+        targetUrl.searchParams.set("state", data.state);
+
+        console.info(`Relaying auth callback to ${targetUrl.hostname}`);
+        res.set("Cache-Control", "no-store");
+        res.redirect(targetUrl.toString());
+        return;
+      }
+    }
+
+    const authService = AuthService.create(
+      req.session,
+      `${req.protocol}://${req.hostname}`,
+    );
+    const result = await authService.processAuthCodeCallback(data);
     if (result.error instanceof TokenAcquisitionError) {
       res.status(UNAUTHORIZED).send(result.error.message);
       return;
@@ -61,7 +94,6 @@ export const processAuthCodeCallback = async (
     }
 
     const { account, idToken, isAuthenticated, tokenCache } = req.session;
-
     req.session.regenerate((error: Error | null | undefined) => {
       if (error) {
         next(error);
