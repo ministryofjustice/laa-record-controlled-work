@@ -8,7 +8,7 @@ import type {
   CsrfConfig,
   EntraConfig,
   RedisConfig,
-} from "#/types/config-types.js";
+} from "#/config.types.js";
 
 import { HOUR, MINUTE, SECOND } from "#/lib/constants/time.js";
 import { optional, required } from "#/lib/env.js";

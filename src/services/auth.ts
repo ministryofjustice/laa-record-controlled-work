@@ -8,7 +8,7 @@ import {
 } from "@azure/msal-node";
 import { randomUUID } from "node:crypto";
 
-import type { AuthCodeResponse, PKCECodes } from "#/types/auth-types.js";
+import type { AuthCodeResponse, PKCECodes } from "#/services/auth.types.js";
 
 import config from "#/config.js";
 import { authRequestDefaults, msalConfig } from "#/config/auth.js";

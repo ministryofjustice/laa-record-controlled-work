@@ -12,7 +12,7 @@
 
 import type { AxiosResponse } from "axios";
 
-import type { AxiosInstanceWrapper } from "#/types/axios-instance-wrapper.js";
+import type { AxiosInstanceWrapper } from "#/services/axiosInstanceWrapper.js";
 
 import { devLog } from "#/lib/devLogger.js";
 import { extractAndLogError } from "#/lib/errorHandler.js";

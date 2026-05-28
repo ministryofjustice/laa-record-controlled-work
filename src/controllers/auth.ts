@@ -14,7 +14,7 @@ import {
 } from "#/lib/constants/httpStatus.js";
 import { TokenAcquisitionError } from "#/lib/errors/auth.js";
 import { AuthService } from "#/services/auth.js";
-import { authCodeResponseSchema } from "#/types/auth-types.js";
+import { authCodeResponseSchema } from "#/services/auth.types.js";
 
 export const signIn = async (
   req: Request,
