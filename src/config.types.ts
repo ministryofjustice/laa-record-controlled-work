@@ -1,5 +1,3 @@
-// Configuration type definitions
-
 import type { SessionOptions } from "express-session";
 
 export interface AppConfig {

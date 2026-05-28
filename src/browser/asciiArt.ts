@@ -6,7 +6,7 @@
  * ASCII Art created by: https://patorjk.com/software/taag/#p=display&f=Graffiti&t=Type%20Something%20
  */
 
-import type { DisplayConsoleBannerFunction } from "#/types/ascii-art-types.js";
+type DisplayConsoleBannerFunction = () => void;
 
 /**
  * Messages to display in the console.

@@ -1,6 +1,6 @@
 import config from "#/config.js";
 import { createRedisClient, createRedisStore } from "#/lib/redis.js";
-import { RedisConfig } from "#/types/config-types.js";
+import { RedisConfig } from "#/config.types.js";
 import { strict as assert } from "assert";
 import { expect } from "chai";
 import sinon from "sinon";

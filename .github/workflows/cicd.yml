@@ -23,7 +23,7 @@ jobs:
         uses: ./.github/actions/setup-node
 
       - name: Run ESLint
-        run: yarn lint
+        run: yarn eslint .
 
   code-security-audit:
     name: Code Security Audit
