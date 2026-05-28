@@ -10,7 +10,9 @@ import { randomUUID } from "node:crypto";
 
 import type { AuthCodeResponse, PKCECodes } from "#/types/auth-types.js";
 
+import config from "#/config.js";
 import { authRequestDefaults, msalConfig } from "#/config/auth.js";
+import { createRelayState } from "#/lib/auth.relay.js";
 import { devError } from "#/lib/devLogger.js";
 import { type Either, failure, success } from "#/lib/either.js";
 import {
@@ -26,6 +28,7 @@ import {
 // TODO - this service is modifying the express-session by reference.
 //        should probably consider pulling session mutation up and out
 //        into a different module
+// TODO - this service has a lot of mixed responsibilities and needs refactoring.
 
 /**
  * Handles Microsoft Entra ID (MSAL) authentication flows including
@@ -35,17 +38,21 @@ export class AuthService {
   public msalClient: ConfidentialClientApplication;
   public session: SessionData;
   private readonly cryptoProvider: CryptoProvider = new CryptoProvider();
+  private readonly requestOrigin: string;
 
   /**
    * Creates an AuthService instance with the given session and MSAL client.
    * @param {SessionData} sessionData - The Express session data object.
+   * @param {string} requestOrigin - The origin of the incoming request (e.g. "https://host").
    * @param {ConfidentialClientApplication} msalClient - The MSAL confidential client application.
    */
   private constructor(
     sessionData: SessionData,
+    requestOrigin: string,
     msalClient?: ConfidentialClientApplication,
   ) {
     this.session = sessionData;
+    this.requestOrigin = requestOrigin;
     this.msalClient =
       msalClient ?? new ConfidentialClientApplication(msalConfig);
   }
@@ -53,14 +60,16 @@ export class AuthService {
   /**
    * Factory method to create a new AuthService instance.
    * @param {SessionData} sessionData - The Express session data object.
+   * @param {string} requestOrigin - The origin of the incoming request (e.g. "https://host").
    * @param {ConfidentialClientApplication} msalClient - The MSAL confidential client application.
    * @returns {AuthService} A new AuthService instance.
    */
   public static create(
     sessionData: SessionData,
+    requestOrigin: string,
     msalClient?: ConfidentialClientApplication,
   ): AuthService {
-    return new AuthService(sessionData, msalClient);
+    return new AuthService(sessionData, requestOrigin, msalClient);
   }
 
   /**
@@ -134,6 +143,8 @@ export class AuthService {
 
   /**
    * Builds the MSAL authorisation URL request and stores PKCE state on the session.
+   * When the request origin differs from the configured redirect URI origin (ephemeral environments),
+   * the state parameter includes a signed relay target so UAT can forward the callback.
    * @param pkceCodes - The PKCE code verifier, challenge, and challenge method.
    * @returns {AuthorizationUrlRequest} The authorisation URL request object for MSAL.
    */
@@ -152,10 +163,15 @@ export class AuthService {
     // Cryptographically random nonce used as the OAuth state parameter for CSRF protection.
     // Validated against session.authState on callback before any token exchange.
     // Encoded as base64(JSON) so MSAL's parseRequestState can parse it without throwing invalid_state.
-    const nonce = this.cryptoProvider.base64Encode(
-      JSON.stringify({ id: randomUUID() }),
-    );
-    this.session.authState = nonce;
+    const nonce = randomUUID();
+    const redirectOrigin = new URL(authRequestDefaults.redirectUri).origin;
+    const isRelay = this.requestOrigin !== redirectOrigin;
+
+    const state = isRelay
+      ? createRelayState(nonce, this.requestOrigin, config.session.secret)
+      : this.cryptoProvider.base64Encode(JSON.stringify({ id: nonce }));
+
+    this.session.authState = state;
 
     const authCodeUrlRequest: AuthorizationUrlRequest = {
       codeChallenge: challenge,
@@ -164,7 +180,7 @@ export class AuthService {
       redirectUri: authRequestDefaults.redirectUri,
       responseMode: authRequestDefaults.responseMode,
       scopes: authRequestDefaults.scopes,
-      state: nonce,
+      state,
     };
 
     this.session.pkceCodes = pkceCodes;
