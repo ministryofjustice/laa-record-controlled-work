@@ -7,9 +7,11 @@ import { setupCsrf } from "#/middleware/setupCsrf.js";
 
 /**
  * Creates a mock app for test auth routes against
+ * @param options - optional config
+ * @param options.seedSession - whether to auto-seed session state on callback requests (default true)
  * @returns a sandbox express app
  */
-export function createMockApp(): Application {
+export function createMockApp({ seedSession = true } = {}): Application {
   const app = express();
   app.use(express.urlencoded({ extended: false }));
   app.use(session({ resave: false, saveUninitialized: true, secret: "test" }));
@@ -24,20 +26,22 @@ export function createMockApp(): Application {
   // The state value must match the query param sent in the test request.
   // eslint-disable-next-line @typescript-eslint/no-empty-object-type -- only need to define query param
   type CallbackRequest = Request<{}, {}, {}, { state: string }>;
-  app.use("/auth/code/callback", (req: CallbackRequest, res, next) => {
-    const { state } = req.query;
-    if (state) {
-      req.session.authState = state;
-      req.session.authCodeRequest = {
-        code: "",
-        codeVerifier: "",
-        redirectUri: "",
-        scopes: [],
-      };
-      req.session.returnTo = "/landing";
-    }
-    next();
-  });
+  if (seedSession) {
+    app.use("/auth/code/callback", (req: CallbackRequest, res, next) => {
+      const { state } = req.query;
+      if (state) {
+        req.session.authState = state;
+        req.session.authCodeRequest = {
+          code: "",
+          codeVerifier: "",
+          redirectUri: "",
+          scopes: [],
+        };
+        req.session.returnTo = "/landing";
+      }
+      next();
+    });
+  }
 
   app.use("/auth", authRouter);
 

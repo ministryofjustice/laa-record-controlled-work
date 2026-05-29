@@ -114,6 +114,31 @@ describe("Auth Handlers", () => {
       expect(res.text).to.equal("Token acquisition failed");
     });
 
+    describe("session guards", () => {
+      let app: express.Application;
+
+      before(() => {
+        app = createMockApp({ seedSession: false });
+      });
+
+      it("responds with 400 when session has no authCodeRequest", async () => {
+        const res = await request(app)
+          .get("/auth/code/callback")
+          .query(QUERY_PARAMS);
+
+        expect(res.status).to.equal(BAD_REQUEST);
+        expect(res.text).to.equal("Missing auth code request in session");
+      });
+
+      it("responds with 400 when state does not match session authState", async () => {
+        const res = await request(app)
+          .get("/auth/code/callback")
+          .query({ code: "auth-code", state: "mismatched-state" });
+
+        expect(res.status).to.equal(BAD_REQUEST);
+      });
+    });
+
     describe("relay behavior", () => {
       const SESSION_SECRET = process.env.SESSION_SECRET as string;
       const VALID_EPHEMERAL_TARGET =
