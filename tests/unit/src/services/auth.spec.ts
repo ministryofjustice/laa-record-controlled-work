@@ -9,7 +9,7 @@ import sinon from "sinon";
 import { authRequestDefaults } from "#/auth/auth.config.js";
 import { parseRelayState, verifyRelayState } from "#/auth/auth.relay.js";
 import { Success } from "#/lib/either.js";
-import { MsalError, TokenAcquisitionError } from "#/auth/auth.errors.js";
+import { MsalError, PkceGenerationError, TokenAcquisitionError } from "#/auth/auth.errors.js";
 
 describe("EntraService", () => {
   let msalStub: Partial<ConfidentialClientApplication>;
@@ -85,6 +85,20 @@ describe("EntraService", () => {
         .and.to.be.instanceOf(MsalError)
       expect(result.error?.cause).to.be.an("error")
         .and.to.have.property("message", "MSAL failure")
+    });
+
+    it("returns a PkceGenerationError failure when PKCE generation throws", async () => {
+      (CryptoProvider.prototype.generatePkceCodes as sinon.SinonStub).rejects(
+        new Error("PKCE failure"),
+      );
+
+      const result = await service.initiateAuthCodeFlow();
+      
+      expect(result.error)
+        .to.be.an("error")
+        .and.to.be.instanceOf(PkceGenerationError);
+      expect(result.error?.cause).to.be.an("error")
+        .and.to.have.property("message", "PKCE failure");
     });
 
     it("creates a plain state when requestHostname matches the redirect URI hostname", async () => {
