@@ -74,6 +74,11 @@ describe("EntraService", () => {
       expect(result.value.returnTo).to.equal("/landing");
     });
 
+    it("falls back to /landing when returnTo could redirect to an external site", async () => {
+      const result = await service.initiateAuthCodeFlow("//external.com") as Success<AuthCodeFlowState>;
+      expect(result.value.returnTo).to.equal("/landing");
+    });
+
     it("returns a MsalError failure when MSAL throws", async () => {
       (msalStub.getAuthCodeUrl as sinon.SinonStub).rejects(
         new Error("MSAL failure"),
@@ -93,7 +98,7 @@ describe("EntraService", () => {
       );
 
       const result = await service.initiateAuthCodeFlow();
-      
+
       expect(result.error)
         .to.be.an("error")
         .and.to.be.instanceOf(PkceGenerationError);
