@@ -1,5 +1,5 @@
 /* eslint-disable jsdoc/require-jsdoc -- not needed */
-import { DomainError } from "./domainError.js";
+import { DomainError } from "#/lib/errors/domainError.js";
 
 export class MissingAuthCodeRequestError extends DomainError {
   public readonly name = "MissingAuthCodeRequestError";
