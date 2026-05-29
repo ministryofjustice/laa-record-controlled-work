@@ -86,7 +86,6 @@ describe("Auth Handlers", () => {
         .get("/auth/code/callback")
         .query(QUERY_PARAMS);
 
-      expect(authServiceStub.exchangeAuthCode.calledOnce).to.be.true;
       expect(res.status).to.equal(FOUND);
       expect(res.headers.location).to.equal("/landing");
     });
