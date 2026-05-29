@@ -66,7 +66,7 @@ describe("Auth Handlers", () => {
       expect(res.headers.location).to.equal(AUTH_CODE_URL);
     });
 
-    it("calls next(error) when initiateAuthCodeFlow() throws", async () => {
+    it("calls next(error) when initiateAuthCodeFlow() fails", async () => {
       const errorMessage = "MSAL failure";
       const error = new Error(errorMessage);
       authServiceStub.initiateAuthCodeFlow.resolves(failure(error));
