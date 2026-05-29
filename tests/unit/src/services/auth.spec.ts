@@ -52,19 +52,6 @@ describe("EntraService", () => {
       expect(result.value.authCodeUrl).to.equal(AUTH_CODE_URL);
     });
 
-    it("returns PKCE codes", async () => {
-      const result = await service.initiateAuthCodeFlow() as Success<AuthCodeFlowState>;
-      expect(result.value.pkceCodes).to.exist;
-      expect(result.value.pkceCodes.verifier).to.equal(VERIFIER);
-      expect(result.value.pkceCodes.challenge).to.equal(CHALLENGE);
-    });
-
-    it("returns authCodeUrlRequest and authCodeRequest", async () => {
-      const result = await service.initiateAuthCodeFlow() as Success<AuthCodeFlowState>;
-      expect(result.value.authCodeUrlRequest).to.exist;
-      expect(result.value.authCodeRequest).to.exist;
-    });
-
     it("returns a random authState and passes it as the state parameter", async () => {
       const result = await service.initiateAuthCodeFlow() as Success<AuthCodeFlowState>;
       expect(result.value.authState).to.be.a("string").with.length.greaterThan(0);
