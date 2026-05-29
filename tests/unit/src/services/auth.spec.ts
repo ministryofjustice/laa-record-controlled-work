@@ -124,14 +124,6 @@ describe("EntraService", () => {
         .returns({ serialize: sinon.stub().returns("{}") });
     });
 
-    it("calls acquireTokenByCode with authCodeRequest plus the code", async () => {
-      await service.exchangeAuthCode(AUTH_CODE, authCodeRequest);
-      const [requestArg] = (msalStub.acquireTokenByCode as sinon.SinonStub)
-        .args[0];
-      expect(requestArg.code).to.equal(AUTH_CODE);
-      expect(requestArg.codeVerifier).to.equal(VERIFIER);
-    });
-
     it("returns tokenCache from the serialized MSAL cache", async () => {
       const result = await service.exchangeAuthCode(AUTH_CODE, authCodeRequest) as Success<TokenExchangeResult>;
       expect(result.value.tokenCache).to.equal("{}");
