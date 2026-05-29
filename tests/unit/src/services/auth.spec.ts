@@ -2,7 +2,7 @@ import {
   ConfidentialClientApplication,
   CryptoProvider,
 } from "@azure/msal-node";
-import { EntraService } from "#/auth/auth.service.js";
+import { EntraService } from "#/auth/entra.service.js";
 import type { AuthCodeFlowState, TokenExchangeResult } from "#/auth/auth.types.js";
 import { expect } from "chai";
 import sinon from "sinon";

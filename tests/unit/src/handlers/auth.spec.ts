@@ -7,7 +7,7 @@ import {
   UNAUTHORIZED,
 } from "#/lib/constants/httpStatus.js";
 import sinon from "sinon";
-import { EntraService } from "#/auth/auth.service.js";
+import { EntraService } from "#/auth/entra.service.js";
 import { createRelayState } from "#/auth/auth.relay.js";
 import { failure, success } from "#/lib/either.js";
 import { expect } from "chai";
