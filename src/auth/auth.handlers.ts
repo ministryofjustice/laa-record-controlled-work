@@ -9,8 +9,8 @@ import {
   parseRelayState,
   verifyRelayState,
 } from "#/auth/auth.relay.js";
-import { EntraService } from "#/auth/entra.service.js";
 import { authCodeCallbackSchema } from "#/auth/auth.types.js";
+import { EntraService } from "#/auth/entra.service.js";
 import config from "#/config.js";
 import {
   BAD_REQUEST,
