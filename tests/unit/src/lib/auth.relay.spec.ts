@@ -79,7 +79,7 @@ describe("authRelay", () => {
     it("returns false when the target has been tampered with", () => {
       const state = createRelayState(NONCE, VALID_TARGET, SECRET);
       const parsed = parseRelayState(state)!;
-      parsed.target = "https://evil.com";
+      parsed.target = "https://external.com";
       expect(verifyRelayState(parsed, SECRET)).to.be.false;
     });
 
@@ -111,7 +111,7 @@ describe("authRelay", () => {
     });
 
     it("rejects an arbitrary external domain", () => {
-      expect(isAllowedRelayTarget("https://evil.com")).to.be.false;
+      expect(isAllowedRelayTarget("https://external.com")).to.be.false;
     });
 
     it("rejects an http URL (non-HTTPS)", () => {
@@ -133,7 +133,7 @@ describe("authRelay", () => {
     it("rejects a target with a path component that looks valid", () => {
       expect(
         isAllowedRelayTarget(
-          "https://evil.com/el-257-laa-record-controlled-work-uat.cloud-platform.service.justice.gov.uk",
+          "https://external.com/el-257-laa-record-controlled-work-uat.cloud-platform.service.justice.gov.uk",
         ),
       ).to.be.false;
     });
@@ -141,7 +141,7 @@ describe("authRelay", () => {
     it("rejects a target using a query string to mimic the pattern", () => {
       expect(
         isAllowedRelayTarget(
-          "https://evil.com?x-laa-record-controlled-work-uat.cloud-platform.service.justice.gov.uk",
+          "https://external.com?x-laa-record-controlled-work-uat.cloud-platform.service.justice.gov.uk",
         ),
       ).to.be.false;
     });
