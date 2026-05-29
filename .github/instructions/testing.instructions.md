@@ -2,8 +2,6 @@
 applyTo: "tests/**"
 ---
 
-# Testing
-
 ## Frameworks
 
 - **Unit**: Mocha + TSX; assertions via Chai (`expect`); HTTP testing via Supertest; stubs/spies via Sinon
@@ -12,21 +10,16 @@ applyTo: "tests/**"
 
 ## Conventions
 
-- Unit test files live in `tests/unit/src/`, mirroring the `src/` directory structure.
+- Unit tests in `tests/unit/src/`, mirroring `src/` structure.
 - File naming: `<name>.spec.ts`
-- `tests/unit/setup.ts` provides required env vars — do not redeclare them in individual test files.
-- Always call `sinon.restore()` in `afterEach` to clean up stubs.
-- Use `createMockApp()` from `tests/unit/utils.ts` to create a test Express application.
-- Stub service factory methods (e.g. `ServiceName.create`) rather than internal implementation details.
+- `tests/unit/setup.ts` provides env vars — don't redeclare in test files.
+- Call `sinon.restore()` in `afterEach`.
+- Use `createMockApp()` from `tests/unit/utils.ts` for test Express apps.
+- Stub service factory methods (e.g. `ServiceName.create`), not internals.
 
-## Commands
+## Approach
 
-| Command | Purpose |
-|---------|---------|
-| `make unit` | Run all unit tests |
-| `make unit file=<name>` | Run a single test file (e.g. `make unit file=services/auth`) |
-| `yarn test:watch` | Unit tests in watch mode |
-| `make e2e` | Build + run Playwright tests headlessly |
-| `make e2e-ui` | Playwright in interactive UI mode |
-| `make test-all` | Unit + E2E + lint |
-| `yarn coverage` | Unit tests with c8 coverage report |
+- Test observable behaviour (inputs, outputs, side effects), not implementation.
+- Don't test private functions, internal state, or call order unless it's the observable contract.
+- Only test behaviour that downstream code depends on.
+- Test names describe the outcome (e.g. "returns 302" not "calls redirect with status 302").

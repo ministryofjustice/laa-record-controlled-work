@@ -2,37 +2,27 @@
 applyTo: "src/**"
 ---
 
-# Architecture
-
 ## Stack
-
 - **Runtime**: Node.js 25.9.0, TypeScript (ESM), Express 5
 - **Auth**: Microsoft Entra ID via MSAL (`@azure/msal-node`); sessions stored in Redis
 - **Templates**: Nunjucks (`src/views/`); GOV.UK Frontend components
 - **i18n**: i18next; all translations in `locales/en.json`
-- **HTTP client**: Axios via `BaseApiService` (`src/services/baseApiService.ts`)
 - **Package manager**: Yarn 4 (corepack); path alias `#/*` → `src/*`
-- **Secrets**: 1Password (`op run --env-file=.env`) in development — never hardcode
-
-## Project structure
-
-```
-src/
-  controllers/   # Route handlers; call services, render views
-  services/      # API clients extending BaseApiService
-  middleware/    # Express middleware (auth, CSRF, Helmet, rate-limit, i18n)
-  routes/        # Express router definitions
-  views/         # Nunjucks templates
-  lib/           # Shared utilities and constants
-  config/        # App and auth configuration
-  types/         # TypeScript type definitions
-```
 
 ## Key patterns
+- **Error handling**: Use `Either` (`success(value)` / `failure(error)`) from `src/lib/either.ts`; don't throw across service boundaries.
+- **HTTP status codes**: Named constants from `src/lib/constants/httpStatus.ts`, not magic numbers.
+- **Auth guard**: `requireAuth` middleware on all non-public routes.
+- **CSRF**: `setupCsrf` middleware on all state-changing routes.
+- **Naming**: Route handlers are "handlers", not "controllers". Name services for the provider they wrap (e.g. `EntraService` not `AuthService`).
+- **Service purity**: Services return data, never mutate `req`/`req.session`. Handlers own framework interaction.
 
-- **Error handling**: Use `Either` (`success(value)` / `failure(error)`) from `src/lib/either.ts`; do not throw across service boundaries.
-- **HTTP status codes**: Import named constants from `src/lib/constants/httpStatus.ts`, not magic numbers.
-- **Auth guard**: `requireAuth` middleware applied to all non-public routes.
-- **CSRF**: `setupCsrf` middleware active on all state-changing routes.
-- **Services**: Extend `BaseApiService`; configure `baseUrl`, `apiPrefix`, and optional `timeout`.
+## TypeScript idioms (TypeScript 6.x / ESM)
+- Prefer `function` declarations over arrow expressions for named functions. Use arrows only when tidier (callbacks, inline transforms).
+- Colocate types with the owning module (e.g. `auth/auth.types.ts`). `src/@types/` is only for global augmentations.
+- Prefer `type` over `interface` unless declaration merging is needed.
+- Use `satisfies` for type-safe literals that should retain their narrow type.
 
+## Module patterns
+- **Vertical slice / feature module** (e.g. `src/auth/`): Colocate types, config, errors, service, handlers, and routes in a feature-prefixed directory. Prefer for new features.
+- Shared utilities and cross-cutting concerns in `src/lib/` and `src/middleware/`.

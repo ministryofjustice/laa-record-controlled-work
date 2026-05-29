@@ -1,19 +1,22 @@
 ---
-applyTo: "**/*.njk, src/scss/**, src/browser/**"
+applyTo: "**/*.njk, src/journeys/**, src/scss/**, src/browser/**"
 ---
-
-# Frontend / Views
 
 ## Templates
 
-- Nunjucks templates in `src/views/`; base layout is `base.njk`.
-- Use GOV.UK Design System macros and components from `@ministryofjustice/frontend`.
-- All user-facing strings via i18next: use `t('key')` in templates; add keys to `locales/en.json`.
-- Never use inline styles; add styles to `src/scss/`.
+- Nunjucks in `src/views/`; base layout `base.njk`.
+- Use GOV.UK Design System macros from `@ministryofjustice/frontend`.
+- User-facing strings via i18next: `t('key')` in templates; keys in `locales/en.json`.
+- No inline styles; use `src/scss/`.
 
 ## Accessibility
 
-- Semantic HTML; target WCAG 2.2 AA.
-- All form inputs must have an associated `<label>`.
-- Use GOV.UK error summary and error message patterns for form validation feedback.
-- Ensure sufficient colour contrast; do not rely on colour alone to convey meaning.
+- Semantic HTML; WCAG 2.2 AA.
+- All form inputs must have a `<label>`.
+- GOV.UK error summary and error message patterns for validation.
+- Sufficient colour contrast; don't rely on colour alone.
+
+## Journeys (HMPPS Forge)
+
+- Multi-step flows in `src/journeys/` using `@ministryofjustice/hmpps-forge`.
+- Each journey owns its steps and effects in a self-contained subdirectory.
