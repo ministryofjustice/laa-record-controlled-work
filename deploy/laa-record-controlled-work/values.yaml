@@ -26,7 +26,7 @@ rcw:
   image:
     repository: nginx
     pullPolicy: Always
-    tag: "@sha256:06aa3d7be10bc6307990c81bdca075793132e9163391abc370c015e344e23128"
+    tag: "@sha256:5aca99593157f4ae539a5dec1092a0ad8762f8e2eb1789085a13a0f5622369f6"
 
   imagePullSecrets: []
   podAnnotations: {}
@@ -121,7 +121,6 @@ rcw:
     NODE_ENV: ""
     ENTRA_AUTHORITY_BASE_URL: "https://login.microsoftonline.com/"
     ENTRA_REDIRECT_URI: ""
-    ENTRA_POST_LOGOUT_REDIRECT_URI: ""
     REDIS_ENABLED: true  
     REDIS_SECRET_NAME: elasticache-redis
 
@@ -139,6 +138,30 @@ rcw:
   tolerations: []
   affinity: {}
 
+ccq:
+  replicaCount: 1
+
+  image:
+    # Overridden at deploy time to ECR; see deploy.sh and docker-images.env
+    repository: laa-check-client-qualifies
+    pullPolicy: Always
+    tag: latest
+
+  envSecretName: ccq-env-secrets
+  envSecrets:
+    - SECRET_KEY_BASE
+
+  env:
+    REDIS_URL: ""
+
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1Gi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+
 nginx:
   replicaCount: 1
 
@@ -146,7 +169,7 @@ nginx:
     # Overridden at deploy time to ECR; see deploy.sh and docker-images.env
     repository: nginxinc/nginx-unprivileged
     pullPolicy: Always
-    tag: alpine@sha256:4c18337659c90a01627f2e152b7c89524521c82dcedb255dc83d3689642b0803
+    tag: alpine@sha256:8122337ed6c475bb486bc9340da453d4599f225e6b920ff0d92ca2267486b9b5
 
   resources:
     limits:

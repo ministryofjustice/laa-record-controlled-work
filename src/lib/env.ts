@@ -25,12 +25,10 @@ const injected = z.string().refine((val) => !val.startsWith("op://"), {
 });
 
 const requiredEnvSchema = z.object({
-  ENTRA_AUTHORITY_BASE_URL: injected.nonempty(),
+  ENTRA_AUTHORITY_BASE_URL: z.url().nonempty(),
   ENTRA_CLIENT_ID: injected.nonempty(),
-
   ENTRA_CLIENT_SECRET: injected.nonempty(),
-  ENTRA_POST_LOGOUT_REDIRECT_URI: injected.nonempty(),
-  ENTRA_REDIRECT_URI: injected.nonempty(),
+  ENTRA_REDIRECT_URI: z.url().nonempty(),
   ENTRA_TENANT_ID: injected.nonempty(),
   NODE_ENV: z.literal([
     "test",

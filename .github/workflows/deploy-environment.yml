@@ -35,12 +35,14 @@ jobs:
           ENTRA_CLIENT_ID: ${{ secrets.ENTRA_CLIENT_ID }}
           ENTRA_CLIENT_SECRET: ${{ secrets.ENTRA_CLIENT_SECRET }}
           ENTRA_TENANT_ID: ${{ secrets.ENTRA_TENANT_ID }}
+          SECRET_KEY_BASE: ${{ secrets.SECRET_KEY_BASE }}
         with:
           sha: ${{ inputs.sha }}
           branch-ref: ${{ inputs.branch-ref }}
           app-environment: ${{ inputs.app-environment }}
           ecr-registry_url: ${{ secrets.ECR_REGISTRY_URL }}
           ecr-repository: ${{ vars.ECR_REPOSITORY }}
+          ccq-ecr-repository: ${{ vars.CCQ_ECR_REPOSITORY }}
           nginx-ecr-repository: ${{ vars.NGINX_ECR_REPOSITORY }}
           kube-cert: ${{ secrets.KUBE_CERT }}
           kube-token: ${{ secrets.KUBE_TOKEN }}
