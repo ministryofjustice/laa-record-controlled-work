@@ -6785,9 +6785,9 @@ __metadata:
   linkType: hard
 
 "tinyexec@npm:^1.0.4":
-  version: 1.1.2
-  resolution: "tinyexec@npm:1.1.2"
-  checksum: 10c0/9e0ef6c001ce54688cf16833a02f70a339276219ca947b88930b124267de2cffc764ff44e87e7369384b1d75ab63491465412cbbdf06f2437956b9ab66ab4491
+  version: 1.2.2
+  resolution: "tinyexec@npm:1.2.2"
+  checksum: 10c0/8bcb4969c572c21d570c033e29cb896e26d96e49e58f4fe07a532d3d65e10bdfae59733bf8a6a0fd9b611543c4ed3b890c939c3234489599296fb92515eb4625
   languageName: node
   linkType: hard
 
@@ -6801,21 +6801,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tldts-core@npm:^7.0.30":
-  version: 7.0.30
-  resolution: "tldts-core@npm:7.0.30"
-  checksum: 10c0/e3cd730e96b0e9c0332fcaab44d0257b668f9089644508e4f6f870d37bbf5c218243b7e83aa39690c87b386d1b0ad577772a5994969c4c81cc25a476f783ccd7
+"tldts-core@npm:^7.1.0":
+  version: 7.1.0
+  resolution: "tldts-core@npm:7.1.0"
+  checksum: 10c0/e380f601e0b73105ef2add60f296fd001543e93e4c70cebf4f779717fae609680a8a0f77f1bec72043ce7597acab5f1d54769e8b3d07d20996d84c124d8e90f1
   languageName: node
   linkType: hard
 
 "tldts@npm:^7.0.5":
-  version: 7.0.30
-  resolution: "tldts@npm:7.0.30"
+  version: 7.1.0
+  resolution: "tldts@npm:7.1.0"
   dependencies:
-    tldts-core: "npm:^7.0.30"
+    tldts-core: "npm:^7.1.0"
   bin:
     tldts: bin/cli.js
-  checksum: 10c0/c36f7b480f09128303158e4738a82426c33e8da9f77d4fb57a2d5ef5896c803d7a3c1d53ade965712f9cb4946935139b6d192a18698665556ca504493c7c265e
+  checksum: 10c0/ff3b87a16ef96fde6e6eac745078cb87f0614cd2b854322245b98595efafb63fafbef23ea1f719105a77f7ee8c8d51ca21a42c030d4e9d5a50fdd5bca4da57a6
   languageName: node
   linkType: hard
 
