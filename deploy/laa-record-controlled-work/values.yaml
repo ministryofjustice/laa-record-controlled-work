@@ -26,7 +26,7 @@ rcw:
   image:
     repository: nginx
     pullPolicy: Always
-    tag: "@sha256:800e7c98538c6bf725f5177e841aa720ae0ed1c378bbea368b6330bfe18a36b3"
+    tag: "@sha256:5aca99593157f4ae539a5dec1092a0ad8762f8e2eb1789085a13a0f5622369f6"
 
   imagePullSecrets: []
   podAnnotations: {}
@@ -138,6 +138,30 @@ rcw:
   tolerations: []
   affinity: {}
 
+ccq:
+  replicaCount: 1
+
+  image:
+    # Overridden at deploy time to ECR; see deploy.sh and docker-images.env
+    repository: laa-check-client-qualifies
+    pullPolicy: Always
+    tag: latest
+
+  envSecretName: ccq-env-secrets
+  envSecrets:
+    - SECRET_KEY_BASE
+
+  env:
+    REDIS_URL: ""
+
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1Gi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+
 nginx:
   replicaCount: 1
 
@@ -145,7 +169,7 @@ nginx:
     # Overridden at deploy time to ECR; see deploy.sh and docker-images.env
     repository: nginxinc/nginx-unprivileged
     pullPolicy: Always
-    tag: alpine@sha256:3707417e3304492667a63c90ac0103465330437f9cdfaa38f8cd19f9975cbeed
+    tag: alpine@sha256:8122337ed6c475bb486bc9340da453d4599f225e6b920ff0d92ca2267486b9b5
 
   resources:
     limits:

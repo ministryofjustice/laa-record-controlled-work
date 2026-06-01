@@ -7,9 +7,8 @@ import type {
   Config,
   CsrfConfig,
   EntraConfig,
-  PathsConfig,
   RedisConfig,
-} from "#/types/config-types.js";
+} from "#/config.types.js";
 
 import { HOUR, MINUTE, SECOND } from "#/lib/constants/time.js";
 import { optional, required } from "#/lib/env.js";
@@ -31,58 +30,55 @@ const useHttps = ["production", "staging", "uat"].includes(required.NODE_ENV);
 
 export default {
   app: {
-    appName: optional.SERVICE_NAME ?? "Your service name",
+    contact: {
+      email: optional.CONTACT_EMAIL,
+      phone: optional.CONTACT_PHONE,
+    },
+    department: {
+      name: optional.DEPARTMENT_NAME,
+      url: optional.DEPARTMENT_URL,
+    },
     environment: required.NODE_ENV,
+    paths: {
+      static: "public",
+    },
     port: optional.PORT ?? DEFAULT_PORT,
-    useHttps, // Use HTTPS in production
+    rateLimit: {
+      authMax: optional.AUTH_RATE_LIMIT_MAX ?? DEFAULT_AUTH_RATE_LIMIT_MAX,
+      headersEnabled: optional.RATELIMIT_HEADERS_ENABLED,
+      max: optional.RATE_LIMIT_MAX ?? DEFAULT_RATE_LIMIT_MAX,
+      storageUri: optional.RATELIMIT_STORAGE_URI,
+      windowMs: optional.RATE_WINDOW_MS ?? DEFAULT_RATE_WINDOW,
+    },
+    service: {
+      name: optional.SERVICE_NAME ?? "LAA Record Controlled Work",
+      phase: optional.SERVICE_PHASE,
+      url: optional.SERVICE_URL,
+    },
+    useHttps,
   } satisfies AppConfig,
-  AUTH_RATE_LIMIT_MAX:
-    optional.AUTH_RATE_LIMIT_MAX ?? DEFAULT_AUTH_RATE_LIMIT_MAX,
-  CONTACT_EMAIL: optional.CONTACT_EMAIL,
-  CONTACT_PHONE: optional.CONTACT_PHONE,
 
   csrf: {
     cookieName: "_csrf",
-    httpOnly: true, // Restrict client-side access
-    secure: useHttps, // Only secure in production
+    httpOnly: true,
+    secure: useHttps,
   } satisfies CsrfConfig,
-  DEPARTMENT_NAME: optional.DEPARTMENT_NAME,
 
-  DEPARTMENT_URL: optional.DEPARTMENT_URL,
   entra: {
     authority: `${required.ENTRA_AUTHORITY_BASE_URL}${required.ENTRA_TENANT_ID}`,
-    authorityBaseUrl: required.ENTRA_AUTHORITY_BASE_URL,
     clientId: required.ENTRA_CLIENT_ID,
     clientSecret: required.ENTRA_CLIENT_SECRET,
     redirectUri: required.ENTRA_REDIRECT_URI,
-    tenantId: required.ENTRA_TENANT_ID,
   } satisfies EntraConfig,
-  paths: {
-    static: "public", // Path for serving static files
-    views: "src/views", // Path for Nunjucks views
-  } satisfies PathsConfig,
-
-  RATE_LIMIT_MAX: optional.RATE_LIMIT_MAX ?? DEFAULT_RATE_LIMIT_MAX,
-  RATE_WINDOW_MS: optional.RATE_WINDOW_MS ?? DEFAULT_RATE_WINDOW,
-  RATELIMIT_HEADERS_ENABLED: optional.RATELIMIT_HEADERS_ENABLED,
-
-  RATELIMIT_STORAGE_URI: optional.RATELIMIT_STORAGE_URI,
 
   redis: {
     enabled: optional.REDIS_ENABLED === "true",
     maxRetryAttempts: REDIS_MAX_RETRY_ATTEMPTS,
-
     socketConnectionTimeout: REDIS_SOCKET_CONNECTION_TIMEOUT,
     url:
       optional.REDIS_URL ??
       `redis://${DEFAULT_REDIS_HOST}:${DEFAULT_REDIS_PORT}`,
   } satisfies RedisConfig,
-
-  SERVICE_NAME: optional.SERVICE_NAME,
-
-  SERVICE_PHASE: optional.SERVICE_PHASE,
-
-  SERVICE_URL: optional.SERVICE_URL,
 
   session: {
     cookie: {

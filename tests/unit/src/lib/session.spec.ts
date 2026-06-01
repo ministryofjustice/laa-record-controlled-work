@@ -1,6 +1,6 @@
 import config from "#/config.js";
 import { createSession } from "#/lib/session.js";
-import type { RedisClientType } from "#/types/redis-types.js";
+import type { RedisClientType } from "#/lib/redis.js";
 import * as chai from "chai";
 import type { RedisStore } from "connect-redis";
 import chaiAsPromised from "chai-as-promised"

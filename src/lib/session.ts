@@ -1,7 +1,7 @@
 import type { RedisStore } from "connect-redis";
 import type { SessionOptions } from "express-session";
 
-import type { Config } from "#/types/config-types.js";
+import type { Config } from "#/config.types.js";
 
 import * as redis from "#/lib/redis.js";
 

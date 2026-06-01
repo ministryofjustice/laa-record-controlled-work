@@ -6,7 +6,10 @@ FROM base AS installer
 WORKDIR /app
 
 # Enable Corepack so it picks up the yarn version from the packageManager field in package.json
-RUN npm install -g --force corepack && corepack enable
+# Remove yarn/yarnpkg shims pre-installed by the base image to avoid conflicts when installing corepack
+RUN rm -f /usr/local/bin/yarn /usr/local/bin/yarnpkg &&\
+    npm install -g corepack &&\
+    corepack enable
 
 COPY package*.json yarn.lock .yarnrc.yml ./
 RUN yarn install --immutable
