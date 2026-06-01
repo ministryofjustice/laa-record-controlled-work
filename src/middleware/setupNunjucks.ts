@@ -70,7 +70,7 @@ export const setupNunjucks = (app: Application): nunjucks.Environment => {
     {
       autoescape: true, // Enable auto escaping to prevent XSS attacks
       express: appInstance, // Bind Nunjucks to the Express app instance
-      watch: process.env.NODE_ENV === "development", // Watch for template changes in development only
+      watch: ["development", "docker"].includes(process.env.NODE_ENV ?? ""), // Watch for template changes in development and docker
     },
   );
 

@@ -37,7 +37,7 @@ lint:
 	yarn lint
 
 docker-up:
-	op run --env-file=.env -- docker compose up
+	op run --env-file=.env -- docker compose up --watch --build
 
 docker-down:
 	docker compose down
