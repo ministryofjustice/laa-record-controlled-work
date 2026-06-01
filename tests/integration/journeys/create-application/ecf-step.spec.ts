@@ -34,14 +34,15 @@ function createClient() {
 }
 
 describe("ECF step", () => {
+
+  const client = createClient();
+
   it("should render the ECF form on GET", async () => {
-    const client = createClient();
     const result = await client.get("/create-application/ecf");
     expect(result.type).to.equal("render");
   });
 
   it("should show validation error if no option is selected", async () => {
-    const client = createClient();
     const result = await client.post("/create-application/ecf", {
       body: {},
     });
@@ -55,7 +56,6 @@ describe("ECF step", () => {
   });
 
   it("should redirect to ineligible step if ECF is not required", async () => {
-    const client = createClient();
     const result: TestResult = await client.post("/create-application/ecf", {
       body: {
         ecf: "yes",
@@ -68,7 +68,6 @@ describe("ECF step", () => {
   });
 
   it("should redirect to legal aid before step if ECF is not required", async () => {
-    const client = createClient();
     const result = await client.post("/create-application/ecf", {
       body: {
         ecf: "no",
