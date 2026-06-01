@@ -16,7 +16,6 @@ import config from "#/config.js";
 import createApplication from "#/journeys/create-application/index.js";
 import { initializeI18nextSync } from "#/lib/i18nLoader.js";
 import { createSession } from "#/lib/session.js";
-import { axiosMiddleware } from "#/middleware/apiMiddleware.js";
 import { requireAuth } from "#/middleware/requireAuth.js";
 import { setupConfig } from "#/middleware/setupConfigs.js";
 import { setupCsrf } from "#/middleware/setupCsrf.js";
@@ -53,8 +52,6 @@ const createApp = async (): Promise<express.Application> => {
 
   // Set up common middleware for handling cookies, body parsing, etc.
   standardMiddleware(app);
-
-  app.use(axiosMiddleware);
 
   // Response compression setup
   app.use(

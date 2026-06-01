@@ -15,8 +15,6 @@ const externalModules: string[] = [
   "express-session",
   "morgan",
   "compression",
-  "axios",
-  "middleware-axios",
   "util",
   "path",
   "fs",
