@@ -5,7 +5,7 @@
 
 import type { NextFunction, Request, Response } from "express";
 
-import type { ExpressLocaleLoader } from "#/types/express-types.js";
+import type { ExpressLocaleLoader } from "#/@types/express.js";
 
 import { t } from "#/lib/i18nLoader.js";
 

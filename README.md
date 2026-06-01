@@ -169,7 +169,6 @@ CSRF protection is not applied to `/auth/code/callback` — it is secured by the
 | `ENTRA_TENANT_ID` | Directory (tenant) ID |
 | `ENTRA_AUTHORITY_BASE_URL` | Authority base URL (e.g. `https://login.microsoftonline.com/`) |
 | `ENTRA_REDIRECT_URI` | Redirect URI registered in Entra for auth code callback |
-| `ENTRA_POST_LOGOUT_REDIRECT_URI` | URI to redirect to after sign-out |
 
 These values are stored in 1Password and injected at runtime via the 1Password CLI (see above).
 
