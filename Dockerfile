@@ -31,7 +31,7 @@ RUN npm prune --omit=dev --legacy-peer-deps
 FROM installer AS dev
 
 EXPOSE 3000
-CMD ["yarn", "start:dev"]
+CMD ["yarn", "watch"]
 
 ###########################################
 FROM base AS runner

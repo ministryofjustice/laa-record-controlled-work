@@ -16,11 +16,14 @@
     "build": "yarn clean && tsc && node public/esbuild/esbuild.js",
     "clean": "rimraf public",
     "lint": "yarn eslint . --fix",
-    "unit": "./node_modules/.bin/mocha",
-    "unit:watch": "./node_modules/.bin/mocha --watch",
+    "unit": "./node_modules/.bin/mocha --recursive 'tests/unit/**/*.spec.ts'",
+    "unit:watch": "./node_modules/.bin/mocha --watch --recursive 'tests/unit/**/*.spec.ts'",
+    "coverage": "c8 yarn unit --check-coverage",
+    "integration": "./node_modules/.bin/mocha --recursive 'tests/integration/**/*.spec.ts'",
+    "integration:watch": "./node_modules/.bin/mocha --watch --recursive 'tests/integration/**/*.spec.ts'",
     "e2e": "yarn build && yarn playwright test --config=tests/playwright/playwright.config.ts",
     "e2e:ui": "yarn build && yarn playwright test --config=tests/playwright/playwright.config.ts --ui",
-    "coverage": "c8 yarn test:unit --check-coverage"
+    "test:all": "yarn lint && yarn unit && yarn integration && yarn e2e"
   },
   "engines": {
     "node": "25.9.0"
