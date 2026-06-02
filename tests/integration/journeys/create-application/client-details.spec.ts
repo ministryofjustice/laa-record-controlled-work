@@ -49,7 +49,7 @@ describe("Client details step", () => {
 
     expect(result.type).to.equal("redirect");
     if (result.type === "redirect") {
-      expect(result.url).to.equal("/create-application/check-answers");
+      expect(result.url).to.equal("/create-application/ni-number");
     }
   });
 
