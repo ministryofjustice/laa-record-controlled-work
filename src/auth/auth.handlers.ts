@@ -66,7 +66,7 @@ export async function authCodeCallback(
       }
 
       Object.assign(req.session, result.value, { isAuthenticated: true });
-      res.redirect(returnTo ?? "/landing");
+      res.redirect(returnTo ?? "/");
     });
   } catch (error) {
     next(error);

@@ -133,11 +133,9 @@ export class EntraService {
     const { challenge, challengeMethod, verifier } = pkceCodes;
 
     const validReturnTo =
-      returnTo?.startsWith("/") === true &&
-      !returnTo.startsWith("//") &&
-      returnTo !== "/"
+      returnTo?.startsWith("/") === true && !returnTo.startsWith("//")
         ? returnTo
-        : "/landing";
+        : "/";
 
     // Cryptographically random nonce used as the OAuth state parameter for CSRF protection.
     // Validated against session.authState on callback before any token exchange.
