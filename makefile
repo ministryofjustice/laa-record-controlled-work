@@ -20,7 +20,7 @@ MOCHA_OPTS := --no-config \
 # 	you can --no-masking flag means that varaibles is not masked in the output which can be used for debugging
 
 watch: 
-	op run --env-file=.env -- yarn build && yarn dev
+	yarn dev
 
 dev: 
 	op run --env-file=.env -- npx tsx src/server.ts
