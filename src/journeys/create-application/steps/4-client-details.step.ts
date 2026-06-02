@@ -84,7 +84,7 @@ export const clientDetailsStep = (journeyCode: string): ReturnType<typeof step> 
             when: Query("returnTo").match(Condition.Equals("check-answers")),
             goto: "check-answers",
           }),
-          redirect({ goto: "check-answers" }),
+          redirect({ goto: "ni-number" }),
         ],
       },
     }),

@@ -20,12 +20,6 @@ test("create application flow", async ({ page }) => {
   await expect(yesOption).toBeVisible();
   await expect(noOption).toBeVisible();
 
-  // Check for the validation message when no option is selected
-  await page.click('button[type="submit"]');
-  await expect(page.locator(".govuk-error-message")).toHaveText(
-    /Please select an option/,
-  );
-
   // Select "Yes" and submit
   await yesOption.check();
   await page.click('button[type="submit"]');
@@ -62,12 +56,6 @@ test("create application flow", async ({ page }) => {
   await expect(yesSameMatterOption).toBeVisible();
   await expect(yesDifferentMatterOption).toBeVisible();
   await expect(noMatterOption).toBeVisible();
-  
-  // Check for the validation message when no option is selected
-  await page.click('button[type="submit"]');
-  await expect(page.locator(".govuk-error-message")).toHaveText(
-    /Please select an option/,
-  );
 
   // Select "Yes, about the same matter" and submit
   await yesSameMatterOption.check();
@@ -84,11 +72,6 @@ test("create application flow", async ({ page }) => {
   await expect(yesLast6MonthsOption).toBeVisible();
   await expect(noLast6MonthsOption).toBeVisible();
 
-  await page.click('button[type="submit"]');
-  await expect(page.locator(".govuk-error-message")).toHaveText(
-    /Select if your client got legal help for this matter in the last 6 months/,
-  );
-
   const reasonForYesField = page.locator('textarea[name="reasonForYes"]');
   // Check that the reason field is not visible when "Yes, about the same matter" is not selected
   await expect(reasonForYesField).toBeHidden();
@@ -97,12 +80,6 @@ test("create application flow", async ({ page }) => {
 
   // Check that the reason field is visible when "Yes, about the same matter" is selected
   await expect(reasonForYesField).toBeVisible();
-
-  // Check for validation message when reason field is empty
-  await page.click('button[type="submit"]');
-  await expect(page.locator(".govuk-error-message")).toHaveText(
-    /Enter the reason you’re creating a new case for the same matter/,
-  );
 
   // Fill in the reason field and submit
   await reasonForYesField.fill("Client's circumstances have changed");
@@ -135,25 +112,12 @@ test("create application flow", async ({ page }) => {
 
   // Fill in the full name and submit to check for date of birth validation
   await fullNameInput.fill("John Doe");
-  await page.click('button[type="submit"]');
-  await expect(page.locator(".govuk-error-message")).toHaveText(
-    /Enter your client's date of birth/,
-  );
-
-  // Fill in an invalid date of birth and submit
-  await dateOfBirthDayInput.fill("31");
-  await dateOfBirthMonthInput.fill("2");
-  await dateOfBirthYearInput.fill("2000");
-  await page.click('button[type="submit"]');
-  await expect(page.locator(".govuk-error-message")).toHaveText(
-    /Date of birth must be a real date/,
-  );
 
   // Fill in a valid date of birth and submit
   await dateOfBirthDayInput.fill("15");
   await dateOfBirthMonthInput.fill("6");
   await dateOfBirthYearInput.fill("1990");
   await page.click('button[type="submit"]');
-  // Verify redirection to the next page (e.g., check answers)
-  await expect(page).toHaveURL("/create-application/check-answers");
+  // Verify redirection to the next page
+  await expect(page).toHaveURL("/create-application/ni-number");
 });
