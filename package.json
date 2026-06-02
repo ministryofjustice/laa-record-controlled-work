@@ -9,23 +9,18 @@
     "#/*": "./src/*"
   },
   "scripts": {
-    "start": "node public/app.js",
-    "start:dev": "yarn build && concurrently \"tsc --watch\" \"node public/esbuild/esbuild.js --watch\" \"nodemon\"",
-    "start:docker": "docker compose --env-file docker-images.env up -d",
+    "dev": "op run --env-file=.env -- npx tsx src/server.ts",
+    "dev:watch": "op run --env-file=.env -- yarn watch",
+    "dev:docker": "op run --env-file=.env -- docker compose up --watch --build",
+    "watch": "yarn build && concurrently \"tsc --watch\" \"node public/esbuild/esbuild.js --watch\" \"nodemon\"",
+    "build": "yarn clean && tsc && node public/esbuild/esbuild.js",
     "clean": "rimraf public",
-    "build": "yarn clean && yarn build:ts && node public/esbuild/esbuild.js",
     "lint": "yarn eslint . --fix",
-    "dev": "op run --env-file=.env -- yarn start:dev",
-    "deploy": "./scripts/deploy.sh",
-    "prepare": "husky",
-    "tsc": "tsc --noEmit",
-    "build:ts": "tsc",
-    "test": "yarn test:unit && yarn test:e2e",
-    "test:unit": "./node_modules/.bin/mocha",
-    "test:watch": "./node_modules/.bin/mocha --watch",
-    "test:e2e": "yarn playwright test --config=tests/playwright/playwright.config.ts",
-    "coverage": "c8 yarn test:unit --check-coverage",
-    "up": "op run --env-file=.env -- docker compose up -d"
+    "unit": "./node_modules/.bin/mocha",
+    "unit:watch": "./node_modules/.bin/mocha --watch",
+    "e2e": "yarn build && yarn playwright test --config=tests/playwright/playwright.config.ts",
+    "e2e:ui": "yarn build && yarn playwright test --config=tests/playwright/playwright.config.ts --ui",
+    "coverage": "c8 yarn test:unit --check-coverage"
   },
   "engines": {
     "node": "25.9.0"

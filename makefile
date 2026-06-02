@@ -14,36 +14,37 @@ MOCHA_OPTS := --no-config \
 	--reporter list
 
 
-.PHONY: watch dev unit e2e e2e-ui test-all lint docker-up
+.PHONY: dev watch docker-up docker-down build lint e2e e2e-ui test-all unit
 
 # 	op run --env-file=.env uses 1Password to load environment variables securely
 # 	you can --no-masking flag means that varaibles is not masked in the output which can be used for debugging
 
-watch: 
+dev: 
 	yarn dev
 
-dev: 
-	op run --env-file=.env -- npx tsx src/server.ts
-
-e2e:
-	yarn build && yarn test:e2e
-
-e2e-ui:
-	yarn build && yarn playwright test --ui --config=tests/playwright/playwright.config.ts
-
-test-all: unit e2e lint
-
-lint: 
-	yarn lint
+watch: 
+	yarn dev:watch
 
 docker-up:
-	op run --env-file=.env -- docker compose up --watch --build
+	yarn dev:docker
 
 docker-down:
 	docker compose down
 
-docker-build:
-	op run --env-file=.env -- docker compose up --build 
+build:
+	yarn build
+
+lint: 
+	yarn lint
+
+e2e:
+	yarn e2e
+
+e2e-ui:
+	yarn e2e-ui
+
+test-all: unit e2e lint
+
 
 # Run unit tests.
 #
