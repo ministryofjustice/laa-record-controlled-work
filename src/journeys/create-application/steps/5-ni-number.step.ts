@@ -57,7 +57,7 @@ export const niNumberStep = (journeyCode: string): ReturnType<typeof step> =>
                     ),
                   ),
                   message:
-                    "Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C ",
+                    "Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C",
                 }),
               ],
             }),
