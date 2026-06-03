@@ -41,8 +41,8 @@ e2e:
 e2e-ui:
 	yarn e2e:ui
 
-test-all: 
-	yarn test:all
+test: 
+	yarn test
 
 coverage:
 	yarn unit:coverage
