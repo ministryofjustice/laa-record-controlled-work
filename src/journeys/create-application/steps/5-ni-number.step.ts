@@ -40,11 +40,11 @@ export const niNumberStep = (journeyCode: string): ReturnType<typeof step> =>
           {
             block: GovUKTextInput({
               code: "niNumber",
+              classes: "govuk-input--width-10",
               dependentWhen: Answer("hasNINumber").match(
                 Condition.Equals("yes"),
               ),
               label: "Enter your client's National Insurance number",
-              classes: "govuk-input--width-10",
               validWhen: [
                 validation({
                   condition: Self().match(Condition.IsRequired()),
