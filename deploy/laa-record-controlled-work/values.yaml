@@ -153,6 +153,10 @@ ccq:
 
   env:
     REDIS_SECRET_NAME: elasticache-redis-ccq
+    RAILS_ENV: production
+    RAILS_SERVE_STATIC_FILES: "true"
+    RAILS_LOG_TO_STDOUT: "true"
+    CCQ_MODE: embedded
 
   resources:
     limits:

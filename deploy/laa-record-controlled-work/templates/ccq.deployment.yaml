@@ -38,24 +38,22 @@ spec:
             seccompProfile:
               type: RuntimeDefault
           env:
-            - name: RAILS_ENV
-              value: production
-            - name: RAILS_SERVE_STATIC_FILES
-              value: "true"
-            - name: RAILS_LOG_TO_STDOUT
-              value: "true"
-            - name: CCQ_MODE
-              value: embedded
             - name: REDIS_URL
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.ccq.env.REDIS_SECRET_NAME }}
                   key: url
-            - name: SECRET_KEY_BASE
+            {{- range $key, $val := .Values.ccq.env }}
+            - name: {{ $key }}
+              value: {{ $val | quote }}
+            {{- end }}
+            {{- range .Values.ccq.envSecrets }}
+            - name: {{ . }}
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.ccq.envSecretName }}
-                  key: SECRET_KEY_BASE
+                  name: {{ $.Values.ccq.envSecretName }}
+                  key: {{ . }}
+            {{- end }}
           volumeMounts:
             - name: tmp
               mountPath: /tmp
