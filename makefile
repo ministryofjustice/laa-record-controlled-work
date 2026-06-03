@@ -45,7 +45,7 @@ test-all:
 	yarn test:all
 
 coverage:
-	yarn coverage
+	yarn unit:coverage
 
 unit-watch:
 	yarn unit:watch
