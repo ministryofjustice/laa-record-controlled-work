@@ -120,4 +120,42 @@ test("create application flow", async ({ page }) => {
   await page.click('button[type="submit"]');
   // Verify redirection to the next page
   await expect(page).toHaveURL("/create-application/ni-number");
+
+  // Test for NI number page
+  
+  // Check for the question
+  await expect(
+    page.getByRole("heading", {
+      name: /Does your client have a National Insurance number\?/,
+      level: 1,
+    }),
+  ).toBeVisible();
+
+  // Check for the radio options
+  const yesNINumberOption = page.locator(
+    'input[type="radio"][value="yes"]',
+  );
+  const noNINumberOption = page.locator('input[type="radio"][value="no"]');
+  await expect(yesNINumberOption).toBeVisible();
+  await expect(noNINumberOption).toBeVisible();
+
+  // Select "Yes" and check for NI number input
+  await yesNINumberOption.check();
+  const niNumberInput = page.locator('input[name="niNumber"]');
+  await expect(niNumberInput).toBeVisible();
+
+  // Fill in a valid NI number and submit
+  await niNumberInput.fill("JN123456A");
+  await page.click('button[type="submit"]');
+  // Verify redirection to the next page
+  await expect(page).toHaveURL("/create-application/does-client-have-address");
+
+  // Navigate back to the NI number page
+  await page.goto("/create-application/ni-number");
+
+  // Select "No" and submit
+  await noNINumberOption.check();
+  await page.click('button[type="submit"]');
+  // Verify redirection to the next page
+  await expect(page).toHaveURL("/create-application/does-client-have-address");
 });
