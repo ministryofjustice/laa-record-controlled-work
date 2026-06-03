@@ -3,7 +3,7 @@ export
 
 MOCHA    := ./node_modules/.bin/mocha
 
-.PHONY: dev watch docker-up docker-down build lint integration integration-watch e2e e2e-ui test-all coverage unit unit-watch
+.PHONY: dev watch docker-up docker-down build lint lint-fix integration integration-watch e2e e2e-ui test-all coverage unit unit-watch
 
 # 	op run --env-file=.env uses 1Password to load environment variables securely
 # 	you can --no-masking flag means that varaibles is not masked in the output which can be used for debugging
@@ -25,6 +25,9 @@ build:
 
 lint: 
 	yarn lint
+
+lint-fix: 
+	yarn lint:fix
 
 integration:
 	yarn integration
