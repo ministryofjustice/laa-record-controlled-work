@@ -12,6 +12,6 @@ test("landing page should display Landing page title", async ({ page }) => {
 
   // Check for Landing Page title
   await expect(
-    page.getByRole("heading", { name: "Stub Landing Page", level: 1 }),
+    page.getByRole("heading", { name: "Landing Page", level: 1 }),
   ).toBeVisible();
 });
