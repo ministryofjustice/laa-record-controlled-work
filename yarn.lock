@@ -660,15 +660,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ministryofjustice/hmpps-forge@npm:^0.1.0-alpha.15":
-  version: 0.1.0-alpha.15
-  resolution: "@ministryofjustice/hmpps-forge@npm:0.1.0-alpha.15"
+"@ministryofjustice/hmpps-forge@npm:^0.1.0-alpha.16":
+  version: 0.1.0-alpha.16
+  resolution: "@ministryofjustice/hmpps-forge@npm:0.1.0-alpha.16"
   dependencies:
     express: "npm:^4.21.0 || ^5.0.0"
     http-errors: "npm:^2.0.0"
     nunjucks: "npm:^3.2.4"
     zod: "npm:^4.1.5"
-  checksum: 10c0/83c9b16aecdb9b27284f98382555e85f1d31994b9b0a5ccb4fc0672110bb6dd57f97ee97e9eaf394a64c39b821993daaeaebfa6ebfea4deb178353a7ba39be38
+  checksum: 10c0/9717342f3160bfd238c75f45e80741dd8c0d70c171b1eec525c8f8e5d1584e0bcae3391fdd0338bbd51851356d76c194933f6c6587e3eddd00d357b0029bdc3b
   languageName: node
   linkType: hard
 
@@ -4724,7 +4724,7 @@ __metadata:
     "@azure/msal-node": "npm:^5.2.2"
     "@eslint/js": "npm:^10.0.1"
     "@ministryofjustice/frontend": "npm:9.0.0"
-    "@ministryofjustice/hmpps-forge": "npm:^0.1.0-alpha.15"
+    "@ministryofjustice/hmpps-forge": "npm:^0.1.0-alpha.16"
     "@playwright/test": "npm:^1.60.0"
     "@types/chai": "npm:^5.2.3"
     "@types/chai-as-promised": "npm:^8.0.2"
