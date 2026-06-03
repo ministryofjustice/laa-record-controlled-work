@@ -16,4 +16,11 @@ export default [
       "no-console": "warn", // TODO: should be using a proper logger like pino or winston
     },
   },
+  {
+    name: "project/src-browser-console-exemption",
+    files: ["src/browser/**/*.{js,jsx,ts,tsx}"],
+    rules: {
+      "no-console": "off",
+    },
+  },
 ];
