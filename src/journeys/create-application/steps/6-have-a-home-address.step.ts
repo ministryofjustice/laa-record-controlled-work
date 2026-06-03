@@ -69,11 +69,11 @@ export const haveAHomeAddressStep = (
               when: Query("returnTo").match(Condition.Equals("check-answers")),
             }),
             redirect({
-              goto: "TODODODODODODODOD",
+              goto: "enter-address-manually",
               when: Answer("haveAHomeAddress").match(Condition.Equals("yes")),
             }),
             redirect({
-              goto: "TODODODODODODODOD",
+              goto: "need-means-assessment",
               when: Answer("haveAHomeAddress").match(Condition.Equals("no")),
             }),
           ],
