@@ -13,6 +13,9 @@ spec:
       app.kubernetes.io/component: nginx
   template:
     metadata:
+      annotations:
+        # Triggers rolling restart if nginx template files change
+        checksum/nginx-config: {{ include (print $.Template.BasePath "/nginx.configmap.yaml") . | sha256sum }}
       labels:
         {{- include "laa-record-controlled-work.labels" . | nindent 8 }}
         app.kubernetes.io/component: nginx
