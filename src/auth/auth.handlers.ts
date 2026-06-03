@@ -17,6 +17,7 @@ import {
   INTERNAL_SERVER_ERROR,
   UNAUTHORIZED,
 } from "#/lib/constants/httpStatus.js";
+import { logger } from "#/logger.js";
 
 /**
  * Handles the Entra auth code callback, exchanging the code for tokens.
@@ -165,7 +166,7 @@ function handleRelay(
   targetUrl.searchParams.set("code", data.code);
   targetUrl.searchParams.set("state", data.state);
 
-  console.info(`Relaying auth callback to ${targetUrl.hostname}`);
+  logger.info("Relaying auth callback", { targetHostname: targetUrl.hostname });
   res.set("Cache-Control", "no-store");
   res.redirect(targetUrl.toString());
   return true;

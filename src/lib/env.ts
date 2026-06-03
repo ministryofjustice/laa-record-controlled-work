@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers -- Zod schema constraints are self-documenting */
 import z from "zod";
 
+import { logger } from "#/logger.js";
+
 const optionalEnvSchema = z.object({
   AUTH_RATE_LIMIT_MAX: z.coerce.number().optional(),
   CONTACT_EMAIL: z.string().optional(),
@@ -52,7 +54,9 @@ const { data, error } = z
   });
 
 if (error) {
-  console.error(z.prettifyError(error));
+  logger.fatal("Environment validation failed", error, {
+    prettyError: z.prettifyError(error),
+  });
   process.exit(1);
 }
 
