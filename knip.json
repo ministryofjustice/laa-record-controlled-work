@@ -18,6 +18,7 @@
     "*.js",
     "*.ts"
   ],
+  "include": ["dependencies", "unlisted", "binaries", "unresolved", "catalog"],
   "ignoreDependencies": ["@ministryofjustice/frontend", "govuk-frontend"],
   "ignoreBinaries": ["op"]
 }
