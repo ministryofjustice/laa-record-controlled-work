@@ -39,8 +39,8 @@ export const niNumberStep = (journeyCode: string): ReturnType<typeof step> =>
         items: [
           {
             block: GovUKTextInput({
-              code: "niNumber",
               classes: "govuk-input--width-10",
+              code: "niNumber",
               dependentWhen: Answer("hasNINumber").match(
                 Condition.Equals("yes"),
               ),
