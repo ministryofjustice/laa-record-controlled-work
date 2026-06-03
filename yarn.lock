@@ -4316,7 +4316,6 @@ __metadata:
     prettier: "npm:^3.8.3"
     redis: "npm:^5.12.1"
     rimraf: "npm:^6.1.3"
-    sass: "npm:^1.100.0"
     sass-embedded: "npm:^1.100.0"
     sinon: "npm:^21.1.2"
     supertest: "npm:^7.2.2"
@@ -5739,7 +5738,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sass@npm:1.100.0, sass@npm:^1.100.0, sass@npm:^1.97.3":
+"sass@npm:1.100.0, sass@npm:^1.97.3":
   version: 1.100.0
   resolution: "sass@npm:1.100.0"
   dependencies:
