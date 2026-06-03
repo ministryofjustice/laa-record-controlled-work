@@ -37,7 +37,7 @@ export function createMockApp({ seedSession = true } = {}): Application {
           redirectUri: "",
           scopes: [],
         };
-        req.session.returnTo = "/landing";
+        req.session.returnTo = "/";
       }
       next();
     });

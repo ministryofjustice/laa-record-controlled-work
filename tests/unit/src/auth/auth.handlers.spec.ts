@@ -37,7 +37,7 @@ describe("Auth Handlers", () => {
       initiateAuthCodeFlow: sinon.stub().resolves(success({
         authCodeUrl: AUTH_CODE_URL,
         authState: "test-state",
-        returnTo: "/landing",
+        returnTo: "/",
         pkceCodes: {},
         authCodeUrlRequest: {},
         authCodeRequest: {},
@@ -87,7 +87,7 @@ describe("Auth Handlers", () => {
         .query(QUERY_PARAMS);
 
       expect(res.status).to.equal(FOUND);
-      expect(res.headers.location).to.equal("/landing");
+      expect(res.headers.location).to.equal("/");
     });
 
     it("responds with 400 when auth request body doesn't match schema", async () => {
@@ -194,7 +194,7 @@ describe("Auth Handlers", () => {
 
         expect(authServiceStub.exchangeAuthCode.calledOnce).to.be.true;
         expect(res.status).to.equal(FOUND);
-        expect(res.headers.location).to.equal("/landing");
+        expect(res.headers.location).to.equal("/");
       });
 
       it("processes the callback normally when state has no relay target", async () => {
@@ -204,7 +204,7 @@ describe("Auth Handlers", () => {
 
         expect(authServiceStub.exchangeAuthCode.calledOnce).to.be.true;
         expect(res.status).to.equal(FOUND);
-        expect(res.headers.location).to.equal("/landing");
+        expect(res.headers.location).to.equal("/");
       });
     });
   });

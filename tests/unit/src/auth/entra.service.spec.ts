@@ -59,9 +59,9 @@ describe("EntraService", () => {
       expect(requestArg.state).to.equal(result.value.authState);
     });
 
-    it("defaults returnTo to /landing when no returnTo is provided", async () => {
+    it("defaults returnTo to / when no returnTo is provided", async () => {
       const result = await service.initiateAuthCodeFlow() as Success<AuthCodeFlowState>;
-      expect(result.value.returnTo).to.equal("/landing");
+      expect(result.value.returnTo).to.equal("/");
     });
 
     it("preserves a valid returnTo path", async () => {
@@ -69,14 +69,14 @@ describe("EntraService", () => {
       expect(result.value.returnTo).to.equal("/case/123");
     });
 
-    it("falls back to /landing when returnTo is /", async () => {
+    it("preserves returnTo of /", async () => {
       const result = await service.initiateAuthCodeFlow("/") as Success<AuthCodeFlowState>;
-      expect(result.value.returnTo).to.equal("/landing");
+      expect(result.value.returnTo).to.equal("/");
     });
 
-    it("falls back to /landing when returnTo could redirect to an external site", async () => {
+    it("falls back to / when returnTo could redirect to an external site", async () => {
       const result = await service.initiateAuthCodeFlow("//external.com") as Success<AuthCodeFlowState>;
-      expect(result.value.returnTo).to.equal("/landing");
+      expect(result.value.returnTo).to.equal("/");
     });
 
     it("returns a MsalError failure when MSAL throws", async () => {
