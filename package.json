@@ -23,7 +23,7 @@
     "integration:watch": "./node_modules/.bin/mocha --watch --recursive 'tests/integration/**/*.spec.ts'",
     "e2e": "yarn build && yarn playwright test --config=tests/playwright/playwright.config.ts",
     "e2e:ui": "yarn build && yarn playwright test --config=tests/playwright/playwright.config.ts --ui",
-    "test:all": "yarn lint && yarn unit && yarn integration && yarn e2e"
+    "test:all": "yarn eslint . && yarn unit && yarn integration && yarn e2e"
   },
   "engines": {
     "node": "25.9.0"
