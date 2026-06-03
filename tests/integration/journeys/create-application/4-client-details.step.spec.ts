@@ -43,7 +43,7 @@ describe("Client details step", () => {
     const result = await client.post("/create-application/client-details", {
       body: {
         fullName: "John Doe",
-        dateOfBirth: { year: "2000", month: "2", day: "2" }
+        dateOfBirth: { year: "2000", month: "2", day: "2" },
       } as unknown as Record<string, string | string[]>,
     });
 
@@ -53,127 +53,91 @@ describe("Client details step", () => {
     }
   });
 
-  it("should show validation error if no name is provided", async () => {
-    const result = await client.post("/create-application/client-details", {
-      body: {},
-    });
-    expect(result.type).to.equal("render");
 
-    if (result.type === "render") {
-      expect(result.context.showValidationFailures).to.equal(true);
-
-      expect(
-        result.getValidationErrorsByFieldCode("fullName")[0].message,
-      ).to.deep.equal("Enter your client's name");
-    }
-  });
-
-  it("should show validation error if no date is provided", async () => {
-    const result = await client.post("/create-application/client-details", {
+  const validationErrorTests: Array<{
+    description: string;
+    body: Record<string, string | string[] | Record<string, string>>;
+    expectedMessage: string;
+    fieldCode: string;
+  }> = [
+    {
+      description: "no name is provided",
+      body: {
+        fullName: "",
+        dateOfBirth: { year: "2000", month: "2", day: "2" },
+      },
+      expectedMessage: "Enter your client's name",
+      fieldCode: "fullName",
+    },
+    {
+      description: "no date is provided",
       body: {
         fullName: "John Doe",
-        dateOfBirth: { year: "", month: "", day: "" }
-      } as unknown as Record<string, string | string[]>,
-    });
-    expect(result.type).to.equal("render");
-
-    if (result.type === "render") {
-      expect(result.context.showValidationFailures).to.equal(true);
-
-      expect(
-        result.getValidationErrorsByFieldCode("dateOfBirth")[0].message,
-      ).to.deep.equal("Enter your client's date of birth");
-    }
-  });
-
-  it("should show validation error if date is incorrect", async () => {
-    const result = await client.post("/create-application/client-details", {
+        dateOfBirth: { year: "", month: "", day: "" },
+      },
+      expectedMessage: "Enter your client's date of birth",
+      fieldCode: "dateOfBirth",
+    },
+    {
+      description: "date is incorrect",
       body: {
         fullName: "John Doe",
-        dateOfBirth: { year: "2000", month: "2", day: "31" }
-      } as unknown as Record<string, string | string[]>,
-    });
+        dateOfBirth: { year: "2000", month: "2", day: "31" },
+      },
+      expectedMessage: "Date of birth must be a real date",
+      fieldCode: "dateOfBirth",
+    },
+    {
+      description: "day is missing",
+      body: {
+        fullName: "John Doe",
+        dateOfBirth: { year: "2000", month: "2", day: "" },
+      },
+      expectedMessage: "Date of birth must include a day",
+      fieldCode: "dateOfBirth",
+    },
+    {
+      description: "month is missing",
+      body: {
+        fullName: "John Doe",
+        dateOfBirth: { year: "2000", month: "", day: "1" },
+      },
+      expectedMessage: "Date of birth must include a month",
+      fieldCode: "dateOfBirth",
+    },
+    {
+      description: "year is missing",
+      body: {
+        fullName: "John Doe",
+        dateOfBirth: { year: "", month: "2", day: "15" },
+      },
+      expectedMessage: "Date of birth must include a year",
+      fieldCode: "dateOfBirth",
+    },
+    {
+      description: "date is in the future",
+      body: {
+        fullName: "John Doe",
+        dateOfBirth: { year: "3000", month: "12", day: "31" },
+      },
+      expectedMessage: "Date of birth must be in the past",
+      fieldCode: "dateOfBirth",
+    },
+  ];
 
-    expect(result.type).to.equal("render");
-
-    if (result.type === "render") {
-
-      expect(result.context.showValidationFailures).to.equal(true);
-      expect(
-        result.getValidationErrorsByFieldCode("dateOfBirth")[0].message,
-      ).to.deep.equal("Date of birth must be a real date");
-    }
-  });
-
-    it("should show validation error if day is missing", async () => {
+  for (const { description, body, expectedMessage, fieldCode } of validationErrorTests) {
+    it(`should show validation error when ${description}`, async () => {
       const result = await client.post("/create-application/client-details", {
-        body: {
-          fullName: "John Doe",
-        dateOfBirth: { year: "2000", month: "2", day: "" }
-      } as unknown as Record<string, string | string[]>,
+        body: body as unknown as Record<string, string | string[]>,
       });
 
       expect(result.type).to.equal("render");
       if (result.type === "render") {
-
         expect(result.context.showValidationFailures).to.equal(true);
         expect(
-          result.getValidationErrorsByFieldCode("dateOfBirth")[0].message,
-        ).to.deep.equal("Date of birth must include a day");
+          result.getValidationErrorsByFieldCode(fieldCode)[0].message,
+        ).to.deep.equal(expectedMessage);
       }
     });
-
-    it("should show validation error if month is missing", async () => {
-      const result = await client.post("/create-application/client-details", {
-        body: {
-          fullName: "John Doe",
-        dateOfBirth: { year: "2000", month: "", day: "1" }
-      } as unknown as Record<string, string | string[]>,
-      });
-
-      expect(result.type).to.equal("render");
-      if (result.type === "render") {
-
-        expect(result.context.showValidationFailures).to.equal(true);
-        expect(
-          result.getValidationErrorsByFieldCode("dateOfBirth")[0].message,
-        ).to.deep.equal("Date of birth must include a month");
-      }
-    });
-
-    it("should show validation error if year is missing", async () => {
-      const result = await client.post("/create-application/client-details", {
-        body: {
-          fullName: "John Doe",
-          dateOfBirth: { year: "", month: "2", day: "15" }
-        } as unknown as Record<string, string | string[]>,
-      });
-
-      expect(result.type).to.equal("render");
-      if (result.type === "render") {
-
-        expect(result.context.showValidationFailures).to.equal(true);
-        expect(
-          result.getValidationErrorsByFieldCode("dateOfBirth")[0].message,
-        ).to.deep.equal("Date of birth must include a year");
-      }
-    });
-
-  it("should show validation error if date is in the future", async () => {
-    const result = await client.post("/create-application/client-details", {
-      body: {
-        fullName: "John Doe",
-        dateOfBirth: { year: "3000", month: "12", day: "31" }
-      } as unknown as Record<string, string | string[]>,
-    });
-
-    expect(result.type).to.equal("render");
-    if (result.type === "render") {
-
-      expect(result.context.showValidationFailures).to.equal(true);
-      expect(
-        result.getValidationErrorsByFieldCode("dateOfBirth")[0].message,
-      ).to.deep.equal("Date of birth must be in the past");
-    }
-  });
+  }
 });
