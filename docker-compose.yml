@@ -22,7 +22,7 @@ services:
       context: .
       target: dev
     container_name: rcw-front-end
-    command: yarn start:dev
+    command: yarn watch
     expose:
       - 3000
     depends_on:
