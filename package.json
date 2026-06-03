@@ -17,6 +17,8 @@
     "clean": "rimraf public",
     "lint": "yarn eslint .",
     "lint:fix": "yarn eslint . --fix",
+    "knip": "yarn dlx knip --config knip.json --dependencies --reporter compact",
+    "knip:fix": "yarn dlx knip --config knip.json --dependencies --fix --fix-type dependencies --reporter compact",
     "unit": "./node_modules/.bin/mocha --recursive 'tests/unit/**/*.spec.ts'",
     "unit:watch": "./node_modules/.bin/mocha --watch --recursive 'tests/unit/**/*.spec.ts'",
     "unit:coverage": "c8 yarn unit --check-coverage",
