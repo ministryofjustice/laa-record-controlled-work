@@ -5,7 +5,7 @@ import express from "express";
 const router = express.Router();
 
 router.get("/", (req: Request, res: Response): void => {
-  res.render("main/landing");
+  res.render("main/index");
 });
 
 export default router;
