@@ -47,7 +47,10 @@ spec:
             - name: CCQ_MODE
               value: embedded
             - name: REDIS_URL
-              value: {{ .Values.ccq.env.REDIS_URL | quote }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.ccq.env.REDIS_SECRET_NAME }}
+                  key: url
             - name: SECRET_KEY_BASE
               valueFrom:
                 secretKeyRef:

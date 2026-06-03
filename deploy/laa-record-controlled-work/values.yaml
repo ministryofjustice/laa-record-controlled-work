@@ -152,7 +152,7 @@ ccq:
     - SECRET_KEY_BASE
 
   env:
-    REDIS_URL: ""
+    REDIS_SECRET_NAME: elasticache-redis-ccq
 
   resources:
     limits:
