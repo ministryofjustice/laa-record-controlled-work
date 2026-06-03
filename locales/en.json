@@ -30,50 +30,8 @@
     }
   },
   "pages": {
-    "home": {
-      "defaultHeading": "Default page template",
-      "defaultTemplate": "This is a default page template.",
-      "mountainsOfTheWorld": "Mountains of the world",
-      "rowName": {
-        "label": "Name",
-        "aconcagua": "Aconcagua",
-        "denali": "Denali",
-        "elbrus": "Elbrus",
-        "everest": "Everest",
-        "kilimanjaro": "Kilimanjaro",
-        "puncakJaya": "Puncak Jaya",
-        "vinson": "Vinson"
-      },
-      "rowElevation": {
-        "label": "Elevation",
-        "6961meters": "6,961 meters",
-        "6194meters": "6,194 meters",
-        "5642meters": "5,642 meters",
-        "8850meters": "8,850 meters",
-        "5895meters": "5,895 meters",
-        "4884meters": "4,884 meters",
-        "4897meters": "4,897 meters"
-      },
-      "rowContinent": {
-        "label": "Continent",
-        "southAmerica": "South America",
-        "northAmerica": "North America",
-        "europe": "Europe",
-        "asia": "Asia",
-        "africa": "Africa",
-        "australia": "Australia",
-        "antarctica": "Antarctica"
-      },
-      "rowFirstSummit": {
-        "label": "First summit",
-        "1897": "1897",
-        "1913": "1913",
-        "1874": "1874",
-        "1953": "1953",
-        "1889": "1889",
-        "1962": "1962",
-        "1966": "1966"
-      }
+    "index": {
+      "defaultHeading": "Landing Page"
     },
     "error": {
       "pageTitle": "Sorry, there is a problem with the service – {SERVICE_NAME} – GOV.UK"
