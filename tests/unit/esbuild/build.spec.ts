@@ -48,25 +48,8 @@ describe("esbuild build", function () {
     );
   });
 
-  it("should build custom.js with a content-hashed filename", async () => {
-    const [customConfig] = browserConfigs();
-    const result = await esbuild.build({
-      ...withoutSideEffects(customConfig),
-      metafile: true,
-      write: false,
-    });
-
-    const outputs = Object.keys(result.metafile.outputs);
-    assert.ok(
-      outputs.some((p) =>
-        /^public\/js\/custom\.[A-Z0-9]+\.min\.js$/.test(p),
-      ),
-      `Expected public/js/custom.[hash].min.js in outputs: ${outputs.join(", ")}`,
-    );
-  });
-
   it("should build frontend-packages.js with a content-hashed filename", async () => {
-    const [, frontendConfig] = browserConfigs();
+    const [frontendConfig] = browserConfigs();
     const result = await esbuild.build({
       ...withoutSideEffects(frontendConfig),
       metafile: true,
