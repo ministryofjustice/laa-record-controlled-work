@@ -25,6 +25,7 @@ export default {
     "tests/playwright/utils/*", // Test utilities and helpers
     "tests/playwright/playwright.config.ts", // Playwright configuration file
     "tests/helpers/*", // Test helper utilities (if any remain)
+    "tests/integration/utils/*", // Integration test utilities and helpers
     "docs/source/javascripts/application.js", // Parsing error: not found by the project service
     "docs/source/javascripts/govuk_frontend.js", // Documentation JavaScript file, not part of main TypeScript project
     "scripts/e2e_coverage/*", // Route coverage analysis scripts

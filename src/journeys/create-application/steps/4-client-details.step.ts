@@ -26,7 +26,7 @@ export const clientDetailsStep = (
   step({
     blocks: [
       GovUKBackLink({
-        href: "/new-case/legal-aid-before",
+        href: "/create-application/legal-aid-before",
       }),
       HtmlBlock({
         content: '<span class="govuk-caption-l">Client and case details</span>',

@@ -87,7 +87,7 @@ export const niNumberStep = (journeyCode: string): ReturnType<typeof step> =>
               goto: "check-answers",
               when: Query("returnTo").match(Condition.Equals("check-answers")),
             }),
-            redirect({ goto: "does-client-have-address" }),
+            redirect({ goto: "have-a-home-address" }),
           ],
         },
         validate: true,
