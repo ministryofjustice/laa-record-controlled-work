@@ -1,73 +1,47 @@
-import {
-  ForgeTestHarness,
-  TestResult,
-  createTestPackage,
-} from "@ministryofjustice/hmpps-forge/core/testing";
-import { govukComponents } from "@ministryofjustice/hmpps-forge/govuk-components";
+import { TestResult, TestRenderResult } from "@ministryofjustice/hmpps-forge/core/testing";
+import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import { expect } from "chai";
-import { JourneyEffectsImplementations } from "#/journeys/effects.js";
-import { journey } from "@ministryofjustice/hmpps-forge/core/authoring";
 import { haveAHomeAddressStep } from "#/journeys/create-application/steps/6-have-a-home-address.step.js";
-
-const singleStepJourney = journey({
-  path: "/create-application",
-  code: "testJourney",
-  reachability: { disableReachabilityChecks: true },
-  steps: [haveAHomeAddressStep("testJourney")],
-  title: "Record new case",
-  view: { template: "partials/form-step" },
-});
-
-const basePackage = {
-  journey: singleStepJourney,
-  functions: JourneyEffectsImplementations,
-};
-
-const testPackage = createTestPackage(basePackage);
-
-function createClient() {
-  return new ForgeTestHarness()
-    .registerGlobalComponents(govukComponents)
-    .registerPackage(testPackage)
-    .createClient();
-}
+import { createStepClient } from "../../utils/helpers.js";
 
 describe("Have A Home Address Step", () => {
-  const client = createClient();
+  const client = createStepClient(haveAHomeAddressStep("testJourney"));
 
-  it.only("should render the have a home address form on GET", async () => {
-    const result: TestResult = await client.get(
-      "/create-application/have-a-home-address",
-    );
-    expect(result.type).to.equal("render");
-    if (result.type === "render") {
-      
-      // Check that the page title is correct
+  describe("GET /create-application/have-a-home-address", () => {
+    let result: TestRenderResult;
+    let radioInput: RenderBlock;
+
+    before(async () => {
+      const res = await client.get("/create-application/have-a-home-address");
+      expect(res.type).to.equal("render");
+      result = res as TestRenderResult;
+      [radioInput] = result.getBlocksByVariant("govukRadioInput");
+    });
+
+    it("has the correct title", () => {
       expect(result.context.step.title).to.equal(
         "Does your client have a home address?",
       );
-      // Check that the radio options are correct
-      const radios = result.getBlocksByVariant("govukRadioInput");
-      const buttons = radios[0].properties.items as { text: string;}[];
+    });
+
+    it("renders two radio options", () => {
+      const buttons = radioInput.properties.items as { text: string }[];
       expect(buttons.length).to.equal(2);
       expect(buttons[0].text).to.equal("Yes");
       expect(buttons[1].text).to.equal("No, they have no fixed address");
+    });
 
-      // Check that the hint text is correct
-      const hint = radios[0].properties.hint as { text: string };
+    it("renders the hint text", () => {
+      const hint = radioInput.properties.hint as { text: string };
       expect(hint.text).to.equal(
         "The home address is the place that they normally live in, and sometimes called the main dwelling.",
       );
-    }
+    });
   });
 
   it("should show validation error if no option is selected", async () => {
-    const result = await client.post(
-      "/create-application/have-a-home-address",
-      {
-        body: {},
-      },
-    );
+    const result = await client.post("/create-application/have-a-home-address");
+
     expect(result.type).to.equal("render");
     if (result.type === "render") {
       expect(result.context.showValidationFailures).to.equal(true);
