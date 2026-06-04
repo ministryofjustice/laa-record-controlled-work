@@ -5,10 +5,10 @@ import {
 import { type BlockASTNode, type Evaluated } from "@ministryofjustice/hmpps-forge/core/framework";
 import { expect } from "chai";
 import { niNumberStep } from "#/journeys/create-application/steps/5-ni-number.step.js";
-import { createStepClient } from "../../utils/helpers.js";
+import { createForgeTestClient } from "../../utils/helpers.js";
 
 describe("NI number step", () => {
-  const client = createStepClient(niNumberStep("testJourney"));
+  const client = createForgeTestClient(niNumberStep("testJourney"));
 
   describe("GET /create-application/ni-number", () => {
     let renderResult: TestRenderResult;

@@ -16,7 +16,9 @@ import { JourneyEffectsImplementations } from "#/journeys/effects.js";
  * @param {...any} steps - Step definitions to include in the test journey.
  * @returns {ForgeTestClient} A configured test client.
  */
-export function createStepClient(...steps: StepDefinition[]): ForgeTestClient {
+export function createForgeTestClient(
+  ...steps: StepDefinition[]
+): ForgeTestClient {
   const testJourney = journey({
     code: "testJourney",
     path: "/create-application",

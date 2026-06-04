@@ -5,10 +5,10 @@ import {
 import { type BlockASTNode, type Evaluated } from "@ministryofjustice/hmpps-forge/core/framework";
 import { expect } from "chai";
 import { haveAHomeAddressStep } from "#/journeys/create-application/steps/6-have-a-home-address.step.js";
-import { createStepClient } from "../../utils/helpers.js";
+import { createForgeTestClient } from "../../utils/helpers.js";
 
 describe("Have A Home Address Step", () => {
-  const client = createStepClient(haveAHomeAddressStep("testJourney"));
+  const client = createForgeTestClient(haveAHomeAddressStep("testJourney"));
 
   describe("GET /create-application/have-a-home-address", () => {
     let renderResult: TestRenderResult;

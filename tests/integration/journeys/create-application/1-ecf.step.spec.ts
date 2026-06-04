@@ -6,10 +6,10 @@ import { type BlockASTNode, type Evaluated } from "@ministryofjustice/hmpps-forg
 import { expect } from "chai";
 import { ineligibleStep } from "#/journeys/create-application/steps/1-ecf-dropout.step.js";
 import { ecfStep } from "#/journeys/create-application/steps/1-ecf.step.js";
-import { createStepClient } from "../../utils/helpers.js";
+import { createForgeTestClient } from "../../utils/helpers.js";
 
 describe("ECF step", () => {
-  const client = createStepClient(
+  const client = createForgeTestClient(
     ecfStep("testJourney"),
     ineligibleStep("testJourney"),
   );
