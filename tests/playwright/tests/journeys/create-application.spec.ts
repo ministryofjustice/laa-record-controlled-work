@@ -158,4 +158,13 @@ test("create application flow", async ({ page }) => {
   await page.click('button[type="submit"]');
   // Verify redirection to the next page
   await expect(page).toHaveURL("/create-application/does-client-have-address");
+   
+  // Have a home address page
+  
+  // Select "Yes" and submit
+  await page.getByRole('radio', { name: 'Yes' }).check();
+  await page.getByRole('button', { name: 'Continue' }).click();
+
+  // Verify redirection to the enter address manually page
+  await expect(page).toHaveURL("/create-application/enter-address-manually");
 });
