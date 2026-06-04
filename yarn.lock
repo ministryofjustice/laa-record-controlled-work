@@ -2288,7 +2288,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"commander@npm:^14.0.0, commander@npm:^14.0.3":
+"commander@npm:^14.0.3":
   version: 14.0.3
   resolution: "commander@npm:14.0.3"
   checksum: 10c0/755652564bbf56ff2ff083313912b326450d3f8d8c85f4b71416539c9a05c3c67dbd206821ca72635bf6b160e2afdefcb458e86b317827d5cb333b69ce7f1a24
@@ -3515,17 +3515,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"figlet@npm:^1.11.0":
-  version: 1.11.0
-  resolution: "figlet@npm:1.11.0"
-  dependencies:
-    commander: "npm:^14.0.0"
-  bin:
-    figlet: bin/index.js
-  checksum: 10c0/8db7abf55e3e00073b42e71cdc8f75823d613dbf2924513df7de4b05a668f44ef69ebb6c98494dcbae01b9af0b84bc500611fe14d054c67dd070033ff0db58b8
-  languageName: node
-  linkType: hard
-
 "file-entry-cache@npm:^8.0.0":
   version: 8.0.0
   resolution: "file-entry-cache@npm:8.0.0"
@@ -4701,7 +4690,6 @@ __metadata:
     express: "npm:^5.2.1"
     express-rate-limit: "npm:^8.5.2"
     express-session: "npm:^1.19.0"
-    figlet: "npm:^1.11.0"
     globals: "npm:^17.6.0"
     govuk-frontend: "npm:^6.1.0"
     helmet: "npm:^8.2.0"
