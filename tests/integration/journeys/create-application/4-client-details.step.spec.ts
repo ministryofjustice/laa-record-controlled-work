@@ -1,3 +1,5 @@
+import { TestRenderResult } from "@ministryofjustice/hmpps-forge/core/testing";
+import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import { expect } from "chai";
 import { clientDetailsStep } from "#/journeys/create-application/steps/4-client-details.step.js";
 import { createStepClient } from "../../utils/helpers.js";
@@ -5,9 +7,37 @@ import { createStepClient } from "../../utils/helpers.js";
 describe("Client details step", () => {
   const client = createStepClient(clientDetailsStep("testJourney"));
 
-  it("should render the client details form on GET", async () => {
-    const result = await client.get("/create-application/client-details");
-    expect(result.type).to.equal("render");
+  describe("GET /create-application/client-details", () => {
+    let result: TestRenderResult;
+    let nameInput: RenderBlock;
+    let dateInput: RenderBlock;
+
+    before(async () => {
+      const res = await client.get("/create-application/client-details");
+      expect(res.type).to.equal("render");
+      result = res as TestRenderResult;
+      [nameInput] = result.getBlocksByVariant("govukTextInput");
+      [dateInput] = result.getBlocksByVariant("govukDateInputFull");
+    });
+
+    it("has the correct title", () => {
+      expect(result.context.step.title).to.equal("Your client's details");
+    });
+
+    it("renders a full name text input", () => {
+      const label = nameInput.properties.label as { text: string };
+      expect(label.text).to.equal("Full name");
+    });
+
+    it("renders a date of birth input", () => {
+      const fieldset = dateInput.properties.fieldset as { legend: { text: string } };
+      expect(fieldset.legend.text).to.equal("Date of birth");
+    });
+
+    it("renders hint text on the date of birth input", () => {
+      const hint = dateInput.properties.hint as { text: string };
+      expect(hint.text).to.equal("For example, 31 3 1980");
+    });
   });
 
   it("should redirect to the check answers page when given valid data", async () => {

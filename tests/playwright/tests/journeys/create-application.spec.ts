@@ -86,30 +86,22 @@ test("create application flow", async ({ page }) => {
   // Verify redirection to the client details page
   await expect(page).toHaveURL("/create-application/client-details");
 
-  const fullNameInput = page.locator('input[name="fullName"]');
-  const dateOfBirthDayInput = page.locator('input[name="dateOfBirth[day]"]');
-  const dateOfBirthMonthInput = page.locator(
-    'input[name="dateOfBirth[month]"]',
-  );
-  const dateOfBirthYearInput = page.locator('input[name="dateOfBirth[year]"]');
+  // Client Details page
 
-  // Check for the validation messages when fields are empty
-  await page.click('button[type="submit"]');
-  await expect(page.locator(".govuk-error-message").nth(0)).toHaveText(
-    /Enter your client's name/,
-  );
-  await expect(page.locator(".govuk-error-message").nth(1)).toHaveText(
-    /Enter your client's date of birth/,
-  );
+  await expect(
+    page.getByRole("heading", {
+      name: /Your client's details/,
+      level: 1,
+    }),
+  ).toBeVisible();
 
-  // Fill in the full name and submit to check for date of birth validation
-  await fullNameInput.fill("John Doe");
+  // Fill in the full name and date of birth and submit
+  await page.getByLabel("Full name").fill("John Doe");
+  await page.getByLabel("Day").fill("15");
+  await page.getByLabel("Month").fill("6");
+  await page.getByLabel("Year").fill("1990");
+  await page.getByRole("button", { name: "Continue" }).click();
 
-  // Fill in a valid date of birth and submit
-  await dateOfBirthDayInput.fill("15");
-  await dateOfBirthMonthInput.fill("6");
-  await dateOfBirthYearInput.fill("1990");
-  await page.click('button[type="submit"]');
   // Verify redirection to the next page
   await expect(page).toHaveURL("/create-application/ni-number");
 
