@@ -148,7 +148,7 @@ test("create application flow", async ({ page }) => {
   await niNumberInput.fill("JN123456A");
   await page.click('button[type="submit"]');
   // Verify redirection to the next page
-  await expect(page).toHaveURL("/create-application/does-client-have-address");
+  await expect(page).toHaveURL("/create-application/have-a-home-address");
 
   // Navigate back to the NI number page
   await page.goto("/create-application/ni-number");
@@ -157,7 +157,7 @@ test("create application flow", async ({ page }) => {
   await noNINumberOption.check();
   await page.click('button[type="submit"]');
   // Verify redirection to the next page
-  await expect(page).toHaveURL("/create-application/does-client-have-address");
+  await expect(page).toHaveURL("/create-application/have-a-home-address");
    
   // Have a home address page
   

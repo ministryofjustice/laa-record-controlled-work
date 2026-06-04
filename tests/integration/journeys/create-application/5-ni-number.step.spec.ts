@@ -92,7 +92,7 @@ describe("NI number step", () => {
     expect(result.type).to.equal("redirect");
     if (result.type === "redirect") {
       expect(result.url).to.equal(
-        "/create-application/does-client-have-address",
+        "/create-application/have-a-home-address",
       );
     }
   });
@@ -106,7 +106,7 @@ describe("NI number step", () => {
     expect(result.type).to.equal("redirect");
     if (result.type === "redirect") {
       expect(result.url).to.equal(
-        "/create-application/does-client-have-address",
+        "/create-application/have-a-home-address",
       );
     }
   });
