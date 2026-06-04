@@ -36,14 +36,18 @@ describe("NI number step", () => {
   });
 
   describe("POST /create-application/ni-number", () => {
+    const niNumberfieldCode = "niNumber";
+    const hasNiNumberfieldCode = "hasNINumber";
+
     it("shows a validation error if no option is selected", async () => {
       const result = await client.post("/create-application/ni-number");
       expect(result.type).to.equal("render");
       const renderResult = result as TestRenderResult;
       expect(renderResult.context.showValidationFailures).to.equal(true);
-      expect(renderResult.context.fieldValidationErrors[0].message).to.equal(
-        "Select if your client has a National Insurance number",
-      );
+
+      expect(
+        renderResult.getValidationErrorsByFieldCode(hasNiNumberfieldCode)[0].message,
+      ).to.equal("Select if your client has a National Insurance number");
     });
 
     it("shows a validation error if yes is selected but no NI number is given", async () => {
@@ -53,9 +57,9 @@ describe("NI number step", () => {
       expect(result.type).to.equal("render");
       const renderResult = result as TestRenderResult;
       expect(renderResult.context.showValidationFailures).to.equal(true);
-      expect(renderResult.context.fieldValidationErrors[0].message).to.equal(
-        "Enter your client's National Insurance number",
-      );
+      expect(
+        renderResult.getValidationErrorsByFieldCode(niNumberfieldCode)[0].message,
+      ).to.equal("Enter your client's National Insurance number");
     });
 
     it("shows a validation error if the NI number is invalid", async () => {
@@ -65,7 +69,9 @@ describe("NI number step", () => {
       expect(result.type).to.equal("render");
       const renderResult = result as TestRenderResult;
       expect(renderResult.context.showValidationFailures).to.equal(true);
-      expect(renderResult.context.fieldValidationErrors[0].message).to.equal(
+      expect(
+        renderResult.getValidationErrorsByFieldCode(niNumberfieldCode)[0].message,
+      ).to.equal(
         "Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C",
       );
     });

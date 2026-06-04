@@ -40,13 +40,15 @@ describe("ECF step", () => {
   });
 
   describe("POST /create-application/ecf", () => {
+    const fieldCode = "ecf";
+    
     it("should show validation error if no option is selected", async () => {
       const result = await client.post("/create-application/ecf");
       expect(result.type).to.equal("render");
       const renderResult = result as TestRenderResult;
       expect(renderResult.context.showValidationFailures).to.equal(true);
       expect(
-        renderResult.context.fieldValidationErrors[0].message,
+        renderResult.getValidationErrorsByFieldCode(fieldCode)[0].message,
       ).to.deep.equal("Please select an option");
     });
 

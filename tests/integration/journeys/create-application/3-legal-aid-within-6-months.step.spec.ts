@@ -38,6 +38,9 @@ describe("Legal aid before 6 months step", () => {
   });
 
   describe("POST /create-application/legal-aid-last-6-months", () => {
+    const legalAidLast6MonthsfieldCode = "legalAidLast6Months";
+    const reasonForYesFieldCode = "reasonForYes";
+
     it("should show validation error if no option is selected", async () => {
       const result = await client.post(
         "/create-application/legal-aid-last-6-months",
@@ -46,7 +49,7 @@ describe("Legal aid before 6 months step", () => {
       const renderResult = result as TestRenderResult;
       expect(renderResult.context.showValidationFailures).to.equal(true);
       expect(
-        renderResult.context.fieldValidationErrors[0].message,
+        renderResult.getValidationErrorsByFieldCode(legalAidLast6MonthsfieldCode)[0].message,
       ).to.deep.equal(
         "Select if your client got legal help for this matter in the last 6 months",
       );
@@ -63,7 +66,7 @@ describe("Legal aid before 6 months step", () => {
       const renderResult = result as TestRenderResult;
       expect(renderResult.context.showValidationFailures).to.equal(true);
       expect(
-        renderResult.context.fieldValidationErrors[0].message,
+        renderResult.getValidationErrorsByFieldCode(reasonForYesFieldCode)[0].message,
       ).to.deep.equal(
         "Enter the reason you're creating a new case for the same matter",
       );

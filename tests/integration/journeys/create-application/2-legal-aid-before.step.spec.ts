@@ -37,6 +37,8 @@ describe("Legal aid before step", () => {
   });
 
   describe("POST /create-application/legal-aid-before", () => {
+    const fieldCode = "legalAidBefore";
+    
     it("should show validation error if no option is selected", async () => {
       const result = await client.post("/create-application/legal-aid-before", {
         body: {},
@@ -45,7 +47,7 @@ describe("Legal aid before step", () => {
       const renderResult = result as TestRenderResult;
       expect(renderResult.context.showValidationFailures).to.equal(true);
       expect(
-        renderResult.context.fieldValidationErrors[0].message,
+        renderResult.getValidationErrorsByFieldCode(fieldCode)[0].message,
       ).to.deep.equal("Please select an option");
     });
 

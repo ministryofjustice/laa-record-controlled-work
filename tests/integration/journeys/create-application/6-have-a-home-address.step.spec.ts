@@ -45,6 +45,8 @@ describe("Have A Home Address Step", () => {
   });
 
   describe("POST /create-application/have-a-home-address", () => {
+    const fieldCode = "haveAHomeAddress";
+    
     it("should show validation error if no option is selected", async () => {
       const result = await client.post(
         "/create-application/have-a-home-address",
@@ -54,7 +56,7 @@ describe("Have A Home Address Step", () => {
       const renderResult = result as TestRenderResult;
       expect(renderResult.context.showValidationFailures).to.equal(true);
       expect(
-        renderResult.getValidationErrorsByFieldCode("haveAHomeAddress")[0]
+        renderResult.getValidationErrorsByFieldCode(fieldCode)[0]
           .message,
       ).to.deep.equal("Select if your client has a home address");
     });
