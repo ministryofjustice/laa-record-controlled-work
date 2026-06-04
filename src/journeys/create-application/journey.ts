@@ -1,5 +1,6 @@
 import { access, journey } from "@ministryofjustice/hmpps-forge/core/authoring";
 
+import { clientDetailsStep } from "#/journeys/create-application/steps/4-client-details.step.js";
 import { JourneyEffects } from "#/journeys/effects.js";
 
 import { ineligibleStep } from "./steps/1-ecf-dropout.step.js";
@@ -23,6 +24,7 @@ export const createApplicationJourney = journey({
     ineligibleStep(journeyCode),
     legalAidBeforeStep(journeyCode),
     legalAidBefore6MonthsStep(journeyCode),
+    clientDetailsStep(journeyCode),
   ],
   title: "Record new case",
   view: { template: "partials/form-step" },
