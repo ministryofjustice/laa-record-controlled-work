@@ -37,59 +37,65 @@ describe("Legal aid before 6 months step", () => {
     });
   });
 
-  it("should show validation error if no option is selected", async () => {
-    const result = await client.post(
-      "/create-application/legal-aid-last-6-months",
-    );
-    expect(result.type).to.equal("render");
-    const renderResult = result as TestRenderResult;
-    expect(renderResult.context.showValidationFailures).to.equal(true);
-    expect(renderResult.context.fieldValidationErrors[0].message).to.deep.equal(
-      "Select if your client got legal help for this matter in the last 6 months",
-    );
-  });
+  describe("POST /create-application/legal-aid-last-6-months", () => {
+    it("should show validation error if no option is selected", async () => {
+      const result = await client.post(
+        "/create-application/legal-aid-last-6-months",
+      );
+      expect(result.type).to.equal("render");
+      const renderResult = result as TestRenderResult;
+      expect(renderResult.context.showValidationFailures).to.equal(true);
+      expect(
+        renderResult.context.fieldValidationErrors[0].message,
+      ).to.deep.equal(
+        "Select if your client got legal help for this matter in the last 6 months",
+      );
+    });
 
-  it("should show validation error if yes is selected but no reason is given", async () => {
-    const result = await client.post(
-      "/create-application/legal-aid-last-6-months",
-      {
-        body: { legalAidLast6Months: "yes" },
-      },
-    );
-    expect(result.type).to.equal("render");
-    const renderResult = result as TestRenderResult;
-    expect(renderResult.context.showValidationFailures).to.equal(true);
-    expect(renderResult.context.fieldValidationErrors[0].message).to.deep.equal(
-      "Enter the reason you're creating a new case for the same matter",
-    );
-  });
-
-  it("should redirect to legal aid last 6 months step if yes", async () => {
-    const result = await client.post(
-      "/create-application/legal-aid-last-6-months",
-      {
-        body: {
-          legalAidLast6Months: "yes",
-          reasonForYes: "Some reason",
+    it("should show validation error if yes is selected but no reason is given", async () => {
+      const result = await client.post(
+        "/create-application/legal-aid-last-6-months",
+        {
+          body: { legalAidLast6Months: "yes" },
         },
-      },
-    );
-    expect(result.type).to.equal("redirect");
-    const redirectResult = result as TestRedirectResult;
-    expect(redirectResult.url).to.equal("/create-application/client-details");
-  });
+      );
+      expect(result.type).to.equal("render");
+      const renderResult = result as TestRenderResult;
+      expect(renderResult.context.showValidationFailures).to.equal(true);
+      expect(
+        renderResult.context.fieldValidationErrors[0].message,
+      ).to.deep.equal(
+        "Enter the reason you're creating a new case for the same matter",
+      );
+    });
 
-  it("should redirect to client details step if no, different matter", async () => {
-    const result = await client.post(
-      "/create-application/legal-aid-last-6-months",
-      {
-        body: {
-          legalAidLast6Months: "no",
+    it("should redirect to legal aid last 6 months step if yes", async () => {
+      const result = await client.post(
+        "/create-application/legal-aid-last-6-months",
+        {
+          body: {
+            legalAidLast6Months: "yes",
+            reasonForYes: "Some reason",
+          },
         },
-      },
-    );
-    expect(result.type).to.equal("redirect");
-    const redirectResult = result as TestRedirectResult;
-    expect(redirectResult.url).to.equal("/create-application/client-details");
+      );
+      expect(result.type).to.equal("redirect");
+      const redirectResult = result as TestRedirectResult;
+      expect(redirectResult.url).to.equal("/create-application/client-details");
+    });
+
+    it("should redirect to client details step if no, different matter", async () => {
+      const result = await client.post(
+        "/create-application/legal-aid-last-6-months",
+        {
+          body: {
+            legalAidLast6Months: "no",
+          },
+        },
+      );
+      expect(result.type).to.equal("redirect");
+      const redirectResult = result as TestRedirectResult;
+      expect(redirectResult.url).to.equal("/create-application/client-details");
+    });
   });
 });

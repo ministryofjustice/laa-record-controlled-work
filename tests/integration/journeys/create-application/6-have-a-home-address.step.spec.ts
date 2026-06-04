@@ -1,4 +1,7 @@
-import { TestRenderResult, TestRedirectResult } from "@ministryofjustice/hmpps-forge/core/testing";
+import {
+  TestRenderResult,
+  TestRedirectResult,
+} from "@ministryofjustice/hmpps-forge/core/testing";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import { expect } from "chai";
 import { haveAHomeAddressStep } from "#/journeys/create-application/steps/6-have-a-home-address.step.js";
@@ -12,7 +15,9 @@ describe("Have A Home Address Step", () => {
     let radioInput: RenderBlock;
 
     before(async () => {
-      const result = await client.get("/create-application/have-a-home-address");
+      const result = await client.get(
+        "/create-application/have-a-home-address",
+      );
       expect(result.type).to.equal("render");
       renderResult = result as TestRenderResult;
       [radioInput] = renderResult.getBlocksByVariant("govukRadioInput");
@@ -39,42 +44,51 @@ describe("Have A Home Address Step", () => {
     });
   });
 
-  it("should show validation error if no option is selected", async () => {
-    const result = await client.post("/create-application/have-a-home-address");
+  describe("POST /create-application/have-a-home-address", () => {
+    it("should show validation error if no option is selected", async () => {
+      const result = await client.post(
+        "/create-application/have-a-home-address",
+      );
 
-    expect(result.type).to.equal("render");
-    const renderResult = result as TestRenderResult;
-    expect(renderResult.context.showValidationFailures).to.equal(true);
-    expect(renderResult.context.fieldValidationErrors[0].message).to.deep.equal(
-      "Select if your client has a home address",
-    );
-  });
+      expect(result.type).to.equal("render");
+      const renderResult = result as TestRenderResult;
+      expect(renderResult.context.showValidationFailures).to.equal(true);
+      expect(
+        renderResult.getValidationErrorsByFieldCode("haveAHomeAddress")[0]
+          .message,
+      ).to.deep.equal("Select if your client has a home address");
+    });
 
-  it("should redirect to Enter address manually step if yes", async () => {
-    const result = await client.post(
-      "/create-application/have-a-home-address",
-      {
-        body: {
-          haveAHomeAddress: "yes",
+    it("should redirect to Enter address manually step if yes", async () => {
+      const result = await client.post(
+        "/create-application/have-a-home-address",
+        {
+          body: {
+            haveAHomeAddress: "yes",
+          },
         },
-      },
-    );
-    expect(result.type).to.equal("redirect");
-    const redirectResult = result as TestRedirectResult;
-    expect(redirectResult.url).to.equal("/create-application/enter-address-manually");
-  });
+      );
+      expect(result.type).to.equal("redirect");
+      const redirectResult = result as TestRedirectResult;
+      expect(redirectResult.url).to.equal(
+        "/create-application/enter-address-manually",
+      );
+    });
 
-  it("should redirect to Need means assessment step if no", async () => {
-    const result = await client.post(
-      "/create-application/have-a-home-address",
-      {
-        body: {
-          haveAHomeAddress: "no",
+    it("should redirect to Need means assessment step if no", async () => {
+      const result = await client.post(
+        "/create-application/have-a-home-address",
+        {
+          body: {
+            haveAHomeAddress: "no",
+          },
         },
-      },
-    );
-    expect(result.type).to.equal("redirect");
-    const redirectResult = result as TestRedirectResult;
-    expect(redirectResult.url).to.equal("/create-application/need-means-assessment");
+      );
+      expect(result.type).to.equal("redirect");
+      const redirectResult = result as TestRedirectResult;
+      expect(redirectResult.url).to.equal(
+        "/create-application/need-means-assessment",
+      );
+    });
   });
 });
