@@ -1,40 +1,11 @@
-import {
-  ForgeTestHarness,
-  TestResult,
-  createTestPackage,
-} from "@ministryofjustice/hmpps-forge/core/testing";
-import { govukComponents } from "@ministryofjustice/hmpps-forge/govuk-components";
+import { TestResult } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
-import { JourneyEffectsImplementations } from "#/journeys/effects.js";
-import { journey } from "@ministryofjustice/hmpps-forge/core/authoring";
 import { legalAidBefore6MonthsStep } from "#/journeys/create-application/steps/3-legal-aid-within-6-months.step.js";
-
-const singleStepJourney = journey({
-  path: "/create-application",
-  code: "testJourney",
-  reachability: { disableReachabilityChecks: true },
-  steps: [legalAidBefore6MonthsStep("testJourney")],
-  title: "Record new case",
-  view: { template: "partials/form-step" },
-});
-
-const basePackage = {
-  journey: singleStepJourney,
-  functions: JourneyEffectsImplementations,
-};
-
-const testPackage = createTestPackage(basePackage);
-
-function createClient() {
-  return new ForgeTestHarness()
-    .registerGlobalComponents(govukComponents)
-    .registerPackage(testPackage)
-    .createClient();
-}
+import { createStepClient } from "../../utils/helpers.js";
 
 describe("Legal aid before 6 months step", () => {
     
-  const client = createClient();
+  const client = createStepClient(legalAidBefore6MonthsStep("testJourney"));
 
   it("should render the legal aid before 6 months form on GET", async () => {
     const result = await client.get(

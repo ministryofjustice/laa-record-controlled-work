@@ -1,38 +1,9 @@
-import {
-  ForgeTestHarness,
-  createTestPackage,
-} from "@ministryofjustice/hmpps-forge/core/testing";
-import { govukComponents } from "@ministryofjustice/hmpps-forge/govuk-components";
 import { expect } from "chai";
-import { JourneyEffectsImplementations } from "#/journeys/effects.js";
-import { journey } from "@ministryofjustice/hmpps-forge/core/authoring";
 import { clientDetailsStep } from "#/journeys/create-application/steps/4-client-details.step.js";
-
-const singleStepJourney = journey({
-  path: "/create-application",
-  code: "testJourney",
-  reachability: { disableReachabilityChecks: true },
-  steps: [clientDetailsStep("testJourney")],
-  title: "Record new case",
-  view: { template: "partials/form-step" },
-});
-
-const basePackage = {
-  journey: singleStepJourney,
-  functions: JourneyEffectsImplementations,
-};
-
-const testPackage = createTestPackage(basePackage);
-
-function createClient() {
-  return new ForgeTestHarness()
-    .registerGlobalComponents(govukComponents)
-    .registerPackage(testPackage)
-    .createClient();
-}
+import { createStepClient } from "../../utils/helpers.js";
 
 describe("Client details step", () => {
-  const client = createClient();
+  const client = createStepClient(clientDetailsStep("testJourney"));
 
   it("should render the client details form on GET", async () => {
     const result = await client.get("/create-application/client-details");

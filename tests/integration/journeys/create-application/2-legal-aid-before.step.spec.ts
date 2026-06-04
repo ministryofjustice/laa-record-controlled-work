@@ -1,40 +1,11 @@
-import {
-  ForgeTestHarness,
-  TestResult,
-  createTestPackage,
-} from "@ministryofjustice/hmpps-forge/core/testing";
-import { govukComponents } from "@ministryofjustice/hmpps-forge/govuk-components";
+import { TestResult } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
-import { JourneyEffectsImplementations } from "#/journeys/effects.js";
 import { legalAidBeforeStep } from "#/journeys/create-application/steps/2-legal-aid-before.step.js";
-import { journey } from "@ministryofjustice/hmpps-forge/core/authoring";
-
-const singleStepJourney = journey({
-  path: "/create-application",
-  code: "testJourney",
-  reachability: { disableReachabilityChecks: true },
-  steps: [legalAidBeforeStep("testJourney")],
-  title: "Record new case",
-  view: { template: "partials/form-step" },
-});
-
-const basePackage = {
-  journey: singleStepJourney,
-  functions: JourneyEffectsImplementations,
-};
-
-const testPackage = createTestPackage(basePackage);
-
-function createClient() {
-  return new ForgeTestHarness()
-    .registerGlobalComponents(govukComponents)
-    .registerPackage(testPackage)
-    .createClient();
-}
+import { createStepClient } from "../../utils/helpers.js";
 
 describe("Legal aid before step", () => {
 
-  const client = createClient();
+  const client = createStepClient(legalAidBeforeStep("testJourney"));
 
   it("should render the legal aid before form on GET", async () => {
     const result = await client.get("/create-application/legal-aid-before");

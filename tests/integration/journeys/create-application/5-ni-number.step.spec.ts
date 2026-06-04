@@ -1,39 +1,10 @@
-import {
-  ForgeTestHarness,
-  TestResult,
-  createTestPackage,
-} from "@ministryofjustice/hmpps-forge/core/testing";
-import { govukComponents } from "@ministryofjustice/hmpps-forge/govuk-components";
+import { TestResult } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
-import { JourneyEffectsImplementations } from "#/journeys/effects.js";
-import { journey } from "@ministryofjustice/hmpps-forge/core/authoring";
 import { niNumberStep } from "#/journeys/create-application/steps/5-ni-number.step.js";
-
-const singleStepJourney = journey({
-  path: "/create-application",
-  code: "testJourney",
-  reachability: { disableReachabilityChecks: true },
-  steps: [niNumberStep("testJourney")],
-  title: "Record new case",
-  view: { template: "partials/form-step" },
-});
-
-const basePackage = {
-  journey: singleStepJourney,
-  functions: JourneyEffectsImplementations,
-};
-
-const testPackage = createTestPackage(basePackage);
-
-function createClient() {
-  return new ForgeTestHarness()
-    .registerGlobalComponents(govukComponents)
-    .registerPackage(testPackage)
-    .createClient();
-}
+import { createStepClient } from "../../utils/helpers.js";
 
 describe("NI number step", () => {
-  const client = createClient();
+  const client = createStepClient(niNumberStep("testJourney"));
 
   it("should render the NI number form on GET", async () => {
     const result = await client.get("/create-application/ni-number");

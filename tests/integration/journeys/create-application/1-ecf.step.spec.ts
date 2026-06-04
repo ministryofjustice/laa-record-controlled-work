@@ -1,41 +1,12 @@
-import {
-  ForgeTestHarness,
-  TestResult,
-  createTestPackage,
-} from "@ministryofjustice/hmpps-forge/core/testing";
-import { govukComponents } from "@ministryofjustice/hmpps-forge/govuk-components";
+import { TestResult } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
-import { JourneyEffectsImplementations } from "#/journeys/effects.js";
-import { journey } from "@ministryofjustice/hmpps-forge/core/authoring";
 import { ineligibleStep } from "#/journeys/create-application/steps/1-ecf-dropout.step.js";
 import { ecfStep } from "#/journeys/create-application/steps/1-ecf.step.js";
-
-const singleStepJourney = journey({
-  path: "/create-application",
-  code: "testJourney",
-  reachability: { disableReachabilityChecks: true },
-  steps: [ecfStep("testJourney"), ineligibleStep("testJourney")],
-  title: "Record new case",
-  view: { template: "partials/form-step" },
-});
-
-const basePackage = {
-  journey: singleStepJourney,
-  functions: JourneyEffectsImplementations,
-};
-
-const testPackage = createTestPackage(basePackage);
-
-function createClient() {
-  return new ForgeTestHarness()
-    .registerGlobalComponents(govukComponents)
-    .registerPackage(testPackage)
-    .createClient();
-}
+import { createStepClient } from "../../utils/helpers.js";
 
 describe("ECF step", () => {
 
-  const client = createClient();
+  const client = createStepClient(ecfStep("testJourney"), ineligibleStep("testJourney"));
 
   it("should render the ECF form on GET", async () => {
     const result = await client.get("/create-application/ecf");
