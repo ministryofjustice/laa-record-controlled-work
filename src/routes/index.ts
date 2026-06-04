@@ -8,8 +8,4 @@ router.get("/", (req: Request, res: Response): void => {
   res.render("main/index");
 });
 
-router.get("/landing", (req: Request, res: Response): void => {
-  res.render("main/landing");
-});
-
 export default router;
