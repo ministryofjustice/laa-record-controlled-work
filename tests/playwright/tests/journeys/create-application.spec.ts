@@ -6,6 +6,14 @@ test("create application flow", async ({ page }) => {
   // Navigate to the ECF page
   await page.goto("/create-application/ecf");
 
+  // Check for the question
+  await expect(
+    page.getByRole("heading", {
+      name: /Does this case require Exceptional Case Funding\?/,
+      level: 1,
+    }),
+  ).toBeVisible();
+
   // Select "Yes" and submit
   await page.getByRole('radio', { name: 'Yes' }).check();
   await page.getByRole('button', { name: 'Continue' }).click();
@@ -25,21 +33,18 @@ test("create application flow", async ({ page }) => {
 
   // Legal aid before page
 
-  // Check for the radio options
-  const yesSameMatterOption = page.locator(
-    'input[type="radio"][value="yesSameMatter"]',
-  );
-  const yesDifferentMatterOption = page.locator(
-    'input[type="radio"][value="yesDifferentMatter"]',
-  );
-  const noMatterOption = page.locator('input[type="radio"][value="no"]');
-  await expect(yesSameMatterOption).toBeVisible();
-  await expect(yesDifferentMatterOption).toBeVisible();
-  await expect(noMatterOption).toBeVisible();
+    await expect(
+    page.getByRole("heading", {
+      name: /Has your client accessed legal aid before\?/,
+      level: 1,
+    }),
+  ).toBeVisible();
+
 
   // Select "Yes, about the same matter" and submit
-  await yesSameMatterOption.check();
-  await page.click('button[type="submit"]');
+  await page.getByRole('radio', { name: 'Yes, about the same matter' }).check();
+  await page.getByRole('button', { name: 'Continue' }).click();
+
   // Verify redirection to the legal aid before 6 months page
   await expect(page).toHaveURL("/create-application/legal-aid-last-6-months");
 

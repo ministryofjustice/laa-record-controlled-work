@@ -1,4 +1,5 @@
-import { TestResult } from "@ministryofjustice/hmpps-forge/core/testing";
+import { TestResult, TestRenderResult } from "@ministryofjustice/hmpps-forge/core/testing";
+import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import { expect } from "chai";
 import { legalAidBeforeStep } from "#/journeys/create-application/steps/2-legal-aid-before.step.js";
 import { createStepClient } from "../../utils/helpers.js";
@@ -7,9 +8,30 @@ describe("Legal aid before step", () => {
 
   const client = createStepClient(legalAidBeforeStep("testJourney"));
 
-  it("should render the legal aid before form on GET", async () => {
-    const result = await client.get("/create-application/legal-aid-before");
-    expect(result.type).to.equal("render");
+  describe("GET /create-application/legal-aid-before", () => {
+    let result: TestRenderResult;
+    let radioInput: RenderBlock;
+
+    before(async () => {
+      const res = await client.get("/create-application/legal-aid-before");
+      expect(res.type).to.equal("render");
+      result = res as TestRenderResult;
+      [radioInput] = result.getBlocksByVariant("govukRadioInput");
+    });
+
+    it("has the correct title", () => {
+      expect(result.context.step.title).to.equal(
+        "Has your client accessed legal aid before?",
+      );
+    });
+
+    it("renders three radio options", () => {
+      const buttons = radioInput.properties.items as { text: string }[];
+      expect(buttons.length).to.equal(3);
+      expect(buttons[0].text).to.equal("Yes, about the same matter");
+      expect(buttons[1].text).to.equal("Yes, about a different matter");
+      expect(buttons[2].text).to.equal("No");
+    });
   });
 
   it("should show validation error if no option is selected", async () => {
