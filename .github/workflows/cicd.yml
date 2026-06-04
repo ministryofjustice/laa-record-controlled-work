@@ -25,6 +25,9 @@ jobs:
       - name: Run ESLint
         run: yarn eslint .
 
+      - name: Run Knip dependency linting
+        run: yarn knip
+
   code-security-audit:
     name: Code Security Audit
     runs-on: ubuntu-latest

@@ -1,0 +1,24 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": [
+    "src/**/*.ts",
+    "esbuild/**/*.ts",
+    "scripts/**/*.ts",
+    "tests/**/*.ts",
+    "eslint.config.js",
+    "src/browser/frontendPackagesEntry.ts",
+    "src/scss/main.scss"
+  ],
+  "project": [
+    "src/**/*.ts",
+    "esbuild/**/*.ts",
+    "scripts/**/*.ts",
+    "tests/**/*.ts",
+    "eslint/**/*.js",
+    "*.js",
+    "*.ts"
+  ],
+  "include": ["dependencies", "unlisted", "binaries", "unresolved", "catalog"],
+  "ignoreDependencies": ["@ministryofjustice/frontend", "govuk-frontend"],
+  "ignoreBinaries": ["op"]
+}
