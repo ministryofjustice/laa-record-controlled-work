@@ -53,7 +53,7 @@ export const legalAidBefore6MonthsStep = (
                 validation({
                   condition: Self().match(Condition.IsRequired()),
                   message:
-                    "Enter the reason you’re creating a new case for the same matter",
+                    "Enter the reason you're creating a new case for the same matter",
                 }),
               ],
             }),

@@ -1,4 +1,4 @@
-import { TestRenderResult } from "@ministryofjustice/hmpps-forge/core/testing";
+import { TestRenderResult, TestRedirectResult } from "@ministryofjustice/hmpps-forge/core/testing";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import { expect } from "chai";
 import { clientDetailsStep } from "#/journeys/create-application/steps/4-client-details.step.js";
@@ -8,20 +8,20 @@ describe("Client details step", () => {
   const client = createStepClient(clientDetailsStep("testJourney"));
 
   describe("GET /create-application/client-details", () => {
-    let result: TestRenderResult;
+    let renderResult: TestRenderResult;
     let nameInput: RenderBlock;
     let dateInput: RenderBlock;
 
     before(async () => {
-      const res = await client.get("/create-application/client-details");
-      expect(res.type).to.equal("render");
-      result = res as TestRenderResult;
-      [nameInput] = result.getBlocksByVariant("govukTextInput");
-      [dateInput] = result.getBlocksByVariant("govukDateInputFull");
+      const result = await client.get("/create-application/client-details");
+      expect(result.type).to.equal("render");
+      renderResult = result as TestRenderResult;
+      [nameInput] = renderResult.getBlocksByVariant("govukTextInput");
+      [dateInput] = renderResult.getBlocksByVariant("govukDateInputFull");
     });
 
     it("has the correct title", () => {
-      expect(result.context.step.title).to.equal("Your client's details");
+      expect(renderResult.context.step.title).to.equal("Your client's details");
     });
 
     it("renders a full name text input", () => {
@@ -49,9 +49,8 @@ describe("Client details step", () => {
     });
 
     expect(result.type).to.equal("redirect");
-    if (result.type === "redirect") {
-      expect(result.url).to.equal("/create-application/ni-number");
-    }
+    const redirectResult = result as TestRedirectResult;
+    expect(redirectResult.url).to.equal("/create-application/ni-number");
   });
 
 
@@ -133,12 +132,11 @@ describe("Client details step", () => {
       });
 
       expect(result.type).to.equal("render");
-      if (result.type === "render") {
-        expect(result.context.showValidationFailures).to.equal(true);
-        expect(
-          result.getValidationErrorsByFieldCode(fieldCode)[0].message,
-        ).to.deep.equal(expectedMessage);
-      }
+      const renderResult = result as TestRenderResult;
+      expect(renderResult.context.showValidationFailures).to.equal(true);
+      expect(
+        renderResult.getValidationErrorsByFieldCode(fieldCode)[0].message,
+      ).to.deep.equal(expectedMessage);
     });
   }
 });

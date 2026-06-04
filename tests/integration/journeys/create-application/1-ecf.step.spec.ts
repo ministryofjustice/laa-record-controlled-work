@@ -1,4 +1,4 @@
-import { TestResult, TestRenderResult } from "@ministryofjustice/hmpps-forge/core/testing";
+import { TestRenderResult, TestRedirectResult } from "@ministryofjustice/hmpps-forge/core/testing";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import { expect } from "chai";
 import { ineligibleStep } from "#/journeys/create-application/steps/1-ecf-dropout.step.js";
@@ -10,18 +10,18 @@ describe("ECF step", () => {
   const client = createStepClient(ecfStep("testJourney"), ineligibleStep("testJourney"));
 
   describe("GET /create-application/ecf", () => {
-    let result: TestRenderResult;
+    let renderResult: TestRenderResult;
     let radioInput: RenderBlock;
 
     before(async () => {
-      const res = await client.get("/create-application/ecf");
-      expect(res.type).to.equal("render");
-      result = res as TestRenderResult;
-      [radioInput] = result.getBlocksByVariant("govukRadioInput");
+      const result = await client.get("/create-application/ecf");
+      expect(result.type).to.equal("render");
+      renderResult = result as TestRenderResult;
+      [radioInput] = renderResult.getBlocksByVariant("govukRadioInput");
     });
 
     it("has the correct title", () => {
-      expect(result.context.step.title).to.equal(
+      expect(renderResult.context.step.title).to.equal(
         "Does this case require Exceptional Case Funding?",
       );
     });
@@ -37,24 +37,22 @@ describe("ECF step", () => {
   it("should show validation error if no option is selected", async () => {
     const result = await client.post("/create-application/ecf");
     expect(result.type).to.equal("render");
-    if (result.type === "render") {
-      expect(result.context.showValidationFailures).to.equal(true);
-      expect(result.context.fieldValidationErrors[0].message).to.deep.equal(
-        "Please select an option",
-      );
-    }
+    const renderResult = result as TestRenderResult;
+    expect(renderResult.context.showValidationFailures).to.equal(true);
+    expect(renderResult.context.fieldValidationErrors[0].message).to.deep.equal(
+      "Please select an option",
+    );
   });
 
   it("should redirect to ineligible step if ECF is not required", async () => {
-    const result: TestResult = await client.post("/create-application/ecf", {
+    const result = await client.post("/create-application/ecf", {
       body: {
         ecf: "yes",
       },
     });
     expect(result.type).to.equal("redirect");
-    if (result.type === "redirect") {
-      expect(result.url).to.equal("/create-application/ecf-dropout");
-    }
+    const redirectResult = result as TestRedirectResult;
+    expect(redirectResult.url).to.equal("/create-application/ecf-dropout");
   });
 
   it("should redirect to legal aid before step if ECF is not required", async () => {
@@ -64,8 +62,7 @@ describe("ECF step", () => {
       },
     });
     expect(result.type).to.equal("redirect");
-    if (result.type === "redirect") {
-      expect(result.url).to.equal("/create-application/legal-aid-before");
-    }
+    const redirectResult = result as TestRedirectResult;
+    expect(redirectResult.url).to.equal("/create-application/legal-aid-before");
   });
 });

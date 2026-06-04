@@ -1,6 +1,6 @@
 import {
-  TestResult,
   TestRenderResult,
+  TestRedirectResult,
 } from "@ministryofjustice/hmpps-forge/core/testing";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import { expect } from "chai";
@@ -11,20 +11,20 @@ describe("Legal aid before 6 months step", () => {
   const client = createStepClient(legalAidBefore6MonthsStep("testJourney"));
 
   describe("GET /create-application/legal-aid-last-6-months", () => {
-    let result: TestRenderResult;
+    let renderResult: TestRenderResult;
     let radioInput: RenderBlock;
 
     before(async () => {
-      const res = await client.get(
+      const result = await client.get(
         "/create-application/legal-aid-last-6-months",
       );
-      expect(res.type).to.equal("render");
-      result = res as TestRenderResult;
-      [radioInput] = result.getBlocksByVariant("govukRadioInput");
+      expect(result.type).to.equal("render");
+      renderResult = result as TestRenderResult;
+      [radioInput] = renderResult.getBlocksByVariant("govukRadioInput");
     });
 
     it("has the correct title", () => {
-      expect(result.context.step.title).to.equal(
+      expect(renderResult.context.step.title).to.equal(
         "Did your client get legal help for this matter in the last 6 months?",
       );
     });
@@ -42,12 +42,11 @@ describe("Legal aid before 6 months step", () => {
       "/create-application/legal-aid-last-6-months",
     );
     expect(result.type).to.equal("render");
-    if (result.type === "render") {
-      expect(result.context.showValidationFailures).to.equal(true);
-      expect(result.context.fieldValidationErrors[0].message).to.deep.equal(
-        "Select if your client got legal help for this matter in the last 6 months",
-      );
-    }
+    const renderResult = result as TestRenderResult;
+    expect(renderResult.context.showValidationFailures).to.equal(true);
+    expect(renderResult.context.fieldValidationErrors[0].message).to.deep.equal(
+      "Select if your client got legal help for this matter in the last 6 months",
+    );
   });
 
   it("should show validation error if yes is selected but no reason is given", async () => {
@@ -58,16 +57,15 @@ describe("Legal aid before 6 months step", () => {
       },
     );
     expect(result.type).to.equal("render");
-    if (result.type === "render") {
-      expect(result.context.showValidationFailures).to.equal(true);
-      expect(result.context.fieldValidationErrors[0].message).to.deep.equal(
-        "Enter the reason you’re creating a new case for the same matter",
-      );
-    }
+    const renderResult = result as TestRenderResult;
+    expect(renderResult.context.showValidationFailures).to.equal(true);
+    expect(renderResult.context.fieldValidationErrors[0].message).to.deep.equal(
+      "Enter the reason you're creating a new case for the same matter",
+    );
   });
 
   it("should redirect to legal aid last 6 months step if yes", async () => {
-    const result: TestResult = await client.post(
+    const result = await client.post(
       "/create-application/legal-aid-last-6-months",
       {
         body: {
@@ -77,9 +75,8 @@ describe("Legal aid before 6 months step", () => {
       },
     );
     expect(result.type).to.equal("redirect");
-    if (result.type === "redirect") {
-      expect(result.url).to.equal("/create-application/client-details");
-    }
+    const redirectResult = result as TestRedirectResult;
+    expect(redirectResult.url).to.equal("/create-application/client-details");
   });
 
   it("should redirect to client details step if no, different matter", async () => {
@@ -92,8 +89,7 @@ describe("Legal aid before 6 months step", () => {
       },
     );
     expect(result.type).to.equal("redirect");
-    if (result.type === "redirect") {
-      expect(result.url).to.equal("/create-application/client-details");
-    }
+    const redirectResult = result as TestRedirectResult;
+    expect(redirectResult.url).to.equal("/create-application/client-details");
   });
 });

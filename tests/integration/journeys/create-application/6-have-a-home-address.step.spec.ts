@@ -1,4 +1,4 @@
-import { TestResult, TestRenderResult } from "@ministryofjustice/hmpps-forge/core/testing";
+import { TestRenderResult, TestRedirectResult } from "@ministryofjustice/hmpps-forge/core/testing";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import { expect } from "chai";
 import { haveAHomeAddressStep } from "#/journeys/create-application/steps/6-have-a-home-address.step.js";
@@ -8,18 +8,18 @@ describe("Have A Home Address Step", () => {
   const client = createStepClient(haveAHomeAddressStep("testJourney"));
 
   describe("GET /create-application/have-a-home-address", () => {
-    let result: TestRenderResult;
+    let renderResult: TestRenderResult;
     let radioInput: RenderBlock;
 
     before(async () => {
-      const res = await client.get("/create-application/have-a-home-address");
-      expect(res.type).to.equal("render");
-      result = res as TestRenderResult;
-      [radioInput] = result.getBlocksByVariant("govukRadioInput");
+      const result = await client.get("/create-application/have-a-home-address");
+      expect(result.type).to.equal("render");
+      renderResult = result as TestRenderResult;
+      [radioInput] = renderResult.getBlocksByVariant("govukRadioInput");
     });
 
     it("has the correct title", () => {
-      expect(result.context.step.title).to.equal(
+      expect(renderResult.context.step.title).to.equal(
         "Does your client have a home address?",
       );
     });
@@ -43,16 +43,15 @@ describe("Have A Home Address Step", () => {
     const result = await client.post("/create-application/have-a-home-address");
 
     expect(result.type).to.equal("render");
-    if (result.type === "render") {
-      expect(result.context.showValidationFailures).to.equal(true);
-      expect(result.context.fieldValidationErrors[0].message).to.deep.equal(
-        "Select if your client has a home address",
-      );
-    }
+    const renderResult = result as TestRenderResult;
+    expect(renderResult.context.showValidationFailures).to.equal(true);
+    expect(renderResult.context.fieldValidationErrors[0].message).to.deep.equal(
+      "Select if your client has a home address",
+    );
   });
 
   it("should redirect to Enter address manually step if yes", async () => {
-    const result: TestResult = await client.post(
+    const result = await client.post(
       "/create-application/have-a-home-address",
       {
         body: {
@@ -61,9 +60,8 @@ describe("Have A Home Address Step", () => {
       },
     );
     expect(result.type).to.equal("redirect");
-    if (result.type === "redirect") {
-      expect(result.url).to.equal("/create-application/enter-address-manually");
-    }
+    const redirectResult = result as TestRedirectResult;
+    expect(redirectResult.url).to.equal("/create-application/enter-address-manually");
   });
 
   it("should redirect to Need means assessment step if no", async () => {
@@ -76,8 +74,7 @@ describe("Have A Home Address Step", () => {
       },
     );
     expect(result.type).to.equal("redirect");
-    if (result.type === "redirect") {
-      expect(result.url).to.equal("/create-application/need-means-assessment");
-    }
+    const redirectResult = result as TestRedirectResult;
+    expect(redirectResult.url).to.equal("/create-application/need-means-assessment");
   });
 });

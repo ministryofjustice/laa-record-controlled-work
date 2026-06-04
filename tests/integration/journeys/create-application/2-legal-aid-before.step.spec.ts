@@ -1,4 +1,4 @@
-import { TestResult, TestRenderResult } from "@ministryofjustice/hmpps-forge/core/testing";
+import { TestRenderResult, TestRedirectResult } from "@ministryofjustice/hmpps-forge/core/testing";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import { expect } from "chai";
 import { legalAidBeforeStep } from "#/journeys/create-application/steps/2-legal-aid-before.step.js";
@@ -9,18 +9,18 @@ describe("Legal aid before step", () => {
   const client = createStepClient(legalAidBeforeStep("testJourney"));
 
   describe("GET /create-application/legal-aid-before", () => {
-    let result: TestRenderResult;
+    let renderResult: TestRenderResult;
     let radioInput: RenderBlock;
 
     before(async () => {
-      const res = await client.get("/create-application/legal-aid-before");
-      expect(res.type).to.equal("render");
-      result = res as TestRenderResult;
-      [radioInput] = result.getBlocksByVariant("govukRadioInput");
+      const result = await client.get("/create-application/legal-aid-before");
+      expect(result.type).to.equal("render");
+      renderResult = result as TestRenderResult;
+      [radioInput] = renderResult.getBlocksByVariant("govukRadioInput");
     });
 
     it("has the correct title", () => {
-      expect(result.context.step.title).to.equal(
+      expect(renderResult.context.step.title).to.equal(
         "Has your client accessed legal aid before?",
       );
     });
@@ -39,36 +39,33 @@ describe("Legal aid before step", () => {
       body: {},
     });
     expect(result.type).to.equal("render");
-    if (result.type === "render") {
-      expect(result.context.showValidationFailures).to.equal(true);
-      expect(result.context.fieldValidationErrors[0].message).to.deep.equal(
-        "Please select an option",
-      );
-    }
+    const renderResult = result as TestRenderResult;
+    expect(renderResult.context.showValidationFailures).to.equal(true);
+    expect(renderResult.context.fieldValidationErrors[0].message).to.deep.equal(
+      "Please select an option",
+    );
   });
 
   it("should redirect to legal aid last 6 months step if yes, same matter", async () => {
-    const result: TestResult = await client.post("/create-application/legal-aid-before", {
+    const result = await client.post("/create-application/legal-aid-before", {
       body: {
         legalAidBefore: "yesSameMatter",
       },
     });
     expect(result.type).to.equal("redirect");
-    if (result.type === "redirect") {
-      expect(result.url).to.equal("/create-application/legal-aid-last-6-months");
-    }
+    const redirectResult = result as TestRedirectResult;
+    expect(redirectResult.url).to.equal("/create-application/legal-aid-last-6-months");
   });
 
   it("should redirect to client details step if yes, different matter", async () => {
-    const result: TestResult = await client.post("/create-application/legal-aid-before", {
+    const result = await client.post("/create-application/legal-aid-before", {
       body: {
         legalAidBefore: "yesDifferentMatter",
       },
     });
     expect(result.type).to.equal("redirect");
-    if (result.type === "redirect") {
-      expect(result.url).to.equal("/create-application/client-details");
-    }
+    const redirectResult = result as TestRedirectResult;
+    expect(redirectResult.url).to.equal("/create-application/client-details");
   });
 
   it("should redirect to client details step if no, different matter", async () => {
@@ -78,8 +75,7 @@ describe("Legal aid before step", () => {
       },
     });
     expect(result.type).to.equal("redirect");
-    if (result.type === "redirect") {
-      expect(result.url).to.equal("/create-application/client-details");
-    }
+    const redirectResult = result as TestRedirectResult;
+    expect(redirectResult.url).to.equal("/create-application/client-details");
   });
 });
