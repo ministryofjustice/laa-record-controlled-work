@@ -16,6 +16,19 @@ export const scssConfig = (): BuildOptions => ({
   plugins: [
     sassPlugin({
       loadPaths: [path.resolve("."), path.resolve("node_modules")],
+      // silence warnings from sass regarding govuk-frontend depreciations when running tests, as they are too noisy
+      ...(process.env.NODE_ENV === "test" && {
+        logger: {
+          debug: () => {
+            /* empty */
+          },
+          warn: () => {
+            /* empty */
+          },
+        },
+        quietDeps: true,
+        silenceDeprecations: ["import"],
+      }),
       transform: (source: string): string =>
         source
           .replace(
