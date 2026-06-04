@@ -2,7 +2,7 @@ import {
   TestRenderResult,
   TestRedirectResult,
 } from "@ministryofjustice/hmpps-forge/core/testing";
-import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
+import { type BlockASTNode, type Evaluated } from "@ministryofjustice/hmpps-forge/core/framework";
 import { expect } from "chai";
 import { ineligibleStep } from "#/journeys/create-application/steps/1-ecf-dropout.step.js";
 import { ecfStep } from "#/journeys/create-application/steps/1-ecf.step.js";
@@ -16,7 +16,7 @@ describe("ECF step", () => {
 
   describe("GET /create-application/ecf", () => {
     let renderResult: TestRenderResult;
-    let radioInput: RenderBlock;
+    let radioInput: Evaluated<BlockASTNode>;
 
     before(async () => {
       const result = await client.get("/create-application/ecf");

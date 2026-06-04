@@ -2,7 +2,7 @@ import {
   TestRenderResult,
   TestRedirectResult,
 } from "@ministryofjustice/hmpps-forge/core/testing";
-import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
+import { type BlockASTNode, type Evaluated } from "@ministryofjustice/hmpps-forge/core/framework";
 import { expect } from "chai";
 import { haveAHomeAddressStep } from "#/journeys/create-application/steps/6-have-a-home-address.step.js";
 import { createStepClient } from "../../utils/helpers.js";
@@ -12,7 +12,7 @@ describe("Have A Home Address Step", () => {
 
   describe("GET /create-application/have-a-home-address", () => {
     let renderResult: TestRenderResult;
-    let radioInput: RenderBlock;
+    let radioInput: Evaluated<BlockASTNode>;
 
     before(async () => {
       const result = await client.get(

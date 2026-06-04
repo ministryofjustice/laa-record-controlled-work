@@ -2,7 +2,7 @@ import {
   TestRenderResult,
   TestRedirectResult,
 } from "@ministryofjustice/hmpps-forge/core/testing";
-import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
+import { type BlockASTNode, type Evaluated } from "@ministryofjustice/hmpps-forge/core/framework";
 import { expect } from "chai";
 import { legalAidBeforeStep } from "#/journeys/create-application/steps/2-legal-aid-before.step.js";
 import { createStepClient } from "../../utils/helpers.js";
@@ -12,7 +12,7 @@ describe("Legal aid before step", () => {
 
   describe("GET /create-application/legal-aid-before", () => {
     let renderResult: TestRenderResult;
-    let radioInput: RenderBlock;
+    let radioInput: Evaluated<BlockASTNode>;
 
     before(async () => {
       const result = await client.get("/create-application/legal-aid-before");

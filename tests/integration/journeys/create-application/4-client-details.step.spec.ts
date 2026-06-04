@@ -2,7 +2,7 @@ import {
   TestRenderResult,
   TestRedirectResult,
 } from "@ministryofjustice/hmpps-forge/core/testing";
-import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
+import { type BlockASTNode, type Evaluated } from "@ministryofjustice/hmpps-forge/core/framework";
 import { expect } from "chai";
 import { clientDetailsStep } from "#/journeys/create-application/steps/4-client-details.step.js";
 import { createStepClient } from "../../utils/helpers.js";
@@ -12,8 +12,8 @@ describe("Client details step", () => {
 
   describe("GET /create-application/client-details", () => {
     let renderResult: TestRenderResult;
-    let nameInput: RenderBlock;
-    let dateInput: RenderBlock;
+    let nameInput: Evaluated<BlockASTNode>;
+    let dateInput: Evaluated<BlockASTNode>;
 
     before(async () => {
       const result = await client.get("/create-application/client-details");
