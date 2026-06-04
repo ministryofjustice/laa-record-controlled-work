@@ -33,6 +33,7 @@ test("create application flow", async ({ page }) => {
 
   // Legal aid before page
 
+  // Check for the question
   await expect(
     page.getByRole("heading", {
       name: /Has your client accessed legal aid before\?/,
@@ -67,7 +68,9 @@ test("create application flow", async ({ page }) => {
   await expect(reasonForYesField).toBeVisible();
 
   // Check the character count limit
-  await expect(page.getByText("You can enter up to 500 characters")).toBeVisible();
+  await expect(
+    page.getByText("You can enter up to 500 characters"),
+  ).toBeVisible();
 
   // Fill in the reason field and submit
   await reasonForYesField.fill("Client's circumstances have changed");
@@ -88,6 +91,7 @@ test("create application flow", async ({ page }) => {
 
   // Client Details page
 
+  // Check for the title
   await expect(
     page.getByRole("heading", {
       name: /Your client's details/,
@@ -115,20 +119,20 @@ test("create application flow", async ({ page }) => {
     }),
   ).toBeVisible();
 
-  // Check for the radio options
-  const yesNINumberOption = page.locator('input[type="radio"][value="yes"]');
-  const noNINumberOption = page.locator('input[type="radio"][value="no"]');
-  await expect(yesNINumberOption).toBeVisible();
-  await expect(noNINumberOption).toBeVisible();
+  // Check NI input field is not visible when "Yes" is not selected
+  const niNumberInput = page.getByLabel(
+    "Enter your client's National Insurance number",
+  );
+  await expect(niNumberInput).toBeHidden();
 
   // Select "Yes" and check for NI number input
-  await yesNINumberOption.check();
-  const niNumberInput = page.locator('input[name="niNumber"]');
+  await page.getByRole("radio", { name: "Yes" }).check();
   await expect(niNumberInput).toBeVisible();
 
   // Fill in a valid NI number and submit
   await niNumberInput.fill("JN123456A");
-  await page.click('button[type="submit"]');
+  await page.getByRole("button", { name: "Continue" }).click();
+
   // Verify redirection to the next page
   await expect(page).toHaveURL("/create-application/have-a-home-address");
 
@@ -136,12 +140,21 @@ test("create application flow", async ({ page }) => {
   await page.goto("/create-application/ni-number");
 
   // Select "No" and submit
-  await noNINumberOption.check();
-  await page.click('button[type="submit"]');
+  await page.getByRole("radio", { name: "No" }).check();
+  await page.getByRole("button", { name: "Continue" }).click();
+
   // Verify redirection to the next page
   await expect(page).toHaveURL("/create-application/have-a-home-address");
 
   // Have a home address page
+
+  // Check for the question
+  await expect(
+    page.getByRole("heading", {
+      name: /Does your client have a home address\?/,
+      level: 1,
+    }),
+  ).toBeVisible();
 
   // Select "Yes" and submit
   await page.getByRole("radio", { name: "Yes" }).check();
