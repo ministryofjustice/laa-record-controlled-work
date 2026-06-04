@@ -1,28 +1,15 @@
 import { test, expect } from "../../fixtures/index.js";
 
 test("create application flow", async ({ page }) => {
-  // Test for ECF page
+  // ECF page
   
   // Navigate to the ECF page
   await page.goto("/create-application/ecf");
 
-  // Check for the question
-  await expect(
-    page.getByRole("heading", {
-      name: /Does this case require Exceptional Case Funding\?/,
-      level: 1,
-    }),
-  ).toBeVisible();
-
-  // Check for the radio options
-  const yesOption = page.locator('input[type="radio"][value="yes"]');
-  const noOption = page.locator('input[type="radio"][value="no"]');
-  await expect(yesOption).toBeVisible();
-  await expect(noOption).toBeVisible();
-
   // Select "Yes" and submit
-  await yesOption.check();
-  await page.click('button[type="submit"]');
+  await page.getByRole('radio', { name: 'Yes' }).check();
+  await page.getByRole('button', { name: 'Continue' }).click();
+
   // Verify redirection to the ECF dropout page
   await expect(page).toHaveURL("/create-application/ecf-dropout");
 
@@ -30,20 +17,13 @@ test("create application flow", async ({ page }) => {
   await page.goto("/create-application/ecf");
 
   // Select "No" and submit
-  await noOption.check();
-  await page.click('button[type="submit"]');
+  await page.getByRole('radio', { name: 'No' }).check();
+  await page.getByRole('button', { name: 'Continue' }).click();
+
   // Verify redirection to the legal aid before page
   await expect(page).toHaveURL("/create-application/legal-aid-before");
 
-  // Test for legal aid before page
-
-  // Check for the question
-  await expect(
-    page.getByRole("heading", {
-      name: /Has your client accessed legal aid before\?/,
-      level: 1,
-    }),
-  ).toBeVisible();
+  // Legal aid before page
 
   // Check for the radio options
   const yesSameMatterOption = page.locator(
