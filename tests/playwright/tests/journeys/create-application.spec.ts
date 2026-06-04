@@ -110,7 +110,6 @@ test("create application flow", async ({ page }) => {
   await expect(page).toHaveURL("/create-application/ni-number");
 
   // Test for NI number page
-
   // Check for the question
   await expect(
     page.getByRole("heading", {
