@@ -20,7 +20,9 @@ const initialiseFrontendPackages = (): void => {
       }
     } catch (error: unknown) {
       // Always log errors, even in production
-      console.error("Frontend initialization error:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : JSON.stringify(error);
+      console.error(`Frontend initialization error: ${errorMessage}`);
     }
   }
 };

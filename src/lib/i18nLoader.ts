@@ -8,6 +8,8 @@ import i18next from "i18next";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 
+import { logger } from "#/logger.js";
+
 /**
  * Initialise i18next synchronously using Node.js fs methods
  * This ensures i18next is ready before any modules that use translations are loaded
@@ -46,7 +48,7 @@ export function initializeI18nextSync(): void {
         },
       });
     } catch (fileError) {
-      console.warn("Locale file not found, initializing with empty resources");
+      logger.warn("Locale file not found, initializing with empty resources");
       void i18next.init({
         fallbackLng: "en",
         interpolation: {
@@ -59,7 +61,7 @@ export function initializeI18nextSync(): void {
       });
     }
   } catch (error) {
-    console.error("Failed to initialise i18next synchronously:", error);
+    logger.error("Failed to initialise i18next synchronously", error);
     // Initialise with empty resources as fallback
     void i18next.init({
       fallbackLng: "en",
@@ -100,7 +102,7 @@ export { i18next };
 export const t = (key: string, options?: Record<string, unknown>): string => {
   // Ensure i18next is initialised before calling translation
   if (!i18next.isInitialized) {
-    console.warn(`i18next not initialised when translating: ${key}`);
+    logger.warn("i18next not initialised when translating", { key });
     return key; // Return the key as fallback
   }
 

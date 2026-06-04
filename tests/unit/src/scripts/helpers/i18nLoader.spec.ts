@@ -8,19 +8,20 @@ import {
   nunjucksT,
   t,
 } from "#/lib/i18nLoader.js";
+import { logger } from "#/logger.js";
 import { expect } from "chai";
 import fs from "node:fs";
 import path from "node:path";
 import sinon from "sinon";
 
 describe('i18nLoader', () => {
-  let consoleWarnStub: sinon.SinonStub;
-  let consoleErrorStub: sinon.SinonStub;
+  let loggerWarnStub: sinon.SinonStub;
+  let loggerErrorStub: sinon.SinonStub;
   let readFileSyncStub: sinon.SinonStub;
 
   before(() => {
-    consoleWarnStub = sinon.stub(console, 'warn');
-    consoleErrorStub = sinon.stub(console, 'error');
+    loggerWarnStub = sinon.stub(logger, 'warn');
+    loggerErrorStub = sinon.stub(logger, 'error');
   });
 
   after(() => {
@@ -56,7 +57,7 @@ describe('i18nLoader', () => {
 
       initializeI18nextSync();
 
-      expect(consoleWarnStub.calledWith('Locale file not found, initializing with empty resources')).to.be.true;
+      expect(loggerWarnStub.calledWith('Locale file not found, initializing with empty resources')).to.be.true;
       expect(i18next.isInitialized).to.be.true;
     });
 
@@ -65,7 +66,7 @@ describe('i18nLoader', () => {
 
       initializeI18nextSync();
 
-      expect(consoleWarnStub.calledWith('Locale file not found, initializing with empty resources')).to.be.true;
+      expect(loggerWarnStub.calledWith('Locale file not found, initializing with empty resources')).to.be.true;
       expect(i18next.isInitialized).to.be.true;
     });
 
@@ -74,7 +75,7 @@ describe('i18nLoader', () => {
 
       initializeI18nextSync();
 
-      expect(consoleErrorStub.calledWithMatch('Failed to initialise i18next synchronously:')).to.be.true;
+      expect(loggerErrorStub.calledWith('Failed to initialise i18next synchronously', sinon.match.any)).to.be.true;
       expect(i18next.isInitialized).to.be.true;
     });
   });
@@ -125,7 +126,7 @@ describe('i18nLoader', () => {
 
         const result = t('back');
 
-        expect(consoleWarnStub.calledWith('i18next not initialised when translating: back')).to.be.true;
+        expect(loggerWarnStub.calledWith('i18next not initialised when translating', { key: 'back' })).to.be.true;
         expect(result).to.equal('back');
 
         Object.defineProperty(i18next, 'isInitialized', { value: originalIsInitialized, writable: true });

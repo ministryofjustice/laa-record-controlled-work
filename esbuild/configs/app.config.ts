@@ -24,6 +24,7 @@ const externalModules: string[] = [
   "*.node",
   "connect-redis",
   "redis",
+  "pino",
 ];
 
 export const appConfig = (watch = false): BuildOptions => ({

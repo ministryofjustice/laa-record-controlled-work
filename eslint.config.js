@@ -3,14 +3,13 @@ import perfectionist from "eslint-plugin-perfectionist";
 import prettier from "eslint-plugin-prettier/recommended";
 import globals from "globals";
 
+import consoleConfigs from "./eslint/console.js";
 import ignoresConfig from "./eslint/ignores.js";
 import jsdocConfig from "./eslint/jsdoc.js";
 import jsonConfigs from "./eslint/json.js";
 import typescriptConfig from "./eslint/typescript.js";
 
 export default [
-  // Global ignores
-  ignoresConfig,
   // Base: eslint-config-love for all JS/TS files
   { name: "love/base", ...love, files: ["**/*.js", "**/*.ts"] },
   // Global language options
@@ -22,9 +21,6 @@ export default [
       sourceType: "module",
     },
   },
-  // TypeScript and JSDoc rules
-  typescriptConfig,
-  jsdocConfig,
   // Declaration files: relax strict TypeScript rules
   {
     name: "project/declaration-files",
@@ -39,6 +35,10 @@ export default [
   perfectionist.configs["recommended-natural"],
   // Formatting: prettier (must be last to override any conflicting formatting rules)
   prettier,
-  // JSON/JSONC linting
+
+  ...consoleConfigs,
+  ignoresConfig,
+  jsdocConfig,
   ...jsonConfigs,
+  typescriptConfig,
 ];
