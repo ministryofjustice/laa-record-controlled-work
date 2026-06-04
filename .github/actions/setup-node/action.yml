@@ -21,6 +21,8 @@ runs:
 
     - name: SLSA Supply Chain Security
       uses: ministryofjustice/devsecops-actions/sca/slsa@4cd163be7859cd130800d6719d925318826038ea
+      with:
+        security-patch-package-exclusion: "@ministryofjustice/hmpps-forge"
 
     - name: Install dependencies
       run: yarn install --immutable
