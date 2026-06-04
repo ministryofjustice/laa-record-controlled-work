@@ -23,7 +23,7 @@ export const legalAidBeforeStep = (
   step({
     blocks: [
       GovUKBackLink({
-        href: "/new-case/ecf",
+        href: "/create-application/ecf",
       }),
       HtmlBlock({
         content: '<span class="govuk-caption-l">Client and case details</span>',
