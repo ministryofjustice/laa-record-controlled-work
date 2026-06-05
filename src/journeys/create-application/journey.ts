@@ -1,5 +1,6 @@
 import { access, journey } from "@ministryofjustice/hmpps-forge/core/authoring";
 
+import { legalAidLast6MonthsStep } from "#/journeys/create-application/steps/3-legal-aid-last-6-months.step.js";
 import { clientDetailsStep } from "#/journeys/create-application/steps/4-client-details.step.js";
 import { haveAHomeAddressStep } from "#/journeys/create-application/steps/6-have-a-home-address.step.js";
 import { JourneyEffects } from "#/journeys/effects.js";
@@ -7,7 +8,6 @@ import { JourneyEffects } from "#/journeys/effects.js";
 import { ineligibleStep } from "./steps/1-ecf-dropout.step.js";
 import { ecfStep } from "./steps/1-ecf.step.js";
 import { legalAidBeforeStep } from "./steps/2-legal-aid-before.step.js";
-import { legalAidBefore6MonthsStep } from "./steps/3-legal-aid-within-6-months.step.js";
 import { niNumberStep } from "./steps/5-ni-number.step.js";
 
 const journeyCode = "createApplication";
@@ -25,7 +25,7 @@ export const createApplicationJourney = journey({
     ecfStep(journeyCode),
     ineligibleStep(journeyCode),
     legalAidBeforeStep(journeyCode),
-    legalAidBefore6MonthsStep(journeyCode),
+    legalAidLast6MonthsStep(journeyCode),
     clientDetailsStep(journeyCode),
     niNumberStep(journeyCode),
     haveAHomeAddressStep(journeyCode),
