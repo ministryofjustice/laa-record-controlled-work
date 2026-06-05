@@ -34,7 +34,6 @@ import testRouter from "#/routes/test.js";
 const TRUST_FIRST_PROXY = 1;
 const ENABLE_PLAYWRIGHT_TEST_SIGNIN =
   process.env.PLAYWRIGHT_TEST_SIGNIN === "true";
-const BYPASS_AUTH = process.env.BYPASS_AUTH === "true";
 
 /**
  * Creates and configures an Express application.
