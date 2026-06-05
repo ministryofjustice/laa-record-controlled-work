@@ -28,6 +28,16 @@
           "required": "Please select an option"
         }
       }
+    },
+    "legalAidBefore": {
+      "title": "Has your client accessed legal aid before?",
+      "radioButton": {
+        "yesSameMatter": "Yes, about the same matter",
+        "yesDifferentMatter": "Yes, about a different matter"
+      },
+      "validation": {
+        "required": "Please select an option"
+      }
     }
   }
 }
