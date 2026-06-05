@@ -68,6 +68,25 @@
           "mustBePast": "Date of birth must be in the past"
         }
       }
+    },
+    "niNumber": {
+      "title": "Does your client have a National Insurance number?",
+      "label": "Enter your client's National Insurance number",
+      "validation": {
+        "required": "Enter your client's National Insurance number",
+        "invalid": "Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C",
+        "hasNIRequired": "Select if your client has a National Insurance number"
+      }
+    },
+    "haveAHomeAddress": {
+      "title": "Does your client have a home address?",
+      "hint": "The home address is the place that they normally live in, and sometimes called the main dwelling.",
+      "radioButton": {
+        "no": "No, they have no fixed address"
+      },
+      "validation": {
+        "required": "Select if your client has a home address"
+      }
     }
   }
 }
