@@ -48,6 +48,26 @@
         "required": "Select if your client got legal help for this matter in the last 6 months",
         "reasonRequired": "Enter the reason you're creating a new case for the same matter"
       }
+    },
+    "clientDetails": {
+      "title": "Your client's details",
+      "fullName": {
+        "label": "Full name",
+        "validation": {
+          "required": "Enter your client's name"
+        }
+      },
+      "dateOfBirth": {
+        "hint": "For example, 31 3 1980",
+        "validation": {
+          "empty": "Enter your client's date of birth",
+          "invalid": "Date of birth must be a real date",
+          "missingDay": "Date of birth must include a day",
+          "missingMonth": "Date of birth must include a month",
+          "missingYear": "Date of birth must include a year",
+          "mustBePast": "Date of birth must be in the past"
+        }
+      }
     }
   }
 }
