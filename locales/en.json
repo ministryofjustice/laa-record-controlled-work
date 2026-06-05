@@ -27,65 +27,65 @@
         "validation": {
           "required": "Please select an option"
         }
-      }
-    },
-    "legalAidBefore": {
-      "title": "Has your client accessed legal aid before?",
-      "radioButton": {
-        "yesSameMatter": "Yes, about the same matter",
-        "yesDifferentMatter": "Yes, about a different matter"
       },
-      "validation": {
-        "required": "Please select an option"
-      }
-    },
-    "legalAidLast6Months": {
-      "title": "Did your client get legal help for this matter in the last 6 months?",
-      "reasonForYes": {
-        "hint": "Explain the reason for creating a new case for the same matter"
-      },
-      "validation": {
-        "required": "Select if your client got legal help for this matter in the last 6 months",
-        "reasonRequired": "Enter the reason you're creating a new case for the same matter"
-      }
-    },
-    "clientDetails": {
-      "title": "Your client's details",
-      "fullName": {
-        "label": "Full name",
+      "legalAidBefore": {
+        "title": "Has your client accessed legal aid before?",
+        "radioButton": {
+          "yesSameMatter": "Yes, about the same matter",
+          "yesDifferentMatter": "Yes, about a different matter"
+        },
         "validation": {
-          "required": "Enter your client's name"
+          "required": "Please select an option"
         }
       },
-      "dateOfBirth": {
-        "hint": "For example, 31 3 1980",
+      "legalAidLast6Months": {
+        "title": "Did your client get legal help for this matter in the last 6 months?",
+        "reasonForYes": {
+          "hint": "Explain the reason for creating a new case for the same matter"
+        },
         "validation": {
-          "empty": "Enter your client's date of birth",
-          "invalid": "Date of birth must be a real date",
-          "missingDay": "Date of birth must include a day",
-          "missingMonth": "Date of birth must include a month",
-          "missingYear": "Date of birth must include a year",
-          "mustBePast": "Date of birth must be in the past"
+          "required": "Select if your client got legal help for this matter in the last 6 months",
+          "reasonRequired": "Enter the reason you're creating a new case for the same matter"
         }
-      }
-    },
-    "niNumber": {
-      "title": "Does your client have a National Insurance number?",
-      "label": "Enter your client's National Insurance number",
-      "validation": {
-        "required": "Enter your client's National Insurance number",
-        "invalid": "Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C",
-        "hasNIRequired": "Select if your client has a National Insurance number"
-      }
-    },
-    "haveAHomeAddress": {
-      "title": "Does your client have a home address?",
-      "hint": "The home address is the place that they normally live in, and sometimes called the main dwelling.",
-      "radioButton": {
-        "no": "No, they have no fixed address"
       },
-      "validation": {
-        "required": "Select if your client has a home address"
+      "clientDetails": {
+        "title": "Your client's details",
+        "fullName": {
+          "label": "Full name",
+          "validation": {
+            "required": "Enter your client's name"
+          }
+        },
+        "dateOfBirth": {
+          "hint": "For example, 31 3 1980",
+          "validation": {
+            "empty": "Enter your client's date of birth",
+            "invalid": "Date of birth must be a real date",
+            "missingDay": "Date of birth must include a day",
+            "missingMonth": "Date of birth must include a month",
+            "missingYear": "Date of birth must include a year",
+            "mustBePast": "Date of birth must be in the past"
+          }
+        }
+      },
+      "niNumber": {
+        "title": "Does your client have a National Insurance number?",
+        "label": "Enter your client's National Insurance number",
+        "validation": {
+          "required": "Enter your client's National Insurance number",
+          "invalid": "Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C",
+          "hasNIRequired": "Select if your client has a National Insurance number"
+        }
+      },
+      "haveAHomeAddress": {
+        "title": "Does your client have a home address?",
+        "hint": "The home address is the place that they normally live in, and sometimes called the main dwelling.",
+        "radioButton": {
+          "no": "No, they have no fixed address"
+        },
+        "validation": {
+          "required": "Select if your client has a home address"
+        }
       }
     }
   }
