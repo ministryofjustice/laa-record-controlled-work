@@ -38,6 +38,16 @@
       "validation": {
         "required": "Please select an option"
       }
+    },
+    "legalAidLast6Months": {
+      "title": "Did your client get legal help for this matter in the last 6 months?",
+      "reasonForYes": {
+        "hint": "Explain the reason for creating a new case for the same matter"
+      },
+      "validation": {
+        "required": "Select if your client got legal help for this matter in the last 6 months",
+        "reasonRequired": "Enter the reason you're creating a new case for the same matter"
+      }
     }
   }
 }
