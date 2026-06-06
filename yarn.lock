@@ -327,7 +327,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@eslint/core@npm:^1.0.1, @eslint/core@npm:^1.1.1, @eslint/core@npm:^1.2.1":
+"@eslint/core@npm:^1.0.1, @eslint/core@npm:^1.2.1":
   version: 1.2.1
   resolution: "@eslint/core@npm:1.2.1"
   dependencies:
@@ -343,13 +343,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@eslint/plugin-kit@npm:^0.6.0":
-  version: 0.6.1
-  resolution: "@eslint/plugin-kit@npm:0.6.1"
+"@eslint/plugin-kit@npm:^0.7.0":
+  version: 0.7.2
+  resolution: "@eslint/plugin-kit@npm:0.7.2"
   dependencies:
-    "@eslint/core": "npm:^1.1.1"
+    "@eslint/core": "npm:^1.2.1"
     levn: "npm:^0.4.1"
-  checksum: 10c0/f8354a7b92cc41e7a55d51986d192134be84f9dc0c91b5e649d075d733b56981c4ca8bf4460d54120c4c87b47984167bad2cb9bceb303f11b0a3bad22b3ed06a
+  checksum: 10c0/aafba08077bcd6d7dde6c2e21db18086046a88f914f29971a84cac9ad2d48952ded1b293e665e523805297eff756522dafa16f0062195e2c7143dcd1d47d11ed
   languageName: node
   linkType: hard
 
@@ -3140,13 +3140,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-jsonc@npm:^3.1.2":
-  version: 3.1.2
-  resolution: "eslint-plugin-jsonc@npm:3.1.2"
+"eslint-plugin-jsonc@npm:^3.2.0":
+  version: 3.2.0
+  resolution: "eslint-plugin-jsonc@npm:3.2.0"
   dependencies:
     "@eslint-community/eslint-utils": "npm:^4.5.1"
     "@eslint/core": "npm:^1.0.1"
-    "@eslint/plugin-kit": "npm:^0.6.0"
+    "@eslint/plugin-kit": "npm:^0.7.0"
     "@ota-meshi/ast-token-store": "npm:^0.3.0"
     diff-sequences: "npm:^29.6.3"
     eslint-json-compat-utils: "npm:^0.2.3"
@@ -3155,7 +3155,7 @@ __metadata:
     synckit: "npm:^0.11.12"
   peerDependencies:
     eslint: ">=9.38.0"
-  checksum: 10c0/1812555eb1cfb28a67ea29ea444ac25aeb922a7c5fb3b5c85ccb1021d90284270a5ba360d78b9fec821c7d20e50ff2551806a0f8aef1d13307a0f1a271f91ffe
+  checksum: 10c0/1fd91b27a7b0d717a15af11d2b006a6085c53406bdf4d688b326848b9f5f6c74eab57233e341d6ccd6830de16cb2f91d0e98d891b6f96ac5947c397f5d6d3ea0
   languageName: node
   linkType: hard
 
@@ -4691,7 +4691,7 @@ __metadata:
     eslint-config-love: "npm:^153.0.0"
     eslint-config-prettier: "npm:^10.1.8"
     eslint-plugin-jsdoc: "npm:^62.9.0"
-    eslint-plugin-jsonc: "npm:^3.1.2"
+    eslint-plugin-jsonc: "npm:^3.2.0"
     eslint-plugin-perfectionist: "npm:^5.9.0"
     eslint-plugin-prettier: "npm:^5.5.6"
     express: "npm:^5.2.1"
