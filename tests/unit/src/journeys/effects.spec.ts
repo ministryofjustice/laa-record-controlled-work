@@ -4,8 +4,21 @@ import { createForgeTestClient } from "../../../integration/utils/helpers.js";
 import { ecfStep } from "#/journeys/create-application/steps/1-ecf.step.js";
 import { TestRenderResult } from "@ministryofjustice/hmpps-forge/core/testing";
 import { JourneyEffects } from "#/journeys/effects.js";
+import { access, step } from "@ministryofjustice/hmpps-forge/core/authoring";
 
-const client = createForgeTestClient(ecfStep("testJourney"));
+const clearDraftStep = step({
+  blocks: [],
+  onAccess: [
+    access({
+      effects: [JourneyEffects.ClearDraftAnswers("testJourney")],
+    }),
+  ],
+  path: "/clear-draft",
+  reachability: { entryWhen: true },
+  title: "Clear Draft",
+});
+
+const client = createForgeTestClient(ecfStep("testJourney"), clearDraftStep);
 const session: Record<string, unknown> = {};
 
 describe("SaveDraftAnswers", () => {
@@ -60,7 +73,7 @@ describe("SaveDraftAnswers", () => {
     expect(drafts?.testJourney?.ecf).to.equal("yes");
   });
 
-  it('overwrites existing draft answer for the same question', async () => {
+  it("overwrites existing draft answer for the same question", async () => {
     session.journeyDrafts = {
       testJourney: { ecf: "no" },
     };
@@ -107,5 +120,41 @@ describe("LoadDraftAnswers", () => {
     const [radioInput] = renderResult.getBlocksByVariant("govukRadioInput");
 
     expect(radioInput.properties.value).to.equal(undefined);
+  });
+});
+
+describe("ClearDraftAnswers", () => {
+  it("removes the journey's draft from the session", async () => {
+    session.journeyDrafts = {
+      testJourney: { ecf: "yes" },
+    };
+
+    await client.get("/create-application/clear-draft", { session });
+
+    const drafts = session.journeyDrafts as Record<string, unknown>;
+    expect(drafts.testJourney).to.be.undefined;
+  });
+
+  it("preserves drafts for other journeys", async () => {
+    session.journeyDrafts = {
+      testJourney: { ecf: "yes" },
+      anotherJourney: { someAnswer: "yes" },
+    };
+
+    await client.get("/create-application/clear-draft", { session });
+
+    const drafts = session.journeyDrafts as Record<string, unknown>;
+    expect((drafts.anotherJourney as Record<string, unknown>).someAnswer).to.equal(
+      "yes",
+    );
+  });
+
+  it("does nothing when no draft exists for the journey", async () => {
+    session.journeyDrafts = { anotherJourney: { someAnswer: "yes" } };
+
+    await client.get("/create-application/clear-draft", { session });
+
+    const drafts = session.journeyDrafts as Record<string, unknown>;
+    expect(drafts.anotherJourney).to.exist;
   });
 });
