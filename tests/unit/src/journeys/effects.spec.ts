@@ -108,7 +108,7 @@ describe("LoadDraftAnswers", () => {
     expect(radioInput.properties.value).to.equal("yes");
   });
 
-  it("does does nothing when no draft exists for this journey", async () => {
+  it("does nothing when no draft exists for this journey", async () => {
     session.journeyDrafts = {
       testJourney: {},
     };
