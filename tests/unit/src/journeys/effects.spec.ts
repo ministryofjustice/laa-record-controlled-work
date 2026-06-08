@@ -19,7 +19,11 @@ const clearDraftStep = step({
 });
 
 const client = createForgeTestClient(ecfStep("testJourney"), clearDraftStep);
-const session: Record<string, unknown> = {};
+let session: Record<string, unknown> = {};
+
+beforeEach(() => {
+  session = {};
+});
 
 describe("SaveDraftAnswers", () => {
   it("persists draft answers in the session under the journey key", async () => {
