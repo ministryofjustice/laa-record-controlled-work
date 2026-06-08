@@ -110,6 +110,19 @@ runs:
         K8S_NAMESPACE: ${{ inputs.kube-namespace }}
         CCQ_ECR_REPOSITORY: ${{ inputs.ccq-ecr-repository }}
         NGINX_ECR_REPOSITORY: ${{ inputs.nginx-ecr-repository }}
+
+    - name: Comment ephemeral environment URL on PR
+      if: ${{ inputs.branch-ref != '' && github.event.pull_request.number != '' }}
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+        BRANCH_NAME: ${{ inputs.branch-ref }}
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+      run: |
+        RELEASE_NAME=$(./scripts/release-name.sh "$BRANCH_NAME")
+        URL="https://${RELEASE_NAME}-laa-record-controlled-work-uat.cloud-platform.service.justice.gov.uk"
+        gh pr comment "$PR_NUMBER" --body "Ephemeral environment deployed: ${URL}"
+
 # TODO set up slack notification
 # - name: Notify deployment failure
 #   shell: bash
