@@ -14,7 +14,6 @@ import session from "express-session";
 import authRouter from "#/auth/auth.routes.js";
 import config from "#/config.js";
 import createApplication from "#/journeys/create-application/index.js";
-import { initializeI18nextSync } from "#/lib/i18nLoader.js";
 import { createSession } from "#/lib/session.js";
 import { requireAuth } from "#/middleware/requireAuth.js";
 import { setupConfig } from "#/middleware/setupConfigs.js";
@@ -43,9 +42,6 @@ const ENABLE_PLAYWRIGHT_TEST_SIGNIN =
  * @returns {Promise<import('express').Application>} The configured Express application
  */
 const createApp = async (): Promise<express.Application> => {
-  // Initialise i18next synchronously before setting up the app
-  initializeI18nextSync();
-
   const app = express();
 
   app.use("/", healthRouter);

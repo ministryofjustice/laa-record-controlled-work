@@ -1,32 +1,14 @@
 {
   "common": {
-    "back": "Back",
-    "change": "Change",
-    "remove": "Remove",
-    "save": "Save",
-    "cancel": "Cancel",
+    "continue": "Continue",
     "signOut": "Sign out",
     "yes": "Yes",
-    "no": "No",
-    "error": "Error",
-    "warning": "Warning",
-    "errorSummaryTitle": "There is a problem"
-  },
-  "navigation": {
-    "mainNav": {},
-    "footer": {
-      "accessibility": "Accessibility",
-      "cookiePolicy": "Cookies",
-      "privacyPolicy": "Privacy"
-    }
+    "no": "No"
   },
   "components": {
     "phaseBanner": {
       "feedbackText": "This is a new service. Help us improve it and ",
       "feedbackLinkTextHTML": "<a class='govuk-link' href='#'>give your feedback by email</a>."
-    },
-    "errorSummary": {
-      "title": "There is a problem"
     }
   },
   "pages": {
@@ -37,86 +19,74 @@
       "pageTitle": "Sorry, there is a problem with the service – {SERVICE_NAME} – GOV.UK"
     }
   },
-  "forms": {
-    "name": {
-      "label": "Full name",
-      "title": "Change your name",
-      "pageTitle": "Change your name – {serviceName} – GOV.UK",
-      "validationError": {
-        "notEmpty": "Enter your full name",
-        "notChanged": "Change your full name, or select 'Cancel'"
-      }
-    },
-    "address": {
-      "label": "Address",
-      "title": "Address",
-      "validationError": {
-        "notEmpty": "Enter your address"
-      }
-    },
-    "contactPreference": {
-      "label": "Contact preference",
-      "title": "How would you prefer to be contacted?",
-      "validationError": {
-        "notEmpty": "Select how you would prefer to be contacted",
-        "invalidOption": "Select a valid contact preference",
-        "notChanged": "Change your contact preference, or select 'Cancel'"
-      }
-    },
-    "communicationMethods": {
-      "label": "Communication methods",
-      "title": "How would you like us to contact you?",
-      "hint": "Select all that apply",
-      "validationError": {
-        "notEmpty": "Select at least one communication method"
-      }
-    },
-    "priority": {
-      "label": "Priority level",
-      "title": "Priority level",
-      "validationError": {
-        "notEmpty": "Select a priority level",
-        "invalidOption": "Select a valid priority level",
-        "notChanged": "Change the priority level, or select 'Cancel'"
-      }
-    },
-    "dateOfBirth": {
-      "label": "Date of birth",
-      "title": "Date of birth",
-      "hint": "For example, 27 3 1986",
-      "validationError": {
-        "day": {
-          "notEmpty": "Date of birth must include a day",
-          "isInt": "Day must be a number between 1 and 31"
+  "journeys": {
+    "createApplication": {
+      "caption": "Client and case details",
+      "ecf": {
+        "title": "Does this case require Exceptional Case Funding?",
+        "validation": {
+          "required": "Please select an option"
+        }
+      },
+      "legalAidBefore": {
+        "title": "Has your client accessed legal aid before?",
+        "radioButton": {
+          "yesSameMatter": "Yes, about the same matter",
+          "yesDifferentMatter": "Yes, about a different matter"
         },
-        "month": {
-          "notEmpty": "Date of birth must include a month",
-          "isInt": "Month must be a number between 1 and 12"
+        "validation": {
+          "required": "Please select an option"
+        }
+      },
+      "legalAidLast6Months": {
+        "title": "Did your client get legal help for this matter in the last 6 months?",
+        "reasonForYes": {
+          "hint": "Explain the reason for creating a new case for the same matter"
         },
-        "year": {
-          "notEmpty": "Date of birth must include a year",
-          "isLength": "Year must be 4 numbers",
-          "isInt": "Year must be a valid number"
+        "validation": {
+          "required": "Select if your client got legal help for this matter in the last 6 months",
+          "reasonRequired": "Enter the reason you're creating a new case for the same matter"
+        }
+      },
+      "clientDetails": {
+        "title": "Your client's details",
+        "fullName": {
+          "label": "Full name",
+          "validation": {
+            "required": "Enter your client's name"
+          }
         },
-        "validDate": "Enter a real date of birth"
-      }
-    },
-    "clientDetails": {
-      "name": {
-        "label": "Name",
-        "title": "Client name",
-        "pageTitle": "Client name – {caseReference} – {serviceName} – GOV.UK",
-        "validationError": {
-          "notEmpty": "Enter the client name",
-          "notChanged": "Change the client name, or select 'Cancel'"
+        "dateOfBirth": {
+          "hint": "For example, 31 3 1980",
+          "validation": {
+            "empty": "Enter your client's date of birth",
+            "invalid": "Date of birth must be a real date",
+            "missingDay": "Date of birth must include a day",
+            "missingMonth": "Date of birth must include a month",
+            "missingYear": "Date of birth must include a year",
+            "mustBePast": "Date of birth must be in the past"
+          }
+        }
+      },
+      "niNumber": {
+        "title": "Does your client have a National Insurance number?",
+        "label": "Enter your client's National Insurance number",
+        "validation": {
+          "required": "Enter your client's National Insurance number",
+          "invalid": "Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C",
+          "hasNIRequired": "Select if your client has a National Insurance number"
+        }
+      },
+      "haveAHomeAddress": {
+        "title": "Does your client have a home address?",
+        "hint": "The home address is the place that they normally live in, and sometimes called the main dwelling.",
+        "radioButton": {
+          "no": "No, they have no fixed address"
+        },
+        "validation": {
+          "required": "Select if your client has a home address"
         }
       }
-    },
-    "home": {
-      "validationError": {}
     }
-  },
-  "accessibility": {
-    "visuallyHiddenText": {}
   }
 }

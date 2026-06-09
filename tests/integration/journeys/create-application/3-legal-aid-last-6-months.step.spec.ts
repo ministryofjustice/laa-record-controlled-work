@@ -3,12 +3,12 @@ import {
   TestRedirectResult,
 } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
-import { legalAidBefore6MonthsStep } from "#/journeys/create-application/steps/3-legal-aid-within-6-months.step.js";
+import { legalAidLast6MonthsStep } from "#/journeys/create-application/steps/3-legal-aid-last-6-months.step.js";
 import { createForgeTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 
 describe("Legal aid before 6 months step", () => {
-  const client = createForgeTestClient(legalAidBefore6MonthsStep("testJourney"));
+  const client = createForgeTestClient(legalAidLast6MonthsStep("testJourney"));
 
   describe("GET /create-application/legal-aid-last-6-months", () => {
     let renderResult: TestRenderResult;
