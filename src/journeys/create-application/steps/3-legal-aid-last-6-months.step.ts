@@ -17,8 +17,9 @@ import {
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
 import { JourneyEffects } from "#/journeys/effects.js";
-import { characterLimt } from "#/journeys/journey.type.js";
 import { t } from "#/lib/i18n.js";
+
+const REASON_MAX_LENGTH = 500;
 
 export const legalAidLast6MonthsStep = (
   journeyCode: string,
@@ -50,7 +51,7 @@ export const legalAidLast6MonthsStep = (
               label: t(
                 "journeys.createApplication.legalAidLast6Months.reasonForYes.hint",
               ),
-              maxLength: characterLimt.fiveHundred,
+              maxLength: REASON_MAX_LENGTH,
               validWhen: [
                 validation({
                   condition: Self().match(Condition.IsRequired()),

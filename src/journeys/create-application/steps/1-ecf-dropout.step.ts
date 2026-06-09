@@ -11,7 +11,7 @@ import {
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
 import { JourneyEffects } from "#/journeys/effects.js";
-import { headerLevels } from "#/journeys/journey.type.js";
+import { H1 } from "#/lib/constants/header.levels.js";
 
 export const ineligibleStep = (journeyCode: string): ReturnType<typeof step> =>
   step({
@@ -20,7 +20,7 @@ export const ineligibleStep = (journeyCode: string): ReturnType<typeof step> =>
         href: "/create-application/ecf",
       }),
       GovUKHeading({
-        level: headerLevels.h1,
+        level: H1,
         text: "You cannot use this service for this type of case",
       }),
       GovUKBody({
