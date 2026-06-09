@@ -15,6 +15,8 @@ import { logger } from "#/logger.js";
  * This ensures i18next is ready before any modules that use translations are loaded
  */
 export function initializeI18nextSync(): void {
+  if (i18next.isInitialized) return;
+
   try {
     const localeFile = path.join(process.cwd(), "locales", "en.json");
 
@@ -120,3 +122,7 @@ export const nunjucksT = (
   key: string,
   options?: Record<string, unknown>,
 ): string => t(key, options);
+
+// Auto-initialise when this module is first imported so that it is available
+// in forge step definitions.
+initializeI18nextSync();

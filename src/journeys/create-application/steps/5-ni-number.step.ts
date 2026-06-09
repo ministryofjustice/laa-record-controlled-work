@@ -17,6 +17,7 @@ import {
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
 import { JourneyEffects } from "#/journeys/effects.js";
+import { t } from "#/lib/i18nLoader.js";
 
 export const niNumberStep = (journeyCode: string): ReturnType<typeof step> =>
   step({
@@ -25,7 +26,7 @@ export const niNumberStep = (journeyCode: string): ReturnType<typeof step> =>
         href: "/create-application/client-details",
       }),
       HtmlBlock({
-        content: '<span class="govuk-caption-l">Client and case details</span>',
+        content: `<span class="govuk-caption-l">${t("journeys.createApplication.caption")}</span>`,
       }),
       GovUKRadioInput({
         code: "hasNINumber",
@@ -33,7 +34,7 @@ export const niNumberStep = (journeyCode: string): ReturnType<typeof step> =>
           legend: {
             classes: "govuk-fieldset__legend--l",
             isPageHeading: true,
-            text: "Does your client have a National Insurance number?",
+            text: t("journeys.createApplication.niNumber.title"),
           },
         },
         items: [
@@ -44,11 +45,13 @@ export const niNumberStep = (journeyCode: string): ReturnType<typeof step> =>
               dependentWhen: Answer("hasNINumber").match(
                 Condition.Equals("yes"),
               ),
-              label: "Enter your client's National Insurance number",
+              label: t("journeys.createApplication.niNumber.label"),
               validWhen: [
                 validation({
                   condition: Self().match(Condition.IsRequired()),
-                  message: "Enter your client's National Insurance number",
+                  message: t(
+                    "journeys.createApplication.niNumber.validation.required",
+                  ),
                 }),
                 validation({
                   condition: Self().match(
@@ -56,27 +59,30 @@ export const niNumberStep = (journeyCode: string): ReturnType<typeof step> =>
                       "^(?!BG|GB|KN|NK|NT|TN|ZZ)[^DFIQUV][^DFIQUVo][0-9]{6}[ABCD]$",
                     ),
                   ),
-                  message:
-                    "Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C",
+                  message: t(
+                    "journeys.createApplication.niNumber.validation.invalid",
+                  ),
                 }),
               ],
             }),
-            text: "Yes",
+            text: t("common.yes"),
             value: "yes",
           },
           {
-            text: "No",
+            text: t("common.no"),
             value: "no",
           },
         ],
         validWhen: [
           validation({
             condition: Self().match(Condition.IsRequired()),
-            message: "Select if your client has a National Insurance number",
+            message: t(
+              "journeys.createApplication.niNumber.validation.hasNIRequired",
+            ),
           }),
         ],
       }),
-      GovUKButton({ text: "Continue" }),
+      GovUKButton({ text: t("common.continue") }),
     ],
     onSubmission: [
       submit({
@@ -94,5 +100,5 @@ export const niNumberStep = (journeyCode: string): ReturnType<typeof step> =>
       }),
     ],
     path: "/ni-number",
-    title: "Does your client have a National Insurance number?",
+    title: t("journeys.createApplication.niNumber.title"),
   });
