@@ -57,6 +57,7 @@
           }
         },
         "dateOfBirth": {
+          "label": "Date of birth",
           "hint": "For example, 31 3 1980",
           "validation": {
             "empty": "Enter your client's date of birth",
@@ -114,6 +115,15 @@
           }
         },
         "nonUkAddress": "The address is not in the UK"
+      },
+      "checkAnswers": {
+        "title": "Check your answers",
+        "changeLink": {
+          "change": "Change"
+        },
+        "submitButton": {
+          "submit": "Save and continue"
+        }
       }
     }
   }
