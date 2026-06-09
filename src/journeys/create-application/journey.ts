@@ -3,6 +3,7 @@ import { access, journey } from "@ministryofjustice/hmpps-forge/core/authoring";
 import { legalAidLast6MonthsStep } from "#/journeys/create-application/steps/3-legal-aid-last-6-months.step.js";
 import { clientDetailsStep } from "#/journeys/create-application/steps/4-client-details.step.js";
 import { haveAHomeAddressStep } from "#/journeys/create-application/steps/6-have-a-home-address.step.js";
+import { enterAddressManuallyStep } from "#/journeys/create-application/steps/7-enter-address-manually.step.js";
 import { JourneyEffects } from "#/journeys/effects.js";
 
 import { ineligibleStep } from "./steps/1-ecf-dropout.step.js";
@@ -29,6 +30,7 @@ export const createApplicationJourney = journey({
     clientDetailsStep(journeyCode),
     niNumberStep(journeyCode),
     haveAHomeAddressStep(journeyCode),
+    enterAddressManuallyStep(journeyCode),
   ],
   title: "Record new case",
   view: { template: "partials/form-step" },
