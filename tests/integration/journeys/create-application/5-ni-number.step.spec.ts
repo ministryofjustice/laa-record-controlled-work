@@ -2,17 +2,17 @@ import {
   TestRenderResult,
   TestRedirectResult,
 } from "@ministryofjustice/hmpps-forge/core/testing";
-import { type BlockASTNode, type Evaluated } from "@ministryofjustice/hmpps-forge/core/framework";
 import { expect } from "chai";
 import { niNumberStep } from "#/journeys/create-application/steps/5-ni-number.step.js";
 import { createForgeTestClient } from "../../utils/helpers.js";
+import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 
 describe("NI number step", () => {
   const client = createForgeTestClient(niNumberStep("testJourney"));
 
   describe("GET /create-application/ni-number", () => {
     let renderResult: TestRenderResult;
-    let radioInput: Evaluated<BlockASTNode>;
+    let radioInput: RenderBlock;
 
     before(async () => {
       const result = await client.get("/create-application/ni-number");

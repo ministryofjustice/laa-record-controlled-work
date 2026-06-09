@@ -2,17 +2,17 @@ import {
   TestRenderResult,
   TestRedirectResult,
 } from "@ministryofjustice/hmpps-forge/core/testing";
-import { type BlockASTNode, type Evaluated } from "@ministryofjustice/hmpps-forge/core/framework";
 import { expect } from "chai";
 import { haveAHomeAddressStep } from "#/journeys/create-application/steps/6-have-a-home-address.step.js";
 import { createForgeTestClient } from "../../utils/helpers.js";
+import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 
 describe("Have A Home Address Step", () => {
   const client = createForgeTestClient(haveAHomeAddressStep("testJourney"));
 
   describe("GET /create-application/have-a-home-address", () => {
     let renderResult: TestRenderResult;
-    let radioInput: Evaluated<BlockASTNode>;
+    let radioInput: RenderBlock;
 
     before(async () => {
       const result = await client.get(
