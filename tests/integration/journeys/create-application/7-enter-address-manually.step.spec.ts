@@ -30,6 +30,14 @@ describe("Enter address manually step", () => {
       expect(renderResult.context.step.title).to.equal("Enter your client's home address");
     });
 
+    it("renders a link to the overseas address page", () => {
+      const linkBlock = renderResult
+        .getBlocksByVariant("html")
+        .find((b) => (b.properties.content as string).includes("/enter-overseas-address"));
+      expect(linkBlock).to.exist;
+      expect(linkBlock!.properties.content as string).to.contain("The address is not in the UK");
+    });
+
     it("renders an address line 1 input", () => {
       const label = addressLine1Input.properties.label as { text: string };
       expect(label.text).to.equal("Address line 1");
