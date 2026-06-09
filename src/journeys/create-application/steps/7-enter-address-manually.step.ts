@@ -59,6 +59,7 @@ export const enterAddressManuallyStep = (
         },
       }),
       GovUKTextInput({
+        classes: "govuk-!-width-two-thirds",
         code: "townOrCity",
         label: {
           isPageHeading: false,
@@ -76,6 +77,7 @@ export const enterAddressManuallyStep = (
         ],
       }),
       GovUKTextInput({
+        classes: "govuk-!-width-two-thirds",
         code: "county",
         label: {
           isPageHeading: false,
@@ -85,6 +87,7 @@ export const enterAddressManuallyStep = (
         },
       }),
       GovUKTextInput({
+        classes: "govuk-input--width-10",
         code: "postcode",
         label: {
           isPageHeading: false,
