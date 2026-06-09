@@ -86,6 +86,33 @@
         "validation": {
           "required": "Select if your client has a home address"
         }
+      },
+      "enterAddressManually": {
+        "title": "Enter your client's home address",
+        "AddressLine1": {
+          "label": "Address line 1",
+          "validation": {
+            "required": "Enter address line 1, typically the building and street"
+          }
+        },
+        "addressLine2": {
+          "label": "Address line 2 (optional)"
+        },
+        "townOrCity": {
+          "label": "Town or city",
+          "validation": {
+            "required": "Enter town or city"
+          }
+        },
+        "county": {
+          "label": "County (optional)"
+        },
+        "postCode": {
+          "label": "Postcode",
+          "validation": {
+            "required": "Enter postcode"
+          }
+        }
       }
     }
   }
