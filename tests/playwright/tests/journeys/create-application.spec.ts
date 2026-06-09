@@ -161,4 +161,23 @@ test("create application flow", async ({ page }) => {
 
   // Verify redirection to the enter address manually page
   await expect(page).toHaveURL("/create-application/enter-address-manually");
+
+  // Enter Address Manually page
+
+  // Check for the title
+  await expect(
+    page.getByRole("heading", {
+      name: /Enter your client's home address/,
+      level: 1,
+    }),
+  ).toBeVisible();
+
+  // Fill in the full address and submit
+  await page.getByLabel("Address line 1").fill("10 Some Street");
+  await page.getByLabel("Town or city").fill("SomeCity");
+  await page.getByLabel("Postcode").fill("AB1 2CD");
+  await page.getByRole("button", { name: "Continue" }).click();
+
+  // Verify redirection to the next page
+  await expect(page).toHaveURL("/create-application/check-answers");
 });

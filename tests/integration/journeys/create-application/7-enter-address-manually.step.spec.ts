@@ -65,14 +65,14 @@ describe("Enter address manually step", () => {
       postcode: "AB1 2CD",
     };
 
-    it("should redirect to ni-number when given valid data", async () => {
+    it("should redirect to check-answers when given valid data", async () => {
       const result = await client.post("/create-application/enter-address-manually", {
         body: validBody,
       });
 
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
-      expect(redirectResult.url).to.equal("/create-application/ni-number");
+      expect(redirectResult.url).to.equal("/create-application/check-answers");
     });
 
     const validationErrorTests: Array<{

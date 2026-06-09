@@ -117,7 +117,7 @@ export const enterAddressManuallyStep = (
               goto: "check-answers",
               when: Query("returnTo").match(Condition.Equals("check-answers")),
             }),
-            redirect({ goto: "ni-number" }),
+            redirect({ goto: "check-answers" }),
           ],
         },
         validate: true,
