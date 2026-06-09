@@ -9,10 +9,39 @@ on:
         default: ''
 
 jobs:
+  setup:
+    name: Setup & Build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+        with:
+          ref: ${{ inputs.sha || github.sha }}
+          fetch-depth: 0
+
+      - name: Setup Node and Dependencies
+        uses: ./.github/actions/setup-node
+
+      - name: Build application
+        run: yarn build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: build-artifacts
+          path: public/
+          retention-days: 1
+          overwrite: false
+
   playwright:
     name: Playwright Tests
+    needs: setup
     timeout-minutes: 60
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     # Mark this job as required for PR checks
     outputs:
       status: ${{ job.status }}
@@ -25,6 +54,12 @@ jobs:
 
       - name: Setup Node and Dependencies
         uses: ./.github/actions/setup-node
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          name: build-artifacts
+          path: public/
 
       - name: Cache Playwright browsers
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
@@ -48,6 +83,7 @@ jobs:
           NODE_ENV: "test"
           SESSION_SECRET: "playwright-test-secret"
           SESSION_ENCRYPTION_KEY: "playwright-test-encryption-key"
+
       - name: Upload trace artifacts
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
@@ -64,18 +100,28 @@ jobs:
 
   accessibility:
     name: Accessibility Tests
+    needs: setup
     timeout-minutes: 30
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     outputs:
       status: ${{ job.status }}
     steps:
       - name: Checkout code
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
         with:
+          ref: ${{ inputs.sha || github.sha }}
           fetch-depth: 0
 
       - name: Setup Node and Dependencies
         uses: ./.github/actions/setup-node
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          name: build-artifacts
+          path: public/
 
       - name: Cache Playwright browsers
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
