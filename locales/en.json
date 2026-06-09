@@ -89,7 +89,7 @@
       },
       "enterAddressManually": {
         "title": "Enter your client's home address",
-        "AddressLine1": {
+        "addressLine1": {
           "label": "Address line 1",
           "validation": {
             "required": "Enter address line 1, typically the building and street"
@@ -107,7 +107,7 @@
         "county": {
           "label": "County (optional)"
         },
-        "postCode": {
+        "postcode": {
           "label": "Postcode",
           "validation": {
             "required": "Enter postcode"
