@@ -112,7 +112,8 @@
           "validation": {
             "required": "Enter postcode"
           }
-        }
+        },
+        "nonUkAddress": "The address is not in the UK"
       }
     }
   }
