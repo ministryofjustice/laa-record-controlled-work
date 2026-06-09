@@ -35,7 +35,6 @@ export const enterAddressManuallyStep = (
       GovUKTextInput({
         code: "addressLine1",
         label: {
-          classes: "govuk-label--m",
           isPageHeading: false,
           text: t(
             "journeys.createApplication.enterAddressManually.addressLine1.label",
@@ -53,7 +52,6 @@ export const enterAddressManuallyStep = (
       GovUKTextInput({
         code: "addressLine2",
         label: {
-          classes: "govuk-label--m",
           isPageHeading: false,
           text: t(
             "journeys.createApplication.enterAddressManually.addressLine2.label",
@@ -63,7 +61,6 @@ export const enterAddressManuallyStep = (
       GovUKTextInput({
         code: "townOrCity",
         label: {
-          classes: "govuk-label--m",
           isPageHeading: false,
           text: t(
             "journeys.createApplication.enterAddressManually.townOrCity.label",
@@ -81,7 +78,6 @@ export const enterAddressManuallyStep = (
       GovUKTextInput({
         code: "county",
         label: {
-          classes: "govuk-label--m",
           isPageHeading: false,
           text: t(
             "journeys.createApplication.enterAddressManually.county.label",
@@ -91,7 +87,6 @@ export const enterAddressManuallyStep = (
       GovUKTextInput({
         code: "postcode",
         label: {
-          classes: "govuk-label--m",
           isPageHeading: false,
           text: t(
             "journeys.createApplication.enterAddressManually.postcode.label",
