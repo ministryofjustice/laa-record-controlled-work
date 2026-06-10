@@ -12,7 +12,7 @@ import express from "express";
 import session from "express-session";
 
 import authRouter from "#/auth/auth.routes.js";
-import { accessibleAutocomplete } from "#/components/accessibleAutocomplete/accessibleAutocomplete.js";
+import { accessibleAutocomplete } from "#/components/accessibleAutocomplete/accessibleAutocomplete.component.js";
 import config from "#/config.js";
 import createApplication from "#/journeys/create-application/index.js";
 import { createSession } from "#/lib/session.js";
