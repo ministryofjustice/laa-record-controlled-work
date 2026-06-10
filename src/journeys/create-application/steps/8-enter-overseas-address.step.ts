@@ -25,6 +25,8 @@ import {
 } from "#/journeys/journey.constants.js";
 import { t } from "#/lib/i18nLoader.js";
 
+const MINIMUM_AUTOCOMPLETE_CHARACTERS = 2;
+
 export const enterOverseasAddressStep = (
   journeyCode: string,
 ): ReturnType<typeof step> =>
@@ -60,8 +62,7 @@ export const enterOverseasAddressStep = (
             }),
           ],
         }),
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- .
-        minLength: 0,
+        minLength: MINIMUM_AUTOCOMPLETE_CHARACTERS,
         showAllValues: false,
         showNoOptionsFound: true,
       }),

@@ -25,7 +25,7 @@ export const browserConfigs = (): BuildOptions[] => [
     bundle: true,
     entryNames: "accessible-autocomplete.[hash].min",
     entryPoints: [
-      "src/components/accessibleAutocomplete/accessibleAutocomplete.element.mjs",
+      "src/components/accessibleAutocomplete/accessibleAutocomplete.element.ts",
     ],
     format: "esm",
     minify: process.env.NODE_ENV === "production",
