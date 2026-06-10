@@ -114,6 +114,33 @@
           }
         },
         "nonUkAddress": "The address is not in the UK"
+      },
+      "enterOverseasAddress": {
+        "title": "Enter your client's overseas home address",
+        "country": {
+          "label": "Country",
+          "validation": {
+            "required": "Enter country"
+          }
+        },
+        "address": {
+          "title": "Address",
+          "line1": {
+            "label": "Address line 1",
+            "validation": {
+              "required": "Enter address line 1, typically the building and street"
+            }
+          },
+          "line2": {
+            "label": "Address line 2 (optional)"
+          },
+          "line3": {
+            "label": "Address line 3 (optional)"
+          },
+          "line4": {
+            "label": "Address line 4 (optional)"
+          }
+        }
       }
     }
   }
