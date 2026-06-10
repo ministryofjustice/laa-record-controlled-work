@@ -1,7 +1,4 @@
-import type {
-  EvaluatedBlock,
-  FieldBlockDefinition,
-} from "@ministryofjustice/hmpps-forge/core/components";
+import type { EvaluatedBlock } from "@ministryofjustice/hmpps-forge/core/components";
 
 import { block as blockBuilder } from "@ministryofjustice/hmpps-forge/core/authoring";
 import { buildNunjucksComponent } from "@ministryofjustice/hmpps-forge/express-nunjucks";
@@ -9,6 +6,7 @@ import { buildNunjucksComponent } from "@ministryofjustice/hmpps-forge/express-n
 import type {
   AccessibleAutocomplete,
   AccessibleAutocompleteProps,
+  EvaluatedField,
 } from "./accessibleAutocomplete.types.js";
 
 /**
@@ -19,31 +17,59 @@ import type {
  * @param defaultValue - The pre-filled value to set on the autocomplete input
  * @returns A space-separated string of HTML attributes
  */
-function buildWrapperAttrs(
+function buildWrapperAttributes(
   block: EvaluatedBlock<AccessibleAutocomplete>,
   dataId: string,
   defaultValue: unknown,
 ): string {
+  const optionalAttributes: Array<[string, unknown]> = [
+    ["data-autocomplete-source-key-from", block.dataKeyFrom],
+    ["data-autocomplete-min-length", block.minLength],
+    ["data-autocomplete-show-no-options", block.showNoOptionsFound],
+    ["data-autocomplete-menu-classes", block.menuClasses],
+    ["data-autocomplete-input-classes", block.inputClasses],
+    ["data-autocomplete-hint-classes", block.hintClasses],
+    ["data-autocomplete-autoselect", block.autoselect],
+    ["data-autocomplete-confirm-on-blur", block.confirmOnBlur],
+    ["data-autocomplete-display-menu", block.displayMenu],
+    ["data-autocomplete-show-all-values", block.showAllValues],
+    ["data-autocomplete-default-value", defaultValue],
+  ];
+  const menuAttributes =
+    block.menuAttributes !== undefined
+      ? `data-autocomplete-menu-attributes='${JSON.stringify(block.menuAttributes)}'`
+      : "";
+
   return [
     'class="accessible-autocomplete-wrapper"',
     `data-autocomplete-source="${dataId}"`,
-    optionalAttr("data-autocomplete-default-value", defaultValue),
-    optionalAttr("data-autocomplete-source-key-from", block.dataKeyFrom),
-    optionalAttr("data-autocomplete-min-length", block.minLength),
-    optionalAttr("data-autocomplete-show-no-options", block.showNoOptionsFound),
-    optionalAttr("data-autocomplete-menu-classes", block.menuClasses),
-    optionalAttr("data-autocomplete-input-classes", block.inputClasses),
-    optionalAttr("data-autocomplete-hint-classes", block.hintClasses),
-    optionalAttr("data-autocomplete-autoselect", block.autoselect),
-    optionalAttr("data-autocomplete-confirm-on-blur", block.confirmOnBlur),
-    optionalAttr("data-autocomplete-display-menu", block.displayMenu),
-    optionalAttr("data-autocomplete-show-all-values", block.showAllValues),
-    block.menuAttributes !== undefined
-      ? `data-autocomplete-menu-attributes='${JSON.stringify(block.menuAttributes)}'`
-      : "",
-  ]
-    .filter(Boolean)
-    .join(" ");
+    menuAttributes,
+    ...optionalAttributes.map(([name, value]) => setAttribute(name, value)),
+  ].join(" ");
+}
+
+/**
+ * Extracts the data ID and default value from the evaluated field block.
+ *
+ * @param block - The evaluated AccessibleAutocomplete block
+ * @returns The data script ID and pre-filled default value
+ */
+function resolveField(block: EvaluatedBlock<AccessibleAutocomplete>): {
+  dataId: string;
+  defaultValue: unknown;
+} {
+  /* eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- 
+  Forge resolves all block expressions before calling render, so value and
+  defaultValue are present on the field block at runtime
+  */
+  const field = block.field.block as unknown as EvaluatedField;
+  const fieldCode =
+    typeof field.code === "string" ? field.code : "autocomplete-field";
+
+  return {
+    dataId: `autocomplete-data-${fieldCode}`,
+    defaultValue: field.value ?? field.defaultValue,
+  };
 }
 
 /**
@@ -53,7 +79,7 @@ function buildWrapperAttrs(
  * @param value - The attribute value; non-primitive values are ignored
  * @returns An attribute string like `name="value"`, or an empty string
  */
-function optionalAttr(name: string, value: unknown): string {
+function setAttribute(name: string, value: unknown): string {
   if (
     typeof value === "string" ||
     typeof value === "number" ||
@@ -64,31 +90,13 @@ function optionalAttr(name: string, value: unknown): string {
   return "";
 }
 
-/**
- * Renders the AccessibleAutocomplete wrapper component.
- *
- * Outputs:
- * 1. A script tag with type="application/json" containing the autocomplete data
- * 2. A wrapper div with data attributes around the field's HTML
- */
 export const accessibleAutocomplete =
   buildNunjucksComponent<AccessibleAutocomplete>(
     "accessibleAutocomplete",
     (block: EvaluatedBlock<AccessibleAutocomplete>): string => {
-      const rawBlock = block.field.block;
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Forge resolves all expressions before calling render; value and defaultValue exist at runtime
-      const fieldBlock = rawBlock as unknown as FieldBlockDefinition & {
-        defaultValue?: unknown;
-        value?: unknown;
-      };
-      const fieldCode =
-        typeof fieldBlock.code === "string"
-          ? fieldBlock.code
-          : "autocomplete-field";
-      const dataId = `autocomplete-data-${fieldCode}`;
+      const { dataId, defaultValue } = resolveField(block);
       const dataScript = `<script type="application/json" id="${dataId}" data-qa="${dataId}">${JSON.stringify(block.data)}</script>`;
-      const defaultValue = fieldBlock.value ?? fieldBlock.defaultValue;
-      const wrapperAttrs = buildWrapperAttrs(block, dataId, defaultValue);
+      const wrapperAttrs = buildWrapperAttributes(block, dataId, defaultValue);
       return `${dataScript}\n<accessible-autocomplete-wrapper ${wrapperAttrs}>\n${block.field.html}\n</accessible-autocomplete-wrapper>`;
     },
   );

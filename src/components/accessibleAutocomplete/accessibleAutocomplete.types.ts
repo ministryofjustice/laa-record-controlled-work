@@ -111,3 +111,8 @@ export interface AccessibleAutocompleteProps {
    */
   showNoOptionsFound?: ResolvableBoolean;
 }
+
+export type EvaluatedField = FieldBlockDefinition & {
+  defaultValue?: unknown;
+  value?: unknown;
+};
