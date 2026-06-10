@@ -1736,6 +1736,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"accessible-autocomplete@npm:^3.0.1":
+  version: 3.0.1
+  resolution: "accessible-autocomplete@npm:3.0.1"
+  peerDependencies:
+    preact: ^8.0.0
+  peerDependenciesMeta:
+    preact:
+      optional: true
+  checksum: 10c0/a90d76f29940cd7c5cb0795f2062d32f8f4904bae3acfc89eab717c56f2b18ce3fd07a4035ec5e30643119cdfe56be3a4bc260eb80e39eeb4009ea5dc09b163c
+  languageName: node
+  linkType: hard
+
 "acorn-jsx@npm:^5.3.2":
   version: 5.3.2
   resolution: "acorn-jsx@npm:5.3.2"
@@ -4650,6 +4662,7 @@ __metadata:
     "@types/sinon": "npm:^21.0.1"
     "@types/supertest": "npm:^7.2.0"
     "@typescript-eslint/parser": "npm:^8.60.1"
+    accessible-autocomplete: "npm:^3.0.1"
     body-parser: "npm:^2.2.2"
     c8: "npm:^11.0.0"
     chai: "npm:^6.2.2"

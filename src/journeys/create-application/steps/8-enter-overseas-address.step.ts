@@ -16,9 +16,11 @@ import {
   GovUKTextInput,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
+import { AccessibleAutocomplete } from "#/components/accessibleAutocomplete/accessibleAutocomplete.js";
 import { JourneyEffects } from "#/journeys/effects.js";
 import {
   ADDRESS_FIELD,
+  countries,
   UK_EXCLUSIVE_ADDRESS_FIELDS,
 } from "#/journeys/journey.constants.js";
 import { t } from "#/lib/i18nLoader.js";
@@ -37,24 +39,31 @@ export const enterOverseasAddressStep = (
       GovUKHeading({
         text: t("journeys.createApplication.enterOverseasAddress.title"),
       }),
-      GovUKTextInput({
-        classes: "govuk-!-width-two-thirds govuk-label--m",
-        code: ADDRESS_FIELD.country,
-        label: {
-          classes: "govuk-label--m",
-          isPageHeading: false,
-          text: t(
-            "journeys.createApplication.enterOverseasAddress.country.label",
-          ),
-        },
-        validWhen: [
-          validation({
-            condition: Self().match(Condition.IsRequired()),
-            message: t(
-              "journeys.createApplication.enterOverseasAddress.country.validation.required",
+      AccessibleAutocomplete({
+        data: countries,
+        field: GovUKTextInput({
+          classes: "govuk-!-width-two-thirds",
+          code: ADDRESS_FIELD.country,
+          label: {
+            classes: "govuk-label--m",
+            isPageHeading: false,
+            text: t(
+              "journeys.createApplication.enterOverseasAddress.country.label",
             ),
-          }),
-        ],
+          },
+          validWhen: [
+            validation({
+              condition: Self().match(Condition.IsRequired()),
+              message: t(
+                "journeys.createApplication.enterOverseasAddress.country.validation.required",
+              ),
+            }),
+          ],
+        }),
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- .
+        minLength: 0,
+        showAllValues: false,
+        showNoOptionsFound: true,
       }),
       GovUKHeading({
         classes: "govuk-label--m",

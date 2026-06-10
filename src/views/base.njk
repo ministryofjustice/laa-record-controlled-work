@@ -9,7 +9,6 @@
   <meta name="description" content="{{config.app.service.name}}">
   <meta name="keywords" content="GOV.UK, govuk, gov, government, uk, frontend, ui, user interface, jinja, python, flask, port, template, templating, macro, component, design system, html, forms, wtf, wtforms, widget, widgets, demo, example">
   <meta name="author" content="{{config.app.department.name}}">
-  <script type="module" nonce="{{ cspNonce }}" src="/js/{{getAsset('custom','min.js')}}"></script>
 {% endblock %}
 
 {% block bodyStart %}
@@ -37,4 +36,5 @@
 {% block bodyEnd %}
   {# Run JavaScript at end of the <body>, to avoid blocking the initial render. #}
   <script type="module" nonce="{{ cspNonce }}" src="/js/{{getAsset('frontend-packages','min.js')}}"></script>
+  <script type="module" nonce="{{ cspNonce }}" src="/js/{{getAsset('accessible-autocomplete','min.js')}}"></script>
 {% endblock %}

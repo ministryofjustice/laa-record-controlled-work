@@ -12,6 +12,7 @@ import express from "express";
 import session from "express-session";
 
 import authRouter from "#/auth/auth.routes.js";
+import { accessibleAutocomplete } from "#/components/accessibleAutocomplete/accessibleAutocomplete.js";
 import config from "#/config.js";
 import createApplication from "#/journeys/create-application/index.js";
 import { createSession } from "#/lib/session.js";
@@ -84,6 +85,7 @@ const createApp = async (): Promise<express.Application> => {
   forge
     .registerGlobalComponents(govukComponents)
     .registerGlobalComponents(mojComponents)
+    .registerGlobalComponents([accessibleAutocomplete])
     .registerGlobalFunctions(nunjucksFunctions)
     .registerPackage(createApplication);
 
