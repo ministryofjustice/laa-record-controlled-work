@@ -17,8 +17,8 @@ import {
 
 import { JourneyEffects } from "#/journeys/effects.js";
 import {
-  OVERSEAS_ADDRESS_FIELDS,
-  UK_ADDRESS_FIELD,
+  ADDRESS_FIELD,
+  OVERSEAS_EXCLUSIVE_ADDRESS_FIELDS,
 } from "#/journeys/journey.constants.js";
 import { t } from "#/lib/i18nLoader.js";
 
@@ -37,7 +37,7 @@ export const enterAddressManuallyStep = (
         text: t("journeys.createApplication.enterAddressManually.title"),
       }),
       GovUKTextInput({
-        code: UK_ADDRESS_FIELD.addressLine1,
+        code: ADDRESS_FIELD.addressLine1,
         label: {
           isPageHeading: false,
           text: t(
@@ -54,7 +54,7 @@ export const enterAddressManuallyStep = (
         ],
       }),
       GovUKTextInput({
-        code: UK_ADDRESS_FIELD.addressLine2,
+        code: ADDRESS_FIELD.addressLine2,
         label: {
           isPageHeading: false,
           text: t(
@@ -64,7 +64,7 @@ export const enterAddressManuallyStep = (
       }),
       GovUKTextInput({
         classes: "govuk-!-width-two-thirds",
-        code: UK_ADDRESS_FIELD.townOrCity,
+        code: ADDRESS_FIELD.townOrCity,
         label: {
           isPageHeading: false,
           text: t(
@@ -82,7 +82,7 @@ export const enterAddressManuallyStep = (
       }),
       GovUKTextInput({
         classes: "govuk-!-width-two-thirds",
-        code: UK_ADDRESS_FIELD.county,
+        code: ADDRESS_FIELD.county,
         label: {
           isPageHeading: false,
           text: t(
@@ -92,7 +92,7 @@ export const enterAddressManuallyStep = (
       }),
       GovUKTextInput({
         classes: "govuk-input--width-10",
-        code: UK_ADDRESS_FIELD.postcode,
+        code: ADDRESS_FIELD.postcode,
         label: {
           isPageHeading: false,
           text: t(
@@ -119,7 +119,7 @@ export const enterAddressManuallyStep = (
           effects: [
             JourneyEffects.ClearFieldAnswers(
               journeyCode,
-              OVERSEAS_ADDRESS_FIELDS,
+              OVERSEAS_EXCLUSIVE_ADDRESS_FIELDS,
             ),
             JourneyEffects.SaveDraftAnswers(journeyCode),
           ],

@@ -18,8 +18,8 @@ import {
 
 import { JourneyEffects } from "#/journeys/effects.js";
 import {
-  OVERSEAS_ADDRESS_FIELD,
-  UK_ADDRESS_FIELDS,
+  ADDRESS_FIELD,
+  UK_EXCLUSIVE_ADDRESS_FIELDS,
 } from "#/journeys/journey.constants.js";
 import { t } from "#/lib/i18nLoader.js";
 
@@ -39,7 +39,7 @@ export const enterOverseasAddressStep = (
       }),
       GovUKTextInput({
         classes: "govuk-!-width-two-thirds govuk-label--m",
-        code: OVERSEAS_ADDRESS_FIELD.country,
+        code: ADDRESS_FIELD.country,
         label: {
           classes: "govuk-label--m",
           isPageHeading: false,
@@ -63,7 +63,7 @@ export const enterOverseasAddressStep = (
         ),
       }),
       GovUKTextInput({
-        code: OVERSEAS_ADDRESS_FIELD.addressLine1,
+        code: ADDRESS_FIELD.addressLine1,
         label: {
           isPageHeading: false,
           text: t(
@@ -80,7 +80,7 @@ export const enterOverseasAddressStep = (
         ],
       }),
       GovUKTextInput({
-        code: OVERSEAS_ADDRESS_FIELD.addressLine2,
+        code: ADDRESS_FIELD.addressLine2,
         label: {
           isPageHeading: false,
           text: t(
@@ -89,7 +89,7 @@ export const enterOverseasAddressStep = (
         },
       }),
       GovUKTextInput({
-        code: OVERSEAS_ADDRESS_FIELD.addressLine3,
+        code: ADDRESS_FIELD.addressLine3,
         label: {
           isPageHeading: false,
           text: t(
@@ -98,7 +98,7 @@ export const enterOverseasAddressStep = (
         },
       }),
       GovUKTextInput({
-        code: OVERSEAS_ADDRESS_FIELD.addressLine4,
+        code: ADDRESS_FIELD.addressLine4,
         label: {
           isPageHeading: false,
           text: t(
@@ -112,7 +112,10 @@ export const enterOverseasAddressStep = (
       submit({
         onValid: {
           effects: [
-            JourneyEffects.ClearFieldAnswers(journeyCode, UK_ADDRESS_FIELDS),
+            JourneyEffects.ClearFieldAnswers(
+              journeyCode,
+              UK_EXCLUSIVE_ADDRESS_FIELDS,
+            ),
             JourneyEffects.SaveDraftAnswers(journeyCode),
           ],
           next: [
