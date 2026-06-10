@@ -36,7 +36,7 @@ export const ineligibleStep = (journeyCode: string): ReturnType<typeof step> =>
     onSubmission: [
       submit({
         onValid: {
-          effects: [JourneyEffects.ClearDraftAnswers(journeyCode)],
+          effects: [JourneyEffects.ClearAllDraftAnswers(journeyCode)],
           next: [redirect({ goto: "/" })],
         },
         validate: true,

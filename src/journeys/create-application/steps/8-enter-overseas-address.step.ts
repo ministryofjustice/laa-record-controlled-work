@@ -17,6 +17,10 @@ import {
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
 import { JourneyEffects } from "#/journeys/effects.js";
+import {
+  OVERSEAS_ADDRESS_FIELD,
+  UK_ADDRESS_FIELDS,
+} from "#/journeys/journey.constants.js";
 import { t } from "#/lib/i18nLoader.js";
 
 export const enterOverseasAddressStep = (
@@ -35,7 +39,7 @@ export const enterOverseasAddressStep = (
       }),
       GovUKTextInput({
         classes: "govuk-!-width-two-thirds govuk-label--m",
-        code: "country",
+        code: OVERSEAS_ADDRESS_FIELD.country,
         label: {
           classes: "govuk-label--m",
           isPageHeading: false,
@@ -59,7 +63,7 @@ export const enterOverseasAddressStep = (
         ),
       }),
       GovUKTextInput({
-        code: "addressLine1",
+        code: OVERSEAS_ADDRESS_FIELD.addressLine1,
         label: {
           isPageHeading: false,
           text: t(
@@ -76,7 +80,7 @@ export const enterOverseasAddressStep = (
         ],
       }),
       GovUKTextInput({
-        code: "addressLine2",
+        code: OVERSEAS_ADDRESS_FIELD.addressLine2,
         label: {
           isPageHeading: false,
           text: t(
@@ -85,7 +89,7 @@ export const enterOverseasAddressStep = (
         },
       }),
       GovUKTextInput({
-        code: "addressLine3",
+        code: OVERSEAS_ADDRESS_FIELD.addressLine3,
         label: {
           isPageHeading: false,
           text: t(
@@ -94,7 +98,7 @@ export const enterOverseasAddressStep = (
         },
       }),
       GovUKTextInput({
-        code: "addressLine4",
+        code: OVERSEAS_ADDRESS_FIELD.addressLine4,
         label: {
           isPageHeading: false,
           text: t(
@@ -107,7 +111,10 @@ export const enterOverseasAddressStep = (
     onSubmission: [
       submit({
         onValid: {
-          effects: [JourneyEffects.SaveDraftAnswers(journeyCode)],
+          effects: [
+            JourneyEffects.ClearFieldAnswers(journeyCode, UK_ADDRESS_FIELDS),
+            JourneyEffects.SaveDraftAnswers(journeyCode),
+          ],
           next: [
             redirect({
               goto: "check-answers",

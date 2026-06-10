@@ -10,7 +10,7 @@ const clearDraftStep = step({
   blocks: [],
   onAccess: [
     access({
-      effects: [JourneyEffects.ClearDraftAnswers("testJourney")],
+      effects: [JourneyEffects.ClearAllDraftAnswers("testJourney")],
     }),
   ],
   path: "/clear-draft",
@@ -127,7 +127,7 @@ describe("LoadDraftAnswers", () => {
   });
 });
 
-describe("ClearDraftAnswers", () => {
+describe("ClearAllDraftAnswers", () => {
   it("removes the journey's draft from the session", async () => {
     session.journeyDrafts = {
       testJourney: { ecf: "yes" },

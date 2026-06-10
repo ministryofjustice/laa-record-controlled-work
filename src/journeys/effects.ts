@@ -10,7 +10,12 @@ const isJourneySession = (value: unknown): value is JourneySession =>
 
 export interface JourneyEffectShape {
   /** Clears draft answers for this journey (used after committing drafts to the store). */
-  ClearDraftAnswers: (journeyCode: string) => EffectFunctionExpr;
+  ClearAllDraftAnswers: (journeyCode: string) => EffectFunctionExpr;
+  /** Clears the given fields from the session draft and the form context. */
+  ClearFieldAnswers: (
+    journeyCode: string,
+    fields: readonly string[],
+  ) => EffectFunctionExpr;
   /** Copies previously stored draft answers for this journey into the form context on access. */
   LoadDraftAnswers: (journeyCode: string) => EffectFunctionExpr;
   /** Persists the current answers into the session as a draft, kept separately from committed answers. */
@@ -21,7 +26,7 @@ export const {
   effects: JourneyEffects,
   implementations: JourneyEffectsImplementations,
 } = defineEffectFunctions<JourneyEffectShape>({
-  ClearDraftAnswers: () => {
+  ClearAllDraftAnswers: () => {
     return (context, journeyCode: string) => {
       const session = context.getSession();
 
@@ -30,9 +35,10 @@ export const {
       }
 
       if (session.journeyDrafts) {
-        const { [journeyCode]: _removed, ...remainingDrafts } =
+        const { [journeyCode]: _selectedJourneyDraft, ...otherJourneyDrafts } =
           session.journeyDrafts;
-        session.journeyDrafts = remainingDrafts;
+
+        session.journeyDrafts = otherJourneyDrafts;
       }
 
       for (const key of Object.keys(context.getAllAnswers())) {
@@ -40,6 +46,35 @@ export const {
       }
     };
   },
+
+  ClearFieldAnswers:
+    () => (context, journeyCode: string, fields: readonly string[]) => {
+      const session = context.getSession();
+
+      if (!isJourneySession(session)) {
+        return;
+      }
+
+      if (session.journeyDrafts?.[journeyCode]) {
+        const { [journeyCode]: selectedJourneyDraft, ...otherJourneyDrafts } =
+          session.journeyDrafts;
+
+        const selectedJourneyWithRemovedFields = Object.fromEntries(
+          Object.entries(selectedJourneyDraft).filter(
+            ([key]) => !fields.includes(key),
+          ),
+        );
+
+        session.journeyDrafts = {
+          ...otherJourneyDrafts,
+          [journeyCode]: selectedJourneyWithRemovedFields,
+        };
+      }
+
+      for (const field of fields) {
+        context.clearAnswer(field);
+      }
+    },
 
   LoadDraftAnswers: () => (context, journeyCode: string) => {
     const session = context.getSession();
