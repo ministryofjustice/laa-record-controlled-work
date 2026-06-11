@@ -217,5 +217,5 @@ test("create application flow", async ({ page }) => {
   await submitButton.click();
 
   // Verify redirection to the task list page
-  await expect(page).toHaveURL("/task-list");
+  await expect(page).toHaveURL("/create-application/task-list");
 });

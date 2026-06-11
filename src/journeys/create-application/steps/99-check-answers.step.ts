@@ -259,7 +259,7 @@ export const checkAnswersStep = (
         onAlways: {
           next: [
             redirect({
-              goto: "task-list",
+              goto: "create-application/task-list",
             }),
           ],
         },
