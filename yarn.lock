@@ -519,15 +519,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ministryofjustice/hmpps-forge@npm:^0.1.0-alpha.17":
-  version: 0.1.0-alpha.17
-  resolution: "@ministryofjustice/hmpps-forge@npm:0.1.0-alpha.17"
+"@ministryofjustice/hmpps-forge@npm:^0.1.0-alpha.21":
+  version: 0.1.0-alpha.21
+  resolution: "@ministryofjustice/hmpps-forge@npm:0.1.0-alpha.21"
   dependencies:
     express: "npm:^4.21.0 || ^5.0.0"
     http-errors: "npm:^2.0.0"
     nunjucks: "npm:^3.2.4"
     zod: "npm:^4.1.5"
-  checksum: 10c0/c7c7ad82f42c2eefe3fe5c5c34d075dd8250b8079f7e31e2cf29da192248e1a80b634a901b08bd05d109e7c4e272549045774f4fd03404c84bda2558c9b68d42
+  checksum: 10c0/94f1dee7eb245beab4d82be75ad7e54780b1d029973e3b1740d965a65714b80230efdde45f283814c3a025b0d06e723a26c1c131f8f121fa0aed1d30c5fe3cb3
   languageName: node
   linkType: hard
 
@@ -3893,10 +3893,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"govuk-frontend@npm:^6.1.0":
-  version: 6.1.0
-  resolution: "govuk-frontend@npm:6.1.0"
-  checksum: 10c0/543a8c6b1d709ec938e396fa3be923171637ab9b724f03618fa1bdc52023b6aa27fb42932b9e81df3fc134b0473442d42478dbf3e4b18e2bae00dbfe95363e96
+"govuk-frontend@npm:^6.2.0":
+  version: 6.2.0
+  resolution: "govuk-frontend@npm:6.2.0"
+  checksum: 10c0/ab4a6b157b2785d14479bae4c78916dfe60ac9e00da7202b6c46b656078920a0b99627ec03e24482ab6a09962e200c477323e7229d75207c6ce24a3ac35dd30f
   languageName: node
   linkType: hard
 
@@ -4646,7 +4646,7 @@ __metadata:
     "@axe-core/playwright": "npm:^4.11.3"
     "@azure/msal-node": "npm:^5.2.2"
     "@ministryofjustice/frontend": "npm:9.0.0"
-    "@ministryofjustice/hmpps-forge": "npm:^0.1.0-alpha.17"
+    "@ministryofjustice/hmpps-forge": "npm:^0.1.0-alpha.21"
     "@playwright/test": "npm:^1.60.0"
     "@types/chai": "npm:^5.2.3"
     "@types/chai-as-promised": "npm:^8.0.2"
@@ -4688,7 +4688,7 @@ __metadata:
     express-rate-limit: "npm:^8.5.2"
     express-session: "npm:^1.19.0"
     globals: "npm:^17.6.0"
-    govuk-frontend: "npm:^6.1.0"
+    govuk-frontend: "npm:^6.2.0"
     helmet: "npm:^8.2.0"
     husky: "npm:^9.1.7"
     i18next: "npm:^26.3.0"
@@ -4696,7 +4696,7 @@ __metadata:
     lint-staged: "npm:^17.0.7"
     mocha: "npm:^11.7.6"
     moment: "npm:^2.30.1"
-    morgan: "npm:~1.10.1"
+    morgan: "npm:~1.11.0"
     msw: "npm:^2.14.6"
     nodemon: "npm:^3.1.14"
     nunjucks: "npm:^3.2.4"
@@ -5041,16 +5041,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"morgan@npm:~1.10.1":
-  version: 1.10.1
-  resolution: "morgan@npm:1.10.1"
+"morgan@npm:~1.11.0":
+  version: 1.11.0
+  resolution: "morgan@npm:1.11.0"
   dependencies:
     basic-auth: "npm:~2.0.1"
     debug: "npm:2.6.9"
     depd: "npm:~2.0.0"
-    on-finished: "npm:~2.3.0"
+    on-finished: "npm:~2.4.1"
     on-headers: "npm:~1.1.0"
-  checksum: 10c0/2ecd68504d29151b516a6233839e4f27ae0312acc4dbcb1fe84ff9b5db0eb9b25f31258a931dcf689184b4858839572095fcc62eef3cbd7339287d59f1424346
+  checksum: 10c0/1d8c67bdeb34dc4112f5b6cbff0d5b4ef14bfdcb9f67a7ae67fc7a77282c18dd493a11dc8dff1ff2e285c1846947cfdc3698fdceb1fa7bea2a09fe6cb754455d
   languageName: node
   linkType: hard
 
@@ -5322,21 +5322,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"on-finished@npm:^2.4.1":
+"on-finished@npm:^2.4.1, on-finished@npm:~2.4.1":
   version: 2.4.1
   resolution: "on-finished@npm:2.4.1"
   dependencies:
     ee-first: "npm:1.1.1"
   checksum: 10c0/46fb11b9063782f2d9968863d9cbba33d77aa13c17f895f56129c274318b86500b22af3a160fe9995aa41317efcd22941b6eba747f718ced08d9a73afdb087b4
-  languageName: node
-  linkType: hard
-
-"on-finished@npm:~2.3.0":
-  version: 2.3.0
-  resolution: "on-finished@npm:2.3.0"
-  dependencies:
-    ee-first: "npm:1.1.1"
-  checksum: 10c0/c904f9e518b11941eb60279a3cbfaf1289bd0001f600a950255b1dede9fe3df8cd74f38483550b3bb9485165166acb5db500c3b4c4337aec2815c88c96fcc2ea
   languageName: node
   linkType: hard
 
