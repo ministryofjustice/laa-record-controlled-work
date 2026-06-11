@@ -10,6 +10,7 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/testing";
 import { govukComponents } from "@ministryofjustice/hmpps-forge/govuk-components";
 
+import { accessibleAutocomplete } from "#/components/accessibleAutocomplete/accessibleAutocomplete.component.js";
 import {
   JourneyEffects,
   JourneyEffectsImplementations,
@@ -44,6 +45,7 @@ export function createForgeTestClient(
 
   return new ForgeTestHarness()
     .registerGlobalComponents(govukComponents)
+    .registerGlobalComponents([accessibleAutocomplete])
     .registerPackage(testPackage)
     .createClient();
 }
