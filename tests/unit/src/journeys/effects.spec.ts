@@ -4,7 +4,7 @@ import { createForgeTestClient } from "../../../integration/utils/helpers.js";
 import { ecfStep } from "#/journeys/create-application/steps/1-ecf.step.js";
 import { TestRenderResult } from "@ministryofjustice/hmpps-forge/core/testing";
 import { JourneyEffects } from "#/journeys/effects.js";
-import { access, step } from "@ministryofjustice/hmpps-forge/core/authoring";
+import { access, step, StepDefinition } from "@ministryofjustice/hmpps-forge/core/authoring";
 
 const clearDraftStep = step({
   blocks: [],
@@ -18,7 +18,28 @@ const clearDraftStep = step({
   title: "Clear Draft",
 });
 
-const client = createForgeTestClient(ecfStep("testJourney"), clearDraftStep);
+const clearAnswerStep = step({
+  blocks: [],
+  onAccess: [
+    access({
+      effects: [
+        JourneyEffects.ClearFieldAnswers("testJourney", [
+          "adressLine2",
+          "adressLine3",
+        ]),
+      ],
+    }),
+  ],
+  path: "/clear-answers",
+  reachability: { entryWhen: true },
+  title: "Clear Answers",
+});
+
+const client = createForgeTestClient(
+  ecfStep("testJourney"),
+  clearDraftStep,
+  clearAnswerStep,
+);
 let session: Record<string, unknown> = {};
 
 beforeEach(() => {
@@ -148,9 +169,9 @@ describe("ClearAllDraftAnswers", () => {
     await client.get("/create-application/clear-draft", { session });
 
     const drafts = session.journeyDrafts as Record<string, unknown>;
-    expect((drafts.anotherJourney as Record<string, unknown>).someAnswer).to.equal(
-      "yes",
-    );
+    expect(
+      (drafts.anotherJourney as Record<string, unknown>).someAnswer,
+    ).to.equal("yes");
   });
 
   it("does nothing when no draft exists for the journey", async () => {
@@ -160,5 +181,29 @@ describe("ClearAllDraftAnswers", () => {
 
     const drafts = session.journeyDrafts as Record<string, unknown>;
     expect(drafts.anotherJourney).to.exist;
+  });
+});
+
+describe("ClearFieldAnswers", () => {
+  it("removes specificy field answers from the journey's draft and retains other fields", async () => {
+    session.journeyDrafts = {
+      testJourney: {
+        adressLine1: "adressLine1",
+        adressLine2: "adressLine2",
+        adressLine3: "adressLine3",
+      },
+    };
+
+    await client.get("/create-application/clear-answers", { session });
+    const drafts = session.journeyDrafts as Record<string, unknown>;
+    expect(
+      (drafts.testJourney as Record<string, unknown>).adressLine1,
+    ).to.equal("adressLine1");
+    expect(
+      (drafts.testJourney as Record<string, unknown>).adressLine2,
+    ).to.be.undefined;
+    expect(
+      (drafts.testJourney as Record<string, unknown>).adressLine3,
+    ).to.be.undefined;
   });
 });
