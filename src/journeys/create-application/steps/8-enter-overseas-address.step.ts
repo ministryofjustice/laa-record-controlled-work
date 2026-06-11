@@ -62,6 +62,8 @@ export const enterOverseasAddressStep = (
             }),
           ],
         }),
+        inputClasses: "govuk-!-width-two-thirds",
+        menuClasses: "govuk-!-width-two-thirds",
         minLength: MINIMUM_AUTOCOMPLETE_CHARACTERS,
         showAllValues: false,
         showNoOptionsFound: true,
