@@ -206,7 +206,7 @@ test("create application flow", async ({ page }) => {
   await expect(rows.nth(4).locator(".govuk-summary-list__value")).toHaveText("15 June 1990");
   await expect(rows.nth(5).locator(".govuk-summary-list__key")).toHaveText("Address");
   await expect(rows.nth(5).locator(".govuk-summary-list__value")).toHaveText(
-    "10 Some Street\nSomeCity\nAB1 2CD",
+    "\n    10 Some Street,\n    \n    SomeCity,\n    \n    AB1 2CD\n  ",
   );
 
   // Check that the submit button is displayed

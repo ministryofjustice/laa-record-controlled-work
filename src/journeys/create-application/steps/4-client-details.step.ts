@@ -57,7 +57,9 @@ export const clientDetailsStep = (
           legend: {
             classes: GovUKUtilityClasses.Fieldset.MediumLabel,
             isPageHeading: false,
-            text: t("journeys.createApplication.clientDetails.dateOfBirth.label"),
+            text: t(
+              "journeys.createApplication.clientDetails.dateOfBirth.label",
+            ),
           },
         },
         hint: {
