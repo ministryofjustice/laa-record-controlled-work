@@ -180,4 +180,36 @@ test("create application flow", async ({ page }) => {
 
   // Verify redirection to the next page
   await expect(page).toHaveURL("/create-application/check-answers");
+
+  // Navigate back to the enter-address-manually page
+  await page.goto("/create-application/enter-address-manually");
+
+  // Enter Overseas Address page
+
+  // click the non-UK address link
+  await page.getByText("The address is not in the UK").click();
+
+  // Verify redirection to the overseas address page
+  await expect(page).toHaveURL("/create-application/enter-overseas-address");
+
+  // Check for the title
+  await expect(
+    page.getByRole("heading", {
+      name: /Enter your client's overseas home address/,
+      level: 1,
+    }),
+  ).toBeVisible();
+
+  // Fill in the full address and submit
+  
+  // expect options to be visible with autocomplete
+  await page.getByLabel("Country").fill("Ire");
+  const irelandOption = page.getByRole("option", { name: "Ireland" });
+  expect(irelandOption).toBeVisible();
+  expect(page.getByRole("option", { name: "Bonaire" })).toBeVisible();
+
+  await irelandOption.click();
+
+  await page.getByLabel("Address line 1").fill("10 Some Street");
+  await page.getByRole("button", { name: "Continue" }).click();
 });
