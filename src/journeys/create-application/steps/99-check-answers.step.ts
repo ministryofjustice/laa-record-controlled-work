@@ -48,26 +48,6 @@ const dateOfBirthDisplay = Answer("dateOfBirth").pipe(
   Transformer.Date.Format("D MMMM YYYY"),
 );
 
-const hasNiNumberLabel = match(Answer("hasNINumber"))
-  .branch(
-    Condition.Equals("yes"),
-    t("common.yes"),
-  )
-  .branch(
-    Condition.Equals("no"),
-    t("common.no"),
-  );
-
-const homeAddressLabel = match(Answer("haveAHomeAddress"))
-  .branch(
-    Condition.Equals("yes"),
-    t("common.yes"),
-  )
-  .branch(
-    Condition.Equals("no"),
-    t("journeys.createApplication.haveAHomeAddress.no"),
-  );
-
 const addressDisplay = NunjucksGenerators.String({
   template: `
     {{ line1 }},<br />
@@ -85,7 +65,7 @@ const addressDisplay = NunjucksGenerators.String({
   },
 })
 
-export const checkAnswersStep = (): ReturnType<typeof step> =>
+export const checkAnswersStep = (journeyCode: string): ReturnType<typeof step> =>
   step({
     code: "check-answers",
     path: "/check-answers",
@@ -97,20 +77,20 @@ export const checkAnswersStep = (): ReturnType<typeof step> =>
       GovUKSummaryList({
         rows: [
           {
-            key: { text: t("journeys.createApplication.ecf.title") },
+            key: { text: t("journeys.createApplication.checkAnswers.answerLabels.ecf") },
             value: { text: ecfLabel },
             actions: {
               items: [
                 {
                   href: "ecf?returnTo=check-answers",
                   text: t("journeys.createApplication.checkAnswers.changeLink.change"),
-                  visuallyHiddenText: t("journeys.createApplication.ecf.title"),
+                  visuallyHiddenText: t("journeys.createApplication.checkAnswers.answerLabels.ecf"),
                 },
               ],
             },
           },
           {
-            key: { text: t("journeys.createApplication.legalAidBefore.title") },
+            key: { text: t("journeys.createApplication.checkAnswers.answerLabels.legalAidBefore") },
             value: { text: legalAidBeforeLabel },
             actions: {
               items: [
@@ -118,7 +98,7 @@ export const checkAnswersStep = (): ReturnType<typeof step> =>
                   href: "legal-aid-before?returnTo=check-answers",
                   text: t("journeys.createApplication.checkAnswers.changeLink.change"),
                   visuallyHiddenText: t(
-                    "journeys.createApplication.legalAidBefore.title",
+                    "journeys.createApplication.checkAnswers.answerLabels.legalAidBefore",
                   ),
                 },
               ],
@@ -126,7 +106,7 @@ export const checkAnswersStep = (): ReturnType<typeof step> =>
           },
           {
             key: {
-              text: t("journeys.createApplication.legalAidLast6Months.title"),
+              text: t("journeys.createApplication.checkAnswers.answerLabels.legalAidLast6Months"),
             },
             value: { text: legalAidLast6MonthsLabel },
             actions: {
@@ -135,7 +115,7 @@ export const checkAnswersStep = (): ReturnType<typeof step> =>
                   href: "legal-aid-last-6-months?returnTo=check-answers",
                   text: t("journeys.createApplication.checkAnswers.changeLink.change"),
                   visuallyHiddenText: t(
-                    "journeys.createApplication.legalAidLast6Months.title",
+                    "journeys.createApplication.checkAnswers.answerLabels.legalAidLast6Months",
                   ),
                 },
               ],
@@ -147,7 +127,7 @@ export const checkAnswersStep = (): ReturnType<typeof step> =>
           {
             key: {
               text: t(
-                "journeys.createApplication.legalAidLast6Months.reasonForYes.hint",
+                "journeys.createApplication.checkAnswers.answerLabels.legalAidLast6MonthsReasonForYes",
               ),
             },
             value: { text: Answer("reasonForYes") },
@@ -157,7 +137,7 @@ export const checkAnswersStep = (): ReturnType<typeof step> =>
                   href: "legal-aid-last-6-months?returnTo=check-answers",
                   text: t("journeys.createApplication.checkAnswers.changeLink.change"),
                   visuallyHiddenText: t(
-                    "journeys.createApplication.legalAidLast6Months.reasonForYes.hint",
+                    "journeys.createApplication.checkAnswers.answerLabels.legalAidLast6MonthsReasonForYes",
                   ),
                 },
               ],
@@ -169,7 +149,7 @@ export const checkAnswersStep = (): ReturnType<typeof step> =>
           {
             key: {
               text: t(
-                "journeys.createApplication.clientDetails.fullName.label",
+                "journeys.createApplication.checkAnswers.answerLabels.fullName",
               ),
             },
             value: { text: Answer("fullName") },
@@ -179,7 +159,7 @@ export const checkAnswersStep = (): ReturnType<typeof step> =>
                   href: "client-details?returnTo=check-answers",
                   text: t("journeys.createApplication.checkAnswers.changeLink.change"),
                   visuallyHiddenText: t(
-                    "journeys.createApplication.clientDetails.fullName.label",
+                    "journeys.createApplication.checkAnswers.answerLabels.fullName",
                   ),
                 },
               ],
@@ -188,7 +168,7 @@ export const checkAnswersStep = (): ReturnType<typeof step> =>
           {
             key: {
               text: t(
-                "journeys.createApplication.clientDetails.dateOfBirth.label",
+                "journeys.createApplication.checkAnswers.answerLabels.dateOfBirth",
               ),
             },
             value: { text: dateOfBirthDisplay },
@@ -198,29 +178,14 @@ export const checkAnswersStep = (): ReturnType<typeof step> =>
                   href: "client-details?returnTo=check-answers",
                   text: t("journeys.createApplication.checkAnswers.changeLink.change"),
                   visuallyHiddenText: t(
-                    "journeys.createApplication.clientDetails.dateOfBirth.label",
+                    "journeys.createApplication.checkAnswers.answerLabels.dateOfBirth",
                   ),
                 },
               ],
             },
           },
           {
-            key: { text: t("journeys.createApplication.niNumber.title") },
-            value: { text: hasNiNumberLabel },
-            actions: {
-              items: [
-                {
-                  href: "ni-number?returnTo=check-answers",
-                  text: t("journeys.createApplication.checkAnswers.changeLink.change"),
-                  visuallyHiddenText: t(
-                    "journeys.createApplication.niNumber.title",
-                  ),
-                },
-              ],
-            },
-          },
-          {
-            key: { text: t("journeys.createApplication.niNumber.label") },
+            key: { text: t("journeys.createApplication.checkAnswers.answerLabels.niNumber") },
             value: { text: Answer("niNumber") },
             actions: {
               items: [
@@ -228,7 +193,7 @@ export const checkAnswersStep = (): ReturnType<typeof step> =>
                   href: "ni-number?returnTo=check-answers",
                   text: t("journeys.createApplication.checkAnswers.changeLink.change"),
                   visuallyHiddenText: t(
-                    "journeys.createApplication.niNumber.label",
+                    "journeys.createApplication.checkAnswers.answerLabels.niNumber",
                   ),
                 },
               ],
@@ -237,24 +202,7 @@ export const checkAnswersStep = (): ReturnType<typeof step> =>
           },
           {
             key: {
-              text: t("journeys.createApplication.haveAHomeAddress.title"),
-            },
-            value: { text: homeAddressLabel },
-            actions: {
-              items: [
-                {
-                  href: "have-a-home-address?returnTo=check-answers",
-                  text: t("journeys.createApplication.checkAnswers.changeLink.change"),
-                  visuallyHiddenText: t(
-                    "journeys.createApplication.haveAHomeAddress.title",
-                  ),
-                },
-              ],
-            },
-          },
-          {
-            key: {
-              text: t("journeys.createApplication.enterAddressManually.title"),
+              text: t("journeys.createApplication.checkAnswers.answerLabels.address"),
             },
             value: { html: addressDisplay },
             actions: {
@@ -263,7 +211,7 @@ export const checkAnswersStep = (): ReturnType<typeof step> =>
                   href: "enter-address-manually?returnTo=check-answers",
                   text: t("journeys.createApplication.checkAnswers.changeLink.change"),
                   visuallyHiddenText: t(
-                    "journeys.createApplication.enterAddressManually.title",
+                    "journeys.createApplication.checkAnswers.answerLabels.address",
                   ),
                 },
               ],
@@ -282,7 +230,7 @@ export const checkAnswersStep = (): ReturnType<typeof step> =>
         onAlways: {
           next: [
             redirect({
-              goto: "confirmation",
+              goto: "task-list",
             }),
           ],
         },
