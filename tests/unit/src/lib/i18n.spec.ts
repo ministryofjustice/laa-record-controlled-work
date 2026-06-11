@@ -7,7 +7,7 @@ import {
   initializeI18nextSync,
   nunjucksT,
   t,
-} from "#/lib/i18nLoader.js";
+} from "#/lib/i18n.js";
 import { logger } from "#/logger.js";
 import { expect } from "chai";
 import fs from "node:fs";
