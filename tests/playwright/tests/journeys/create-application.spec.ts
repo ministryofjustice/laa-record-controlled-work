@@ -209,6 +209,20 @@ test("create application flow", async ({ page }) => {
     "\n    10 Some Street,\n    \n    SomeCity,\n    \n    AB1 2CD\n  ",
   );
 
+  const changeAddressLink = rows.nth(5).locator(".govuk-summary-list__actions a");
+  await expect(changeAddressLink).toHaveAttribute(
+    "href",
+    "enter-address-manually?returnTo=check-answers",
+  );
+  changeAddressLink.click();
+  
+  // Verify redirection back to the enter address manually page
+  await expect(page).toHaveURL("/create-application/enter-address-manually?returnTo=check-answers");
+  // Navigate back to the check answers page
+  const continueButton = page.getByRole("button", { name: "Continue" });
+  await continueButton.click();
+  await expect(page).toHaveURL("/create-application/check-answers");
+
   // Check that the submit button is displayed
   const submitButton = page.getByRole("button", { name: "Save and continue" });
   await expect(submitButton).toBeVisible();
