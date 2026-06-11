@@ -11,7 +11,7 @@ import {
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
 import { JourneyEffects } from "#/journeys/effects.js";
-import { H1 } from "#/lib/constants/header.levels.js";
+import { H1 } from "#/lib/constants/headings.js";
 
 export const ineligibleStep = (journeyCode: string): ReturnType<typeof step> =>
   step({
