@@ -121,7 +121,8 @@
           "label": "Country",
           "validation": {
             "required": "Enter country"
-          }
+          },
+          "clearButton": "Clear"
         },
         "address": {
           "title": "Address",
