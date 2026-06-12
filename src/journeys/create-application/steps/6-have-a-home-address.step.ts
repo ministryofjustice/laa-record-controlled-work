@@ -87,6 +87,8 @@ export const haveAHomeAddressStep = (
       }),
     ],
     path: "/have-a-home-address",
-    reachability: { entryWhen:Query("returnTo").match(Condition.Equals("check-answers")) },
+    reachability: {
+      entryWhen: Query("returnTo").match(Condition.Equals("check-answers")),
+    },
     title: t("journeys.createApplication.haveAHomeAddress.title"),
   });
