@@ -89,5 +89,6 @@ export const legalAidBeforeStep = (
       }),
     ],
     path: "/legal-aid-before",
+    reachability: { entryWhen:Query("returnTo").match(Condition.Equals("check-answers")) },
     title: t("journeys.createApplication.legalAidBefore.title"),
   });

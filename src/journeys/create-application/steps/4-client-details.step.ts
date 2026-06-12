@@ -119,5 +119,6 @@ export const clientDetailsStep = (
       }),
     ],
     path: "/client-details",
+    reachability: { entryWhen:Query("returnTo").match(Condition.Equals("check-answers")) },
     title: t("journeys.createApplication.clientDetails.title"),
   });

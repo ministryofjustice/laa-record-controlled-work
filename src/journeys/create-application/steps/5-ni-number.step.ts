@@ -100,5 +100,6 @@ export const niNumberStep = (journeyCode: string): ReturnType<typeof step> =>
       }),
     ],
     path: "/ni-number",
+    reachability: { entryWhen:Query("returnTo").match(Condition.Equals("check-answers")) },
     title: t("journeys.createApplication.niNumber.title"),
   });
