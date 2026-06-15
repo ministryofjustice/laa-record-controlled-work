@@ -23,10 +23,8 @@ export const browserConfigs = (): BuildOptions[] => [
   },
   {
     bundle: true,
-    entryNames: "accessible-autocomplete.[hash].min",
-    entryPoints: [
-      "src/components/accessibleAutocomplete/accessibleAutocomplete.element.ts",
-    ],
+    entryNames: "forge-components.[hash].min",
+    entryPoints: ["src/browser/forgeComponentsEntry.ts"],
     format: "esm",
     minify: process.env.NODE_ENV === "production",
     outdir: "public/js",
@@ -34,7 +32,7 @@ export const browserConfigs = (): BuildOptions[] => [
     plugins: [
       cleanPlugin(
         "public/js",
-        /^accessible-autocomplete\.[a-zA-Z0-9]+\.min\.js(\.map)?$/,
+        /^forge-components\.[a-zA-Z0-9]+\.min\.js(\.map)?$/,
       ),
     ],
     sourcemap: process.env.NODE_ENV !== "production",

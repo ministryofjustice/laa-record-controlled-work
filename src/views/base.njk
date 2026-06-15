@@ -36,5 +36,4 @@
 {% block bodyEnd %}
   {# Run JavaScript at end of the <body>, to avoid blocking the initial render. #}
   <script type="module" nonce="{{ cspNonce }}" src="/js/{{getAsset('frontend-packages','min.js')}}"></script>
-  <script type="module" nonce="{{ cspNonce }}" src="/js/{{getAsset('accessible-autocomplete','min.js')}}"></script>
 {% endblock %}
