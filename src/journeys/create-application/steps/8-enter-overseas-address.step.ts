@@ -42,9 +42,11 @@ export const enterOverseasAddressStep = (
         text: t("journeys.createApplication.enterOverseasAddress.title"),
       }),
       Autocomplete({
+        clearLinkText: t(
+          "journeys.createApplication.enterOverseasAddress.country.clearButton",
+        ),
         data: countries,
         field: GovUKTextInput({
-          classes: "govuk-!-width-two-thirds",
           code: ADDRESS_FIELD.country,
           label: {
             classes: "govuk-label--m",
@@ -62,14 +64,10 @@ export const enterOverseasAddressStep = (
             }),
           ],
         }),
-        inputClasses: "govuk-!-width-two-thirds",
         menuClasses: "govuk-!-width-two-thirds",
         minLength: MINIMUM_AUTOCOMPLETE_CHARACTERS,
         showAllValues: false,
         showNoOptionsFound: true,
-      }),
-      HtmlBlock({
-        content: `<p class="govuk-body"><a id="${ADDRESS_FIELD.country}-clear" class="govuk-link" href="#">${t("journeys.createApplication.enterOverseasAddress.country.clearButton")}</a></p>`,
       }),
       GovUKHeading({
         classes: "govuk-label--m",

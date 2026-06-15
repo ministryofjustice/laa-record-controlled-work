@@ -23,3 +23,30 @@ autocomplete-wrapper {
   margin-bottom: 0;
 }
 
+// Flex wrapper rendered when clearLinkText is set — aligns the clear link
+// with the bottom of the input without affecting the input's width
+.autocomplete-with-clear {
+  display: grid;
+  grid-template-rows: min-content min-content;
+  grid-template-columns: 66.6% 33.3%;
+  gap: govuk-spacing(3);
+  margin-bottom: govuk-spacing(6);
+
+  // Override the wrapper's own margin so the container controls spacing
+  autocomplete-wrapper,
+  .autocomplete-wrapper {
+    flex: 1 1 auto;
+    margin-bottom: 0;
+  }
+
+  .autocomplete__clear-button {
+    display: inline-block;
+    height: min-content;
+    width: min-content;
+    min-height: 2.5rem;
+    align-self: end;
+    background: transparent;
+    border: 0;
+    margin-bottom: 0;
+  }
+}

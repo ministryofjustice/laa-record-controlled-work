@@ -57,6 +57,7 @@ function buildWrapperAttributes(
 function resolveField(block: EvaluatedBlock<Autocomplete>): {
   dataId: string;
   defaultValue: unknown;
+  fieldCode: string;
 } {
   /* eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- 
   Forge resolves all block expressions before calling render, so value and
@@ -69,6 +70,7 @@ function resolveField(block: EvaluatedBlock<Autocomplete>): {
   return {
     dataId: `autocomplete-data-${fieldCode}`,
     defaultValue: field.value ?? field.defaultValue,
+    fieldCode,
   };
 }
 
@@ -93,10 +95,18 @@ function setAttribute(name: string, value: unknown): string {
 export const autocomplete = buildNunjucksComponent<Autocomplete>(
   "autocomplete",
   (block: EvaluatedBlock<Autocomplete>): string => {
-    const { dataId, defaultValue } = resolveField(block);
+    const { dataId, defaultValue, fieldCode } = resolveField(block);
     const dataScript = `<script type="application/json" id="${dataId}" data-qa="${dataId}">${JSON.stringify(block.data)}</script>`;
     const wrapperAttrs = buildWrapperAttributes(block, dataId, defaultValue);
-    return `${dataScript}\n<autocomplete-wrapper ${wrapperAttrs}>\n${block.field.html}\n</autocomplete-wrapper>`;
+    const autocompleteEl = `<autocomplete-wrapper ${wrapperAttrs}>\n${block.field.html}\n</autocomplete-wrapper>`;
+
+    if (typeof block.clearLinkText === "string" && block.clearLinkText !== "") {
+      const clearHtml = `<button id="${fieldCode}-clear" class="govuk-body govuk-link autocomplete__clear-button" >${block.clearLinkText}</button>`;
+
+      return `<div class="autocomplete-with-clear">\n${dataScript}\n${autocompleteEl}\n${clearHtml}\n</div>`;
+    }
+
+    return `${dataScript}\n${autocompleteEl}`;
   },
 );
 

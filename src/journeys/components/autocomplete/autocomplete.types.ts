@@ -27,6 +27,14 @@ export interface AutocompleteProps {
   autoselect?: ResolvableBoolean;
 
   /**
+   * Text for a clear link rendered beside the autocomplete input.
+   * When provided, clicking the link resets the input to an empty value.
+   * The link is given the id `${fieldCode}-clear` so the browser element
+   * can wire the click handler automatically.
+   */
+  clearLinkText?: ResolvableString;
+
+  /**
    * Confirm the selected option when the user clicks outside the component.
    * @default true
    */
