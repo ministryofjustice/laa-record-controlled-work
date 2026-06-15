@@ -203,10 +203,10 @@ test("create application flow", async ({ page }) => {
   // Fill in the full address and submit
   
   // expect options to be visible with autocomplete
-  await page.getByLabel("Country").fill("Ire");
-  const irelandOption = page.getByRole("option", { name: "Ireland" });
+  await page.getByLabel("Country").fill("Aus");
+  const irelandOption = page.getByRole("option", { name: "Australia" });
   expect(irelandOption).toBeVisible();
-  expect(page.getByRole("option", { name: "Bonaire" })).toBeVisible();
+  expect(page.getByRole("option", { name: "Austria" })).toBeVisible();
 
   await irelandOption.click();
 

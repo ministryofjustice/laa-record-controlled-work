@@ -20,12 +20,13 @@ import { Autocomplete } from "#/journeys/components/autocomplete/autocomplete.co
 import { JourneyEffects } from "#/journeys/effects.js";
 import {
   ADDRESS_FIELD,
-  countries,
   UK_EXCLUSIVE_ADDRESS_FIELDS,
 } from "#/journeys/journey.constants.js";
+import countries from "#/lib/constants/FCDOGeographicalNamesIndexSeptember2025.json" with { type: "json" };
 import { t } from "#/lib/i18n.js";
 
 const MINIMUM_AUTOCOMPLETE_CHARACTERS = 2;
+const COUNTRY_NAMES = countries.map((country) => country.name);
 
 export const enterOverseasAddressStep = (
   journeyCode: string,
@@ -45,7 +46,7 @@ export const enterOverseasAddressStep = (
         clearLinkText: t(
           "journeys.createApplication.enterOverseasAddress.country.clearButton",
         ),
-        data: countries,
+        data: COUNTRY_NAMES,
         field: GovUKTextInput({
           code: ADDRESS_FIELD.country,
           label: {
