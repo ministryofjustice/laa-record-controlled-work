@@ -8,6 +8,7 @@ import {
   type ForgeTestClient,
   ForgeTestHarness,
 } from "@ministryofjustice/hmpps-forge/core/testing";
+import { nunjucksFunctions } from "@ministryofjustice/hmpps-forge/express-nunjucks";
 import { govukComponents } from "@ministryofjustice/hmpps-forge/govuk-components";
 
 import { autocomplete } from "#/journeys/components/autocomplete/autocomplete.component.js";
@@ -46,6 +47,7 @@ export function createForgeTestClient(
   return new ForgeTestHarness()
     .registerGlobalComponents(govukComponents)
     .registerGlobalComponents([autocomplete])
+    .registerGlobalFunctions(nunjucksFunctions)
     .registerPackage(testPackage)
     .createClient();
 }

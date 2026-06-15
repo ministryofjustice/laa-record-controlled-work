@@ -135,5 +135,8 @@ export const enterAddressManuallyStep = (
       }),
     ],
     path: "/enter-address-manually",
+    reachability: {
+      entryWhen: Query("returnTo").match(Condition.Equals("check-answers")),
+    },
     title: t("journeys.createApplication.enterAddressManually.title"),
   });

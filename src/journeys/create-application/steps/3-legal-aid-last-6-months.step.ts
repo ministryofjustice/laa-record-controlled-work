@@ -96,5 +96,8 @@ export const legalAidLast6MonthsStep = (
       }),
     ],
     path: "/legal-aid-last-6-months",
+    reachability: {
+      entryWhen: Query("returnTo").match(Condition.Equals("check-answers")),
+    },
     title: t("journeys.createApplication.legalAidLast6Months.title"),
   });

@@ -11,6 +11,7 @@ import { ineligibleStep } from "./steps/1-ecf-dropout.step.js";
 import { ecfStep } from "./steps/1-ecf.step.js";
 import { legalAidBeforeStep } from "./steps/2-legal-aid-before.step.js";
 import { niNumberStep } from "./steps/5-ni-number.step.js";
+import { checkAnswersStep } from "./steps/99-check-answers.step.js";
 
 const journeyCode = "createApplication";
 
@@ -33,6 +34,7 @@ export const createApplicationJourney = journey({
     haveAHomeAddressStep(journeyCode),
     enterAddressManuallyStep(journeyCode),
     enterOverseasAddressStep(journeyCode),
+    checkAnswersStep(),
   ],
   title: "Record new case",
   view: { template: "partials/form-step" },
