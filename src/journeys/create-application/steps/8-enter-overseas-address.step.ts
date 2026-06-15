@@ -17,7 +17,7 @@ import {
   GovUKTextInput,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
-import { AccessibleAutocomplete } from "#/components/accessibleAutocomplete/accessibleAutocomplete.component.js";
+import { AccessibleAutocomplete } from "#/journeys/components/accessibleAutocomplete/accessibleAutocomplete.component.js";
 import { JourneyEffects } from "#/journeys/effects.js";
 import {
   ADDRESS_FIELD,

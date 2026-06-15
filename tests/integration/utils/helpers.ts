@@ -10,7 +10,7 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/testing";
 import { govukComponents } from "@ministryofjustice/hmpps-forge/govuk-components";
 
-import { accessibleAutocomplete } from "#/components/accessibleAutocomplete/accessibleAutocomplete.component.js";
+import { accessibleAutocomplete } from "#/journeys/components/accessibleAutocomplete/accessibleAutocomplete.component.js";
 import {
   JourneyEffects,
   JourneyEffectsImplementations,

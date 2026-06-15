@@ -22,7 +22,11 @@ describe("Enter overseas address step", () => {
       const result = await client.get("/create-application/enter-overseas-address");
       expect(result.type).to.equal("render");
       renderResult = result as TestRenderResult;
-      const [autocompleteBlock] = renderResult.getBlocksByVariant("accessibleAutocomplete");
+
+      const [gridWrapperBlock] = renderResult.getBlocksByVariant("templateWrapper");
+      const slots = gridWrapperBlock.properties.slots as Record<string, RenderBlock[]>;
+      const [autocompleteBlock] = slots.col0;
+
       countryInput = autocompleteBlock.properties.field as RenderBlock;
       [addressLine1Input, addressLine2Input, addressLine3Input, addressLine4Input] =
         renderResult.getBlocksByVariant("govukTextInput");

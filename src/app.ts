@@ -12,8 +12,8 @@ import express from "express";
 import session from "express-session";
 
 import authRouter from "#/auth/auth.routes.js";
-import { accessibleAutocomplete } from "#/components/accessibleAutocomplete/accessibleAutocomplete.component.js";
 import config from "#/config.js";
+import { accessibleAutocomplete } from "#/journeys/components/accessibleAutocomplete/accessibleAutocomplete.component.js";
 import createApplication from "#/journeys/create-application/index.js";
 import { createSession } from "#/lib/session.js";
 import { requireAuth } from "#/middleware/requireAuth.js";
