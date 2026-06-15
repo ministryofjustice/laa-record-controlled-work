@@ -35,8 +35,8 @@
   "dependencies": {
     "@azure/msal-node": "^5.2.2",
     "@ministryofjustice/frontend": "9.0.0",
-    "accessible-autocomplete": "^3.0.1",
     "@ministryofjustice/hmpps-forge": "^0.1.0-alpha.21",
+    "accessible-autocomplete": "^3.0.1",
     "body-parser": "^2.2.2",
     "compression": "^1.8.1",
     "connect-redis": "^9.0.0",
@@ -78,7 +78,7 @@
     "chai-as-promised": "^8.0.2",
     "concurrently": "^9.2.1",
     "connect-livereload": "^0.6.1",
-    "esbuild": "^0.28.0",
+    "esbuild": "^0.28.1",
     "esbuild-plugin-copy": "^2.1.1",
     "esbuild-sass-plugin": "^3.7.0",
     "eslint": "^10.4.1",
