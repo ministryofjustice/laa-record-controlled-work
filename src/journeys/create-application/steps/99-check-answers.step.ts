@@ -59,9 +59,7 @@ const addressDisplay = NunjucksGenerators.String({
   `,
 });
 
-export const checkAnswersStep = (
-  journeyCode: string,
-): ReturnType<typeof step> =>
+export const checkAnswersStep = (): ReturnType<typeof step> =>
   step({
     blocks: [
       GovUKHeading({

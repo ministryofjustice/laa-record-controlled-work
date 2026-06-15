@@ -32,7 +32,7 @@ export const createApplicationJourney = journey({
     niNumberStep(journeyCode),
     haveAHomeAddressStep(journeyCode),
     enterAddressManuallyStep(journeyCode),
-    checkAnswersStep(journeyCode),
+    checkAnswersStep(),
   ],
   title: "Record new case",
   view: { template: "partials/form-step" },
