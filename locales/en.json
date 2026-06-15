@@ -141,7 +141,9 @@
           },
           "line4": {
             "label": "Address line 4 (optional)"
-          },
+          }
+        }
+      },
       "checkAnswers": {
         "title": "Check your answers",
         "answerLabels": {
