@@ -180,4 +180,56 @@ test("create application flow", async ({ page }) => {
 
   // Verify redirection to the next page
   await expect(page).toHaveURL("/create-application/check-answers");
+
+  // Check Answers page
+  
+  // Check for the title
+  await expect(
+    page.getByRole("heading", {
+      name: /Check your answers/,
+      level: 1,
+    }),
+  ).toBeVisible();
+  // Check that all answers are displayed correctly
+  const summaryList = page.locator(".govuk-summary-list");
+  const rows = summaryList.locator(".govuk-summary-list__row");
+  await expect(rows).toHaveCount(6);
+  await expect(rows.nth(0).locator(".govuk-summary-list__key")).toHaveText("ECF");
+  await expect(rows.nth(0).locator(".govuk-summary-list__value")).toHaveText("No");
+  await expect(rows.nth(1).locator(".govuk-summary-list__key")).toHaveText("Accessed legal aid before");
+  await expect(rows.nth(1).locator(".govuk-summary-list__value")).toHaveText("Yes, about the same matter");
+  await expect(rows.nth(2).locator(".govuk-summary-list__key")).toHaveText("Did your client get legal help for this matter in the last 6 months?");
+  await expect(rows.nth(2).locator(".govuk-summary-list__value")).toHaveText("No");
+  await expect(rows.nth(3).locator(".govuk-summary-list__key")).toHaveText("Full name");
+  await expect(rows.nth(3).locator(".govuk-summary-list__value")).toHaveText("John Doe");
+  await expect(rows.nth(4).locator(".govuk-summary-list__key")).toHaveText("Date of birth");
+  await expect(rows.nth(4).locator(".govuk-summary-list__value")).toHaveText("15 June 1990");
+  await expect(rows.nth(5).locator(".govuk-summary-list__key")).toHaveText("Address");
+  await expect(rows.nth(5).locator(".govuk-summary-list__value")).toHaveText(
+    "\n    10 Some Street,\n    \n    SomeCity,\n    \n    AB1 2CD\n  ",
+  );
+
+  const changeAddressLink = rows.nth(5).locator(".govuk-summary-list__actions a");
+  await expect(changeAddressLink).toHaveAttribute(
+    "href",
+    "enter-address-manually?returnTo=check-answers",
+  );
+  changeAddressLink.click();
+  
+  // Verify redirection back to the enter address manually page
+  await expect(page).toHaveURL("/create-application/enter-address-manually?returnTo=check-answers");
+  // Navigate back to the check answers page
+  const continueButton = page.getByRole("button", { name: "Continue" });
+  await continueButton.click();
+  await expect(page).toHaveURL("/create-application/check-answers");
+
+  // Check that the submit button is displayed
+  const submitButton = page.getByRole("button", { name: "Save and continue" });
+  await expect(submitButton).toBeVisible();
+
+  // Submit the form
+  await submitButton.click();
+
+  // Verify redirection to the task list page
+  await expect(page).toHaveURL("/create-application/task-list");
 });
