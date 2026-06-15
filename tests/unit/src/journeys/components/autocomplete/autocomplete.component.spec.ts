@@ -3,17 +3,17 @@ import { expect } from "chai";
 import type { EvaluatedBlock } from "@ministryofjustice/hmpps-forge/core/components";
 
 import {
-  AccessibleAutocomplete,
-  accessibleAutocomplete,
-} from "#/journeys/components/accessibleAutocomplete/accessibleAutocomplete.component.js";
-import type { AccessibleAutocomplete as AccessibleAutocompleteBlock } from "#/journeys/components/accessibleAutocomplete/accessibleAutocomplete.types.js";
+  Autocomplete,
+  autocomplete,
+} from "#/journeys/components/autocomplete/autocomplete.component.js";
+import type { Autocomplete as AutocompleteBlock } from "#/journeys/components/autocomplete/autocomplete.types.js";
 
-type MockBlock = EvaluatedBlock<AccessibleAutocompleteBlock>;
+type MockBlock = EvaluatedBlock<AutocompleteBlock>;
 
 function makeBlock(overrides: Partial<MockBlock> = {}): MockBlock {
   return {
     type: "StructureType.Block" as MockBlock["type"],
-    variant: "accessibleAutocomplete",
+    variant: "autocomplete",
     blockType: "BlockType.Block" as MockBlock["blockType"],
     data: ["Option A", "Option B"],
     field: {
@@ -24,33 +24,33 @@ function makeBlock(overrides: Partial<MockBlock> = {}): MockBlock {
   } as MockBlock;
 }
 
-describe("AccessibleAutocomplete component", () => {
-  describe("accessibleAutocomplete (registry entry)", () => {
-    it("has variant 'accessibleAutocomplete'", () => {
-      expect(accessibleAutocomplete.variant).to.equal("accessibleAutocomplete");
+describe("Autocomplete component", () => {
+  describe("autocomplete (registry entry)", () => {
+    it("has variant 'autocomplete'", () => {
+      expect(autocomplete.variant).to.equal("autocomplete");
     });
 
     describe("render()", () => {
       it("includes a JSON script tag with the data", () => {
         const block = makeBlock({ data: ["Manchester", "Liverpool"] });
-        const html = accessibleAutocomplete.render(block);
+        const html = autocomplete.render(block);
         expect(html).to.include(
           `<script type="application/json" id="autocomplete-data-fieldCode" data-qa="autocomplete-data-fieldCode">`,
         );
         expect(html).to.include(JSON.stringify(["Manchester", "Liverpool"]));
       });
 
-      it("wraps the field HTML in an accessible-autocomplete-wrapper element", () => {
+      it("wraps the field HTML in an autocomplete-wrapper element", () => {
         const block = makeBlock();
-        const html = accessibleAutocomplete.render(block);
-        expect(html).to.include("<accessible-autocomplete-wrapper ");
-        expect(html).to.include("</accessible-autocomplete-wrapper>");
+        const html = autocomplete.render(block);
+        expect(html).to.include("<autocomplete-wrapper ");
+        expect(html).to.include("</autocomplete-wrapper>");
         expect(html).to.include('<input id="field-code-input" />');
       });
 
       it("sets data-autocomplete-source to the script tag ID derived from field code", () => {
         const block = makeBlock();
-        const html = accessibleAutocomplete.render(block);
+        const html = autocomplete.render(block);
         expect(html).to.include(
           'data-autocomplete-source="autocomplete-data-fieldCode"',
         );
@@ -63,7 +63,7 @@ describe("AccessibleAutocomplete component", () => {
             html: "<input />",
           },
         });
-        const html = accessibleAutocomplete.render(block);
+        const html = autocomplete.render(block);
         expect(html).to.include("autocomplete-data-autocomplete-field");
       });
 
@@ -77,7 +77,7 @@ describe("AccessibleAutocomplete component", () => {
             html: "<input />",
           },
         });
-        const html = accessibleAutocomplete.render(block);
+        const html = autocomplete.render(block);
         expect(html).to.include(
           'data-autocomplete-default-value="pre-filled-value"',
         );
@@ -93,7 +93,7 @@ describe("AccessibleAutocomplete component", () => {
             html: "<input />",
           },
         });
-        const html = accessibleAutocomplete.render(block);
+        const html = autocomplete.render(block);
         expect(html).to.include(
           'data-autocomplete-default-value="default-option"',
         );
@@ -106,7 +106,7 @@ describe("AccessibleAutocomplete component", () => {
             html: "<input />",
           },
         });
-        const html = accessibleAutocomplete.render(block);
+        const html = autocomplete.render(block);
         expect(html).not.to.include("data-autocomplete-default-value");
       });
 
@@ -123,7 +123,7 @@ describe("AccessibleAutocomplete component", () => {
           inputClasses: "my-input",
           hintClasses: "my-hint",
         });
-        const html = accessibleAutocomplete.render(block);
+        const html = autocomplete.render(block);
         expect(html).to.include(
           'data-autocomplete-source-key-from="#area-of-need"',
         );
@@ -140,7 +140,7 @@ describe("AccessibleAutocomplete component", () => {
 
       it("omits optional attributes when not provided", () => {
         const block = makeBlock();
-        const html = accessibleAutocomplete.render(block);
+        const html = autocomplete.render(block);
         expect(html).not.to.include("data-autocomplete-source-key-from");
         expect(html).not.to.include("data-autocomplete-min-length");
         expect(html).not.to.include("data-autocomplete-autoselect");
@@ -151,7 +151,7 @@ describe("AccessibleAutocomplete component", () => {
         const block = makeBlock({
           menuAttributes: { "aria-labelledby": "my-label" },
         });
-        const html = accessibleAutocomplete.render(block);
+        const html = autocomplete.render(block);
         expect(html).to.include(
           `data-autocomplete-menu-attributes='{"aria-labelledby":"my-label"}'`,
         );
@@ -159,33 +159,33 @@ describe("AccessibleAutocomplete component", () => {
 
       it("omits data-autocomplete-menu-attributes when menuAttributes is not provided", () => {
         const block = makeBlock();
-        const html = accessibleAutocomplete.render(block);
+        const html = autocomplete.render(block);
         expect(html).not.to.include("data-autocomplete-menu-attributes");
       });
 
       it("encodes a keyed data object as JSON", () => {
         const data = { countries: ["Ireland", "Goal B"], risks: ["Risk X"] };
         const block = makeBlock({ data });
-        const html = accessibleAutocomplete.render(block);
+        const html = autocomplete.render(block);
         expect(html).to.include(JSON.stringify(data));
       });
     });
   });
 
-  describe("AccessibleAutocomplete() builder", () => {
-    it("returns a block with variant 'accessibleAutocomplete'", () => {
-      const result = AccessibleAutocomplete({
+  describe("Autocomplete() builder", () => {
+    it("returns a block with variant 'autocomplete'", () => {
+      const result = Autocomplete({
         data: ["Option 1"],
-        field: {} as AccessibleAutocompleteBlock["field"],
+        field: {} as AutocompleteBlock["field"],
       });
-      expect(result.variant).to.equal("accessibleAutocomplete");
+      expect(result.variant).to.equal("autocomplete");
     });
 
     it("includes the provided props in the returned block", () => {
       const data = ["Alpha", "Beta"];
-      const result = AccessibleAutocomplete({
+      const result = Autocomplete({
         data,
-        field: {} as AccessibleAutocompleteBlock["field"],
+        field: {} as AutocompleteBlock["field"],
         minLength: 2,
         autoselect: true,
       });

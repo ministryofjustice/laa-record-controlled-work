@@ -10,16 +10,15 @@ import type {
 /**
  * Accessible Autocomplete block definition including Forge discriminator.
  */
-export interface AccessibleAutocomplete
-  extends AccessibleAutocompleteProps, BlockDefinition {
-  variant: "accessibleAutocomplete";
+export interface Autocomplete extends AutocompleteProps, BlockDefinition {
+  variant: "autocomplete";
 }
 
 /**
- * Props for the AccessibleAutocomplete component.
+ * Props for the Autocomplete component.
  * @see https://github.com/alphagov/accessible-autocomplete
  */
-export interface AccessibleAutocompleteProps {
+export interface AutocompleteProps {
   /**
    * Highlight the first option when the user types and receives results.
    * Pressing enter will select it.

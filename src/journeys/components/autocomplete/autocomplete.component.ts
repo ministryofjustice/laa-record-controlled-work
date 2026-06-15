@@ -4,21 +4,21 @@ import { block as blockBuilder } from "@ministryofjustice/hmpps-forge/core/autho
 import { buildNunjucksComponent } from "@ministryofjustice/hmpps-forge/express-nunjucks";
 
 import type {
-  AccessibleAutocomplete,
-  AccessibleAutocompleteProps,
+  Autocomplete,
+  AutocompleteProps,
   EvaluatedField,
-} from "./accessibleAutocomplete.types.js";
+} from "./autocomplete.types.js";
 
 /**
- * Builds the HTML attribute string for the accessible-autocomplete-wrapper element.
+ * Builds the HTML attribute string for the autocomplete-wrapper element.
  *
- * @param block - The evaluated AccessibleAutocomplete block
+ * @param block - The evaluated Autocomplete block
  * @param dataId - The id of the JSON data script tag
  * @param defaultValue - The pre-filled value to set on the autocomplete input
  * @returns A space-separated string of HTML attributes
  */
 function buildWrapperAttributes(
-  block: EvaluatedBlock<AccessibleAutocomplete>,
+  block: EvaluatedBlock<Autocomplete>,
   dataId: string,
   defaultValue: unknown,
 ): string {
@@ -41,7 +41,7 @@ function buildWrapperAttributes(
       : "";
 
   return [
-    'class="accessible-autocomplete-wrapper"',
+    'class="autocomplete-wrapper"',
     `data-autocomplete-source="${dataId}"`,
     menuAttributes,
     ...optionalAttributes.map(([name, value]) => setAttribute(name, value)),
@@ -51,10 +51,10 @@ function buildWrapperAttributes(
 /**
  * Extracts the data ID and default value from the evaluated field block.
  *
- * @param block - The evaluated AccessibleAutocomplete block
+ * @param block - The evaluated Autocomplete block
  * @returns The data script ID and pre-filled default value
  */
-function resolveField(block: EvaluatedBlock<AccessibleAutocomplete>): {
+function resolveField(block: EvaluatedBlock<Autocomplete>): {
   dataId: string;
   defaultValue: unknown;
 } {
@@ -90,35 +90,32 @@ function setAttribute(name: string, value: unknown): string {
   return "";
 }
 
-export const accessibleAutocomplete =
-  buildNunjucksComponent<AccessibleAutocomplete>(
-    "accessibleAutocomplete",
-    (block: EvaluatedBlock<AccessibleAutocomplete>): string => {
-      const { dataId, defaultValue } = resolveField(block);
-      const dataScript = `<script type="application/json" id="${dataId}" data-qa="${dataId}">${JSON.stringify(block.data)}</script>`;
-      const wrapperAttrs = buildWrapperAttributes(block, dataId, defaultValue);
-      return `${dataScript}\n<accessible-autocomplete-wrapper ${wrapperAttrs}>\n${block.field.html}\n</accessible-autocomplete-wrapper>`;
-    },
-  );
+export const autocomplete = buildNunjucksComponent<Autocomplete>(
+  "autocomplete",
+  (block: EvaluatedBlock<Autocomplete>): string => {
+    const { dataId, defaultValue } = resolveField(block);
+    const dataScript = `<script type="application/json" id="${dataId}" data-qa="${dataId}">${JSON.stringify(block.data)}</script>`;
+    const wrapperAttrs = buildWrapperAttributes(block, dataId, defaultValue);
+    return `${dataScript}\n<autocomplete-wrapper ${wrapperAttrs}>\n${block.field.html}\n</autocomplete-wrapper>`;
+  },
+);
 
 /**
  * Creates an accessible autocomplete wrapper around a field.
  *
  * @param props - The autocomplete configuration options
- * @returns An AccessibleAutocomplete block definition
+ * @returns An Autocomplete block definition
  * @example
  * ```typescript
- * AccessibleAutocomplete({
+ * Autocomplete({
  *   field: GovUKTextInput({ code: 'goal', label: 'Select a goal' }),
  *   data: Data('goals'),
  * })
  * ```
  */
-export function AccessibleAutocomplete(
-  props: AccessibleAutocompleteProps,
-): AccessibleAutocomplete {
-  return blockBuilder<AccessibleAutocomplete>({
+export function Autocomplete(props: AutocompleteProps): Autocomplete {
+  return blockBuilder<Autocomplete>({
     ...props,
-    variant: "accessibleAutocomplete",
+    variant: "autocomplete",
   });
 }

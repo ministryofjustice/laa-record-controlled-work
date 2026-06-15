@@ -1,1 +1,1 @@
-import "#/journeys/components/accessibleAutocomplete/accessibleAutocomplete.element.js";
+import "#/journeys/components/autocomplete/autocomplete.element.js";

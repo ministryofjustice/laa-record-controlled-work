@@ -13,7 +13,7 @@ import session from "express-session";
 
 import authRouter from "#/auth/auth.routes.js";
 import config from "#/config.js";
-import { accessibleAutocomplete } from "#/journeys/components/accessibleAutocomplete/accessibleAutocomplete.component.js";
+import { autocomplete } from "#/journeys/components/autocomplete/autocomplete.component.js";
 import createApplication from "#/journeys/create-application/index.js";
 import { createSession } from "#/lib/session.js";
 import { requireAuth } from "#/middleware/requireAuth.js";
@@ -85,7 +85,7 @@ const createApp = async (): Promise<express.Application> => {
   forge
     .registerGlobalComponents(govukComponents)
     .registerGlobalComponents(mojComponents)
-    .registerGlobalComponents([accessibleAutocomplete])
+    .registerGlobalComponents([autocomplete])
     .registerGlobalFunctions(nunjucksFunctions)
     .registerPackage(createApplication);
 

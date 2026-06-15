@@ -1,13 +1,13 @@
 @import "accessible-autocomplete/dist/accessible-autocomplete.min.css";
 
-// Accessible Autocomplete - use GOV.UK font
+// Autocomplete - use GOV.UK font
 .autocomplete__menu {
   @include govuk-font($size: 19);
 }
 
-// Accessible Autocomplete - fix spacing with following form elements
-.accessible-autocomplete-wrapper,
-accessible-autocomplete-wrapper {
+// Autocomplete - fix spacing with following form elements
+.autocomplete-wrapper,
+autocomplete-wrapper {
   display: block;
   // Reset the default form group margin that's being inherited
   .govuk-form-group {

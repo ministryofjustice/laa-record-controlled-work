@@ -1,5 +1,5 @@
-import accessibleAutocomplete, {
-  type AccessibleAutocompleteOptions,
+import autocomplete, {
+  type AutocompleteOptions,
 } from "accessible-autocomplete";
 
 /**
@@ -10,7 +10,7 @@ import accessibleAutocomplete, {
  * server-rendered component. Options data is loaded from a sibling
  * `<script type="application/json">` element identified by `data-autocomplete-source`.
  */
-class AccessibleAutocomplete extends HTMLElement {
+class Autocomplete extends HTMLElement {
   /**
    * Initialises the autocomplete when the element is connected; guards
    * against double-initialisation via the `initialized` dataset flag.
@@ -68,7 +68,7 @@ class AccessibleAutocomplete extends HTMLElement {
     inputId: string,
     inputName: string,
     defaultValue: string,
-  ): AccessibleAutocompleteOptions {
+  ): AutocompleteOptions {
     return {
       autoselect: this.dataset.autocompleteAutoselect === "true",
       confirmOnBlur: this.dataset.autocompleteConfirmOnBlur !== "false",
@@ -107,7 +107,7 @@ class AccessibleAutocomplete extends HTMLElement {
       return [];
     }
 
-    const data = AccessibleAutocomplete.getData(sourceId);
+    const data = Autocomplete.getData(sourceId);
     const keyFromSelector = this.dataset.autocompleteSourceKeyFrom;
 
     if (keyFromSelector && !Array.isArray(data) && typeof data === "object") {
@@ -151,7 +151,7 @@ class AccessibleAutocomplete extends HTMLElement {
 
     input.remove();
 
-    accessibleAutocomplete(this.buildOptions(inputId, inputName, defaultValue));
+    autocomplete(this.buildOptions(inputId, inputName, defaultValue));
     this.preserveDescribedBy(originalDescribedByErrorIds);
   }
 
@@ -198,7 +198,4 @@ class AccessibleAutocomplete extends HTMLElement {
   }
 }
 
-customElements.define(
-  "accessible-autocomplete-wrapper",
-  AccessibleAutocomplete,
-);
+customElements.define("autocomplete-wrapper", Autocomplete);

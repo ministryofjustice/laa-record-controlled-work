@@ -1,5 +1,5 @@
 declare module "accessible-autocomplete" {
-  export interface AccessibleAutocompleteOptions {
+  export interface AutocompleteOptions {
     autoselect?: boolean;
     confirmOnBlur?: boolean;
     defaultValue?: string;
@@ -19,9 +19,7 @@ declare module "accessible-autocomplete" {
       | string[];
   }
 
-  export default function accessibleAutocomplete(
-    options: AccessibleAutocompleteOptions,
-  ): void;
+  export default function autocomplete(options: AutocompleteOptions): void;
 }
 
 declare module "govuk-frontend" {

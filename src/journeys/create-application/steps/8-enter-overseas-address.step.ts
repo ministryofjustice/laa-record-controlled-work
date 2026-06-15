@@ -17,7 +17,7 @@ import {
   GovUKTextInput,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
-import { AccessibleAutocomplete } from "#/journeys/components/accessibleAutocomplete/accessibleAutocomplete.component.js";
+import { Autocomplete } from "#/journeys/components/autocomplete/autocomplete.component.js";
 import { JourneyEffects } from "#/journeys/effects.js";
 import {
   ADDRESS_FIELD,
@@ -46,7 +46,7 @@ export const enterOverseasAddressStep = (
         columns: [
           {
             blocks: [
-              AccessibleAutocomplete({
+              Autocomplete({
                 data: countries,
                 field: GovUKTextInput({
                   classes: "govuk-!-width-two-thirds",
