@@ -23,9 +23,7 @@ describe("Enter overseas address step", () => {
       expect(result.type).to.equal("render");
       renderResult = result as TestRenderResult;
 
-      const [gridWrapperBlock] = renderResult.getBlocksByVariant("templateWrapper");
-      const slots = gridWrapperBlock.properties.slots as Record<string, RenderBlock[]>;
-      const [autocompleteBlock] = slots.col0;
+      const [autocompleteBlock] = renderResult.getBlocksByVariant("autocomplete");
 
       countryInput = autocompleteBlock.properties.field as RenderBlock;
       [addressLine1Input, addressLine2Input, addressLine3Input, addressLine4Input] =
