@@ -36,9 +36,14 @@ This project uses Yarn 4.14.1 managed by corepack (built into Node.js 16.10+). T
 **To Note:**
 - Corepack automatically uses the Yarn version specified in the `packageManager` field of `package.json`. No additional setup is required once corepack is enabled
 - `yarn install --immutable` ensures that the lockfile (`yarn.lock`) is not modified during the installation process
-- Renovate can raise PRs for vulnerability patches, but `npmMinimalAgeGate: 7d` in `.yarnrc.yml` will cause Renovate to fail when generating artifacts (creating the lockfile).
-  - Check out the failing Renovate branch
-  - Run `YARN_NPM_MINIMUM_PACKAGE_AGE=0 yarn up <package>` to skip the quarantine period
+
+#### Vulnerabilities in PRs
+Renovate can raise PRs for vulnerability patches, but `npmMinimalAgeGate: 7d` in `.yarnrc.yml` will cause Renovate to fail when generating artifacts (creating the lockfile). 
+
+This may also happen if a vulnerability is raised for a package we currently have installed and the patch is less than 7 days old (`yarn` will quarantine it).
+
+  - Check out the failing branch
+  - Run `yarn up <package> --no-time-gate` to skip the quarantine period
   - Commit the updated yarn.lock and push it to unblock the PR.
 
 ### Start the application
