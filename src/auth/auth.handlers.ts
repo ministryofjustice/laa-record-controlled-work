@@ -16,7 +16,7 @@ import {
   BAD_REQUEST,
   INTERNAL_SERVER_ERROR,
   UNAUTHORIZED,
-} from "#/lib/constants/httpStatus.js";
+} from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
 
 /**

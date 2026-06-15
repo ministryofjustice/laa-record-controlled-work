@@ -4,7 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import nunjucks from "nunjucks";
 
-import { nunjucksT } from "#/lib/i18nLoader.js";
+import { nunjucksT } from "#/lib/i18n.js";
 
 const FIRST_IN_ARRAY = 0;
 

@@ -5,7 +5,7 @@ import {
   FOUND,
   INTERNAL_SERVER_ERROR,
   UNAUTHORIZED,
-} from "#/lib/constants/httpStatus.js";
+} from "#/lib/constants/http.js";
 import sinon from "sinon";
 import { EntraService } from "#/auth/entra.service.js";
 import { createRelayState } from "#/auth/auth.relay.js";

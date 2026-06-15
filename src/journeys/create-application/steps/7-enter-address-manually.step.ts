@@ -20,7 +20,7 @@ import {
   ADDRESS_FIELD,
   OVERSEAS_EXCLUSIVE_ADDRESS_FIELDS,
 } from "#/journeys/journey.constants.js";
-import { t } from "#/lib/i18nLoader.js";
+import { t } from "#/lib/i18n.js";
 
 export const enterAddressManuallyStep = (
   journeyCode: string,
