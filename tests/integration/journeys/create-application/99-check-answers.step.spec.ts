@@ -8,7 +8,7 @@ import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import { checkAnswersStep } from "#/journeys/create-application/steps/99-check-answers.step.js";
 
 describe("Check answers step", () => {
-  const client = createForgeTestClient(checkAnswersStep("testJourney"));
+  const client = createForgeTestClient(checkAnswersStep());
   const session = {
     journeyDrafts: {
       testJourney: {
