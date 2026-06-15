@@ -12,7 +12,6 @@ import { HtmlBlock } from "@ministryofjustice/hmpps-forge/core/components";
 import {
   GovUKBackLink,
   GovUKButton,
-  GovUKGridRow,
   GovUKHeading,
   GovUKTextInput,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
@@ -42,49 +41,35 @@ export const enterOverseasAddressStep = (
       GovUKHeading({
         text: t("journeys.createApplication.enterOverseasAddress.title"),
       }),
-      GovUKGridRow({
-        columns: [
-          {
-            blocks: [
-              Autocomplete({
-                data: countries,
-                field: GovUKTextInput({
-                  classes: "govuk-!-width-two-thirds",
-                  code: ADDRESS_FIELD.country,
-                  label: {
-                    classes: "govuk-label--m",
-                    isPageHeading: false,
-                    text: t(
-                      "journeys.createApplication.enterOverseasAddress.country.label",
-                    ),
-                  },
-                  validWhen: [
-                    validation({
-                      condition: Self().match(Condition.IsRequired()),
-                      message: t(
-                        "journeys.createApplication.enterOverseasAddress.country.validation.required",
-                      ),
-                    }),
-                  ],
-                }),
-                inputClasses: "govuk-!-width-two-thirds",
-                menuClasses: "govuk-!-width-two-thirds",
-                minLength: MINIMUM_AUTOCOMPLETE_CHARACTERS,
-                showAllValues: false,
-                showNoOptionsFound: true,
-              }),
-            ],
-            width: "two-thirds",
+      Autocomplete({
+        data: countries,
+        field: GovUKTextInput({
+          classes: "govuk-!-width-two-thirds",
+          code: ADDRESS_FIELD.country,
+          label: {
+            classes: "govuk-label--m",
+            isPageHeading: false,
+            text: t(
+              "journeys.createApplication.enterOverseasAddress.country.label",
+            ),
           },
-          {
-            blocks: [
-              HtmlBlock({
-                content: `<p class="govuk-body"><a class="govuk-link" >${t("journeys.createApplication.enterOverseasAddress.country.clearButton")}</a></p>`,
-              }),
-            ],
-            width: "one-third",
-          },
-        ],
+          validWhen: [
+            validation({
+              condition: Self().match(Condition.IsRequired()),
+              message: t(
+                "journeys.createApplication.enterOverseasAddress.country.validation.required",
+              ),
+            }),
+          ],
+        }),
+        inputClasses: "govuk-!-width-two-thirds",
+        menuClasses: "govuk-!-width-two-thirds",
+        minLength: MINIMUM_AUTOCOMPLETE_CHARACTERS,
+        showAllValues: false,
+        showNoOptionsFound: true,
+      }),
+      HtmlBlock({
+        content: `<p class="govuk-body"><a id="${ADDRESS_FIELD.country}-clear" class="govuk-link" href="#">${t("journeys.createApplication.enterOverseasAddress.country.clearButton")}</a></p>`,
       }),
       GovUKHeading({
         classes: "govuk-label--m",

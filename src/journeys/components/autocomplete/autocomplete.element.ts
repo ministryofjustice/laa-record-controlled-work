@@ -153,6 +153,7 @@ class Autocomplete extends HTMLElement {
 
     autocomplete(this.buildOptions(inputId, inputName, defaultValue));
     this.preserveDescribedBy(originalDescribedByErrorIds);
+    this.wireClearLink(inputId);
   }
 
   /**
@@ -195,6 +196,28 @@ class Autocomplete extends HTMLElement {
       attributes: true,
     });
     merge();
+  }
+
+  /**
+   * Wires a click handler onto a server-rendered clear link whose id follows
+   * the convention `${inputId}-clear`. Clears the autocomplete input value
+   * @param inputId - The id of the autocomplete input element
+   */
+  private wireClearLink(inputId: string): void {
+    const clearLink = document.getElementById(`${inputId}-clear`);
+    if (!clearLink) return;
+
+    clearLink.addEventListener("click", (e: MouseEvent) => {
+      e.preventDefault();
+      const input = this.querySelector<HTMLInputElement>(
+        "input.autocomplete__input",
+      );
+      if (input) {
+        input.value = "";
+        input.dispatchEvent(new Event("input", { bubbles: true }));
+        input.focus();
+      }
+    });
   }
 }
 
