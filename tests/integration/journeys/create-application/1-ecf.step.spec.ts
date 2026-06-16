@@ -4,7 +4,7 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
 import { ineligibleStep } from "#/journeys/create-application/steps/1-ecf-dropout.step.js";
-import { ecfStep } from "#/journeys/create-application/steps/1-ecf.step.js";
+import { ecfStep } from "#/journeys/create-application/steps/1-ecf/1-ecf.step.js";
 import { createForgeTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 

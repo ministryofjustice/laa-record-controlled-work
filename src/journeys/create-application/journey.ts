@@ -8,7 +8,7 @@ import { enterOverseasAddressStep } from "#/journeys/create-application/steps/8-
 import { JourneyEffects } from "#/journeys/effects.js";
 
 import { ineligibleStep } from "./steps/1-ecf-dropout.step.js";
-import { ecfStep } from "./steps/1-ecf.step.js";
+import { ecfStep } from "./steps/1-ecf/1-ecf.step.js";
 import { legalAidBeforeStep } from "./steps/2-legal-aid-before.step.js";
 import { niNumberStep } from "./steps/5-ni-number.step.js";
 import { checkAnswersStep } from "./steps/99-check-answers.step.js";
