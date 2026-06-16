@@ -1,6 +1,7 @@
 import { test as base, expect } from "@playwright/test";
 import { AxeBuilder } from "@axe-core/playwright";
 import { PageFactory } from "../pages/PageFactory.js";
+import { TEST_CONFIG } from "../playwright.config.js";
 
 /**
  * Custom test fixture with accessibility testing.
@@ -22,6 +23,17 @@ export const test = base.extend<TestFixtures>({
    */
   page: async ({ page }, use): Promise<void> => {
     await page.goto("/test/signin");
+
+    // If the test route isn't registered, requireAuth redirects to Entra.
+    // Catch this early so the failure message points at the real cause
+    if (!page.url().startsWith(TEST_CONFIG.BASE_URL)) {
+      throw new Error(
+        `Auth bypass failed — redirected to: ${page.url()}\n` +
+          "The test server must be running with PLAYWRIGHT_TEST_SIGNIN=true and NODE_ENV=test.\n" +
+          "Stop any dev server before running e2e tests: kill -9 $(lsof -t -i :3001)",
+      );
+    }
+
     await use(page);
   },
 

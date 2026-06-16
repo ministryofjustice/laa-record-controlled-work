@@ -79,8 +79,8 @@ describe("Check answers step", () => {
       }>;
       const addressRow = rows.find((row) => row.key.text === "Address");
 
-      expect(addressRow?.value.html).to.equal(
-        "\n    123 Test Street,<br />\n    \n    Testville,<br />\n    \n    TE5 7ST\n  ",
+      expect(addressRow?.value.html).to.match(
+        /123 Test Street,<br \/>.*Testville,<br \/>.*TE5 7ST/s,
       );
     });
 

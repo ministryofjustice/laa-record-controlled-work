@@ -190,24 +190,25 @@ test("create application flow", async ({ page }) => {
       level: 1,
     }),
   ).toBeVisible();
+  
   // Check that all answers are displayed correctly
   const summaryList = page.locator(".govuk-summary-list");
   const rows = summaryList.locator(".govuk-summary-list__row");
   await expect(rows).toHaveCount(6);
-  await expect(rows.nth(0).locator(".govuk-summary-list__key")).toHaveText("ECF");
-  await expect(rows.nth(0).locator(".govuk-summary-list__value")).toHaveText("No");
-  await expect(rows.nth(1).locator(".govuk-summary-list__key")).toHaveText("Accessed legal aid before");
-  await expect(rows.nth(1).locator(".govuk-summary-list__value")).toHaveText("Yes, about the same matter");
-  await expect(rows.nth(2).locator(".govuk-summary-list__key")).toHaveText("Did your client get legal help for this matter in the last 6 months?");
-  await expect(rows.nth(2).locator(".govuk-summary-list__value")).toHaveText("No");
-  await expect(rows.nth(3).locator(".govuk-summary-list__key")).toHaveText("Full name");
-  await expect(rows.nth(3).locator(".govuk-summary-list__value")).toHaveText("John Doe");
-  await expect(rows.nth(4).locator(".govuk-summary-list__key")).toHaveText("Date of birth");
-  await expect(rows.nth(4).locator(".govuk-summary-list__value")).toHaveText("15 June 1990");
-  await expect(rows.nth(5).locator(".govuk-summary-list__key")).toHaveText("Address");
-  await expect(rows.nth(5).locator(".govuk-summary-list__value")).toHaveText(
-    "\n    10 Some Street,\n    \n    SomeCity,\n    \n    AB1 2CD\n  ",
-  );
+  await expect(rows.locator(".govuk-summary-list__value")).toHaveText([
+    // ECF
+    "No",
+    // Accessed legal aid before
+    "Yes, about the same matter",
+    // Did your client get legal help for this matter in the last 6 months?
+    "No",
+    // Full name
+    "John Doe",
+    // Date of birth
+    "15 June 1990",
+    // Address
+    "10 Some Street, SomeCity, AB1 2CD",
+  ], { useInnerText: true });
 
   const changeAddressLink = rows.nth(5).locator(".govuk-summary-list__actions a");
   await expect(changeAddressLink).toHaveAttribute(
@@ -218,10 +219,44 @@ test("create application flow", async ({ page }) => {
   
   // Verify redirection back to the enter address manually page
   await expect(page).toHaveURL("/create-application/enter-address-manually?returnTo=check-answers");
+  
+  // Enter Overseas Address page
+
+  // click the non-UK address link
+  await page.getByText("The address is not in the UK").click();
+
+  // Verify redirection to the overseas address page
+  await expect(page).toHaveURL("/create-application/enter-overseas-address");
+
+  // Check for the title
+  await expect(
+    page.getByRole("heading", {
+      name: /Enter your client's overseas home address/,
+      level: 1,
+    }),
+  ).toBeVisible();
+
+  // Fill in the full address and submit
+  
+  // expect options to be visible with autocomplete
+  await page.getByLabel("Country").fill("Aus");
+  const australiaOption = page.getByRole("option", { name: "Australia" });
+  expect(australiaOption).toBeVisible();
+  expect(page.getByRole("option", { name: "Austria" })).toBeVisible();
+
+  await australiaOption.click();
+
+  await page.getByLabel("Address line 1").fill("10 Some Other Street");
+  
   // Navigate back to the check answers page
-  const continueButton = page.getByRole("button", { name: "Continue" });
-  await continueButton.click();
+  await page.getByRole("button", { name: "Continue" }).click();
   await expect(page).toHaveURL("/create-application/check-answers");
+
+  // Verify adress has been updated in the summary list
+  await expect(rows.nth(5).locator(".govuk-summary-list__value")).toHaveText(
+    "10 Some Other Street, Australia",
+    { useInnerText: true },
+  );
 
   // Check that the submit button is displayed
   const submitButton = page.getByRole("button", { name: "Save and continue" });

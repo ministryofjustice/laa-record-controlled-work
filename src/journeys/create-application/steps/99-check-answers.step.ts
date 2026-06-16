@@ -18,7 +18,7 @@ import { t } from "#/lib/i18n.js";
 
 const ecfLabel = match(Answer("ecf"))
   .branch(Condition.Equals("yes"), t("common.yes"))
-  .branch(Condition.Equals("no"), t("common.no"));
+  .otherwise(t("common.no"));
 
 const legalAidBeforeLabel = match(Answer("legalAidBefore"))
   .branch(
@@ -31,11 +31,11 @@ const legalAidBeforeLabel = match(Answer("legalAidBefore"))
       "journeys.createApplication.legalAidBefore.radioButton.yesDifferentMatter",
     ),
   )
-  .branch(Condition.Equals("no"), t("common.no"));
+  .otherwise(t("common.no"));
 
 const legalAidLast6MonthsLabel = match(Answer("legalAidLast6Months"))
   .branch(Condition.Equals("yes"), t("common.yes"))
-  .branch(Condition.Equals("no"), t("common.no"));
+  .otherwise(t("common.no"));
 
 const dateOfBirthDisplay = Answer("dateOfBirth").pipe(
   Transformer.String.ToDate(),
@@ -44,20 +44,33 @@ const dateOfBirthDisplay = Answer("dateOfBirth").pipe(
 
 const addressDisplay = NunjucksGenerators.String({
   data: {
+    country: Answer("country"),
     county: Answer("county"),
     line1: Answer("addressLine1"),
     line2: Answer("addressLine2"),
+    line3: Answer("addressLine3"),
+    line4: Answer("addressLine4"),
     postcode: Answer("postcode"),
     town: Answer("townOrCity"),
   },
   template: `
     {{ line1 }},<br />
     {% if line2 %}{{ line2 }},<br />{% endif %}
-    {{ town }},<br />
+    {% if line3 %}{{ line3 }},<br />{% endif %}
+    {% if line4 %}{{ line4 }},<br />{% endif %}
+    {% if town %}{{ town }},<br />{% endif %}
     {% if county %}{{ county }},<br />{% endif %}
-    {{ postcode }}
+    {% if country %}{{ country }}<br />{% endif %}
+    {% if postcode %}{{ postcode }}<br />{% endif %}
   `,
 });
+
+const changeAddressRedirect = match(Answer("postcode"))
+  .branch(
+    Condition.IsRequired(),
+    "enter-address-manually?returnTo=check-answers",
+  )
+  .otherwise("enter-overseas-address?returnTo=check-answers");
 
 export const checkAnswersStep = (): ReturnType<typeof step> =>
   step({
@@ -225,7 +238,7 @@ export const checkAnswersStep = (): ReturnType<typeof step> =>
             actions: {
               items: [
                 {
-                  href: "enter-address-manually?returnTo=check-answers",
+                  href: changeAddressRedirect,
                   text: t(
                     "journeys.createApplication.checkAnswers.changeLink.change",
                   ),
