@@ -3,7 +3,7 @@ import {
   TestRedirectResult,
 } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
-import { legalAidBeforeStep } from "#/journeys/create-application/steps/2-legal-aid-before.step.js";
+import { legalAidBeforeStep } from "#/journeys/create-application/steps/2-legal-aid-before/2-legal-aid-before.step.js";
 import { createForgeTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 
