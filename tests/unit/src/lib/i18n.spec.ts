@@ -7,7 +7,7 @@ import {
   initializeI18nextSync,
   nunjucksT,
   t,
-} from "#/lib/i18nLoader.js";
+} from "#/lib/i18n.js";
 import { logger } from "#/logger.js";
 import { expect } from "chai";
 import fs from "node:fs";
@@ -18,6 +18,7 @@ describe('i18nLoader', () => {
   let loggerWarnStub: sinon.SinonStub;
   let loggerErrorStub: sinon.SinonStub;
   let readFileSyncStub: sinon.SinonStub;
+  let isInitializedStub: sinon.SinonStub;
 
   before(() => {
     loggerWarnStub = sinon.stub(logger, 'warn');
@@ -30,11 +31,13 @@ describe('i18nLoader', () => {
 
   describe('initializeI18nextSync', () => {
     beforeEach(() => {
+      isInitializedStub = sinon.stub(i18next, 'isInitialized').value(false);
       readFileSyncStub = sinon.stub(fs, 'readFileSync');
     });
 
     afterEach(() => {
       readFileSyncStub.restore();
+      isInitializedStub.restore();
     });
 
     it('should initialize i18next with locale data when file exists', () => {

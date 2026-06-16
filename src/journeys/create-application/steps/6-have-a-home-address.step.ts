@@ -16,6 +16,7 @@ import {
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
 import { JourneyEffects } from "#/journeys/effects.js";
+import { t } from "#/lib/i18n.js";
 
 export const haveAHomeAddressStep = (
   journeyCode: string,
@@ -26,7 +27,7 @@ export const haveAHomeAddressStep = (
         href: "/create-application/ni-number",
       }),
       HtmlBlock({
-        content: '<span class="govuk-caption-l">Client and case details</span>',
+        content: `<span class="govuk-caption-l">${t("journeys.createApplication.caption")}</span>`,
       }),
       GovUKRadioInput({
         code: "haveAHomeAddress",
@@ -34,30 +35,34 @@ export const haveAHomeAddressStep = (
           legend: {
             classes: "govuk-fieldset__legend--l",
             isPageHeading: true,
-            text: "Does your client have a home address?",
+            text: t("journeys.createApplication.haveAHomeAddress.title"),
           },
         },
         hint: {
-          text: "The home address is the place that they normally live in, and sometimes called the main dwelling.",
+          text: t("journeys.createApplication.haveAHomeAddress.hint"),
         },
         items: [
           {
-            text: "Yes",
+            text: t("common.yes"),
             value: "yes",
           },
           {
-            text: "No, they have no fixed address",
+            text: t(
+              "journeys.createApplication.haveAHomeAddress.radioButton.no",
+            ),
             value: "no",
           },
         ],
         validWhen: [
           validation({
             condition: Self().match(Condition.IsRequired()),
-            message: "Select if your client has a home address",
+            message: t(
+              "journeys.createApplication.haveAHomeAddress.validation.required",
+            ),
           }),
         ],
       }),
-      GovUKButton({ text: "Continue" }),
+      GovUKButton({ text: t("common.continue") }),
     ],
     onSubmission: [
       submit({
@@ -82,5 +87,8 @@ export const haveAHomeAddressStep = (
       }),
     ],
     path: "/have-a-home-address",
-    title: "Does your client have a home address?",
+    reachability: {
+      entryWhen: Query("returnTo").match(Condition.Equals("check-answers")),
+    },
+    title: t("journeys.createApplication.haveAHomeAddress.title"),
   });

@@ -19,6 +19,7 @@ import {
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
 import { JourneyEffects } from "#/journeys/effects.js";
+import { t } from "#/lib/i18n.js";
 
 export const clientDetailsStep = (
   journeyCode: string,
@@ -29,22 +30,24 @@ export const clientDetailsStep = (
         href: "/create-application/legal-aid-before",
       }),
       HtmlBlock({
-        content: '<span class="govuk-caption-l">Client and case details</span>',
+        content: `<span class="govuk-caption-l">${t("journeys.createApplication.caption")}</span>`,
       }),
       GovUKHeading({
-        text: "Your client's details",
+        text: t("journeys.createApplication.clientDetails.title"),
       }),
       GovUKTextInput({
         code: "fullName",
         label: {
           classes: "govuk-label--m",
           isPageHeading: false,
-          text: "Full name",
+          text: t("journeys.createApplication.clientDetails.fullName.label"),
         },
         validWhen: [
           validation({
             condition: Self().match(Condition.IsRequired()),
-            message: "Enter your client's name",
+            message: t(
+              "journeys.createApplication.clientDetails.fullName.validation.required",
+            ),
           }),
         ],
       }),
@@ -54,27 +57,51 @@ export const clientDetailsStep = (
           legend: {
             classes: GovUKUtilityClasses.Fieldset.MediumLabel,
             isPageHeading: false,
-            text: "Date of birth",
+            text: t(
+              "journeys.createApplication.clientDetails.dateOfBirth.label",
+            ),
           },
         },
         hint: {
-          text: "For example, 31 3 1980",
+          text: t("journeys.createApplication.clientDetails.dateOfBirth.hint"),
         },
         validWhen: [
           ...GovUKValidations.DateInputFull({
-            empty: { message: "Enter your client's date of birth" },
-            invalid: { message: "Date of birth must be a real date" },
-            missingDay: { message: "Date of birth must include a day" },
-            missingMonth: { message: "Date of birth must include a month" },
-            missingYear: { message: "Date of birth must include a year" },
+            empty: {
+              message: t(
+                "journeys.createApplication.clientDetails.dateOfBirth.validation.empty",
+              ),
+            },
+            invalid: {
+              message: t(
+                "journeys.createApplication.clientDetails.dateOfBirth.validation.invalid",
+              ),
+            },
+            missingDay: {
+              message: t(
+                "journeys.createApplication.clientDetails.dateOfBirth.validation.missingDay",
+              ),
+            },
+            missingMonth: {
+              message: t(
+                "journeys.createApplication.clientDetails.dateOfBirth.validation.missingMonth",
+              ),
+            },
+            missingYear: {
+              message: t(
+                "journeys.createApplication.clientDetails.dateOfBirth.validation.missingYear",
+              ),
+            },
             mustBePast: {
-              message: "Date of birth must be in the past",
+              message: t(
+                "journeys.createApplication.clientDetails.dateOfBirth.validation.mustBePast",
+              ),
               submissionOnly: true,
             },
           }),
         ],
       }),
-      GovUKButton({ text: "Continue" }),
+      GovUKButton({ text: t("common.continue") }),
     ],
     onSubmission: [
       submit({
@@ -92,5 +119,8 @@ export const clientDetailsStep = (
       }),
     ],
     path: "/client-details",
-    title: "Your client's details",
+    reachability: {
+      entryWhen: Query("returnTo").match(Condition.Equals("check-answers")),
+    },
+    title: t("journeys.createApplication.clientDetails.title"),
   });

@@ -1,4 +1,5 @@
 import {
+  access,
   journey,
   type StepDefinition,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
@@ -7,9 +8,13 @@ import {
   type ForgeTestClient,
   ForgeTestHarness,
 } from "@ministryofjustice/hmpps-forge/core/testing";
+import { nunjucksFunctions } from "@ministryofjustice/hmpps-forge/express-nunjucks";
 import { govukComponents } from "@ministryofjustice/hmpps-forge/govuk-components";
 
-import { JourneyEffectsImplementations } from "#/journeys/effects.js";
+import {
+  JourneyEffects,
+  JourneyEffectsImplementations,
+} from "#/journeys/effects.js";
 
 /**
  * Creates a test client for a single-step journey under /create-application.
@@ -22,6 +27,11 @@ export function createForgeTestClient(
   const testJourney = journey({
     code: "testJourney",
     path: "/create-application",
+    onAccess: [
+      access({
+        effects: [JourneyEffects.LoadDraftAnswers("testJourney")],
+      }),
+    ],
     reachability: { disableReachabilityChecks: true },
     steps,
     title: "Record new case",
@@ -35,6 +45,7 @@ export function createForgeTestClient(
 
   return new ForgeTestHarness()
     .registerGlobalComponents(govukComponents)
+    .registerGlobalFunctions(nunjucksFunctions)
     .registerPackage(testPackage)
     .createClient();
 }

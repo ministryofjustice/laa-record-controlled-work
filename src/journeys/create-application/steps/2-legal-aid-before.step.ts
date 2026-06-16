@@ -16,6 +16,7 @@ import {
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
 import { JourneyEffects } from "#/journeys/effects.js";
+import { t } from "#/lib/i18n.js";
 
 export const legalAidBeforeStep = (
   journeyCode: string,
@@ -26,7 +27,7 @@ export const legalAidBeforeStep = (
         href: "/create-application/ecf",
       }),
       HtmlBlock({
-        content: '<span class="govuk-caption-l">Client and case details</span>',
+        content: `<span class="govuk-caption-l">${t("journeys.createApplication.caption")}</span>`,
       }),
       GovUKRadioInput({
         code: "legalAidBefore",
@@ -34,31 +35,37 @@ export const legalAidBeforeStep = (
           legend: {
             classes: "govuk-fieldset__legend--l",
             isPageHeading: true,
-            text: "Has your client accessed legal aid before?",
+            text: t("journeys.createApplication.legalAidBefore.title"),
           },
         },
         items: [
           {
-            text: "Yes, about the same matter",
+            text: t(
+              "journeys.createApplication.legalAidBefore.radioButton.yesSameMatter",
+            ),
             value: "yesSameMatter",
           },
           {
-            text: "Yes, about a different matter",
+            text: t(
+              "journeys.createApplication.legalAidBefore.radioButton.yesDifferentMatter",
+            ),
             value: "yesDifferentMatter",
           },
           {
-            text: "No",
+            text: t("common.no"),
             value: "no",
           },
         ],
         validWhen: [
           validation({
             condition: Self().match(Condition.IsRequired()),
-            message: "Please select an option",
+            message: t(
+              "journeys.createApplication.legalAidBefore.validation.required",
+            ),
           }),
         ],
       }),
-      GovUKButton({ text: "Continue" }),
+      GovUKButton({ text: t("common.continue") }),
     ],
     onSubmission: [
       submit({
@@ -82,5 +89,8 @@ export const legalAidBeforeStep = (
       }),
     ],
     path: "/legal-aid-before",
-    title: "Has your client accessed legal aid before?",
+    reachability: {
+      entryWhen: Query("returnTo").match(Condition.Equals("check-answers")),
+    },
+    title: t("journeys.createApplication.legalAidBefore.title"),
   });

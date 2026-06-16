@@ -16,6 +16,7 @@ import {
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
 import { JourneyEffects } from "#/journeys/effects.js";
+import { t } from "#/lib/i18n.js";
 
 export const ecfStep = (journeyCode: string): ReturnType<typeof step> =>
   step({
@@ -24,7 +25,7 @@ export const ecfStep = (journeyCode: string): ReturnType<typeof step> =>
         href: "/",
       }),
       HtmlBlock({
-        content: '<span class="govuk-caption-l">Client and case details</span>',
+        content: `<span class="govuk-caption-l">${t("journeys.createApplication.caption")}</span>`,
       }),
       GovUKRadioInput({
         code: "ecf",
@@ -32,27 +33,27 @@ export const ecfStep = (journeyCode: string): ReturnType<typeof step> =>
           legend: {
             classes: "govuk-fieldset__legend--l",
             isPageHeading: true,
-            text: "Does this case require Exceptional Case Funding?",
+            text: t("journeys.createApplication.ecf.title"),
           },
         },
         items: [
           {
-            text: "Yes",
+            text: t("common.yes"),
             value: "yes",
           },
           {
-            text: "No",
+            text: t("common.no"),
             value: "no",
           },
         ],
         validWhen: [
           validation({
             condition: Self().match(Condition.IsRequired()),
-            message: "Please select an option",
+            message: t("journeys.createApplication.ecf.validation.required"),
           }),
         ],
       }),
-      GovUKButton({ text: "Continue" }),
+      GovUKButton({ text: t("common.continue") }),
     ],
     onSubmission: [
       submit({
@@ -75,5 +76,5 @@ export const ecfStep = (journeyCode: string): ReturnType<typeof step> =>
     ],
     path: "/ecf",
     reachability: { entryWhen: true },
-    title: "Does this case require Exceptional Case Funding?",
+    title: t("journeys.createApplication.ecf.title"),
   });

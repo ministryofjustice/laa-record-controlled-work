@@ -17,8 +17,11 @@ import {
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
 import { JourneyEffects } from "#/journeys/effects.js";
+import { t } from "#/lib/i18n.js";
 
-export const legalAidBefore6MonthsStep = (
+const REASON_MAX_LENGTH = 500;
+
+export const legalAidLast6MonthsStep = (
   journeyCode: string,
 ): ReturnType<typeof step> =>
   step({
@@ -27,7 +30,7 @@ export const legalAidBefore6MonthsStep = (
         href: "/create-application/legal-aid-before",
       }),
       HtmlBlock({
-        content: '<span class="govuk-caption-l">Client and case details</span>',
+        content: `<span class="govuk-caption-l">${t("journeys.createApplication.caption")}</span>`,
       }),
       GovUKRadioInput({
         code: "legalAidLast6Months",
@@ -35,7 +38,7 @@ export const legalAidBefore6MonthsStep = (
           legend: {
             classes: "govuk-fieldset__legend--l",
             isPageHeading: true,
-            text: "Did your client get legal help for this matter in the last 6 months?",
+            text: t("journeys.createApplication.legalAidLast6Months.title"),
           },
         },
         items: [
@@ -45,35 +48,37 @@ export const legalAidBefore6MonthsStep = (
               dependentWhen: Answer("legalAidLast6Months").match(
                 Condition.Equals("yes"),
               ),
-              label:
-                "Explain the reason for creating a new case for the same matter",
-              /* eslint-disable-next-line @typescript-eslint/no-magic-numbers -- this is the max character length for the reason field */
-              maxLength: 500,
+              label: t(
+                "journeys.createApplication.legalAidLast6Months.reasonForYes.hint",
+              ),
+              maxLength: REASON_MAX_LENGTH,
               validWhen: [
                 validation({
                   condition: Self().match(Condition.IsRequired()),
-                  message:
-                    "Enter the reason you're creating a new case for the same matter",
+                  message: t(
+                    "journeys.createApplication.legalAidLast6Months.validation.reasonRequired",
+                  ),
                 }),
               ],
             }),
-            text: "Yes",
+            text: t("common.yes"),
             value: "yes",
           },
           {
-            text: "No",
+            text: t("common.no"),
             value: "no",
           },
         ],
         validWhen: [
           validation({
             condition: Self().match(Condition.IsRequired()),
-            message:
-              "Select if your client got legal help for this matter in the last 6 months",
+            message: t(
+              "journeys.createApplication.legalAidLast6Months.validation.required",
+            ),
           }),
         ],
       }),
-      GovUKButton({ text: "Continue" }),
+      GovUKButton({ text: t("common.continue") }),
     ],
     onSubmission: [
       submit({
@@ -91,6 +96,8 @@ export const legalAidBefore6MonthsStep = (
       }),
     ],
     path: "/legal-aid-last-6-months",
-    title:
-      "Did your client get legal help for this matter in the last 6 months?",
+    reachability: {
+      entryWhen: Query("returnTo").match(Condition.Equals("check-answers")),
+    },
+    title: t("journeys.createApplication.legalAidLast6Months.title"),
   });

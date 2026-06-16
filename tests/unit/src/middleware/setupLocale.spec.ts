@@ -3,7 +3,7 @@
  */
 
 import { setupLocaleMiddleware } from '#/middleware/setupLocale.js';
-import { initializeI18nextSync } from '#/lib/i18nLoader.js';
+import { initializeI18nextSync } from '#/lib/i18n.js';
 
 import { expect } from 'chai';
 import type { NextFunction, Request, Response } from "express";

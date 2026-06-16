@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 
 import express from "express";
 
-import { OK } from "#/lib/constants/httpStatus.js";
+import { OK } from "#/lib/constants/http.js";
 
 const router = express.Router();
 
