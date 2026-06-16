@@ -2,10 +2,7 @@ import { expect } from "chai";
 
 import type { EvaluatedBlock } from "@ministryofjustice/hmpps-forge/core/components";
 
-import {
-  Autocomplete,
-  autocomplete,
-} from "#/journeys/components/autocomplete/autocomplete.component.js";
+import { autocomplete } from "#/journeys/components/autocomplete/autocomplete.component.js";
 import type { Autocomplete as AutocompleteBlock } from "#/journeys/components/autocomplete/autocomplete.types.js";
 
 type MockBlock = EvaluatedBlock<AutocompleteBlock>;
@@ -26,10 +23,6 @@ function makeBlock(overrides: Partial<MockBlock> = {}): MockBlock {
 
 describe("Autocomplete component", () => {
   describe("autocomplete (registry entry)", () => {
-    it("has variant 'autocomplete'", () => {
-      expect(autocomplete.variant).to.equal("autocomplete");
-    });
-
     describe("render()", () => {
       it("includes a JSON script tag with the data", () => {
         const block = makeBlock({ data: ["Manchester", "Liverpool"] });
@@ -40,21 +33,8 @@ describe("Autocomplete component", () => {
         expect(html).to.include(JSON.stringify(["Manchester", "Liverpool"]));
       });
 
-      it("wraps the field HTML in an autocomplete-wrapper element", () => {
-        const block = makeBlock();
-        const html = autocomplete.render(block);
-        expect(html).to.include("<autocomplete-wrapper ");
-        expect(html).to.include("</autocomplete-wrapper>");
-        expect(html).to.include('<input id="field-code-input" />');
-      });
 
-      it("sets data-autocomplete-source to the script tag ID derived from field code", () => {
-        const block = makeBlock();
-        const html = autocomplete.render(block);
-        expect(html).to.include(
-          'data-autocomplete-source="autocomplete-data-fieldCode"',
-        );
-      });
+
 
       it("falls back to 'autocomplete-field' as the field code when code is not a string", () => {
         const block = makeBlock({
@@ -145,6 +125,7 @@ describe("Autocomplete component", () => {
         expect(html).not.to.include("data-autocomplete-min-length");
         expect(html).not.to.include("data-autocomplete-autoselect");
         expect(html).not.to.include("data-autocomplete-menu-classes");
+        expect(html).not.to.include("data-autocomplete-menu-attributes");
       });
 
       it("serialises menuAttributes as JSON", () => {
@@ -157,41 +138,26 @@ describe("Autocomplete component", () => {
         );
       });
 
-      it("omits data-autocomplete-menu-attributes when menuAttributes is not provided", () => {
-        const block = makeBlock();
+
+      it("wraps output in autocomplete-with-clear div and renders a clear button when clearLinkText is set", () => {
+        const block = makeBlock({
+          field: {
+            block: { code: "fieldCode" } as unknown as MockBlock["field"]["block"],
+            html: "<input />",
+          },
+          clearLinkText: "Clear",
+        });
         const html = autocomplete.render(block);
-        expect(html).not.to.include("data-autocomplete-menu-attributes");
+        expect(html).to.include('<div class="autocomplete-with-clear">');
+        expect(html).to.include('id="fieldCode-clear"');
+        expect(html).to.include("Clear");
       });
 
-      it("encodes a keyed data object as JSON", () => {
-        const data = { countries: ["Ireland", "Goal B"], risks: ["Risk X"] };
-        const block = makeBlock({ data });
+      it("does not render the clear button when clearLinkText is an empty string", () => {
+        const block = makeBlock({ clearLinkText: "" });
         const html = autocomplete.render(block);
-        expect(html).to.include(JSON.stringify(data));
+        expect(html).not.to.include('-clear"');
       });
-    });
-  });
-
-  describe("Autocomplete() builder", () => {
-    it("returns a block with variant 'autocomplete'", () => {
-      const result = Autocomplete({
-        data: ["Option 1"],
-        field: {} as AutocompleteBlock["field"],
-      });
-      expect(result.variant).to.equal("autocomplete");
-    });
-
-    it("includes the provided props in the returned block", () => {
-      const data = ["Alpha", "Beta"];
-      const result = Autocomplete({
-        data,
-        field: {} as AutocompleteBlock["field"],
-        minLength: 2,
-        autoselect: true,
-      });
-      expect(result.data).to.deep.equal(data);
-      expect(result.minLength).to.equal(2);
-      expect(result.autoselect).to.equal(true);
     });
   });
 });

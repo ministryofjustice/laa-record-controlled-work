@@ -22,9 +22,7 @@ autocomplete-wrapper {
 .autocomplete__wrapper {
   margin-bottom: 0;
 }
-
-// Flex wrapper rendered when clearLinkText is set — aligns the clear link
-// with the bottom of the input without affecting the input's width
+// Ensure if clear button is present, it doesn't add extra vertical space
 .autocomplete-with-clear {
   display: grid;
   grid-template-rows: min-content min-content;
