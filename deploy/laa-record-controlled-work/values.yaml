@@ -84,9 +84,6 @@ rcw:
   #
   # envSecrets: 
   #   - Keys to pull from that secret.
-  #   - Each key must also be listed in the env: block of the deploy step
-  #     in deploy-environment.yml, so the CI job can pass the value to
-  #     the kubectl upsert step.
   #
   # Helm merges maps (env:) deeply across values files, but replaces
   # lists (envSecrets:) entirely. If an environment needs additional
