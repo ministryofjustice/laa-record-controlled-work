@@ -76,7 +76,7 @@ rcw:
   # Secret env vars stored in a Kubernetes Secret, referenced via
   # secretKeyRef in the deployment template.
   #
-  # envSecretName: 
+  # envSecretName:
   #   - The name of the Kubernetes Secret to create/update.
   #   - Scoped per Kubernetes namespace (one per environment), shared across all releases
   #     including ephemeral branches - all releases in a namespace use the
@@ -88,7 +88,7 @@ rcw:
   # Helm merges maps (env:) deeply across values files, but replaces
   # lists (envSecrets:) entirely. If an environment needs additional
   # secrets, repeat the full envSecrets: list in its values file.
-  envSecretName: env-secrets
+  envSecretName: rcw-env-secrets
   envSecrets:
     - SESSION_SECRET
     - SESSION_ENCRYPTION_KEY
