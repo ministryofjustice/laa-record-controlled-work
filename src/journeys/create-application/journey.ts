@@ -4,6 +4,7 @@ import { legalAidLast6MonthsStep } from "#/journeys/create-application/steps/3-l
 import { clientDetailsStep } from "#/journeys/create-application/steps/4-client-details.step.js";
 import { haveAHomeAddressStep } from "#/journeys/create-application/steps/6-have-a-home-address.step.js";
 import { enterAddressManuallyStep } from "#/journeys/create-application/steps/7-enter-address-manually.step.js";
+import { enterOverseasAddressStep } from "#/journeys/create-application/steps/8-enter-overseas-address.step.js";
 import { JourneyEffects } from "#/journeys/effects.js";
 
 import { ineligibleStep } from "./steps/1-ecf-dropout.step.js";
@@ -32,6 +33,7 @@ export const createApplicationJourney = journey({
     niNumberStep(journeyCode),
     haveAHomeAddressStep(journeyCode),
     enterAddressManuallyStep(journeyCode),
+    enterOverseasAddressStep(journeyCode),
     checkAnswersStep(),
   ],
   title: "Record new case",

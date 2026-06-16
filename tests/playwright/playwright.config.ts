@@ -5,7 +5,7 @@ export const ENTRA_TEST_CONFIG = {
   ENTRA_CLIENT_SECRET: "test-client-secret",
   ENTRA_TENANT_ID: "test-tenant-id",
   ENTRA_AUTHORITY_BASE_URL: "https://login.microsoftonline.com/",
-  ENTRA_REDIRECT_URI: "http://localhost:3000/auth/code/callback",
+  ENTRA_REDIRECT_URI: "http://localhost:3001/auth/code/callback",
 };
 
 /**
@@ -20,7 +20,7 @@ export const MSW_CONFIG = {
  * Test configuration values
  */
 export const TEST_CONFIG = {
-  BASE_URL: process.env.BASE_URL || "http://localhost:3000",
+  BASE_URL: process.env.BASE_URL || "http://localhost:3001",
 };
 
 /**
@@ -45,7 +45,7 @@ export default defineConfig({
   ],
   webServer: {
     command: process.env.CI === "true" ? "yarn tsx scripts/test-server-with-msw.ts" : "yarn build && yarn tsx scripts/test-server-with-msw.ts",
-    url: "http://127.0.0.1:3000/health",
+    url: "http://127.0.0.1:3001/health",
     reuseExistingServer: process.env.CI !== "true",
     stdout: "pipe",
     stderr: "pipe",
@@ -53,7 +53,7 @@ export default defineConfig({
     cwd: "../..", // Run from project root since config is now in tests/playwright/ subdirectory
     env: {
       NODE_ENV: "test",
-      PORT: "3000",
+      PORT: "3001",
       PLAYWRIGHT_TEST_SIGNIN: "true",
       SESSION_SECRET: "test-secret-key-for-playwright-tests",
       SERVICE_NAME: "Record civil controlled work",

@@ -16,6 +16,10 @@ import {
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
 import { JourneyEffects } from "#/journeys/effects.js";
+import {
+  ADDRESS_FIELD,
+  OVERSEAS_EXCLUSIVE_ADDRESS_FIELDS,
+} from "#/journeys/journey.constants.js";
 import { t } from "#/lib/i18n.js";
 
 export const enterAddressManuallyStep = (
@@ -33,7 +37,7 @@ export const enterAddressManuallyStep = (
         text: t("journeys.createApplication.enterAddressManually.title"),
       }),
       GovUKTextInput({
-        code: "addressLine1",
+        code: ADDRESS_FIELD.addressLine1,
         label: {
           isPageHeading: false,
           text: t(
@@ -50,7 +54,7 @@ export const enterAddressManuallyStep = (
         ],
       }),
       GovUKTextInput({
-        code: "addressLine2",
+        code: ADDRESS_FIELD.addressLine2,
         label: {
           isPageHeading: false,
           text: t(
@@ -60,7 +64,7 @@ export const enterAddressManuallyStep = (
       }),
       GovUKTextInput({
         classes: "govuk-!-width-two-thirds",
-        code: "townOrCity",
+        code: ADDRESS_FIELD.townOrCity,
         label: {
           isPageHeading: false,
           text: t(
@@ -78,7 +82,7 @@ export const enterAddressManuallyStep = (
       }),
       GovUKTextInput({
         classes: "govuk-!-width-two-thirds",
-        code: "county",
+        code: ADDRESS_FIELD.county,
         label: {
           isPageHeading: false,
           text: t(
@@ -88,7 +92,7 @@ export const enterAddressManuallyStep = (
       }),
       GovUKTextInput({
         classes: "govuk-input--width-10",
-        code: "postcode",
+        code: ADDRESS_FIELD.postcode,
         label: {
           isPageHeading: false,
           text: t(
@@ -105,14 +109,20 @@ export const enterAddressManuallyStep = (
         ],
       }),
       HtmlBlock({
-        content: `<p class="govuk-body"><a class="govuk-link" href="/enter-overseas-address">${t("journeys.createApplication.enterAddressManually.nonUkAddress")}</a></p>`,
+        content: `<p class="govuk-body"><a class="govuk-link" href="/create-application/enter-overseas-address">${t("journeys.createApplication.enterAddressManually.nonUkAddress")}</a></p>`,
       }),
       GovUKButton({ text: t("common.continue") }),
     ],
     onSubmission: [
       submit({
         onValid: {
-          effects: [JourneyEffects.SaveDraftAnswers(journeyCode)],
+          effects: [
+            JourneyEffects.ClearFieldAnswers(
+              journeyCode,
+              OVERSEAS_EXCLUSIVE_ADDRESS_FIELDS,
+            ),
+            JourneyEffects.SaveDraftAnswers(journeyCode),
+          ],
           next: [
             redirect({
               goto: "check-answers",
