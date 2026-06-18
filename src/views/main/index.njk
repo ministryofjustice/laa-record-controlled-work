@@ -1,5 +1,11 @@
 {% extends "base.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% block content %}
     <h1 class="govuk-heading-xl">{{ t('pages.index.defaultHeading') }}</h1>
+    {{ govukButton({
+        text: "Temporary Record New Case",
+        href: '/create-application',
+        isStartButton: true
+    })  }}
 {% endblock %}
