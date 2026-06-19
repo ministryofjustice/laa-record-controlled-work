@@ -85,9 +85,21 @@ runs:
         BRANCH_NAME: ${{ inputs.branch-ref }}
         PR_NUMBER: ${{ github.event.pull_request.number }}
       run: |
+        LABEL_NAME="ephemeral-deployed"
+
+        if gh pr view "$PR_NUMBER" --json labels --jq '.labels[].name' | grep -Fxq "$LABEL_NAME"; then
+          echo "PR #$PR_NUMBER already has '$LABEL_NAME' label; skipping comment."
+          exit 0
+        fi
+
+        if ! gh label list --limit 1000 --json name --jq '.[].name' | grep -Fxq "$LABEL_NAME"; then
+          gh label create "$LABEL_NAME" --description "PR has been deployed to ephemeral environment" --color "0E8A16"
+        fi
+
         RELEASE_NAME=$(./scripts/release-name.sh "$BRANCH_NAME")
         URL="https://${RELEASE_NAME}-laa-record-controlled-work-uat.cloud-platform.service.justice.gov.uk"
-        gh pr comment "$PR_NUMBER" --body "Ephemeral environment deployed: ${URL}"
+        gh pr comment "$PR_NUMBER" --body $'Ephemeral environment deployed:\n'"$URL"
+        gh pr edit "$PR_NUMBER" --add-label "$LABEL_NAME"
 
 # TODO set up slack notification
 # - name: Notify deployment failure
