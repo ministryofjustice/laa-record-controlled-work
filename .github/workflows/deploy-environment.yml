@@ -28,16 +28,6 @@ jobs:
 
       - name: Deploy
         uses: ./.github/actions/deploy
-        env:
-          # This block only contains secrets being used as pod
-          # environment variables. Anything used by the workflow
-          # should be an input.
-          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
-          SESSION_ENCRYPTION_KEY: ${{ secrets.SESSION_ENCRYPTION_KEY }}
-          ENTRA_CLIENT_ID: ${{ secrets.ENTRA_CLIENT_ID }}
-          ENTRA_CLIENT_SECRET: ${{ secrets.ENTRA_CLIENT_SECRET }}
-          ENTRA_TENANT_ID: ${{ secrets.ENTRA_TENANT_ID }}
-          SECRET_KEY_BASE: ${{ secrets.SECRET_KEY_BASE }}
         with:
           sha: ${{ inputs.sha }}
           branch-ref: ${{ inputs.branch-ref }}

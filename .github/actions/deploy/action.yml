@@ -64,40 +64,6 @@ runs:
           kubectl apply --record=false -f ./deploy/infrastructure/laa-record-controlled-work-uat/
         fi
 
-    - name: Update env-secrets kube secret
-      shell: bash
-      env:
-        K8S_NAMESPACE: ${{ inputs.kube-namespace }}
-      run: |
-        readarray -t keys <<< "$(yq '.rcw.envSecrets[]' ./deploy/laa-record-controlled-work/values.yaml)"
-
-        args=()
-        for key in "${keys[@]}"; do
-          args+=(--from-literal="${key}=${!key}")
-        done
-
-        kubectl create secret generic "env-secrets" \
-          --namespace="$K8S_NAMESPACE" \
-          "${args[@]}" \
-          --dry-run=client -o yaml | kubectl apply -f -
-
-    - name: Update ccq-env-secrets kube secret
-      shell: bash
-      env:
-        K8S_NAMESPACE: ${{ inputs.kube-namespace }}
-      run: |
-        readarray -t keys <<< "$(yq '.ccq.envSecrets[]' ./deploy/laa-record-controlled-work/values.yaml)"
-
-        args=()
-        for key in "${keys[@]}"; do
-          args+=(--from-literal="${key}=${!key}")
-        done
-
-        kubectl create secret generic "ccq-env-secrets" \
-          --namespace="$K8S_NAMESPACE" \
-          "${args[@]}" \
-          --dry-run=client -o yaml | kubectl apply -f -
-
     - name: Deploy using Helm
       shell: bash
       run: ./scripts/deploy.sh ${{ inputs.app-environment }}
