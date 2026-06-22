@@ -84,7 +84,7 @@
     "eslint": "^10.5.0",
     "eslint-config-love": "^154.0.0",
     "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-jsdoc": "^62.9.0",
+    "eslint-plugin-jsdoc": "^63.0.0",
     "eslint-plugin-jsonc": "^3.2.0",
     "eslint-plugin-perfectionist": "^5.9.0",
     "eslint-plugin-prettier": "^5.5.6",
