@@ -30,6 +30,7 @@ import { setupRequestLogging } from "#/middleware/setupRequestLogging.js";
 import { standardMiddleware } from "#/middleware/standardMiddleware.js";
 import healthRouter from "#/routes/health.js";
 import indexRouter from "#/routes/index.js";
+import privateApiRouter from "#/routes/privateApi.js";
 import testRouter from "#/routes/test.js";
 
 const TRUST_FIRST_PROXY = 1;
@@ -110,6 +111,7 @@ const createApp = async (): Promise<express.Application> => {
 
   app.use("/auth", createAuthLimiter(config), authRouter);
   app.use(requireAuth);
+  app.use("/api/private", privateApiRouter);
   app.use("/", indexRouter);
 
   // Enable live-reload middleware in development mode
