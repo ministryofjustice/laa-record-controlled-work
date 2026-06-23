@@ -179,17 +179,38 @@ export const checkAnswersStep = (): ReturnType<typeof step> =>
                     "journeys.createApplication.checkAnswers.changeLink.change",
                   ),
                   visuallyHiddenText: t(
-                    "journeys.createApplication.checkAnswers.answerLabels.fullName",
+                    "journeys.createApplication.checkAnswers.answerLabels.firstName",
                   ),
                 },
               ],
             },
             key: {
               text: t(
-                "journeys.createApplication.checkAnswers.answerLabels.fullName",
+                "journeys.createApplication.checkAnswers.answerLabels.firstName",
               ),
             },
-            value: { text: Answer("fullName") },
+            value: { text: Answer("firstName") },
+          },
+                    {
+            actions: {
+              items: [
+                {
+                  href: "client-details?returnTo=check-answers",
+                  text: t(
+                    "journeys.createApplication.checkAnswers.changeLink.change",
+                  ),
+                  visuallyHiddenText: t(
+                    "journeys.createApplication.checkAnswers.answerLabels.lastName",
+                  ),
+                },
+              ],
+            },
+            key: {
+              text: t(
+                "journeys.createApplication.checkAnswers.answerLabels.lastName",
+              ),
+            },
+            value: { text: Answer("lastName") },
           },
           {
             actions: {

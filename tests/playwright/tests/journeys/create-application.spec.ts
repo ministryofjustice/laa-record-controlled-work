@@ -100,7 +100,8 @@ test("create application flow", async ({ page }) => {
   ).toBeVisible();
 
   // Fill in the full name and date of birth and submit
-  await page.getByLabel("Full name").fill("John Doe");
+  await page.getByLabel("First name").fill("John");
+  await page.getByLabel("Last name").fill("Doe");
   await page.getByLabel("Day").fill("15");
   await page.getByLabel("Month").fill("6");
   await page.getByLabel("Year").fill("1990");
@@ -194,7 +195,7 @@ test("create application flow", async ({ page }) => {
   // Check that all answers are displayed correctly
   const summaryList = page.locator(".govuk-summary-list");
   const rows = summaryList.locator(".govuk-summary-list__row");
-  await expect(rows).toHaveCount(6);
+  await expect(rows).toHaveCount(7);
   await expect(rows.locator(".govuk-summary-list__value")).toHaveText([
     // ECF
     "No",
@@ -202,15 +203,17 @@ test("create application flow", async ({ page }) => {
     "Yes, about the same matter",
     // Did your client get legal help for this matter in the last 6 months?
     "No",
-    // Full name
-    "John Doe",
+    // First name
+    "John",
+    // Last name
+    "Doe",
     // Date of birth
     "15 June 1990",
     // Address
     "10 Some Street, SomeCity, AB1 2CD",
   ], { useInnerText: true });
 
-  const changeAddressLink = rows.nth(5).locator(".govuk-summary-list__actions a");
+  const changeAddressLink = rows.nth(6).locator(".govuk-summary-list__actions a");
   await expect(changeAddressLink).toHaveAttribute(
     "href",
     "enter-address-manually?returnTo=check-answers",
@@ -252,8 +255,8 @@ test("create application flow", async ({ page }) => {
   await page.getByRole("button", { name: "Continue" }).click();
   await expect(page).toHaveURL("/create-application/check-answers");
 
-  // Verify adress has been updated in the summary list
-  await expect(rows.nth(5).locator(".govuk-summary-list__value")).toHaveText(
+  // Verify address has been updated in the summary list
+  await expect(rows.nth(6).locator(".govuk-summary-list__value")).toHaveText(
     "10 Some Other Street, Australia",
     { useInnerText: true },
   );
