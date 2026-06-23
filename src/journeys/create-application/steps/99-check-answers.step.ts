@@ -191,7 +191,7 @@ export const checkAnswersStep = (): ReturnType<typeof step> =>
             },
             value: { text: Answer("firstName") },
           },
-                    {
+          {
             actions: {
               items: [
                 {
