@@ -81,7 +81,7 @@ services:
 
   redis-rcw:
     container_name: rcw-session-redis
-    image: "redis:8.8-alpine@sha256:09160599abd229764c0fb44cb6be640294e1d360a54b19985ab4843dcf2d90f1"
+    image: "redis:8.8-alpine@sha256:9eb6a7ba3d344e1958c7e1589fa3dee90373a934e8159c634562a91d622759a0"
     ports:
       - 6379:6379
     command: >
@@ -98,7 +98,7 @@ services:
 
   redis-ccq:
     container_name: rcw-ccq-cache-redis
-    image: "redis:8.8-alpine@sha256:09160599abd229764c0fb44cb6be640294e1d360a54b19985ab4843dcf2d90f1"
+    image: "redis:8.8-alpine@sha256:9eb6a7ba3d344e1958c7e1589fa3dee90373a934e8159c634562a91d622759a0"
     ports:
       - 6380:6379
     command: >
