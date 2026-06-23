@@ -54,7 +54,8 @@ export const test = base.extend<TestFixtures>({
    */
   checkAccessibility: async ({ page }, use): Promise<void> => {
     const checkAccessibility = async (): Promise<void> => {
-      const accessibilityScanResults = await new AxeBuilder({ page })
+       // https://github.com/dequelabs/axe-core-npm/issues/1279 - axe-core types are broken, so we have to cast the page to playwright-core
+      const accessibilityScanResults = await new AxeBuilder({ page: page as import('playwright-core').Page })
         .withTags(["wcag22a"])
         .analyze();
 
