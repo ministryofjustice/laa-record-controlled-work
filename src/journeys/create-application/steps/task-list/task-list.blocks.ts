@@ -25,7 +25,7 @@ export function taskList(): BlockDefinition[] {
       items: [
         taskItem(
           t("journeys.createApplication.taskList.clientDetails.taskItem.label"),
-          "/client-details",
+          "check-answers",
           Status.Completed,
         ),
       ],
