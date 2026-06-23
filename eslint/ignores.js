@@ -31,5 +31,6 @@ export default {
     "scripts/e2e_coverage/*", // Route coverage analysis scripts
     "public/assets/manifest.json", // Build artifact
     "yarn.lock", // Not JSON
+    "src/api/generated/*" // Generated API client code, not manually edited
   ],
 };

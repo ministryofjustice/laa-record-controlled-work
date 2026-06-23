@@ -31,3 +31,6 @@ coverage/
 # Local workspace
 .local/
 **/*.cjs
+
+# Generated API client code via Orval
+/src/api/generated/*

@@ -34,6 +34,7 @@
   },
   "dependencies": {
     "@azure/msal-node": "^5.2.4",
+    "@faker-js/faker": "^10.4.0",
     "@ministryofjustice/frontend": "9.0.0",
     "@ministryofjustice/hmpps-forge": "^0.1.0-alpha.22",
     "accessible-autocomplete": "^3.0.1",
@@ -95,6 +96,7 @@
     "mocha": "^11.7.6",
     "msw": "^2.14.6",
     "nodemon": "^3.1.14",
+    "orval": "^8.17.0",
     "playwright-core": "^1.60.0",
     "prettier": "^3.8.4",
     "rimraf": "^6.1.3",
