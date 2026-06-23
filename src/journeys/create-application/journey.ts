@@ -5,7 +5,7 @@ import { clientDetailsStep } from "#/journeys/create-application/steps/4-client-
 import { haveAHomeAddressStep } from "#/journeys/create-application/steps/6-have-a-home-address.step.js";
 import { enterAddressManuallyStep } from "#/journeys/create-application/steps/7-enter-address-manually.step.js";
 import { enterOverseasAddressStep } from "#/journeys/create-application/steps/8-enter-overseas-address.step.js";
-import { taskListStep } from "#/journeys/create-application/steps/task-list.step.js";
+import { taskListStep } from "#/journeys/create-application/steps/task-list/task-list.step.js";
 import { JourneyEffects } from "#/journeys/effects.js";
 
 import { ineligibleStep } from "./steps/1-ecf-dropout.step.js";
