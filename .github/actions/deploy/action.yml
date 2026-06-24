@@ -122,4 +122,5 @@ runs:
         slack-mention: ${{ inputs.slack-alerts-mention }}
         message: |
           :red_circle: Main deployment failed for RCW environment: ${{ inputs.app-environment }}
+          
           Run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/attempts/${{ github.run_attempt }}

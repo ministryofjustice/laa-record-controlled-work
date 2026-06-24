@@ -158,7 +158,10 @@ jobs:
           slack-mention: ${{ vars.SLACK_ALERTS_MENTION }}
           message: |
             :red_circle: Main branch CI failed for RCW
-            Jobs monitored: `code-linting`, `code-security-audit`, `snyk`, `snyk-infra`, `mocha-unit-tests`, `playwright`, `intentional-ci-failure-test`, `build-image`
+
+            Jobs monitored: 
+            `code-linting`, `code-security-audit`, `snyk`, `snyk-infra`, `mocha-unit-tests`, `playwright`, `intentional-ci-failure-test`, `build-image`
+            
             Run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/attempts/${{ github.run_attempt }}
 
   deploy-uat:
