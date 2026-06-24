@@ -294,7 +294,7 @@ test("create application flow", async ({ page }) => {
   // Check for the title
   await expect(
     page.getByRole("heading", {
-      name: /Joe Blogs - TODO DYNAMIC/,
+      name: /Joe Blogs/,
       level: 1,
     }),
   ).toBeVisible();

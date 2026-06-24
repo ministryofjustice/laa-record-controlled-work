@@ -17,6 +17,8 @@ describe("Task list step", () => {
 
   describe("GET /create-application/task-list", () => {
     let renderResult: TestRenderResult;
+    let heading: RenderBlock;
+    let body: RenderBlock;
     let taskLists: RenderBlock[];
     let submitButton: RenderBlock;
 
@@ -26,12 +28,17 @@ describe("Task list step", () => {
       });
       expect(result.type).to.equal("render");
       renderResult = result as TestRenderResult;
+      [heading, body] = renderResult.getBlocksByVariant("html");
       taskLists = renderResult.getBlocksByVariant("govukTaskList");
       [submitButton] = renderResult.getBlocksByVariant("govukButton");
     });
 
-    it("has the correct title", () => {
-      expect(renderResult.context.step.title).to.equal("Task List");
+    it("renders the client name as the heading", () => {
+      expect(heading.properties.content).to.equal("Joe Blogs");
+    });
+
+    it("renders the reference number", () => {
+      expect(body.properties.content).to.equal("Reference number: CW-123456");
     });
 
     it("renders 3 task list sections", () => {
@@ -58,7 +65,7 @@ describe("Task list step", () => {
       }>;
       expect(items.length).to.equal(1);
       expect(items[0].title.text).to.equal("Income and capital");
-      expect(items[0].href).to.equal("/income-TODO");
+      expect(items[0].href).to.equal("income-TODO");
       expect(items[0].status.tag.text).to.equal("Incomplete");
     });
 
