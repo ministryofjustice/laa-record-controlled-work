@@ -83,6 +83,15 @@ jobs:
     with:
       sha: ${{ github.event.pull_request.head.sha || github.sha }}
 
+  intentional-ci-failure-test:
+    name: Intentional CI Failure Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fail intentionally to test CI notification
+        run: |
+          echo "::error::Intentional CI failure to verify Slack notification"
+          exit 1
+
   build-image:
     name: Build Docker Image
     runs-on: ubuntu-latest
@@ -135,6 +144,7 @@ jobs:
       - snyk-infra
       - mocha-unit-tests
       - playwright
+      - intentional-ci-failure-test
       - build-image
     steps:
       - name: Notify Slack on CI failure
@@ -145,7 +155,7 @@ jobs:
           slack-mention: ${{ vars.SLACK_ALERTS_MENTION }}
           message: |
             :red_circle: Main branch CI failed for RCW
-            Jobs monitored: `code-linting`, `code-security-audit`, `snyk`, `snyk-infra`, `mocha-unit-tests`, `playwright`, `build-image`
+            Jobs monitored: `code-linting`, `code-security-audit`, `snyk`, `snyk-infra`, `mocha-unit-tests`, `playwright`, `intentional-ci-failure-test`, `build-image`
             Run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/attempts/${{ github.run_attempt }}
 
   deploy-uat:
