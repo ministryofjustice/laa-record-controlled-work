@@ -157,7 +157,7 @@ jobs:
           slack-channel-id: ${{ vars.SLACK_ALERTS_CHANNEL_ID }}
           slack-mention: ${{ vars.SLACK_ALERTS_MENTION }}
           message: |
-            :red_circle: Main branch CI failed for RCW
+            :red_circle: *CI failed for RCW `main` branch*
 
             Jobs monitored: 
             `code-linting`, `code-security-audit`, `snyk`, `snyk-infra`, `mocha-unit-tests`, `playwright`, `intentional-ci-failure-test`, `build-image`
