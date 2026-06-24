@@ -52,11 +52,7 @@ This project uses Yarn 4.14.1 managed by corepack (built into Node.js 16.10+). T
    prek install
    ```
 
-- This hook will run automatically on git commit. To run it manually:
-
-   ```shell
-   make pre-commit
-   ```
+- This hook will run automatically on git commit.
 
 #### Vulnerabilities in PRs
 Renovate can raise PRs for vulnerability patches, but `npmMinimalAgeGate: 7d` in `.yarnrc.yml` will cause Renovate to fail when generating artifacts (creating the lockfile). 

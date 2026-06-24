@@ -28,7 +28,6 @@
     "e2e": "yarn playwright test --config=tests/playwright/playwright.config.ts",
     "e2e:ui": "yarn playwright test --config=tests/playwright/playwright.config.ts --ui",
     "test": "yarn unit && yarn integration && yarn e2e",
-    "pre-commit": "prek run baseline --all-files"
   },
   "engines": {
     "node": "26.1.0"
