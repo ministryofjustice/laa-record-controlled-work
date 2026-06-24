@@ -41,12 +41,7 @@ This project uses Yarn 4.14.1 managed by corepack (built into Node.js 16.10+). T
 
 - We use [devsecops-hooks](https://github.com/ministryofjustice/devsecops-hooks) for pre-commits
 
-1. Install prek and gitleaks packages on local machine
-   ```shell
-   brew install prek gitleaks
-   ```
-
-2. Install precommit hook
+- Install precommit hook
 
    ```shell
    prek install
