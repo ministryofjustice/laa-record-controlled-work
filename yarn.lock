@@ -16,20 +16,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@azure/msal-common@npm:16.8.0":
-  version: 16.8.0
-  resolution: "@azure/msal-common@npm:16.8.0"
-  checksum: 10c0/a363595615710c2a954ff169acec66e097537d73b2e8ae35e6dd81d172c006c17b7b08a4b238ff0a18b3d530d149fcc3d4e778ef0774638477cb5f7be4782fb8
+"@azure/msal-common@npm:16.9.0":
+  version: 16.9.0
+  resolution: "@azure/msal-common@npm:16.9.0"
+  checksum: 10c0/48a876096e57715b40ad392779d8848fa3c851fc4b847fe900f067e39b45bf8a20e8f95d1155f3763f05998fe14b3de974220503b17bd802f995c3d4a269c207
   languageName: node
   linkType: hard
 
-"@azure/msal-node@npm:^5.2.4":
-  version: 5.2.4
-  resolution: "@azure/msal-node@npm:5.2.4"
+"@azure/msal-node@npm:^5.2.5":
+  version: 5.2.5
+  resolution: "@azure/msal-node@npm:5.2.5"
   dependencies:
-    "@azure/msal-common": "npm:16.8.0"
+    "@azure/msal-common": "npm:16.9.0"
     jsonwebtoken: "npm:^9.0.0"
-  checksum: 10c0/b30c192ae603642c52570102475614ba3e226f97c5699f5d49b5ab04621d6e7a963169134a3d47580be560d4b548f4d82880f889312ec322ee0f2dcca7ad0887
+  checksum: 10c0/00288d66355e0256e03f54845ce923a108a04c943f9ae597a5fca49e33c3e7fd790678d3823e08a8dcf4561461276bf853c35a77b2385d7405d48d7fb0cc156d
   languageName: node
   linkType: hard
 
@@ -4964,7 +4964,7 @@ __metadata:
   resolution: "laa-record-controlled-work@workspace:."
   dependencies:
     "@axe-core/playwright": "npm:^4.11.3"
-    "@azure/msal-node": "npm:^5.2.4"
+    "@azure/msal-node": "npm:^5.2.5"
     "@ministryofjustice/frontend": "npm:9.0.0"
     "@ministryofjustice/hmpps-forge": "npm:^0.1.0-alpha.22"
     "@playwright/test": "npm:^1.61.0"
