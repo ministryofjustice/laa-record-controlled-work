@@ -1,5 +1,5 @@
 repos:
   - repo: https://github.com/ministryofjustice/devsecops-hooks
-    rev: 8028d87da82b8152e7a3ad1baeab3a32cb3f5822
+    rev: 5b00ab6401ed59fa55ff76b32cf8027c920cef46
     hooks:
       - id: baseline

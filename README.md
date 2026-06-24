@@ -37,6 +37,25 @@ This project uses Yarn 4.14.1 managed by corepack (built into Node.js 16.10+). T
 - Corepack automatically uses the Yarn version specified in the `packageManager` field of `package.json`. No additional setup is required once corepack is enabled
 - `yarn install --immutable` ensures that the lockfile (`yarn.lock`) is not modified during the installation process
 
+#### Setup Pre-commit hooks
+
+- We use [devsecops-hooks](https://github.com/ministryofjustice/devsecops-hooks) for pre-commits
+
+1. Install prek and gitleaks packages on local machine
+   ```shell
+   brew install prek gitleaks
+   ```
+
+2. Install precommit hook
+
+   ```shell
+   prek install
+   ```
+
+- This hook will run automatically on git commit. To run it manually:
+
+make pre-commit
+
 #### Vulnerabilities in PRs
 Renovate can raise PRs for vulnerability patches, but `npmMinimalAgeGate: 7d` in `.yarnrc.yml` will cause Renovate to fail when generating artifacts (creating the lockfile). 
 
