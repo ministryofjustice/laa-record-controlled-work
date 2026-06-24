@@ -22,7 +22,7 @@
   "ignoreDependencies": [
     "@ministryofjustice/frontend",
     "govuk-frontend",
-    "prek"
+    "@j178/prek"
   ],
   "ignoreBinaries": ["op"]
 }
