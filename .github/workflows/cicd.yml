@@ -176,6 +176,7 @@ jobs:
       - mocha-unit-tests
       - playwright
       - snyk-infra
+      - intentional-ci-failure-test
     secrets: inherit
 
   # deploy-staging:
