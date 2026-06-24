@@ -83,15 +83,6 @@ jobs:
     with:
       sha: ${{ github.event.pull_request.head.sha || github.sha }}
 
-  intentional-ci-failure-test:
-    name: Intentional CI Failure Test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Fail intentionally to test CI notification
-        run: |
-          echo "::error::Intentional CI failure to verify Slack notification"
-          exit 1
-
   build-image:
     name: Build Docker Image
     runs-on: ubuntu-latest
@@ -134,7 +125,7 @@ jobs:
 
   notify-main-ci-failure:
     name: Notify Main CI Failure
-    if: ${{ always() && contains(needs.*.result, 'failure') }}
+    if: ${{ always() && github.ref == 'refs/heads/main' && contains(needs.*.result, 'failure') }}
     runs-on: ubuntu-latest
     environment: uat
     needs:
@@ -144,7 +135,6 @@ jobs:
       - snyk-infra
       - mocha-unit-tests
       - playwright
-      - intentional-ci-failure-test
       - build-image
     steps:
       - name: Checkout code
@@ -160,7 +150,7 @@ jobs:
             :red_circle: *CI failed for RCW `main` branch*
 
             Jobs monitored: 
-            `code-linting`, `code-security-audit`, `snyk`, `snyk-infra`, `mocha-unit-tests`, `playwright`, `intentional-ci-failure-test`, `build-image`
+            `code-linting`, `code-security-audit`, `snyk`, `snyk-infra`, `mocha-unit-tests`, `playwright`, `build-image`
             
             Run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/attempts/${{ github.run_attempt }}
 
@@ -182,7 +172,6 @@ jobs:
       - mocha-unit-tests
       - playwright
       - snyk-infra
-      - intentional-ci-failure-test
     secrets: inherit
 
   # deploy-staging:
