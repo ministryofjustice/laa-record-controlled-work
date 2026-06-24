@@ -41,7 +41,7 @@ export function taskList(): BlockDefinition[] {
           t(
             "journeys.createApplication.taskList.meansAssessment.taskItem.label",
           ),
-          "/income-TODO",
+          "income-TODO",
           Status.Incomplete,
         ),
       ],
@@ -59,14 +59,14 @@ export function taskList(): BlockDefinition[] {
           t(
             "journeys.createApplication.taskList.EvidenceAndDeclaration.taskItem.evidence.label",
           ),
-          "/evidence-TODO",
+          "evidence-TODO",
           Status.CannotStart,
         ),
         taskItem(
           t(
             "journeys.createApplication.taskList.EvidenceAndDeclaration.taskItem.declaration.label",
           ),
-          "/client-declaration-TODO",
+          "client-declaration-TODO",
           Status.CannotStart,
         ),
       ],

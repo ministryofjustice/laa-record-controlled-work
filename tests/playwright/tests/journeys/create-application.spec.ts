@@ -267,11 +267,6 @@ test("create application flow", async ({ page }) => {
 
   await page.getByLabel("Address line 1").fill("10 Some Other Street");
   
-
-  // ==========================================================================
-  // Check answers page
-  // ==========================================================================
-
   // Navigate back to the check answers page
   await page.getByRole("button", { name: "Continue" }).click();
   await expect(page).toHaveURL("/create-application/check-answers");
@@ -296,5 +291,44 @@ test("create application flow", async ({ page }) => {
   // Task list page
   // ==========================================================================
 
+  // Check for the title
+  await expect(
+    page.getByRole("heading", {
+      name: /Joe Blogs - TODO DYNAMIC/,
+      level: 1,
+    }),
+  ).toBeVisible();
   
+  // Check that the task list sections are displayed
+  const taskListSections = page.locator(".govuk-task-list");
+  await expect(taskListSections).toHaveCount(3);
+
+  // Check that the client details task is marked as completed
+  const clientDetailsTask = taskListSections.nth(0).locator(".govuk-task-list__item");
+  await expect(clientDetailsTask.locator(".govuk-task-list__status")).toHaveText("Completed");
+
+  // Click Completed link and verify redirection to the check answers page and return
+  await clientDetailsTask.locator("a").click();
+  await expect(page).toHaveURL("/create-application/check-answers");
+  await page.getByRole("button", { name: "Save and continue" }).click();
+  await expect(page).toHaveURL("/create-application/task-list");
+  await expect(clientDetailsTask.locator(".govuk-task-list__status")).toHaveText("Completed");
+
+  // Check that the means assessment task is marked as incomplete
+  const meansAssessmentTask = taskListSections.nth(1).locator(".govuk-task-list__item");
+  await expect(meansAssessmentTask.locator(".govuk-task-list__status")).toHaveText("Incomplete");
+
+  // click Incomplete link and verify redirection to the income page and return
+  await meansAssessmentTask.locator("a").click();
+  await expect(page).toHaveURL("/create-application/income-TODO");
+  
+  await page.goto("/create-application/task-list");
+
+  // Submit the task list form
+  await page.getByRole("button", { name: "Save and return later" }).click();
+
+  // Verify redirection to the case list page
+  await expect(page).toHaveURL("/case-list"); 
+  
+
 });
