@@ -51,10 +51,16 @@
       },
       "clientDetails": {
         "title": "Your client's details",
-        "fullName": {
-          "label": "Full name",
+        "firstName": {
+          "label": "First name",
           "validation": {
-            "required": "Enter your client's name"
+            "required": "Enter your client's first name"
+          }
+        },
+        "lastName": {
+          "label": "Last name",
+          "validation": {
+            "required": "Enter your client's last name"
           }
         },
         "dateOfBirth": {
@@ -152,7 +158,8 @@
           "legalAidBefore": "Accessed legal aid before",
           "legalAidLast6Months": "Did your client get legal help for this matter in the last 6 months?",
           "legalAidLast6MonthsReasonForYes": "Reason for new application for same matter",
-          "fullName": "Full name",
+          "firstName": "First name",
+          "lastName": "Last name",
           "dateOfBirth": "Date of birth",
           "niNumber": "National Insurance number",
           "address": "Address"

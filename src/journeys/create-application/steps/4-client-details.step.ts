@@ -36,17 +36,33 @@ export const clientDetailsStep = (
         text: t("journeys.createApplication.clientDetails.title"),
       }),
       GovUKTextInput({
-        code: "fullName",
+        code: "firstName",
         label: {
           classes: "govuk-label--m",
           isPageHeading: false,
-          text: t("journeys.createApplication.clientDetails.fullName.label"),
+          text: t("journeys.createApplication.clientDetails.firstName.label"),
         },
         validWhen: [
           validation({
             condition: Self().match(Condition.IsRequired()),
             message: t(
-              "journeys.createApplication.clientDetails.fullName.validation.required",
+              "journeys.createApplication.clientDetails.firstName.validation.required",
+            ),
+          }),
+        ],
+      }),
+      GovUKTextInput({
+        code: "lastName",
+        label: {
+          classes: "govuk-label--m",
+          isPageHeading: false,
+          text: t("journeys.createApplication.clientDetails.lastName.label"),
+        },
+        validWhen: [
+          validation({
+            condition: Self().match(Condition.IsRequired()),
+            message: t(
+              "journeys.createApplication.clientDetails.lastName.validation.required",
             ),
           }),
         ],
