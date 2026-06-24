@@ -134,7 +134,7 @@ jobs:
 
   notify-main-ci-failure:
     name: Notify Main CI Failure
-    if: ${{ always() && github.ref == 'refs/heads/main' && contains(needs.*.result, 'failure') }}
+    if: ${{ always() && contains(needs.*.result, 'failure') }}
     runs-on: ubuntu-latest
     environment: uat
     needs:
