@@ -44,7 +44,7 @@ This project uses Yarn 4.14.1 managed by corepack (built into Node.js 16.10+). T
 - Install precommit hook
 
    ```shell
-   prek install
+   yarn prek install
    ```
 
 - This hook will run automatically on git commit.
