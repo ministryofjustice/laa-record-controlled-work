@@ -33,9 +33,9 @@ jobs:
           sha: ${{ inputs.sha }}
           branch-ref: ${{ inputs.branch-ref }}
           app-environment: ${{ inputs.app-environment }}
-          slack-deployment-bot-token: ${{ secrets.SLACK_DEPLOYMENT_BOT_TOKEN }}
-          slack-deployment-channel-id: ${{ vars.SLACK_DEPLOYMENT_CHANNEL_ID }}
-          slack-deployment-mention: ${{ vars.SLACK_DEPLOYMENT_MENTION }}
+          slack-alerts-bot-token: ${{ secrets.SLACK_ALERTS_BOT_TOKEN }}
+          slack-alerts-channel-id: ${{ vars.SLACK_ALERTS_CHANNEL_ID }}
+          slack-alerts-mention: ${{ vars.SLACK_ALERTS_MENTION }}
           ecr-registry_url: ${{ secrets.ECR_REGISTRY_URL }}
           ecr-repository: ${{ vars.ECR_REPOSITORY }}
           ccq-ecr-repository: ${{ vars.CCQ_ECR_REPOSITORY }}

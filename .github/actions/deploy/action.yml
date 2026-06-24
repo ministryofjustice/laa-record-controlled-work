@@ -39,15 +39,15 @@ inputs:
   branch-ref:
     description: "Branch ref for ephemeral deployments"
     default: ''
-  slack-deployment-bot-token:
-    description: "Slack app bot token used to post deployment failure notifications"
+  slack-alerts-bot-token:
+    description: "Slack app bot token used to post failure notifications"
     required: false
     default: ''
-  slack-deployment-channel-id:
-    description: "Slack channel ID for deployment failure notifications"
+  slack-alerts-channel-id:
+    description: "Slack channel ID for failure notifications"
     required: false
     default: ''
-  slack-deployment-mention:
+  slack-alerts-mention:
     description: "Optional Slack mention token (for example <!subteam^S12345>)"
     required: false
     default: ''
@@ -113,45 +113,13 @@ runs:
         gh pr comment "$PR_NUMBER" --body $'Ephemeral environment deployed:\n'"$URL"
         gh pr edit "$PR_NUMBER" --add-label "$LABEL_NAME"
 
-    - name: Fail on purpose for notification testing
-      if: 'true'
-      shell: bash
-      run: |
-        echo "::error::Intentional deployment failure for Slack notification test"
-        exit 1
-
     - name: Notify deployment failure
-      if: ${{ failure() && inputs.slack-deployment-bot-token != '' && inputs.slack-deployment-channel-id != '' }}
-      shell: bash
-      env:
-        APP_ENVIRONMENT: ${{ inputs.app-environment }}
-        REPOSITORY: ${{ github.repository }}
-        RUN_ID: ${{ github.run_id }}
-        RUN_ATTEMPT: ${{ github.run_attempt }}
-        WORKFLOW: ${{ github.workflow }}
-        SLACK_BOT_TOKEN: ${{ inputs.slack-deployment-bot-token }}
-        SLACK_CHANNEL_ID: ${{ inputs.slack-deployment-channel-id }}
-        SLACK_MENTION: ${{ inputs.slack-deployment-mention }}
-      run: |
-        RUN_URL="https://github.com/${REPOSITORY}/actions/runs/${RUN_ID}/attempts/${RUN_ATTEMPT}"
-        MENTION_PREFIX=""
-
-        if [ -n "$SLACK_MENTION" ]; then
-          MENTION_PREFIX="${SLACK_MENTION}\\n"
-        fi
-
-        PAYLOAD=$(jq -n \
-          --arg channel "$SLACK_CHANNEL_ID" \
-          --arg text "${MENTION_PREFIX}:red_circle: Deployment failed\nRepository: ${REPOSITORY}\nWorkflow: ${WORKFLOW}\nEnvironment: ${APP_ENVIRONMENT}\nRun: ${RUN_URL}" \
-          '{channel: $channel, text: $text}')
-
-        RESPONSE=$(curl --silent --show-error --fail-with-body \
-          -X POST "https://slack.com/api/chat.postMessage" \
-          -H "Authorization: Bearer ${SLACK_BOT_TOKEN}" \
-          -H "Content-type: application/json; charset=utf-8" \
-          --data "$PAYLOAD")
-
-        if ! jq -e '.ok == true' >/dev/null <<<"$RESPONSE"; then
-          echo "Slack API response: $RESPONSE"
-          exit 1
-        fi
+      if: ${{ failure() && github.ref == 'refs/heads/main' && inputs.slack-alerts-bot-token != '' && inputs.slack-alerts-channel-id != '' }}
+      uses: ./.github/actions/notify-slack
+      with:
+        slack-bot-token: ${{ inputs.slack-alerts-bot-token }}
+        slack-channel-id: ${{ inputs.slack-alerts-channel-id }}
+        slack-mention: ${{ inputs.slack-alerts-mention }}
+        message: |
+          :red_circle: Main deployment failed for RCW environment: ${{ inputs.app-environment }}
+          Run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/attempts/${{ github.run_attempt }}
