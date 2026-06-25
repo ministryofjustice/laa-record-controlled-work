@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# Skip in CI environments
-if [ -n "$CI" ]; then
-  echo "Skipping Git hooks setup in CI environment"
+# Skip in CI or Docker environments
+if [ -n "$CI" ] || [ -f /.dockerenv ]; then
+  echo "Skipping Git hooks setup in CI/Docker environment"
   exit 0
 fi
 
