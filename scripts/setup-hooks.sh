@@ -2,6 +2,7 @@
 
 # Skip in CI environments
 if [ -n "$CI" ]; then
+  echo "Skipping Git hooks setup in CI environment"
   exit 0
 fi
 
