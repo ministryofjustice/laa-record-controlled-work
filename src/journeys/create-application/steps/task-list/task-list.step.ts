@@ -12,7 +12,6 @@ import {
 } from "#/journeys/create-application/steps/task-list/task-list.blocks.js";
 import { Status } from "#/journeys/journey.types.js";
 
-
 export interface TaskListData {
   caseReferenceNumber: string;
   clientDetails: { clientName: string; status: Status };

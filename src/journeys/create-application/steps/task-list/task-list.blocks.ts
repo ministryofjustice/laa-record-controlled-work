@@ -35,7 +35,7 @@ export function heading(text: string): ReturnType<typeof GovUKHeading> {
 }
 /**
  * Builds the task list page blocks for the create application journey.
- * @param taskListData
+ * @param taskListData - The data used to populate the task list items.
  * @returns Array of block definitions for the task list page.
  */
 export function taskList(taskListData: TaskListData): BlockDefinition[] {
