@@ -5,6 +5,8 @@ FROM base AS installer
 
 WORKDIR /app
 
+ENV DOCKER=true
+
 # Enable Corepack so it picks up the yarn version from the packageManager field in package.json
 # Remove yarn/yarnpkg shims pre-installed by the base image to avoid conflicts when installing corepack
 RUN rm -f /usr/local/bin/yarn /usr/local/bin/yarnpkg &&\
