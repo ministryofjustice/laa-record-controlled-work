@@ -1,7 +1,9 @@
 import { test, expect } from "../../fixtures/index.js";
 
 test("create application flow", async ({ page }) => {
+  // ==========================================================================
   // ECF page
+  // ==========================================================================
 
   // Navigate to the ECF page
   await page.goto("/create-application/ecf");
@@ -31,7 +33,9 @@ test("create application flow", async ({ page }) => {
   // Verify redirection to the legal aid before page
   await expect(page).toHaveURL("/create-application/legal-aid-before");
 
+  // ==========================================================================
   // Legal aid before page
+  // ==========================================================================
 
   // Check for the question
   await expect(
@@ -48,7 +52,9 @@ test("create application flow", async ({ page }) => {
   // Verify redirection to the legal aid before 6 months page
   await expect(page).toHaveURL("/create-application/legal-aid-last-6-months");
 
-  // Legal aid Within 6 months page
+  // ==========================================================================
+  // Legal aid within 6 months page
+  // ==========================================================================
 
   await expect(
     page.getByRole("heading", {
@@ -89,7 +95,9 @@ test("create application flow", async ({ page }) => {
   // Verify redirection to the client details page
   await expect(page).toHaveURL("/create-application/client-details");
 
-  // Client Details page
+  // ==========================================================================
+  // Client details page
+  // ==========================================================================
 
   // Check for the title
   await expect(
@@ -110,7 +118,10 @@ test("create application flow", async ({ page }) => {
   // Verify redirection to the next page
   await expect(page).toHaveURL("/create-application/ni-number");
 
-  // Test for NI number page
+  // ==========================================================================
+  // National Insurance number page
+  // ==========================================================================
+
   // Check for the question
   await expect(
     page.getByRole("heading", {
@@ -146,7 +157,9 @@ test("create application flow", async ({ page }) => {
   // Verify redirection to the next page
   await expect(page).toHaveURL("/create-application/have-a-home-address");
 
+  // ==========================================================================
   // Have a home address page
+  // ==========================================================================
 
   // Check for the question
   await expect(
@@ -163,7 +176,9 @@ test("create application flow", async ({ page }) => {
   // Verify redirection to the enter address manually page
   await expect(page).toHaveURL("/create-application/enter-address-manually");
 
-  // Enter Address Manually page
+  // ==========================================================================
+  // Enter address manually page
+  // ==========================================================================
 
   // Check for the title
   await expect(
@@ -182,8 +197,10 @@ test("create application flow", async ({ page }) => {
   // Verify redirection to the next page
   await expect(page).toHaveURL("/create-application/check-answers");
 
-  // Check Answers page
-  
+  // ==========================================================================
+  // Check answers page
+  // ==========================================================================
+
   // Check for the title
   await expect(
     page.getByRole("heading", {
@@ -223,7 +240,9 @@ test("create application flow", async ({ page }) => {
   // Verify redirection back to the enter address manually page
   await expect(page).toHaveURL("/create-application/enter-address-manually?returnTo=check-answers");
   
-  // Enter Overseas Address page
+  // ==========================================================================
+  // Enter overseas address page
+  // ==========================================================================
 
   // click the non-UK address link
   await page.getByText("The address is not in the UK").click();
@@ -270,4 +289,49 @@ test("create application flow", async ({ page }) => {
 
   // Verify redirection to the task list page
   await expect(page).toHaveURL("/create-application/task-list");
+
+  // ==========================================================================
+  // Task list page
+  // ==========================================================================
+
+  // Check for the title
+  await expect(
+    page.getByRole("heading", {
+      name: /Joe Blogs/,
+      level: 1,
+    }),
+  ).toBeVisible();
+  
+  // Check that the task list sections are displayed
+  const taskListSections = page.locator(".govuk-task-list");
+  await expect(taskListSections).toHaveCount(3);
+
+  // Check that the client details task is marked as completed
+  const clientDetailsTask = taskListSections.nth(0).locator(".govuk-task-list__item");
+  await expect(clientDetailsTask.locator(".govuk-task-list__status")).toHaveText("Completed");
+
+  // Click Completed link and verify redirection to the check answers page and return
+  await clientDetailsTask.locator("a").click();
+  await expect(page).toHaveURL("/create-application/check-answers");
+  await page.getByRole("button", { name: "Save and continue" }).click();
+  await expect(page).toHaveURL("/create-application/task-list");
+  await expect(clientDetailsTask.locator(".govuk-task-list__status")).toHaveText("Completed");
+
+  // Check that the means assessment task is marked as incomplete
+  const meansAssessmentTask = taskListSections.nth(1).locator(".govuk-task-list__item");
+  await expect(meansAssessmentTask.locator(".govuk-task-list__status")).toHaveText("Incomplete");
+
+  // click Incomplete link and verify redirection to the income page and return
+  await meansAssessmentTask.locator("a").click();
+  await expect(page).toHaveURL("/create-application/income-TODO");
+  
+  await page.goto("/create-application/task-list");
+
+  // Submit the task list form
+  await page.getByRole("button", { name: "Save and return later" }).click();
+
+  // Verify redirection to the case list page
+  await expect(page).toHaveURL("/case-list"); 
+  
+
 });
