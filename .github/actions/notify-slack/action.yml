@@ -1,0 +1,49 @@
+name: "Notify Slack"
+description: "Post a message to Slack using chat.postMessage"
+inputs:
+  slack-bot-token:
+    description: "Slack app bot token"
+    required: true
+  slack-channel-id:
+    description: "Slack channel ID"
+    required: true
+  slack-mention:
+    description: "Optional Slack mention token (for example <!subteam^S12345>)"
+    required: false
+    default: ''
+  message:
+    description: "Slack message body text"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Post message
+      shell: bash
+      env:
+        SLACK_BOT_TOKEN: ${{ inputs.slack-bot-token }}
+        SLACK_CHANNEL_ID: ${{ inputs.slack-channel-id }}
+        SLACK_MENTION: ${{ inputs.slack-mention }}
+        SLACK_MESSAGE: ${{ inputs.message }}
+      run: |
+        MESSAGE_TEXT="$SLACK_MESSAGE"
+
+        if [ -n "$SLACK_MENTION" ]; then
+          printf -v MESSAGE_TEXT '%s\n%s' "$SLACK_MENTION" "$SLACK_MESSAGE"
+        fi
+
+        PAYLOAD=$(jq -n \
+          --arg channel "$SLACK_CHANNEL_ID" \
+          --arg text "$MESSAGE_TEXT" \
+          '{channel: $channel, text: $text}')
+
+        RESPONSE=$(curl --silent --show-error --fail-with-body \
+          -X POST "https://slack.com/api/chat.postMessage" \
+          -H "Authorization: Bearer ${SLACK_BOT_TOKEN}" \
+          -H "Content-type: application/json; charset=utf-8" \
+          --data "$PAYLOAD")
+
+        if ! jq -e '.ok == true' >/dev/null <<<"$RESPONSE"; then
+          echo "Slack API response: $RESPONSE"
+          exit 1
+        fi

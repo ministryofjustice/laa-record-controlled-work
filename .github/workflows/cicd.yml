@@ -123,6 +123,37 @@ jobs:
           dockerfile_path: Dockerfile
           image_tag: ${{ github.event.pull_request.head.sha || github.sha }}
 
+  notify-main-ci-failure:
+    name: Notify Main CI Failure
+    if: ${{ always() && github.ref == 'refs/heads/main' && contains(needs.*.result, 'failure') }}
+    runs-on: ubuntu-latest
+    environment: uat
+    needs:
+      - code-linting
+      - code-security-audit
+      - snyk
+      - snyk-infra
+      - mocha-unit-tests
+      - playwright
+      - build-image
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+
+      - name: Notify Slack on CI failure
+        uses: ./.github/actions/notify-slack
+        with:
+          slack-bot-token: ${{ secrets.SLACK_ALERTS_BOT_TOKEN }}
+          slack-channel-id: ${{ vars.SLACK_ALERTS_CHANNEL_ID }}
+          slack-mention: ${{ vars.SLACK_ALERTS_MENTION }}
+          message: |
+            :red_circle: *CI failed for RCW `main` branch*
+
+            Jobs monitored: 
+            `code-linting`, `code-security-audit`, `snyk`, `snyk-infra`, `mocha-unit-tests`, `playwright`, `build-image`
+            
+            Run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/attempts/${{ github.run_attempt }}
+
   deploy-uat:
     if: github.event_name != 'merge_group' && !(github.event_name == 'pull_request' && github.actor == 'renovate[bot]')
     uses: ./.github/workflows/deploy-environment.yml
