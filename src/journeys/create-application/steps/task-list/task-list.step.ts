@@ -1,33 +1,50 @@
 import {
-  Format,
   redirect,
   step,
   submit,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
+
 import {
-  GovUKBody,
-  GovUKButton,
-  GovUKHeading,
-} from "@ministryofjustice/hmpps-forge/govuk-components";
+  caseReferenceNumber,
+  heading,
+  saveAndReturnButton,
+  taskList,
+} from "#/journeys/create-application/steps/task-list/task-list.blocks.js";
+import { Status } from "#/journeys/journey.types.js";
 
-import { taskList } from "#/journeys/create-application/steps/task-list/task-list.blocks.js";
-import { t } from "#/lib/i18n.js";
 
+export interface TaskListData {
+  caseReferenceNumber: string;
+  clientDetails: { clientName: string; status: Status };
+  declaration: { status: Status };
+  evidence: { status: Status };
+  meansAssessment: { status: Status };
+}
 // TODO: Hardcoded for now, will be dynamic in future
-const CLIENT_NAME = "Joe Blogs";
-const CASE_REF_NUMBER = "CW-123456";
+const TASK_LIST_DATA: TaskListData = {
+  caseReferenceNumber: "CW-123456",
+  clientDetails: {
+    clientName: "Joe Blogs",
+    status: Status.Completed,
+  },
+  declaration: {
+    status: Status.CannotStart,
+  },
+  evidence: {
+    status: Status.CannotStart,
+  },
+  meansAssessment: {
+    status: Status.Incomplete,
+  },
+};
 
 export const taskListStep = (): ReturnType<typeof step> =>
   step({
     blocks: [
-      GovUKHeading({ text: CLIENT_NAME }),
-      GovUKBody({ text: Format("Reference number: %1", CASE_REF_NUMBER) }),
-
-      ...taskList(),
-      GovUKButton({
-        classes: "govuk-button--secondary",
-        text: t("common.saveAndReturn"),
-      }),
+      heading(TASK_LIST_DATA.clientDetails.clientName),
+      caseReferenceNumber(TASK_LIST_DATA.caseReferenceNumber),
+      ...taskList(TASK_LIST_DATA),
+      saveAndReturnButton,
     ],
     onSubmission: [
       submit({

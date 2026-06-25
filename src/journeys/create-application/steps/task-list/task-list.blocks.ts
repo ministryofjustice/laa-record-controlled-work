@@ -1,20 +1,44 @@
 import type { BlockDefinition } from "@ministryofjustice/hmpps-forge/core/components";
 
+import { Format } from "@ministryofjustice/hmpps-forge/core/authoring";
 import {
+  GovUKBody,
+  GovUKButton,
   GovUKHeading,
   GovUKTaskList,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
+import type { TaskListData } from "#/journeys/create-application/steps/task-list/task-list.step.js";
+
 import { taskItem } from "#/journeys/journey.blocks.js";
-import { Status } from "#/journeys/journey.types.js";
 import { H2 } from "#/lib/constants/headings.js";
 import { t } from "#/lib/i18n.js";
 
 /**
+ * Builds a GovUKBody block for the case reference number.
+ * @param caseRefNumber - The text content for the Body.
+ * @returns A GovUKBody block definition.
+ */
+export function caseReferenceNumber(
+  caseRefNumber: string,
+): ReturnType<typeof GovUKBody> {
+  return GovUKBody({ text: Format("Reference number: %1", caseRefNumber) });
+}
+
+/**
+ * Builds a heading block.
+ * @param text - The text content for the heading.
+ * @returns A heading block definition.
+ */
+export function heading(text: string): ReturnType<typeof GovUKHeading> {
+  return GovUKHeading({ text });
+}
+/**
  * Builds the task list page blocks for the create application journey.
+ * @param taskListData
  * @returns Array of block definitions for the task list page.
  */
-export function taskList(): BlockDefinition[] {
+export function taskList(taskListData: TaskListData): BlockDefinition[] {
   return [
     GovUKHeading({
       classes: "govuk-label--m",
@@ -26,7 +50,7 @@ export function taskList(): BlockDefinition[] {
         taskItem(
           t("journeys.createApplication.taskList.clientDetails.taskItem.label"),
           "check-answers",
-          Status.Completed,
+          taskListData.clientDetails.status,
         ),
       ],
     }),
@@ -42,7 +66,7 @@ export function taskList(): BlockDefinition[] {
             "journeys.createApplication.taskList.meansAssessment.taskItem.label",
           ),
           "income-TODO",
-          Status.Incomplete,
+          taskListData.meansAssessment.status,
         ),
       ],
     }),
@@ -60,18 +84,21 @@ export function taskList(): BlockDefinition[] {
             "journeys.createApplication.taskList.EvidenceAndDeclaration.taskItem.evidence.label",
           ),
           "evidence-TODO",
-          Status.CannotStart,
+          taskListData.evidence.status,
         ),
         taskItem(
           t(
             "journeys.createApplication.taskList.EvidenceAndDeclaration.taskItem.declaration.label",
           ),
           "client-declaration-TODO",
-          Status.CannotStart,
+          taskListData.declaration.status,
         ),
       ],
     }),
   ];
 }
 
-// TODO check status method for each task and update the status accordingly. Currently, all tasks are hardcoded to Completed, Incomplete, or CannotStart.
+export const saveAndReturnButton: GovUKButton = GovUKButton({
+  classes: "govuk-button--secondary",
+  text: t("common.saveAndReturn"),
+});
