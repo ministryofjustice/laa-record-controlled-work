@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Skip in CI or Docker environments
 if [ -n "$CI" ] || [ -n "$DOCKER" ]; then

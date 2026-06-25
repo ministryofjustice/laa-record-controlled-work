@@ -10,7 +10,7 @@
   },
   "scripts": {
     "postinstall": "yarn prek",
-    "prek": "bash scripts/setup-hooks.sh",
+    "prek": "sh scripts/setup-hooks.sh",
     "dev": "op run --env-file=.env -- npx tsx src/server.ts",
     "dev:watch": "op run --env-file=.env -- yarn watch",
     "dev:docker": "op run --env-file=.env -- docker compose up --watch --build",
