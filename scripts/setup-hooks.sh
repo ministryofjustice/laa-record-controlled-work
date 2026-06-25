@@ -1,11 +1,5 @@
 #!/bin/sh
 
-# Skip in CI or Docker environments
-if [ -n "$CI" ] || [ -n "$DOCKER" ]; then
-  echo "Skipping Git hooks setup in CI/Docker environment"
-  exit 0
-fi
-
 # Setup script for Git hooks
 echo "Setting up Pre-commit..."
 

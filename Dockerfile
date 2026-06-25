@@ -5,7 +5,10 @@ FROM base AS installer
 
 WORKDIR /app
 
+# Set an environment variable to indicate that the application is running inside a Docker container. 
+# This is used in the package.json postinstall script to conditionally skip the execution of the "prek" script when running in Docker.
 ENV DOCKER=true
+
 
 # Enable Corepack so it picks up the yarn version from the packageManager field in package.json
 # Remove yarn/yarnpkg shims pre-installed by the base image to avoid conflicts when installing corepack
