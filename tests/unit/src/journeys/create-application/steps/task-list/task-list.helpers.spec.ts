@@ -23,7 +23,7 @@ describe("taskItem", () => {
     expect(tag.classes).to.equal("govuk-tag--blue");
   });
 
-  it("Status.CannotStart returns correct text and status with href", () => {
+  it("Status.CannotStart returns correct text and status without href", () => {
     const item = taskItem("Evidence", "/evidence", Status.CannotStart);
 
     expect(item.title.text).to.equal("Evidence");
