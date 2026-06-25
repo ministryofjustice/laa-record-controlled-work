@@ -19,10 +19,6 @@
     "*.ts"
   ],
   "include": ["dependencies", "unlisted", "binaries", "unresolved", "catalog"],
-  "ignoreDependencies": [
-    "@ministryofjustice/frontend",
-    "govuk-frontend",
-    "@j178/prek"
-  ],
-  "ignoreBinaries": ["op"]
+  "ignoreDependencies": ["@ministryofjustice/frontend", "govuk-frontend"],
+  "ignoreBinaries": ["op", "@j178/prek"]
 }

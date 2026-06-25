@@ -20,10 +20,10 @@ This project uses Yarn 4.14.1 managed by corepack (built into Node.js 16.10+). T
    corepack enable
    ```
 
-2. **Install dependencies:**
+2. **Install dependencies and pre-commit hooks:**
 
    ```shell
-   yarn install
+   make install
    ```
 
 3. **Verify the installation:**
@@ -40,13 +40,11 @@ This project uses Yarn 4.14.1 managed by corepack (built into Node.js 16.10+). T
 #### Setup Pre-commit hooks
 
 - We use [devsecops-hooks](https://github.com/ministryofjustice/devsecops-hooks) for pre-commits
-
-- Install precommit hook
-
-   ```shell
-   yarn prek install
-   ```
-
+- This is installed in a postinstall script in yarn and is skipped in CICD
+- you can run the script manually via:
+```sh
+make prek-install
+```
 - This hook will run automatically on git commit.
 
 #### Vulnerabilities in PRs
