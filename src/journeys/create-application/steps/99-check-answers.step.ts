@@ -60,7 +60,7 @@ const addressDisplay = NunjucksGenerators.String({
     {% if line4 %}{{ line4 }},<br />{% endif %}
     {% if town %}{{ town }},<br />{% endif %}
     {% if county %}{{ county }},<br />{% endif %}
-    {% if country %}{{ country }}<br />{% endif %}
+    {% if country and country != "United Kingdom" %}{{ country }}<br />{% endif %}
     {% if postcode %}{{ postcode }}<br />{% endif %}
   `,
 });
