@@ -9,7 +9,7 @@
     "#/*": "./src/*"
   },
   "scripts": {
-    "postinstall": "yarn prek",
+    "postinstall": "[ -n \"$CI\" ] || [ -n \"$DOCKER\" ] || yarn prek",
     "prek": "sh scripts/setup-hooks.sh",
     "dev": "op run --env-file=.env -- npx tsx src/server.ts",
     "dev:watch": "op run --env-file=.env -- yarn watch",
