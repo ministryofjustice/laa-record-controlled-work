@@ -10,7 +10,7 @@ import {
 
 import type { TaskListData } from "#/journeys/create-application/steps/task-list/task-list.step.js";
 
-import { taskItem } from "#/journeys/journey.blocks.js";
+import { taskItem } from "#/journeys/create-application/steps/task-list/task-list.helpers.js";
 import { H2 } from "#/lib/constants/headings.js";
 import { t } from "#/lib/i18n.js";
 

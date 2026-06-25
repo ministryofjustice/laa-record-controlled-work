@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { describe, it } from "mocha";
 
-import { taskItem } from "#/journeys/journey.blocks.js";
+import { taskItem } from "#/journeys/create-application/steps/task-list/task-list.helpers.js";
 import { Status } from "#/journeys/journey.types.js";
 
 describe("taskItem", () => {
