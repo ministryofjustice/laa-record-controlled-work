@@ -39,6 +39,18 @@ inputs:
   branch-ref:
     description: "Branch ref for ephemeral deployments"
     default: ''
+  slack-alerts-bot-token:
+    description: "Slack app bot token used to post failure notifications"
+    required: false
+    default: ''
+  slack-alerts-channel-id:
+    description: "Slack channel ID for failure notifications"
+    required: false
+    default: ''
+  slack-alerts-mention:
+    description: "Optional Slack mention token (for example <!subteam^S12345>)"
+    required: false
+    default: ''
 
 runs:
   using: "composite"
@@ -101,11 +113,14 @@ runs:
         gh pr comment "$PR_NUMBER" --body $'Ephemeral environment deployed:\n'"$URL"
         gh pr edit "$PR_NUMBER" --add-label "$LABEL_NAME"
 
-# TODO set up slack notification
-# - name: Notify deployment failure
-#   shell: bash
-#   if: failure()
-#   run: |
-#     curl -X POST -H 'Content-type: application/json' --data '{"text":"Manage Civil Cases deployment to ${{ inputs.app-environment }} failed!"}' ${{ inputs.slack_webhook_url }}
-#   env:
-#     SLACK_WEBHOOK_URL: ${{ inputs.slack_webhook_url }}
+    - name: Notify deployment failure
+      if: ${{ failure() && github.ref == 'refs/heads/main' && inputs.slack-alerts-bot-token != '' && inputs.slack-alerts-channel-id != '' }}
+      uses: ./.github/actions/notify-slack
+      with:
+        slack-bot-token: ${{ inputs.slack-alerts-bot-token }}
+        slack-channel-id: ${{ inputs.slack-alerts-channel-id }}
+        slack-mention: ${{ inputs.slack-alerts-mention }}
+        message: |
+          :red_circle: Main deployment failed for RCW environment: ${{ inputs.app-environment }}
+          
+          Run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/attempts/${{ github.run_attempt }}

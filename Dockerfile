@@ -1,4 +1,4 @@
-FROM node:26.1.0-alpine@sha256:51b507afc2ba5a8209413bc46c93e3929da14ae6444c647b1aae873601a6580a AS base
+FROM node:26.3.0-alpine@sha256:6e24acff8a03e79cdae25716a1580afdaf6fdd8218874d7073f15007f1c1f95d AS base
 
 ###########################################
 FROM base AS installer
