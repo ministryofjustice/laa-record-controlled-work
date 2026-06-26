@@ -12,7 +12,7 @@ install:
 	yarn install
 
 prek-install:
-	yarn prek
+	yarn prek:install
 
 dev:
 	yarn dev

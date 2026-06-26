@@ -6,7 +6,7 @@ FROM base AS installer
 WORKDIR /app
 
 # Set an environment variable to indicate that the application is running inside a Docker container. 
-# This is used in the package.json postinstall script to conditionally skip the execution of the "prek" script when running in Docker.
+# This is used in the package.json postinstall script to conditionally skip prek installation
 ENV DOCKER=true
 
 
