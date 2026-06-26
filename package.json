@@ -10,7 +10,7 @@
   },
   "scripts": {
     "postinstall": "[ -n \"${CI:-}\" ] || [ -n \"${DOCKER:-}\" ] || yarn prek:install",
-    "prek:install": "prek install && echo Pre-commit hook is now installed \nThis hook runs Moj Secrets Scanner - GitLeaks",
+    "prek:install": "prek install && echo Pre-commit hook is now installed  && echo This hook runs Moj Secrets Scanner - GitLeaks",
     "dev": "op run --env-file=.env -- npx tsx src/server.ts",
     "dev:watch": "op run --env-file=.env -- yarn watch",
     "dev:docker": "op run --env-file=.env -- docker compose up --watch --build",
