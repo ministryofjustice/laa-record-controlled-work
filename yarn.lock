@@ -1601,7 +1601,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^25.9.3":
+"@types/node@npm:^25.9.4":
   version: 25.9.4
   resolution: "@types/node@npm:25.9.4"
   dependencies:
@@ -4736,7 +4736,7 @@ __metadata:
     "@types/express-session": "npm:^1.19.0"
     "@types/mocha": "npm:^10.0.10"
     "@types/morgan": "npm:^1.9.10"
-    "@types/node": "npm:^25.9.3"
+    "@types/node": "npm:^25.9.4"
     "@types/nunjucks": "npm:^3.2.6"
     "@types/sinon": "npm:^21.0.1"
     "@types/supertest": "npm:^7.2.0"
