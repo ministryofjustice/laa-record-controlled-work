@@ -2447,7 +2447,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"concurrently@npm:^10.0.0":
+"concurrently@npm:^10.0.3":
   version: 10.0.3
   resolution: "concurrently@npm:10.0.3"
   dependencies:
@@ -4779,7 +4779,7 @@ __metadata:
     chai: "npm:^6.2.2"
     chai-as-promised: "npm:^8.0.2"
     compression: "npm:^1.8.1"
-    concurrently: "npm:^10.0.0"
+    concurrently: "npm:^10.0.3"
     connect-livereload: "npm:^0.6.1"
     connect-redis: "npm:^9.0.0"
     cookie-parser: "npm:~1.4.7"
