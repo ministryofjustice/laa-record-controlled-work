@@ -1,0 +1,62 @@
+// // NOTE: Supports cases where `content-type` is other than `json`
+const getBody = async (c: Request | Response): Promise<unknown> => {
+  const contentType = c.headers.get("content-type");
+
+  if (contentType?.includes("application/json")) {
+    return await c.json();
+  }
+
+  if (contentType?.includes("application/pdf")) {
+    return await c.blob();
+  }
+
+  return await c.text();
+};
+
+// NOTE: Update just base url
+const getUrl = (contextUrl: string): string => {
+  const url = new URL(contextUrl);
+  const { pathname } = url;
+  const { search } = url;
+  const baseUrl =
+    process.env.NODE_ENV === "production"
+      ? "productionBaseUrl"
+      : "http://localhost:3000";
+
+  const requestUrl = new URL(`${baseUrl}${pathname}${search}`);
+
+  return requestUrl.toString();
+};
+
+// NOTE: Add headers
+const getHeaders = (headers?: HeadersInit): Record<string, string> => {
+  const base: Record<string, string> = {};
+  new Headers(headers).forEach((value, key) => {
+    base[key] = value;
+  });
+  return {
+    ...base,
+    Authorization: "token",
+    "Content-Type": "multipart/form-data",
+  };
+};
+
+export const customFetch = async <T>(
+  url: string,
+  options: RequestInit,
+): Promise<T> => {
+  const requestUrl = getUrl(url);
+  const requestHeaders = getHeaders(options.headers);
+
+  const requestInit: RequestInit = {
+    ...options,
+    headers: requestHeaders,
+  };
+
+  const response = await fetch(requestUrl, requestInit);
+  const data = await getBody(response);
+  const { headers, status } = response;
+  /* eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion --
+    Return shape matches the orval-generated T type at runtime */
+  return { data, headers, status } as unknown as T;
+};
