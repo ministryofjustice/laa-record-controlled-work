@@ -102,6 +102,8 @@ const createApp = async (): Promise<express.Application> => {
   // Setup express-session using redis
   app.use(session(await createSession(config)));
 
+  app.use("/api/private", requireAuth, privateApiRouter);
+
   setupCsrf(app);
 
   // Playwright-only route: sets an authenticated session without going through Entra.
@@ -111,7 +113,6 @@ const createApp = async (): Promise<express.Application> => {
 
   app.use("/auth", createAuthLimiter(config), authRouter);
   app.use(requireAuth);
-  app.use("/api/private", privateApiRouter);
   app.use("/", indexRouter);
 
   // Enable live-reload middleware in development mode
