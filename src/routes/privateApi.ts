@@ -7,6 +7,10 @@ import { logger } from "#/logger.js";
 
 const router = express.Router();
 
+interface PrivateApiLocals {
+  privateApiError?: unknown;
+}
+
 router.use(logFailureStatusCodes);
 
 router.get("/load", (_req: Request, res: Response): void => {
@@ -15,14 +19,20 @@ router.get("/load", (_req: Request, res: Response): void => {
 
 router.use(logRouteErrors);
 
+/**
+ * Logs non-2xx/3xx private API responses, including captured error details where available.
+ * @param req Express request object.
+ * @param res Express response object with typed private API locals.
+ * @param next Express next callback.
+ */
 export function logFailureStatusCodes(
   req: Request,
-  res: Response,
+  res: Response<unknown, PrivateApiLocals>,
   next: NextFunction,
 ): void {
   res.on("finish", () => {
     if (res.statusCode >= BAD_REQUEST) {
-      const privateApiError = res.locals.privateApiError;
+      const { privateApiError } = res.locals;
       const errorDetails =
         privateApiError instanceof Error
           ? {
@@ -43,23 +53,29 @@ export function logFailureStatusCodes(
   next();
 }
 
+/**
+ * Captures and logs route errors with message and stack trace before delegating to downstream handlers.
+ * @param error The error propagated by upstream middleware/handlers.
+ * @param req Express request object.
+ * @param res Express response object with typed private API locals.
+ * @param next Express next callback.
+ */
 export function logRouteErrors(
   error: unknown,
   req: Request,
-  res: Response,
+  res: Response<unknown, PrivateApiLocals>,
   next: NextFunction,
 ): void {
   res.locals.privateApiError = error;
 
-  const logError =
-    error instanceof Error ? error : new Error(String(error));
+  const logError = error instanceof Error ? error : new Error(String(error));
 
   logger.error("Private API route error", logError, {
+    errorMessage: logError.message,
+    errorStack: logError.stack,
     method: req.method,
     path: req.originalUrl,
     statusCode: res.statusCode,
-    errorMessage: logError.message,
-    errorStack: logError.stack,
   });
 
   next(error);
