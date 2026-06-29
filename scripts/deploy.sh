@@ -23,7 +23,7 @@ deploy_branch() {
                 --set rcw.image.tag="$IMAGE_TAG" \
                 --set ccq.image.repository="$REGISTRY/$CCQ_ECR_REPOSITORY" \
                 --set ccq.image.tag="$CCQ_IMAGE_TAG" \
-                --set-string ccq.env.HOST_SERVICE_URL="$BRANCH_RELEASE_NAME-laa-record-controlled-work-rcw:3000" \
+                --set-string ccq.env.HOST_SERVICE_URL="http://$BRANCH_RELEASE_NAME-laa-record-controlled-work-rcw:3000" \
                 --set nginx.image.repository="$REGISTRY/$NGINX_ECR_REPOSITORY" \
                 --set nginx.image.tag="${NGINX_IMAGE_TAG}@${NGINX_ECR_IMAGE_DIGEST_AMD64}" \
                 --set ingress.annotations."external-dns\.alpha\.kubernetes\.io/set-identifier"="$IDENTIFIER" \

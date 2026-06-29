@@ -7,7 +7,6 @@ export const UK_EXCLUSIVE_ADDRESS_FIELD = {
 export const OVERSEAS_EXCLUSIVE_ADDRESS_FIELD = {
   addressLine3: "addressLine3",
   addressLine4: "addressLine4",
-  country: "country",
 } as const;
 
 export const ADDRESS_FIELD = {
@@ -15,6 +14,7 @@ export const ADDRESS_FIELD = {
   addressLine2: "addressLine2",
   ...UK_EXCLUSIVE_ADDRESS_FIELD,
   ...OVERSEAS_EXCLUSIVE_ADDRESS_FIELD,
+  country: "country",
 } as const;
 
 export const UK_EXCLUSIVE_ADDRESS_FIELDS = Object.values(
