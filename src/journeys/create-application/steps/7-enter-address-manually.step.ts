@@ -108,6 +108,16 @@ export const enterAddressManuallyStep = (
           }),
         ],
       }),
+      GovUKTextInput({
+        classes:
+          "govuk-input--width-10 govuk-!-display-none govuk-!-visibility-hidden",
+        code: ADDRESS_FIELD.country,
+        defaultValue: "United Kingdom",
+        label: {
+          isPageHeading: false,
+          text: "",
+        },
+      }),
       HtmlBlock({
         content: `<p class="govuk-body"><a class="govuk-link" href="/create-application/enter-overseas-address">${t("journeys.createApplication.enterAddressManually.nonUkAddress")}</a></p>`,
       }),

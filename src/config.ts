@@ -87,7 +87,7 @@ export default {
       sameSite: "lax",
       secure: useHttps,
     },
-    name: "rcw.sid",
+    name: useHttps ? "__Host-rcw.sid" : "rcw.sid",
     resave: false,
     saveUninitialized: false,
     secret: required.SESSION_SECRET,
