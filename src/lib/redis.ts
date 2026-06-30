@@ -1,5 +1,5 @@
 import { RedisStore } from "connect-redis";
-import { createClient } from "redis";
+import { createClient, type RedisClientType } from "redis";
 
 import type { RedisConfig } from "#/config.types.js";
 
@@ -8,7 +8,6 @@ import { logger } from "#/logger.js";
 import { SECOND } from "./constants/time.js";
 
 export type RedisClientFactory = (options: RedisConfig) => RedisClientType;
-export type RedisClientType = ReturnType<typeof createClient>;
 
 /**
  * Create and configure Redis client
