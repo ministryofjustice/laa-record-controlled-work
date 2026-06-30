@@ -1,10 +1,8 @@
 import {
-  Data,
   redirect,
   step,
   submit,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
-import { GovUKBody } from "@ministryofjustice/hmpps-forge/govuk-components";
 
 import {
   caseReferenceNumber,
@@ -42,8 +40,7 @@ const TASK_LIST_DATA: TaskListData = {
 export const taskListStep = (): ReturnType<typeof step> =>
   step({
     blocks: [
-      GovUKBody({ text: Data("data.id") }),
-      heading(Data("data.name")),
+      heading(TASK_LIST_DATA.clientDetails.clientName),
       caseReferenceNumber(TASK_LIST_DATA.caseReferenceNumber),
       ...taskList(TASK_LIST_DATA),
       saveAndReturnButton,

@@ -1,9 +1,6 @@
 import type { BlockDefinition } from "@ministryofjustice/hmpps-forge/core/components";
 
-import {
-  type Data,
-  Format,
-} from "@ministryofjustice/hmpps-forge/core/authoring";
+import { Format } from "@ministryofjustice/hmpps-forge/core/authoring";
 import {
   GovUKBody,
   GovUKButton,
@@ -33,9 +30,7 @@ export function caseReferenceNumber(
  * @param text - The text content for the heading.
  * @returns A heading block definition.
  */
-export function heading(
-  text: ReturnType<typeof Data>,
-): ReturnType<typeof GovUKHeading> {
+export function heading(text: string): ReturnType<typeof GovUKHeading> {
   return GovUKHeading({ text });
 }
 /**
