@@ -9,7 +9,6 @@ import { z as zod } from 'zod';
 export const Address = zod.object({
   "id": zod.uuid(),
   "addressLine1": zod.string(),
-
   "addressLine2": zod.string().optional(),
   "addressLine3": zod.string().optional(),
   "addressLine4": zod.string().optional(),

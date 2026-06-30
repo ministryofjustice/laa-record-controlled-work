@@ -29,6 +29,7 @@ jobs:
         run: yarn knip
 
   verify-api-code-generation:
+    name: Verify API Code Generation
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
