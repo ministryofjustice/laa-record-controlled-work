@@ -28,7 +28,6 @@ const injected = z.string().refine((val) => !val.startsWith("op://"), {
 });
 
 const requiredEnvSchema = z.object({
-  API_GITHUB_SHA: z.string().nonempty(),
   ENTRA_AUTHORITY_BASE_URL: z.url().nonempty(),
   ENTRA_CLIENT_ID: injected.nonempty(),
   ENTRA_CLIENT_SECRET: injected.nonempty(),

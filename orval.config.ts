@@ -5,10 +5,6 @@ config({ path: ".rcw-api-version.env" });
 
 export default defineConfig({
   rcw: {
-    // commands to run after generating files, e.g. to run a linter or formatter
-    hooks: {
-      afterAllFilesWrite: "make lint-fix",
-    },
     input: {
       filters: {
         mode: "exclude",
