@@ -14,11 +14,11 @@ export type JourneyEffectContext = EffectFunctionContext<
  * Each journey owns a key under `session.journeys` so journeys cannot collide.
  */
 export type JourneySession = Session & {
-  journeyDrafts?: Record<string, Record<string, unknown>>;
-  journeySubmitted?: Record<string, boolean>;
   caseList?: Array<{
     clientName: string;
-    referenceNumber: string;
     lastUpdated?: string;
+    referenceNumber: string;
   }>;
+  journeyDrafts?: Record<string, Record<string, unknown>>;
+  journeySubmitted?: Record<string, boolean>;
 };

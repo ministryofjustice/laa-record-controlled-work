@@ -1,6 +1,7 @@
 import { access, journey } from "@ministryofjustice/hmpps-forge/core/authoring";
 
 import { JourneyEffects } from "#/journeys/effects.js";
+
 import { yourCasesStep } from "./steps/your-cases.step.js";
 
 export const yourCasesJourney = journey({
@@ -12,9 +13,7 @@ export const yourCasesJourney = journey({
   ],
   path: "/your-cases",
   reachability: { disableReachabilityChecks: true },
-  steps: [
-    yourCasesStep()
-  ],
+  steps: [yourCasesStep()],
   title: "Your Cases",
   view: { template: "partials/case-list-step" },
 });

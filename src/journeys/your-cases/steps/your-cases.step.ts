@@ -7,14 +7,14 @@ import {
   Transformer,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 import {
-  GovUKLinkButton,
   GovUKHeading,
+  GovUKLinkButton,
   GovUKTable,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
-
-import { t } from "#/lib/i18n.js";
-import { H1 } from "#/lib/constants/headings.js";
 import { MOJSubNavigation } from "@ministryofjustice/hmpps-forge/moj-components";
+
+import { H1 } from "#/lib/constants/headings.js";
+import { t } from "#/lib/i18n.js";
 
 export const yourCasesStep = (): ReturnType<typeof step> =>
   step({
@@ -24,19 +24,19 @@ export const yourCasesStep = (): ReturnType<typeof step> =>
         text: "Your cases",
       }),
       GovUKLinkButton({
-        text: t("pages.yourCases.createCaseButton"),
         href: "/create-application",
+        text: t("pages.yourCases.createCaseButton"),
       }),
       MOJSubNavigation({
         items: [
           {
-            text: t("pages.yourCases.tabs.inProgress"),
-            href: "/your-cases",
             active: true,
+            href: "/your-cases",
+            text: t("pages.yourCases.tabs.inProgress"),
           },
           {
-            text: t("pages.yourCases.tabs.recorded"),
             href: "/your-cases-recorded",
+            text: t("pages.yourCases.tabs.recorded"),
           },
         ],
       }),
@@ -57,14 +57,16 @@ export const yourCasesStep = (): ReturnType<typeof step> =>
             },
             { text: Item().path("referenceNumber") },
             {
-              text: Item().path("lastUpdated").pipe(
-                Transformer.String.FormatDate({
-                  day: "numeric",
-                  month: "short",
-                  year: "numeric",
-                  locale: "en-GB",
-                }),
-              ),
+              text: Item()
+                .path("lastUpdated")
+                .pipe(
+                  Transformer.String.FormatDate({
+                    day: "numeric",
+                    locale: "en-GB",
+                    month: "short",
+                    year: "numeric",
+                  }),
+                ),
             },
           ]),
         ),
