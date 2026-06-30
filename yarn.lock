@@ -5,7 +5,7 @@ __metadata:
   version: 10
   cacheKey: 10c0
 
-"@axe-core/playwright@npm:^4.11.3":
+"@axe-core/playwright@npm:^4.12.1":
   version: 4.12.1
   resolution: "@axe-core/playwright@npm:4.12.1"
   dependencies:
@@ -4744,7 +4744,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "laa-record-controlled-work@workspace:."
   dependencies:
-    "@axe-core/playwright": "npm:^4.11.3"
+    "@axe-core/playwright": "npm:^4.12.1"
     "@azure/msal-node": "npm:^5.2.5"
     "@j178/prek": "npm:^0.4.5"
     "@ministryofjustice/frontend": "npm:9.0.0"
