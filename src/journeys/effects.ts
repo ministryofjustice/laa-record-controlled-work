@@ -3,6 +3,9 @@ import {
   type EffectFunctionExpr,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
+import { Applications } from "#/api/generated/model/applications.zod.js";
+import { getApplications } from "#/api/generated/schema/applications/applications.js";
+
 import type { JourneySession } from "./context.type.ts";
 
 const isJourneySession = (value: unknown): value is JourneySession =>
@@ -16,6 +19,7 @@ export interface JourneyEffectShape {
     journeyCode: string,
     fields: readonly string[],
   ) => EffectFunctionExpr;
+  FetchApplications: () => EffectFunctionExpr;
   /** Copies previously stored draft answers for this journey into the form context on access. */
   LoadDraftAnswers: (journeyCode: string) => EffectFunctionExpr;
   /** Persists the current answers into the session as a draft, kept separately from committed answers. */
@@ -76,6 +80,18 @@ export const {
       }
     },
 
+  FetchApplications: () => async (context) => {
+    const respsonse = await getApplications();
+    const result = Applications.safeParse(respsonse.data);
+    if (result.success) {
+      // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- test
+      context.setData("data", result.data[0]);
+    }
+    if (result.error) {
+      context.setData("data", result.error.message);
+    }
+  },
+
   LoadDraftAnswers: () => (context, journeyCode: string) => {
     const session = context.getSession();
 
@@ -95,7 +111,6 @@ export const {
       }
     }
   },
-
   SaveDraftAnswers: () => (context, journeyCode: string) => {
     const session = context.getSession();
 

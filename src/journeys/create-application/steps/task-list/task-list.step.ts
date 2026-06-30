@@ -1,8 +1,11 @@
 import {
+  access,
+  Data,
   redirect,
   step,
   submit,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
+import { GovUKBody } from "@ministryofjustice/hmpps-forge/govuk-components";
 
 import {
   caseReferenceNumber,
@@ -10,6 +13,7 @@ import {
   saveAndReturnButton,
   taskList,
 } from "#/journeys/create-application/steps/task-list/task-list.blocks.js";
+import { JourneyEffects } from "#/journeys/effects.js";
 import { Status } from "#/journeys/journey.types.js";
 
 export interface TaskListData {
@@ -40,10 +44,16 @@ const TASK_LIST_DATA: TaskListData = {
 export const taskListStep = (): ReturnType<typeof step> =>
   step({
     blocks: [
-      heading(TASK_LIST_DATA.clientDetails.clientName),
+      GovUKBody({ text: Data("data.id") }),
+      heading(Data("data.name")),
       caseReferenceNumber(TASK_LIST_DATA.caseReferenceNumber),
       ...taskList(TASK_LIST_DATA),
       saveAndReturnButton,
+    ],
+    onAccess: [
+      access({
+        effects: [JourneyEffects.FetchApplications()],
+      }),
     ],
     onSubmission: [
       submit({
