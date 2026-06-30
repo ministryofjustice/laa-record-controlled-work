@@ -28,6 +28,7 @@ export default defineConfig({
       // custom fetch function to use instead of the default fetch implementation
       override: {
         mutator: {
+          extension: ".js",
           name: "fetcher",
           path: "./src/api/lib/fetch.ts",
         },
