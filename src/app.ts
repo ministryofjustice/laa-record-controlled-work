@@ -31,6 +31,7 @@ import { standardMiddleware } from "#/middleware/standardMiddleware.js";
 import healthRouter from "#/routes/health.js";
 import indexRouter from "#/routes/index.js";
 import testRouter from "#/routes/test.js";
+import yourCases from "#/journeys/your-cases/index.js";
 
 const TRUST_FIRST_PROXY = 1;
 const ENABLE_PLAYWRIGHT_TEST_SIGNIN =
@@ -87,7 +88,8 @@ const createApp = async (): Promise<express.Application> => {
     .registerGlobalComponents(mojComponents)
     .registerGlobalComponents([autocomplete])
     .registerGlobalFunctions(nunjucksFunctions)
-    .registerPackage(createApplication);
+    .registerPackage(createApplication)
+    .registerPackage(yourCases);
 
   // Set up rate limiting
   setupRateLimit(app, config);

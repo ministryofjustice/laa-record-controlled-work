@@ -16,4 +16,9 @@ export type JourneyEffectContext = EffectFunctionContext<
 export type JourneySession = Session & {
   journeyDrafts?: Record<string, Record<string, unknown>>;
   journeySubmitted?: Record<string, boolean>;
+  caseList?: Array<{
+    clientName: string;
+    referenceNumber: string;
+    lastUpdated?: string;
+  }>;
 };

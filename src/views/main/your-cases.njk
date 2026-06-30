@@ -1,5 +1,6 @@
 {% extends "base.njk" %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
 {%- from "moj/components/sub-navigation/macro.njk" import mojSubNavigation -%}
 {%-
   from "components/sortableTableComponent.njk" import sortableTableComponent
@@ -95,6 +96,16 @@
       limit: 5
   }
 %}
+{% set rows = [] %}
+{% for row in data %}
+  {%
+    set rows = (rows.push([
+        { html: '<a href="/cases/' + row.referenceNumber + '/client-details" class="govuk-link">' + row.clientName + '</a>' },
+        { text: row.referenceNumber },
+        { text: row.lastUpdated }
+    ]), rows)
+  %}
+{% endfor %}
 
 {% block content %}
   <h1 class="govuk-heading-xl">{{ t('pages.yourCases.pageTitle') }}</h1>
@@ -106,8 +117,28 @@
     })
   }}
 
-  {% if data and data.length > 0 %}
-    {# Render the sortable table with dynamic configuration #}
+  {{
+    mojSubNavigation({
+    label: "Sub navigation",
+        items: [
+            { text: t('pages.yourCases.tabs.inProgress'), href: '/your-cases', active: true },
+            { text: t('pages.yourCases.tabs.recorded'), href: '/your-cases-recorded' }
+        ]
+    })
+  }}
+
+  {{
+    govukTable({
+        head: [
+            { text: t('pages.yourCases.table.columns.clientName') },
+            { text: t('pages.yourCases.table.columns.referenceNumber') },
+            { text: t('pages.yourCases.table.columns.lastUpdated') }
+        ],
+      rows: rows
+    })
+  }}
+
+  {# {% if data and data.length > 0 %}
     {{
       sortableTableComponent({
         id: tableId,
@@ -123,7 +154,6 @@
       })
     }}
 
-    {# Render pagination if pagination data is available #}
     {% if pagination %}
       {{
         paginationComponent({
@@ -136,5 +166,5 @@
     {% endif %}
   {% else %}
     <p>{{ emptyMessage }}</p>
-  {% endif %}
+  {% endif %} #}
 {% endblock %}

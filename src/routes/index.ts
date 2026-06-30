@@ -8,9 +8,4 @@ router.get("/", (req: Request, res: Response): void => {
   res.render("main/index");
 });
 
-router.get("/your-cases", (req: Request, res: Response): void => {
-  res.render("main/your-cases");
-});
-
-
 export default router;
