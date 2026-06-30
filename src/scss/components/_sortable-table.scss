@@ -1,0 +1,26 @@
+[aria-sort="ascending"] a,
+[aria-sort="none"] a,
+[aria-sort="descending"] a {
+  align-items: center;
+  gap: 4px;
+  position: relative;
+}
+
+[aria-sort="descending"] a::after {
+  content: "▼";
+  font-size: 0.8em;
+  flex-shrink: 0;
+}
+
+[aria-sort="ascending"] a::after {
+  content: "▲";
+  font-size: 0.8em;
+  flex-shrink: 0;
+}
+
+[aria-sort="none"] a::after {
+  content: url("../../views/icons/double-arrow.svg");
+  color: var(--color-text);
+  font-size: 0.8em;
+  flex-shrink: 0;
+}
