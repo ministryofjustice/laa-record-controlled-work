@@ -4,14 +4,14 @@
  * Record Controlled Work API
  * OpenAPI spec version: 1.0.0
  */
-import { z as zod } from "zod";
+import { z as zod } from 'zod';
 
 export const ApplicationOverview = zod.object({
-  id: zod.uuid(),
-  name: zod.string(),
-  applicationRefNumber: zod.string(),
-  modifiedAt: zod.iso.datetime({ offset: true }),
-});
+  "id": zod.uuid(),
+  "name": zod.string(),
+  "applicationRefNumber": zod.string(),
+  "modifiedAt": zod.iso.datetime({"offset":true})
+})
 
 export type ApplicationOverview = zod.input<typeof ApplicationOverview>;
 export type ApplicationOverviewOutput = zod.output<typeof ApplicationOverview>;

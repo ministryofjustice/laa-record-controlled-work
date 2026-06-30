@@ -1,5 +1,4 @@
 import {
-  access,
   Data,
   redirect,
   step,
@@ -13,7 +12,6 @@ import {
   saveAndReturnButton,
   taskList,
 } from "#/journeys/create-application/steps/task-list/task-list.blocks.js";
-import { JourneyEffects } from "#/journeys/effects.js";
 import { Status } from "#/journeys/journey.types.js";
 
 export interface TaskListData {
@@ -49,11 +47,6 @@ export const taskListStep = (): ReturnType<typeof step> =>
       caseReferenceNumber(TASK_LIST_DATA.caseReferenceNumber),
       ...taskList(TASK_LIST_DATA),
       saveAndReturnButton,
-    ],
-    onAccess: [
-      access({
-        effects: [JourneyEffects.FetchApplications()],
-      }),
     ],
     onSubmission: [
       submit({

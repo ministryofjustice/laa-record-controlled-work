@@ -1,4 +1,5 @@
-// // NOTE: Supports cases where `content-type` is other than `json`
+import config from "#/config.js";
+
 const getBody = async (c: Request | Response): Promise<unknown> => {
   const contentType = c.headers.get("content-type");
 
@@ -13,15 +14,11 @@ const getBody = async (c: Request | Response): Promise<unknown> => {
   return await c.text();
 };
 
-// NOTE: Update just base url
 const getUrl = (contextUrl: string): string => {
   const url = new URL(contextUrl);
   const { pathname } = url;
   const { search } = url;
-  const baseUrl =
-    process.env.NODE_ENV === "production"
-      ? "productionBaseUrl"
-      : "http://localhost:3000";
+  const { baseUrl } = config.api;
 
   const requestUrl = new URL(`${baseUrl}${pathname}${search}`);
 
@@ -41,7 +38,7 @@ const getHeaders = (headers?: HeadersInit): Record<string, string> => {
   };
 };
 
-export const customFetch = async <T>(
+export const fetcher = async <T>(
   url: string,
   options: RequestInit,
 ): Promise<T> => {

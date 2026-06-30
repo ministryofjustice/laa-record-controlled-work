@@ -4,9 +4,9 @@
  * Record Controlled Work API
  * OpenAPI spec version: 1.0.0
  */
-import { z as zod } from "zod";
+import { z as zod } from 'zod';
 
-export const EvidenceStatus = zod.enum(["DRAFT"]);
+export const EvidenceStatus = zod.enum(['DRAFT'])
 
 export type EvidenceStatus = zod.input<typeof EvidenceStatus>;
 export type EvidenceStatusOutput = zod.output<typeof EvidenceStatus>;

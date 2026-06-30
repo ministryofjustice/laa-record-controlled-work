@@ -4,6 +4,7 @@ import z from "zod";
 import { logger } from "#/logger.js";
 
 const optionalEnvSchema = z.object({
+  API_BASE_URL: z.url().optional(),
   AUTH_RATE_LIMIT_MAX: z.coerce.number().optional(),
   CONTACT_EMAIL: z.string().optional(),
   CONTACT_PHONE: z.string().optional(),
@@ -27,6 +28,7 @@ const injected = z.string().refine((val) => !val.startsWith("op://"), {
 });
 
 const requiredEnvSchema = z.object({
+  API_GITHUB_SHA: z.string().nonempty(),
   ENTRA_AUTHORITY_BASE_URL: z.url().nonempty(),
   ENTRA_CLIENT_ID: injected.nonempty(),
   ENTRA_CLIENT_SECRET: injected.nonempty(),

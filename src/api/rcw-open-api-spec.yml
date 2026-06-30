@@ -244,6 +244,8 @@ components:
         modifiedAt:
           type: string
           format: date-time
+        test:
+          type: string  
 
     ClientDeclarationStatus:
       type: string
