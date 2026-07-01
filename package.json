@@ -51,7 +51,7 @@
     "express": "^5.2.1",
     "express-rate-limit": "^8.5.2",
     "express-session": "^1.19.0",
-    "govuk-frontend": "^6.2.0",
+    "govuk-frontend": "^6.3.0",
     "helmet": "^8.2.0",
     "i18next": "^26.3.1",
     "moment": "^2.30.1",
@@ -62,7 +62,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@axe-core/playwright": "^4.11.3",
+    "@axe-core/playwright": "^4.12.1",
     "@faker-js/faker": "^10.4.0",
     "@j178/prek": "^0.4.5",
     "@playwright/test": "^1.61.0",
