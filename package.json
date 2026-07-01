@@ -63,7 +63,7 @@
   "devDependencies": {
     "@axe-core/playwright": "^4.12.1",
     "@j178/prek": "^0.4.5",
-    "@playwright/test": "^1.61.0",
+    "@playwright/test": "^1.61.1",
     "@types/chai": "^5.2.3",
     "@types/chai-as-promised": "^8.0.2",
     "@types/compression": "^1.8.1",
