@@ -38,7 +38,6 @@
   },
   "dependencies": {
     "@azure/msal-node": "^5.2.5",
-    "@faker-js/faker": "^10.4.0",
     "@ministryofjustice/frontend": "9.0.0",
     "@ministryofjustice/hmpps-forge": "^0.1.0-alpha.22",
     "accessible-autocomplete": "^3.0.1",
@@ -62,6 +61,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@faker-js/faker": "^10.4.0",
     "@axe-core/playwright": "^4.11.3",
     "@j178/prek": "^0.4.5",
     "@playwright/test": "^1.61.0",
