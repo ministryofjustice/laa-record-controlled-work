@@ -101,6 +101,5 @@ export const {
         referenceNumber: "CASE987654",
       },
     ]);
-    console.log("Case list loaded into context:", context.getData("caseList"));
   },
 });
