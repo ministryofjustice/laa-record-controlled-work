@@ -19,6 +19,7 @@ export default {
     "coverage",
     "tests/**/*.spec.ts", // Unit test specs (if any remain in tests/)
     "tests/playwright/**/*.spec.ts", // E2E test specs in new Playwright structure
+    "tests/mocks/**", // Generated test mocks
     "tests/playwright/fixtures/*", // Test fixtures
     "tests/playwright/factories/*", // Test factories and mock handlers
     "tests/playwright/pages/*", // Page object models

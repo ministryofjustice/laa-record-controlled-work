@@ -16,9 +16,13 @@ export default defineConfig({
       clean: true,
       client: "fetch",
       fileExtension: ".gen.ts",
+      formatter: "prettier",
       indexFiles: false,
       mock: {
-        generators: [{ type: "msw" }, { type: "faker" }],
+        generators: [
+          { path: "./tests/mocks/api/msw", type: "msw" },
+          { path: "./tests/mocks/api/fakers", type: "faker" },
+        ],
       },
       mode: "tags-split",
       // custom fetch function to use instead of the default fetch implementation

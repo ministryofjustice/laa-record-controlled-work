@@ -4,31 +4,33 @@
  * Record Controlled Work API
  * OpenAPI spec version: 1.0.0
  */
-import { z as zod } from 'zod';
+import { z as zod } from "zod";
 
 export const ClientDetails = zod.object({
-  "id": zod.uuid().optional(),
-  "firstName": zod.string().optional(),
-  "lastName": zod.string().optional(),
-  "dateOfBirth": zod.iso.date().optional(),
-  "niNumber": zod.string().optional(),
-  "hasFixedAddress": zod.boolean().optional(),
-  "address": zod.object({
-  "id": zod.uuid(),
-  "addressLine1": zod.string(),
-  "addressLine2": zod.string().optional(),
-  "addressLine3": zod.string().optional(),
-  "addressLine4": zod.string().optional(),
-  "townOrCity": zod.string().optional(),
-  "postCode": zod.string().optional(),
-  "county": zod.string().optional(),
-  "country": zod.string(),
-  "createdAt": zod.iso.datetime({"offset":true}).optional(),
-  "modifiedAt": zod.iso.datetime({"offset":true}).optional()
-}).optional(),
-  "createdAt": zod.iso.datetime({"offset":true}).optional(),
-  "modifiedAt": zod.iso.datetime({"offset":true}).optional()
-})
+  id: zod.uuid().optional(),
+  firstName: zod.string().optional(),
+  lastName: zod.string().optional(),
+  dateOfBirth: zod.iso.date().optional(),
+  niNumber: zod.string().optional(),
+  hasFixedAddress: zod.boolean().optional(),
+  address: zod
+    .object({
+      id: zod.uuid(),
+      addressLine1: zod.string(),
+      addressLine2: zod.string().optional(),
+      addressLine3: zod.string().optional(),
+      addressLine4: zod.string().optional(),
+      townOrCity: zod.string().optional(),
+      postCode: zod.string().optional(),
+      county: zod.string().optional(),
+      country: zod.string(),
+      createdAt: zod.iso.datetime({ offset: true }).optional(),
+      modifiedAt: zod.iso.datetime({ offset: true }).optional(),
+    })
+    .optional(),
+  createdAt: zod.iso.datetime({ offset: true }).optional(),
+  modifiedAt: zod.iso.datetime({ offset: true }).optional(),
+});
 
 export type ClientDetails = zod.input<typeof ClientDetails>;
 export type ClientDetailsOutput = zod.output<typeof ClientDetails>;

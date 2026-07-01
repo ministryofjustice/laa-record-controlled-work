@@ -4,29 +4,33 @@
  * Record Controlled Work API
  * OpenAPI spec version: 1.0.0
  */
-import { z as zod } from 'zod';
+import { z as zod } from "zod";
 
 export const CreateApplicationResponseBody = zod.object({
-  "id": zod.uuid().optional(),
-  "ecf": zod.string().optional(),
-  "legalAidBefore": zod.string().optional(),
-  "legalAidLast6Months": zod.string().optional(),
-  "reasonForYes": zod.string().optional(),
-  "firstName": zod.string().optional(),
-  "lastName": zod.string().optional(),
-  "dateOfBirth": zod.iso.date().optional(),
-  "hasNINumber": zod.string().optional(),
-  "niNumber": zod.string().optional(),
-  "haveAHomeAddress": zod.string().optional(),
-  "addressLine1": zod.string().optional(),
-  "addressLine2": zod.string().optional(),
-  "addressLine3": zod.string().optional(),
-  "addressLine4": zod.string().optional(),
-  "townOrCity": zod.string().optional(),
-  "county": zod.string().optional(),
-  "postcode": zod.string().optional(),
-  "country": zod.string().optional()
-})
+  id: zod.uuid().optional(),
+  ecf: zod.string().optional(),
+  legalAidBefore: zod.string().optional(),
+  legalAidLast6Months: zod.string().optional(),
+  reasonForYes: zod.string().optional(),
+  firstName: zod.string().optional(),
+  lastName: zod.string().optional(),
+  dateOfBirth: zod.iso.date().optional(),
+  hasNINumber: zod.string().optional(),
+  niNumber: zod.string().optional(),
+  haveAHomeAddress: zod.string().optional(),
+  addressLine1: zod.string().optional(),
+  addressLine2: zod.string().optional(),
+  addressLine3: zod.string().optional(),
+  addressLine4: zod.string().optional(),
+  townOrCity: zod.string().optional(),
+  county: zod.string().optional(),
+  postcode: zod.string().optional(),
+  country: zod.string().optional(),
+});
 
-export type CreateApplicationResponseBody = zod.input<typeof CreateApplicationResponseBody>;
-export type CreateApplicationResponseBodyOutput = zod.output<typeof CreateApplicationResponseBody>;
+export type CreateApplicationResponseBody = zod.input<
+  typeof CreateApplicationResponseBody
+>;
+export type CreateApplicationResponseBodyOutput = zod.output<
+  typeof CreateApplicationResponseBody
+>;

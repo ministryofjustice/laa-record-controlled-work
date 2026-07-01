@@ -4,197 +4,193 @@
  * Record Controlled Work API
  * OpenAPI spec version: 1.0.0
  */
-import type {
-  Application
-} from '../../model/application.zod.gen.js';
+import type { Application } from "../../model/application.zod.gen.js";
 
-import type {
-  Applications
-} from '../../model/applications.zod.gen.js';
+import type { Applications } from "../../model/applications.zod.gen.js";
 
-import type {
-  CreateApplicationRequestBody
-} from '../../model/createApplicationRequestBody.zod.gen.js';
+import type { CreateApplicationRequestBody } from "../../model/createApplicationRequestBody.zod.gen.js";
 
-import type {
-  CreateApplicationResponseBody
-} from '../../model/createApplicationResponseBody.zod.gen.js';
+import type { CreateApplicationResponseBody } from "../../model/createApplicationResponseBody.zod.gen.js";
 
-import { fetcher } from '../../../lib/fetch.js';
+import { fetcher } from "../../../lib/fetch.js";
 
 export type getApplicationsResponse200 = {
-  data: Applications
-  status: 200
-}
+  data: Applications;
+  status: 200;
+};
 
 export type getApplicationsResponse400 = {
-  data: void
-  status: 400
-}
+  data: void;
+  status: 400;
+};
 
 export type getApplicationsResponse401 = {
-  data: void
-  status: 401
-}
+  data: void;
+  status: 401;
+};
 
 export type getApplicationsResponse403 = {
-  data: void
-  status: 403
-}
+  data: void;
+  status: 403;
+};
 
 export type getApplicationsResponse500 = {
-  data: void
-  status: 500
-}
-
-export type getApplicationsResponseSuccess = (getApplicationsResponse200) & {
-  headers: Headers;
-};
-export type getApplicationsResponseError = (getApplicationsResponse400 | getApplicationsResponse401 | getApplicationsResponse403 | getApplicationsResponse500) & {
-  headers: Headers;
+  data: void;
+  status: 500;
 };
 
-export type getApplicationsResponse = (getApplicationsResponseSuccess | getApplicationsResponseError)
+export type getApplicationsResponseSuccess = getApplicationsResponse200 & {
+  headers: Headers;
+};
+export type getApplicationsResponseError = (
+  | getApplicationsResponse400
+  | getApplicationsResponse401
+  | getApplicationsResponse403
+  | getApplicationsResponse500
+) & {
+  headers: Headers;
+};
+
+export type getApplicationsResponse =
+  | getApplicationsResponseSuccess
+  | getApplicationsResponseError;
 
 export const getGetApplicationsUrl = () => {
-
-
-
-
-  return `/api/v1/applications`
-}
+  return `/api/v1/applications`;
+};
 
 /**
  * @summary Get all applications
  */
-export const getApplications = async ( options?: RequestInit): Promise<getApplicationsResponse> => {
-
-  return fetcher<getApplicationsResponse>(getGetApplicationsUrl(),
-  {
+export const getApplications = async (
+  options?: RequestInit,
+): Promise<getApplicationsResponse> => {
+  return fetcher<getApplicationsResponse>(getGetApplicationsUrl(), {
     ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+    method: "GET",
+  });
+};
 
 export type createApplicationResponse200 = {
-  data: CreateApplicationResponseBody
-  status: 200
-}
+  data: CreateApplicationResponseBody;
+  status: 200;
+};
 
 export type createApplicationResponse400 = {
-  data: void
-  status: 400
-}
+  data: void;
+  status: 400;
+};
 
 export type createApplicationResponse401 = {
-  data: void
-  status: 401
-}
+  data: void;
+  status: 401;
+};
 
 export type createApplicationResponse403 = {
-  data: void
-  status: 403
-}
+  data: void;
+  status: 403;
+};
 
 export type createApplicationResponse404 = {
-  data: void
-  status: 404
-}
+  data: void;
+  status: 404;
+};
 
 export type createApplicationResponse500 = {
-  data: void
-  status: 500
-}
-
-export type createApplicationResponseSuccess = (createApplicationResponse200) & {
-  headers: Headers;
-};
-export type createApplicationResponseError = (createApplicationResponse400 | createApplicationResponse401 | createApplicationResponse403 | createApplicationResponse404 | createApplicationResponse500) & {
-  headers: Headers;
+  data: void;
+  status: 500;
 };
 
-export type createApplicationResponse = (createApplicationResponseSuccess | createApplicationResponseError)
+export type createApplicationResponseSuccess = createApplicationResponse200 & {
+  headers: Headers;
+};
+export type createApplicationResponseError = (
+  | createApplicationResponse400
+  | createApplicationResponse401
+  | createApplicationResponse403
+  | createApplicationResponse404
+  | createApplicationResponse500
+) & {
+  headers: Headers;
+};
+
+export type createApplicationResponse =
+  | createApplicationResponseSuccess
+  | createApplicationResponseError;
 
 export const getCreateApplicationUrl = () => {
-
-
-
-
-  return `/api/v1/applications`
-}
+  return `/api/v1/applications`;
+};
 
 /**
  * @summary Create an application
  */
-export const createApplication = async (createApplicationRequestBody?: CreateApplicationRequestBody, options?: RequestInit): Promise<createApplicationResponse> => {
-
-  return fetcher<createApplicationResponse>(getCreateApplicationUrl(),
-  {
+export const createApplication = async (
+  createApplicationRequestBody?: CreateApplicationRequestBody,
+  options?: RequestInit,
+): Promise<createApplicationResponse> => {
+  return fetcher<createApplicationResponse>(getCreateApplicationUrl(), {
     ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(createApplicationRequestBody)
-  }
-);}
-
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(createApplicationRequestBody),
+  });
+};
 
 export type getApplicationResponse200 = {
-  data: Application
-  status: 200
-}
+  data: Application;
+  status: 200;
+};
 
 export type getApplicationResponse401 = {
-  data: void
-  status: 401
-}
+  data: void;
+  status: 401;
+};
 
 export type getApplicationResponse403 = {
-  data: void
-  status: 403
-}
+  data: void;
+  status: 403;
+};
 
 export type getApplicationResponse404 = {
-  data: void
-  status: 404
-}
+  data: void;
+  status: 404;
+};
 
 export type getApplicationResponse500 = {
-  data: void
-  status: 500
-}
-
-export type getApplicationResponseSuccess = (getApplicationResponse200) & {
-  headers: Headers;
-};
-export type getApplicationResponseError = (getApplicationResponse401 | getApplicationResponse403 | getApplicationResponse404 | getApplicationResponse500) & {
-  headers: Headers;
+  data: void;
+  status: 500;
 };
 
-export type getApplicationResponse = (getApplicationResponseSuccess | getApplicationResponseError)
+export type getApplicationResponseSuccess = getApplicationResponse200 & {
+  headers: Headers;
+};
+export type getApplicationResponseError = (
+  | getApplicationResponse401
+  | getApplicationResponse403
+  | getApplicationResponse404
+  | getApplicationResponse500
+) & {
+  headers: Headers;
+};
 
-export const getGetApplicationUrl = (id: string,) => {
+export type getApplicationResponse =
+  | getApplicationResponseSuccess
+  | getApplicationResponseError;
 
-
-
-
-  return `/api/v1/applications/${id}`
-}
+export const getGetApplicationUrl = (id: string) => {
+  return `/api/v1/applications/${id}`;
+};
 
 /**
  * @summary Get application by ID
  */
-export const getApplication = async (id: string, options?: RequestInit): Promise<getApplicationResponse> => {
-
-  return fetcher<getApplicationResponse>(getGetApplicationUrl(id),
-  {
+export const getApplication = async (
+  id: string,
+  options?: RequestInit,
+): Promise<getApplicationResponse> => {
+  return fetcher<getApplicationResponse>(getGetApplicationUrl(id), {
     ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
+    method: "GET",
+  });
+};

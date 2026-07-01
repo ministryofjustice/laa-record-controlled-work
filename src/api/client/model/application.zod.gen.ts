@@ -4,70 +4,76 @@
  * Record Controlled Work API
  * OpenAPI spec version: 1.0.0
  */
-import { z as zod } from 'zod';
+import { z as zod } from "zod";
 
 export const Application = zod.object({
-  "id": zod.uuid(),
-  "individualLegalAidNumber": zod.uuid(),
-  "providerFirmId": zod.uuid(),
-  "providerOfficeId": zod.uuid(),
-  "meansAssessmentId": zod.uuid().optional(),
-  "clientDetails": zod.object({
-  "id": zod.uuid().optional(),
-  "firstName": zod.string().optional(),
-  "lastName": zod.string().optional(),
-  "dateOfBirth": zod.iso.date().optional(),
-  "niNumber": zod.string().optional(),
-  "hasFixedAddress": zod.boolean().optional(),
-  "address": zod.object({
-  "id": zod.uuid(),
-  "addressLine1": zod.string(),
-  "addressLine2": zod.string().optional(),
-  "addressLine3": zod.string().optional(),
-  "addressLine4": zod.string().optional(),
-  "townOrCity": zod.string().optional(),
-  "postCode": zod.string().optional(),
-  "county": zod.string().optional(),
-  "country": zod.string(),
-  "createdAt": zod.iso.datetime({"offset":true}).optional(),
-  "modifiedAt": zod.iso.datetime({"offset":true}).optional()
-}).optional(),
-  "createdAt": zod.iso.datetime({"offset":true}).optional(),
-  "modifiedAt": zod.iso.datetime({"offset":true}).optional()
-}),
-  "applicationStatus": zod.enum(['DRAFT']).optional(),
-  "declaration": zod.object({
-  "id": zod.uuid().optional(),
-  "clientDeclarationStatus": zod.enum(['DRAFT']).optional(),
-  "declarationConfirmation": zod.boolean().optional(),
-  "createdAt": zod.iso.datetime({"offset":true}).optional(),
-  "createdBy": zod.string().optional(),
-  "modifiedAt": zod.iso.datetime({"offset":true}).optional(),
-  "modifiedBy": zod.string().optional()
-}).optional(),
-  "evidence": zod.object({
-  "id": zod.uuid().optional(),
-  "evidenceStatus": zod.enum(['DRAFT']).optional(),
-  "payeIncomeEvidence": zod.boolean().optional(),
-  "otherIncomeEvidence": zod.boolean().optional(),
-  "housingCostsEvidence": zod.boolean().optional(),
-  "capitalEvidence": zod.boolean().optional(),
-  "createdAt": zod.iso.datetime({"offset":true}).optional(),
-  "createdBy": zod.string().optional(),
-  "modifiedAt": zod.iso.datetime({"offset":true}).optional(),
-  "modifiedBy": zod.string().optional()
-}).optional(),
-  "reasonForReapplication": zod.string().optional(),
-  "meansAssessmentRequired": zod.boolean().optional(),
-  "typeOfNonMeans": zod.boolean().optional(),
-  "ecfFlag": zod.boolean(),
-  "contribution": zod.string().optional(),
-  "applicationType": zod.string(),
-  "createdAt": zod.iso.datetime({"offset":true}),
-  "createdBy": zod.string(),
-  "modifiedAt": zod.iso.datetime({"offset":true}),
-  "modifiedBy": zod.string()
-})
+  id: zod.uuid(),
+  individualLegalAidNumber: zod.uuid(),
+  providerFirmId: zod.uuid(),
+  providerOfficeId: zod.uuid(),
+  meansAssessmentId: zod.uuid().optional(),
+  clientDetails: zod.object({
+    id: zod.uuid().optional(),
+    firstName: zod.string().optional(),
+    lastName: zod.string().optional(),
+    dateOfBirth: zod.iso.date().optional(),
+    niNumber: zod.string().optional(),
+    hasFixedAddress: zod.boolean().optional(),
+    address: zod
+      .object({
+        id: zod.uuid(),
+        addressLine1: zod.string(),
+        addressLine2: zod.string().optional(),
+        addressLine3: zod.string().optional(),
+        addressLine4: zod.string().optional(),
+        townOrCity: zod.string().optional(),
+        postCode: zod.string().optional(),
+        county: zod.string().optional(),
+        country: zod.string(),
+        createdAt: zod.iso.datetime({ offset: true }).optional(),
+        modifiedAt: zod.iso.datetime({ offset: true }).optional(),
+      })
+      .optional(),
+    createdAt: zod.iso.datetime({ offset: true }).optional(),
+    modifiedAt: zod.iso.datetime({ offset: true }).optional(),
+  }),
+  applicationStatus: zod.enum(["DRAFT"]).optional(),
+  declaration: zod
+    .object({
+      id: zod.uuid().optional(),
+      clientDeclarationStatus: zod.enum(["DRAFT"]).optional(),
+      declarationConfirmation: zod.boolean().optional(),
+      createdAt: zod.iso.datetime({ offset: true }).optional(),
+      createdBy: zod.string().optional(),
+      modifiedAt: zod.iso.datetime({ offset: true }).optional(),
+      modifiedBy: zod.string().optional(),
+    })
+    .optional(),
+  evidence: zod
+    .object({
+      id: zod.uuid().optional(),
+      evidenceStatus: zod.enum(["DRAFT"]).optional(),
+      payeIncomeEvidence: zod.boolean().optional(),
+      otherIncomeEvidence: zod.boolean().optional(),
+      housingCostsEvidence: zod.boolean().optional(),
+      capitalEvidence: zod.boolean().optional(),
+      createdAt: zod.iso.datetime({ offset: true }).optional(),
+      createdBy: zod.string().optional(),
+      modifiedAt: zod.iso.datetime({ offset: true }).optional(),
+      modifiedBy: zod.string().optional(),
+    })
+    .optional(),
+  reasonForReapplication: zod.string().optional(),
+  meansAssessmentRequired: zod.boolean().optional(),
+  typeOfNonMeans: zod.boolean().optional(),
+  ecfFlag: zod.boolean(),
+  contribution: zod.string().optional(),
+  applicationType: zod.string(),
+  createdAt: zod.iso.datetime({ offset: true }),
+  createdBy: zod.string(),
+  modifiedAt: zod.iso.datetime({ offset: true }),
+  modifiedBy: zod.string(),
+});
 
 export type Application = zod.input<typeof Application>;
 export type ApplicationOutput = zod.output<typeof Application>;
