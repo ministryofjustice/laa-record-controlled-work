@@ -30,7 +30,7 @@ build:
 	yarn build
 
 orval:
-	yarn orval
+	yarn api:generate
 
 lint: 
 	yarn lint

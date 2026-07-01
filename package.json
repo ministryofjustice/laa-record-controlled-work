@@ -10,6 +10,7 @@
   },
   "scripts": {
     "postinstall": "[ -n \"${CI:-}\" ] || [ -n \"${DOCKER:-}\" ] || yarn prek:install",
+    "api:generate": "yarn orval",
     "gitleaks:install": "sh ./scripts/install-gitleaks.sh",
     "prek:patch-hook-path": "sh ./scripts/patch-precommit-hook-path.sh",
     "prek:install": "yarn gitleaks:install && prek install && yarn prek:patch-hook-path",
@@ -61,8 +62,8 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@faker-js/faker": "^10.4.0",
     "@axe-core/playwright": "^4.11.3",
+    "@faker-js/faker": "^10.4.0",
     "@j178/prek": "^0.4.5",
     "@playwright/test": "^1.61.0",
     "@types/chai": "^5.2.3",
