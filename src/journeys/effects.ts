@@ -75,6 +75,7 @@ export const {
         context.clearAnswer(field);
       }
     },
+
   LoadDraftAnswers: () => (context, journeyCode: string) => {
     const session = context.getSession();
 
@@ -94,6 +95,7 @@ export const {
       }
     }
   },
+
   SaveDraftAnswers: () => (context, journeyCode: string) => {
     const session = context.getSession();
 
