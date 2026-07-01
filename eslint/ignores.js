@@ -19,6 +19,7 @@ export default {
     "coverage",
     "tests/**/*.spec.ts", // Unit test specs (if any remain in tests/)
     "tests/playwright/**/*.spec.ts", // E2E test specs in new Playwright structure
+    "tests/mocks/**", // Generated test mocks
     "tests/playwright/fixtures/*", // Test fixtures
     "tests/playwright/factories/*", // Test factories and mock handlers
     "tests/playwright/pages/*", // Page object models
@@ -31,5 +32,6 @@ export default {
     "scripts/e2e_coverage/*", // Route coverage analysis scripts
     "public/assets/manifest.json", // Build artifact
     "yarn.lock", // Not JSON
+    "src/api/client/**" // Generated API client code, not manually edited
   ],
 };

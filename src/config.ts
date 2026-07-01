@@ -3,6 +3,7 @@ import "dotenv/config";
 import type { SessionOptions } from "express-session";
 
 import type {
+  ApiConfig,
   AppConfig,
   Config,
   CsrfConfig,
@@ -19,6 +20,7 @@ const DEFAULT_PORT = 3000;
 const REDIS_MAX_RETRY_ATTEMPTS = 10;
 const DEFAULT_REDIS_PORT = 6379;
 const DEFAULT_REDIS_HOST = "localhost";
+const DEFAULT_API_BASE_URL = "http://localhost:8081";
 
 /* eslint-disable @typescript-eslint/no-magic-numbers -- time constants are intuitive */
 const REDIS_SOCKET_CONNECTION_TIMEOUT = 10 * SECOND;
@@ -29,6 +31,10 @@ const DEFAULT_RATE_WINDOW = 15 * MINUTE;
 const useHttps = ["production", "staging", "uat"].includes(required.NODE_ENV);
 
 export default {
+  api: {
+    baseUrl: optional.API_BASE_URL ?? DEFAULT_API_BASE_URL,
+  } satisfies ApiConfig,
+
   app: {
     contact: {
       email: optional.CONTACT_EMAIL,
