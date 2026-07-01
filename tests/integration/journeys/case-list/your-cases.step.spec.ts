@@ -2,7 +2,7 @@ import {
   TestRenderResult,
 } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
-import { yourCasesStep } from "#/journeys/your-cases/steps/your-cases.step.js";
+import { yourCasesStep } from "#/journeys/your-cases/steps/your-cases/your-cases.step.js";
 import { createForgeTestClientForCaseList } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 

@@ -21,7 +21,7 @@ import {
   CaseListEffects,
   CaseListEffectsImplementations,
 } from "#/journeys/your-cases/effects.js";
-import { yourCasesStep } from "#/journeys/your-cases/steps/your-cases.step.js";
+import { yourCasesStep } from "#/journeys/your-cases/steps/your-cases/your-cases.step.js";
 
 /**
  * Creates a test client for a single-step journey under /create-application.
