@@ -30,7 +30,7 @@ export default defineConfig({
         mutator: {
           extension: ".js",
           name: "fetcher",
-          path: "./src/api/lib/fetch.ts",
+          path: "./src/lib/fetch.ts",
         },
       },
       schemaFileExtension: ".zod.gen.ts",

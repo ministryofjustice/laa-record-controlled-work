@@ -12,7 +12,7 @@ import type { CreateApplicationRequestBody } from "../../model/createApplication
 
 import type { CreateApplicationResponseBody } from "../../model/createApplicationResponseBody.zod.gen.js";
 
-import { fetcher } from "../../../lib/fetch.js";
+import { fetcher } from "../../../../lib/fetch.js";
 
 export type getApplicationsResponse200 = {
   data: Applications;
