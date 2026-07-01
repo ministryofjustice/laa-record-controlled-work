@@ -1,7 +1,7 @@
-import { config } from "dotenv";
+import { readFileSync } from "node:fs";
 import { defineConfig } from "orval";
 
-config({ path: ".rcw-api-version.env" });
+const API_SHA = readFileSync(".rcw-api-version", "utf-8").trim();
 
 export default defineConfig({
   rcw: {
@@ -10,7 +10,7 @@ export default defineConfig({
         mode: "exclude",
         tags: ["items"],
       },
-      target: `https://raw.githubusercontent.com/ministryofjustice/laa-record-controlled-work-api/${process.env.API_GITHUB_SHA}/record-controlled-work-api/open-api-specification.yml`,
+      target: `https://raw.githubusercontent.com/ministryofjustice/laa-record-controlled-work-api/${API_SHA}/record-controlled-work-api/open-api-specification.yml`,
     },
     output: {
       clean: true,
