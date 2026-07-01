@@ -3,11 +3,6 @@ import {
   type EffectFunctionExpr,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
-import type { CaseListSession } from "../context.type.js";
-
-const isCaseListSession = (value: unknown): value is CaseListSession =>
-  typeof value === "object" && value !== null;
-
 export interface CaseListEffectShape {
   /** Loads a list of cases for the user. */
   LoadCaseList: () => EffectFunctionExpr;
@@ -18,11 +13,6 @@ export const {
   implementations: CaseListEffectsImplementations,
 } = defineEffectFunctions<CaseListEffectShape>({
   LoadCaseList: () => (context) => {
-    const session = context.getSession();
-
-    if (!isCaseListSession(session)) {
-      return;
-    }
 
     context.setData("caseList", [
       {

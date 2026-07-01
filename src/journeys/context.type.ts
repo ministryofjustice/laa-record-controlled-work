@@ -3,23 +3,8 @@ import type { Session } from "express-session";
 
 export type CaseListEffectContext = EffectFunctionContext<
   Record<string, unknown>,
-  Record<string, unknown>,
-  CaseListSession
+  Record<string, unknown>
 >;
-
-/**
- * Journeys use the express session for answer storage. This keeps the examples
- * self-contained with no external dependency on Redis or a database.
- *
- * Each journey owns a key under `session.journeys` so journeys cannot collide.
- */
-export type CaseListSession = Session & {
-  caseList?: Array<{
-    clientName: string;
-    lastUpdated?: string;
-    referenceNumber: string;
-  }>;
-};
 
 export type JourneyEffectContext = EffectFunctionContext<
   Record<string, unknown>,
