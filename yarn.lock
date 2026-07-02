@@ -381,7 +381,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@faker-js/faker@npm:^10.4.0":
+"@faker-js/faker@npm:^10.5.0":
   version: 10.5.0
   resolution: "@faker-js/faker@npm:10.5.0"
   checksum: 10c0/2de3c7b8f41592d52cefc3ab4c99536656249bca78d5ad184a3b7ac43ecc9d946056cef2c4d37060373ef06ad992d82530de08479fabe16fdbe77b911d842446
@@ -749,14 +749,14 @@ __metadata:
   linkType: hard
 
 "@ministryofjustice/hmpps-forge@npm:^0.1.0-alpha.22":
-  version: 0.1.0-alpha.22
-  resolution: "@ministryofjustice/hmpps-forge@npm:0.1.0-alpha.22"
+  version: 0.1.0-alpha.23
+  resolution: "@ministryofjustice/hmpps-forge@npm:0.1.0-alpha.23"
   dependencies:
     express: "npm:^4.21.0 || ^5.0.0"
     http-errors: "npm:^2.0.0"
     nunjucks: "npm:^3.2.4"
     zod: "npm:^4.1.5"
-  checksum: 10c0/0355cf39f197fa3d14bd5fc252a67b5939ae873318e8239e7b152c44f4251ec6a9c66321efa0f6d9d1cfea61b3a25d1cde448d9a07478a457da1882ea51085fd
+  checksum: 10c0/a61fdf632893b5478485101171b2d5da5a7366dda9a8a68fb83f7edd22f4a9cc7fb792dc501cd439083af594e91a7885e0407871ea362e1fcabae137b13d6453
   languageName: node
   linkType: hard
 
@@ -4576,7 +4576,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"i18next@npm:^26.3.1":
+"i18next@npm:^26.3.2":
   version: 26.3.2
   resolution: "i18next@npm:26.3.2"
   peerDependencies:
@@ -5185,7 +5185,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"knip@npm:^6.18.0":
+"knip@npm:^6.20.0":
   version: 6.20.0
   resolution: "knip@npm:6.20.0"
   dependencies:
@@ -5215,7 +5215,7 @@ __metadata:
   dependencies:
     "@axe-core/playwright": "npm:^4.12.1"
     "@azure/msal-node": "npm:^5.3.0"
-    "@faker-js/faker": "npm:^10.4.0"
+    "@faker-js/faker": "npm:^10.5.0"
     "@j178/prek": "npm:^0.4.5"
     "@ministryofjustice/frontend": "npm:9.0.0"
     "@ministryofjustice/hmpps-forge": "npm:^0.1.0-alpha.22"
@@ -5262,19 +5262,19 @@ __metadata:
     globals: "npm:^17.7.0"
     govuk-frontend: "npm:^6.3.0"
     helmet: "npm:^8.2.0"
-    i18next: "npm:^26.3.1"
-    knip: "npm:^6.18.0"
+    i18next: "npm:^26.3.2"
+    knip: "npm:^6.20.0"
     mocha: "npm:^11.7.6"
     moment: "npm:^2.30.1"
     morgan: "npm:~1.11.0"
     msw: "npm:^2.14.6"
     nodemon: "npm:^3.1.14"
     nunjucks: "npm:^3.2.4"
-    orval: "npm:^8.17.0"
+    orval: "npm:^8.19.0"
     pino: "npm:^10.3.1"
     playwright-core: "npm:^1.61.1"
     prettier: "npm:^3.8.4"
-    redis: "npm:^6.0.0"
+    redis: "npm:^6.0.1"
     rimraf: "npm:^6.1.3"
     sass-embedded: "npm:^1.100.0"
     sinon: "npm:^22.0.0"
@@ -5946,7 +5946,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"orval@npm:^8.17.0":
+"orval@npm:^8.19.0":
   version: 8.19.0
   resolution: "orval@npm:8.19.0"
   dependencies:
@@ -6548,7 +6548,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"redis@npm:^6.0.0":
+"redis@npm:^6.0.1":
   version: 6.0.1
   resolution: "redis@npm:6.0.1"
   dependencies:
