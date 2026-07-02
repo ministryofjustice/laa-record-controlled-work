@@ -1,9 +1,11 @@
-import { Case, CaseListContext } from "#/journeys/your-cases/journey.types.js";
-import {
-  defineEffectFunctions,
-} from "@ministryofjustice/hmpps-forge/core/authoring";
+import { defineEffectFunctions } from "@ministryofjustice/hmpps-forge/core/authoring";
 
-export type CaseListEffectShape = {
+import type {
+  Case,
+  CaseListContext,
+} from "#/journeys/your-cases/journey.types.js";
+
+export interface CaseListEffectShape {
   /** Loads a list of cases for the user. */
   LoadCaseList: (context: CaseListContext) => void;
 }
@@ -13,7 +15,6 @@ export const {
   implementations: CaseListEffectsImplementations,
 } = defineEffectFunctions<CaseListEffectShape>({
   LoadCaseList: () => (context: CaseListContext) => {
-
     context.setData("caseList", [
       {
         clientName: "John Doe",

@@ -1,8 +1,4 @@
-import { Case } from "#/journeys/your-cases/journey.types.js";
-import { H1 } from "#/lib/constants/headings.js";
-import {
-  Format,
-} from "@ministryofjustice/hmpps-forge/core/authoring";
+import { Format } from "@ministryofjustice/hmpps-forge/core/authoring";
 import {
   GovUKHeading,
   GovUKLinkButton,
@@ -10,6 +6,10 @@ import {
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 import { MOJSubNavigation } from "@ministryofjustice/hmpps-forge/moj-components";
 import { t } from "i18next";
+
+import type { Case } from "#/journeys/your-cases/journey.types.js";
+
+import { H1 } from "#/lib/constants/headings.js";
 
 export const heading = GovUKHeading({
   level: H1,
