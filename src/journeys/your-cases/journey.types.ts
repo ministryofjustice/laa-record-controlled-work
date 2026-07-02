@@ -1,4 +1,4 @@
-import type { EffectFunctionContext } from "@ministryofjustice/hmpps-forge/core/authoring";
+import type { EffectFunctionContext } from "@ministryofjustice/hmpps-forge/core";
 
 export interface Case extends Record<string, unknown> {
   clientName: string;
@@ -9,10 +9,10 @@ export interface Case extends Record<string, unknown> {
 export type CaseListContext = EffectFunctionContext<
   MyData,
   Record<string, unknown>,
-  Record<string, unknown>,
+  unknown,
   Record<string, unknown>
 >;
 
-interface MyData extends Record<string, unknown> {
+export interface MyData extends Record<string, unknown> {
   caseList: Case[];
 }

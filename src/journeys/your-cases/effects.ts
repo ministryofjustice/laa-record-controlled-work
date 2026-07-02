@@ -1,20 +1,19 @@
-import { defineEffectFunctions } from "@ministryofjustice/hmpps-forge/core/authoring";
+import {
+  defineEffectFunctions,
+  EffectFunctionExpr,
+} from "@ministryofjustice/hmpps-forge/core/authoring";
 
-import type {
-  Case,
-  CaseListContext,
-} from "#/journeys/your-cases/journey.types.js";
 
 export interface CaseListEffectShape {
   /** Loads a list of cases for the user. */
-  LoadCaseList: (context: CaseListContext) => void;
+  LoadCaseList: () => EffectFunctionExpr;
 }
 
 export const {
   effects: CaseListEffects,
   implementations: CaseListEffectsImplementations,
 } = defineEffectFunctions<CaseListEffectShape>({
-  LoadCaseList: () => (context: CaseListContext) => {
+  LoadCaseList: () => (context) => {
     context.setData("caseList", [
       {
         clientName: "John Doe",
@@ -91,6 +90,6 @@ export const {
         lastUpdated: "2023-04-20",
         referenceNumber: "CASE987654",
       },
-    ] as Case[]);
+    ]);
   },
 });

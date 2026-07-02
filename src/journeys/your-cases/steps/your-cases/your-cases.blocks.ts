@@ -1,4 +1,10 @@
-import { Format } from "@ministryofjustice/hmpps-forge/core/authoring";
+import {
+  ChainableRef,
+  Format,
+  Item,
+  Iterator,
+  Transformer,
+} from "@ministryofjustice/hmpps-forge/core/authoring";
 import {
   GovUKHeading,
   GovUKLinkButton,
@@ -35,22 +41,35 @@ export const subNavigation = MOJSubNavigation({
   ],
 });
 
-export const casesTable = (cases: Case[]) =>
+export const casesTable = (cases: ChainableRef) =>
   GovUKTable({
     head: [
       { text: t("pages.yourCases.table.columns.clientName") },
       { text: t("pages.yourCases.table.columns.referenceNumber") },
       { text: t("pages.yourCases.table.columns.lastUpdated") },
     ],
-    rows: cases.map((caseItem: Case) => [
-      {
-        html: Format(
-          '<a class="govuk-link" href="/cases/%1">%2</a>',
-          caseItem.referenceNumber,
-          caseItem.clientName,
-        ),
-      },
-      { text: caseItem.referenceNumber },
-      { text: caseItem.lastUpdated },
-    ]),
+    rows: cases.each(
+      Iterator.Map([
+        {
+          html: Format(
+            '<a class="govuk-link" href="/cases/%1">%2</a>',
+            Item().path("referenceNumber"),
+            Item().path("clientName"),
+          ),
+        },
+        { text: Item().path("referenceNumber") },
+        {
+          text: Item()
+            .path("lastUpdated")
+            .pipe(
+              Transformer.String.FormatDate({
+                day: "numeric",
+                locale: "en-GB",
+                month: "short",
+                year: "numeric",
+              }),
+            ),
+        },
+      ]),
+    ),
   });

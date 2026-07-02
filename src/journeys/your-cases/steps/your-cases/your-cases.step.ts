@@ -15,7 +15,7 @@ export const yourCasesStep = (): ReturnType<typeof step> =>
       heading,
       createCaseButton,
       subNavigation,
-      casesTable(Data("caseList") as unknown as Case[]),
+      casesTable(Data("caseList")),
     ],
     path: "/",
     title: "Your Cases",
