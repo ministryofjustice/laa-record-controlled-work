@@ -39,7 +39,7 @@ export const subNavigation = MOJSubNavigation({
   ],
 });
 
-export const casesTable = (cases: ChainableRef) =>
+export const casesTable = (cases: ChainableRef): ReturnType<typeof GovUKTable> =>
   GovUKTable({
     head: [
       { text: t("pages.yourCases.table.columns.clientName") },
