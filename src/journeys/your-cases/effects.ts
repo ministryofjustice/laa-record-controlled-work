@@ -1,8 +1,7 @@
 import {
   defineEffectFunctions,
-  EffectFunctionExpr,
+  type EffectFunctionExpr,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
-
 
 export interface CaseListEffectShape {
   /** Loads a list of cases for the user. */

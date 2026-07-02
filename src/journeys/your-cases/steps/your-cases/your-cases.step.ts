@@ -1,7 +1,5 @@
 import { Data, step } from "@ministryofjustice/hmpps-forge/core/authoring";
 
-import type { Case } from "#/journeys/your-cases/journey.types.js";
-
 import {
   casesTable,
   createCaseButton,

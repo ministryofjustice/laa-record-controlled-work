@@ -6,12 +6,7 @@ export interface Case extends Record<string, unknown> {
   referenceNumber: string;
 }
 
-export type CaseListContext = EffectFunctionContext<
-  MyData,
-  Record<string, unknown>,
-  unknown,
-  Record<string, unknown>
->;
+export type CaseListContext = EffectFunctionContext<MyData>;
 
 export interface MyData extends Record<string, unknown> {
   caseList: Case[];

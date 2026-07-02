@@ -1,5 +1,5 @@
 import {
-  ChainableRef,
+  type ChainableRef,
   Format,
   Item,
   Iterator,
@@ -12,8 +12,6 @@ import {
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 import { MOJSubNavigation } from "@ministryofjustice/hmpps-forge/moj-components";
 import { t } from "i18next";
-
-import type { Case } from "#/journeys/your-cases/journey.types.js";
 
 import { H1 } from "#/lib/constants/headings.js";
 
