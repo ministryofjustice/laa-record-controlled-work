@@ -1,28 +1,14 @@
 {
   "reporter": ["text", "lcov", "html"],
-  "include": [
-    "src/**/*.ts",
-    "routes/**/*.ts",
-    "middleware/**/*.ts",
-    "utils/**/*.ts"
-  ],
+  "include": ["src/**/*.ts"],
   "exclude": [
-    "playwright.config.ts",
-    "test",
-    "tests",
     "**/*.d.ts",
     "**/*.test.ts",
-    "src/scripts/custom.ts",
-    "src/scripts/frontendPackagesEntry.ts",
-    "src/scripts/helpers/index.ts",
-    "src/scripts/pages/yourCases.ts",
-    "middleware/index.ts",
-    "middleware/setupCsrf.ts",
-    "utils/helmetSetup.ts",
-    "utils/rateLimitSetUp.ts",
-    "utils/index.ts",
-    "utils/axiosSetup.ts",
-    "utils/nunjucksSetup.ts"
+    "**/*.type.ts",
+    "**/*.types.ts",
+    "src/journeys/**/index.ts",
+    "test",
+    "tests"
   ],
   "all": true,
   "sourceMap": true,
