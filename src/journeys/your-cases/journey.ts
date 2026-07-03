@@ -1,14 +1,13 @@
 import { access, journey } from "@ministryofjustice/hmpps-forge/core/authoring";
 
-import { CaseListEffects } from "#/journeys/your-cases/effects.js";
-
-import { yourCasesStep } from "./steps/your-cases/your-cases.step.js";
+import { yourCasesStep } from "#/journeys/your-cases/steps/your-cases/your-cases.step.js";
+import { YourCasesEffects } from "#/journeys/your-cases/your-cases.effects.js";
 
 export const yourCasesJourney = journey({
   code: "yourCases",
   onAccess: [
     access({
-      effects: [CaseListEffects.LoadCaseList()],
+      effects: [YourCasesEffects.LoadYourCaseList()],
     }),
   ],
   path: "/your-cases",

@@ -1,59 +1,59 @@
-import config from "#/config.js";
+// import config from "#/config.js";
 
-const getBody = async (c: Request | Response): Promise<unknown> => {
-  const contentType = c.headers.get("content-type");
+// const getBody = async (c: Request | Response): Promise<unknown> => {
+//   const contentType = c.headers.get("content-type");
 
-  if (contentType?.includes("application/json")) {
-    return await c.json();
-  }
+//   if (contentType?.includes("application/json")) {
+//     return await c.json();
+//   }
 
-  if (contentType?.includes("application/pdf")) {
-    return await c.blob();
-  }
+//   if (contentType?.includes("application/pdf")) {
+//     return await c.blob();
+//   }
 
-  return await c.text();
-};
+//   return await c.text();
+// };
 
-const getUrl = (contextUrl: string): string => {
-  const url = new URL(contextUrl);
-  const { pathname } = url;
-  const { search } = url;
-  const { baseUrl } = config.api;
+// const getUrl = (contextUrl: string): string => {
+//   const url = new URL(contextUrl);
+//   const { pathname } = url;
+//   const { search } = url;
+//   const { baseUrl } = config.api;
 
-  const requestUrl = new URL(`${baseUrl}${pathname}${search}`);
+//   const requestUrl = new URL(`${baseUrl}${pathname}${search}`);
 
-  return requestUrl.toString();
-};
+//   return requestUrl.toString();
+// };
 
-// NOTE: Add headers
-const getHeaders = (headers?: HeadersInit): Record<string, string> => {
-  const base: Record<string, string> = {};
-  new Headers(headers).forEach((value, key) => {
-    base[key] = value;
-  });
-  return {
-    ...base,
-    Authorization: "token",
-    "Content-Type": "multipart/form-data",
-  };
-};
+// // NOTE: Add headers
+// const getHeaders = (headers?: HeadersInit): Record<string, string> => {
+//   const base: Record<string, string> = {};
+//   new Headers(headers).forEach((value, key) => {
+//     base[key] = value;
+//   });
+//   return {
+//     ...base,
+//     Authorization: "token",
+//     "Content-Type": "multipart/form-data",
+//   };
+// };
 
-export const fetcher = async <T>(
-  url: string,
-  options: RequestInit,
-): Promise<T> => {
-  const requestUrl = getUrl(url);
-  const requestHeaders = getHeaders(options.headers);
+// export const fetcher = async <T>(
+//   url: string,
+//   options: RequestInit,
+// ): Promise<T> => {
+//   const requestUrl = getUrl(url);
+//   const requestHeaders = getHeaders(options.headers);
 
-  const requestInit: RequestInit = {
-    ...options,
-    headers: requestHeaders,
-  };
+//   const requestInit: RequestInit = {
+//     ...options,
+//     headers: requestHeaders,
+//   };
 
-  const response = await fetch(requestUrl, requestInit);
-  const data = await getBody(response);
-  const { headers, status } = response;
-  /* eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion --
-    Return shape matches the orval-generated T type at runtime */
-  return { data, headers, status } as unknown as T;
-};
+//   const response = await fetch(requestUrl, requestInit);
+//   const data = await getBody(response);
+//   const { headers, status } = response;
+//   /* eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion --
+//     Return shape matches the orval-generated T type at runtime */
+//   return { data, headers, status } as unknown as T;
+// };

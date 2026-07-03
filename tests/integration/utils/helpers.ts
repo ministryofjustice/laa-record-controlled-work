@@ -17,11 +17,7 @@ import {
   JourneyEffects,
   JourneyEffectsImplementations,
 } from "#/journeys/effects.js";
-import {
-  CaseListEffects,
-  CaseListEffectsImplementations,
-} from "#/journeys/your-cases/effects.js";
-import { yourCasesStep } from "#/journeys/your-cases/steps/your-cases/your-cases.step.js";
+import { YourCasesEffectImplementations, YourCasesEffects } from "#/journeys/your-cases/your-cases.effects.js";
 
 /**
  * Creates a test client for a single-step journey under /create-application.
@@ -70,7 +66,7 @@ export function createForgeTestClientForCaseList(
     code: "yourCases",
     onAccess: [
       access({
-        effects: [CaseListEffects.LoadCaseList()],
+        effects: [YourCasesEffects.LoadYourCaseList()],
       }),
     ],
     path: "/your-cases",
@@ -81,7 +77,7 @@ export function createForgeTestClientForCaseList(
   });
 
   const testPackage = createTestPackage({
-    functions: CaseListEffectsImplementations,
+    functions: YourCasesEffectImplementations,
     journey: testJourney,
   });
 

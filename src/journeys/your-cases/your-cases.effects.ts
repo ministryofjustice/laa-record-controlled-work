@@ -23,7 +23,13 @@ export const {
   LoadYourCaseList:
     ({ getApplications }) =>
     async (context) => {
-      const response = await getApplications();
+      let response;
+      try {
+        response = await getApplications();
+      } catch (error) {
+        console.log("Error fetching applications:", error);
+        return;
+      }
 
       if (response.status !== HTTP_STATUS.OK) {
         // TODO how to handle
