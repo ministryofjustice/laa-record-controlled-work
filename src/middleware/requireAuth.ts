@@ -1,5 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 
+const BYPASS_PATHS = ["/health", "/status"];
+
 /**
  * Middleware that enforces authentication on all routes except public bypass paths.
  * Stores the original URL in the session for post-login redirect, then redirects to sign-in.
@@ -13,10 +15,9 @@ export function requireAuth(
   res: Response,
   next: NextFunction,
 ): void {
-  const bypassPaths = ["/health", "/status"];
   const { originalUrl, session } = req;
 
-  if (bypassPaths.includes(originalUrl) || originalUrl.startsWith("/auth/")) {
+  if (BYPASS_PATHS.includes(originalUrl) || originalUrl.startsWith("/auth/")) {
     next();
     return;
   }
