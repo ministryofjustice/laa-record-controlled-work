@@ -14,7 +14,7 @@ interface PrivateApiLocals {
 router.use(logFailureStatusCodes);
 
 router.get("/load", (_req: Request, res: Response): void => {
-  res.sendStatus(OK);
+  res.json({ return_url: "http://localhost:8080" });
 });
 
 router.use(logRouteErrors);
