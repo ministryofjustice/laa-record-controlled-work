@@ -4,6 +4,7 @@ import z from "zod";
 import { logger } from "#/logger.js";
 
 const optionalEnvSchema = z.object({
+  API_BASE_URL: z.url().optional(),
   AUTH_RATE_LIMIT_MAX: z.coerce.number().optional(),
   CONTACT_EMAIL: z.string().optional(),
   CONTACT_PHONE: z.string().optional(),

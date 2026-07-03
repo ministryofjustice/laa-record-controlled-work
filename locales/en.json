@@ -18,6 +18,26 @@
     },
     "error": {
       "pageTitle": "Sorry, there is a problem with the service – {SERVICE_NAME} – GOV.UK"
+    },
+    "yourCases": {
+      "pageTitle": "Your cases",
+      "heading": "Your cases",
+      "noCases": {
+        "heading": "You have no cases"
+      },
+      "createCaseButton": "Record a new case",
+      "tabs": {
+        "inProgress": "In progress",
+        "recorded": "Recorded"
+      },
+      "table": {
+        "emptyMessage": "You have no cases in progress",
+        "columns": {
+          "referenceNumber": "Reference number",
+          "clientName": "Client name",
+          "lastUpdated": "Last updated"
+        }
+      }
     }
   },
   "journeys": {

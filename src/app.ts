@@ -15,6 +15,7 @@ import authRouter from "#/auth/auth.routes.js";
 import config from "#/config.js";
 import { autocomplete } from "#/journeys/components/autocomplete/autocomplete.component.js";
 import createApplication from "#/journeys/create-application/index.js";
+import yourCases from "#/journeys/your-cases/index.js";
 import { createSession } from "#/lib/session.js";
 import { requireAuth } from "#/middleware/requireAuth.js";
 import { setupConfig } from "#/middleware/setupConfigs.js";
@@ -88,7 +89,8 @@ const createApp = async (): Promise<express.Application> => {
     .registerGlobalComponents(mojComponents)
     .registerGlobalComponents([autocomplete])
     .registerGlobalFunctions(nunjucksFunctions)
-    .registerPackage(createApplication);
+    .registerPackage(createApplication)
+    .registerPackage(yourCases);
 
   // Set up rate limiting
   setupRateLimit(app, config);

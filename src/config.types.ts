@@ -1,5 +1,9 @@
 import type { SessionOptions } from "express-session";
 
+export interface ApiConfig {
+  baseUrl: string;
+}
+
 export interface AppConfig {
   contact: {
     email: string | undefined;
@@ -28,8 +32,8 @@ export interface AppConfig {
   };
   useHttps: boolean;
 }
-
 export interface Config {
+  api: ApiConfig;
   app: AppConfig;
   csrf: CsrfConfig;
   entra: EntraConfig;
