@@ -7,10 +7,6 @@ const getBody = async (c: Request | Response): Promise<unknown> => {
     return await c.json();
   }
 
-  if (contentType?.includes("application/pdf")) {
-    return await c.blob();
-  }
-
   return await c.text();
 };
 
