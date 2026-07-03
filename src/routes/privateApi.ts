@@ -2,7 +2,7 @@ import type { NextFunction, Request, Response } from "express";
 
 import express from "express";
 
-import { BAD_REQUEST, OK } from "#/lib/constants/http.js";
+import { BAD_REQUEST } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
 
 const router = express.Router();
