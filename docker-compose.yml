@@ -75,9 +75,11 @@ services:
       RAILS_SERVE_STATIC_FILES: true # won't serve assets without this
       RAILS_LOG_TO_STDOUT: true # logs to a file without this
       SECRET_KEY_BASE: dev-secret # doesn't work without it
+      DISABLE_SECURE_COOKIES: true
 
       CCQ_MODE: embedded
       REDIS_URL: redis://redis-ccq:6379
+      HOST_SERVICE_URL: http://rcw:3000
 
   redis-rcw:
     container_name: rcw-session-redis
