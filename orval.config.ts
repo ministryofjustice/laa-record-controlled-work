@@ -13,7 +13,6 @@ export default defineConfig({
       target: `https://raw.githubusercontent.com/ministryofjustice/laa-record-controlled-work-api/${API_SHA}/record-controlled-work-api/open-api-specification.yml`,
     },
     output: {
-      baseUrl: "http://localhost:8081",
       clean: true,
       client: "fetch",
       fileExtension: ".gen.ts",
@@ -36,11 +35,11 @@ export default defineConfig({
           ...(info.version ? [`OpenAPI spec version: ${info.version}`] : []),
         ],
         // custom fetch function to use instead of the default fetch implementation
-        // mutator: {
-        //   extension: ".js",
-        //   name: "fetcher",
-        //   path: "./src/lib/fetch.ts",
-        // },
+        mutator: {
+          extension: ".js",
+          name: "fetcher",
+          path: "./src/lib/fetch.ts",
+        },
       },
       schemaFileExtension: ".zod.gen.ts",
       schemas: {

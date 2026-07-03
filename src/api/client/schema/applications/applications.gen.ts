@@ -12,6 +12,8 @@ import type { CreateApplicationRequestBody } from "../../model/createApplication
 
 import type { CreateApplicationResponseBody } from "../../model/createApplicationResponseBody.zod.gen.js";
 
+import { fetcher } from "../../../../lib/fetch.js";
+
 export type getApplicationsResponse200 = {
   data: Applications;
   status: 200;
@@ -54,7 +56,7 @@ export type getApplicationsResponse =
   | getApplicationsResponseError;
 
 export const getGetApplicationsUrl = () => {
-  return `http://localhost:8081/api/v1/applications`;
+  return `/api/v1/applications`;
 };
 
 /**
@@ -63,19 +65,10 @@ export const getGetApplicationsUrl = () => {
 export const getApplications = async (
   options?: RequestInit,
 ): Promise<getApplicationsResponse> => {
-  const res = await fetch(getGetApplicationsUrl(), {
+  return fetcher<getApplicationsResponse>(getGetApplicationsUrl(), {
     ...options,
     method: "GET",
   });
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: getApplicationsResponse["data"] = body ? JSON.parse(body) : {};
-  return {
-    data,
-    status: res.status,
-    headers: res.headers,
-  } as getApplicationsResponse;
 };
 
 export type createApplicationResponse200 = {
@@ -126,7 +119,7 @@ export type createApplicationResponse =
   | createApplicationResponseError;
 
 export const getCreateApplicationUrl = () => {
-  return `http://localhost:8081/api/v1/applications`;
+  return `/api/v1/applications`;
 };
 
 /**
@@ -136,21 +129,12 @@ export const createApplication = async (
   createApplicationRequestBody?: CreateApplicationRequestBody,
   options?: RequestInit,
 ): Promise<createApplicationResponse> => {
-  const res = await fetch(getCreateApplicationUrl(), {
+  return fetcher<createApplicationResponse>(getCreateApplicationUrl(), {
     ...options,
     method: "POST",
     headers: { "Content-Type": "application/json", ...options?.headers },
     body: JSON.stringify(createApplicationRequestBody),
   });
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: createApplicationResponse["data"] = body ? JSON.parse(body) : {};
-  return {
-    data,
-    status: res.status,
-    headers: res.headers,
-  } as createApplicationResponse;
 };
 
 export type getApplicationResponse200 = {
@@ -195,7 +179,7 @@ export type getApplicationResponse =
   | getApplicationResponseError;
 
 export const getGetApplicationUrl = (id: string) => {
-  return `http://localhost:8081/api/v1/applications/${id}`;
+  return `/api/v1/applications/${id}`;
 };
 
 /**
@@ -205,17 +189,8 @@ export const getApplication = async (
   id: string,
   options?: RequestInit,
 ): Promise<getApplicationResponse> => {
-  const res = await fetch(getGetApplicationUrl(id), {
+  return fetcher<getApplicationResponse>(getGetApplicationUrl(id), {
     ...options,
     method: "GET",
   });
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: getApplicationResponse["data"] = body ? JSON.parse(body) : {};
-  return {
-    data,
-    status: res.status,
-    headers: res.headers,
-  } as getApplicationResponse;
 };
