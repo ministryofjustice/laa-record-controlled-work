@@ -51,14 +51,14 @@ export const casesTable = (cases: ChainableRef): GovUKTable =>
         {
           html: Format(
             '<a class="govuk-link" href="/cases/%1">%2</a>',
-            Item().path("referenceNumber"),
-            Item().path("clientName"),
+            Item().path("applicationRefNumber"),
+            Item().path("name"),
           ),
         },
-        { text: Item().path("referenceNumber") },
+        { text: Item().path("applicationRefNumber") },
         {
           text: Item()
-            .path("lastUpdated")
+            .path("modifiedAt")
             .pipe(
               Transformer.String.FormatDate({
                 day: "numeric",
