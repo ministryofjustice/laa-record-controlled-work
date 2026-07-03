@@ -45,7 +45,6 @@ export const fetcher = async <T>(
   };
 
   const response = await fetch(requestUrl, requestInit);
-  console.log("fetcher response", { response });
   const data = await getBody(response);
   const { headers, status } = response;
   /* eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion --
