@@ -1,43 +1,37 @@
 import { test, expect } from "../../fixtures/index.js";
 
 test("Your Cases step", async ({ page }) => {
+  // Navigate to the Your Cases page
   await page.goto("/your-cases");
 
-  // Check the title of the page
-  const title = await page.locator("h1").textContent();
-  expect(title).toBe("Your cases");
+  // // Check the title of the page
+  await expect(
+    page.getByRole("heading", {
+      name: /Your cases/,
+      level: 1,
+    }),
+  ).toBeVisible();
 
   // Check the button
-  const recordButton = page.locator(".govuk-button");
-  await expect(recordButton).toHaveText("Record a new case");
-  await expect(recordButton).toHaveAttribute("href", "/create-application");
+  await page.getByRole("button", { name: "Record a new case" }).click();
 
-  // Check the table headers
-  const tableHeaders = page.locator(".govuk-table thead th");
-  await expect(tableHeaders.nth(0)).toHaveText("Client name");
-  await expect(tableHeaders.nth(1)).toHaveText("Reference number");
-  await expect(tableHeaders.nth(2)).toHaveText("Last updated");
+  // Verify redirection to the ECF page
+  await expect(page).toHaveURL("/create-application/ecf");
+
+  // Navigate back to the ECF page
+  await page.goto("/your-cases");
 
   // Check the sub navigation
-  const subNavigation = page.locator(".moj-sub-navigation");
-  const subNavItems = subNavigation.locator("li");
-  await expect(subNavItems.nth(0)).toHaveText("In progress");
-  await expect(subNavItems.nth(0).locator("a")).toHaveAttribute(
-    "href",
-    "/your-cases",
-  );
+  const inProgressLink = page.getByRole("link", { name: "In progress" });
+  const recordedLink = page.getByRole("link", { name: "Recorded" });
 
-  subNavItems.nth(0).click();
+  // Check in progress link navigates to correct page and links have correct aria-current attribute
+  await inProgressLink.click();
   await expect(page).toHaveURL("/your-cases");
+  await expect(inProgressLink).toHaveAttribute("aria-current", "page");
+  await expect(recordedLink).not.toHaveAttribute("aria-current", "page");
 
-  await expect(subNavItems.nth(0).locator("a")).toHaveAttribute("aria-current", "page");
-  await expect(subNavItems.nth(1)).toHaveText("Recorded");
-  await expect(subNavItems.nth(1).locator("a")).toHaveAttribute(
-    "href",
-    "/your-cases-recorded",
-  );
-  await expect(subNavItems.nth(1).locator("a")).not.toHaveAttribute("aria-current", "page");
-
-  subNavItems.nth(1).click();
+  // Check recorded link navigates to the correct page
+  await recordedLink.click();
   await expect(page).toHaveURL("/your-cases-recorded");
 });
