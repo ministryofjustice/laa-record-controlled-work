@@ -2,7 +2,7 @@
  * Dev Server with MSW Integration
  *
  * This script starts the app with MSW intercepting outbound API calls.
- * It initializes MSW to intercept outgoing API calls and serve mock responses.
+ * Set USE_MSW=false in .env to connect to a real API instead.
  *
  */
 
@@ -10,33 +10,39 @@ import { setupServer } from "msw/node";
 
 import { handlers } from "../tests/playwright/factories/handlers/index.js";
 
-const mswServer = setupServer(...handlers);
 const SUCCESS_EXIT_CODE = 0;
 const ERROR_EXIT_CODE = 1;
+const useMsw = process.env.USE_MSW !== "false";
 
-mswServer.listen({
-  onUnhandledRequest: (req, print) => {
-    // Only warn for calls to our own API base URL, not internal Express routes
-    if (new URL(req.url).pathname.startsWith("/api/")) {
-      print.warning();
-    }
-  },
-});
+if (useMsw) {
+  const mswServer = setupServer(...handlers);
 
-console.log("🎭 MSW active — outbound API calls will be intercepted");
+  mswServer.listen({
+    onUnhandledRequest: (req, print) => {
+      if (new URL(req.url).pathname.startsWith("/api/")) {
+        print.warning();
+      }
+    },
+  });
 
-const gracefulShutdown = (signal: string): void => {
-  console.log(`\n🛑 Received ${signal}, shutting down gracefully...`);
-  mswServer.close();
-  process.exit(SUCCESS_EXIT_CODE);
-};
+  console.log("🎭 MSW active — outbound API calls will be intercepted");
 
-process.on("SIGTERM", () => {
-  gracefulShutdown("SIGTERM");
-});
-process.on("SIGINT", () => {
-  gracefulShutdown("SIGINT");
-});
+  const gracefulShutdown = (signal: string): void => {
+    console.log(`\n🛑 Received ${signal}, shutting down gracefully...`);
+    mswServer.close();
+    process.exit(SUCCESS_EXIT_CODE);
+  };
+
+  process.on("SIGTERM", () => {
+    gracefulShutdown("SIGTERM");
+  });
+  process.on("SIGINT", () => {
+    gracefulShutdown("SIGINT");
+  });
+} else {
+  console.log("🔌 MSW disabled — connecting to real API");
+}
+
 process.on("uncaughtException", (error: unknown) => {
   console.error("💥 Uncaught Exception:", error);
   process.exit(ERROR_EXIT_CODE);
