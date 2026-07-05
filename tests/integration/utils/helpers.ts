@@ -66,11 +66,6 @@ export function createForgeTestClientForCaseList(
 ): ForgeTestClient {
   const testJourney = journey({
     code: "yourCases",
-    onAccess: [
-      access({
-        effects: [YourCasesEffects.LoadYourCaseList()],
-      }),
-    ],
     path: "/your-cases",
     reachability: { disableReachabilityChecks: true },
     steps,
