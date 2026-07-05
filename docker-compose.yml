@@ -55,6 +55,12 @@ services:
         - action: sync
           path: ./tsconfig.json
           target: /app/tsconfig.json
+        - action: sync
+          path: ./scripts
+          target: /app/scripts
+        - action: sync
+          path: ./tests/mocks
+          target: /app/tests/mocks
         - action: rebuild
           path: package.json
         - action: rebuild
