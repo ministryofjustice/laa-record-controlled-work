@@ -5185,9 +5185,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"knip@npm:^6.22.0":
-  version: 6.22.0
-  resolution: "knip@npm:6.22.0"
+"knip@npm:^6.23.0":
+  version: 6.23.0
+  resolution: "knip@npm:6.23.0"
   dependencies:
     fdir: "npm:^6.5.0"
     formatly: "npm:^0.3.0"
@@ -5205,7 +5205,7 @@ __metadata:
   bin:
     knip: bin/knip.js
     knip-bun: bin/knip-bun.js
-  checksum: 10c0/3211020e89a57a3dfb08a40e42c2a08e5efed1bf17d1d1405d64971f037a04695026aa6127d3742f0786b7d9a81f5a06d7d484fcf461e9ba98f9517950c08a50
+  checksum: 10c0/ef27c7353e3622e4e494db27563a7e96d8bf5a766f2b4b1eb4a5b8d82d8f65befed5deada5ad51e9b24f4038e6dc26bfc18f7bca15e320f986c438f3796d9352
   languageName: node
   linkType: hard
 
@@ -5263,7 +5263,7 @@ __metadata:
     govuk-frontend: "npm:^6.3.0"
     helmet: "npm:^8.2.0"
     i18next: "npm:^26.3.3"
-    knip: "npm:^6.22.0"
+    knip: "npm:^6.23.0"
     mocha: "npm:^11.7.6"
     moment: "npm:^2.30.1"
     morgan: "npm:~1.11.0"
