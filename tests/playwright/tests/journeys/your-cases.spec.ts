@@ -1,4 +1,5 @@
 import { test, expect } from "../../fixtures/index.js";
+import { applications } from "../../fixtures/applications.fixtures.js";
 
 test("Your Cases step", async ({ page }) => {
   // Navigate to the Your Cases page
@@ -34,4 +35,29 @@ test("Your Cases step", async ({ page }) => {
   // Check recorded link navigates to the correct page
   await recordedLink.click();
   await expect(page).toHaveURL("/your-cases-recorded");
+
+  // Navigate back to the Your Cases page
+  await page.goto("/your-cases");
+
+  // Check the table renders mock data correctly
+  const table = page.getByRole("table");
+  const rows = table.getByRole("row").filter({ hasNot: page.getByRole("columnheader") }); // Exclude the header row
+
+  await expect(rows).toHaveCount(applications.length);
+
+  for (const [i, app] of applications.entries()) {
+    const row = rows.nth(i);
+    const formattedDate = new Intl.DateTimeFormat("en-GB", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    }).format(new Date(app.modifiedAt));
+
+    await expect(row.getByRole("link", { name: app.name })).toHaveAttribute(
+      "href",
+      `/cases/${app.applicationRefNumber}`,
+    );
+    await expect(row.getByRole("cell").nth(1)).toHaveText(app.applicationRefNumber);
+    await expect(row.getByRole("cell").nth(2)).toHaveText(formattedDate);
+  }
 });

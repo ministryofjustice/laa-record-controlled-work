@@ -5,8 +5,7 @@
  * to external APIs and serve mock responses.
  */
 
-import { getApplicationsMock } from "../../../mocks/api/msw/applications/applications.msw.gen.js";
+import { getGetApplicationsMockHandler } from "../../../mocks/api/msw/applications/applications.msw.gen.js";
+import { applications } from "../../fixtures/applications.fixtures.js";
 
-export const apiHandlers = [
-  ...getApplicationsMock(),
-];
+export const apiHandlers = [getGetApplicationsMockHandler(applications)];
