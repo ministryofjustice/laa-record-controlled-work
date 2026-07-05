@@ -11,9 +11,9 @@ import {
   GovUKTable,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 import { MOJSubNavigation } from "@ministryofjustice/hmpps-forge/moj-components";
-import { t } from "i18next";
 
 import { H1 } from "#/lib/constants/headings.js";
+import { t } from "#/lib/i18n.js";
 
 export const heading = GovUKHeading({
   level: H1,
