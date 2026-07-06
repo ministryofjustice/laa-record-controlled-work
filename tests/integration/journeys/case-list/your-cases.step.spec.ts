@@ -40,6 +40,10 @@ describe("Your Cases step", () => {
       [subNavigation] = renderResult.getBlocksByVariant("mojSubNavigation");
     });
 
+    afterEach(() => {
+      getApplicationsStub.resolves({ status: 200, data: mockData });
+    });
+
     it("has the correct title", () => {
       expect(renderResult.context.step.title).to.equal("Your Cases");
     });
@@ -69,7 +73,10 @@ describe("Your Cases step", () => {
     });
 
     it("renders a table with the correct values", () => {
-      const rows = table.properties.rows as { html?: string; text?: string }[][];
+      const rows = table.properties.rows as {
+        html?: string;
+        text?: string;
+      }[][];
       const dateFormatter = new Intl.DateTimeFormat("en-GB", {
         day: "numeric",
         month: "short",
@@ -83,8 +90,29 @@ describe("Your Cases step", () => {
         expect(row[0].html).to.include(name);
         expect(row[0].html).to.include(`/cases/${applicationRefNumber}`);
         expect(row[1].text).to.equal(applicationRefNumber);
-        expect(row[2].text).to.equal(dateFormatter.format(new Date(modifiedAt)));
+        expect(row[2].text).to.equal(
+          dateFormatter.format(new Date(modifiedAt)),
+        );
       }
+    });
+
+    it("renders empty value string when getApplications returns an empty array", async () => {
+      getApplicationsStub.resolves({ status: 200, data: [] });
+
+      const result = await client.get("/your-cases");
+      expect(result.type).to.equal("render");
+      const renderResult = result as TestRenderResult;
+      const [emptyTable] = renderResult.getBlocksByVariant("govukTable");
+      const [ _, body] = renderResult.getBlocksByVariant("html");
+      const rows = emptyTable.properties.rows as {
+        html?: string;
+        text?: string;
+      }[][];
+      
+      expect(rows).to.have.length(0);
+      expect(body.properties.content).to.equal(
+        "You have no cases in progress",
+      );
     });
   });
 });
