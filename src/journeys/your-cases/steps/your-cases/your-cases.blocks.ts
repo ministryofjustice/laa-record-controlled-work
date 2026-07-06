@@ -1,11 +1,14 @@
 import {
   type ChainableRef,
+  Condition,
+  Data,
   Format,
   Item,
   Iterator,
   Transformer,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 import {
+  GovUKBody,
   GovUKHeading,
   GovUKLinkButton,
   GovUKTable,
@@ -70,4 +73,17 @@ export const casesTable = (cases: ChainableRef): GovUKTable =>
         },
       ]),
     ),
+    // TODO replace with arr.length when transformer is available
+    visibleWhen: Data("caseList")
+      .pipe(Transformer.Array.Length())
+      // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- temporary
+      .match(Condition.Number.GreaterThan(0)),
   });
+
+export const noCasesMessage = GovUKBody({
+  text: t("pages.yourCases.table.emptyMessage"),
+  visibleWhen: Data("caseList")
+    .pipe(Transformer.Array.Length())
+    // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- temporary
+    .match(Condition.Number.LessThanOrEqual(0)),
+});
