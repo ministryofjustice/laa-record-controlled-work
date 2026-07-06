@@ -6,6 +6,7 @@ import { createForgeTestClientForCaseList } from "../../../../integration/utils/
 import { getGetApplicationsResponseMock } from "../../../../mocks/api/fakers/applications/applications.faker.gen.js";
 import { TestRenderResult } from "@ministryofjustice/hmpps-forge/core/testing";
 import { ApiResponseError, ApiValidationError } from "#/api/api.errors.js";
+import { logger } from "#/logger.js";
 
 const mockData = getGetApplicationsResponseMock();
 
@@ -40,6 +41,10 @@ describe("LoadYourCaseList", () => {
   });
 
   describe("when getApplications throws", () => {
+    // stubbing logger.error to avoid logging the error to the console during tests
+    before(() => sinon.stub(logger, "error"));
+    after(() => sinon.restore());
+
     async function getErrorFromYourCases(
       stub: sinon.SinonStub,
     ): Promise<unknown> {
