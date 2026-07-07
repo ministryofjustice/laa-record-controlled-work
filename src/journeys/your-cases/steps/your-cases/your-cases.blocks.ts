@@ -67,6 +67,7 @@ export const casesTable = (cases: ChainableRef): GovUKTable =>
                 day: "numeric",
                 locale: "en-GB",
                 month: "short",
+                timeZone: "Europe/London",
                 year: "numeric",
               }),
             ),

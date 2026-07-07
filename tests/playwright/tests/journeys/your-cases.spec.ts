@@ -51,6 +51,7 @@ test("Your Cases step", async ({ page }) => {
       day: "numeric",
       month: "short",
       year: "numeric",
+      timeZone: "Europe/London",
     }).format(new Date(app.modifiedAt));
 
     await expect(row.getByRole("link", { name: app.name })).toHaveAttribute(
