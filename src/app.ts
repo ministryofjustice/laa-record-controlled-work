@@ -117,11 +117,7 @@ const createApp = async (): Promise<express.Application> => {
     app.use(livereload());
   }
 
-  // set up forge router for handling routes and use express.urlencoded middleware for parsing URL-encoded bodies
-  app.use(express.urlencoded({ extended: true }));
-  const forgeRouter = createExpressRouter(forge, { nunjucksEnv });
-
-  app.use("/", forgeRouter);
+  app.use("/", createExpressRouter(forge, { nunjucksEnv }));
 
   return app;
 };
