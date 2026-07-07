@@ -5,7 +5,7 @@ import {
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 import { t } from "i18next";
 
-export const backLink = (url: string) =>
+export const backLink = (url: string): GovUKBackLink =>
   GovUKBackLink({
     href: url,
   });
