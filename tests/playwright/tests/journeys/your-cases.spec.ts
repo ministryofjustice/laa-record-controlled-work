@@ -19,7 +19,7 @@ test("Your Cases step", async ({ page }) => {
   // Verify redirection to the ECF page
   await expect(page).toHaveURL("/create-application/ecf");
 
-  // Navigate back to the ECF page
+  // Navigate back to the your cases page
   await page.goto("/your-cases");
 
   // Check the sub navigation
