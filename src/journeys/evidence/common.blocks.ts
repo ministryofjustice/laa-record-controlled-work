@@ -1,10 +1,14 @@
 import { HtmlBlock } from "@ministryofjustice/hmpps-forge/core/components";
-import { GovUKBackLink, GovUKButton } from "@ministryofjustice/hmpps-forge/govuk-components";
+import {
+  GovUKBackLink,
+  GovUKButton,
+} from "@ministryofjustice/hmpps-forge/govuk-components";
 import { t } from "i18next";
 
-export const backLink = (url: string) => GovUKBackLink({
-  href: url,
-});
+export const backLink = (url: string) =>
+  GovUKBackLink({
+    href: url,
+  });
 
 export const caption = HtmlBlock({
   content: `<span class="govuk-caption-l">${t("journeys.evidence.caption")}</span>`,

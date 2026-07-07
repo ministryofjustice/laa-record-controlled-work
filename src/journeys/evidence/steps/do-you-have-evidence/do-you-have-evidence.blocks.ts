@@ -3,9 +3,7 @@ import {
   Self,
   validation,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
-import {
-  GovUKRadioInput,
-} from "@ministryofjustice/hmpps-forge/govuk-components";
+import { GovUKRadioInput } from "@ministryofjustice/hmpps-forge/govuk-components";
 
 import { t } from "#/lib/i18n.js";
 
