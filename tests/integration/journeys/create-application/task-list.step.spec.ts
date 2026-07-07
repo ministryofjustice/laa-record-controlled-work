@@ -69,14 +69,16 @@ describe("Task list step", () => {
       expect(items[0].status.tag.text).to.equal("Incomplete");
     });
 
-    it("renders the evidence and declaration tasks as cannot start yet", () => {
+    it("renders the evidence task as incomplete and declaration task as cannot start yet", () => {
       const items = taskLists[2].properties.items as Array<{
         title: { text: string };
-        status: { text?: string };
+        href?: string;
+        status: { tag: { text?: string }; text?: string };
       }>;
       expect(items.length).to.equal(2);
       expect(items[0].title.text).to.equal("Evidence");
-      expect(items[0].status.text).to.equal("Cannot start yet");
+      expect(items[0].status.tag.text).to.equal("Incomplete");
+      expect(items[0].href).to.equal("/cases/evidence/have-evidence");
       expect(items[1].title.text).to.equal("Client declaration");
       expect(items[1].status.text).to.equal("Cannot start yet");
     });
