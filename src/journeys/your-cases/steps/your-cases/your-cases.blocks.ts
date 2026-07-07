@@ -20,7 +20,7 @@ import { t } from "#/lib/i18n.js";
 
 export const heading = GovUKHeading({
   level: H1,
-  text: "Your cases",
+  text: t("pages.yourCases.heading"),
 });
 
 export const createCaseButton = GovUKLinkButton({

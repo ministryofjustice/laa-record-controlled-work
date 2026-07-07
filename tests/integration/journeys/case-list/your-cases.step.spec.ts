@@ -45,7 +45,7 @@ describe("Your Cases step", () => {
     });
 
     it("has the correct title", () => {
-      expect(renderResult.context.step.title).to.equal("Your Cases");
+      expect(renderResult.context.step.title).to.equal("Your cases");
     });
 
     it("renders a link button", () => {

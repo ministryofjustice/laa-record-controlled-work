@@ -221,6 +221,15 @@
           "completed": "Completed"
         }
       }
+    },
+    "evidence": {
+      "caption": "Evidence",
+      "doYouHaveEvidence": {
+        "title": "Do you have evidence of your client's financial eligibility?",
+        "validation": {
+          "required": "Please select an option to continue"
+        }
+      }
     }
   }
 }

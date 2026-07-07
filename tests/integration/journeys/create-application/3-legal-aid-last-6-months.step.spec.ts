@@ -8,7 +8,11 @@ import { createForgeTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 
 describe("Legal aid before 6 months step", () => {
-  const client = createForgeTestClient(legalAidLast6MonthsStep("testJourney"));
+  const client = createForgeTestClient(
+    "Record new case",
+    "/create-application/",
+    legalAidLast6MonthsStep("testJourney"),
+  );
 
   describe("GET /create-application/legal-aid-last-6-months", () => {
     let renderResult: TestRenderResult;

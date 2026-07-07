@@ -3,25 +3,23 @@ import {
   TestRedirectResult,
 } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
-import { ineligibleStep } from "#/journeys/create-application/steps/1-ecf-dropout.step.js";
-import { ecfStep } from "#/journeys/create-application/steps/1-ecf.step.js";
+import { doYouHaveEvidence } from "#/journeys/evidence/steps/do-you-have-evidence/do-you-have-evidence.step.js";
 import { createForgeTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 
-describe("ECF step", () => {
+describe("Do you have evidence step", () => {
   const client = createForgeTestClient(
-    "Record new case",
-    "/create-application/",
-    ecfStep("testJourney"),
-    ineligibleStep("testJourney"),
+    "Evidence",
+    "/cases/evidence",
+    doYouHaveEvidence("testJourney"),
   );
 
-  describe("GET /create-application/ecf", () => {
+  describe("GET /cases/evidence/have-evidence", () => {
     let renderResult: TestRenderResult;
     let radioInput: RenderBlock;
 
     before(async () => {
-      const result = await client.get("/create-application/ecf");
+      const result = await client.get("/cases/evidence/have-evidence");
       expect(result.type).to.equal("render");
       renderResult = result as TestRenderResult;
       [radioInput] = renderResult.getBlocksByVariant("govukRadioInput");
@@ -29,7 +27,7 @@ describe("ECF step", () => {
 
     it("has the correct title", () => {
       expect(renderResult.context.step.title).to.equal(
-        "Does this case require Exceptional Case Funding?",
+        "Do you have evidence of your client's financial eligibility?",
       );
     });
 
@@ -41,40 +39,40 @@ describe("ECF step", () => {
     });
   });
 
-  describe("POST /create-application/ecf", () => {
-    const fieldCode = "ecf";
+  describe("POST /cases/evidence/have-evidence", () => {
+    const fieldCode = "doYouHaveEvidence";
     
     it("should show validation error if no option is selected", async () => {
-      const result = await client.post("/create-application/ecf");
+      const result = await client.post("/cases/evidence/have-evidence");
       expect(result.type).to.equal("render");
       const renderResult = result as TestRenderResult;
       expect(renderResult.context.showValidationFailures).to.equal(true);
       expect(
         renderResult.getValidationErrorsByFieldCode(fieldCode)[0].message,
-      ).to.deep.equal("Please select an option");
+      ).to.deep.equal("Please select an option to continue");
     });
 
-    it("should redirect to ineligible step if ECF is not required", async () => {
-      const result = await client.post("/create-application/ecf", {
+    it("should redirect to reason for no evidence step if no is selected", async () => {
+      const result = await client.post("/cases/evidence/have-evidence", {
         body: {
-          ecf: "yes",
+          doYouHaveEvidence: "no",
         },
       });
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
-      expect(redirectResult.url).to.equal("/create-application/ecf-dropout");
+      expect(redirectResult.url).to.equal("/cases/evidence/reason-for-no-evidence");
     });
 
-    it("should redirect to legal aid before step if ECF is not required", async () => {
-      const result = await client.post("/create-application/ecf", {
+    it("should redirect to evidence of income step if yes is selected", async () => {
+      const result = await client.post("/cases/evidence/have-evidence", {
         body: {
-          ecf: "no",
+          doYouHaveEvidence: "yes",
         },
       });
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
       expect(redirectResult.url).to.equal(
-        "/create-application/legal-aid-before",
+        "/cases/evidence/evidence-of-income",
       );
     });
   });

@@ -25,11 +25,13 @@ import { YourCasesEffectImplementations, YourCasesEffects, type YourCasesEffects
  * @returns {ForgeTestClient} A configured test client.
  */
 export function createForgeTestClient(
+  title: string,
+  path: string,
   ...steps: StepDefinition[]
 ): ForgeTestClient {
   const testJourney = journey({
     code: "testJourney",
-    path: "/create-application",
+    path: path,
     onAccess: [
       access({
         effects: [JourneyEffects.LoadDraftAnswers("testJourney")],
@@ -37,7 +39,7 @@ export function createForgeTestClient(
     ],
     reachability: { disableReachabilityChecks: true },
     steps,
-    title: "Record new case",
+    title: title,
     view: { template: "partials/form-step" },
   });
 
@@ -85,8 +87,3 @@ export function createForgeTestClientForCaseList(
     .registerPackage(testPackage, mockYourCasesEffectsDeps)
     .createClient();
 }
-
-
-
-
-
