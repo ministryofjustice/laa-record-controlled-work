@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 
 import { Forge } from "@ministryofjustice/hmpps-forge/core";
 import {
-  ExpressFrameworkAdapter,
+  createExpressRouter,
   nunjucksFunctions,
 } from "@ministryofjustice/hmpps-forge/express-nunjucks";
 import { govukComponents } from "@ministryofjustice/hmpps-forge/govuk-components";
@@ -77,13 +77,9 @@ const createApp = async (): Promise<express.Application> => {
   // Set up locale middleware for internationalization
   app.use(setupLocaleMiddleware);
 
-  // Set up Nunjucks as the template engine
-  // Set up Nunjucks as the template engine
+  // Set up Nunjucks as the template engine and forge
   const nunjucksEnv = setupNunjucks(app);
-
-  const forge = new Forge({
-    frameworkAdapter: ExpressFrameworkAdapter.configure({ nunjucksEnv }),
-  });
+  const forge = new Forge({});
 
   forge
     .registerGlobalComponents(govukComponents)
@@ -123,10 +119,7 @@ const createApp = async (): Promise<express.Application> => {
     app.use(livereload());
   }
 
-  app.use(express.urlencoded({ extended: true }));
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Forge.getRouter returns unknown but will always be an express.Router.
-  const forgeRouter = forge.getRouter() as express.Router;
-  app.use("/", forgeRouter);
+  app.use("/", createExpressRouter(forge, { nunjucksEnv }));
 
   return app;
 };
