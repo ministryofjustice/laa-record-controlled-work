@@ -11,6 +11,7 @@ import compression from "compression";
 import express from "express";
 import session from "express-session";
 
+import { getApplications } from "#/api/client/schema/applications/applications.gen.js";
 import authRouter from "#/auth/auth.routes.js";
 import config from "#/config.js";
 import { autocomplete } from "#/journeys/components/autocomplete/autocomplete.component.js";
@@ -88,8 +89,8 @@ const createApp = async (): Promise<express.Application> => {
     .registerGlobalComponents(mojComponents)
     .registerGlobalComponents([autocomplete])
     .registerGlobalFunctions(nunjucksFunctions)
-    .registerPackage(createApplication)
-    .registerPackage(yourCases);
+    .registerPackage(yourCases, { getApplications })
+    .registerPackage(createApplication);
 
   // Set up rate limiting
   setupRateLimit(app, config);

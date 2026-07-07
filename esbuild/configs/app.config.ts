@@ -32,7 +32,7 @@ export const appConfig = (watch = false): BuildOptions => ({
   entryPoints: ["src/server.ts"],
   external: externalModules,
   format: "esm",
-  loader: { ".js": "jsx", ".json": "json", ".ts": "tsx" },
+  loader: { ".js": "js", ".json": "json", ".ts": "ts" },
   minify: process.env.NODE_ENV === "production",
   outfile: "public/app.js",
   platform: "node",
