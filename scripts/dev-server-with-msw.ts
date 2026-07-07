@@ -8,11 +8,14 @@
 
 import { setupServer } from "msw/node";
 
+import config from "#/config.js";
+
 import { handlers } from "../tests/playwright/factories/handlers/index.js";
 
 const SUCCESS_EXIT_CODE = 0;
 const ERROR_EXIT_CODE = 1;
-const useMsw = process.env.USE_MSW !== "false";
+
+const useMsw = config.api.mode === "msw";
 
 if (useMsw) {
   const mswServer = setupServer(...handlers);

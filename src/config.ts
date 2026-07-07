@@ -21,6 +21,7 @@ const REDIS_MAX_RETRY_ATTEMPTS = 10;
 const DEFAULT_REDIS_PORT = 6379;
 const DEFAULT_REDIS_HOST = "localhost";
 const DEFAULT_API_BASE_URL = "http://localhost:8081";
+const DEFAULT_API_MODE = "msw";
 
 /* eslint-disable @typescript-eslint/no-magic-numbers -- time constants are intuitive */
 const REDIS_SOCKET_CONNECTION_TIMEOUT = 10 * SECOND;
@@ -33,6 +34,7 @@ const useHttps = ["production", "staging", "uat"].includes(required.NODE_ENV);
 export default {
   api: {
     baseUrl: optional.API_BASE_URL ?? DEFAULT_API_BASE_URL,
+    mode: optional.API_MODE ?? DEFAULT_API_MODE,
   } satisfies ApiConfig,
 
   app: {
