@@ -6,7 +6,6 @@ import {
   step,
   submit,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
-import { t } from "#/lib/i18n.js";
 
 import { JourneyEffects } from "#/journeys/effects.js";
 import {
@@ -15,6 +14,7 @@ import {
   doYouHaveEvidenceRadioInput,
   govBackLink,
 } from "#/journeys/evidence/steps/do-you-have-evidence/do-you-have-evidence.blocks.js";
+import { t } from "#/lib/i18n.js";
 
 export const doYouHaveEvidence = (
   journeyCode: string,
