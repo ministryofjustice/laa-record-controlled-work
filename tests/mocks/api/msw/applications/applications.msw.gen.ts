@@ -326,8 +326,7 @@ export const getCreateApplicationMockHandler = (
     | ((
         info: Parameters<Parameters<typeof http.post>[1]>[0],
       ) =>
-        | Promise<CreateApplicationResponseBody>
-        | CreateApplicationResponseBody),
+        Promise<CreateApplicationResponseBody> | CreateApplicationResponseBody),
   options?: RequestHandlerOptions,
 ) => {
   return http.post(
