@@ -15,16 +15,16 @@ test("evidence flow", async ({ page }) => {
   await page.getByRole("radio", { name: "Yes" }).check();
   await page.getByRole("button", { name: "Continue" }).click();
 
-  // Verify redirection to the ECF dropout page
+  // Verify redirection to the evidence of income page
   await expect(page).toHaveURL("/cases/evidence/evidence-of-income");
 
-  // Navigate back to the ECF page
+  // Navigate back to the has evidence page
   await page.goto("/cases/evidence/have-evidence");
 
   // Select "No" and submit
   await page.getByRole("radio", { name: "No" }).check();
   await page.getByRole("button", { name: "Continue" }).click();
 
-  // Verify redirection to the legal aid before page
+  // Verify redirection to the reason for no evidence page
   await expect(page).toHaveURL("/cases/evidence/reason-for-no-evidence");
 });
