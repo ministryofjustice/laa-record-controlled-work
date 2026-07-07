@@ -5,7 +5,7 @@ import {
   step,
   submit,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
-import { t } from "i18next";
+import { t } from "#/lib/i18n.js";
 
 import { JourneyEffects } from "#/journeys/effects.js";
 import { moreDetailsForNoEvidence, reasonForNoEvidenceRadioInput } from "#/journeys/evidence/steps/reason-for-no-evidence/reason-for-no-evidence.blocks.js";
