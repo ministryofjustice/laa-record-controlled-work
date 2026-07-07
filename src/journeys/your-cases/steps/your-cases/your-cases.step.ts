@@ -30,5 +30,5 @@ export const yourCasesStep = (): ReturnType<typeof step> =>
       }),
     ],
     path: "/",
-    title: t("yourCases.pageTitle"),
+    title: t("pages.yourCases.pageTitle"),
   });
