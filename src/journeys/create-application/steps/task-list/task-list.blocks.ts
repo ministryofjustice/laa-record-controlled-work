@@ -83,7 +83,7 @@ export function taskList(taskListData: TaskListData): BlockDefinition[] {
           t(
             "journeys.createApplication.taskList.EvidenceAndDeclaration.taskItem.evidence.label",
           ),
-          "evidence-TODO",
+          "/cases/evidence/have-evidence",
           taskListData.evidence.status,
         ),
         taskItem(
