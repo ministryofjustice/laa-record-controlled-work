@@ -5,7 +5,7 @@ test("Your Cases step", async ({ page }) => {
   // Navigate to the Your Cases page
   await page.goto("/your-cases");
 
-  // // Check the title of the page
+  // Check the title of the page
   await expect(
     page.getByRole("heading", {
       name: /Your cases/,
