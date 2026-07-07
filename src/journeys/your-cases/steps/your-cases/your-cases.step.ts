@@ -12,6 +12,7 @@ import {
   subNavigation,
 } from "#/journeys/your-cases/steps/your-cases/your-cases.blocks.js";
 import { YourCasesEffects } from "#/journeys/your-cases/your-cases.effects.js";
+import { t } from "i18next";
 
 export const yourCasesStep = (): ReturnType<typeof step> =>
   step({
@@ -29,5 +30,5 @@ export const yourCasesStep = (): ReturnType<typeof step> =>
       }),
     ],
     path: "/",
-    title: "Your Cases",
+    title: t("yourCases.title"),
   });

@@ -86,7 +86,37 @@ export function createForgeTestClientForCaseList(
     .createClient();
 }
 
+/**
+ * Creates a test client for a single-step journey under /create-application.
+ * @param {...any} steps - Step definitions to include in the test journey.
+ * @returns {ForgeTestClient} A configured test client.
+ */
+export function createForgeTestClientForEvidence(
+  ...steps: StepDefinition[]
+): ForgeTestClient {
+  const testJourney = journey({
+    code: "testJourney",
+    path: "/cases/evidence",
+    onAccess: [
+      access({
+        effects: [JourneyEffects.LoadDraftAnswers("testJourney")],
+      }),
+    ],
+    reachability: { disableReachabilityChecks: true },
+    steps,
+    title: "Evidence",
+    view: { template: "partials/form-step" },
+  });
 
+  const testPackage = createTestPackage({
+    functions: JourneyEffectsImplementations,
+    journey: testJourney,
+  });
 
-
-
+  return new ForgeTestHarness()
+    .registerGlobalComponents(govukComponents)
+    .registerGlobalComponents([autocomplete])
+    .registerGlobalFunctions(nunjucksFunctions)
+    .registerPackage(testPackage)
+    .createClient();
+}
