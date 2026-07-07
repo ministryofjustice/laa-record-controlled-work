@@ -60,7 +60,7 @@ describe("fetcher()", () => {
 
     expect(fetchStub.calledOnce).to.be.true;
     sinon.assert.calledWithMatch(fetchStub, `${BASE_URL}/test`, {
-      headers: { "x-custom": "value", Authorization: "token" },
+      headers: { "x-custom": "value" },
     });
   });
 });

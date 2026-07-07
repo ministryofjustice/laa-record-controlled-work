@@ -40,3 +40,12 @@ export class TokenAcquisitionError extends DomainError {
     super("Token acquisition failed", cause);
   }
 }
+
+export class TokenRefreshError extends DomainError {
+  public readonly name = "TokenRefreshError";
+
+  constructor(cause?: unknown) {
+    super("Token refresh failed", cause);
+  }
+}
+

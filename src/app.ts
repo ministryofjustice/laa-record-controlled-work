@@ -19,6 +19,7 @@ import createApplication from "#/journeys/create-application/create-application.
 import evidence from "#/journeys/evidence/evidence.index.js";
 import yourCases from "#/journeys/your-cases/your-cases.index.js";
 import { createSession } from "#/lib/session.js";
+import { refreshToken } from "#/middleware/refreshToken.js";
 import { requireAuth } from "#/middleware/requireAuth.js";
 import { setupConfig } from "#/middleware/setupConfigs.js";
 import { setupCsrf } from "#/middleware/setupCsrf.js";
@@ -111,6 +112,7 @@ const createApp = async (): Promise<express.Application> => {
 
   app.use("/auth", createAuthLimiter(config), authRouter);
   app.use(requireAuth);
+  app.use(refreshToken);
   app.use("/", indexRouter);
 
   // Enable live-reload middleware in development mode

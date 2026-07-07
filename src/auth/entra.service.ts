@@ -1,4 +1,5 @@
 import {
+  type AccountInfo,
   type AuthenticationResult,
   type AuthorizationCodeRequest,
   type AuthorizationUrlRequest,
@@ -18,6 +19,7 @@ import {
   MsalError,
   PkceGenerationError,
   TokenAcquisitionError,
+  TokenRefreshError,
 } from "#/auth/auth.errors.js";
 import { createRelayState } from "#/auth/auth.relay.js";
 import config from "#/config.js";
@@ -73,18 +75,53 @@ export class EntraService {
     const tokenRequest = { ...authCodeRequest, code };
 
     try {
-      const tokenCache = this.msalClient.getTokenCache().serialize();
-      const { account, idToken }: AuthenticationResult =
+      const { accessToken, account, expiresOn, idToken }: AuthenticationResult =
         await this.msalClient.acquireTokenByCode(tokenRequest);
+      const tokenCache = this.msalClient.getTokenCache().serialize();
 
       return success({
+        accessToken,
         account: account ?? undefined,
         idToken,
         tokenCache,
+        tokenExpiry: expiresOn?.getTime(),
       });
     } catch (error) {
       logger.error("Failed to handle Entra auth redirect", error);
       return failure(TokenAcquisitionError.from(error));
+    }
+  }
+
+  /**
+   * Acquire a fresh access token using cached credentials.
+   *
+   * @param tokenCache - The serialised MSAL token cache from the session.
+   * @param account - The authenticated account from the session.
+   * @returns {Promise<Either<TokenRefreshError, TokenExchangeResult>>} The refreshed token set or an error.
+   */
+  public async getAccessToken(
+    tokenCache: string,
+    account: AccountInfo,
+  ): Promise<Either<TokenRefreshError, TokenExchangeResult>> {
+    try {
+      this.msalClient.getTokenCache().deserialize(tokenCache);
+      const result: AuthenticationResult =
+        await this.msalClient.acquireTokenSilent({
+          account,
+          scopes: authRequestDefaults.scopes,
+        });
+      const updatedCache = this.msalClient.getTokenCache().serialize();
+
+      return success({
+        accessToken: result.accessToken,
+        account: result.account ?? undefined,
+        idToken: result.idToken,
+        tokenCache: updatedCache,
+        tokenExpiry: result.expiresOn?.getTime(),
+      });
+    } catch (error) {
+      logger.error("Failed to silently acquire token", error);
+      return failure(TokenRefreshError.from(error));
     }
   }
 

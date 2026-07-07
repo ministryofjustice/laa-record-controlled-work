@@ -10,7 +10,7 @@ export const msalConfig = {
   },
 };
 
-export const scopes: string[] = ["openid", "profile"];
+export const scopes: string[] = config.entra.apiScopes;
 export const authRequestDefaults = {
   prompt: "select_account",
   redirectUri: config.entra.redirectUri,
