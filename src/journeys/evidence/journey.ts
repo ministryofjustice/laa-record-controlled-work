@@ -14,9 +14,7 @@ export const EvidenceJourney = journey({
   ],
   path: "/cases/evidence",
   reachability: { disableReachabilityChecks: false },
-  steps: [
-    doYouHaveEvidence(journeyCode),
-  ],
+  steps: [doYouHaveEvidence(journeyCode)],
   title: "Record new case",
   view: { template: "partials/form-step" },
 });

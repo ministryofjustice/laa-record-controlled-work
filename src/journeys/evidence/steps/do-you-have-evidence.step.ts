@@ -7,15 +7,15 @@ import {
   submit,
   validation,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
+import { HtmlBlock } from "@ministryofjustice/hmpps-forge/core/components";
 import {
   GovUKBackLink,
   GovUKButton,
   GovUKRadioInput,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
+import { t } from "i18next";
 
 import { JourneyEffects } from "#/journeys/effects.js";
-import { HtmlBlock } from "@ministryofjustice/hmpps-forge/core/components";
-import { t } from "i18next";
 
 export const doYouHaveEvidence = (
   journeyCode: string,
