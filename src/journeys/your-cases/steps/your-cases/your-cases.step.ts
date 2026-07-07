@@ -1,5 +1,8 @@
-
-import { Data, step, access } from "@ministryofjustice/hmpps-forge/core/authoring";
+import {
+  access,
+  Data,
+  step,
+} from "@ministryofjustice/hmpps-forge/core/authoring";
 
 import {
   casesTable,
