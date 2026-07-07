@@ -9,7 +9,6 @@ import {
   GovUKButton,
   GovUKRadioInput,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
-
 import { t } from "#/lib/i18n.js";
 
 export const govBackLink = GovUKBackLink({
