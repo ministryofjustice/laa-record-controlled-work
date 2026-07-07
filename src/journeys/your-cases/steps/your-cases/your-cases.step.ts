@@ -1,5 +1,9 @@
-
-import { Data, step, access } from "@ministryofjustice/hmpps-forge/core/authoring";
+import {
+  access,
+  Data,
+  step,
+} from "@ministryofjustice/hmpps-forge/core/authoring";
+import { t } from "i18next";
 
 import {
   casesTable,
@@ -9,7 +13,6 @@ import {
   subNavigation,
 } from "#/journeys/your-cases/steps/your-cases/your-cases.blocks.js";
 import { YourCasesEffects } from "#/journeys/your-cases/your-cases.effects.js";
-import { t } from "i18next";
 
 export const yourCasesStep = (): ReturnType<typeof step> =>
   step({

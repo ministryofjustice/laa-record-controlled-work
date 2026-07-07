@@ -9,18 +9,18 @@ import {
 import { t } from "i18next";
 
 import { JourneyEffects } from "#/journeys/effects.js";
-import { govBackLink, caption, doYouHaveEvidenceRadioInput, continueButton } from "#/journeys/evidence/steps/do-you-have-evidence/do-you-have-evidence.blocks.js";
+import {
+  caption,
+  continueButton,
+  doYouHaveEvidenceRadioInput,
+  govBackLink,
+} from "#/journeys/evidence/steps/do-you-have-evidence/do-you-have-evidence.blocks.js";
 
 export const doYouHaveEvidence = (
   journeyCode: string,
 ): ReturnType<typeof step> =>
   step({
-    blocks: [
-      govBackLink,
-      caption,
-      doYouHaveEvidenceRadioInput,
-      continueButton,
-    ],
+    blocks: [govBackLink, caption, doYouHaveEvidenceRadioInput, continueButton],
     onSubmission: [
       submit({
         onValid: {
