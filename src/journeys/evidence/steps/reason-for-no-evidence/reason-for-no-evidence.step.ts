@@ -12,7 +12,7 @@ import { JourneyEffects } from "#/journeys/effects.js";
 import { moreDetailsForNoEvidence, reasonForNoEvidenceRadioInput } from "#/journeys/evidence/steps/reason-for-no-evidence/reason-for-no-evidence.blocks.js";
 import { backLink, caption, continueButton } from "#/journeys/evidence/common.blocks.js";
 
-export const doYouHaveEvidence = (
+export const reasonForNoEvidence = (
   journeyCode: string,
 ): ReturnType<typeof step> =>
   step({
@@ -32,7 +32,7 @@ export const doYouHaveEvidence = (
         validate: true,
       }),
     ],
-    path: "/have-evidence",
+    path: "/reason-for-no-evidence",
     reachability: { entryWhen: true },
-    title: t("journeys.evidence.doYouHaveEvidence.title"),
+    title: t("journeys.evidence.reasonForNoEvidence.title"),
   });

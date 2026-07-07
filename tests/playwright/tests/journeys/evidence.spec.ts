@@ -27,4 +27,20 @@ test("evidence flow", async ({ page }) => {
 
   // Verify redirection to the reason for no evidence page
   await expect(page).toHaveURL("/cases/evidence/reason-for-no-evidence");
+
+  // check for questions on reason for no evidence page
+  await expect(
+    page.getByRole("heading", {
+      name: /What's the reason for not having evidence\?/,
+      level: 1,
+    }),
+  ).toBeVisible();
+
+  // Select "It's not possible to get it before starting the work" and submit
+  await page.getByRole("radio", { name: "It's not possible to get it before starting the work" }).check();
+  await page.getByRole("textbox", { name: "Give more details" }).fill("Some details about why I don't have evidence.");
+  await page.getByRole("button", { name: "Continue" }).click();
+
+  // Verify redirection to the check your answers page
+  await expect(page).toHaveURL("/cases/evidence/check-your-answers");
 });
