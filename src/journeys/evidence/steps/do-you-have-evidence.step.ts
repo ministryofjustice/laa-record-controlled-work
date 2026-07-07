@@ -1,4 +1,5 @@
 import {
+  Answer,
   Condition,
   Query,
   redirect,
@@ -69,7 +70,7 @@ export const doYouHaveEvidence = (
             }),
             redirect({
               goto: "evidence-of-income",
-              when: Query("doYouHaveEvidence").match(Condition.Equals("yes")),
+              when: Answer("doYouHaveEvidence").match(Condition.Equals("yes")),
             }),
             redirect({ goto: "reason-for-no-evidence" }),
           ],
