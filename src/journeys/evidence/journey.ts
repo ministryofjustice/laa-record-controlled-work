@@ -1,7 +1,7 @@
 import { access, journey } from "@ministryofjustice/hmpps-forge/core/authoring";
 
 import { JourneyEffects } from "#/journeys/effects.js";
-import { doYouHaveEvidence } from "#/journeys/evidence/steps/do-you-have-evidence.step.js";
+import { doYouHaveEvidence } from "#/journeys/evidence/steps/do-you-have-evidence/do-you-have-evidence.step.js";
 
 const journeyCode = "evidence";
 
