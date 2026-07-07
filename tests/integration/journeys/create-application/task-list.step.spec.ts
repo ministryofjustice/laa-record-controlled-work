@@ -8,7 +8,11 @@ import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import { taskListStep } from "#/journeys/create-application/steps/task-list/task-list.step.js";
 
 describe("Task list step", () => {
-  const client = createForgeTestClient(taskListStep());
+  const client = createForgeTestClient(
+    "Record new case",
+    "/create-application/",
+    taskListStep(),
+  );
   const session = {
     journeyDrafts: {
       testJourney: {},

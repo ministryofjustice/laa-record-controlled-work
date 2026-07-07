@@ -3,7 +3,7 @@ import {
   Data,
   step,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
-import { t } from "i18next";
+import { t } from "#/lib/i18n.js";
 
 import {
   casesTable,

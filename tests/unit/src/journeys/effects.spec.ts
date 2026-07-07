@@ -36,6 +36,8 @@ const clearAnswerStep = step({
 });
 
 const client = createForgeTestClient(
+  "Record new case",
+  "/create-application/",
   ecfStep("testJourney"),
   clearDraftStep,
   clearAnswerStep,

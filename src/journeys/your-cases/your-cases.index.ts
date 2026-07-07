@@ -1,6 +1,6 @@
 import { createForgePackage } from "@ministryofjustice/hmpps-forge/core/authoring";
 
-import { yourCasesJourney } from "#/journeys/your-cases/journey.js";
+import { yourCasesJourney } from "#/journeys/your-cases/your-cases.journey.js";
 import {
   YourCasesEffectImplementations,
   type YourCasesEffectsDeps,

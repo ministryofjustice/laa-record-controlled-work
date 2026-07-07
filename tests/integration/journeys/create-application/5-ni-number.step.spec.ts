@@ -8,7 +8,11 @@ import { createForgeTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 
 describe("NI number step", () => {
-  const client = createForgeTestClient(niNumberStep("testJourney"));
+  const client = createForgeTestClient(
+    "Record new case",
+    "/create-application/",
+    niNumberStep("testJourney"),
+  );
 
   describe("GET /create-application/ni-number", () => {
     let renderResult: TestRenderResult;

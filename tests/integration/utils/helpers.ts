@@ -25,11 +25,13 @@ import { YourCasesEffectImplementations, YourCasesEffects, type YourCasesEffects
  * @returns {ForgeTestClient} A configured test client.
  */
 export function createForgeTestClient(
+  title: string,
+  path: string,
   ...steps: StepDefinition[]
 ): ForgeTestClient {
   const testJourney = journey({
     code: "testJourney",
-    path: "/create-application",
+    path: path,
     onAccess: [
       access({
         effects: [JourneyEffects.LoadDraftAnswers("testJourney")],
@@ -37,7 +39,7 @@ export function createForgeTestClient(
     ],
     reachability: { disableReachabilityChecks: true },
     steps,
-    title: "Record new case",
+    title: title,
     view: { template: "partials/form-step" },
   });
 
@@ -83,40 +85,5 @@ export function createForgeTestClientForCaseList(
     .registerGlobalComponents(mojComponents)
     .registerGlobalFunctions(nunjucksFunctions)
     .registerPackage(testPackage, mockYourCasesEffectsDeps)
-    .createClient();
-}
-
-/**
- * Creates a test client for a single-step journey under /create-application.
- * @param {...any} steps - Step definitions to include in the test journey.
- * @returns {ForgeTestClient} A configured test client.
- */
-export function createForgeTestClientForEvidence(
-  ...steps: StepDefinition[]
-): ForgeTestClient {
-  const testJourney = journey({
-    code: "testJourney",
-    path: "/cases/evidence",
-    onAccess: [
-      access({
-        effects: [JourneyEffects.LoadDraftAnswers("testJourney")],
-      }),
-    ],
-    reachability: { disableReachabilityChecks: true },
-    steps,
-    title: "Evidence",
-    view: { template: "partials/form-step" },
-  });
-
-  const testPackage = createTestPackage({
-    functions: JourneyEffectsImplementations,
-    journey: testJourney,
-  });
-
-  return new ForgeTestHarness()
-    .registerGlobalComponents(govukComponents)
-    .registerGlobalComponents([autocomplete])
-    .registerGlobalFunctions(nunjucksFunctions)
-    .registerPackage(testPackage)
     .createClient();
 }

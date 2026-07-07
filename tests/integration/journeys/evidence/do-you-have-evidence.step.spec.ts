@@ -4,11 +4,13 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
 import { doYouHaveEvidence } from "#/journeys/evidence/steps/do-you-have-evidence/do-you-have-evidence.step.js";
-import { createForgeTestClientForEvidence } from "../../utils/helpers.js";
+import { createForgeTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 
 describe("Do you have evidence step", () => {
-  const client = createForgeTestClientForEvidence(
+  const client = createForgeTestClient(
+    "Evidence",
+    "/cases/evidence",
     doYouHaveEvidence("testJourney"),
   );
 
