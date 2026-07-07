@@ -16,6 +16,7 @@ import authRouter from "#/auth/auth.routes.js";
 import config from "#/config.js";
 import { autocomplete } from "#/journeys/components/autocomplete/autocomplete.component.js";
 import createApplication from "#/journeys/create-application/index.js";
+import evidence from "#/journeys/evidence/index.js";
 import yourCases from "#/journeys/your-cases/index.js";
 import { createSession } from "#/lib/session.js";
 import { requireAuth } from "#/middleware/requireAuth.js";
@@ -33,7 +34,6 @@ import { standardMiddleware } from "#/middleware/standardMiddleware.js";
 import healthRouter from "#/routes/health.js";
 import indexRouter from "#/routes/index.js";
 import testRouter from "#/routes/test.js";
-import evidence from "#/journeys/evidence/index.js";
 
 const TRUST_FIRST_PROXY = 1;
 const ENABLE_PLAYWRIGHT_TEST_SIGNIN =
