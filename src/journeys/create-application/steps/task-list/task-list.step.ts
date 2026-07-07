@@ -30,7 +30,7 @@ const TASK_LIST_DATA: TaskListData = {
     status: Status.CannotStart,
   },
   evidence: {
-    status: Status.CannotStart,
+    status: Status.Incomplete,
   },
   meansAssessment: {
     status: Status.Incomplete,
