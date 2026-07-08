@@ -48,4 +48,3 @@ export class TokenRefreshError extends DomainError {
     super("Token refresh failed", cause);
   }
 }
-

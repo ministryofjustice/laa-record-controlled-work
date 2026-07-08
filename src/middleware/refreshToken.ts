@@ -1,4 +1,3 @@
-import type { AccountInfo } from "@azure/msal-node";
 import type { NextFunction, Request, Response } from "express";
 
 import { EntraService } from "#/auth/entra.service.js";
@@ -61,4 +60,3 @@ export async function refreshToken(
   Object.assign(session, result.value);
   next();
 }
-
