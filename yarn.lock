@@ -4577,7 +4577,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"i18next@npm:^26.3.3":
+"i18next@npm:^26.3.4":
   version: 26.3.4
   resolution: "i18next@npm:26.3.4"
   peerDependencies:
@@ -5263,7 +5263,7 @@ __metadata:
     globals: "npm:^17.7.0"
     govuk-frontend: "npm:^6.3.0"
     helmet: "npm:^8.2.0"
-    i18next: "npm:^26.3.3"
+    i18next: "npm:^26.3.4"
     knip: "npm:^6.23.0"
     mocha: "npm:^11.7.6"
     moment: "npm:^2.30.1"
