@@ -20,7 +20,6 @@ export const yourCasesStep = (): ReturnType<typeof step> =>
       heading,
       createCaseButton,
       subNavigation,
-      // TODO create transformer mapper and test
       casesTable(Data("caseList")),
       noCasesMessage,
     ],
