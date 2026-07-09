@@ -18,6 +18,22 @@ test("evidence flow", async ({ page }) => {
   // Verify redirection to the evidence of income page
   await expect(page).toHaveURL("/cases/evidence/evidence-of-income");
 
+  // Check for the question on the evidence of income page
+  await expect(
+    page.getByRole("heading", {
+      name: /Do you have evidence of your client's income\?/,
+      level: 1,
+    }),
+  ).toBeVisible();
+
+  // Select "Wage slips" and "Bank statements" and submit
+  await page.getByRole("checkbox", { name: "Wage slips" }).check();
+  await page.getByRole("checkbox", { name: "Bank statements" }).check();
+  await page.getByRole("button", { name: "Continue" }).click();
+
+  // Verify redirection to the evidence of expenditure and capital page
+  await expect(page).toHaveURL("/cases/evidence/evidence-of-expenditure-and-capital");
+
   // Navigate back to the has evidence page
   await page.goto("/cases/evidence/have-evidence");
 

@@ -81,6 +81,7 @@ describe("Your Cases step", () => {
         day: "numeric",
         month: "short",
         year: "numeric",
+        timeZone: "Europe/London",
       });
 
       expect(rows).to.have.length(mockData.length);
