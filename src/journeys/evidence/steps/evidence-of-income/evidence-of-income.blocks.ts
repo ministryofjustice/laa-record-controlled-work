@@ -1,7 +1,7 @@
 import {
+  GovUKBody,
   GovUKCheckboxInput,
   GovUKHeading,
-  GovUKBody,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
 import { H1 } from "#/lib/constants/headings.js";
@@ -13,8 +13,8 @@ export const heading = GovUKHeading({
 });
 
 export const description = GovUKBody({
-  text: t("journeys.evidence.evidenceOfIncome.hint"),
   classes: "govuk-hint",
+  text: t("journeys.evidence.evidenceOfIncome.hint"),
 });
 
 export const employedEvidenceGroup = GovUKCheckboxInput({
