@@ -73,7 +73,12 @@ export default {
   } satisfies CsrfConfig,
 
   entra: {
-    apiScopes: ["openid", "profile", "offline_access"],
+    apiScopes: [
+      "openid",
+      "profile",
+      "offline_access",
+      `api://${required.ENTRA_CLIENT_ID}/Applications.Read`,
+    ],
     authority: `${required.ENTRA_AUTHORITY_BASE_URL}${required.ENTRA_TENANT_ID}`,
     clientId: required.ENTRA_CLIENT_ID,
     clientSecret: required.ENTRA_CLIENT_SECRET,
