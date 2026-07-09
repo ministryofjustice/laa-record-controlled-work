@@ -229,6 +229,21 @@
         "validation": {
           "required": "Please select an option to continue"
         }
+      },
+      "reasonForNoEvidence": {
+        "title": "What's the reason for not having evidence?",
+        "options": {
+          "notPossibleBeforeStart": "It's not possible to get it before starting the work",
+          "adviceOverPhone": "Advice is being given over the phone before the case is signed",
+          "personalCircumstances": "The personal circumstances of the client make it not possible to get evidence at any point in the case"
+        },
+        "moreDetails": {
+          "label": "Give more details"
+        },
+        "validation": {
+          "required": "You must select a reason for not having evidence",
+          "moreDetailsRequired": "You must provide details for not having evidence"
+        }
       }
     }
   }

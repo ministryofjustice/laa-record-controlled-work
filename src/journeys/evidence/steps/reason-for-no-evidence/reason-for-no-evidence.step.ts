@@ -1,5 +1,4 @@
 import {
-  Answer,
   Condition,
   Query,
   redirect,
@@ -13,17 +12,21 @@ import {
   caption,
   continueButton,
 } from "#/journeys/evidence/common.blocks.js";
-import { doYouHaveEvidenceRadioInput } from "#/journeys/evidence/steps/do-you-have-evidence/do-you-have-evidence.blocks.js";
+import {
+  moreDetailsForNoEvidence,
+  reasonForNoEvidenceRadioInput,
+} from "#/journeys/evidence/steps/reason-for-no-evidence/reason-for-no-evidence.blocks.js";
 import { t } from "#/lib/i18n.js";
 
-export const doYouHaveEvidence = (
+export const reasonForNoEvidence = (
   journeyCode: string,
 ): ReturnType<typeof step> =>
   step({
     blocks: [
-      backLink("/create-application/task-list"),
+      backLink("/cases/evidence/do-you-have-evidence"),
       caption,
-      doYouHaveEvidenceRadioInput,
+      reasonForNoEvidenceRadioInput,
+      moreDetailsForNoEvidence,
       continueButton,
     ],
     onSubmission: [
@@ -35,17 +38,13 @@ export const doYouHaveEvidence = (
               goto: "check-answers",
               when: Query("returnTo").match(Condition.Equals("check-answers")),
             }),
-            redirect({
-              goto: "evidence-of-income",
-              when: Answer("doYouHaveEvidence").match(Condition.Equals("yes")),
-            }),
-            redirect({ goto: "reason-for-no-evidence" }),
+            redirect({ goto: "check-your-answers" }),
           ],
         },
         validate: true,
       }),
     ],
-    path: "/have-evidence",
+    path: "/reason-for-no-evidence",
     reachability: { entryWhen: true },
-    title: t("journeys.evidence.doYouHaveEvidence.title"),
+    title: t("journeys.evidence.reasonForNoEvidence.title"),
   });
