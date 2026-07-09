@@ -4,7 +4,8 @@
     "saveAndReturn": "Save and return later",
     "signOut": "Sign out",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "or": "or"
   },
   "components": {
     "phaseBanner": {
@@ -243,6 +244,43 @@
         "validation": {
           "required": "You must select a reason for not having evidence",
           "moreDetailsRequired": "You must provide details for not having evidence"
+        }
+      },
+      "evidenceOfIncome": {
+        "title": "Do you have evidence of your client's income?",
+        "hint": "You can use the same piece of evidence across different categories. Select all that apply.",
+        "groupsOfEvidence": {
+          "employedPAYE": "Employed (PAYE) income",
+          "selfEmployed": "Self-employed income",
+          "benefitsInKind": "Benefits in Kind",
+          "otherIncome": "Other income",
+          "stateBenefits": "State benefits (including passporting benefits)",
+          "asylumSupport": "Asylum support",
+          "taxCredits": "Tax credits"
+        },
+        "evidenceTypes": {
+          "wageSlips": "Wage slips",
+          "bankStatement": "Bank statement",
+          "completeFinancialAccounts": "Complete financial accounts",
+          "selfAssessmentTaxReturn": "Self Assessment tax return",
+          "cashBook": "Cash book",
+          "p11dTaxForm": "P11D tax form",
+          "evidenceOfRentalIncome": "Evidence of rental income",
+          "evidenceOfTrustIncome": "Evidence of trust income",
+          "letterFromFriendOrFamily": "Letter from friend or family providing support",
+          "pensionDocuments": "Pension documents",
+          "other": "Other",
+          "bankStatements": "Bank statements",
+          "latestBenefitChangeLetter": "Latest letter showing change in benefit amount",
+          "passportingBenefitLetter": "Letter from the paying agency that shows the client is receiving the passporting benefit",
+          "originalNotificationLetter": "Original notification letter",
+          "studentLoanLetter": "Student loan letter",
+          "asylumSupportLetter": "Letter from asylum support or the local authority that shows the client is receiving support",
+          "latestTaxCreditAwardNotice": "Latest tax credit award notice",
+          "otherRecentHMRCLetter": "Other recent HMRC letter confirming the amount received"
+        },
+        "validation": {
+          "required": " You must select an income evidence to continue"
         }
       }
     }
