@@ -16,6 +16,7 @@ rcw:
   env:
     NODE_ENV: "uat"
     ENTRA_REDIRECT_URI: "https://laa-record-controlled-work-uat.cloud-platform.service.justice.gov.uk/auth/code/callback"      
+    API_BASE_URL: "https://laa-record-controlled-work-api-uat.cloud-platform.service.justice.gov.uk"
 
 ccq:
   replicaCount: 1
