@@ -52,7 +52,7 @@ export async function authCodeCallback(
     }
 
     // exchange auth code for tokens and state
-    const entra = EntraService.create(req.hostname);
+    const entra = EntraService.create(req.hostname, req.sessionID);
     const result = await entra.exchangeAuthCode(data.code, authCodeRequest);
     if (result.error) {
       res.status(UNAUTHORIZED).send(result.error.message);

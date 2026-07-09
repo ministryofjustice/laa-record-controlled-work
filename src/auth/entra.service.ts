@@ -22,8 +22,11 @@ import {
   TokenRefreshError,
 } from "#/auth/auth.errors.js";
 import { createRelayState } from "#/auth/auth.relay.js";
+import { RedisCachePlugin } from "#/auth/msal.plugin.js";
 import config from "#/config.js";
+import { SECOND } from "#/lib/constants/time.js";
 import { type Either, failure, success } from "#/lib/either.js";
+import { getRedisClient } from "#/lib/redis.js";
 import { logger } from "#/logger.js";
 
 /**
@@ -51,15 +54,46 @@ export class EntraService {
 
   /**
    * Factory method to create a new EntraService instance.
+   * Supports three patterns:
+   * - create(hostname) - creates with default MSAL client
+   * - create(hostname, sessionId) - auto-detects Redis and creates with cache plugin if available
+   * - create(hostname, sessionId, msalClient) - creates with provided MSAL client (for testing)
+   *
    * @param {string} requestHostname - The hostname of the incoming request (e.g. "my-host.example.com").
-   * @param {ConfidentialClientApplication} msalClient - The MSAL confidential client application.
+   * @param {string} [sessionId] - Session ID to enable Redis caching.
+   * @param {ConfidentialClientApplication} [msalClient] - Pre-configured MSAL client for testing or custom setup.
    * @returns {EntraService} A new EntraService instance.
    */
   public static create(
     requestHostname: string,
+    sessionId?: string,
     msalClient?: ConfidentialClientApplication,
   ): EntraService {
-    return new EntraService(requestHostname, msalClient);
+    // Use provided client if given for testing purporses
+    if (msalClient) {
+      return new EntraService(requestHostname, msalClient);
+    }
+    const redisClient = getRedisClient();
+
+    if (sessionId !== undefined && redisClient) {
+      const sessionTtlSeconds = Math.ceil(
+        config.session.cookie.maxAge / SECOND,
+      );
+
+      const cachePlugin = new RedisCachePlugin(
+        redisClient,
+        sessionId,
+        sessionTtlSeconds,
+      );
+      const configuredMsalClient = new ConfidentialClientApplication({
+        ...msalConfig,
+        cache: { cachePlugin },
+      });
+      return new EntraService(requestHostname, configuredMsalClient);
+    }
+
+    // Pattern: create(hostname) - default client
+    return new EntraService(requestHostname);
   }
 
   /**

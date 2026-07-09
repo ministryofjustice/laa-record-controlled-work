@@ -9,6 +9,17 @@ import { SECOND } from "./constants/time.js";
 
 export type RedisClientFactory = (options: RedisConfig) => RedisClientType;
 
+// Module-level reference to the active Redis client, set by createRedisClient
+let activeRedisClient: null | RedisClientType = null;
+
+/**
+ * Returns the active Redis client instance, or null if not initialized.
+ * @returns The active Redis client or null.
+ */
+export function getRedisClient(): null | RedisClientType {
+  return activeRedisClient;
+}
+
 /**
  * Create and configure Redis client
  * @param  config - Redis configuration from environment variables
@@ -59,6 +70,7 @@ export const createRedisClient = (config: RedisConfig): RedisClientType => {
     logger.info("Redis client disconnected");
   });
 
+  activeRedisClient = client;
   return client;
 };
 

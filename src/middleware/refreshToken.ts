@@ -47,7 +47,7 @@ export async function refreshToken(
     return;
   }
 
-  const entra = EntraService.create(req.hostname);
+  const entra = EntraService.create(req.hostname, req.sessionID);
   const result = await entra.getAccessToken(tokenCache, account);
 
   if (result.error) {
