@@ -17,6 +17,7 @@ import {
 import {
   asylumSupportEvidenceGroup,
   benefitsInKindEvidenceGroup,
+  description,
   employedEvidenceGroup,
   heading,
   otherEvidenceGroup,
@@ -34,6 +35,7 @@ export const evidenceOfIncome = (
       backLink("/have-evidence"),
       caption,
       heading,
+      description,
       employedEvidenceGroup,
       selfEmployedEvidenceGroup,
       benefitsInKindEvidenceGroup,
