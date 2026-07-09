@@ -5,27 +5,44 @@ import {
   redirect,
   step,
   submit,
+  validation,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
 import { JourneyEffects } from "#/journeys/effects.js";
 import {
-heading,
-  employedEvidenceGroup,
-  selfEmployedEvidenceGroup,
-  benefitsInKindEvidenceGroup,
-  otherEvidenceGroup,
-  stateBenefitsEvidenceGroup,
+  backLink,
+  caption,
+  continueButton,
+} from "#/journeys/evidence/common.blocks.js";
+import {
   asylumSupportEvidenceGroup,
+  benefitsInKindEvidenceGroup,
+  employedEvidenceGroup,
+  heading,
+  otherEvidenceGroup,
+  selfEmployedEvidenceGroup,
+  stateBenefitsEvidenceGroup,
   taxCreditsEvidenceGroup,
 } from "#/journeys/evidence/steps/evidence-of-income/evidence-of-income.blocks.js";
 import { t } from "#/lib/i18n.js";
-import { caption, continueButton, backLink } from "#/journeys/evidence/common.blocks.js";
 
 export const evidenceOfIncome = (
   journeyCode: string,
 ): ReturnType<typeof step> =>
   step({
-    blocks: [backLink("/have-evidence"), caption, heading, employedEvidenceGroup, selfEmployedEvidenceGroup, benefitsInKindEvidenceGroup, otherEvidenceGroup, stateBenefitsEvidenceGroup, asylumSupportEvidenceGroup, taxCreditsEvidenceGroup, continueButton],
+    blocks: [
+      backLink("/have-evidence"),
+      caption,
+      heading,
+      employedEvidenceGroup,
+      selfEmployedEvidenceGroup,
+      benefitsInKindEvidenceGroup,
+      otherEvidenceGroup,
+      stateBenefitsEvidenceGroup,
+      asylumSupportEvidenceGroup,
+      taxCreditsEvidenceGroup,
+      continueButton,
+    ],
     onSubmission: [
       submit({
         onValid: {
@@ -44,4 +61,10 @@ export const evidenceOfIncome = (
     path: "/evidence-of-income",
     reachability: { entryWhen: true },
     title: t("journeys.evidence.evidenceOfIncome.title"),
+    validWhen: [
+      validation({
+        condition: Answer("incomeEvidenceTypes").match(Condition.IsRequired()),
+        message: t("journeys.evidence.evidenceOfIncome.validation.required"),
+      }),
+    ],
   });

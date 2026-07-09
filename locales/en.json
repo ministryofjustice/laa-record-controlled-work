@@ -260,7 +260,6 @@
         },
         "evidenceTypes": {
           "wageSlips": "Wage slips",
-          "bankStatement": "Bank statement",
           "completeFinancialAccounts": "Complete financial accounts",
           "selfAssessmentTaxReturn": "Self Assessment tax return",
           "cashBook": "Cash book",
