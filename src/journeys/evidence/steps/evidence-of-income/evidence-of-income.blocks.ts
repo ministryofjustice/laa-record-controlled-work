@@ -1,33 +1,39 @@
+import { H1 } from "#/lib/constants/headings.js";
 import { t } from "#/lib/i18n.js";
-import { GovUKCheckboxInput } from "@ministryofjustice/hmpps-forge/govuk-components";
+import { GovUKCheckboxInput, GovUKHeading } from "@ministryofjustice/hmpps-forge/govuk-components";
 
-export const evidenceOfIncomeTypes = GovUKCheckboxInput({
-  code: "evidenceOfIncomeTypes",
-  hint: {
-    text: t("journeys.evidence.evidenceOfIncome.hint"),
-  },
+export const heading = GovUKHeading({
+  text: t("journeys.evidence.evidenceOfIncome.title"),
+  level: H1,
+});
+
+export const employedEvidenceGroup = GovUKCheckboxInput({
+  code: "incomeEvidenceGroup",
   fieldset: {
     legend: {
-      classes: "govuk-fieldset__legend--l",
-      isPageHeading: true,
-      text: t("journeys.evidence.evidenceOfIncome.title"),
+      classes: "govuk-fieldset__legend--m",
+      isPageHeading: false,
+      text: t("journeys.evidence.evidenceOfIncome.groupsOfEvidence.employedPAYE"),
     },
   },
   items: [
     {
-      divider: t(
-        "journeys.evidence.evidenceOfIncome.groupsOfEvidence.employedPAYE",
-      ),
-    },
-    {
       text: t("journeys.evidence.evidenceOfIncome.evidenceTypes.wageSlips"),
       value: "wageSlips",
     },
-    {
-      divider: t(
-        "journeys.evidence.evidenceOfIncome.groupsOfEvidence.selfEmployed",
-      ),
+  ],
+});
+
+export const selfEmployedEvidenceGroup = GovUKCheckboxInput({
+  code: "incomeEvidenceGroup",
+  fieldset: {
+    legend: {
+      classes: "govuk-fieldset__legend--m",
+      isPageHeading: false,
+      text: t("journeys.evidence.evidenceOfIncome.groupsOfEvidence.selfEmployed"),
     },
+  },
+  items: [
     {
       text: t(
         "journeys.evidence.evidenceOfIncome.evidenceTypes.bankStatements",
@@ -50,32 +56,37 @@ export const evidenceOfIncomeTypes = GovUKCheckboxInput({
       text: t("journeys.evidence.evidenceOfIncome.evidenceTypes.cashBook"),
       value: "cashBook",
     },
-    {
-      divider: t(
-        "journeys.evidence.evidenceOfIncome.groupsOfEvidence.benefitsInKind",
-      ),
+  ],
+});
+
+export const benefitsInKindEvidenceGroup = GovUKCheckboxInput({
+  code: "incomeEvidenceGroup",
+  fieldset: {
+    legend: {
+      classes: "govuk-fieldset__legend--m",
+      isPageHeading: false,
+      text: t("journeys.evidence.evidenceOfIncome.groupsOfEvidence.benefitsInKind"),
     },
+  },
+  items: [
     {
       text: t("journeys.evidence.evidenceOfIncome.evidenceTypes.p11dTaxForm"),
       value: "p11dTaxForm",
     },
-    {
-      divider: t(
-        "journeys.evidence.evidenceOfIncome.groupsOfEvidence.otherIncome",
-      ),
+  ],
+});
+
+export const otherEvidenceGroup = GovUKCheckboxInput({
+
+  code: "incomeEvidenceGroup",
+  fieldset: {
+    legend: {
+      classes: "govuk-fieldset__legend--m",
+      isPageHeading: false,
+      text: t("journeys.evidence.evidenceOfIncome.groupsOfEvidence.otherIncome"),
     },
-    {
-      text: t(
-        "journeys.evidence.evidenceOfIncome.evidenceTypes.evidenceOfRentalIncome",
-      ),
-      value: "evidenceOfRentalIncome",
-    },
-    {
-      text: t(
-        "journeys.evidence.evidenceOfIncome.evidenceTypes.evidenceOfTrustIncome",
-      ),
-      value: "evidenceOfTrustIncome",
-    },
+  },
+  items: [
     {
       text: t(
         "journeys.evidence.evidenceOfIncome.evidenceTypes.letterFromFriendOrFamily",
@@ -98,17 +109,19 @@ export const evidenceOfIncomeTypes = GovUKCheckboxInput({
       text: t("journeys.evidence.evidenceOfIncome.evidenceTypes.other"),
       value: "other",
     },
-    {
-      divider: t(
-        "journeys.evidence.evidenceOfIncome.groupsOfEvidence.stateBenefits",
-      ),
+  ],
+});
+
+export const stateBenefitsEvidenceGroup = GovUKCheckboxInput({
+  code: "incomeEvidenceGroup",
+  fieldset: {
+    legend: {
+      classes: "govuk-fieldset__legend--m",
+      isPageHeading: false,
+      text: t("journeys.evidence.evidenceOfIncome.groupsOfEvidence.stateBenefits"),
     },
-    {
-      text: t(
-        "journeys.evidence.evidenceOfIncome.evidenceTypes.bankStatements",
-      ),
-      value: "bankStatements",
-    },
+  },
+  items: [
     {
       text: t(
         "journeys.evidence.evidenceOfIncome.evidenceTypes.latestBenefitChangeLetter",
@@ -127,23 +140,38 @@ export const evidenceOfIncomeTypes = GovUKCheckboxInput({
       ),
       value: "originalNotificationLetter",
     },
-    {
-      divider: t(
-        "journeys.evidence.evidenceOfIncome.groupsOfEvidence.asylumSupport",
-      ),
-      attributes: { class: "govuk-heading-m" },
+  ],
+});
+
+export const asylumSupportEvidenceGroup = GovUKCheckboxInput({
+  code: "incomeEvidenceGroup",
+  fieldset: {
+    legend: {
+      classes: "govuk-fieldset__legend--m",
+      isPageHeading: false,
+      text: t("journeys.evidence.evidenceOfIncome.groupsOfEvidence.asylumSupport"),
     },
+  },
+  items: [
     {
       text: t(
         "journeys.evidence.evidenceOfIncome.evidenceTypes.asylumSupportLetter",
       ),
       value: "asylumSupportLetter",
     },
-    {
-      divider: t(
-        "journeys.evidence.evidenceOfIncome.groupsOfEvidence.taxCredits",
-      ),
+  ],
+});
+
+export const taxCreditsEvidenceGroup = GovUKCheckboxInput({
+  code: "incomeEvidenceGroup",
+  fieldset: {
+    legend: {
+      classes: "govuk-fieldset__legend--m",
+      isPageHeading: false,
+      text: t("journeys.evidence.evidenceOfIncome.groupsOfEvidence.taxCredits"),
     },
+  },
+  items: [
     {
       text: t(
         "journeys.evidence.evidenceOfIncome.evidenceTypes.latestTaxCreditAwardNotice",

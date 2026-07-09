@@ -9,16 +9,23 @@ import {
 
 import { JourneyEffects } from "#/journeys/effects.js";
 import {
-evidenceOfIncomeTypes,
+heading,
+  employedEvidenceGroup,
+  selfEmployedEvidenceGroup,
+  benefitsInKindEvidenceGroup,
+  otherEvidenceGroup,
+  stateBenefitsEvidenceGroup,
+  asylumSupportEvidenceGroup,
+  taxCreditsEvidenceGroup,
 } from "#/journeys/evidence/steps/evidence-of-income/evidence-of-income.blocks.js";
 import { t } from "#/lib/i18n.js";
-import { caption, continueButton, govBackLink } from "#/journeys/evidence/steps/do-you-have-evidence/do-you-have-evidence.blocks.js";
+import { caption, continueButton, backLink } from "#/journeys/evidence/common.blocks.js";
 
 export const evidenceOfIncome = (
   journeyCode: string,
 ): ReturnType<typeof step> =>
   step({
-    blocks: [govBackLink, caption, evidenceOfIncomeTypes, continueButton],
+    blocks: [backLink("/have-evidence"), caption, heading, employedEvidenceGroup, selfEmployedEvidenceGroup, benefitsInKindEvidenceGroup, otherEvidenceGroup, stateBenefitsEvidenceGroup, asylumSupportEvidenceGroup, taxCreditsEvidenceGroup, continueButton],
     onSubmission: [
       submit({
         onValid: {
