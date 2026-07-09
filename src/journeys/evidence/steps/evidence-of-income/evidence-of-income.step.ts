@@ -32,7 +32,7 @@ export const evidenceOfIncome = (
 ): ReturnType<typeof step> =>
   step({
     blocks: [
-      backLink("/have-evidence"),
+      backLink("/cases/evidence/have-evidence"),
       caption,
       heading,
       description,
