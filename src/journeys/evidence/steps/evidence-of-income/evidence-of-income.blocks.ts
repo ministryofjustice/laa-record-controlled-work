@@ -8,7 +8,7 @@ export const heading = GovUKHeading({
 });
 
 export const employedEvidenceGroup = GovUKCheckboxInput({
-  code: "incomeEvidenceGroup",
+  code: "incomeEvidenceTypes",
   fieldset: {
     legend: {
       classes: "govuk-fieldset__legend--m",
@@ -25,7 +25,7 @@ export const employedEvidenceGroup = GovUKCheckboxInput({
 });
 
 export const selfEmployedEvidenceGroup = GovUKCheckboxInput({
-  code: "incomeEvidenceGroup",
+  code: "incomeEvidenceTypes",
   fieldset: {
     legend: {
       classes: "govuk-fieldset__legend--m",
@@ -60,7 +60,7 @@ export const selfEmployedEvidenceGroup = GovUKCheckboxInput({
 });
 
 export const benefitsInKindEvidenceGroup = GovUKCheckboxInput({
-  code: "incomeEvidenceGroup",
+  code: "incomeEvidenceTypes",
   fieldset: {
     legend: {
       classes: "govuk-fieldset__legend--m",
@@ -78,7 +78,7 @@ export const benefitsInKindEvidenceGroup = GovUKCheckboxInput({
 
 export const otherEvidenceGroup = GovUKCheckboxInput({
 
-  code: "incomeEvidenceGroup",
+  code: "incomeEvidenceTypes",
   fieldset: {
     legend: {
       classes: "govuk-fieldset__legend--m",
@@ -113,7 +113,7 @@ export const otherEvidenceGroup = GovUKCheckboxInput({
 });
 
 export const stateBenefitsEvidenceGroup = GovUKCheckboxInput({
-  code: "incomeEvidenceGroup",
+  code: "incomeEvidenceTypes",
   fieldset: {
     legend: {
       classes: "govuk-fieldset__legend--m",
@@ -144,7 +144,7 @@ export const stateBenefitsEvidenceGroup = GovUKCheckboxInput({
 });
 
 export const asylumSupportEvidenceGroup = GovUKCheckboxInput({
-  code: "incomeEvidenceGroup",
+  code: "incomeEvidenceTypes",
   fieldset: {
     legend: {
       classes: "govuk-fieldset__legend--m",
@@ -163,7 +163,7 @@ export const asylumSupportEvidenceGroup = GovUKCheckboxInput({
 });
 
 export const taxCreditsEvidenceGroup = GovUKCheckboxInput({
-  code: "incomeEvidenceGroup",
+  code: "incomeEvidenceTypes",
   fieldset: {
     legend: {
       classes: "govuk-fieldset__legend--m",
