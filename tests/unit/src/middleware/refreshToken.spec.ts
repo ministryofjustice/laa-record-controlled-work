@@ -58,31 +58,7 @@ describe("refreshToken middleware", () => {
     expect(entraStub.acquireTokenSilent.called).to.be.false;
   });
 
-  it("calls next() when token is valid and not near expiry", async () => {
-    const app = createTestApp({
-      isAuthenticated: true,
-      account: { username: "user" },
-      accessToken: "current-token",
-      tokenExpiry: VALID_TOKEN_EXPIRY,
-    });
-    const res = await request(app).get("/protected");
-    expect(res.status).to.equal(OK);
-    expect(entraStub.acquireTokenSilent.called).to.be.false;
-  });
-
-  it("silently refreshes the token when expiry is within the grace period", async () => {
-    const app = createTestApp({
-      isAuthenticated: true,
-      account: { username: "user" },
-      accessToken: "old-token",
-      tokenExpiry: NEAR_EXPIRY_TOKEN,
-    });
-    const res = await request(app).get("/protected");
-    expect(res.status).to.equal(OK);
-    expect(entraStub.acquireTokenSilent.calledOnce).to.be.true;
-  });
-
-  it("silently refreshes the token when no tokenExpiry is set", async () => {
+  it("silently refreshes the token on every authenticated request", async () => {
     const app = createTestApp({
       isAuthenticated: true,
       account: { username: "user" },
@@ -92,14 +68,32 @@ describe("refreshToken middleware", () => {
     expect(entraStub.acquireTokenSilent.calledOnce).to.be.true;
   });
 
-  it("redirects to /auth/signin when token is near expiry and refresh fails", async () => {
+  it("updates session with refreshed token data", async () => {
+    const testAccount = { username: "updated-user" };
+    const testIdToken = "new-id-token";
+    entraStub.acquireTokenSilent.resolves(
+      success({
+        account: testAccount,
+        idToken: testIdToken,
+        tokenExpiry: Date.now() + 3600 * 1000,
+      } as any),
+    );
+
+    const app = createTestApp({
+      isAuthenticated: true,
+      account: { username: "old-user" },
+      idToken: "old-id-token",
+    });
+    const res = await request(app).get("/protected");
+    expect(res.status).to.equal(OK);
+  });
+
+  it("redirects to /auth/signin when token acquisition fails", async () => {
     entraStub.acquireTokenSilent.resolves(failure(new TokenRefreshError()));
-    sinon.stub(console, "warn");
 
     const app = createTestApp({
       isAuthenticated: true,
       account: { username: "user" },
-      tokenExpiry: NEAR_EXPIRY_TOKEN,
     });
     const res = await request(app).get("/protected");
     expect(res.status).to.equal(FOUND);

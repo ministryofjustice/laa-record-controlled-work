@@ -1,16 +1,13 @@
 import type { NextFunction, Request, Response } from "express";
 
 import { EntraService } from "#/auth/entra.service.js";
-import { MINUTE } from "#/lib/constants/time.js";
 import { logger } from "#/logger.js";
 
-/* eslint-disable @typescript-eslint/no-magic-numbers -- 5 minutes is self-documenting */
-const REFRESH_GRACE_PERIOD_MS = 5 * MINUTE;
-/* eslint-enable @typescript-eslint/no-magic-numbers */
-
 /**
- * Silently refresh the access token when it is missing or within the grace period of
- * expiry. Redirects to sign in if refresh fails.
+ * Silently refresh the access token on authenticated requests.
+ * MSAL handles cache expiry automatically via the ICachePlugin - if the cached
+ * token is valid, acquireTokenSilent returns it immediately. If expired, MSAL
+ * automatically refreshes using the cached refresh token.
  *
  * @param req - The Express request object.
  * @param res - The Express response object.
@@ -28,26 +25,21 @@ export async function refreshToken(
     return;
   }
 
-  const { account, tokenExpiry } = session;
-  const shouldRefresh =
-    tokenExpiry === undefined ||
-    tokenExpiry - Date.now() < REFRESH_GRACE_PERIOD_MS;
-
-  if (!shouldRefresh) {
-    next();
-    return;
-  }
-
+  const { account } = session;
   const entra = EntraService.create(req.hostname, req.sessionID);
   const result = await entra.acquireTokenSilent(account);
 
   if (result.error) {
-    logger.warn("Silent token refresh failed, redirecting to sign-in");
+    logger.warn("Silent token acquisition failed, redirecting to sign-in");
     session.returnTo = req.originalUrl;
     res.redirect("/auth/signin");
     return;
   }
 
-  Object.assign(session, result.value);
+  // Update session with refreshed token data (account/idToken may have changed)
+  Object.assign(session, {
+    account: result.value.account,
+    idToken: result.value.idToken,
+  });
   next();
 }

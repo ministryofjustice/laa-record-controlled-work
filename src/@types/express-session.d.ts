@@ -8,7 +8,6 @@ import type { PKCECodes } from "#/auth/auth.types.js";
 
 declare module "express-session" {
   interface SessionData {
-    accessToken?: string;
     account?: AccountInfo;
     authCodeRequest?: AuthorizationCodeRequest;
     authCodeUrlRequest?: AuthorizationUrlRequest;
@@ -17,7 +16,5 @@ declare module "express-session" {
     isAuthenticated?: boolean;
     pkceCodes?: PKCECodes;
     returnTo?: string;
-    tokenCache?: string;
-    tokenExpiry?: number;
   }
 }
