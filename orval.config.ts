@@ -37,8 +37,8 @@ export default defineConfig({
         // custom fetch function to use instead of the default fetch implementation
         mutator: {
           extension: ".js",
-          name: "fetcher",
-          path: "./src/lib/fetch.ts",
+          name: "orvalFetcher",
+          path: "./src/api/client/orvalFetcher.ts",
         },
       },
       schemaFileExtension: ".zod.gen.ts",
