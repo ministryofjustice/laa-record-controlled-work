@@ -4,8 +4,7 @@
     "saveAndReturn": "Save and return later",
     "signOut": "Sign out",
     "yes": "Yes",
-    "no": "No",
-    "or": "or"
+    "no": "No"
   },
   "components": {
     "phaseBanner": {
