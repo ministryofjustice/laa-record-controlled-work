@@ -292,19 +292,8 @@ describe("EntraService", () => {
     });
   });
 
-  describe("getAccessToken()", () => {
-    const SERIALIZED_CACHE = '{"tokens":{}}';
-    const UPDATED_CACHE = '{"tokens":{"refreshed":true}}';
-    let deserializeStub: sinon.SinonStub;
-    let serializeStub: sinon.SinonStub;
-
+  describe("acquireTokenSilent()", () => {
     beforeEach(() => {
-      deserializeStub = sinon.stub().resolves();
-      serializeStub = sinon.stub().returns(UPDATED_CACHE);
-      msalStub.getTokenCache = sinon.stub().returns({
-        deserialize: deserializeStub,
-        serialize: serializeStub,
-      });
       msalStub.acquireTokenSilent = sinon.stub().resolves({
         account: ACCOUNT,
         idToken: ID_TOKEN,
@@ -314,37 +303,29 @@ describe("EntraService", () => {
     });
 
     it("returns a refreshed access token on success", async () => {
-      const result = (await service.getAccessToken(
-        SERIALIZED_CACHE,
-        ACCOUNT as any,
-      )) as Success<TokenExchangeResult>;
+      const result = (await service.acquireTokenSilent(ACCOUNT as any)) as Success<TokenExchangeResult>;
       expect(result.error).to.be.undefined;
       expect(result.value.accessToken).to.equal(ACCESS_TOKEN);
     });
 
-    it("returns the updated token cache after refresh", async () => {
-      const result = (await service.getAccessToken(
-        SERIALIZED_CACHE,
-        ACCOUNT as any,
-      )) as Success<TokenExchangeResult>;
-      expect(result.value.tokenCache).to.equal(UPDATED_CACHE);
+    it("returns the account and idToken", async () => {
+      const result = (await service.acquireTokenSilent(ACCOUNT as any)) as Success<TokenExchangeResult>;
+      expect(result.value.account).to.deep.equal(ACCOUNT);
+      expect(result.value.idToken).to.equal(ID_TOKEN);
     });
 
     it("returns tokenExpiry as a Unix ms timestamp", async () => {
-      const result = (await service.getAccessToken(
-        SERIALIZED_CACHE,
-        ACCOUNT as any,
-      )) as Success<TokenExchangeResult>;
+      const result = (await service.acquireTokenSilent(ACCOUNT as any)) as Success<TokenExchangeResult>;
       expect(result.value.tokenExpiry).to.equal(TOKEN_EXPIRY.getTime());
     });
 
-    it("deserializes the provided token cache before acquiring silently", async () => {
-      await service.getAccessToken(SERIALIZED_CACHE, ACCOUNT as any);
-      expect(deserializeStub.calledOnceWith(SERIALIZED_CACHE)).to.be.true;
+    it("does not include tokenCache in the result (handled by ICachePlugin)", async () => {
+      const result = (await service.acquireTokenSilent(ACCOUNT as any)) as Success<TokenExchangeResult>;
+      expect(result.value.tokenCache).to.be.undefined;
     });
 
     it("passes the correct scopes to acquireTokenSilent", async () => {
-      await service.getAccessToken(SERIALIZED_CACHE, ACCOUNT as any);
+      await service.acquireTokenSilent(ACCOUNT as any);
       const [requestArg] = (msalStub.acquireTokenSilent as sinon.SinonStub)
         .args[0];
       expect(requestArg.scopes).to.include("openid");
@@ -353,15 +334,11 @@ describe("EntraService", () => {
     });
 
     it("returns a TokenRefreshError failure when acquireTokenSilent throws", async () => {
-      sinon.stub(console, "error");
       (msalStub.acquireTokenSilent as sinon.SinonStub).rejects(
         new Error("silent failure"),
       );
 
-      const result = await service.getAccessToken(
-        SERIALIZED_CACHE,
-        ACCOUNT as any,
-      );
+      const result = await service.acquireTokenSilent(ACCOUNT as any);
       expect(result.error)
         .to.be.an("error")
         .and.to.be.instanceOf(TokenRefreshError);

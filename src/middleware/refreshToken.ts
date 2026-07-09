@@ -28,7 +28,7 @@ export async function refreshToken(
     return;
   }
 
-  const { account, tokenCache, tokenExpiry } = session;
+  const { account, tokenExpiry } = session;
   const shouldRefresh =
     tokenExpiry === undefined ||
     tokenExpiry - Date.now() < REFRESH_GRACE_PERIOD_MS;
@@ -38,17 +38,8 @@ export async function refreshToken(
     return;
   }
 
-  if (!tokenCache) {
-    logger.warn(
-      "No token cache available for silent refresh, redirecting to sign-in",
-    );
-    session.returnTo = req.originalUrl;
-    res.redirect("/auth/signin");
-    return;
-  }
-
   const entra = EntraService.create(req.hostname, req.sessionID);
-  const result = await entra.getAccessToken(tokenCache, account);
+  const result = await entra.acquireTokenSilent(account);
 
   if (result.error) {
     logger.warn("Silent token refresh failed, redirecting to sign-in");

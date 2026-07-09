@@ -32,6 +32,6 @@ export interface TokenExchangeResult {
   accessToken: string | undefined;
   account: AccountInfo | undefined;
   idToken: string | undefined;
-  tokenCache: string;
+  tokenCache?: string;
   tokenExpiry: number | undefined;
 }

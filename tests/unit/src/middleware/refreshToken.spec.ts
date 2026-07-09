@@ -18,7 +18,6 @@ const REFRESHED_TOKEN_RESULT = {
   accessToken: "refreshed-token",
   account: { username: "user" },
   idToken: "id-token",
-  tokenCache: '{"refreshed":true}',
   tokenExpiry: Date.now() + 3600 * 1000,
 };
 
@@ -41,11 +40,11 @@ function createTestApp(sessionOverrides: Record<string, unknown> = {}): Applicat
 }
 
 describe("refreshToken middleware", () => {
-  let entraStub: { getAccessToken: sinon.SinonStub };
+  let entraStub: { acquireTokenSilent: sinon.SinonStub };
 
   beforeEach(() => {
     entraStub = {
-      getAccessToken: sinon.stub().resolves(success(REFRESHED_TOKEN_RESULT)),
+      acquireTokenSilent: sinon.stub().resolves(success(REFRESHED_TOKEN_RESULT)),
     };
     sinon.stub(EntraService, "create").returns(entraStub as unknown as EntraService);
   });
@@ -56,7 +55,7 @@ describe("refreshToken middleware", () => {
     const app = createTestApp({ isAuthenticated: false });
     const res = await request(app).get("/protected");
     expect(res.status).to.equal(OK);
-    expect(entraStub.getAccessToken.called).to.be.false;
+    expect(entraStub.acquireTokenSilent.called).to.be.false;
   });
 
   it("calls next() when token is valid and not near expiry", async () => {
@@ -64,12 +63,11 @@ describe("refreshToken middleware", () => {
       isAuthenticated: true,
       account: { username: "user" },
       accessToken: "current-token",
-      tokenCache: "{}",
       tokenExpiry: VALID_TOKEN_EXPIRY,
     });
     const res = await request(app).get("/protected");
     expect(res.status).to.equal(OK);
-    expect(entraStub.getAccessToken.called).to.be.false;
+    expect(entraStub.acquireTokenSilent.called).to.be.false;
   });
 
   it("silently refreshes the token when expiry is within the grace period", async () => {
@@ -77,41 +75,25 @@ describe("refreshToken middleware", () => {
       isAuthenticated: true,
       account: { username: "user" },
       accessToken: "old-token",
-      tokenCache: "{}",
       tokenExpiry: NEAR_EXPIRY_TOKEN,
     });
     const res = await request(app).get("/protected");
     expect(res.status).to.equal(OK);
-    expect(entraStub.getAccessToken.calledOnce).to.be.true;
+    expect(entraStub.acquireTokenSilent.calledOnce).to.be.true;
   });
 
   it("silently refreshes the token when no tokenExpiry is set", async () => {
     const app = createTestApp({
       isAuthenticated: true,
       account: { username: "user" },
-      tokenCache: "{}",
     });
     const res = await request(app).get("/protected");
     expect(res.status).to.equal(OK);
-    expect(entraStub.getAccessToken.calledOnce).to.be.true;
+    expect(entraStub.acquireTokenSilent.calledOnce).to.be.true;
   });
 
   it("redirects to /auth/signin when token is near expiry and refresh fails", async () => {
-    entraStub.getAccessToken.resolves(failure(new TokenRefreshError()));
-    sinon.stub(console, "warn");
-
-    const app = createTestApp({
-      isAuthenticated: true,
-      account: { username: "user" },
-      tokenCache: "{}",
-      tokenExpiry: NEAR_EXPIRY_TOKEN,
-    });
-    const res = await request(app).get("/protected");
-    expect(res.status).to.equal(FOUND);
-    expect(res.headers.location).to.equal("/auth/signin");
-  });
-
-  it("redirects to /auth/signin when token is near expiry and no tokenCache is set", async () => {
+    entraStub.acquireTokenSilent.resolves(failure(new TokenRefreshError()));
     sinon.stub(console, "warn");
 
     const app = createTestApp({
@@ -122,7 +104,6 @@ describe("refreshToken middleware", () => {
     const res = await request(app).get("/protected");
     expect(res.status).to.equal(FOUND);
     expect(res.headers.location).to.equal("/auth/signin");
-    expect(entraStub.getAccessToken.called).to.be.false;
   });
 });
 

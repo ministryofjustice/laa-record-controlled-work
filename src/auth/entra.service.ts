@@ -97,6 +97,35 @@ export class EntraService {
   }
 
   /**
+   * Acquire a fresh access token using cached credentials.
+   * Cache serialization/deserialization is handled automatically by the ICachePlugin.
+   *
+   * @param account - The authenticated account from the session.
+   * @returns {Promise<Either<TokenRefreshError, TokenExchangeResult>>} The refreshed token set or an error.
+   */
+  public async acquireTokenSilent(
+    account: AccountInfo,
+  ): Promise<Either<TokenRefreshError, TokenExchangeResult>> {
+    try {
+      const result: AuthenticationResult =
+        await this.msalClient.acquireTokenSilent({
+          account,
+          scopes: authRequestDefaults.scopes,
+        });
+
+      return success({
+        accessToken: result.accessToken,
+        account: result.account ?? undefined,
+        idToken: result.idToken,
+        tokenExpiry: result.expiresOn?.getTime(),
+      });
+    } catch (error) {
+      logger.error("Failed to silently acquire token", error);
+      return failure(TokenRefreshError.from(error));
+    }
+  }
+
+  /**
    * Exchanges the authorisation code from the Entra redirect for tokens.
    * @param code - The authorisation code to exchange.
    * @param authCodeRequest - The stored MSAL code request from the sign-in initiation.
@@ -123,39 +152,6 @@ export class EntraService {
     } catch (error) {
       logger.error("Failed to handle Entra auth redirect", error);
       return failure(TokenAcquisitionError.from(error));
-    }
-  }
-
-  /**
-   * Acquire a fresh access token using cached credentials.
-   *
-   * @param tokenCache - The serialised MSAL token cache from the session.
-   * @param account - The authenticated account from the session.
-   * @returns {Promise<Either<TokenRefreshError, TokenExchangeResult>>} The refreshed token set or an error.
-   */
-  public async getAccessToken(
-    tokenCache: string,
-    account: AccountInfo,
-  ): Promise<Either<TokenRefreshError, TokenExchangeResult>> {
-    try {
-      this.msalClient.getTokenCache().deserialize(tokenCache);
-      const result: AuthenticationResult =
-        await this.msalClient.acquireTokenSilent({
-          account,
-          scopes: authRequestDefaults.scopes,
-        });
-      const updatedCache = this.msalClient.getTokenCache().serialize();
-
-      return success({
-        accessToken: result.accessToken,
-        account: result.account ?? undefined,
-        idToken: result.idToken,
-        tokenCache: updatedCache,
-        tokenExpiry: result.expiresOn?.getTime(),
-      });
-    } catch (error) {
-      logger.error("Failed to silently acquire token", error);
-      return failure(TokenRefreshError.from(error));
     }
   }
 
