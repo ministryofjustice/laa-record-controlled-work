@@ -13,18 +13,19 @@ export const orvalFetcher = async <T>(
   options: RequestInit,
 ): Promise<T> => {
   const method = (options.method || "GET").toUpperCase();
+  const { body, method: _method, ...requestOptions } = options;
 
   switch (method) {
     case "POST":
-      return http.post<T>(url, options.body, options);
+      return http.post<T>(url, body, requestOptions);
     case "PUT":
-      return http.put<T>(url, options.body, options);
+      return http.put<T>(url, body, requestOptions);
     case "PATCH":
-      return http.patch<T>(url, options.body, options);
+      return http.patch<T>(url, body, requestOptions);
     case "DELETE":
-      return http.delete<T>(url, options);
+      return http.delete<T>(url, requestOptions);
     case "GET":
     default:
-      return http.get<T>(url, options);
+      return http.get<T>(url, requestOptions);
   }
 };

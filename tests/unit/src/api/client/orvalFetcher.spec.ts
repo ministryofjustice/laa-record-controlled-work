@@ -32,7 +32,7 @@ describe("orvalFetcher", () => {
       postStub,
       "/api/v1/applications",
       options.body,
-      options,
+      { headers: options.headers },
     );
   });
 
@@ -45,16 +45,8 @@ describe("orvalFetcher", () => {
     await orvalFetcher("/resource", { body: "{}", method: "PATCH" });
     await orvalFetcher("/resource", { method: "DELETE" });
 
-    sinon.assert.calledOnceWithExactly(putStub, "/resource", "{}", {
-      body: "{}",
-      method: "PUT",
-    });
-    sinon.assert.calledOnceWithExactly(patchStub, "/resource", "{}", {
-      body: "{}",
-      method: "PATCH",
-    });
-    sinon.assert.calledOnceWithExactly(deleteStub, "/resource", {
-      method: "DELETE",
-    });
+    sinon.assert.calledOnceWithExactly(putStub, "/resource", "{}", {});
+    sinon.assert.calledOnceWithExactly(patchStub, "/resource", "{}", {});
+    sinon.assert.calledOnceWithExactly(deleteStub, "/resource", {});
   });
 });
