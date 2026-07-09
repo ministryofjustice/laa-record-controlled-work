@@ -49,7 +49,10 @@ export interface CsrfConfig {
 }
 
 export interface EntraConfig {
-  apiScopes: string[];
+  api: {
+    clientId: string;
+    scopes: string[];
+  };
   authority: string;
   clientId: string;
   clientSecret: string;
