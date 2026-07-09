@@ -5,6 +5,7 @@ import { logger } from "#/logger.js";
 
 const optionalEnvSchema = z.object({
   API_BASE_URL: z.url().optional(),
+  API_MODE: z.enum(["msw", "api"]).optional(),
   AUTH_RATE_LIMIT_MAX: z.coerce.number().optional(),
   CONTACT_EMAIL: z.string().optional(),
   CONTACT_PHONE: z.string().optional(),

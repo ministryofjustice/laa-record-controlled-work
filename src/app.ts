@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 
 import { Forge } from "@ministryofjustice/hmpps-forge/core";
 import {
-  ExpressFrameworkAdapter,
+  createExpressRouter,
   nunjucksFunctions,
 } from "@ministryofjustice/hmpps-forge/express-nunjucks";
 import { govukComponents } from "@ministryofjustice/hmpps-forge/govuk-components";
@@ -11,11 +11,13 @@ import compression from "compression";
 import express from "express";
 import session from "express-session";
 
+import { getApplications } from "#/api/client/schema/applications/applications.gen.js";
 import authRouter from "#/auth/auth.routes.js";
 import config from "#/config.js";
 import { autocomplete } from "#/journeys/components/autocomplete/autocomplete.component.js";
-import createApplication from "#/journeys/create-application/index.js";
-import yourCases from "#/journeys/your-cases/index.js";
+import createApplication from "#/journeys/create-application/create-application.index.js";
+import evidence from "#/journeys/evidence/evidence.index.js";
+import yourCases from "#/journeys/your-cases/your-cases.index.js";
 import { createSession } from "#/lib/session.js";
 import { requireAuth } from "#/middleware/requireAuth.js";
 import { setupConfig } from "#/middleware/setupConfigs.js";
@@ -76,21 +78,18 @@ const createApp = async (): Promise<express.Application> => {
   // Set up locale middleware for internationalization
   app.use(setupLocaleMiddleware);
 
-  // Set up Nunjucks as the template engine
-  // Set up Nunjucks as the template engine
+  // Set up Nunjucks as the template engine and forge
   const nunjucksEnv = setupNunjucks(app);
-
-  const forge = new Forge({
-    frameworkAdapter: ExpressFrameworkAdapter.configure({ nunjucksEnv }),
-  });
+  const forge = new Forge({});
 
   forge
     .registerGlobalComponents(govukComponents)
     .registerGlobalComponents(mojComponents)
     .registerGlobalComponents([autocomplete])
     .registerGlobalFunctions(nunjucksFunctions)
+    .registerPackage(yourCases, { getApplications })
     .registerPackage(createApplication)
-    .registerPackage(yourCases);
+    .registerPackage(evidence);
 
   // Set up rate limiting
   setupRateLimit(app, config);
@@ -123,10 +122,7 @@ const createApp = async (): Promise<express.Application> => {
     app.use(livereload());
   }
 
-  app.use(express.urlencoded({ extended: true }));
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Forge.getRouter returns unknown but will always be an express.Router.
-  const forgeRouter = forge.getRouter() as express.Router;
-  app.use("/", forgeRouter);
+  app.use("/", createExpressRouter(forge, { nunjucksEnv }));
 
   return app;
 };

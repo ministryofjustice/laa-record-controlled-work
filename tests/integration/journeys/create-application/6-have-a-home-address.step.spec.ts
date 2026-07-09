@@ -8,7 +8,11 @@ import { createForgeTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 
 describe("Have A Home Address Step", () => {
-  const client = createForgeTestClient(haveAHomeAddressStep("testJourney"));
+  const client = createForgeTestClient(
+    "Record new case",
+    "/create-application/",
+    haveAHomeAddressStep("testJourney"),
+  );
 
   describe("GET /create-application/have-a-home-address", () => {
     let renderResult: TestRenderResult;

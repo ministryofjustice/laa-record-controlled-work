@@ -2,6 +2,7 @@ import type { SessionOptions } from "express-session";
 
 export interface ApiConfig {
   baseUrl: string;
+  mode: string;
 }
 
 export interface AppConfig {

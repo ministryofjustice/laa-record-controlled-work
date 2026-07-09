@@ -7,25 +7,16 @@ const getBody = async (c: Request | Response): Promise<unknown> => {
     return await c.json();
   }
 
-  if (contentType?.includes("application/pdf")) {
-    return await c.blob();
-  }
-
   return await c.text();
 };
 
 const getUrl = (contextUrl: string): string => {
-  const url = new URL(contextUrl);
-  const { pathname } = url;
-  const { search } = url;
   const { baseUrl } = config.api;
 
-  const requestUrl = new URL(`${baseUrl}${pathname}${search}`);
-
+  const requestUrl = new URL(`${baseUrl}${contextUrl}`);
   return requestUrl.toString();
 };
 
-// NOTE: Add headers
 const getHeaders = (headers?: HeadersInit): Record<string, string> => {
   const base: Record<string, string> = {};
   new Headers(headers).forEach((value, key) => {
@@ -34,7 +25,6 @@ const getHeaders = (headers?: HeadersInit): Record<string, string> => {
   return {
     ...base,
     Authorization: "token",
-    "Content-Type": "multipart/form-data",
   };
 };
 

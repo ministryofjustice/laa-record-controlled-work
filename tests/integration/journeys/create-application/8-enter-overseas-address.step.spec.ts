@@ -8,7 +8,11 @@ import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import { enterOverseasAddressStep } from "#/journeys/create-application/steps/8-enter-overseas-address.step.js";
 
 describe("Enter overseas address step", () => {
-  const client = createForgeTestClient(enterOverseasAddressStep("testJourney"));
+  const client = createForgeTestClient(
+    "Record new case",
+    "/create-application/",
+    enterOverseasAddressStep("testJourney"),
+  );
 
   describe("GET /create-application/enter-overseas-address", () => {
     let renderResult: TestRenderResult;

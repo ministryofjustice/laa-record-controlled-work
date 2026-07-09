@@ -1,23 +1,26 @@
 import {
   type ChainableRef,
+  Condition,
+  Data,
   Format,
   Item,
   Iterator,
   Transformer,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 import {
+  GovUKBody,
   GovUKHeading,
   GovUKLinkButton,
   GovUKTable,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 import { MOJSubNavigation } from "@ministryofjustice/hmpps-forge/moj-components";
-import { t } from "i18next";
 
 import { H1 } from "#/lib/constants/headings.js";
+import { t } from "#/lib/i18n.js";
 
 export const heading = GovUKHeading({
   level: H1,
-  text: "Your cases",
+  text: t("pages.yourCases.heading"),
 });
 
 export const createCaseButton = GovUKLinkButton({
@@ -51,23 +54,36 @@ export const casesTable = (cases: ChainableRef): GovUKTable =>
         {
           html: Format(
             '<a class="govuk-link" href="/cases/%1">%2</a>',
-            Item().path("referenceNumber"),
-            Item().path("clientName"),
+            Item().path("applicationRefNumber"),
+            Item().path("name"),
           ),
         },
-        { text: Item().path("referenceNumber") },
+        { text: Item().path("applicationRefNumber") },
         {
           text: Item()
-            .path("lastUpdated")
+            .path("modifiedAt")
             .pipe(
               Transformer.String.FormatDate({
                 day: "numeric",
                 locale: "en-GB",
                 month: "short",
+                timeZone: "Europe/London",
                 year: "numeric",
               }),
             ),
         },
       ]),
     ),
+    visibleWhen: Data("caseList")
+      .pipe(Transformer.Array.Length())
+      // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- self explanatory
+      .match(Condition.Number.GreaterThan(0)),
   });
+
+export const noCasesMessage = GovUKBody({
+  text: t("pages.yourCases.table.emptyMessage"),
+  visibleWhen: Data("caseList")
+    .pipe(Transformer.Array.Length())
+    // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- self explanatory
+    .match(Condition.Number.LessThanOrEqual(0)),
+});

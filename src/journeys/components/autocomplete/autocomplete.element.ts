@@ -44,8 +44,7 @@ class Autocomplete extends HTMLElement {
     try {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- runtime JSON; shape validated by server-side component
       return JSON.parse(el.textContent || "{}") as
-        | Record<string, unknown>
-        | unknown[];
+        Record<string, unknown> | unknown[];
     } catch (e) {
       // eslint-disable-next-line no-console -- no server logger available in browser context
       console.error(

@@ -52,8 +52,7 @@ export type getApplicationsResponseError = (
 };
 
 export type getApplicationsResponse =
-  | getApplicationsResponseSuccess
-  | getApplicationsResponseError;
+  getApplicationsResponseSuccess | getApplicationsResponseError;
 
 export const getGetApplicationsUrl = () => {
   return `/api/v1/applications`;
@@ -115,8 +114,7 @@ export type createApplicationResponseError = (
 };
 
 export type createApplicationResponse =
-  | createApplicationResponseSuccess
-  | createApplicationResponseError;
+  createApplicationResponseSuccess | createApplicationResponseError;
 
 export const getCreateApplicationUrl = () => {
   return `/api/v1/applications`;
@@ -175,8 +173,7 @@ export type getApplicationResponseError = (
 };
 
 export type getApplicationResponse =
-  | getApplicationResponseSuccess
-  | getApplicationResponseError;
+  getApplicationResponseSuccess | getApplicationResponseError;
 
 export const getGetApplicationUrl = (id: string) => {
   return `/api/v1/applications/${id}`;
