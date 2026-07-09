@@ -1,6 +1,7 @@
 import config from "#/config.js";
 import { createRedisClient, createRedisStore } from "#/lib/redis.js";
-import { RedisConfig } from "#/types/config-types.js";
+import { logger } from "#/logger.js";
+import { RedisConfig } from "#/config.types.js";
 import { strict as assert } from "assert";
 import { expect } from "chai";
 import sinon from "sinon";
@@ -13,12 +14,12 @@ const createMockConfig = (): RedisConfig => ({
 
 describe("Redis", () => {
   describe("createRedisClient()", () => {
-    let consoleLogStub: sinon.SinonStub;
-    let consoleErrorStub: sinon.SinonStub;
+    let loggerInfoStub: sinon.SinonStub;
+    let loggerErrorStub: sinon.SinonStub;
 
     beforeEach(() => {
-      consoleLogStub = sinon.stub(console, "log");
-      consoleErrorStub = sinon.stub(console, "error");
+      loggerInfoStub = sinon.stub(logger, "info");
+      loggerErrorStub = sinon.stub(logger, "error");
     });
 
     afterEach(() => {
@@ -68,9 +69,10 @@ describe("Redis", () => {
         "Should calculate delay for allowed retry range",
       );
       assert(
-        consoleLogStub.calledWithMatch(
-          "Redis reconnecting... attempt 2, waiting 200ms",
-        ),
+        loggerInfoStub.calledWith("Redis reconnecting", {
+          delay: 200,
+          retries: 2,
+        }),
       );
     });
 
@@ -96,11 +98,11 @@ describe("Redis", () => {
       client.emit("end");
       client.emit("error", new Error("Boom"));
 
-      assert(consoleLogStub.calledWithMatch("Redis client connecting..."));
-      assert(consoleLogStub.calledWithMatch("Redis client ready"));
-      assert(consoleLogStub.calledWithMatch("Redis client reconnecting..."));
-      assert(consoleLogStub.calledWithMatch("Redis client disconnected"));
-      assert(consoleErrorStub.calledWithMatch("Redis Client Error:"));
+      assert(loggerInfoStub.calledWith("Redis client connecting"));
+      assert(loggerInfoStub.calledWith("Redis client ready"));
+      assert(loggerInfoStub.calledWith("Redis client reconnecting"));
+      assert(loggerInfoStub.calledWith("Redis client disconnected"));
+      assert(loggerErrorStub.calledWith("Redis client error", sinon.match.any));
     });
   });
   describe("createRedisStore()", () => {

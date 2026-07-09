@@ -1,0 +1,52 @@
+@import "accessible-autocomplete/dist/accessible-autocomplete.min.css";
+
+// Autocomplete - use GOV.UK font
+.autocomplete__menu {
+  @include govuk-font($size: 19);
+}
+
+// Autocomplete - fix spacing with following form elements
+.autocomplete-wrapper,
+autocomplete-wrapper {
+  display: block;
+  // Reset the default form group margin that's being inherited
+  .govuk-form-group {
+    margin-bottom: 0;
+  }
+
+  // Reduce overall wrapper margin to match standard form spacing
+  margin-bottom: govuk-spacing(6);
+}
+
+// Ensure the autocomplete wrapper itself doesn't add extra vertical space
+.autocomplete__wrapper {
+  margin-bottom: 0;
+}
+// Ensure if clear button is present, it doesn't add extra vertical space
+.autocomplete-with-clear {
+  display: grid;
+  grid-template-rows: min-content min-content;
+  grid-template-columns: 66.6% 33.3%;
+  gap: govuk-spacing(3);
+  margin-bottom: govuk-spacing(6);
+
+  // Override the wrapper's own margin so the container controls spacing
+  autocomplete-wrapper,
+  .autocomplete-wrapper {
+    flex: 1 1 auto;
+    margin-bottom: 0;
+  }
+
+  .autocomplete__clear-button {
+    display: inline-block;
+    height: min-content;
+    width: min-content;
+    min-height: 2.5rem;
+    align-self: start;
+    margin-top: 40px;
+    background: transparent;
+    border: 0;
+    margin-bottom: 0;
+    color: -webkit-link
+  }
+}

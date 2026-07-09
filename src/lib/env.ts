@@ -1,7 +1,11 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers -- Zod schema constraints are self-documenting */
 import z from "zod";
 
+import { logger } from "#/logger.js";
+
 const optionalEnvSchema = z.object({
+  API_BASE_URL: z.url().optional(),
+  API_MODE: z.enum(["msw", "api"]).optional(),
   AUTH_RATE_LIMIT_MAX: z.coerce.number().optional(),
   CONTACT_EMAIL: z.string().optional(),
   CONTACT_PHONE: z.string().optional(),
@@ -25,12 +29,10 @@ const injected = z.string().refine((val) => !val.startsWith("op://"), {
 });
 
 const requiredEnvSchema = z.object({
-  ENTRA_AUTHORITY_BASE_URL: injected.nonempty(),
+  ENTRA_AUTHORITY_BASE_URL: z.url().nonempty(),
   ENTRA_CLIENT_ID: injected.nonempty(),
-
   ENTRA_CLIENT_SECRET: injected.nonempty(),
-  ENTRA_POST_LOGOUT_REDIRECT_URI: injected.nonempty(),
-  ENTRA_REDIRECT_URI: injected.nonempty(),
+  ENTRA_REDIRECT_URI: z.url().nonempty(),
   ENTRA_TENANT_ID: injected.nonempty(),
   NODE_ENV: z.literal([
     "test",
@@ -54,7 +56,9 @@ const { data, error } = z
   });
 
 if (error) {
-  console.error(z.prettifyError(error));
+  logger.fatal("Environment validation failed", error, {
+    prettyError: z.prettifyError(error),
+  });
   process.exit(1);
 }
 

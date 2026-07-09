@@ -20,10 +20,10 @@ This project uses Yarn 4.14.1 managed by corepack (built into Node.js 16.10+). T
    corepack enable
    ```
 
-2. **Install dependencies:**
+2. **Install dependencies and pre-commit hooks:**
 
    ```shell
-   yarn install
+   make install
    ```
 
 3. **Verify the installation:**
@@ -36,9 +36,24 @@ This project uses Yarn 4.14.1 managed by corepack (built into Node.js 16.10+). T
 **To Note:**
 - Corepack automatically uses the Yarn version specified in the `packageManager` field of `package.json`. No additional setup is required once corepack is enabled
 - `yarn install --immutable` ensures that the lockfile (`yarn.lock`) is not modified during the installation process
-- Renovate can raise PRs for vulnerability patches, but `npmMinimalAgeGate: 7d` in `.yarnrc.yml` will cause Renovate to fail when generating artifacts (creating the lockfile).
-  - Check out the failing Renovate branch
-  - Run `YARN_NPM_MINIMUM_PACKAGE_AGE=0 yarn up <package>` to skip the quarantine period
+
+#### Setup Pre-commit hooks
+
+- We use [devsecops-hooks](https://github.com/ministryofjustice/devsecops-hooks) for pre-commits
+- This is installed in a postinstall script in yarn and is skipped in CICD
+- you can run the script manually via:
+```sh
+make prek-install
+```
+- This hook will run automatically on git commit.
+
+#### Vulnerabilities in PRs
+Renovate can raise PRs for vulnerability patches, but `npmMinimalAgeGate: 7d` in `.yarnrc.yml` will cause Renovate to fail when generating artifacts (creating the lockfile). 
+
+This may also happen if a vulnerability is raised for a package we currently have installed and the patch is less than 7 days old (`yarn` will quarantine it).
+
+  - Check out the failing branch
+  - Run `yarn up <package> --no-time-gate` to skip the quarantine period
   - Commit the updated yarn.lock and push it to unblock the PR.
 
 ### Start the application
@@ -169,7 +184,6 @@ CSRF protection is not applied to `/auth/code/callback` — it is secured by the
 | `ENTRA_TENANT_ID` | Directory (tenant) ID |
 | `ENTRA_AUTHORITY_BASE_URL` | Authority base URL (e.g. `https://login.microsoftonline.com/`) |
 | `ENTRA_REDIRECT_URI` | Redirect URI registered in Entra for auth code callback |
-| `ENTRA_POST_LOGOUT_REDIRECT_URI` | URI to redirect to after sign-out |
 
 These values are stored in 1Password and injected at runtime via the 1Password CLI (see above).
 

@@ -4,7 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import nunjucks from "nunjucks";
 
-import { nunjucksT } from "#/lib/i18nLoader.js";
+import { nunjucksT } from "#/lib/i18n.js";
 
 const FIRST_IN_ARRAY = 0;
 
@@ -36,7 +36,7 @@ export const resolveAsset = (
  * @param {Application} app - The Express application instance.
  * @returns {void} This function does not return a value; it configures Nunjucks for the provided app.
  */
-export const setupNunjucks = (app: Application): void => {
+export const setupNunjucks = (app: Application): nunjucks.Environment => {
   const appInstance = app;
   appInstance.set("view engine", "njk");
 
@@ -64,14 +64,48 @@ export const setupNunjucks = (app: Application): void => {
       "node_modules/govuk-frontend/dist", // GOV.UK Frontend templates
       "node_modules/govuk-frontend/dist/components/", // GOV.UK components
       "node_modules/@ministryofjustice/frontend", // MoJ Design System components
+      "node_modules/@ministryofjustice/hmpps-forge/dist/govuk-components/",
+      "node_modules/@ministryofjustice/hmpps-forge/dist/moj-components/",
     ],
     {
       autoescape: true, // Enable auto escaping to prevent XSS attacks
       express: appInstance, // Bind Nunjucks to the Express app instance
-      watch: process.env.NODE_ENV === "development", // Watch for template changes in development only
+      watch: ["development", "docker"].includes(process.env.NODE_ENV ?? ""), // Watch for template changes in development and docker
     },
   );
 
   // Add global variables
   nunjucksEnv.addGlobal("t", nunjucksT);
+
+  interface ValidationError {
+    blockCode?: string;
+    message: string;
+  }
+
+  nunjucksEnv.addGlobal(
+    "toErrorList",
+    (fieldErrors?: ValidationError[], domainErrors?: ValidationError[]) => {
+      const allErrors = [...(domainErrors ?? []), ...(fieldErrors ?? [])];
+      const seen = new Set<string>();
+
+      return allErrors.flatMap(
+        (error): Array<{ href?: string; text: string }> => {
+          const key = error.blockCode ?? error.message;
+
+          if (seen.has(key)) {
+            return [];
+          }
+
+          seen.add(key);
+
+          return [
+            error.blockCode
+              ? { href: `#${error.blockCode}`, text: error.message }
+              : { text: error.message },
+          ];
+        },
+      );
+    },
+  );
+  return nunjucksEnv;
 };

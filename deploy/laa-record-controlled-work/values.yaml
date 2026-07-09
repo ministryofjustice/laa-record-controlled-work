@@ -26,7 +26,7 @@ rcw:
   image:
     repository: nginx
     pullPolicy: Always
-    tag: "@sha256:800e7c98538c6bf725f5177e841aa720ae0ed1c378bbea368b6330bfe18a36b3"
+    tag: "@sha256:ec4ed8b5299e5e90694af7750eb6dffd2627317d30544d056b0371f8082f7bce"
 
   imagePullSecrets: []
   podAnnotations: {}
@@ -76,7 +76,7 @@ rcw:
   # Secret env vars stored in a Kubernetes Secret, referenced via
   # secretKeyRef in the deployment template.
   #
-  # envSecretName: 
+  # envSecretName:
   #   - The name of the Kubernetes Secret to create/update.
   #   - Scoped per Kubernetes namespace (one per environment), shared across all releases
   #     including ephemeral branches - all releases in a namespace use the
@@ -84,14 +84,11 @@ rcw:
   #
   # envSecrets: 
   #   - Keys to pull from that secret.
-  #   - Each key must also be listed in the env: block of the deploy step
-  #     in deploy-environment.yml, so the CI job can pass the value to
-  #     the kubectl upsert step.
   #
   # Helm merges maps (env:) deeply across values files, but replaces
   # lists (envSecrets:) entirely. If an environment needs additional
   # secrets, repeat the full envSecrets: list in its values file.
-  envSecretName: env-secrets
+  envSecretName: rcw-env-secrets
   envSecrets:
     - SESSION_SECRET
     - SESSION_ENCRYPTION_KEY
@@ -121,7 +118,6 @@ rcw:
     NODE_ENV: ""
     ENTRA_AUTHORITY_BASE_URL: "https://login.microsoftonline.com/"
     ENTRA_REDIRECT_URI: ""
-    ENTRA_POST_LOGOUT_REDIRECT_URI: ""
     REDIS_ENABLED: true  
     REDIS_SECRET_NAME: elasticache-redis
 
@@ -139,6 +135,34 @@ rcw:
   tolerations: []
   affinity: {}
 
+ccq:
+  replicaCount: 1
+
+  image:
+    # Overridden at deploy time to ECR; see deploy.sh and docker-images.env
+    repository: laa-check-client-qualifies
+    pullPolicy: Always
+    tag: latest
+
+  envSecretName: ccq-env-secrets
+  envSecrets:
+    - SECRET_KEY_BASE
+
+  env:
+    REDIS_SECRET_NAME: elasticache-redis-ccq
+    RAILS_ENV: production
+    RAILS_SERVE_STATIC_FILES: "true"
+    RAILS_LOG_TO_STDOUT: "true"
+    CCQ_MODE: embedded
+
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1Gi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+
 nginx:
   replicaCount: 1
 
@@ -146,7 +170,7 @@ nginx:
     # Overridden at deploy time to ECR; see deploy.sh and docker-images.env
     repository: nginxinc/nginx-unprivileged
     pullPolicy: Always
-    tag: alpine@sha256:3707417e3304492667a63c90ac0103465330437f9cdfaa38f8cd19f9975cbeed
+    tag: alpine@sha256:592b23aa79a6e6c08ba4b20f1fff700e1328895705966722608e115d62e52d39
 
   resources:
     limits:

@@ -1,12 +1,12 @@
 import config from "#/config.js";
 import { createSession } from "#/lib/session.js";
-import type { RedisClientType } from "#/types/redis-types.js";
 import * as chai from "chai";
 import type { RedisStore } from "connect-redis";
 import chaiAsPromised from "chai-as-promised"
 import sinon from "sinon";
 chai.use(chaiAsPromised)
 import { expect } from "chai";
+import { RedisClientType } from "redis";
 describe("session Middleware", () => {
   let createRedisClientStub: sinon.SinonStub;
   let createRedisStoreStub: sinon.SinonStub;

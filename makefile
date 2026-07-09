@@ -2,48 +2,62 @@ include docker-images.env
 export
 
 MOCHA    := ./node_modules/.bin/mocha
-TEST_DIR := tests/unit
 
-# Mirrors .mocharc.json options (excluding spec) which allows single file runs in local without impacting CICD
-MOCHA_OPTS := --no-config \
-	--require tests/unit/setup.ts \
-	--node-option no-warnings \
-	--node-option import=tsx \
-	--extension ts \
-	--extension tsx \
-	--reporter list
-
-
-.PHONY: watch dev unit e2e e2e-ui test-all lint docker-up
+.PHONY: install prek-install dev watch docker-up docker-down build api-generate lint lint-fix integration integration-watch e2e e2e-ui test-all coverage unit unit-watch
 
 # 	op run --env-file=.env uses 1Password to load environment variables securely
 # 	you can --no-masking flag means that varaibles is not masked in the output which can be used for debugging
 
-watch: 
-	op run --env-file=.env -- yarn build && yarn dev
+install:
+	yarn install
 
-dev: 
-	op run --env-file=.env -- npx tsx src/server.ts
+prek-install:
+	yarn prek:install
 
-e2e:
-	yarn build && yarn test:e2e
+dev:
+	yarn dev
 
-e2e-ui:
-	yarn build && yarn playwright test --ui --config=tests/playwright/playwright.config.ts
-
-test-all: unit e2e lint
-
-lint: 
-	yarn lint
+watch:
+	yarn dev:watch
 
 docker-up:
-	op run --env-file=.env -- docker compose up
+	yarn dev:docker
 
 docker-down:
 	docker compose down
 
-docker-build:
-	op run --env-file=.env -- docker compose up --build 
+build:
+	yarn build
+
+api-generate:
+	yarn api:generate
+
+lint: 
+	yarn lint
+
+lint-fix: 
+	yarn lint:fix
+
+integration:
+	yarn integration
+
+integration-watch:
+	yarn integration:watch
+
+e2e:
+	yarn e2e
+
+e2e-ui:
+	yarn e2e:ui
+
+test: 
+	yarn test
+
+coverage:
+	yarn unit:coverage
+
+unit-watch:
+	yarn unit:watch
 
 # Run unit tests.
 #
@@ -52,11 +66,11 @@ docker-build:
 #   make unit file=either            - run a specific test by filename (with or without .spec.ts)
 #   make unit file=services/auth     - When multiple files share the same name
 
-unit:
+unit: 
 ifdef file
-	@MATCHES=$$(find $(TEST_DIR) \( -path "*/$(file)" -o -path "*/$(file).spec.ts" \) 2>/dev/null); \
+	@MATCHES=$$(find tests/unit \( -path "*/$(file)" -o -path "*/$(file).spec.ts" \) 2>/dev/null); \
 	if [ -z "$$MATCHES" ]; then \
-		echo "Error: No test file found matching '$(file)' in $(TEST_DIR)/"; \
+		echo "Error: No test file found matching '$(file)' in tests/unit/"; \
 		exit 1; \
 	fi; \
 	COUNT=$$(echo "$$MATCHES" | wc -l | tr -d ' '); \
@@ -65,7 +79,8 @@ ifdef file
 		echo "$$MATCHES"; \
 		exit 1; \
 	fi; \
-	$(MOCHA) $(MOCHA_OPTS) "$$MATCHES"
+	$(MOCHA) "$$MATCHES"
 else
-	$(MOCHA) --recursive '$(TEST_DIR)/**/*.spec.ts'
+	yarn unit
 endif
+

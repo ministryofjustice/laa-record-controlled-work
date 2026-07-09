@@ -13,6 +13,9 @@ spec:
       app.kubernetes.io/component: nginx
   template:
     metadata:
+      annotations:
+        # Triggers rolling restart if nginx template files change
+        checksum/nginx-config: {{ include (print $.Template.BasePath "/nginx.configmap.yaml") . | sha256sum }}
       labels:
         {{- include "laa-record-controlled-work.labels" . | nindent 8 }}
         app.kubernetes.io/component: nginx
@@ -41,7 +44,7 @@ spec:
             - name: NGINX_UPSTREAM_RCW
               value: {{ include "laa-record-controlled-work.fullname" . }}-rcw:3000
             - name: NGINX_UPSTREAM_CCQ
-              value: {{ include "laa-record-controlled-work.fullname" . }}-rcw:3000
+              value: {{ include "laa-record-controlled-work.fullname" . }}-ccq:3000
           ports:
             - name: http
               containerPort: 8080

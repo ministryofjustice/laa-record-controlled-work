@@ -1,14 +1,24 @@
 import type { Request, Response } from "express";
 
+import { Forge } from "@ministryofjustice/hmpps-forge/core";
+import {
+  createExpressRouter,
+  nunjucksFunctions,
+} from "@ministryofjustice/hmpps-forge/express-nunjucks";
+import { govukComponents } from "@ministryofjustice/hmpps-forge/govuk-components";
+import { mojComponents } from "@ministryofjustice/hmpps-forge/moj-components";
 import compression from "compression";
 import express from "express";
 import session from "express-session";
-import morgan from "morgan";
 
+import { getApplications } from "#/api/client/schema/applications/applications.gen.js";
+import authRouter from "#/auth/auth.routes.js";
 import config from "#/config.js";
-import { initializeI18nextSync } from "#/lib/i18nLoader.js";
+import { autocomplete } from "#/journeys/components/autocomplete/autocomplete.component.js";
+import createApplication from "#/journeys/create-application/create-application.index.js";
+import evidence from "#/journeys/evidence/evidence.index.js";
+import yourCases from "#/journeys/your-cases/your-cases.index.js";
 import { createSession } from "#/lib/session.js";
-import { axiosMiddleware } from "#/middleware/apiMiddleware.js";
 import { requireAuth } from "#/middleware/requireAuth.js";
 import { setupConfig } from "#/middleware/setupConfigs.js";
 import { setupCsrf } from "#/middleware/setupCsrf.js";
@@ -19,8 +29,8 @@ import {
   createAuthLimiter,
   setupRateLimit,
 } from "#/middleware/setupRateLimit.js";
+import { setupRequestLogging } from "#/middleware/setupRequestLogging.js";
 import { standardMiddleware } from "#/middleware/standardMiddleware.js";
-import authRouter from "#/routes/auth.js";
 import healthRouter from "#/routes/health.js";
 import indexRouter from "#/routes/index.js";
 import testRouter from "#/routes/test.js";
@@ -36,17 +46,12 @@ const ENABLE_PLAYWRIGHT_TEST_SIGNIN =
  * @returns {Promise<import('express').Application>} The configured Express application
  */
 const createApp = async (): Promise<express.Application> => {
-  // Initialise i18next synchronously before setting up the app
-  initializeI18nextSync();
-
   const app = express();
 
   app.use("/", healthRouter);
 
   // Set up common middleware for handling cookies, body parsing, etc.
   standardMiddleware(app);
-
-  app.use(axiosMiddleware);
 
   // Response compression setup
   app.use(
@@ -72,8 +77,18 @@ const createApp = async (): Promise<express.Application> => {
   // Set up locale middleware for internationalization
   app.use(setupLocaleMiddleware);
 
-  // Set up Nunjucks as the template engine
-  setupNunjucks(app);
+  // Set up Nunjucks as the template engine and forge
+  const nunjucksEnv = setupNunjucks(app);
+  const forge = new Forge({});
+
+  forge
+    .registerGlobalComponents(govukComponents)
+    .registerGlobalComponents(mojComponents)
+    .registerGlobalComponents([autocomplete])
+    .registerGlobalFunctions(nunjucksFunctions)
+    .registerPackage(yourCases, { getApplications })
+    .registerPackage(createApplication)
+    .registerPackage(evidence);
 
   // Set up rate limiting
   setupRateLimit(app, config);
@@ -82,13 +97,7 @@ const createApp = async (): Promise<express.Application> => {
   setupConfig(app);
 
   // Set up request logging based on environment
-  if (process.env.NODE_ENV === "production") {
-    // Use combined format for production (more structured, less verbose)
-    app.use(morgan("combined"));
-  } else {
-    // Use dev format for development (colored, more readable)
-    app.use(morgan("dev"));
-  }
+  setupRequestLogging(app);
 
   // Setup express-session using redis
   app.use(session(await createSession(config)));
@@ -109,6 +118,8 @@ const createApp = async (): Promise<express.Application> => {
     const { default: livereload } = await import("connect-livereload");
     app.use(livereload());
   }
+
+  app.use("/", createExpressRouter(forge, { nunjucksEnv }));
 
   return app;
 };
