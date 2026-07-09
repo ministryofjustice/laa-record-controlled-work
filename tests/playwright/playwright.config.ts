@@ -6,6 +6,7 @@ export const ENTRA_TEST_CONFIG = {
   ENTRA_TENANT_ID: "test-tenant-id",
   ENTRA_AUTHORITY_BASE_URL: "https://login.microsoftonline.com/",
   ENTRA_REDIRECT_URI: "http://localhost:3001/auth/code/callback",
+  ENTRA_API_CLIENT_ID: "00000000-0000-0000-0000-000000000002",
 };
 
 /**
@@ -68,6 +69,7 @@ export default defineConfig({
       ENTRA_TENANT_ID: ENTRA_TEST_CONFIG.ENTRA_TENANT_ID,
       ENTRA_AUTHORITY_BASE_URL: ENTRA_TEST_CONFIG.ENTRA_AUTHORITY_BASE_URL,
       ENTRA_REDIRECT_URI: ENTRA_TEST_CONFIG.ENTRA_REDIRECT_URI,
+      ENTRA_API_CLIENT_ID: ENTRA_TEST_CONFIG.ENTRA_API_CLIENT_ID,
       REDIS_ENABLED: "false",
       // Configure Axios to ignore proxies
       // SLSA uses safe-chain which proxies package managers
