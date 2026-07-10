@@ -92,7 +92,6 @@ export class EntraService {
       return new EntraService(requestHostname, configuredMsalClient);
     }
 
-    // Pattern: create(hostname) - default client
     return new EntraService(requestHostname);
   }
 
