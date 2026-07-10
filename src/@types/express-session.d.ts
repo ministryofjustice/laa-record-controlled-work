@@ -12,7 +12,6 @@ declare module "express-session" {
     authCodeRequest?: AuthorizationCodeRequest;
     authCodeUrlRequest?: AuthorizationUrlRequest;
     authState?: string;
-    idToken?: string;
     isAuthenticated?: boolean;
     pkceCodes?: PKCECodes;
     returnTo?: string;

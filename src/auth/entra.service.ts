@@ -140,13 +140,11 @@ export class EntraService {
     try {
       const { accessToken, account, expiresOn, idToken }: AuthenticationResult =
         await this.msalClient.acquireTokenByCode(tokenRequest);
-      const tokenCache = this.msalClient.getTokenCache().serialize();
 
       return success({
         accessToken,
         account: account ?? undefined,
         idToken,
-        tokenCache,
         tokenExpiry: expiresOn?.getTime(),
       });
     } catch (error) {

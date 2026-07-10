@@ -66,8 +66,8 @@ export async function authCodeCallback(
         return;
       }
 
-      const { account, idToken } = result.value;
-      Object.assign(req.session, { account, idToken, isAuthenticated: true });
+      const { account } = result.value;
+      Object.assign(req.session, { account, isAuthenticated: true });
       res.redirect(returnTo ?? "/");
     });
   } catch (error) {

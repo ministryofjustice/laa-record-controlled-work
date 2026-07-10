@@ -207,37 +207,6 @@ describe("EntraService", () => {
           accessToken: ACCESS_TOKEN,
           expiresOn: TOKEN_EXPIRY,
         });
-      msalStub.getTokenCache = sinon
-        .stub()
-        .returns({ serialize: sinon.stub().returns("{}") });
-    });
-
-    it("returns tokenCache from the serialized MSAL cache", async () => {
-      const result = (await service.exchangeAuthCode(
-        AUTH_CODE,
-        authCodeRequest,
-      )) as Success<TokenExchangeResult>;
-      expect(result.value.tokenCache).to.equal("{}");
-    });
-
-    it("serializes the token cache after acquiring the token", async () => {
-      const serializeStub = sinon.stub().returns("{}");
-      (msalStub.getTokenCache as sinon.SinonStub).returns({
-        serialize: serializeStub,
-      });
-
-      await service.exchangeAuthCode(AUTH_CODE, authCodeRequest);
-
-      const acquireCallOrder = (msalStub.acquireTokenByCode as sinon.SinonStub)
-        .callCount;
-      const serializeCallOrder = serializeStub.callCount;
-      expect(acquireCallOrder).to.equal(1);
-      expect(serializeCallOrder).to.equal(1);
-      expect(
-        (msalStub.acquireTokenByCode as sinon.SinonStub).calledBefore(
-          serializeStub,
-        ),
-      ).to.be.true;
     });
 
     it("returns account and idToken", async () => {
@@ -317,11 +286,6 @@ describe("EntraService", () => {
     it("returns tokenExpiry as a Unix ms timestamp", async () => {
       const result = (await service.acquireTokenSilent(ACCOUNT as any)) as Success<TokenExchangeResult>;
       expect(result.value.tokenExpiry).to.equal(TOKEN_EXPIRY.getTime());
-    });
-
-    it("does not include tokenCache in the result (handled by ICachePlugin)", async () => {
-      const result = (await service.acquireTokenSilent(ACCOUNT as any)) as Success<TokenExchangeResult>;
-      expect(result.value.tokenCache).to.be.undefined;
     });
 
     it("passes the correct scopes to acquireTokenSilent", async () => {
@@ -496,17 +460,6 @@ describe("EntraService", () => {
       msalStub.acquireTokenByCode = sinon
         .stub()
         .resolves({ account: ACCOUNT, idToken: ID_TOKEN });
-      msalStub.getTokenCache = sinon
-        .stub()
-        .returns({ serialize: sinon.stub().returns("{}") });
-    });
-
-    it("returns tokenCache from the serialized MSAL cache", async () => {
-      const result = (await service.exchangeAuthCode(
-        AUTH_CODE,
-        authCodeRequest,
-      )) as Success<TokenExchangeResult>;
-      expect(result.value.tokenCache).to.equal("{}");
     });
 
     it("returns account and idToken", async () => {
