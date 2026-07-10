@@ -11,7 +11,6 @@ const optionalEnvSchema = z.object({
   CONTACT_PHONE: z.string().optional(),
   DEPARTMENT_NAME: z.string().optional(),
   DEPARTMENT_URL: z.url().optional(),
-  ENTRA_API_SCOPE: z.string().optional(),
   PORT: z.coerce.number().optional(),
   RATE_LIMIT_MAX: z.coerce.number().optional(),
   RATE_WINDOW_MS: z.coerce.number().optional(),

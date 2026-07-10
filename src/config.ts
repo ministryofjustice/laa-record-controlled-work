@@ -79,9 +79,6 @@ export default {
         "profile",
         "offline_access",
         `https://devlexternal.onmicrosoft.com/laa-record-controlled-work-api-uat`,
-
-        // TODO add api scope back in
-        // `api://${required.ENTRA_API_CLIENT_ID}/Applications.Read`,
       ],
     },
     authority: `${required.ENTRA_AUTHORITY_BASE_URL}${required.ENTRA_TENANT_ID}`,
