@@ -5186,7 +5186,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"knip@npm:^6.23.0":
+"knip@npm:^6.24.0":
   version: 6.24.0
   resolution: "knip@npm:6.24.0"
   dependencies:
@@ -5264,7 +5264,7 @@ __metadata:
     govuk-frontend: "npm:^6.3.0"
     helmet: "npm:^8.2.0"
     i18next: "npm:^26.3.4"
-    knip: "npm:^6.23.0"
+    knip: "npm:^6.24.0"
     mocha: "npm:^11.7.6"
     moment: "npm:^2.30.1"
     morgan: "npm:~1.11.0"
