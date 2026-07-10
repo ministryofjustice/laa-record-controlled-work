@@ -41,7 +41,6 @@ services:
       - ENTRA_CLIENT_ID
       - ENTRA_TENANT_ID
       - ENTRA_CLIENT_SECRET
-      - ENTRA_API_CLIENT_ID
     develop:
       watch:
         - action: sync

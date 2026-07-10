@@ -50,7 +50,6 @@ export interface CsrfConfig {
 
 export interface EntraConfig {
   api: {
-    clientId: string;
     scopes: string[];
   };
   authority: string;

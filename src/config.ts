@@ -74,11 +74,12 @@ export default {
 
   entra: {
     api: {
-      clientId: required.ENTRA_API_CLIENT_ID,
       scopes: [
         "openid",
         "profile",
         "offline_access",
+        `https://devlexternal.onmicrosoft.com/laa-record-controlled-work-api-uat`,
+
         // TODO add api scope back in
         // `api://${required.ENTRA_API_CLIENT_ID}/Applications.Read`,
       ],
