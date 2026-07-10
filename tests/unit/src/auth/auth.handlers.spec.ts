@@ -45,7 +45,6 @@ describe("Auth Handlers", () => {
       exchangeAuthCode: sinon.stub().resolves(success({
         idToken: "id-token",
         accessToken: "access-token",
-        tokenExpiry: Date.now() + 3600 * 1000,
         account: undefined,
       })),
     };

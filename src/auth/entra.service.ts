@@ -116,7 +116,6 @@ export class EntraService {
         accessToken: result.accessToken,
         account: result.account ?? undefined,
         idToken: result.idToken,
-        tokenExpiry: result.expiresOn?.getTime(),
       });
     } catch (error) {
       logger.error("Failed to silently acquire token", error);
@@ -137,14 +136,13 @@ export class EntraService {
     const tokenRequest = { ...authCodeRequest, code };
 
     try {
-      const { accessToken, account, expiresOn, idToken }: AuthenticationResult =
+      const { accessToken, account, idToken }: AuthenticationResult =
         await this.msalClient.acquireTokenByCode(tokenRequest);
 
       return success({
         accessToken,
         account: account ?? undefined,
         idToken,
-        tokenExpiry: expiresOn?.getTime(),
       });
     } catch (error) {
       logger.error("Failed to handle Entra auth redirect", error);

@@ -226,28 +226,6 @@ describe("EntraService", () => {
       expect(result.value.accessToken).to.equal(ACCESS_TOKEN);
     });
 
-    it("returns tokenExpiry as a Unix ms timestamp", async () => {
-      const result = (await service.exchangeAuthCode(
-        AUTH_CODE,
-        authCodeRequest,
-      )) as Success<TokenExchangeResult>;
-      expect(result.value.tokenExpiry).to.equal(TOKEN_EXPIRY.getTime());
-    });
-
-    it("returns undefined tokenExpiry when MSAL returns null expiresOn", async () => {
-      (msalStub.acquireTokenByCode as sinon.SinonStub).resolves({
-        account: ACCOUNT,
-        idToken: ID_TOKEN,
-        accessToken: ACCESS_TOKEN,
-        expiresOn: null,
-      });
-      const result = (await service.exchangeAuthCode(
-        AUTH_CODE,
-        authCodeRequest,
-      )) as Success<TokenExchangeResult>;
-      expect(result.value.tokenExpiry).to.be.undefined;
-    });
-
     it("returns a TokenAcquisitionError failure when MSAL throws", async () => {
       sinon.stub(console, "error");
 
@@ -281,11 +259,6 @@ describe("EntraService", () => {
       const result = (await service.acquireTokenSilent(ACCOUNT as any)) as Success<TokenExchangeResult>;
       expect(result.value.account).to.deep.equal(ACCOUNT);
       expect(result.value.idToken).to.equal(ID_TOKEN);
-    });
-
-    it("returns tokenExpiry as a Unix ms timestamp", async () => {
-      const result = (await service.acquireTokenSilent(ACCOUNT as any)) as Success<TokenExchangeResult>;
-      expect(result.value.tokenExpiry).to.equal(TOKEN_EXPIRY.getTime());
     });
 
     it("passes the correct scopes to acquireTokenSilent", async () => {
