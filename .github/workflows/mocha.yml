@@ -1,4 +1,4 @@
-name: Mocha Unit tests
+name: Mocha
 on:
   workflow_dispatch: # Allow manual triggering only
   workflow_call: # Allow this workflow to be called by other workflows
@@ -9,8 +9,8 @@ on:
         default: ''
 
 jobs:
-  mocha-unit-tests:
-    name: Mocha Unit Tests
+  unit-tests:
+    name: Unit
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -41,8 +41,8 @@ jobs:
           name: code-coverage-report
           path: coverage/
 
-  mocha-integration-tests:
-    name: Mocha Integration Tests
+  integration-tests:
+    name: Integration
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code

@@ -1,4 +1,4 @@
-name: Playwright Tests
+name: Playwright
 on:
   workflow_dispatch: # Allow manual triggering only
   workflow_call: # Allow this workflow to be called by other workflows
@@ -10,7 +10,7 @@ on:
 
 jobs:
   setup:
-    name: Setup & Build
+    name: Setup
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -35,7 +35,7 @@ jobs:
           overwrite: true
 
   playwright:
-    name: Playwright Tests
+    name: Tests
     needs: setup
     timeout-minutes: 60
     runs-on: ubuntu-latest
@@ -98,7 +98,7 @@ jobs:
         run: echo "::error::Playwright tests failed! Check the test report for details."
 
   accessibility:
-    name: Accessibility Tests
+    name: Accessibility
     needs: setup
     timeout-minutes: 30
     runs-on: ubuntu-latest

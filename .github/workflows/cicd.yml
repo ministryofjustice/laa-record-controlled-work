@@ -113,19 +113,19 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
   snyk-infra:
-    name: Snyk Infra Scan
+    name: Snyk
     uses: ./.github/workflows/snyk-infra.yml
     secrets: inherit
 
-  mocha-unit-tests:
-    name: Mocha Unit Tests
+  mocha-tests:
+    name: Tests
     needs: setup
     uses: ./.github/workflows/mocha.yml
     with:
       sha: ${{ github.event.pull_request.head.sha || github.sha }}
 
   playwright:
-    name: Playwright Tests
+    name: Playwright
     needs: setup
     uses: ./.github/workflows/playwright.yml
     with:
@@ -181,7 +181,7 @@ jobs:
       - code-security-audit
       - snyk
       - snyk-infra
-      - mocha-unit-tests
+      - mocha-tests
       - playwright
       - build-image
     steps:
@@ -203,6 +203,7 @@ jobs:
             Run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/attempts/${{ github.run_attempt }}
 
   deploy-uat:
+    name: Deploy
     if: github.event_name != 'merge_group' && !(github.event_name == 'pull_request' && github.actor == 'renovate[bot]')
     uses: ./.github/workflows/deploy-environment.yml
     with:
@@ -217,7 +218,7 @@ jobs:
       - code-security-audit
       - snyk
       - build-image
-      - mocha-unit-tests
+      - mocha-tests
       - playwright
       - snyk-infra
     secrets: inherit
