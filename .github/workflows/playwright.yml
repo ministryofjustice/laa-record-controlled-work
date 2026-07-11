@@ -19,7 +19,6 @@ jobs:
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
         with:
           ref: ${{ inputs.sha || github.sha }}
-          fetch-depth: 0
 
       - name: Setup Node and Dependencies
         uses: ./.github/actions/setup-node
@@ -33,7 +32,7 @@ jobs:
           name: build-artifacts
           path: public/
           retention-days: 1
-          overwrite: false
+          overwrite: true
 
   playwright:
     name: Playwright Tests
@@ -42,7 +41,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-    # Mark this job as required for PR checks
     outputs:
       status: ${{ job.status }}
     steps:
@@ -50,7 +48,6 @@ jobs:
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
         with:
           ref: ${{ inputs.sha || github.sha }}
-          fetch-depth: 0 # Fetch all history for proper change detection
 
       - name: Setup Node and Dependencies
         uses: ./.github/actions/setup-node
@@ -62,12 +59,14 @@ jobs:
           path: public/
 
       - name: Cache Playwright browsers
+        id: playwright-cache
         uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5
         with:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-chromium-${{ hashFiles('**/yarn.lock') }}
 
       - name: Install Playwright Chromium
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: yarn playwright install chromium --with-deps
 
       - name: Set env vars from values
@@ -112,7 +111,6 @@ jobs:
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
         with:
           ref: ${{ inputs.sha || github.sha }}
-          fetch-depth: 0
 
       - name: Setup Node and Dependencies
         uses: ./.github/actions/setup-node
@@ -124,12 +122,14 @@ jobs:
           path: public/
 
       - name: Cache Playwright browsers
+        id: playwright-cache
         uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5
         with:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-chromium-${{ hashFiles('**/yarn.lock') }}
 
       - name: Install Playwright Chromium
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: yarn playwright install chromium --with-deps
 
       - name: Set env vars from values

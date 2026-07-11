@@ -10,8 +10,21 @@ on:
   workflow_dispatch: # Allows manual triggering of the workflow
 
 jobs:
+  setup:
+    name: Install dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Setup Node and Dependencies
+        uses: ./.github/actions/setup-node
+
   code-linting:
     name: Code Linting
+    needs: setup
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -30,6 +43,7 @@ jobs:
 
   verify-api-code-generation:
     name: Verify API Code Generation
+    needs: setup
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -61,6 +75,7 @@ jobs:
 
   code-security-audit:
     name: Code Security Audit
+    needs: setup
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -104,12 +119,14 @@ jobs:
 
   mocha-unit-tests:
     name: Mocha Unit Tests
+    needs: setup
     uses: ./.github/workflows/mocha.yml
     with:
       sha: ${{ github.event.pull_request.head.sha || github.sha }}
 
   playwright:
     name: Playwright Tests
+    needs: setup
     uses: ./.github/workflows/playwright.yml
     with:
       sha: ${{ github.event.pull_request.head.sha || github.sha }}
