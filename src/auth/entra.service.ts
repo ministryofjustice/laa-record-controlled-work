@@ -13,7 +13,7 @@ import type {
   TokenExchangeResult,
 } from "#/auth/auth.types.js";
 
-import { authRequestDefaults, msalConfig } from "#/auth/auth.config.js";
+import { authRequestDefaults } from "#/auth/auth.config.js";
 import {
   MsalError,
   PkceGenerationError,
@@ -44,7 +44,15 @@ export class EntraService {
   ) {
     this.requestHostname = requestHostname;
     this.msalClient =
-      msalClient ?? new ConfidentialClientApplication(msalConfig);
+      msalClient ??
+      new ConfidentialClientApplication({
+        auth: {
+          authority: config.entra.authority,
+          clientId: config.entra.clientId,
+          clientSecret: config.entra.clientSecret,
+          knownAuthorities: [new URL(config.entra.authority).host],
+        },
+      });
   }
 
   /**
@@ -141,7 +149,7 @@ export class EntraService {
     // Validated against session.authState on callback before any token exchange.
     // Encoded as base64(JSON) so MSAL's parseRequestState can parse it without throwing invalid_state.
     const nonce = randomUUID();
-    const redirectHostname = new URL(authRequestDefaults.redirectUri).hostname;
+    const redirectHostname = new URL(config.entra.redirectUri).hostname;
     const isRelay = this.requestHostname !== redirectHostname;
 
     const authState = isRelay
@@ -156,7 +164,7 @@ export class EntraService {
       authCodeRequest: {
         code: "",
         codeVerifier: verifier,
-        redirectUri: authRequestDefaults.redirectUri,
+        redirectUri: config.entra.redirectUri,
         scopes: authRequestDefaults.scopes,
       } satisfies AuthorizationCodeRequest,
 
@@ -164,7 +172,7 @@ export class EntraService {
         codeChallenge: challenge,
         codeChallengeMethod: challengeMethod,
         prompt: authRequestDefaults.prompt,
-        redirectUri: authRequestDefaults.redirectUri,
+        redirectUri: config.entra.redirectUri,
         responseMode: authRequestDefaults.responseMode,
         scopes: authRequestDefaults.scopes,
         state: authState,

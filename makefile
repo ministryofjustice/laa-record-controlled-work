@@ -2,8 +2,6 @@ include docker-images.env
 export
 
 MOCHA    := ./node_modules/.bin/mocha
-TEST_DIR := tests/unit
-INTEGRATION_DIR := tests/integration
 
 
 .PHONY: install prek-install dev watch docker-up docker-down build api-generate lint lint-fix integration integration-watch e2e e2e-ui test-all coverage unit unit-watch
@@ -41,8 +39,8 @@ lint:
 lint-fix: 
 	yarn lint:fix
 
-integration:
-	yarn integration
+# integration:
+# 	yarn integration
 
 integration-watch:
 	yarn integration:watch
@@ -85,4 +83,22 @@ ifdef file
 	$(MOCHA) "$$MATCHES"
 else
 	yarn unit
+endif
+
+integration: 
+ifdef file
+	@MATCHES=$$(find tests/integration \( -path "*/$(file)" -o -path "*/$(file).spec.ts" \) 2>/dev/null); \
+	if [ -z "$$MATCHES" ]; then \
+		echo "Error: No test file found matching '$(file)' in tests/integration/"; \
+		exit 1; \
+	fi; \
+	COUNT=$$(echo "$$MATCHES" | wc -l | tr -d ' '); \
+	if [ "$$COUNT" -gt 1 ]; then \
+		echo "Error: Multiple files found for '$(file)', be more specific by including parent directory"; \
+		echo "$$MATCHES"; \
+		exit 1; \
+	fi; \
+	$(MOCHA) "$$MATCHES"
+else
+	yarn integration
 endif

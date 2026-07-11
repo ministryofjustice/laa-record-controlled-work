@@ -31,16 +31,7 @@ const createAppWithSessionStoreClientExposure = async (
   // Override config to point to testcontainers instances
   const idpPort = identityProviderContainer.getMappedPort(IDP_PORT);
   config.entra.authority = `https://localhost:${idpPort}/default`;
-  config.entra.redirectUri = "http://localhost/auth/code/callback";
-  // config.entra.cloudDiscoveryMetadata = JSON.stringify({
-  //   "tenant_discovery_endpoint": `https://localhost:${idpPort}/default/.well-known/openid-configuration`,
-  //   "api-version": "1.1",
-  //   "metadata": [{
-  //     "preferred_network": `localhost:${idpPort}`,
-  //     "preferred_cache": `localhost:${idpPort}`,
-  //     "aliases": [`localhost:${idpPort}`],
-  //   }],
-  // });
+  config.entra.redirectUri = "http://127.0.0.1/auth/code/callback";
   config.redis.enabled = true;
   config.redis.url = `redis://localhost:${redisStoreContainer.getMappedPort(REDIS_PORT)}`;
   process.env.PLAYWRIGHT_TEST_SIGNIN = "true";
@@ -123,21 +114,21 @@ describe("Auth Integration", () => {
     });
   });
 
-  describe("Get /landing", () => {
+  describe("Get /", () => {
     it("redirects unauthenicated user to /auth/signin", async () => {
-      const res = await unauthenticatedUser.get("/landing");
+      const res = await unauthenticatedUser.get("/");
       expect(res.status).to.equal(FOUND);
       expect(res.headers.location).to.equal("/auth/signin");
     });
 
     it("authenicated user lands on landing page", async () => {
-      const res = await authenticatedUser.get("/landing");
+      const res = await authenticatedUser.get("/");
       expect(res.status).to.equal(OK);
-      expect(res.text).to.include("Stub Landing Page");
+      expect(res.text).to.include("Landing Page");
     });
 
     it("authenicated user will store session data in redis", async () => {
-      await authenticatedUser.get("/landing");
+      await authenticatedUser.get("/");
       const keys = await appSessionRedisClient.keys("sess:*");
       const raw = await appSessionRedisClient.get(keys[0]);
       const session = JSON.parse(raw!) as SessionData;
@@ -173,12 +164,12 @@ describe("Auth Integration", () => {
       // Complete the OAuth2 callback by sending the code and state to callback endpoint
       const callbackRes = await unauthenticatedUser.get(pathname + search);
       expect(callbackRes.status).to.equal(FOUND);
-      expect(callbackRes.headers.location).to.equal("/landing");
+      expect(callbackRes.headers.location).to.equal("/");
 
       // Verify the user is now authenticated and can reach the landing page
-      const landingRes = await unauthenticatedUser.get("/landing");
+      const landingRes = await unauthenticatedUser.get("/");
       expect(landingRes.status).to.equal(OK);
-      expect(landingRes.text).to.include("Stub Landing Page");
+      expect(landingRes.text).to.include("Landing Page");
     });
   });
 });

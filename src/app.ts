@@ -34,10 +34,7 @@ import { standardMiddleware } from "#/middleware/standardMiddleware.js";
 import healthRouter from "#/routes/health.js";
 import indexRouter from "#/routes/index.js";
 import testRouter from "#/routes/test.js";
-
 const TRUST_FIRST_PROXY = 1;
-const ENABLE_PLAYWRIGHT_TEST_SIGNIN =
-  process.env.PLAYWRIGHT_TEST_SIGNIN === "true";
 
 /**
  * Creates and configures an Express application.
@@ -105,7 +102,10 @@ const createApp = async (): Promise<express.Application> => {
   setupCsrf(app);
 
   // Playwright-only route: sets an authenticated session without going through Entra.
-  if (ENABLE_PLAYWRIGHT_TEST_SIGNIN && process.env.NODE_ENV === "test") {
+  if (
+    process.env.PLAYWRIGHT_TEST_SIGNIN === "true" &&
+    process.env.NODE_ENV === "test"
+  ) {
     app.use("/test", testRouter);
   }
 
