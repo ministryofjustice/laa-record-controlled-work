@@ -21,8 +21,8 @@ import {
 } from "#/auth/auth.errors.js";
 import { createRelayState } from "#/auth/auth.relay.js";
 import config from "#/config.js";
-import { devError } from "#/lib/devLogger.js";
 import { type Either, failure, success } from "#/lib/either.js";
+import { logger } from "#/logger.js";
 
 /**
  * Handles Microsoft Entra ID (MSAL) authentication flows including
@@ -83,7 +83,7 @@ export class EntraService {
         tokenCache,
       });
     } catch (error) {
-      devError(`Failed to handle Entra auth redirect: ${String(error)}`);
+      logger.error("Failed to handle Entra auth redirect", error);
       return failure(TokenAcquisitionError.from(error));
     }
   }
@@ -102,7 +102,7 @@ export class EntraService {
         await this.cryptoProvider.generatePkceCodes();
       pkceCodes = { challenge, challengeMethod: "S256", verifier };
     } catch (error) {
-      devError(`Failed to generate PKCE codes: ${String(error)}`);
+      logger.error("Failed to generate PKCE codes", error);
       return failure(PkceGenerationError.from(error));
     }
 
@@ -113,7 +113,7 @@ export class EntraService {
       );
       return success({ authCodeUrl, ...prepared });
     } catch (error) {
-      devError(`Failed to generate Entra auth code URL: ${String(error)}`);
+      logger.error("Failed to generate Entra auth code URL", error);
       return failure(MsalError.from(error));
     }
   }
@@ -133,11 +133,9 @@ export class EntraService {
     const { challenge, challengeMethod, verifier } = pkceCodes;
 
     const validReturnTo =
-      returnTo?.startsWith("/") === true &&
-      !returnTo.startsWith("//") &&
-      returnTo !== "/"
+      returnTo?.startsWith("/") === true && !returnTo.startsWith("//")
         ? returnTo
-        : "/landing";
+        : "/";
 
     // Cryptographically random nonce used as the OAuth state parameter for CSRF protection.
     // Validated against session.authState on callback before any token exchange.

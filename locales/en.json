@@ -1,164 +1,286 @@
 {
   "common": {
-    "back": "Back",
-    "change": "Change",
-    "remove": "Remove",
-    "save": "Save",
-    "cancel": "Cancel",
+    "continue": "Continue",
+    "saveAndReturn": "Save and return later",
     "signOut": "Sign out",
     "yes": "Yes",
-    "no": "No",
-    "error": "Error",
-    "warning": "Warning",
-    "errorSummaryTitle": "There is a problem"
-  },
-  "navigation": {
-    "mainNav": {},
-    "footer": {
-      "accessibility": "Accessibility",
-      "cookiePolicy": "Cookies",
-      "privacyPolicy": "Privacy"
-    }
+    "no": "No"
   },
   "components": {
     "phaseBanner": {
       "feedbackText": "This is a new service. Help us improve it and ",
       "feedbackLinkTextHTML": "<a class='govuk-link' href='#'>give your feedback by email</a>."
-    },
-    "errorSummary": {
-      "title": "There is a problem"
     }
   },
   "pages": {
-    "home": {
-      "defaultHeading": "Default page template",
-      "defaultTemplate": "This is a default page template.",
-      "mountainsOfTheWorld": "Mountains of the world",
-      "rowName": {
-        "label": "Name",
-        "aconcagua": "Aconcagua",
-        "denali": "Denali",
-        "elbrus": "Elbrus",
-        "everest": "Everest",
-        "kilimanjaro": "Kilimanjaro",
-        "puncakJaya": "Puncak Jaya",
-        "vinson": "Vinson"
-      },
-      "rowElevation": {
-        "label": "Elevation",
-        "6961meters": "6,961 meters",
-        "6194meters": "6,194 meters",
-        "5642meters": "5,642 meters",
-        "8850meters": "8,850 meters",
-        "5895meters": "5,895 meters",
-        "4884meters": "4,884 meters",
-        "4897meters": "4,897 meters"
-      },
-      "rowContinent": {
-        "label": "Continent",
-        "southAmerica": "South America",
-        "northAmerica": "North America",
-        "europe": "Europe",
-        "asia": "Asia",
-        "africa": "Africa",
-        "australia": "Australia",
-        "antarctica": "Antarctica"
-      },
-      "rowFirstSummit": {
-        "label": "First summit",
-        "1897": "1897",
-        "1913": "1913",
-        "1874": "1874",
-        "1953": "1953",
-        "1889": "1889",
-        "1962": "1962",
-        "1966": "1966"
-      }
+    "index": {
+      "defaultHeading": "Landing Page"
     },
     "error": {
       "pageTitle": "Sorry, there is a problem with the service – {SERVICE_NAME} – GOV.UK"
+    },
+    "yourCases": {
+      "pageTitle": "Your cases",
+      "heading": "Your cases",
+      "noCases": {
+        "heading": "You have no cases"
+      },
+      "createCaseButton": "Record a new case",
+      "tabs": {
+        "inProgress": "In progress",
+        "recorded": "Recorded"
+      },
+      "table": {
+        "emptyMessage": "You have no cases in progress",
+        "columns": {
+          "referenceNumber": "Reference number",
+          "clientName": "Client name",
+          "lastUpdated": "Last updated"
+        }
+      }
     }
   },
-  "forms": {
-    "name": {
-      "label": "Full name",
-      "title": "Change your name",
-      "pageTitle": "Change your name – {serviceName} – GOV.UK",
-      "validationError": {
-        "notEmpty": "Enter your full name",
-        "notChanged": "Change your full name, or select 'Cancel'"
-      }
-    },
-    "address": {
-      "label": "Address",
-      "title": "Address",
-      "validationError": {
-        "notEmpty": "Enter your address"
-      }
-    },
-    "contactPreference": {
-      "label": "Contact preference",
-      "title": "How would you prefer to be contacted?",
-      "validationError": {
-        "notEmpty": "Select how you would prefer to be contacted",
-        "invalidOption": "Select a valid contact preference",
-        "notChanged": "Change your contact preference, or select 'Cancel'"
-      }
-    },
-    "communicationMethods": {
-      "label": "Communication methods",
-      "title": "How would you like us to contact you?",
-      "hint": "Select all that apply",
-      "validationError": {
-        "notEmpty": "Select at least one communication method"
-      }
-    },
-    "priority": {
-      "label": "Priority level",
-      "title": "Priority level",
-      "validationError": {
-        "notEmpty": "Select a priority level",
-        "invalidOption": "Select a valid priority level",
-        "notChanged": "Change the priority level, or select 'Cancel'"
-      }
-    },
-    "dateOfBirth": {
-      "label": "Date of birth",
-      "title": "Date of birth",
-      "hint": "For example, 27 3 1986",
-      "validationError": {
-        "day": {
-          "notEmpty": "Date of birth must include a day",
-          "isInt": "Day must be a number between 1 and 31"
+  "journeys": {
+    "createApplication": {
+      "caption": "Client and case details",
+      "ecf": {
+        "title": "Does this case require Exceptional Case Funding?",
+        "validation": {
+          "required": "Please select an option"
+        }
+      },
+      "legalAidBefore": {
+        "title": "Has your client accessed legal aid before?",
+        "radioButton": {
+          "yesSameMatter": "Yes, about the same matter",
+          "yesDifferentMatter": "Yes, about a different matter"
         },
-        "month": {
-          "notEmpty": "Date of birth must include a month",
-          "isInt": "Month must be a number between 1 and 12"
+        "validation": {
+          "required": "Please select an option"
+        }
+      },
+      "legalAidLast6Months": {
+        "title": "Did your client get legal help for this matter in the last 6 months?",
+        "reasonForYes": {
+          "hint": "Explain the reason for creating a new case for the same matter"
         },
-        "year": {
-          "notEmpty": "Date of birth must include a year",
-          "isLength": "Year must be 4 numbers",
-          "isInt": "Year must be a valid number"
+        "validation": {
+          "required": "Select if your client got legal help for this matter in the last 6 months",
+          "reasonRequired": "Enter the reason you're creating a new case for the same matter"
+        }
+      },
+      "clientDetails": {
+        "title": "Your client's details",
+        "firstName": {
+          "label": "First name",
+          "validation": {
+            "required": "Enter your client's first name"
+          }
         },
-        "validDate": "Enter a real date of birth"
-      }
-    },
-    "clientDetails": {
-      "name": {
-        "label": "Name",
-        "title": "Client name",
-        "pageTitle": "Client name – {caseReference} – {serviceName} – GOV.UK",
-        "validationError": {
-          "notEmpty": "Enter the client name",
-          "notChanged": "Change the client name, or select 'Cancel'"
+        "lastName": {
+          "label": "Last name",
+          "validation": {
+            "required": "Enter your client's last name"
+          }
+        },
+        "dateOfBirth": {
+          "label": "Date of birth",
+          "hint": "For example, 31 3 1980",
+          "validation": {
+            "empty": "Enter your client's date of birth",
+            "invalid": "Date of birth must be a real date",
+            "missingDay": "Date of birth must include a day",
+            "missingMonth": "Date of birth must include a month",
+            "missingYear": "Date of birth must include a year",
+            "mustBePast": "Date of birth must be in the past"
+          }
+        }
+      },
+      "niNumber": {
+        "title": "Does your client have a National Insurance number?",
+        "label": "Enter your client's National Insurance number",
+        "validation": {
+          "required": "Enter your client's National Insurance number",
+          "invalid": "Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C",
+          "hasNIRequired": "Select if your client has a National Insurance number"
+        }
+      },
+      "haveAHomeAddress": {
+        "title": "Does your client have a home address?",
+        "hint": "The home address is the place that they normally live in, and sometimes called the main dwelling.",
+        "radioButton": {
+          "no": "No, they have no fixed address"
+        },
+        "validation": {
+          "required": "Select if your client has a home address"
+        }
+      },
+      "enterAddressManually": {
+        "title": "Enter your client's home address",
+        "addressLine1": {
+          "label": "Address line 1",
+          "validation": {
+            "required": "Enter address line 1, typically the building and street"
+          }
+        },
+        "addressLine2": {
+          "label": "Address line 2 (optional)"
+        },
+        "townOrCity": {
+          "label": "Town or city",
+          "validation": {
+            "required": "Enter town or city"
+          }
+        },
+        "county": {
+          "label": "County (optional)"
+        },
+        "postcode": {
+          "label": "Postcode",
+          "validation": {
+            "required": "Enter postcode"
+          }
+        },
+        "nonUkAddress": "The address is not in the UK"
+      },
+      "enterOverseasAddress": {
+        "title": "Enter your client's overseas home address",
+        "country": {
+          "label": "Country",
+          "validation": {
+            "required": "Enter country"
+          },
+          "clearButton": "Clear"
+        },
+        "address": {
+          "title": "Address",
+          "line1": {
+            "label": "Address line 1",
+            "validation": {
+              "required": "Enter address line 1, typically the building and street"
+            }
+          },
+          "line2": {
+            "label": "Address line 2 (optional)"
+          },
+          "line3": {
+            "label": "Address line 3 (optional)"
+          },
+          "line4": {
+            "label": "Address line 4 (optional)"
+          }
+        }
+      },
+      "checkAnswers": {
+        "title": "Check your answers",
+        "answerLabels": {
+          "ecf": "ECF",
+          "legalAidBefore": "Accessed legal aid before",
+          "legalAidLast6Months": "Did your client get legal help for this matter in the last 6 months?",
+          "legalAidLast6MonthsReasonForYes": "Reason for new application for same matter",
+          "firstName": "First name",
+          "lastName": "Last name",
+          "dateOfBirth": "Date of birth",
+          "niNumber": "National Insurance number",
+          "address": "Address"
+        },
+        "changeLink": {
+          "change": "Change"
+        },
+        "submitButton": {
+          "submit": "Save and continue"
+        }
+      },
+      "taskList": {
+        "clientDetails": {
+          "title": "About your client",
+          "taskItem": {
+            "label": "Client details"
+          }
+        },
+        "meansAssessment": {
+          "title": "Means assessment",
+          "taskItem": {
+            "label": "Income and capital"
+          }
+        },
+        "EvidenceAndDeclaration": {
+          "title": "Evidence and declarations",
+          "taskItem": {
+            "evidence": {
+              "label": "Evidence"
+            },
+            "declaration": {
+              "label": "Client declaration"
+            }
+          }
+        },
+        "status": {
+          "cannotStart": "Cannot start yet",
+          "incomplete": "Incomplete",
+          "completed": "Completed"
         }
       }
     },
-    "home": {
-      "validationError": {}
+    "evidence": {
+      "caption": "Evidence",
+      "doYouHaveEvidence": {
+        "title": "Do you have evidence of your client's financial eligibility?",
+        "validation": {
+          "required": "Please select an option to continue"
+        }
+      },
+      "reasonForNoEvidence": {
+        "title": "What's the reason for not having evidence?",
+        "options": {
+          "notPossibleBeforeStart": "It's not possible to get it before starting the work",
+          "adviceOverPhone": "Advice is being given over the phone before the case is signed",
+          "personalCircumstances": "The personal circumstances of the client make it not possible to get evidence at any point in the case"
+        },
+        "moreDetails": {
+          "label": "Give more details"
+        },
+        "validation": {
+          "required": "You must select a reason for not having evidence",
+          "moreDetailsRequired": "You must provide details for not having evidence"
+        }
+      },
+      "evidenceOfIncome": {
+        "title": "Do you have evidence of your client's income?",
+        "hint": "You can use the same piece of evidence across different categories. Select all that apply.",
+        "groupsOfEvidence": {
+          "employedPAYE": "Employed (PAYE) income",
+          "selfEmployed": "Self-employed income",
+          "benefitsInKind": "Benefits in Kind",
+          "otherIncome": "Other income",
+          "stateBenefits": "State benefits (including passporting benefits)",
+          "asylumSupport": "Asylum support",
+          "taxCredits": "Tax credits"
+        },
+        "evidenceTypes": {
+          "wageSlips": "Wage slips",
+          "completeFinancialAccounts": "Complete financial accounts",
+          "selfAssessmentTaxReturn": "Self Assessment tax return",
+          "cashBook": "Cash book",
+          "p11dTaxForm": "P11D tax form",
+          "evidenceOfRentalIncome": "Evidence of rental income",
+          "evidenceOfTrustIncome": "Evidence of trust income",
+          "letterFromFriendOrFamily": "Letter from friend or family providing support",
+          "pensionDocuments": "Pension documents",
+          "other": "Other",
+          "bankStatements": "Bank statements",
+          "latestBenefitChangeLetter": "Latest letter showing change in benefit amount",
+          "passportingBenefitLetter": "Letter from the paying agency that shows the client is receiving the passporting benefit",
+          "originalNotificationLetter": "Original notification letter",
+          "studentLoanLetter": "Student loan letter",
+          "asylumSupportLetter": "Letter from asylum support or the local authority that shows the client is receiving support",
+          "latestTaxCreditAwardNotice": "Latest tax credit award notice",
+          "otherRecentHMRCLetter": "Other recent HMRC letter confirming the amount received"
+        },
+        "validation": {
+          "required": " You must select an income evidence to continue"
+        }
+      }
     }
-  },
-  "accessibility": {
-    "visuallyHiddenText": {}
   }
 }

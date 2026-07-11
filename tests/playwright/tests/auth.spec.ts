@@ -14,7 +14,7 @@ test("unauthenticated user visiting landing page is redirected to microsoft entr
     (resp) => resp.url().endsWith("/auth/signin") && resp.status() === 302,
   );
 
-  await page.goto("/landing");
+  await page.goto("/");
   await signinRedirect;
 
   await expect(page).toHaveURL(ENTRA_URL_PATTERN);
@@ -26,7 +26,7 @@ test.describe("GET /auth/signout", () => {
       (resp) => resp.url().endsWith("/auth/signout") && resp.status() === 302,
     );
 
-    await page.goto("/landing");
+    await page.goto("/");
     await page.getByRole("link", { name: "Sign out" }).click();
     await signoutRedirect;
 

@@ -22,3 +22,8 @@
     </div>
   </div>
 {% endblock %}
+
+{% block bodyEnd %}
+  {{ super() }}
+  <script type="module" nonce="{{ cspNonce }}" src="/js/{{getAsset('forge-components','min.js')}}"></script>
+{% endblock %}

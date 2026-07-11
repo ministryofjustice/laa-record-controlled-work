@@ -1,0 +1,654 @@
+[
+  {
+    "code": "AF",
+    "name": "Afghanistan",
+    "officialName": "The Islamic Republic of Afghanistan"
+  },
+  {
+    "code": "AL",
+    "name": "Albania",
+    "officialName": "The Republic of Albania"
+  },
+  {
+    "code": "DZ",
+    "name": "Algeria",
+    "officialName": "The People's Democratic Republic of Algeria"
+  },
+  {
+    "code": "AD",
+    "name": "Andorra",
+    "officialName": "The Principality of Andorra"
+  },
+  { "code": "AO", "name": "Angola", "officialName": "The Republic of Angola" },
+  {
+    "code": "AG",
+    "name": "Antigua and Barbuda",
+    "officialName": "Antigua and Barbuda"
+  },
+  {
+    "code": "AR",
+    "name": "Argentina",
+    "officialName": "The Argentine Republic"
+  },
+  {
+    "code": "AM",
+    "name": "Armenia",
+    "officialName": "The Republic of Armenia"
+  },
+  {
+    "code": "AU",
+    "name": "Australia",
+    "officialName": "The Commonwealth of Australia"
+  },
+  {
+    "code": "AT",
+    "name": "Austria",
+    "officialName": "The Republic of Austria"
+  },
+  {
+    "code": "AZ",
+    "name": "Azerbaijan",
+    "officialName": "The Republic of Azerbaijan"
+  },
+  { "code": "BH", "name": "Bahrain", "officialName": "The Kingdom of Bahrain" },
+  {
+    "code": "BD",
+    "name": "Bangladesh",
+    "officialName": "The People's Republic of Bangladesh"
+  },
+  { "code": "BB", "name": "Barbados", "officialName": "Barbados" },
+  {
+    "code": "BY",
+    "name": "Belarus",
+    "officialName": "The Republic of Belarus"
+  },
+  { "code": "BE", "name": "Belgium", "officialName": "The Kingdom of Belgium" },
+  { "code": "BZ", "name": "Belize", "officialName": "Belize" },
+  { "code": "BJ", "name": "Benin", "officialName": "The Republic of Benin" },
+  { "code": "BT", "name": "Bhutan", "officialName": "The Kingdom of Bhutan" },
+  {
+    "code": "BO",
+    "name": "Bolivia",
+    "officialName": "The Plurinational State of Bolivia"
+  },
+  {
+    "code": "BA",
+    "name": "Bosnia and Herzegovina",
+    "officialName": "Bosnia and Herzegovina"
+  },
+  {
+    "code": "BW",
+    "name": "Botswana",
+    "officialName": "The Republic of Botswana"
+  },
+  {
+    "code": "BR",
+    "name": "Brazil",
+    "officialName": "The Federative Republic of Brazil"
+  },
+  { "code": "BN", "name": "Brunei", "officialName": "Brunei Darussalam" },
+  {
+    "code": "BG",
+    "name": "Bulgaria",
+    "officialName": "The Republic of Bulgaria"
+  },
+  { "code": "BF", "name": "Burkina Faso", "officialName": "Burkina Faso" },
+  {
+    "code": "BI",
+    "name": "Burundi",
+    "officialName": "The Republic of Burundi"
+  },
+  {
+    "code": "KH",
+    "name": "Cambodia",
+    "officialName": "The Kingdom of Cambodia"
+  },
+  {
+    "code": "CM",
+    "name": "Cameroon",
+    "officialName": "The Republic of Cameroon"
+  },
+  { "code": "CA", "name": "Canada", "officialName": "Canada" },
+  {
+    "code": "CV",
+    "name": "Cape Verde",
+    "officialName": "The Republic of Cabo Verde"
+  },
+  {
+    "code": "CF",
+    "name": "Central African Republic",
+    "officialName": "The Central African Republic"
+  },
+  { "code": "TD", "name": "Chad", "officialName": "The Republic of Chad" },
+  { "code": "CL", "name": "Chile", "officialName": "The Republic of Chile" },
+  {
+    "code": "CN",
+    "name": "China",
+    "officialName": "The People's Republic of China"
+  },
+  {
+    "code": "CO",
+    "name": "Colombia",
+    "officialName": "The Republic of Colombia"
+  },
+  {
+    "code": "KM",
+    "name": "Comoros",
+    "officialName": "The Union of the Comoros"
+  },
+  {
+    "code": "CG",
+    "name": "Congo",
+    "officialName": "The Republic of the Congo"
+  },
+  {
+    "code": "CD",
+    "name": "Congo (Democratic Republic)",
+    "officialName": "The Democratic Republic of the Congo"
+  },
+  {
+    "code": "CR",
+    "name": "Costa Rica",
+    "officialName": "The Republic of Costa Rica"
+  },
+  {
+    "code": "HR",
+    "name": "Croatia",
+    "officialName": "The Republic of Croatia"
+  },
+  { "code": "CU", "name": "Cuba", "officialName": "The Republic of Cuba" },
+  { "code": "CY", "name": "Cyprus", "officialName": "The Republic of Cyprus" },
+  { "code": "CZ", "name": "Czechia", "officialName": "The Czech Republic" },
+  { "code": "DK", "name": "Denmark", "officialName": "The Kingdom of Denmark" },
+  {
+    "code": "DJ",
+    "name": "Djibouti",
+    "officialName": "The Republic of Djibouti"
+  },
+  {
+    "code": "DM",
+    "name": "Dominica",
+    "officialName": "The Commonwealth of Dominica"
+  },
+  {
+    "code": "DO",
+    "name": "Dominican Republic",
+    "officialName": "The Dominican Republic"
+  },
+  {
+    "code": "TL",
+    "name": "East Timor",
+    "officialName": "The Democratic Republic of Timor-Leste"
+  },
+  {
+    "code": "EC",
+    "name": "Ecuador",
+    "officialName": "The Republic of Ecuador"
+  },
+  {
+    "code": "EG",
+    "name": "Egypt",
+    "officialName": "The Arab Republic of Egypt"
+  },
+  {
+    "code": "SV",
+    "name": "El Salvador",
+    "officialName": "The Republic of El Salvador"
+  },
+  {
+    "code": "GQ",
+    "name": "Equatorial Guinea",
+    "officialName": "The Republic of Equatorial Guinea"
+  },
+  { "code": "ER", "name": "Eritrea", "officialName": "The State of Eritrea" },
+  {
+    "code": "EE",
+    "name": "Estonia",
+    "officialName": "The Republic of Estonia"
+  },
+  { "code": "SZ", "name": "Eswatini", "officialName": "Kingdom of Eswatini" },
+  {
+    "code": "ET",
+    "name": "Ethiopia",
+    "officialName": "The Federal Democratic Republic of Ethiopia"
+  },
+  { "code": "FJ", "name": "Fiji", "officialName": "The Republic of Fiji" },
+  {
+    "code": "FI",
+    "name": "Finland",
+    "officialName": "The Republic of Finland"
+  },
+  { "code": "FR", "name": "France", "officialName": "The French Republic" },
+  { "code": "GA", "name": "Gabon", "officialName": "The Gabonese Republic" },
+  { "code": "GE", "name": "Georgia", "officialName": "Georgia" },
+  {
+    "code": "DE",
+    "name": "Germany",
+    "officialName": "The Federal Republic of Germany"
+  },
+  { "code": "GH", "name": "Ghana", "officialName": "The Republic of Ghana" },
+  { "code": "GR", "name": "Greece", "officialName": "The Hellenic Republic" },
+  { "code": "GD", "name": "Grenada", "officialName": "Grenada" },
+  {
+    "code": "GT",
+    "name": "Guatemala",
+    "officialName": "The Republic of Guatemala"
+  },
+  { "code": "GN", "name": "Guinea", "officialName": "The Republic of Guinea" },
+  {
+    "code": "GW",
+    "name": "Guinea-Bissau",
+    "officialName": "The Republic of Guinea-Bissau"
+  },
+  {
+    "code": "GY",
+    "name": "Guyana",
+    "officialName": "The Co-operative Republic of Guyana"
+  },
+  { "code": "HT", "name": "Haiti", "officialName": "The Republic of Haiti" },
+  {
+    "code": "HN",
+    "name": "Honduras",
+    "officialName": "The Republic of Honduras"
+  },
+  { "code": "HU", "name": "Hungary", "officialName": "Hungary" },
+  { "code": "IS", "name": "Iceland", "officialName": "Iceland" },
+  { "code": "IN", "name": "India", "officialName": "The Republic of India" },
+  {
+    "code": "ID",
+    "name": "Indonesia",
+    "officialName": "The Republic of Indonesia"
+  },
+  {
+    "code": "IR",
+    "name": "Iran",
+    "officialName": "The Islamic Republic of Iran"
+  },
+  { "code": "IQ", "name": "Iraq", "officialName": "The Republic of Iraq" },
+  { "code": "IE", "name": "Ireland", "officialName": "Ireland" },
+  { "code": "IL", "name": "Israel", "officialName": "The State of Israel" },
+  { "code": "IT", "name": "Italy", "officialName": "The Italian Republic" },
+  {
+    "code": "CI",
+    "name": "Ivory Coast",
+    "officialName": "The Republic of Côte D'Ivoire"
+  },
+  { "code": "JM", "name": "Jamaica", "officialName": "Jamaica" },
+  { "code": "JP", "name": "Japan", "officialName": "Japan" },
+  {
+    "code": "JO",
+    "name": "Jordan",
+    "officialName": "The Hashemite Kingdom of Jordan"
+  },
+  {
+    "code": "KZ",
+    "name": "Kazakhstan",
+    "officialName": "The Republic of Kazakhstan"
+  },
+  { "code": "KE", "name": "Kenya", "officialName": "The Republic of Kenya" },
+  {
+    "code": "KI",
+    "name": "Kiribati",
+    "officialName": "The Republic of Kiribati"
+  },
+  { "code": "XK", "name": "Kosovo", "officialName": "The Republic of Kosovo" },
+  { "code": "KW", "name": "Kuwait", "officialName": "The State of Kuwait" },
+  { "code": "KG", "name": "Kyrgyzstan", "officialName": "The Kyrgyz Republic" },
+  {
+    "code": "LA",
+    "name": "Laos",
+    "officialName": "The Lao People's Democratic Republic"
+  },
+  { "code": "LV", "name": "Latvia", "officialName": "The Republic of Latvia" },
+  { "code": "LB", "name": "Lebanon", "officialName": "The Lebanese Republic" },
+  { "code": "LS", "name": "Lesotho", "officialName": "The Kingdom of Lesotho" },
+  {
+    "code": "LR",
+    "name": "Liberia",
+    "officialName": "The Republic of Liberia"
+  },
+  { "code": "LY", "name": "Libya", "officialName": "State of Libya" },
+  {
+    "code": "LI",
+    "name": "Liechtenstein",
+    "officialName": "The Principality of Liechtenstein"
+  },
+  {
+    "code": "LT",
+    "name": "Lithuania",
+    "officialName": "The Republic of Lithuania"
+  },
+  {
+    "code": "LU",
+    "name": "Luxembourg",
+    "officialName": "The Grand Duchy of Luxembourg"
+  },
+  {
+    "code": "MG",
+    "name": "Madagascar",
+    "officialName": "The Republic of Madagascar"
+  },
+  { "code": "MW", "name": "Malawi", "officialName": "The Republic of Malawi" },
+  { "code": "MY", "name": "Malaysia", "officialName": "Malaysia" },
+  {
+    "code": "MV",
+    "name": "Maldives",
+    "officialName": "The Republic of Maldives"
+  },
+  { "code": "ML", "name": "Mali", "officialName": "The Republic of Mali" },
+  { "code": "MT", "name": "Malta", "officialName": "The Republic of Malta" },
+  {
+    "code": "MH",
+    "name": "Marshall Islands",
+    "officialName": "The Republic of the Marshall Islands"
+  },
+  {
+    "code": "MR",
+    "name": "Mauritania",
+    "officialName": "The Islamic Republic of Mauritania"
+  },
+  {
+    "code": "MU",
+    "name": "Mauritius",
+    "officialName": "The Republic of Mauritius"
+  },
+  {
+    "code": "MX",
+    "name": "Mexico",
+    "officialName": "The United Mexican States"
+  },
+  {
+    "code": "FM",
+    "name": "Federated States of Micronesia",
+    "officialName": "Federated States of Micronesia"
+  },
+  {
+    "code": "MD",
+    "name": "Moldova",
+    "officialName": "The Republic of Moldova"
+  },
+  {
+    "code": "MC",
+    "name": "Monaco",
+    "officialName": "The Principality of Monaco"
+  },
+  { "code": "MN", "name": "Mongolia", "officialName": "Mongolia" },
+  { "code": "ME", "name": "Montenegro", "officialName": "Montenegro" },
+  { "code": "MA", "name": "Morocco", "officialName": "The Kingdom of Morocco" },
+  {
+    "code": "MZ",
+    "name": "Mozambique",
+    "officialName": "The Republic of Mozambique"
+  },
+  {
+    "code": "MM",
+    "name": "Myanmar (Burma)",
+    "officialName": "The Republic of the Union of Myanmar"
+  },
+  {
+    "code": "NA",
+    "name": "Namibia",
+    "officialName": "The Republic of Namibia"
+  },
+  { "code": "NR", "name": "Nauru", "officialName": "The Republic of Nauru" },
+  { "code": "NP", "name": "Nepal", "officialName": "Nepal" },
+  {
+    "code": "NL",
+    "name": "Netherlands",
+    "officialName": "The Kingdom of the Netherlands"
+  },
+  { "code": "NZ", "name": "New Zealand", "officialName": "New Zealand" },
+  {
+    "code": "NI",
+    "name": "Nicaragua",
+    "officialName": "The Republic of Nicaragua"
+  },
+  { "code": "NE", "name": "Niger", "officialName": "The Republic of Niger" },
+  {
+    "code": "NG",
+    "name": "Nigeria",
+    "officialName": "The Federal Republic of Nigeria"
+  },
+  {
+    "code": "KP",
+    "name": "North Korea",
+    "officialName": "The Democratic People's Republic of Korea"
+  },
+  {
+    "code": "MK",
+    "name": "North Macedonia",
+    "officialName": "Republic of North Macedonia"
+  },
+  { "code": "NO", "name": "Norway", "officialName": "The Kingdom of Norway" },
+  { "code": "OM", "name": "Oman", "officialName": "The Sultanate of Oman" },
+  {
+    "code": "PK",
+    "name": "Pakistan",
+    "officialName": "The Islamic Republic of Pakistan"
+  },
+  { "code": "PW", "name": "Palau", "officialName": "The Republic of Palau" },
+  { "code": "PS", "name": "Palestine", "officialName": "State of Palestine" },
+  { "code": "PA", "name": "Panama", "officialName": "The Republic of Panama" },
+  {
+    "code": "PG",
+    "name": "Papua New Guinea",
+    "officialName": "The Independent State of Papua New Guinea"
+  },
+  {
+    "code": "PY",
+    "name": "Paraguay",
+    "officialName": "The Republic of Paraguay"
+  },
+  { "code": "PE", "name": "Peru", "officialName": "The Republic of Peru" },
+  {
+    "code": "PH",
+    "name": "Philippines",
+    "officialName": "The Republic of the Philippines"
+  },
+  { "code": "PL", "name": "Poland", "officialName": "The Republic of Poland" },
+  {
+    "code": "PT",
+    "name": "Portugal",
+    "officialName": "The Portuguese Republic"
+  },
+  { "code": "QA", "name": "Qatar", "officialName": "The State of Qatar" },
+  { "code": "RO", "name": "Romania", "officialName": "Romania" },
+  { "code": "RU", "name": "Russia", "officialName": "The Russian Federation" },
+  { "code": "RW", "name": "Rwanda", "officialName": "The Republic of Rwanda" },
+  {
+    "code": "KN",
+    "name": "St Kitts and Nevis",
+    "officialName": "The Federation of Saint Christopher and Nevis"
+  },
+  { "code": "LC", "name": "St Lucia", "officialName": "Saint Lucia" },
+  {
+    "code": "VC",
+    "name": "St Vincent",
+    "officialName": "Saint Vincent and the Grenadines"
+  },
+  {
+    "code": "WS",
+    "name": "Samoa",
+    "officialName": "The Independent State of Samoa"
+  },
+  {
+    "code": "SM",
+    "name": "San Marino",
+    "officialName": "The Republic of San Marino"
+  },
+  {
+    "code": "ST",
+    "name": "Sao Tome and Principe",
+    "officialName": "The Democratic Republic of Sao Tome and Principe"
+  },
+  {
+    "code": "SA",
+    "name": "Saudi Arabia",
+    "officialName": "The Kingdom of Saudi Arabia"
+  },
+  {
+    "code": "SN",
+    "name": "Senegal",
+    "officialName": "The Republic of Senegal"
+  },
+  { "code": "RS", "name": "Serbia", "officialName": "The Republic of Serbia" },
+  {
+    "code": "SC",
+    "name": "Seychelles",
+    "officialName": "The Republic of Seychelles"
+  },
+  {
+    "code": "SL",
+    "name": "Sierra Leone",
+    "officialName": "The Republic of Sierra Leone"
+  },
+  {
+    "code": "SG",
+    "name": "Singapore",
+    "officialName": "The Republic of Singapore"
+  },
+  { "code": "SK", "name": "Slovakia", "officialName": "The Slovak Republic" },
+  {
+    "code": "SI",
+    "name": "Slovenia",
+    "officialName": "The Republic of Slovenia"
+  },
+  {
+    "code": "SB",
+    "name": "Solomon Islands",
+    "officialName": "Solomon Islands"
+  },
+  {
+    "code": "SO",
+    "name": "Somalia",
+    "officialName": "Federal Republic of Somalia"
+  },
+  {
+    "code": "ZA",
+    "name": "South Africa",
+    "officialName": "The Republic of South Africa"
+  },
+  {
+    "code": "KR",
+    "name": "South Korea",
+    "officialName": "The Republic of Korea"
+  },
+  {
+    "code": "SS",
+    "name": "South Sudan",
+    "officialName": "The Republic of South Sudan"
+  },
+  { "code": "ES", "name": "Spain", "officialName": "The Kingdom of Spain" },
+  {
+    "code": "LK",
+    "name": "Sri Lanka",
+    "officialName": "The Democratic Socialist Republic of Sri Lanka"
+  },
+  {
+    "code": "SD",
+    "name": "Sudan",
+    "officialName": "The Republic of the Sudan"
+  },
+  {
+    "code": "SR",
+    "name": "Suriname",
+    "officialName": "The Republic of Suriname"
+  },
+  { "code": "SE", "name": "Sweden", "officialName": "The Kingdom of Sweden" },
+  {
+    "code": "CH",
+    "name": "Switzerland",
+    "officialName": "The Swiss Confederation"
+  },
+  { "code": "SY", "name": "Syria", "officialName": "The Syrian Arab Republic" },
+  {
+    "code": "TJ",
+    "name": "Tajikistan",
+    "officialName": "The Republic of Tajikistan"
+  },
+  {
+    "code": "TZ",
+    "name": "Tanzania",
+    "officialName": "The United Republic of Tanzania"
+  },
+  {
+    "code": "TH",
+    "name": "Thailand",
+    "officialName": "The Kingdom of Thailand"
+  },
+  {
+    "code": "BS",
+    "name": "The Bahamas",
+    "officialName": "The Commonwealth of The Bahamas"
+  },
+  {
+    "code": "GM",
+    "name": "The Gambia",
+    "officialName": "The Republic of The Gambia"
+  },
+  { "code": "TG", "name": "Togo", "officialName": "The Togolese Republic" },
+  { "code": "TO", "name": "Tonga", "officialName": "The Kingdom of Tonga" },
+  {
+    "code": "TT",
+    "name": "Trinidad and Tobago",
+    "officialName": "The Republic of Trinidad and Tobago"
+  },
+  { "code": "TN", "name": "Tunisia", "officialName": "Republic of Tunisia" },
+  { "code": "TR", "name": "Turkey", "officialName": "Republic of Türkiye" },
+  { "code": "TM", "name": "Turkmenistan", "officialName": "Turkmenistan" },
+  { "code": "TV", "name": "Tuvalu", "officialName": "Tuvalu" },
+  { "code": "UG", "name": "Uganda", "officialName": "The Republic of Uganda" },
+  { "code": "UA", "name": "Ukraine", "officialName": "Ukraine" },
+  {
+    "code": "AE",
+    "name": "United Arab Emirates",
+    "officialName": "The United Arab Emirates"
+  },
+  {
+    "code": "GB",
+    "name": "United Kingdom",
+    "officialName": "The United Kingdom of Great Britain and Northern Ireland"
+  },
+  {
+    "code": "US",
+    "name": "United States",
+    "officialName": "The United States of America"
+  },
+  {
+    "code": "UY",
+    "name": "Uruguay",
+    "officialName": "The Oriental Republic of Uruguay"
+  },
+  {
+    "code": "UZ",
+    "name": "Uzbekistan",
+    "officialName": "The Republic of Uzbekistan"
+  },
+  {
+    "code": "VU",
+    "name": "Vanuatu",
+    "officialName": "The Republic of Vanuatu"
+  },
+  {
+    "code": "VA",
+    "name": "Vatican City",
+    "officialName": "Vatican City State"
+  },
+  {
+    "code": "VE",
+    "name": "Venezuela",
+    "officialName": "The Bolivarian Republic of Venezuela"
+  },
+  {
+    "code": "VN",
+    "name": "Vietnam",
+    "officialName": "The Socialist Republic of Viet Nam"
+  },
+  { "code": "YE", "name": "Yemen", "officialName": "The Republic of Yemen" },
+  { "code": "ZM", "name": "Zambia", "officialName": "The Republic of Zambia" },
+  {
+    "code": "ZW",
+    "name": "Zimbabwe",
+    "officialName": "The Republic of Zimbabwe"
+  }
+]

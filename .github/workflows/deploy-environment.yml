@@ -20,26 +20,22 @@ jobs:
     name: Deploy to ${{ inputs.app-environment }}
     runs-on: ubuntu-latest
     environment: ${{ inputs.app-environment }}
+    permissions:
+      issues: write # needed for labels
+      pull-requests: write
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
 
       - name: Deploy
         uses: ./.github/actions/deploy
-        env:
-          # This block only contains secrets being used as pod
-          # environment variables. Anything used by the workflow
-          # should be an input.
-          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
-          SESSION_ENCRYPTION_KEY: ${{ secrets.SESSION_ENCRYPTION_KEY }}
-          ENTRA_CLIENT_ID: ${{ secrets.ENTRA_CLIENT_ID }}
-          ENTRA_CLIENT_SECRET: ${{ secrets.ENTRA_CLIENT_SECRET }}
-          ENTRA_TENANT_ID: ${{ secrets.ENTRA_TENANT_ID }}
-          SECRET_KEY_BASE: ${{ secrets.SECRET_KEY_BASE }}
         with:
           sha: ${{ inputs.sha }}
           branch-ref: ${{ inputs.branch-ref }}
           app-environment: ${{ inputs.app-environment }}
+          slack-alerts-bot-token: ${{ secrets.SLACK_ALERTS_BOT_TOKEN }}
+          slack-alerts-channel-id: ${{ vars.SLACK_ALERTS_CHANNEL_ID }}
+          slack-alerts-mention: ${{ vars.SLACK_ALERTS_MENTION }}
           ecr-registry_url: ${{ secrets.ECR_REGISTRY_URL }}
           ecr-repository: ${{ vars.ECR_REPOSITORY }}
           ccq-ecr-repository: ${{ vars.CCQ_ECR_REPOSITORY }}

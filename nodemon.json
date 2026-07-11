@@ -1,6 +1,6 @@
 {
-  "watch": ["public/app.js", "locales/**/*.json"],
-  "ext": "js,json",
+  "watch": ["src/**/*.ts", "locales/**/*.json"],
+  "ext": "ts,js,json",
   "ignore": [
     "public/assets/**/*",
     "public/css/**/*",
@@ -11,7 +11,6 @@
     "public/tests/",
     "public/types/",
     "node_modules/",
-    "src/",
     "*.log",
     "*.tmp"
   ],
@@ -21,5 +20,5 @@
   "env": {
     "NODE_ENV": "development"
   },
-  "exec": "node public/app.js"
+  "exec": "npx tsx scripts/dev-server-with-msw.ts"
 }

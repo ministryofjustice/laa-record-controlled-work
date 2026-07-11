@@ -5,20 +5,6 @@ import { cleanPlugin } from "../plugins/clean.plugin.js";
 export const browserConfigs = (): BuildOptions[] => [
   {
     bundle: true,
-    entryNames: "[name].[hash].min",
-    entryPoints: ["src/browser/custom.ts"],
-    format: "esm",
-    minify: process.env.NODE_ENV === "production",
-    outdir: "public/js",
-    platform: "browser",
-    plugins: [
-      cleanPlugin("public/js", /^custom\.[a-zA-Z0-9]+\.min\.js(\.map)?$/),
-    ],
-    sourcemap: process.env.NODE_ENV !== "production",
-    target: "esnext",
-  },
-  {
-    bundle: true,
     entryNames: "frontend-packages.[hash].min",
     entryPoints: ["src/browser/frontendPackagesEntry.ts"],
     format: "esm",
@@ -29,6 +15,24 @@ export const browserConfigs = (): BuildOptions[] => [
       cleanPlugin(
         "public/js",
         /^frontend-packages\.[a-zA-Z0-9]+\.min\.js(\.map)?$/,
+      ),
+    ],
+    sourcemap: process.env.NODE_ENV !== "production",
+    target: "esnext",
+    treeShaking: false,
+  },
+  {
+    bundle: true,
+    entryNames: "forge-components.[hash].min",
+    entryPoints: ["src/browser/forgeComponentsEntry.ts"],
+    format: "esm",
+    minify: process.env.NODE_ENV === "production",
+    outdir: "public/js",
+    platform: "browser",
+    plugins: [
+      cleanPlugin(
+        "public/js",
+        /^forge-components\.[a-zA-Z0-9]+\.min\.js(\.map)?$/,
       ),
     ],
     sourcemap: process.env.NODE_ENV !== "production",

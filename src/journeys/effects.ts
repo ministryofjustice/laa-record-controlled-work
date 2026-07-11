@@ -1,47 +1,86 @@
 import {
   defineEffectFunctions,
+  type EffectFunctionContext,
   type EffectFunctionExpr,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
 import type { JourneySession } from "./context.type.ts";
 
-const isJourneySession = (value: unknown): value is JourneySession =>
+export const isJourneySession = (value: unknown): value is JourneySession =>
   typeof value === "object" && value !== null;
 
 export interface JourneyEffectShape {
   /** Clears draft answers for this journey (used after committing drafts to the store). */
-  ClearDraftAnswers: (journeyCode: string) => EffectFunctionExpr;
+  ClearAllDraftAnswers: (journeyCode: string) => EffectFunctionExpr;
+  /** Clears the given fields from the session draft and the form context. */
+  ClearFieldAnswers: (
+    journeyCode: string,
+    fields: readonly string[],
+  ) => EffectFunctionExpr;
   /** Copies previously stored draft answers for this journey into the form context on access. */
   LoadDraftAnswers: (journeyCode: string) => EffectFunctionExpr;
   /** Persists the current answers into the session as a draft, kept separately from committed answers. */
   SaveDraftAnswers: (journeyCode: string) => EffectFunctionExpr;
 }
 
-export const {
-  effects: JourneyEffects,
-  implementations: JourneyEffectsImplementations,
-} = defineEffectFunctions<JourneyEffectShape>({
-  ClearDraftAnswers: () => {
-    return (context, journeyCode: string) => {
-      const session = context.getSession();
+export const clearAllDraftAnswers =
+  () =>
+  (context: EffectFunctionContext, journeyCode: string): void => {
+    const session = context.getSession();
 
-      if (!isJourneySession(session)) {
-        return;
-      }
+    if (!isJourneySession(session)) {
+      return;
+    }
 
-      if (session.journeyDrafts) {
-        const { [journeyCode]: _removed, ...remainingDrafts } =
-          session.journeyDrafts;
-        session.journeyDrafts = remainingDrafts;
-      }
+    if (session.journeyDrafts) {
+      const { [journeyCode]: _selectedJourneyDraft, ...otherJourneyDrafts } =
+        session.journeyDrafts;
 
-      for (const key of Object.keys(context.getAllAnswers())) {
-        context.clearAnswer(key);
-      }
-    };
-  },
+      session.journeyDrafts = otherJourneyDrafts;
+    }
 
-  LoadDraftAnswers: () => (context, journeyCode: string) => {
+    for (const key of Object.keys(context.getAllAnswers())) {
+      context.clearAnswer(key);
+    }
+  };
+
+export const clearFieldAnswers =
+  () =>
+  (
+    context: EffectFunctionContext,
+    journeyCode: string,
+    fields: readonly string[],
+  ): void => {
+    const session = context.getSession();
+
+    if (!isJourneySession(session)) {
+      return;
+    }
+
+    if (session.journeyDrafts?.[journeyCode]) {
+      const { [journeyCode]: selectedJourneyDraft, ...otherJourneyDrafts } =
+        session.journeyDrafts;
+
+      const selectedJourneyWithRemovedFields = Object.fromEntries(
+        Object.entries(selectedJourneyDraft).filter(
+          ([key]) => !fields.includes(key),
+        ),
+      );
+
+      session.journeyDrafts = {
+        ...otherJourneyDrafts,
+        [journeyCode]: selectedJourneyWithRemovedFields,
+      };
+    }
+
+    for (const field of fields) {
+      context.clearAnswer(field);
+    }
+  };
+
+export const loadDraftAnswers =
+  () =>
+  (context: EffectFunctionContext, journeyCode: string): void => {
     const session = context.getSession();
 
     if (!isJourneySession(session)) {
@@ -59,9 +98,11 @@ export const {
         context.setAnswer(code, value);
       }
     }
-  },
+  };
 
-  SaveDraftAnswers: () => (context, journeyCode: string) => {
+export const saveDraftAnswers =
+  () =>
+  (context: EffectFunctionContext, journeyCode: string): void => {
     const session = context.getSession();
 
     if (!isJourneySession(session)) {
@@ -74,5 +115,14 @@ export const {
       ...session.journeyDrafts[journeyCode],
       ...context.getAllAnswers(),
     };
-  },
+  };
+
+export const {
+  effects: JourneyEffects,
+  implementations: JourneyEffectsImplementations,
+} = defineEffectFunctions<JourneyEffectShape>({
+  ClearAllDraftAnswers: clearAllDraftAnswers,
+  ClearFieldAnswers: clearFieldAnswers,
+  LoadDraftAnswers: loadDraftAnswers,
+  SaveDraftAnswers: saveDraftAnswers,
 });

@@ -2,8 +2,10 @@ import type { Application, Request } from "express";
 
 import morgan from "morgan";
 
-const skipAuthCallback = (req: Request): boolean =>
-  req.path === "/auth/code/callback";
+const skipAuthCallback = (req: Request): boolean => {
+  const url = req.originalUrl || req.url;
+  return url.includes("/auth/code/callback");
+};
 
 /**
  * Sets up request logging middleware for the given Express application.

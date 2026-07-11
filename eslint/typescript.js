@@ -11,7 +11,6 @@ export default {
     },
   },
   rules: {
-    "no-console": "warn", // TODO: should be using a proper logger like pino or winston
     "no-negated-condition": "off", // Allow negated conditions as they can improve readability in certain contexts
     "no-param-reassign": [
       "error",

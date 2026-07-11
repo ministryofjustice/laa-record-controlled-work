@@ -16,7 +16,8 @@ import {
   BAD_REQUEST,
   INTERNAL_SERVER_ERROR,
   UNAUTHORIZED,
-} from "#/lib/constants/httpStatus.js";
+} from "#/lib/constants/http.js";
+import { logger } from "#/logger.js";
 
 /**
  * Handles the Entra auth code callback, exchanging the code for tokens.
@@ -66,7 +67,7 @@ export async function authCodeCallback(
       }
 
       Object.assign(req.session, result.value, { isAuthenticated: true });
-      res.redirect(returnTo ?? "/landing");
+      res.redirect(returnTo ?? "/");
     });
   } catch (error) {
     next(error);
@@ -165,7 +166,7 @@ function handleRelay(
   targetUrl.searchParams.set("code", data.code);
   targetUrl.searchParams.set("state", data.state);
 
-  console.info(`Relaying auth callback to ${targetUrl.hostname}`);
+  logger.info("Relaying auth callback", { targetHostname: targetUrl.hostname });
   res.set("Cache-Control", "no-store");
   res.redirect(targetUrl.toString());
   return true;

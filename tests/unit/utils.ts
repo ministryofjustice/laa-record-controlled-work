@@ -2,7 +2,7 @@ import express, { type Application, type Request } from "express";
 import session from "express-session";
 
 import authRouter from "#/auth/auth.routes.js";
-import { INTERNAL_SERVER_ERROR } from "#/lib/constants/httpStatus.js";
+import { INTERNAL_SERVER_ERROR } from "#/lib/constants/http.js";
 import { setupCsrf } from "#/middleware/setupCsrf.js";
 
 /**
@@ -37,7 +37,7 @@ export function createMockApp({ seedSession = true } = {}): Application {
           redirectUri: "",
           scopes: [],
         };
-        req.session.returnTo = "/landing";
+        req.session.returnTo = "/";
       }
       next();
     });

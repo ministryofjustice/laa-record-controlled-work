@@ -9,7 +9,6 @@
   <meta name="description" content="{{config.app.service.name}}">
   <meta name="keywords" content="GOV.UK, govuk, gov, government, uk, frontend, ui, user interface, jinja, python, flask, port, template, templating, macro, component, design system, html, forms, wtf, wtforms, widget, widgets, demo, example">
   <meta name="author" content="{{config.app.department.name}}">
-  <script type="module" nonce="{{ cspNonce }}" src="/js/{{getAsset('custom','min.js')}}"></script>
 {% endblock %}
 
 {% block bodyStart %}
@@ -27,7 +26,7 @@
 {% endblock %}
 
 {% block content %}
-  <h1 class="govuk-heading-xl">{{ t('pages.home.defaultHeading') }}</h1>
+  <h1 class="govuk-heading-xl">{{ t('pages.index.defaultHeading') }}</h1>
 {% endblock %}
 
 {% block footer %}

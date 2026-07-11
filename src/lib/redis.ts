@@ -1,12 +1,13 @@
 import { RedisStore } from "connect-redis";
-import { createClient } from "redis";
+import { createClient, type RedisClientType } from "redis";
 
 import type { RedisConfig } from "#/config.types.js";
+
+import { logger } from "#/logger.js";
 
 import { SECOND } from "./constants/time.js";
 
 export type RedisClientFactory = (options: RedisConfig) => RedisClientType;
-export type RedisClientType = ReturnType<typeof createClient>;
 
 /**
  * Create and configure Redis client
@@ -19,16 +20,19 @@ export const createRedisClient = (config: RedisConfig): RedisClientType => {
       connectTimeout: config.socketConnectionTimeout,
       reconnectStrategy: (retries: number) => {
         if (retries > config.maxRetryAttempts) {
-          console.error(
-            `Redis reconnection failed after ${config.maxRetryAttempts} attempts`,
+          logger.error(
+            "Redis reconnection failed after max attempts",
+            undefined,
+            {
+              maxRetryAttempts: config.maxRetryAttempts,
+              retries,
+            },
           );
           return new Error("Redis reconnection limit exceeded");
         }
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- time values are intuitive here
         const delay = Math.min(retries * (SECOND / 10), 3 * SECOND);
-        console.log(
-          `Redis reconnecting... attempt ${retries}, waiting ${delay}ms`,
-        );
+        logger.info("Redis reconnecting", { delay, retries });
         return delay;
       },
     },
@@ -36,23 +40,23 @@ export const createRedisClient = (config: RedisConfig): RedisClientType => {
   });
 
   client.on("error", (err) => {
-    console.error("Redis Client Error: ", err);
+    logger.error("Redis client error", err);
   });
 
   client.on("connect", () => {
-    console.log("Redis client connecting...");
+    logger.info("Redis client connecting");
   });
 
   client.on("ready", () => {
-    console.log("Redis client ready");
+    logger.info("Redis client ready");
   });
 
   client.on("reconnecting", () => {
-    console.log("Redis client reconnecting...");
+    logger.info("Redis client reconnecting");
   });
 
   client.on("end", () => {
-    console.log("Redis client disconnected");
+    logger.info("Redis client disconnected");
   });
 
   return client;

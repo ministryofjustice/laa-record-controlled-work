@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 
 import { Forge } from "@ministryofjustice/hmpps-forge/core";
 import {
-  ExpressFrameworkAdapter,
+  createExpressRouter,
   nunjucksFunctions,
 } from "@ministryofjustice/hmpps-forge/express-nunjucks";
 import { govukComponents } from "@ministryofjustice/hmpps-forge/govuk-components";
@@ -11,12 +11,14 @@ import compression from "compression";
 import express from "express";
 import session from "express-session";
 
+import { getApplications } from "#/api/client/schema/applications/applications.gen.js";
 import authRouter from "#/auth/auth.routes.js";
 import config from "#/config.js";
-import createApplication from "#/journeys/create-application/index.js";
-import { initializeI18nextSync } from "#/lib/i18nLoader.js";
+import { autocomplete } from "#/journeys/components/autocomplete/autocomplete.component.js";
+import createApplication from "#/journeys/create-application/create-application.index.js";
+import evidence from "#/journeys/evidence/evidence.index.js";
+import yourCases from "#/journeys/your-cases/your-cases.index.js";
 import { createSession } from "#/lib/session.js";
-import { axiosMiddleware } from "#/middleware/apiMiddleware.js";
 import { requireAuth } from "#/middleware/requireAuth.js";
 import { setupConfig } from "#/middleware/setupConfigs.js";
 import { setupCsrf } from "#/middleware/setupCsrf.js";
@@ -33,6 +35,10 @@ import healthRouter from "#/routes/health.js";
 import indexRouter from "#/routes/index.js";
 import testRouter from "#/routes/test.js";
 
+const TRUST_FIRST_PROXY = 1;
+const ENABLE_PLAYWRIGHT_TEST_SIGNIN =
+  process.env.PLAYWRIGHT_TEST_SIGNIN === "true";
+
 /**
  * Creates and configures an Express application.
  * Server startup is handled separately in src/server.ts.
@@ -40,20 +46,12 @@ import testRouter from "#/routes/test.js";
  * @returns {Promise<import('express').Application>} The configured Express application
  */
 const createApp = async (): Promise<express.Application> => {
-  const TRUST_FIRST_PROXY = 1;
-  const ENABLE_PLAYWRIGHT_TEST_SIGNIN =
-    process.env.PLAYWRIGHT_TEST_SIGNIN === "true";
-  // Initialise i18next synchronously before setting up the app
-  initializeI18nextSync();
-
   const app = express();
 
   app.use("/", healthRouter);
 
   // Set up common middleware for handling cookies, body parsing, etc.
   standardMiddleware(app);
-
-  app.use(axiosMiddleware);
 
   // Response compression setup
   app.use(
@@ -79,19 +77,18 @@ const createApp = async (): Promise<express.Application> => {
   // Set up locale middleware for internationalization
   app.use(setupLocaleMiddleware);
 
-  // Set up Nunjucks as the template engine
-  // Set up Nunjucks as the template engine
+  // Set up Nunjucks as the template engine and forge
   const nunjucksEnv = setupNunjucks(app);
-
-  const forge = new Forge({
-    frameworkAdapter: ExpressFrameworkAdapter.configure({ nunjucksEnv }),
-  });
+  const forge = new Forge({});
 
   forge
     .registerGlobalComponents(govukComponents)
     .registerGlobalComponents(mojComponents)
+    .registerGlobalComponents([autocomplete])
     .registerGlobalFunctions(nunjucksFunctions)
-    .registerPackage(createApplication);
+    .registerPackage(yourCases, { getApplications })
+    .registerPackage(createApplication)
+    .registerPackage(evidence);
 
   // Set up rate limiting
   setupRateLimit(app, config);
@@ -122,10 +119,7 @@ const createApp = async (): Promise<express.Application> => {
     app.use(livereload());
   }
 
-  app.use(express.urlencoded({ extended: true }));
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Forge.getRouter returns unknown but will always be an express.Router.
-  const forgeRouter = forge.getRouter() as express.Router;
-  app.use("/", forgeRouter);
+  app.use("/", createExpressRouter(forge, { nunjucksEnv }));
 
   return app;
 };
