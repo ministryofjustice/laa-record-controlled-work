@@ -8,7 +8,11 @@ import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import { checkAnswersStep } from "#/journeys/create-application/steps/99-check-answers.step.js";
 
 describe("Check answers step", () => {
-  const client = createForgeTestClient(checkAnswersStep());
+  const client = createForgeTestClient(
+    "Record new case",
+    "/create-application/",
+    checkAnswersStep(),
+  );
   const session = {
     journeyDrafts: {
       testJourney: {
@@ -16,7 +20,8 @@ describe("Check answers step", () => {
         legalAidBefore: "yesSameMatter",
         legalAidLast6Months: "yes",
         reasonForHelp: "Some reason for help",
-        fullName: "John Doe",
+        firstName: "John",
+        lastName: "Doe",
         dateOfBirth: "1990-01-01",
         hasNINumber: "yes",
         niNumber: "AB123456C",
@@ -50,15 +55,16 @@ describe("Check answers step", () => {
       const rows = summaryList.properties.rows as Array<{
         key: { text: string };
       }>;
-      expect(rows.length).to.equal(8);
+      expect(rows.length).to.equal(9);
       expect(rows[0].key.text).to.equal("ECF");
       expect(rows[1].key.text).to.equal("Accessed legal aid before");
       expect(rows[2].key.text).to.equal("Did your client get legal help for this matter in the last 6 months?");
       expect(rows[3].key.text).to.equal("Reason for new application for same matter");
-      expect(rows[4].key.text).to.equal("Full name");
-      expect(rows[5].key.text).to.equal("Date of birth");
-      expect(rows[6].key.text).to.equal("National Insurance number");
-      expect(rows[7].key.text).to.equal("Address");
+      expect(rows[4].key.text).to.equal("First name");
+      expect(rows[5].key.text).to.equal("Last name");
+      expect(rows[6].key.text).to.equal("Date of birth");
+      expect(rows[7].key.text).to.equal("National Insurance number");
+      expect(rows[8].key.text).to.equal("Address");
     });
 
     it("renders the national insurance number when hasNINumber is 'yes'", () => {

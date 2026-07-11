@@ -1,9 +1,14 @@
-FROM node:25.9.0-alpine@sha256:bdf2cca6fe3dabd014ea60163eca3f0f7015fbd5c7ee1b0e9ccb4ced6eb02ef4 AS base
+FROM node:26.4.0-alpine@sha256:dd3402b2794e96ef50fc09ce3b7d3888f72266389db2dd0007553f425fec21d6 AS base
 
 ###########################################
 FROM base AS installer
 
 WORKDIR /app
+
+# Set an environment variable to indicate that the application is running inside a Docker container. 
+# This is used in the package.json postinstall script to conditionally skip prek installation
+ENV DOCKER=true
+
 
 # Enable Corepack so it picks up the yarn version from the packageManager field in package.json
 # Remove yarn/yarnpkg shims pre-installed by the base image to avoid conflicts when installing corepack

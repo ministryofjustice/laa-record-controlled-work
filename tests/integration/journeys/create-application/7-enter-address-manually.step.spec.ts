@@ -8,7 +8,11 @@ import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import { enterAddressManuallyStep } from "#/journeys/create-application/steps/7-enter-address-manually.step.js";
 
 describe("Enter address manually step", () => {
-  const client = createForgeTestClient(enterAddressManuallyStep("testJourney"));
+  const client = createForgeTestClient(
+    "Record new case",
+    "/create-application/",
+    enterAddressManuallyStep("testJourney"),
+  );
 
   describe("GET /create-application/enter-address-manually", () => {
     let renderResult: TestRenderResult;

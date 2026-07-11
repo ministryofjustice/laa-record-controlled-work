@@ -8,7 +8,11 @@ import { createForgeTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 
 describe("Legal aid before step", () => {
-  const client = createForgeTestClient(legalAidBeforeStep("testJourney"));
+  const client = createForgeTestClient(
+    "Record new case",
+    "/create-application/",
+    legalAidBeforeStep("testJourney"),
+  );
 
   describe("GET /create-application/legal-aid-before", () => {
     let renderResult: TestRenderResult;
@@ -38,7 +42,7 @@ describe("Legal aid before step", () => {
 
   describe("POST /create-application/legal-aid-before", () => {
     const fieldCode = "legalAidBefore";
-    
+
     it("should show validation error if no option is selected", async () => {
       const result = await client.post("/create-application/legal-aid-before", {
         body: {},

@@ -60,7 +60,7 @@ const addressDisplay = NunjucksGenerators.String({
     {% if line4 %}{{ line4 }},<br />{% endif %}
     {% if town %}{{ town }},<br />{% endif %}
     {% if county %}{{ county }},<br />{% endif %}
-    {% if country %}{{ country }}<br />{% endif %}
+    {% if country and country != "United Kingdom" %}{{ country }}<br />{% endif %}
     {% if postcode %}{{ postcode }}<br />{% endif %}
   `,
 });
@@ -179,17 +179,38 @@ export const checkAnswersStep = (): ReturnType<typeof step> =>
                     "journeys.createApplication.checkAnswers.changeLink.change",
                   ),
                   visuallyHiddenText: t(
-                    "journeys.createApplication.checkAnswers.answerLabels.fullName",
+                    "journeys.createApplication.checkAnswers.answerLabels.firstName",
                   ),
                 },
               ],
             },
             key: {
               text: t(
-                "journeys.createApplication.checkAnswers.answerLabels.fullName",
+                "journeys.createApplication.checkAnswers.answerLabels.firstName",
               ),
             },
-            value: { text: Answer("fullName") },
+            value: { text: Answer("firstName") },
+          },
+          {
+            actions: {
+              items: [
+                {
+                  href: "client-details?returnTo=check-answers",
+                  text: t(
+                    "journeys.createApplication.checkAnswers.changeLink.change",
+                  ),
+                  visuallyHiddenText: t(
+                    "journeys.createApplication.checkAnswers.answerLabels.lastName",
+                  ),
+                },
+              ],
+            },
+            key: {
+              text: t(
+                "journeys.createApplication.checkAnswers.answerLabels.lastName",
+              ),
+            },
+            value: { text: Answer("lastName") },
           },
           {
             actions: {

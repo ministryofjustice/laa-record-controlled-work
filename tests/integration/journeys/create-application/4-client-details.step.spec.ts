@@ -8,18 +8,24 @@ import { createForgeTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 
 describe("Client details step", () => {
-  const client = createForgeTestClient(clientDetailsStep("testJourney"));
+  const client = createForgeTestClient(
+    "Record new case",
+    "/create-application/",
+    clientDetailsStep("testJourney"),
+  );
 
   describe("GET /create-application/client-details", () => {
     let renderResult: TestRenderResult;
-    let nameInput: RenderBlock;
+    let firstNameInput: RenderBlock;
+    let lastNameInput: RenderBlock;
     let dateInput: RenderBlock;
 
     before(async () => {
       const result = await client.get("/create-application/client-details");
       expect(result.type).to.equal("render");
       renderResult = result as TestRenderResult;
-      [nameInput] = renderResult.getBlocksByVariant("govukTextInput");
+      [firstNameInput, lastNameInput] =
+        renderResult.getBlocksByVariant("govukTextInput");
       [dateInput] = renderResult.getBlocksByVariant("govukDateInputFull");
     });
 
@@ -27,9 +33,14 @@ describe("Client details step", () => {
       expect(renderResult.context.step.title).to.equal("Your client's details");
     });
 
-    it("renders a full name text input", () => {
-      const label = nameInput.properties.label as { text: string };
-      expect(label.text).to.equal("Full name");
+    it("renders a first name text input", () => {
+      const label = firstNameInput.properties.label as { text: string };
+      expect(label.text).to.equal("First name");
+    });
+
+    it("renders a last name text input", () => {
+      const label = lastNameInput.properties.label as { text: string };
+      expect(label.text).to.equal("Last name");
     });
 
     it("renders a date of birth input", () => {
@@ -49,7 +60,8 @@ describe("Client details step", () => {
     it("should redirect to the check answers page when given valid data", async () => {
       const result = await client.post("/create-application/client-details", {
         body: {
-          fullName: "John Doe",
+          firstName: "John",
+          lastName: "Doe",
           dateOfBirth: { year: "2000", month: "2", day: "2" },
         } as unknown as Record<string, string | string[]>,
       });
@@ -68,16 +80,38 @@ describe("Client details step", () => {
       {
         description: "no name is provided",
         body: {
-          fullName: "",
+          firstName: "",
+          lastName: "",
           dateOfBirth: { year: "2000", month: "2", day: "2" },
         },
-        expectedMessage: "Enter your client's name",
-        fieldCode: "fullName",
+        expectedMessage: "Enter your client's first name",
+        fieldCode: "firstName",
+      },
+      {
+        description: "no first name is provided",
+        body: {
+          firstName: "",
+          lastName: "Doe",
+          dateOfBirth: { year: "2000", month: "2", day: "2" },
+        },
+        expectedMessage: "Enter your client's first name",
+        fieldCode: "firstName",
+      },
+      {
+        description: "no last name is provided",
+        body: {
+          firstName: "John",
+          lastName: "",
+          dateOfBirth: { year: "2000", month: "2", day: "2" },
+        },
+        expectedMessage: "Enter your client's last name",
+        fieldCode: "lastName",
       },
       {
         description: "no date is provided",
         body: {
-          fullName: "John Doe",
+          firstName: "John",
+          lastName: "Doe",
           dateOfBirth: { year: "", month: "", day: "" },
         },
         expectedMessage: "Enter your client's date of birth",
@@ -86,7 +120,8 @@ describe("Client details step", () => {
       {
         description: "date is incorrect",
         body: {
-          fullName: "John Doe",
+          firstName: "John",
+          lastName: "Doe",
           dateOfBirth: { year: "2000", month: "2", day: "31" },
         },
         expectedMessage: "Date of birth must be a real date",
@@ -95,7 +130,8 @@ describe("Client details step", () => {
       {
         description: "day is missing",
         body: {
-          fullName: "John Doe",
+          firstName: "John",
+          lastName: "Doe",
           dateOfBirth: { year: "2000", month: "2", day: "" },
         },
         expectedMessage: "Date of birth must include a day",
@@ -104,7 +140,8 @@ describe("Client details step", () => {
       {
         description: "month is missing",
         body: {
-          fullName: "John Doe",
+          firstName: "John",
+          lastName: "Doe",
           dateOfBirth: { year: "2000", month: "", day: "1" },
         },
         expectedMessage: "Date of birth must include a month",
@@ -113,7 +150,8 @@ describe("Client details step", () => {
       {
         description: "year is missing",
         body: {
-          fullName: "John Doe",
+          firstName: "John",
+          lastName: "Doe",
           dateOfBirth: { year: "", month: "2", day: "15" },
         },
         expectedMessage: "Date of birth must include a year",
@@ -122,7 +160,8 @@ describe("Client details step", () => {
       {
         description: "date is in the future",
         body: {
-          fullName: "John Doe",
+          firstName: "John",
+          lastName: "Doe",
           dateOfBirth: { year: "3000", month: "12", day: "31" },
         },
         expectedMessage: "Date of birth must be in the past",

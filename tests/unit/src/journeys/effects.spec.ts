@@ -4,7 +4,7 @@ import { createForgeTestClient } from "../../../integration/utils/helpers.js";
 import { ecfStep } from "#/journeys/create-application/steps/1-ecf.step.js";
 import { TestRenderResult } from "@ministryofjustice/hmpps-forge/core/testing";
 import { JourneyEffects } from "#/journeys/effects.js";
-import { access, step, StepDefinition } from "@ministryofjustice/hmpps-forge/core/authoring";
+import { access, step } from "@ministryofjustice/hmpps-forge/core/authoring";
 
 const clearDraftStep = step({
   blocks: [],
@@ -36,6 +36,8 @@ const clearAnswerStep = step({
 });
 
 const client = createForgeTestClient(
+  "Record new case",
+  "/create-application/",
   ecfStep("testJourney"),
   clearDraftStep,
   clearAnswerStep,

@@ -40,3 +40,28 @@ jobs:
         with:
           name: code-coverage-report
           path: coverage/
+
+  mocha-integration-tests:
+    name: Mocha Integration Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+        with:
+          ref: ${{ inputs.sha || github.sha }}
+
+      - name: Setup Node and Dependencies
+        uses: ./.github/actions/setup-node
+
+      - name: Set env vars from values
+        run: |
+          yq '.rcw.env | to_entries[] | .key + "=" + (.value | tostring)' \
+            ./deploy/laa-record-controlled-work/values.yaml >> $GITHUB_ENV
+
+      - name: Run Mocha integration tests
+        run: yarn integration
+        env:
+          CI: true
+          NODE_ENV: "test"
+          SESSION_SECRET: "mocha-test-secret"
+          SESSION_ENCRYPTION_KEY: "mocha-test-encryption-key"

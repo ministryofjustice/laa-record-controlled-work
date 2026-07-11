@@ -10,6 +10,8 @@ import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 
 describe("ECF step", () => {
   const client = createForgeTestClient(
+    "Record new case",
+    "/create-application/",
     ecfStep("testJourney"),
     ineligibleStep("testJourney"),
   );
