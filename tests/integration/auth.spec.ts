@@ -7,11 +7,11 @@ import {
 } from "testcontainers";
 import request from "supertest";
 import { expect } from "chai";
-import { FOUND, OK } from "#/lib/constants/httpStatus.js";
 import config from "#/config.js";
 import { SessionData } from "express-session";
-import type { RedisClientType } from "#/types/redis-types.js";
 import { Agent, request as undiciRequest, setGlobalDispatcher } from "undici";
+import { RedisClientType } from "redis";
+import { FOUND, OK } from "#/lib/constants/http.js";
 
 const REDIS_PORT = 6379;
 const IDP_PORT = 8080;
@@ -32,15 +32,15 @@ const createAppWithSessionStoreClientExposure = async (
   const idpPort = identityProviderContainer.getMappedPort(IDP_PORT);
   config.entra.authority = `https://localhost:${idpPort}/default`;
   config.entra.redirectUri = "http://localhost/auth/code/callback";
-  config.entra.cloudDiscoveryMetadata = JSON.stringify({
-    "tenant_discovery_endpoint": `https://localhost:${idpPort}/default/.well-known/openid-configuration`,
-    "api-version": "1.1",
-    "metadata": [{
-      "preferred_network": `localhost:${idpPort}`,
-      "preferred_cache": `localhost:${idpPort}`,
-      "aliases": [`localhost:${idpPort}`],
-    }],
-  });
+  // config.entra.cloudDiscoveryMetadata = JSON.stringify({
+  //   "tenant_discovery_endpoint": `https://localhost:${idpPort}/default/.well-known/openid-configuration`,
+  //   "api-version": "1.1",
+  //   "metadata": [{
+  //     "preferred_network": `localhost:${idpPort}`,
+  //     "preferred_cache": `localhost:${idpPort}`,
+  //     "aliases": [`localhost:${idpPort}`],
+  //   }],
+  // });
   config.redis.enabled = true;
   config.redis.url = `redis://localhost:${redisStoreContainer.getMappedPort(REDIS_PORT)}`;
   process.env.PLAYWRIGHT_TEST_SIGNIN = "true";

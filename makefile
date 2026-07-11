@@ -86,7 +86,3 @@ ifdef file
 else
 	yarn unit
 endif
-
-integration:
-	$(MOCHA) --recursive '$(INTEGRATION_DIR)/**/*.spec.ts'
-
