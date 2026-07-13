@@ -282,45 +282,7 @@ describe("EntraService", () => {
       expect(result.error?.cause).to.have.property("message", "silent failure");
     });
   });
-});
-
-describe("EntraService", () => {
-  let msalStub: Partial<ConfidentialClientApplication>;
-  const AUTH_CODE_URL = "https://login.microsoftonline.com/auth/";
-  let service: EntraService;
-  const NONCE = "test-nonce";
-  const AUTH_CODE = "auth-code";
-  const CHALLENGE_METHOD = "S256";
-  const CHALLENGE = "test-challenge";
-  const VERIFIER = "test-verifier";
-  const ID_TOKEN = "id-token";
-  const ACCOUNT = { username: "user" };
-  const SUCCESS_REDIRECT = "/test/success";
-  const SESSION_SECRET = process.env.SESSION_SECRET as string;
-  const REDIRECT_URI_HOSTNAME = new URL(authRequestDefaults.redirectUri)
-    .hostname;
-  const EPHEMERAL_HOSTNAME =
-    "el-257-laa-record-controlled-work-uat.cloud-platform.service.justice.gov.uk";
-
-  beforeEach(() => {
-    msalStub = {
-      getAuthCodeUrl: sinon.stub().resolves(AUTH_CODE_URL),
-    };
-
-    service = EntraService.create(
-      REDIRECT_URI_HOSTNAME,
-      undefined,
-      msalStub as ConfidentialClientApplication,
-    );
-
-    sinon.stub(CryptoProvider.prototype, "generatePkceCodes").resolves({
-      verifier: VERIFIER,
-      challenge: CHALLENGE,
-    });
-  });
-
-  afterEach(() => sinon.restore());
-
+  
   describe("initiateAuthCodeFlow()", () => {
     it("returns a success with the URL from the MSAL client", async () => {
       const result =
