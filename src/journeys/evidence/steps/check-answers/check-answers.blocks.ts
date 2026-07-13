@@ -1,13 +1,14 @@
 import {
   Answer,
   Condition,
+  match,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 import { NunjucksGenerators } from "@ministryofjustice/hmpps-forge/express-nunjucks";
 import {
   GovUKHeading,
   GovUKSummaryList,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
-import { match } from "@ministryofjustice/hmpps-forge/core/authoring";
+
 import { t } from "#/lib/i18n.js";
 
 const doYouHaveEvidenceLabel = match(Answer("doYouHaveEvidence"))
@@ -30,8 +31,8 @@ const reasonForNoEvidenceLabel = match(Answer("reasonForNoEvidence"))
 
 const mergedReasonForNoEvidenceLabel = NunjucksGenerators.String({
   data: {
-    reasonForNoEvidence: reasonForNoEvidenceLabel,
     moreDetailsForNoEvidence: Answer("moreDetailsForNoEvidence"),
+    reasonForNoEvidence: reasonForNoEvidenceLabel,
   },
   template: `
     {{ reasonForNoEvidence }}.
@@ -41,6 +42,18 @@ const mergedReasonForNoEvidenceLabel = NunjucksGenerators.String({
 
 const evidenceOfIncomeList = NunjucksGenerators.String({
   data: {
+    asylumSupportEvidence: Answer("asylumSupportEvidence"),
+    asylumSupportEvidenceLabel: t(
+      "journeys.evidence.evidenceOfIncome.groupsOfEvidence.asylumSupport",
+    ),
+    benefitsInKindEvidence: Answer("benefitsInKindEvidence"),
+    benefitsInKindEvidenceLabel: t(
+      "journeys.evidence.evidenceOfIncome.groupsOfEvidence.benefitsInKind",
+    ),
+    employedEvidence: Answer("employedEvidence"),
+    employedEvidenceLabel: t(
+      "journeys.evidence.evidenceOfIncome.groupsOfEvidence.employedPAYE",
+    ),
     evidenceTypeLabels: {
       asylumSupportLetter: t(
         "journeys.evidence.evidenceOfIncome.evidenceTypes.asylumSupportLetter",
@@ -93,34 +106,22 @@ const evidenceOfIncomeList = NunjucksGenerators.String({
         "journeys.evidence.evidenceOfIncome.evidenceTypes.wageSlips",
       ),
     },
-    employedEvidenceLabel: t(
-      "journeys.evidence.evidenceOfIncome.groupsOfEvidence.employedPAYE",
-    ),
-    employedEvidence: Answer("employedEvidence"),
-    selfEmployedEvidenceLabel: t(
-      "journeys.evidence.evidenceOfIncome.groupsOfEvidence.selfEmployed",
-    ),
-    selfEmployedEvidence: Answer("selfEmployedEvidence"),
-    benefitsInKindEvidenceLabel: t(
-      "journeys.evidence.evidenceOfIncome.groupsOfEvidence.benefitsInKind",
-    ),
-    benefitsInKindEvidence: Answer("benefitsInKindEvidence"),
+    otherEvidence: Answer("otherEvidence"),
     otherEvidenceLabel: t(
       "journeys.evidence.evidenceOfIncome.groupsOfEvidence.otherIncome",
     ),
-    otherEvidence: Answer("otherEvidence"),
+    selfEmployedEvidence: Answer("selfEmployedEvidence"),
+    selfEmployedEvidenceLabel: t(
+      "journeys.evidence.evidenceOfIncome.groupsOfEvidence.selfEmployed",
+    ),
+    stateBenefitsEvidence: Answer("stateBenefitsEvidence"),
     stateBenefitsEvidenceLabel: t(
       "journeys.evidence.evidenceOfIncome.groupsOfEvidence.stateBenefits",
     ),
-    stateBenefitsEvidence: Answer("stateBenefitsEvidence"),
-    asylumSupportEvidenceLabel: t(
-      "journeys.evidence.evidenceOfIncome.groupsOfEvidence.asylumSupport",
-    ),
-    asylumSupportEvidence: Answer("asylumSupportEvidence"),
+    taxCreditsEvidence: Answer("taxCreditsEvidence"),
     taxCreditsEvidenceLabel: t(
       "journeys.evidence.evidenceOfIncome.groupsOfEvidence.taxCredits",
     ),
-    taxCreditsEvidence: Answer("taxCreditsEvidence"),
   },
   template: `
     {% if employedEvidence.length > 0 %}
@@ -199,7 +200,6 @@ export const summaryList = GovUKSummaryList({
       visibleWhen: Answer("doYouHaveEvidence").match(Condition.Equals("no")),
     },
     {
-      visibleWhen: Answer("doYouHaveEvidence").match(Condition.Equals("yes")),
       actions: {
         items: [
           {
@@ -215,6 +215,7 @@ export const summaryList = GovUKSummaryList({
         text: t("journeys.evidence.checkAnswers.answerLabels.evidenceOfIncome"),
       },
       value: { html: evidenceOfIncomeList },
+      visibleWhen: Answer("doYouHaveEvidence").match(Condition.Equals("yes")),
     },
   ],
 });

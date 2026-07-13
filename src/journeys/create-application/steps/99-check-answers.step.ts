@@ -13,8 +13,8 @@ import {
   GovUKSummaryList,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
-import { t } from "#/lib/i18n.js";
 import { submitButton } from "#/journeys/evidence/common.blocks.js";
+import { t } from "#/lib/i18n.js";
 
 const ecfLabel = match(Answer("ecf"))
   .branch(Condition.Equals("yes"), t("common.yes"))
@@ -281,7 +281,7 @@ export const checkAnswersStep = (): ReturnType<typeof step> =>
           },
         ],
       }),
-      submitButton
+      submitButton,
     ],
     code: "check-answers",
     onSubmission: [
