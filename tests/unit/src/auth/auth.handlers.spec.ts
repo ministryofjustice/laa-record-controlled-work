@@ -20,6 +20,7 @@ describe("Auth Handlers", () => {
   let authServiceStub: {
     initiateAuthCodeFlow: sinon.SinonStub;
     exchangeAuthCode: sinon.SinonStub;
+    withCachePlugin: sinon.SinonStub;
   };
   let mockApp: express.Application;
 
@@ -50,6 +51,7 @@ describe("Auth Handlers", () => {
           account: undefined,
         }),
       ),
+      withCachePlugin: sinon.stub().returnsThis(),
     };
 
     sinon

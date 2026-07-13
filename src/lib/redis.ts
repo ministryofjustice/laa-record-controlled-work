@@ -3,20 +3,20 @@ import { createClient, type RedisClientType } from "redis";
 
 import type { RedisConfig } from "#/config.types.js";
 
+import config from "#/config.js";
 import { logger } from "#/logger.js";
 
 import { SECOND } from "./constants/time.js";
 
-export type RedisClientFactory = (options: RedisConfig) => RedisClientType;
-
-// Module-level reference to the active Redis client, set by createRedisClient
+// Module-level reference to the active Redis client
 let activeRedisClient: null | RedisClientType = null;
 
 /**
- * Returns the active Redis client instance, or null if not initialized.
- * @returns The active Redis client or null.
+ * Returns the active Redis client, creating it on first call.
+ * @returns The active Redis client
  */
-export function getRedisClient(): null | RedisClientType {
+export function getRedisClient(): RedisClientType {
+  activeRedisClient ??= createRedisClient(config.redis);
   return activeRedisClient;
 }
 

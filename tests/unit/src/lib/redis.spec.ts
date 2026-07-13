@@ -1,5 +1,5 @@
 import config from "#/config.js";
-import { createRedisClient, createRedisStore } from "#/lib/redis.js";
+import { createRedisClient, createRedisStore, getRedisClient } from "#/lib/redis.js";
 import { logger } from "#/logger.js";
 import { RedisConfig } from "#/config.types.js";
 import { strict as assert } from "assert";
@@ -103,6 +103,16 @@ describe("Redis", () => {
       assert(loggerInfoStub.calledWith("Redis client reconnecting"));
       assert(loggerInfoStub.calledWith("Redis client disconnected"));
       assert(loggerErrorStub.calledWith("Redis client error", sinon.match.any));
+    });
+  });
+  describe("getRedisClient()", () => {
+    it("creates and returns a client", () => {
+      const client = getRedisClient();
+      expect(client).to.not.be.null;
+    });
+
+    it("returns the same instance on subsequent calls", () => {
+      expect(getRedisClient()).to.equal(getRedisClient());
     });
   });
   describe("createRedisStore()", () => {

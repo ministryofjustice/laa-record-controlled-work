@@ -55,14 +55,16 @@ export async function authCodeCallback(
     }
 
     // exchange auth code for tokens and state
-    const entra = EntraService.create(req.hostname);
-    const redisClient = getRedisClient();
-    if (redisClient) {
-      const ttlSeconds = Math.ceil(config.session.cookie.maxAge / SECOND);
-      entra.withCachePlugin(
-        new RedisCachePlugin(redisClient, req.sessionID, ttlSeconds),
-      );
-    }
+    const ttlSeconds = Math.ceil(config.session.cookie.maxAge / SECOND);
+    const cachePlugin = new RedisCachePlugin(
+      getRedisClient(),
+      req.sessionID,
+      ttlSeconds,
+    );
+    const entra = EntraService.create(req.hostname).withCachePlugin(
+      cachePlugin,
+    );
+
     const result = await entra.exchangeAuthCode(data.code, authCodeRequest);
     if (result.error) {
       res.status(UNAUTHORIZED).send(result.error.message);
