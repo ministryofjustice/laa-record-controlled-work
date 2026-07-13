@@ -3,7 +3,7 @@ import type { RedisClientType } from "redis";
 import { expect } from "chai";
 import sinon from "sinon";
 
-import { MemoryCachePlugin, RedisCachePlugin } from "#/auth/msal.plugin.js";
+import {  RedisCachePlugin } from "#/auth/msal.plugin.js";
 import { TokenCacheContext } from "@azure/msal-node";
 describe("CachePlugin", () => {
   describe("Redis", () => {
@@ -124,48 +124,6 @@ describe("CachePlugin", () => {
 
         expect(cacheContextStub.tokenCache.serialize.called).to.be.true;
       });
-    });
-  });
-
-  describe("Memory", () => {
-    let plugin: MemoryCachePlugin;
-    let cacheContextStub: {
-      cacheHasChanged: boolean;
-      tokenCache: { deserialize: sinon.SinonStub; serialize: sinon.SinonStub };
-    };
-
-    beforeEach(() => {
-      plugin = new MemoryCachePlugin();
-      cacheContextStub = {
-        cacheHasChanged: false,
-        tokenCache: {
-          deserialize: sinon.stub(),
-          serialize: sinon.stub().returns("serialized"),
-        },
-      };
-    });
-
-    afterEach(() => {
-      sinon.restore();
-    });
-
-    it("should store cache in memory on afterCacheAccess when changed", async () => {
-      cacheContextStub.cacheHasChanged = true;
-      await plugin.afterCacheAccess(cacheContextStub as any);
-
-      cacheContextStub.cacheHasChanged = false;
-      cacheContextStub.tokenCache.deserialize = sinon.stub();
-      await plugin.beforeCacheAccess(cacheContextStub as unknown as TokenCacheContext);
-
-      expect(cacheContextStub.tokenCache.deserialize.calledWith("serialized"))
-        .to.be.true;
-    });
-
-    it("should not deserialize if nothing was cached", async () => {
-      cacheContextStub.tokenCache.deserialize = sinon.stub();
-      await plugin.beforeCacheAccess(cacheContextStub as unknown as TokenCacheContext);
-
-      expect(cacheContextStub.tokenCache.deserialize.called).to.be.false;
     });
   });
 });

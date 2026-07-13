@@ -4,40 +4,6 @@ import type { RedisClientType } from "redis";
 const CACHE_KEY_PREFIX = "msal:";
 
 /**
- * In-memory cache plugin for testing and development.
- * Stores the cache blob in memory without requiring Redis.
- */
-export class MemoryCachePlugin implements ICachePlugin {
-  private cache: null | string = null;
-
-  /**
-   * Called by MSAL after it accesses the cache.
-   * If the cache has changed, stores it in memory.
-   * @param cacheContext - The MSAL token cache context.
-   * @returns Promise that resolves when complete.
-   */
-  // eslint-disable-next-line @typescript-eslint/require-await -- ICachePlugin requires async but we're sync
-  async afterCacheAccess(cacheContext: TokenCacheContext): Promise<void> {
-    if (cacheContext.cacheHasChanged) {
-      this.cache = cacheContext.tokenCache.serialize();
-    }
-  }
-
-  /**
-   * Called by MSAL before it accesses the cache.
-   * Retrieves the cached blob from memory and deserializes it into the cache context.
-   * @param cacheContext - The MSAL token cache context.
-   * @returns Promise that resolves when complete.
-   */
-  // eslint-disable-next-line @typescript-eslint/require-await -- ICachePlugin requires async but we're sync
-  async beforeCacheAccess(cacheContext: TokenCacheContext): Promise<void> {
-    if (this.cache) {
-      cacheContext.tokenCache.deserialize(this.cache);
-    }
-  }
-}
-
-/**
  * MSAL cache plugin that persists the token cache to Redis.
  * Implements the ICachePlugin interface to intercept MSAL cache operations
  * and store the serialized cache blob in Redis keyed by session ID.
