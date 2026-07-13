@@ -58,5 +58,5 @@ test("evidence flow", async ({ page }) => {
   await page.getByRole("button", { name: "Continue" }).click();
 
   // Verify redirection to the check your answers page
-  await expect(page).toHaveURL("/cases/evidence/check-your-answers");
+  await expect(page).toHaveURL("/cases/evidence/check-answers");
 });
