@@ -11,12 +11,15 @@ import {
 } from "#/auth/auth.relay.js";
 import { authCodeCallbackSchema } from "#/auth/auth.types.js";
 import { EntraService } from "#/auth/entra.service.js";
+import { RedisCachePlugin } from "#/auth/msal.plugin.js";
 import config from "#/config.js";
 import {
   BAD_REQUEST,
   INTERNAL_SERVER_ERROR,
   UNAUTHORIZED,
 } from "#/lib/constants/http.js";
+import { SECOND } from "#/lib/constants/time.js";
+import { getRedisClient } from "#/lib/redis.js";
 import { logger } from "#/logger.js";
 
 /**
@@ -52,7 +55,14 @@ export async function authCodeCallback(
     }
 
     // exchange auth code for tokens and state
-    const entra = EntraService.create(req.hostname, req.sessionID);
+    const entra = EntraService.create(req.hostname);
+    const redisClient = getRedisClient();
+    if (redisClient) {
+      const ttlSeconds = Math.ceil(config.session.cookie.maxAge / SECOND);
+      entra.withCachePlugin(
+        new RedisCachePlugin(redisClient, req.sessionID, ttlSeconds),
+      );
+    }
     const result = await entra.exchangeAuthCode(data.code, authCodeRequest);
     if (result.error) {
       res.status(UNAUTHORIZED).send(result.error.message);

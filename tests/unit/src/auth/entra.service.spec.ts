@@ -1,6 +1,7 @@
 import {
   ConfidentialClientApplication,
   CryptoProvider,
+  ICachePlugin,
 } from "@azure/msal-node";
 import { EntraService } from "#/auth/entra.service.js";
 import type {
@@ -41,9 +42,7 @@ describe("EntraService", () => {
       getAuthCodeUrl: sinon.stub().resolves(AUTH_CODE_URL),
     };
 
-    service = EntraService.create(
-      REDIRECT_URI_HOSTNAME,
-      undefined,
+    service = EntraService.create(REDIRECT_URI_HOSTNAME).withMsalClient(
       msalStub as ConfidentialClientApplication,
     );
 
@@ -56,19 +55,7 @@ describe("EntraService", () => {
   afterEach(() => sinon.restore());
 
   describe("create() factory method", () => {
-    it("should use provided msalClient and ignore sessionId", () => {
-      const customMsalStub =
-        sinon.stub() as unknown as ConfidentialClientApplication;
-      const result = EntraService.create(
-        REDIRECT_URI_HOSTNAME,
-        "session-123",
-        customMsalStub,
-      );
-
-      expect(result.msalClient).to.equal(customMsalStub);
-    });
-
-    it("should return an EntraService instance with default client when no msalClient provided", () => {
+    it("returns an EntraService instance with a default MSAL client", () => {
       const result = EntraService.create(REDIRECT_URI_HOSTNAME);
 
       expect(result).to.be.an.instanceOf(EntraService);
@@ -76,18 +63,30 @@ describe("EntraService", () => {
         ConfidentialClientApplication,
       );
     });
+  });
 
-    it("should use provided msalClient when both sessionId and msalClient are provided", () => {
+  describe("withMsalClient()", () => {
+    it("replaces the MSAL client", () => {
       const customMsalStub =
         sinon.stub() as unknown as ConfidentialClientApplication;
-      const result = EntraService.create(
-        REDIRECT_URI_HOSTNAME,
-        undefined,
-        customMsalStub,
-      );
+      const result = EntraService.create(REDIRECT_URI_HOSTNAME).withMsalClient(customMsalStub);
 
       expect(result.msalClient).to.equal(customMsalStub);
     });
+  });
+
+  describe("withCachePlugin()", () => {
+    it("replaces the MSAL client with a new instance", () => {
+      const cachePlugin = {} as ICachePlugin;
+      const instance = EntraService.create(REDIRECT_URI_HOSTNAME);
+      const originalClient = instance.msalClient;
+      const result = instance.withCachePlugin(cachePlugin);
+      
+      expect(result).to.equal(instance);
+      expect(instance.msalClient).to.not.equal(originalClient);
+      expect(instance.msalClient).to.be.an.instanceOf(ConfidentialClientApplication);
+    });
+
   });
 
   describe("initiateAuthCodeFlow()", () => {
@@ -170,9 +169,7 @@ describe("EntraService", () => {
     });
 
     it("creates a relay state with target and sig when requestHostname differs from redirect URI hostname", async () => {
-      const ephemeralService = EntraService.create(
-        EPHEMERAL_HOSTNAME,
-        undefined,
+      const ephemeralService = EntraService.create(EPHEMERAL_HOSTNAME).withMsalClient(
         msalStub as ConfidentialClientApplication,
       );
       const result =
@@ -363,9 +360,7 @@ describe("EntraService", () => {
     });
 
     it("creates a relay state with target and sig when requestHostname differs from redirect URI hostname", async () => {
-      const ephemeralService = EntraService.create(
-        EPHEMERAL_HOSTNAME,
-        undefined,
+      const ephemeralService = EntraService.create(EPHEMERAL_HOSTNAME).withMsalClient(
         msalStub as ConfidentialClientApplication,
       );
       const result =

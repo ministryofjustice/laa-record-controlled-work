@@ -5,6 +5,7 @@ import {
   type AuthorizationUrlRequest,
   ConfidentialClientApplication,
   CryptoProvider,
+  type ICachePlugin,
 } from "@azure/msal-node";
 import { randomUUID } from "node:crypto";
 
@@ -22,11 +23,8 @@ import {
   TokenRefreshError,
 } from "#/auth/auth.errors.js";
 import { createRelayState } from "#/auth/auth.relay.js";
-import { RedisCachePlugin } from "#/auth/msal.plugin.js";
 import config from "#/config.js";
-import { SECOND } from "#/lib/constants/time.js";
 import { type Either, failure, success } from "#/lib/either.js";
-import { getRedisClient } from "#/lib/redis.js";
 import { logger } from "#/logger.js";
 
 /**
@@ -41,57 +39,18 @@ export class EntraService {
   /**
    * Creates an EntraService instance.
    * @param {string} requestHostname - The hostname of the incoming request (e.g. "my-host.example.com").
-   * @param {ConfidentialClientApplication} msalClient - The MSAL confidential client application.
    */
-  private constructor(
-    requestHostname: string,
-    msalClient?: ConfidentialClientApplication,
-  ) {
+  private constructor(requestHostname: string) {
     this.requestHostname = requestHostname;
-    this.msalClient =
-      msalClient ?? new ConfidentialClientApplication(msalConfig);
+    this.msalClient = new ConfidentialClientApplication(msalConfig);
   }
 
   /**
-   * Factory method to create a new EntraService instance.
-   * Supports three patterns:
-   * - create(hostname) - creates with default MSAL client
-   * - create(hostname, sessionId) - auto-detects Redis and creates with cache plugin if available
-   * - create(hostname, sessionId, msalClient) - creates with provided MSAL client (for testing)
-   *
+   * Factory method to create a new EntraService instance with a default MSAL client.
    * @param {string} requestHostname - The hostname of the incoming request (e.g. "my-host.example.com").
-   * @param {string} [sessionId] - Session ID to enable Redis caching.
-   * @param {ConfidentialClientApplication} [msalClient] - Pre-configured MSAL client for testing or custom setup.
    * @returns {EntraService} A new EntraService instance.
    */
-  public static create(
-    requestHostname: string,
-    sessionId?: string,
-    msalClient?: ConfidentialClientApplication,
-  ): EntraService {
-    // Use provided client if given for testing purporses
-    if (msalClient) {
-      return new EntraService(requestHostname, msalClient);
-    }
-    const redisClient = getRedisClient();
-
-    if (sessionId !== undefined && redisClient) {
-      const sessionTtlSeconds = Math.ceil(
-        config.session.cookie.maxAge / SECOND,
-      );
-
-      const cachePlugin = new RedisCachePlugin(
-        redisClient,
-        sessionId,
-        sessionTtlSeconds,
-      );
-      const configuredMsalClient = new ConfidentialClientApplication({
-        ...msalConfig,
-        cache: { cachePlugin },
-      });
-      return new EntraService(requestHostname, configuredMsalClient);
-    }
-
+  public static create(requestHostname: string): EntraService {
     return new EntraService(requestHostname);
   }
 
@@ -178,6 +137,29 @@ export class EntraService {
       logger.error("Failed to generate Entra auth code URL", error);
       return failure(MsalError.from(error));
     }
+  }
+
+  /**
+   * Configures this instance with a cache plugin, replacing the MSAL client.
+   * @param {ICachePlugin} cachePlugin - The cache plugin to use for token storage.
+   * @returns {this} The same instance for chaining.
+   */
+  public withCachePlugin(cachePlugin: ICachePlugin): this {
+    this.msalClient = new ConfidentialClientApplication({
+      ...msalConfig,
+      cache: { cachePlugin },
+    });
+    return this;
+  }
+
+  /**
+   * Replaces the MSAL client, primarily for testing.
+   * @param {ConfidentialClientApplication} msalClient - The MSAL client to use.
+   * @returns {this} The same instance for chaining.
+   */
+  public withMsalClient(msalClient: ConfidentialClientApplication): this {
+    this.msalClient = msalClient;
+    return this;
   }
 
   /**

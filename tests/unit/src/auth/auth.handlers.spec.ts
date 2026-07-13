@@ -25,7 +25,6 @@ describe("Auth Handlers", () => {
 
   before(() => {
     mockApp = createMockApp();
-
   });
 
   beforeEach(() => {
@@ -34,19 +33,23 @@ describe("Auth Handlers", () => {
     sinon.stub(console, "info");
 
     authServiceStub = {
-      initiateAuthCodeFlow: sinon.stub().resolves(success({
-        authCodeUrl: AUTH_CODE_URL,
-        authState: "test-state",
-        returnTo: "/",
-        pkceCodes: {},
-        authCodeUrlRequest: {},
-        authCodeRequest: {},
-      })),
-      exchangeAuthCode: sinon.stub().resolves(success({
-        idToken: "id-token",
-        accessToken: "access-token",
-        account: undefined,
-      })),
+      initiateAuthCodeFlow: sinon.stub().resolves(
+        success({
+          authCodeUrl: AUTH_CODE_URL,
+          authState: "test-state",
+          returnTo: "/",
+          pkceCodes: {},
+          authCodeUrlRequest: {},
+          authCodeRequest: {},
+        }),
+      ),
+      exchangeAuthCode: sinon.stub().resolves(
+        success({
+          idToken: "id-token",
+          accessToken: "access-token",
+          account: undefined,
+        }),
+      ),
     };
 
     sinon
@@ -145,7 +148,11 @@ describe("Auth Handlers", () => {
         "https://mem-257-xyz-laa-record-controlled-work-uat.cloud-platform.service.justice.gov.uk";
 
       it("redirects to the relay target when state contains a valid signed target for a different host", async () => {
-        const state = createRelayState("nonce-id", VALID_EPHEMERAL_TARGET, SESSION_SECRET);
+        const state = createRelayState(
+          "nonce-id",
+          VALID_EPHEMERAL_TARGET,
+          SESSION_SECRET,
+        );
 
         const res = await request(mockApp)
           .get("/auth/code/callback")
@@ -156,13 +163,19 @@ describe("Auth Handlers", () => {
           `${VALID_EPHEMERAL_TARGET}/auth/code/callback`,
         );
         expect(res.headers.location).to.include("code=auth-code");
-        expect(res.headers.location).to.include(`state=${encodeURIComponent(state)}`);
+        expect(res.headers.location).to.include(
+          `state=${encodeURIComponent(state)}`,
+        );
         expect(res.headers["cache-control"]).to.equal("no-store");
         expect(authServiceStub.exchangeAuthCode.called).to.be.false;
       });
 
       it("responds with 400 when the relay signature is invalid", async () => {
-        const state = createRelayState("nonce-id", VALID_EPHEMERAL_TARGET, "wrong-secret");
+        const state = createRelayState(
+          "nonce-id",
+          VALID_EPHEMERAL_TARGET,
+          "wrong-secret",
+        );
 
         const res = await request(mockApp)
           .get("/auth/code/callback")
@@ -173,7 +186,11 @@ describe("Auth Handlers", () => {
       });
 
       it("responds with 400 when the relay target is not in the allowlist", async () => {
-        const state = createRelayState("nonce-id", "https://invalid.com", SESSION_SECRET);
+        const state = createRelayState(
+          "nonce-id",
+          "https://invalid.com",
+          SESSION_SECRET,
+        );
 
         const res = await request(mockApp)
           .get("/auth/code/callback")
@@ -185,7 +202,11 @@ describe("Auth Handlers", () => {
 
       it("processes the callback normally when the relay target matches the current host", async () => {
         const ephemeralHost = new URL(VALID_EPHEMERAL_TARGET).hostname;
-        const state = createRelayState("nonce-id", `https://${ephemeralHost}`, SESSION_SECRET);
+        const state = createRelayState(
+          "nonce-id",
+          `https://${ephemeralHost}`,
+          SESSION_SECRET,
+        );
 
         const res = await request(mockApp)
           .get("/auth/code/callback")
