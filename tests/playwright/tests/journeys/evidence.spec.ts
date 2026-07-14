@@ -73,9 +73,9 @@ test("evidence flow", async ({ page }) => {
   await expect(rows).toHaveCount(2);
   await expect(rows.locator(".govuk-summary-list__value")).toHaveText([
     // Do yo have evidence
-    "Yes",
-    // Income evidence
-    "Wage slips, Bank statements",
+    "No",
+    // Reason for no evidence
+    "It's not possible to get it before starting the work. Some details about why I don't have evidence.",
   ], { useInnerText: true });
 
   // Submit the check your answers page
