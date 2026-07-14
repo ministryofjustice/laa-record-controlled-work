@@ -50,8 +50,6 @@ const createAppWithSessionStoreClientExposure = async (
 
   return app;
 };
-
-
 describe("Auth Integration", () => {
   before(async () => {
     // MSAL Node uses native fetch (backed by undici). setGlobalDispatcher patches
