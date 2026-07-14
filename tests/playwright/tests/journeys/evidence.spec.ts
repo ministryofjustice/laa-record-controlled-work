@@ -53,8 +53,14 @@ test("evidence flow", async ({ page }) => {
   ).toBeVisible();
 
   // Select "It's not possible to get it before starting the work" and submit
-  await page.getByRole("radio", { name: "It's not possible to get it before starting the work" }).check();
-  await page.getByRole("textbox", { name: "Give more details" }).fill("Some details about why I don't have evidence.");
+  await page
+    .getByRole("radio", {
+      name: "It's not possible to get it before starting the work",
+    })
+    .check();
+  await page
+    .getByRole("textbox", { name: "Give more details" })
+    .fill("Some details about why I don't have evidence.");
   await page.getByRole("button", { name: "Continue" }).click();
 
   // Verify redirection to the check your answers page
@@ -67,16 +73,19 @@ test("evidence flow", async ({ page }) => {
     }),
   ).toBeVisible();
 
-    // Check that all answers are displayed correctly
+  // Check that all answers are displayed correctly
   const summaryList = page.locator(".govuk-summary-list");
   const rows = summaryList.locator(".govuk-summary-list__row");
   await expect(rows).toHaveCount(2);
-  await expect(rows.locator(".govuk-summary-list__value")).toHaveText([
-    // Do yo have evidence
-    "No",
-    // Reason for no evidence
-    "It's not possible to get it before starting the work. Some details about why I don't have evidence.",
-  ], { useInnerText: true });
+  await expect(rows.locator(".govuk-summary-list__value")).toHaveText(
+    [
+      // Do yo have evidence
+      "No",
+      // Reason for no evidence
+      "It&#39;s not possible to get it before starting the work. Some details about why I don&#39;t have evidence.",
+    ],
+    { useInnerText: true },
+  );
 
   // Submit the check your answers page
   await page.getByRole("button", { name: "Save and continue" }).click();
