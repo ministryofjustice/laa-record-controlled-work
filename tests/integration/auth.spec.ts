@@ -10,7 +10,8 @@ import { expect } from "chai";
 import config from "#/config.js";
 import { SessionData } from "express-session";
 import { Agent, request as undiciRequest, setGlobalDispatcher } from "undici";
-import { createClient, RedisClientType } from "redis";
+import type { RedisClientType } from "redis";
+import { createRedisClient as createAppRedisClient } from "#/lib/redis.js";
 import { FOUND, OK } from "#/lib/constants/http.js";
 
 const REDIS_PORT = 6379;
@@ -21,7 +22,7 @@ let idpContainer: StartedTestContainer;
 let app: Application;
 let authenticatedUser: ReturnType<typeof request.agent>;
 let unauthenticatedUser: ReturnType<typeof request.agent>;
-let appSessionRedisClient: RedisClientType;
+let sessionRedisClient: RedisClientType;
 
 describe("Auth Integration", () => {
   before(async function () {
@@ -60,15 +61,20 @@ describe("Auth Integration", () => {
     config.redis.url = redisUrl;
     process.env.PLAYWRIGHT_TEST_SIGNIN = "true";
 
-    app = await createApp();
-
-    appSessionRedisClient = createClient({ url: redisUrl }) as RedisClientType;
-    await appSessionRedisClient.connect();
+    app = await createApp({
+      createRedisClient: (redisConfig) => {
+        sessionRedisClient = createAppRedisClient(redisConfig);
+        return sessionRedisClient;
+      },
+    });
   });
 
   after(async () => {
+    if (sessionRedisClient.isOpen) {
+      await sessionRedisClient.quit();
+    }
+
     await Promise.all([
-      appSessionRedisClient.quit(),
       redisContainer?.stop(),
       idpContainer?.stop(),
     ]);
@@ -81,7 +87,7 @@ describe("Auth Integration", () => {
   });
 
   afterEach(async () => {
-    await appSessionRedisClient.flushAll();
+    await sessionRedisClient.flushAll();
   });
 
   describe("GET /health", () => {
@@ -107,8 +113,8 @@ describe("Auth Integration", () => {
 
     it("authenicated user will store session data in redis", async () => {
       await authenticatedUser.get("/");
-      const keys = await appSessionRedisClient.keys("sess:*");
-      const raw = await appSessionRedisClient.get(keys[0]);
+      const keys = await sessionRedisClient.keys("sess:*");
+      const raw = await sessionRedisClient.get(keys[0]);
       const session = JSON.parse(raw!) as SessionData;
       expect(session.isAuthenticated).to.equal(true);
       expect(session.account?.homeAccountId).to.equal(

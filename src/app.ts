@@ -18,7 +18,12 @@ import { autocomplete } from "#/journeys/components/autocomplete/autocomplete.co
 import createApplication from "#/journeys/create-application/create-application.index.js";
 import evidence from "#/journeys/evidence/evidence.index.js";
 import yourCases from "#/journeys/your-cases/your-cases.index.js";
-import { createSession } from "#/lib/session.js";
+import * as redis from "#/lib/redis.js";
+import {
+  type CreateRedisClient,
+  type CreateRedisStore,
+  createSession,
+} from "#/lib/session.js";
 import { requireAuth } from "#/middleware/requireAuth.js";
 import { setupConfig } from "#/middleware/setupConfigs.js";
 import { setupCsrf } from "#/middleware/setupCsrf.js";
@@ -36,13 +41,26 @@ import indexRouter from "#/routes/index.js";
 import testRouter from "#/routes/test.js";
 const TRUST_FIRST_PROXY = 1;
 
+interface Dependencies {
+  createRedisClient?: CreateRedisClient;
+  createRedisStore?: CreateRedisStore;
+}
+
 /**
  * Creates and configures an Express application.
  * Server startup is handled separately in src/server.ts.
  *
+ * @param dependencies injected dependencies
  * @returns {Promise<import('express').Application>} The configured Express application
  */
-const createApp = async (): Promise<express.Application> => {
+const createApp = async (
+  dependencies: Dependencies = {},
+): Promise<express.Application> => {
+  const {
+    createRedisClient = redis.createRedisClient,
+    createRedisStore = redis.createRedisStore,
+  } = dependencies;
+
   const app = express();
 
   app.use("/", healthRouter);
@@ -97,7 +115,9 @@ const createApp = async (): Promise<express.Application> => {
   setupRequestLogging(app);
 
   // Setup express-session using redis
-  app.use(session(await createSession(config)));
+  app.use(
+    session(await createSession(config, createRedisClient, createRedisStore)),
+  );
 
   setupCsrf(app);
 

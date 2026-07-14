@@ -1,9 +1,11 @@
 import type { RedisStore } from "connect-redis";
 import type { SessionOptions } from "express-session";
+import type { RedisClientType } from "redis";
 
-import type { Config } from "#/config.types.js";
+import type { Config, RedisConfig } from "#/config.types.js";
 
-import * as redis from "#/lib/redis.js";
+export type CreateRedisClient = (options: RedisConfig) => RedisClientType;
+export type CreateRedisStore = (client: RedisClientType) => Promise<RedisStore>;
 
 /**
  * Express middleware to set up session store instance
@@ -15,8 +17,8 @@ import * as redis from "#/lib/redis.js";
  */
 export async function createSession(
   config: Config,
-  createRedisClient = redis.createRedisClient,
-  createRedisStore = redis.createRedisStore,
+  createRedisClient: CreateRedisClient,
+  createRedisStore: CreateRedisStore,
 ): Promise<SessionOptions> {
   if (config.redis.enabled) {
     const client = createRedisClient(config.redis);
