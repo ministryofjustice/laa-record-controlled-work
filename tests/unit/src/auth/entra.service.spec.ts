@@ -42,9 +42,7 @@ describe("EntraService", () => {
       getAuthCodeUrl: sinon.stub().resolves(AUTH_CODE_URL),
     };
 
-    service = EntraService.create(REDIRECT_URI_HOSTNAME).withMsalClient(
-      msalStub as ConfidentialClientApplication,
-    );
+    service = EntraService.create({ requestHostname: REDIRECT_URI_HOSTNAME, msalClient: msalStub as ConfidentialClientApplication});
 
     sinon.stub(CryptoProvider.prototype, "generatePkceCodes").resolves({
       verifier: VERIFIER,
@@ -56,37 +54,38 @@ describe("EntraService", () => {
 
   describe("create() factory method", () => {
     it("returns an EntraService instance with a default MSAL client", () => {
-      const result = EntraService.create(REDIRECT_URI_HOSTNAME);
+      const result = EntraService.create({ requestHostname: REDIRECT_URI_HOSTNAME});
 
       expect(result).to.be.an.instanceOf(EntraService);
       expect(result.msalClient).to.be.an.instanceOf(
         ConfidentialClientApplication,
       );
     });
-  });
 
-  describe("withMsalClient()", () => {
-    it("replaces the MSAL client", () => {
-      const customMsalStub =
-        sinon.stub() as unknown as ConfidentialClientApplication;
-      const result = EntraService.create(REDIRECT_URI_HOSTNAME).withMsalClient(customMsalStub);
+    it("uses the supplied msalClient when provided", () => {
+      const providedClient = msalStub as ConfidentialClientApplication;
 
-      expect(result.msalClient).to.equal(customMsalStub);
-    });
-  });
+      const result = EntraService.create({
+        requestHostname: REDIRECT_URI_HOSTNAME,
+        msalClient: providedClient,
+      });
 
-  describe("withCachePlugin()", () => {
-    it("replaces the MSAL client with a new instance", () => {
-      const cachePlugin = {} as ICachePlugin;
-      const instance = EntraService.create(REDIRECT_URI_HOSTNAME);
-      const originalClient = instance.msalClient;
-      const result = instance.withCachePlugin(cachePlugin);
-      
-      expect(result).to.equal(instance);
-      expect(instance.msalClient).to.not.equal(originalClient);
-      expect(instance.msalClient).to.be.an.instanceOf(ConfidentialClientApplication);
+      expect(result.msalClient).to.equal(providedClient);
     });
 
+    it("uses cachePlugin as token cache persistence", () => {
+      const cachePlugin = {
+        beforeCacheAccess: sinon.stub().resolves(),
+        afterCacheAccess: sinon.stub().resolves(),
+      } as unknown as ICachePlugin;
+
+      const result = EntraService.create({
+        requestHostname: REDIRECT_URI_HOSTNAME,
+        cachePlugin,
+      });
+
+      expect(result.msalClient.getTokenCache().persistence).to.equal(cachePlugin);
+    });
   });
 
   describe("initiateAuthCodeFlow()", () => {
@@ -169,9 +168,7 @@ describe("EntraService", () => {
     });
 
     it("creates a relay state with target and sig when requestHostname differs from redirect URI hostname", async () => {
-      const ephemeralService = EntraService.create(EPHEMERAL_HOSTNAME).withMsalClient(
-        msalStub as ConfidentialClientApplication,
-      );
+      const ephemeralService = EntraService.create({requestHostname: EPHEMERAL_HOSTNAME})
       const result =
         (await ephemeralService.initiateAuthCodeFlow()) as Success<AuthCodeFlowState>;
       const parsed = parseRelayState(result.value.authState);
@@ -360,9 +357,7 @@ describe("EntraService", () => {
     });
 
     it("creates a relay state with target and sig when requestHostname differs from redirect URI hostname", async () => {
-      const ephemeralService = EntraService.create(EPHEMERAL_HOSTNAME).withMsalClient(
-        msalStub as ConfidentialClientApplication,
-      );
+      const ephemeralService = EntraService.create({requestHostname: EPHEMERAL_HOSTNAME})
       const result =
         (await ephemeralService.initiateAuthCodeFlow()) as Success<AuthCodeFlowState>;
       const parsed = parseRelayState(result.value.authState);

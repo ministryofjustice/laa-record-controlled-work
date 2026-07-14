@@ -27,6 +27,12 @@ import config from "#/config.js";
 import { type Either, failure, success } from "#/lib/either.js";
 import { logger } from "#/logger.js";
 
+interface EntraServiceConfig {
+  cachePlugin?: ICachePlugin;
+  msalClient?: ConfidentialClientApplication;
+  requestHostname: string;
+}
+
 /**
  * Handles Microsoft Entra ID (MSAL) authentication flows including
  * PKCE code exchange, token acquisition, and logout URL generation.
@@ -39,19 +45,31 @@ export class EntraService {
   /**
    * Creates an EntraService instance.
    * @param {string} requestHostname - The hostname of the incoming request (e.g. "my-host.example.com").
+   * @param {ConfidentialClientApplication} msalclient - The MSAL client instance to use for token acquisition and code exchange.
    */
-  private constructor(requestHostname: string) {
+  private constructor(
+    requestHostname: string,
+    msalclient: ConfidentialClientApplication,
+  ) {
     this.requestHostname = requestHostname;
-    this.msalClient = new ConfidentialClientApplication(msalConfig);
+    this.msalClient = msalclient;
   }
 
   /**
    * Factory method to create a new EntraService instance with a default MSAL client.
-   * @param {string} requestHostname - The hostname of the incoming request (e.g. "my-host.example.com").
+   * @param {config} config - Configuration for the EntraService, including optional cache plugin and request hostname.
    * @returns {EntraService} A new EntraService instance.
    */
-  public static create(requestHostname: string): EntraService {
-    return new EntraService(requestHostname);
+  public static create(config: EntraServiceConfig): EntraService {
+    const cachePlugin = config.cachePlugin ?? undefined;
+    const msalClient =
+      config.msalClient ??
+      new ConfidentialClientApplication({
+        ...msalConfig,
+        cache: { cachePlugin },
+      });
+
+    return new EntraService(config.requestHostname, msalClient);
   }
 
   /**
@@ -137,29 +155,6 @@ export class EntraService {
       logger.error("Failed to generate Entra auth code URL", error);
       return failure(MsalError.from(error));
     }
-  }
-
-  /**
-   * Configures this instance with a cache plugin, replacing the MSAL client.
-   * @param {ICachePlugin} cachePlugin - The cache plugin to use for token storage.
-   * @returns {this} The same instance for chaining.
-   */
-  public withCachePlugin(cachePlugin: ICachePlugin): this {
-    this.msalClient = new ConfidentialClientApplication({
-      ...msalConfig,
-      cache: { cachePlugin },
-    });
-    return this;
-  }
-
-  /**
-   * Replaces the MSAL client, primarily for testing.
-   * @param {ConfidentialClientApplication} msalClient - The MSAL client to use.
-   * @returns {this} The same instance for chaining.
-   */
-  public withMsalClient(msalClient: ConfidentialClientApplication): this {
-    this.msalClient = msalClient;
-    return this;
   }
 
   /**

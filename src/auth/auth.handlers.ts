@@ -53,16 +53,17 @@ export async function authCodeCallback(
       return;
     }
 
-    // exchange auth code for tokens and state
     const cachePlugin = new RedisCachePlugin(
       getRedisClient(),
       req.sessionID,
       config.redis.maxAge,
     );
-    const entra = EntraService.create(req.hostname).withCachePlugin(
+    const entra = EntraService.create({
       cachePlugin,
-    );
+      requestHostname: req.hostname,
+    });
 
+    // exchange auth code for tokens and state
     const result = await entra.exchangeAuthCode(data.code, authCodeRequest);
     if (result.error) {
       res.status(UNAUTHORIZED).send(result.error.message);
@@ -96,7 +97,16 @@ export async function signIn(
   res: Response,
   next: NextFunction,
 ): Promise<void> {
-  const entra = EntraService.create(req.hostname);
+  const cachePlugin = new RedisCachePlugin(
+    getRedisClient(),
+    req.sessionID,
+    config.redis.maxAge,
+  );
+
+  const entra = EntraService.create({
+    cachePlugin,
+    requestHostname: req.hostname,
+  });
 
   try {
     const result = await entra.initiateAuthCodeFlow(req.session.returnTo);
