@@ -67,11 +67,16 @@ test("evidence flow", async ({ page }) => {
     }),
   ).toBeVisible();
 
-  // Verify that the answers are displayed correctly
-  await expect(page.getByText("Do you have evidence?")).toBeVisible();
-  await expect(page.getByText("Yes")).toBeVisible();
-  await expect(page.getByText("Income")).toBeVisible();
-  await expect(page.getByText("Wage slips, Bank statements")).toBeVisible();
+    // Check that all answers are displayed correctly
+  const summaryList = page.locator(".govuk-summary-list");
+  const rows = summaryList.locator(".govuk-summary-list__row");
+  await expect(rows).toHaveCount(7);
+  await expect(rows.locator(".govuk-summary-list__value")).toHaveText([
+    // Do yo have evidence
+    "Yes",
+    // Income evidence
+    "Wage slips, Bank statements",
+  ], { useInnerText: true });
 
   // Submit the check your answers page
   await page.getByRole("button", { name: "Save and continue" }).click();
