@@ -10,7 +10,7 @@ import { expect } from "chai";
 import config from "#/config.js";
 import { SessionData } from "express-session";
 import { Agent, request as undiciRequest, setGlobalDispatcher } from "undici";
-import { RedisClientType } from "redis";
+import { createClient, RedisClientType } from "redis";
 import { FOUND, OK } from "#/lib/constants/http.js";
 
 const REDIS_PORT = 6379;
@@ -23,35 +23,9 @@ let authenticatedUser: ReturnType<typeof request.agent>;
 let unauthenticatedUser: ReturnType<typeof request.agent>;
 let appSessionRedisClient: RedisClientType;
 
-const createAppWithSessionStoreClientExposure = async (
-  identityProviderContainer: StartedTestContainer,
-  redisStoreContainer: StartedTestContainer,
-): Promise<Application> => {
-
-  // Override config to point to testcontainers instances
-  const idpPort = identityProviderContainer.getMappedPort(IDP_PORT);
-  config.entra.authority = `https://localhost:${idpPort}/default`;
-  config.entra.redirectUri = "http://127.0.0.1/auth/code/callback";
-  config.redis.enabled = true;
-  config.redis.url = `redis://localhost:${redisStoreContainer.getMappedPort(REDIS_PORT)}`;
-  process.env.PLAYWRIGHT_TEST_SIGNIN = "true";
-
-  const app = await createApp();
-
-  // Expose an endpoint to retrieve the session store's Redis client for testing purposes
-  app.get("/__test/session-store-client", (req, res) => {
-    if (!("client" in req.sessionStore)) {
-      throw new Error("Expected connect-redis session store in integration test");
-    }
-
-    appSessionRedisClient = req.sessionStore.client as RedisClientType;
-    res.status(OK).send("ok");
-  });
-
-  return app;
-};
 describe("Auth Integration", () => {
-  before(async () => {
+  before(async function () {
+    this.timeout(300_000); // containers may need to pull images on first run
     // MSAL Node uses native fetch (backed by undici). setGlobalDispatcher patches
     // undici's default dispatcher so fetch accepts the mock IdP's self-signed TLS cert.
     setGlobalDispatcher(new Agent({ connect: { rejectUnauthorized: false } }));
@@ -77,26 +51,32 @@ describe("Auth Integration", () => {
         .start(),
     ]);
 
-    // Create app instance and reuse its session store Redis client
-    app = await createAppWithSessionStoreClientExposure(
-      idpContainer,
-      redisContainer,
-    );
-    
+    const idpPort = idpContainer.getMappedPort(IDP_PORT);
+    const redisUrl = `redis://localhost:${redisContainer.getMappedPort(REDIS_PORT)}`;
+
+    config.entra.authority = `https://localhost:${idpPort}/default`;
+    config.entra.redirectUri = "http://127.0.0.1/auth/code/callback";
+    config.redis.enabled = true;
+    config.redis.url = redisUrl;
+    process.env.PLAYWRIGHT_TEST_SIGNIN = "true";
+
+    app = await createApp();
+
+    appSessionRedisClient = createClient({ url: redisUrl }) as RedisClientType;
+    await appSessionRedisClient.connect();
   });
 
   after(async () => {
     await Promise.all([
       appSessionRedisClient.quit(),
       redisContainer?.stop(),
-      idpContainer?.stop()
+      idpContainer?.stop(),
     ]);
   });
 
   beforeEach(async () => {
     authenticatedUser = request.agent(app);
     await authenticatedUser.get("/test/signin");
-    await authenticatedUser.get("/__test/session-store-client");
     unauthenticatedUser = request.agent(app);
   });
 
