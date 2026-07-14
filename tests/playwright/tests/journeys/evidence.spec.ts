@@ -59,4 +59,23 @@ test("evidence flow", async ({ page }) => {
 
   // Verify redirection to the check your answers page
   await expect(page).toHaveURL("/cases/evidence/check-answers");
+
+  await expect(
+    page.getByRole("heading", {
+      name: /Check your answers/,
+      level: 1,
+    }),
+  ).toBeVisible();
+
+  // Verify that the answers are displayed correctly
+  await expect(page.getByText("Do you have evidence?")).toBeVisible();
+  await expect(page.getByText("Yes")).toBeVisible();
+  await expect(page.getByText("Income")).toBeVisible();
+  await expect(page.getByText("Wage slips, Bank statements")).toBeVisible();
+
+  // Submit the check your answers page
+  await page.getByRole("button", { name: "Save and continue" }).click();
+
+  // Verify redirection to the task list page
+  await expect(page).toHaveURL("/task-list");
 });
