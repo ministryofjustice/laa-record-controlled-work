@@ -70,7 +70,7 @@ test("evidence flow", async ({ page }) => {
     // Check that all answers are displayed correctly
   const summaryList = page.locator(".govuk-summary-list");
   const rows = summaryList.locator(".govuk-summary-list__row");
-  await expect(rows).toHaveCount(7);
+  await expect(rows).toHaveCount(2);
   await expect(rows.locator(".govuk-summary-list__value")).toHaveText([
     // Do yo have evidence
     "Yes",
