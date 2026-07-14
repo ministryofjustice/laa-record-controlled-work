@@ -32,7 +32,7 @@ test("evidence flow", async ({ page }) => {
   await page.getByRole("button", { name: "Continue" }).click();
 
   // Verify redirection to the evidence of expenditure and capital page
-  await expect(page).toHaveURL("/cases/evidence/evidence-of-expenditure-and-capital");
+  await expect(page).toHaveURL("/cases/evidence/check-answers");
 
   // Navigate back to the has evidence page
   await page.goto("/cases/evidence/have-evidence");
