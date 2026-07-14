@@ -18,7 +18,6 @@ import {
   INTERNAL_SERVER_ERROR,
   UNAUTHORIZED,
 } from "#/lib/constants/http.js";
-import { SECOND } from "#/lib/constants/time.js";
 import { getRedisClient } from "#/lib/redis.js";
 import { logger } from "#/logger.js";
 
