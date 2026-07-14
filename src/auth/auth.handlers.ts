@@ -55,11 +55,10 @@ export async function authCodeCallback(
     }
 
     // exchange auth code for tokens and state
-    const ttlSeconds = Math.ceil(config.session.cookie.maxAge / SECOND);
     const cachePlugin = new RedisCachePlugin(
       getRedisClient(),
       req.sessionID,
-      ttlSeconds,
+      config.redis.maxAge,
     );
     const entra = EntraService.create(req.hostname).withCachePlugin(
       cachePlugin,

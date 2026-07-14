@@ -87,6 +87,7 @@ export default {
 
   redis: {
     enabled: optional.REDIS_ENABLED === "true",
+    maxAge: Math.ceil(SESSION_AGE_MAX / SECOND),
     maxRetryAttempts: REDIS_MAX_RETRY_ATTEMPTS,
     socketConnectionTimeout: REDIS_SOCKET_CONNECTION_TIMEOUT,
     url:

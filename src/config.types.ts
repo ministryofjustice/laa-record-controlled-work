@@ -58,6 +58,7 @@ export interface EntraConfig {
 
 export interface RedisConfig {
   enabled: boolean;
+  maxAge: number;
   maxRetryAttempts: number;
   socketConnectionTimeout: number;
   url: string;
