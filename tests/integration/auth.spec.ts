@@ -99,19 +99,19 @@ describe("Auth Integration", () => {
   });
 
   describe("Get /", () => {
-    it("redirects unauthenicated user to /auth/signin", async () => {
+    it("redirects unauthenticated user to /auth/signin", async () => {
       const res = await unauthenticatedUser.get("/");
       expect(res.status).to.equal(FOUND);
       expect(res.headers.location).to.equal("/auth/signin");
     });
 
-    it("authenicated user lands on landing page", async () => {
+    it("authenticated user lands on landing page", async () => {
       const res = await authenticatedUser.get("/");
       expect(res.status).to.equal(OK);
       expect(res.text).to.include("Landing Page");
     });
 
-    it("authenicated user will store session data in redis", async () => {
+    it("authenticated user will store session data in redis", async () => {
       await authenticatedUser.get("/");
       const keys = await sessionRedisClient.keys("sess:*");
       const raw = await sessionRedisClient.get(keys[0]);
