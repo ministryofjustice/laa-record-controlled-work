@@ -2016,7 +2016,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@typescript-eslint/parser@npm:8.63.0, @typescript-eslint/parser@npm:^8.62.1":
+"@typescript-eslint/parser@npm:8.63.0, @typescript-eslint/parser@npm:^8.63.0":
   version: 8.63.0
   resolution: "@typescript-eslint/parser@npm:8.63.0"
   dependencies:
@@ -5234,7 +5234,7 @@ __metadata:
     "@types/nunjucks": "npm:^3.2.6"
     "@types/sinon": "npm:^21.0.1"
     "@types/supertest": "npm:^7.2.0"
-    "@typescript-eslint/parser": "npm:^8.62.1"
+    "@typescript-eslint/parser": "npm:^8.63.0"
     accessible-autocomplete: "npm:^3.0.1"
     body-parser: "npm:^2.3.0"
     c8: "npm:^11.0.0"
