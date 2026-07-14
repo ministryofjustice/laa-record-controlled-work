@@ -73,18 +73,16 @@ export default {
   } satisfies CsrfConfig,
 
   entra: {
-    api: {
-      scopes: [
-        "openid",
-        "profile",
-        "offline_access",
-        "https://devlexternal.onmicrosoft.com/laa-record-controlled-work-api-uat/Applications.Read",
-      ],
-    },
     authority: `${required.ENTRA_AUTHORITY_BASE_URL}${required.ENTRA_TENANT_ID}`,
     clientId: required.ENTRA_CLIENT_ID,
     clientSecret: required.ENTRA_CLIENT_SECRET,
     redirectUri: required.ENTRA_REDIRECT_URI,
+    scopes: [
+      "openid",
+      "profile",
+      "offline_access",
+      "https://devlexternal.onmicrosoft.com/laa-record-controlled-work-api-uat/Applications.Read",
+    ],
   } satisfies EntraConfig,
 
   redis: {

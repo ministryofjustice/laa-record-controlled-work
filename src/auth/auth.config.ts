@@ -10,7 +10,7 @@ export const msalConfig = {
   },
 };
 
-export const scopes: string[] = config.entra.api.scopes;
+export const scopes: string[] = config.entra.scopes;
 export const authRequestDefaults = {
   prompt: "select_account",
   redirectUri: config.entra.redirectUri,

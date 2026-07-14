@@ -49,13 +49,11 @@ export interface CsrfConfig {
 }
 
 export interface EntraConfig {
-  api: {
-    scopes: string[];
-  };
   authority: string;
   clientId: string;
   clientSecret: string;
   redirectUri: string;
+  scopes: string[];
 }
 
 export interface RedisConfig {
