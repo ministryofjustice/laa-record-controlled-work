@@ -53,10 +53,12 @@ export interface EntraConfig {
   clientId: string;
   clientSecret: string;
   redirectUri: string;
+  scopes: string[];
 }
 
 export interface RedisConfig {
   enabled: boolean;
+  maxAge: number;
   maxRetryAttempts: number;
   socketConnectionTimeout: number;
   url: string;

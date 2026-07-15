@@ -134,6 +134,7 @@ class Autocomplete extends HTMLElement {
     const input = this.querySelector("input");
 
     if (!input) {
+      // eslint-disable-next-line no-console -- Necessary for surfacing errors.
       console.warn("accessible-autocomplete: no input found", this);
       return;
     }

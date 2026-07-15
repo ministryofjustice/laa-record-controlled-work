@@ -9,18 +9,17 @@ import * as redis from "#/lib/redis.js";
  * Express middleware to set up session store instance
  * if redis is not enabled will default to MemoryStore
  * @param config config
- * @param createRedisClient .
+ * @param getRedisClient .
  * @param createRedisStore .
  * @returns - Promise of a Requesr Handler
  */
 export async function createSession(
   config: Config,
-  createRedisClient = redis.createRedisClient,
+  getRedisClient = redis.getRedisClient,
   createRedisStore = redis.createRedisStore,
 ): Promise<SessionOptions> {
   if (config.redis.enabled) {
-    const client = createRedisClient(config.redis);
-    const store: RedisStore = await createRedisStore(client);
+    const store: RedisStore = await createRedisStore(getRedisClient());
 
     return {
       ...config.session,

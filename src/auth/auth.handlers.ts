@@ -11,12 +11,14 @@ import {
 } from "#/auth/auth.relay.js";
 import { authCodeCallbackSchema } from "#/auth/auth.types.js";
 import { EntraService } from "#/auth/entra.service.js";
+import { RedisCachePlugin } from "#/auth/msal.plugin.js";
 import config from "#/config.js";
 import {
   BAD_REQUEST,
   INTERNAL_SERVER_ERROR,
   UNAUTHORIZED,
 } from "#/lib/constants/http.js";
+import { getRedisClient } from "#/lib/redis.js";
 import { logger } from "#/logger.js";
 
 /**
@@ -51,8 +53,17 @@ export async function authCodeCallback(
       return;
     }
 
+    const cachePlugin = new RedisCachePlugin(
+      getRedisClient(),
+      req.sessionID,
+      config.redis.maxAge,
+    );
+    const entra = EntraService.create({
+      cachePlugin,
+      requestHostname: req.hostname,
+    });
+
     // exchange auth code for tokens and state
-    const entra = EntraService.create(req.hostname);
     const result = await entra.exchangeAuthCode(data.code, authCodeRequest);
     if (result.error) {
       res.status(UNAUTHORIZED).send(result.error.message);
@@ -66,7 +77,8 @@ export async function authCodeCallback(
         return;
       }
 
-      Object.assign(req.session, result.value, { isAuthenticated: true });
+      const { account } = result.value;
+      Object.assign(req.session, { account, isAuthenticated: true });
       res.redirect(returnTo ?? "/");
     });
   } catch (error) {
@@ -85,7 +97,16 @@ export async function signIn(
   res: Response,
   next: NextFunction,
 ): Promise<void> {
-  const entra = EntraService.create(req.hostname);
+  const cachePlugin = new RedisCachePlugin(
+    getRedisClient(),
+    req.sessionID,
+    config.redis.maxAge,
+  );
+
+  const entra = EntraService.create({
+    cachePlugin,
+    requestHostname: req.hostname,
+  });
 
   try {
     const result = await entra.initiateAuthCodeFlow(req.session.returnTo);
