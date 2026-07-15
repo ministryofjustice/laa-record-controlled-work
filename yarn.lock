@@ -3599,9 +3599,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-jsonc@npm:^3.2.0":
-  version: 3.2.0
-  resolution: "eslint-plugin-jsonc@npm:3.2.0"
+"eslint-plugin-jsonc@npm:^3.3.0":
+  version: 3.3.0
+  resolution: "eslint-plugin-jsonc@npm:3.3.0"
   dependencies:
     "@eslint-community/eslint-utils": "npm:^4.5.1"
     "@eslint/core": "npm:^1.0.1"
@@ -3614,7 +3614,7 @@ __metadata:
     synckit: "npm:^0.11.12"
   peerDependencies:
     eslint: ">=9.38.0"
-  checksum: 10c0/1fd91b27a7b0d717a15af11d2b006a6085c53406bdf4d688b326848b9f5f6c74eab57233e341d6ccd6830de16cb2f91d0e98d891b6f96ac5947c397f5d6d3ea0
+  checksum: 10c0/070bf8fc638fddb54c0f46c4f55be25437b624f705e93f4074bc1459015945a10ba751e28144a761f18947d7f0043cea3d914322320209ee2bd4baa6cda62e37
   languageName: node
   linkType: hard
 
@@ -5254,7 +5254,7 @@ __metadata:
     eslint-config-love: "npm:^154.0.0"
     eslint-config-prettier: "npm:^10.1.8"
     eslint-plugin-jsdoc: "npm:^63.0.12"
-    eslint-plugin-jsonc: "npm:^3.2.0"
+    eslint-plugin-jsonc: "npm:^3.3.0"
     eslint-plugin-perfectionist: "npm:^5.9.1"
     eslint-plugin-prettier: "npm:^5.5.6"
     express: "npm:^5.2.1"
