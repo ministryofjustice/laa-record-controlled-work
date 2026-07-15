@@ -280,7 +280,7 @@
         }
       },
       "evidenceOfExpenditure": {
-        "title": "Evidence of your client’s expenditure",
+        "title": "Evidence of your client's expenditure",
         "hint": "Select all that apply.",
         "linkText": "Check the risk-based evidence guidelines (opens in a new window or tab).",
         "description": "You only need to gather evidence of your client's expenditure if they are close to the threshold and there is a risk of them being ineligible.",

@@ -5,6 +5,7 @@ import { checkAnswersStep } from "#/journeys/evidence/steps/check-answers/check-
 import { doYouHaveEvidence } from "#/journeys/evidence/steps/do-you-have-evidence/do-you-have-evidence.step.js";
 import { evidenceOfIncome } from "#/journeys/evidence/steps/evidence-of-income/evidence-of-income.step.js";
 import { reasonForNoEvidence } from "#/journeys/evidence/steps/reason-for-no-evidence/reason-for-no-evidence.step.js";
+import { evidenceOfExpenditure } from "#/journeys/evidence/steps/evidence-of-expenditure/evidence-of-expenditure.step.js";
 
 const journeyCode = "evidence";
 
@@ -21,6 +22,7 @@ export const EvidenceJourney = journey({
     doYouHaveEvidence(journeyCode),
     reasonForNoEvidence(journeyCode),
     evidenceOfIncome(journeyCode),
+    evidenceOfExpenditure(journeyCode),
     checkAnswersStep(),
   ],
   title: "Evidence",
