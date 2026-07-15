@@ -47,10 +47,6 @@ const evidenceOfIncomeList = NunjucksGenerators.String({
     asylumSupportEvidence: Answer("asylumSupportEvidence"),
     benefitsInKindEvidence: Answer("benefitsInKindEvidence"),
     employedEvidence: Answer("employedEvidence"),
-    otherEvidence: Answer("otherEvidence"),
-    selfEmployedEvidence: Answer("selfEmployedEvidence"),
-    stateBenefitsEvidence: Answer("stateBenefitsEvidence"),
-    taxCreditsEvidence: Answer("taxCreditsEvidence"),
     evidenceHeadings: {
       asylumSupportEvidenceLabel: t(
         "journeys.evidence.evidenceOfIncome.groupsOfEvidence.asylumSupport",
@@ -126,6 +122,10 @@ const evidenceOfIncomeList = NunjucksGenerators.String({
         "journeys.evidence.evidenceOfIncome.evidenceTypes.wageSlips",
       ),
     },
+    otherEvidence: Answer("otherEvidence"),
+    selfEmployedEvidence: Answer("selfEmployedEvidence"),
+    stateBenefitsEvidence: Answer("stateBenefitsEvidence"),
+    taxCreditsEvidence: Answer("taxCreditsEvidence"),
   },
   template: `
     {% if employedEvidence.length > 0 %}
@@ -160,45 +160,30 @@ const evidenceOfIncomeList = NunjucksGenerators.String({
 
 const evidenceOfExpenditureList = NunjucksGenerators.String({
   data: {
-    incomeEvidence: Answer("incomeEvidence"),
-    housingCostsEvidence: Answer("housingCostsEvidence"),
     childCareEvidence: Answer("childCareEvidence"),
-    maintenanceEvidence: Answer("maintenanceEvidence"),
     evidenceHeadings: {
-      incomeEvidence: t(
-        "journeys.evidence.evidenceOfExpenditure.groupsOfEvidence.incomeTaxAndNationalInsurance",
+      childCareEvidence: t(
+        "journeys.evidence.evidenceOfExpenditure.groupsOfEvidence.childCare",
       ),
       housingCostsEvidence: t(
         "journeys.evidence.evidenceOfExpenditure.groupsOfEvidence.housingCosts",
       ),
-      childCareEvidence: t(
-        "journeys.evidence.evidenceOfExpenditure.groupsOfEvidence.childCare",
+      incomeEvidence: t(
+        "journeys.evidence.evidenceOfExpenditure.groupsOfEvidence.incomeTaxAndNationalInsurance",
       ),
       maintenanceEvidence: t(
         "journeys.evidence.evidenceOfExpenditure.groupsOfEvidence.maintenance",
       ),
     },
     evidenceTypeLabels: {
-      bankStatementsHousing: t(
-        "journeys.evidence.evidenceOfExpenditure.evidenceTypes.bankStatementsHousing",
-      ),
-      mortgageStatement: t(
-        "journeys.evidence.evidenceOfExpenditure.evidenceTypes.mortgageStatement",
-      ),
-      rentStatement: t(
-        "journeys.evidence.evidenceOfExpenditure.evidenceTypes.rentStatement",
-      ),
-      wageSlips: t(
-        "journeys.evidence.evidenceOfExpenditure.evidenceTypes.wageSlips",
-      ),
-      taxCalculationSheet: t(
-        "journeys.evidence.evidenceOfExpenditure.evidenceTypes.taxCalculationSheet",
+      agreementOrContract: t(
+        "journeys.evidence.evidenceOfExpenditure.evidenceTypes.agreementOrContract",
       ),
       bankStatementsChildCare: t(
         "journeys.evidence.evidenceOfExpenditure.evidenceTypes.bankStatementsChildCare",
       ),
-      agreementOrContract: t(
-        "journeys.evidence.evidenceOfExpenditure.evidenceTypes.agreementOrContract",
+      bankStatementsHousing: t(
+        "journeys.evidence.evidenceOfExpenditure.evidenceTypes.bankStatementsHousing",
       ),
       bankStatementsMaintenance: t(
         "journeys.evidence.evidenceOfExpenditure.evidenceTypes.bankStatementsMaintenance",
@@ -206,10 +191,25 @@ const evidenceOfExpenditureList = NunjucksGenerators.String({
       maintenanceOrder: t(
         "journeys.evidence.evidenceOfExpenditure.evidenceTypes.maintenanceOrder",
       ),
+      mortgageStatement: t(
+        "journeys.evidence.evidenceOfExpenditure.evidenceTypes.mortgageStatement",
+      ),
       receipts: t(
         "journeys.evidence.evidenceOfExpenditure.evidenceTypes.receipts",
       ),
+      rentStatement: t(
+        "journeys.evidence.evidenceOfExpenditure.evidenceTypes.rentStatement",
+      ),
+      taxCalculationSheet: t(
+        "journeys.evidence.evidenceOfExpenditure.evidenceTypes.taxCalculationSheet",
+      ),
+      wageSlips: t(
+        "journeys.evidence.evidenceOfExpenditure.evidenceTypes.wageSlips",
+      ),
     },
+    housingCostsEvidence: Answer("housingCostsEvidence"),
+    incomeEvidence: Answer("incomeEvidence"),
+    maintenanceEvidence: Answer("maintenanceEvidence"),
     noEvidenceLabel: t("journeys.evidence.checkAnswers.noEvidenceProvided"),
   },
   template: `

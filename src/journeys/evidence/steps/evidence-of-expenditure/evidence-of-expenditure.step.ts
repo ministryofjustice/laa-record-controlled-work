@@ -15,9 +15,9 @@ import {
 import {
   childCareEvidenceGroup,
   description,
-  incomeEvidenceGroup,
   heading,
   housingCostsEvidenceGroup,
+  incomeEvidenceGroup,
   label,
   maintenanceEvidenceGroup,
 } from "#/journeys/evidence/steps/evidence-of-expenditure/evidence-of-expenditure.blocks.js";
