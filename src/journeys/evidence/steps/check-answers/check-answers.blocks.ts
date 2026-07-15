@@ -1,7 +1,9 @@
 import {
+  and,
   Answer,
   Condition,
   match,
+  or,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 import { NunjucksGenerators } from "@ministryofjustice/hmpps-forge/express-nunjucks";
 import {
@@ -43,17 +45,35 @@ const mergedReasonForNoEvidenceLabel = NunjucksGenerators.String({
 const evidenceOfIncomeList = NunjucksGenerators.String({
   data: {
     asylumSupportEvidence: Answer("asylumSupportEvidence"),
-    asylumSupportEvidenceLabel: t(
-      "journeys.evidence.evidenceOfIncome.groupsOfEvidence.asylumSupport",
-    ),
     benefitsInKindEvidence: Answer("benefitsInKindEvidence"),
-    benefitsInKindEvidenceLabel: t(
-      "journeys.evidence.evidenceOfIncome.groupsOfEvidence.benefitsInKind",
-    ),
     employedEvidence: Answer("employedEvidence"),
-    employedEvidenceLabel: t(
-      "journeys.evidence.evidenceOfIncome.groupsOfEvidence.employedPAYE",
-    ),
+    otherEvidence: Answer("otherEvidence"),
+    selfEmployedEvidence: Answer("selfEmployedEvidence"),
+    stateBenefitsEvidence: Answer("stateBenefitsEvidence"),
+    taxCreditsEvidence: Answer("taxCreditsEvidence"),
+    evidenceHeadings: {
+      asylumSupportEvidenceLabel: t(
+        "journeys.evidence.evidenceOfIncome.groupsOfEvidence.asylumSupport",
+      ),
+      benefitsInKindEvidenceLabel: t(
+        "journeys.evidence.evidenceOfIncome.groupsOfEvidence.benefitsInKind",
+      ),
+      employedEvidenceLabel: t(
+        "journeys.evidence.evidenceOfIncome.groupsOfEvidence.employedPAYE",
+      ),
+      otherEvidenceLabel: t(
+        "journeys.evidence.evidenceOfIncome.groupsOfEvidence.otherIncome",
+      ),
+      selfEmployedEvidenceLabel: t(
+        "journeys.evidence.evidenceOfIncome.groupsOfEvidence.selfEmployed",
+      ),
+      stateBenefitsEvidenceLabel: t(
+        "journeys.evidence.evidenceOfIncome.groupsOfEvidence.stateBenefits",
+      ),
+      taxCreditsEvidenceLabel: t(
+        "journeys.evidence.evidenceOfIncome.groupsOfEvidence.taxCredits",
+      ),
+    },
     evidenceTypeLabels: {
       asylumSupportLetter: t(
         "journeys.evidence.evidenceOfIncome.evidenceTypes.asylumSupportLetter",
@@ -106,50 +126,106 @@ const evidenceOfIncomeList = NunjucksGenerators.String({
         "journeys.evidence.evidenceOfIncome.evidenceTypes.wageSlips",
       ),
     },
-    otherEvidence: Answer("otherEvidence"),
-    otherEvidenceLabel: t(
-      "journeys.evidence.evidenceOfIncome.groupsOfEvidence.otherIncome",
-    ),
-    selfEmployedEvidence: Answer("selfEmployedEvidence"),
-    selfEmployedEvidenceLabel: t(
-      "journeys.evidence.evidenceOfIncome.groupsOfEvidence.selfEmployed",
-    ),
-    stateBenefitsEvidence: Answer("stateBenefitsEvidence"),
-    stateBenefitsEvidenceLabel: t(
-      "journeys.evidence.evidenceOfIncome.groupsOfEvidence.stateBenefits",
-    ),
-    taxCreditsEvidence: Answer("taxCreditsEvidence"),
-    taxCreditsEvidenceLabel: t(
-      "journeys.evidence.evidenceOfIncome.groupsOfEvidence.taxCredits",
-    ),
   },
   template: `
     {% if employedEvidence.length > 0 %}
-    <strong>{{ employedEvidenceLabel }}:</strong><br />
+    <strong>{{ evidenceHeadings.employedEvidence }}:</strong><br />
     {% for item in employedEvidence %}{{ evidenceTypeLabels[item] }},<br />{% endfor %}{% endif %}
     {% if selfEmployedEvidence.length > 0 %}
-    <br /><strong>{{ selfEmployedEvidenceLabel }}:</strong><br />
+    <br /><strong>{{ evidenceHeadings.selfEmployedEvidence }}:</strong><br />
     {% for item in selfEmployedEvidence %}{{ evidenceTypeLabels[item] }},<br />{% endfor %}
     {% endif %}
     {% if benefitsInKindEvidence.length > 0 %}
-    <br /><strong>{{ benefitsInKindEvidenceLabel }}:</strong><br />
+    <br /><strong>{{ evidenceHeadings.benefitsInKindEvidence }}:</strong><br />
     {% for item in benefitsInKindEvidence %}{{ evidenceTypeLabels[item] }},<br />{% endfor %}
     {% endif %}
     {% if otherEvidence.length > 0 %}
-    <br /><strong>{{ otherEvidenceLabel }}:</strong><br />
+    <br /><strong>{{ evidenceHeadings.otherEvidence }}:</strong><br />
     {% for item in otherEvidence %}{{ evidenceTypeLabels[item] }},<br />{% endfor %}
     {% endif %}
     {% if stateBenefitsEvidence.length > 0 %}
-    <br /><strong>{{ stateBenefitsEvidenceLabel }}:</strong><br />
+    <br /><strong>{{ evidenceHeadings.stateBenefitsEvidence }}:</strong><br />
     {% for item in stateBenefitsEvidence %}{{ evidenceTypeLabels[item] }},<br />{% endfor %}
     {% endif %}
     {% if asylumSupportEvidence.length > 0 %}
-    <br /><strong>{{ asylumSupportEvidenceLabel }}:</strong><br />
+    <br /><strong>{{ evidenceHeadings.asylumSupportEvidence }}:</strong><br />
     {% for item in asylumSupportEvidence %}{{ evidenceTypeLabels[item] }},<br />{% endfor %}
     {% endif %}
     {% if taxCreditsEvidence.length > 0 %}
-    <br /><strong>{{ taxCreditsEvidenceLabel }}:</strong><br />
+    <br /><strong>{{ evidenceHeadings.taxCreditsEvidence }}:</strong><br />
     {% for item in taxCreditsEvidence %}{{ evidenceTypeLabels[item] }},<br />{% endfor %}
+    {% endif %}
+  `,
+});
+
+const evidenceOfExpenditureList = NunjucksGenerators.String({
+  data: {
+    employedEvidence: Answer("employedEvidence"),
+    housingCostsEvidence: Answer("housingCostsEvidence"),
+    childCareEvidence: Answer("childCareEvidence"),
+    maintenanceEvidence: Answer("maintenanceEvidence"),
+    evidenceHeadings: {
+      employedEvidence: t(
+        "journeys.evidence.evidenceOfExpenditure.groupsOfEvidence.incomeTaxAndNationalInsurance",
+      ),
+      housingCostsEvidence: t(
+        "journeys.evidence.evidenceOfExpenditure.groupsOfEvidence.housingCosts",
+      ),
+      childCareEvidence: t(
+        "journeys.evidence.evidenceOfExpenditure.groupsOfEvidence.childCareCosts",
+      ),
+      maintenanceEvidence: t(
+        "journeys.evidence.evidenceOfExpenditure.groupsOfEvidence.maintenancePayments",
+      ),
+    },
+    evidenceTypeLabels: {
+      bankStatementsHousing: t(
+        "journeys.evidence.evidenceOfExpenditure.evidenceTypes.bankStatementsHousing",
+      ),
+      mortgageStatement: t(
+        "journeys.evidence.evidenceOfExpenditure.evidenceTypes.mortgageStatement",
+      ),
+      rentStatement: t(
+        "journeys.evidence.evidenceOfExpenditure.evidenceTypes.rentStatement",
+      ),
+      wageSlips: t(
+        "journeys.evidence.evidenceOfExpenditure.evidenceTypes.wageSlips",
+      ),
+      taxCalculationSheet: t(
+        "journeys.evidence.evidenceOfExpenditure.evidenceTypes.taxCalculationSheet",
+      ),
+      bankStatementsChildCare: t(
+        "journeys.evidence.evidenceOfExpenditure.evidenceTypes.bankStatementsChildCare",
+      ),
+      agreementOrContract: t(
+        "journeys.evidence.evidenceOfExpenditure.evidenceTypes.agreementOrContract",
+      ),
+      bankStatementsMaintenance: t(
+        "journeys.evidence.evidenceOfExpenditure.evidenceTypes.bankStatementsMaintenance",
+      ),
+      maintenanceOrder: t(
+        "journeys.evidence.evidenceOfExpenditure.evidenceTypes.maintenanceOrder",
+      ),
+      receipts: t(
+        "journeys.evidence.evidenceOfExpenditure.evidenceTypes.receipts",
+      ),
+    },
+  },
+  template: `
+    {% if employedEvidence.length > 0 %}
+    <strong>{{ evidenceHeadings.employedEvidence }}:</strong><br />
+    {% for item in employedEvidence %}{{ evidenceTypeLabels[item] }},<br />{% endfor %}{% endif %}
+    {% if housingCostsEvidence.length > 0 %}
+    <br /><strong>{{ evidenceHeadings.housingCostsEvidence }}:</strong><br />
+    {% for item in housingCostsEvidence %}{{ evidenceTypeLabels[item] }},<br />{% endfor %}
+    {% endif %}
+    {% if childCareEvidence.length > 0 %}
+    <br /><strong>{{ evidenceHeadings.childCareEvidence }}:</strong><br />
+    {% for item in childCareEvidence %}{{ evidenceTypeLabels[item] }},<br />{% endfor %}
+    {% endif %}
+    {% if maintenanceEvidence.length > 0 %}
+    <br /><strong>{{ evidenceHeadings.maintenanceEvidence }}:</strong><br />
+    {% for item in maintenanceEvidence %}{{ evidenceTypeLabels[item] }},<br />{% endfor %}
     {% endif %}
   `,
 });
@@ -216,6 +292,42 @@ export const summaryList = GovUKSummaryList({
       },
       value: { html: evidenceOfIncomeList },
       visibleWhen: Answer("doYouHaveEvidence").match(Condition.Equals("yes")),
+    },
+    {
+      actions: {
+        items: [
+          {
+            href: "/cases/evidence/evidence-of-expenditure?returnTo=check-answers",
+            text: t("journeys.evidence.checkAnswers.changeLink.change"),
+            visuallyHiddenText: t(
+              "journeys.evidence.checkAnswers.answerLabels.evidenceOfExpenditure",
+            ),
+          },
+        ],
+      },
+      key: {
+        text: t(
+          "journeys.evidence.checkAnswers.answerLabels.evidenceOfExpenditure",
+        ),
+      },
+      value: { html: evidenceOfExpenditureList },
+      visibleWhen: and(
+        Answer("doYouHaveEvidence").match(Condition.Equals("yes")),
+        or(
+          Answer("employedEvidence").match(
+            Condition.Array.IsArray(Answer("employedEvidence")),
+          ),
+          Answer("housingCostsEvidence").match(
+            Condition.Array.IsArray(Answer("housingCostsEvidence")),
+          ),
+          Answer("childCareEvidence").match(
+            Condition.Array.IsArray(Answer("childCareEvidence")),
+          ),
+          Answer("maintenanceEvidence").match(
+            Condition.Array.IsArray(Answer("maintenanceEvidence")),
+          ),
+        ),
+      ),
     },
   ],
 });
