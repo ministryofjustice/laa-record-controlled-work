@@ -64,7 +64,7 @@ test("evidence flow", async ({ page }) => {
   await page.getByRole("button", { name: "Continue" }).click();
 
   // Verify redirection to the check your answers page
-  await expect(page).toHaveURL("/cases/evidence/check-answers");
+  await expect(page).toHaveURL("/cases/evidence/check-answers"); 
 
   await expect(
     page.getByRole("heading", {
@@ -82,7 +82,7 @@ test("evidence flow", async ({ page }) => {
       // Do yo have evidence
       "No",
       // Reason for no evidence
-      "It&#39;s not possible to get it before starting the work. Some details about why I don&#39;t have evidence.",
+      "It's not possible to get it before starting the work. Some details about why I don't have evidence.",
     ],
     { useInnerText: true },
   );

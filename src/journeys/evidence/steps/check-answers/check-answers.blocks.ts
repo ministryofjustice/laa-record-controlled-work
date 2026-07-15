@@ -35,7 +35,7 @@ const mergedReasonForNoEvidenceLabel = NunjucksGenerators.String({
     reasonForNoEvidence: reasonForNoEvidenceLabel,
   },
   template: `
-    {{ reasonForNoEvidence }}.
+    {{ reasonForNoEvidence }}.<br />
     {% if moreDetailsForNoEvidence %}{{ moreDetailsForNoEvidence }}{% endif %}
   `,
 });
@@ -196,7 +196,7 @@ export const summaryList = GovUKSummaryList({
           "journeys.evidence.checkAnswers.answerLabels.reasonForNoEvidence",
         ),
       },
-      value: { text: mergedReasonForNoEvidenceLabel },
+      value: { html: mergedReasonForNoEvidenceLabel },
       visibleWhen: Answer("doYouHaveEvidence").match(Condition.Equals("no")),
     },
     {
