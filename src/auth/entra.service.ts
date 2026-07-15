@@ -60,16 +60,19 @@ export class EntraService {
    * @param {config} config - Configuration for the EntraService, including optional cache plugin and request hostname.
    * @returns {EntraService} A new EntraService instance.
    */
-  public static create(config: EntraServiceConfig): EntraService {
-    const cachePlugin = config.cachePlugin ?? undefined;
-    const msalClient =
-      config.msalClient ??
+  public static create({
+    cachePlugin,
+    msalClient,
+    requestHostname,
+  }: EntraServiceConfig): EntraService {
+    const client =
+      msalClient ??
       new ConfidentialClientApplication({
         ...msalConfig,
         cache: { cachePlugin },
       });
 
-    return new EntraService(config.requestHostname, msalClient);
+    return new EntraService(requestHostname, client);
   }
 
   /**
