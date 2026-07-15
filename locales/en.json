@@ -309,7 +309,7 @@
           "doYouHaveEvidence": "Do you have evidence?",
           "reasonForNoEvidence": "Reason for not having evidence",
           "evidenceOfIncome": "Income",
-          "evidenceOfExpenditureAndCapital": "Expenditure and capital"
+          "evidenceOfExpenditure": "Expenditure"
         },
         "changeLink": {
           "change": "Change"

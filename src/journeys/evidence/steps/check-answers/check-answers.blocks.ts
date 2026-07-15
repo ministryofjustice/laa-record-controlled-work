@@ -129,30 +129,30 @@ const evidenceOfIncomeList = NunjucksGenerators.String({
   },
   template: `
     {% if employedEvidence.length > 0 %}
-    <strong>{{ evidenceHeadings.employedEvidence }}:</strong><br />
+    <strong>{{ evidenceHeadings.employedEvidenceLabel }}:</strong><br />
     {% for item in employedEvidence %}{{ evidenceTypeLabels[item] }},<br />{% endfor %}{% endif %}
     {% if selfEmployedEvidence.length > 0 %}
-    <br /><strong>{{ evidenceHeadings.selfEmployedEvidence }}:</strong><br />
+    <br /><strong>{{ evidenceHeadings.selfEmployedEvidenceLabel }}:</strong><br />
     {% for item in selfEmployedEvidence %}{{ evidenceTypeLabels[item] }},<br />{% endfor %}
     {% endif %}
     {% if benefitsInKindEvidence.length > 0 %}
-    <br /><strong>{{ evidenceHeadings.benefitsInKindEvidence }}:</strong><br />
+    <br /><strong>{{ evidenceHeadings.benefitsInKindEvidenceLabel }}:</strong><br />
     {% for item in benefitsInKindEvidence %}{{ evidenceTypeLabels[item] }},<br />{% endfor %}
     {% endif %}
     {% if otherEvidence.length > 0 %}
-    <br /><strong>{{ evidenceHeadings.otherEvidence }}:</strong><br />
+    <br /><strong>{{ evidenceHeadings.otherEvidenceLabel }}:</strong><br />
     {% for item in otherEvidence %}{{ evidenceTypeLabels[item] }},<br />{% endfor %}
     {% endif %}
     {% if stateBenefitsEvidence.length > 0 %}
-    <br /><strong>{{ evidenceHeadings.stateBenefitsEvidence }}:</strong><br />
+    <br /><strong>{{ evidenceHeadings.stateBenefitsEvidenceLabel }}:</strong><br />
     {% for item in stateBenefitsEvidence %}{{ evidenceTypeLabels[item] }},<br />{% endfor %}
     {% endif %}
     {% if asylumSupportEvidence.length > 0 %}
-    <br /><strong>{{ evidenceHeadings.asylumSupportEvidence }}:</strong><br />
+    <br /><strong>{{ evidenceHeadings.asylumSupportEvidenceLabel }}:</strong><br />
     {% for item in asylumSupportEvidence %}{{ evidenceTypeLabels[item] }},<br />{% endfor %}
     {% endif %}
     {% if taxCreditsEvidence.length > 0 %}
-    <br /><strong>{{ evidenceHeadings.taxCreditsEvidence }}:</strong><br />
+    <br /><strong>{{ evidenceHeadings.taxCreditsEvidenceLabel }}:</strong><br />
     {% for item in taxCreditsEvidence %}{{ evidenceTypeLabels[item] }},<br />{% endfor %}
     {% endif %}
   `,
@@ -172,10 +172,10 @@ const evidenceOfExpenditureList = NunjucksGenerators.String({
         "journeys.evidence.evidenceOfExpenditure.groupsOfEvidence.housingCosts",
       ),
       childCareEvidence: t(
-        "journeys.evidence.evidenceOfExpenditure.groupsOfEvidence.childCareCosts",
+        "journeys.evidence.evidenceOfExpenditure.groupsOfEvidence.childCare",
       ),
       maintenanceEvidence: t(
-        "journeys.evidence.evidenceOfExpenditure.groupsOfEvidence.maintenancePayments",
+        "journeys.evidence.evidenceOfExpenditure.groupsOfEvidence.maintenance",
       ),
     },
     evidenceTypeLabels: {
