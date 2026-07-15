@@ -29,7 +29,7 @@ describe("Evidence of expenditure step", () => {
 
     it("has the correct title", () => {
       expect(renderResult.context.step.title).to.equal(
-        "Evidence of your client’s expenditure",
+        "Evidence of your client's expenditure",
       );
     });
 
@@ -69,7 +69,7 @@ describe("Evidence of expenditure step", () => {
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
       expect(redirectResult.url).to.equal(
-        "/cases/evidence/evidence-of-capital",
+        "/cases/evidence/check-answers",
       );
     });
   });
