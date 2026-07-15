@@ -160,12 +160,12 @@ const evidenceOfIncomeList = NunjucksGenerators.String({
 
 const evidenceOfExpenditureList = NunjucksGenerators.String({
   data: {
-    employedEvidence: Answer("employedEvidence"),
+    incomeEvidence: Answer("incomeEvidence"),
     housingCostsEvidence: Answer("housingCostsEvidence"),
     childCareEvidence: Answer("childCareEvidence"),
     maintenanceEvidence: Answer("maintenanceEvidence"),
     evidenceHeadings: {
-      employedEvidence: t(
+      incomeEvidence: t(
         "journeys.evidence.evidenceOfExpenditure.groupsOfEvidence.incomeTaxAndNationalInsurance",
       ),
       housingCostsEvidence: t(
@@ -210,11 +210,13 @@ const evidenceOfExpenditureList = NunjucksGenerators.String({
         "journeys.evidence.evidenceOfExpenditure.evidenceTypes.receipts",
       ),
     },
+    noEvidenceLabel: t("journeys.evidence.checkAnswers.noEvidenceProvided"),
   },
   template: `
-    {% if employedEvidence.length > 0 %}
-    <strong>{{ evidenceHeadings.employedEvidence }}:</strong><br />
-    {% for item in employedEvidence %}{{ evidenceTypeLabels[item] }},<br />{% endfor %}{% endif %}
+    {% if incomeEvidence.length > 0 or housingCostsEvidence.length > 0 or childCareEvidence.length > 0 or maintenanceEvidence.length > 0 %}
+    {% if incomeEvidence.length > 0 %}
+    <strong>{{ evidenceHeadings.incomeEvidence }}:</strong><br />
+    {% for item in incomeEvidence %}{{ evidenceTypeLabels[item] }},<br />{% endfor %}{% endif %}
     {% if housingCostsEvidence.length > 0 %}
     <br /><strong>{{ evidenceHeadings.housingCostsEvidence }}:</strong><br />
     {% for item in housingCostsEvidence %}{{ evidenceTypeLabels[item] }},<br />{% endfor %}
@@ -226,6 +228,9 @@ const evidenceOfExpenditureList = NunjucksGenerators.String({
     {% if maintenanceEvidence.length > 0 %}
     <br /><strong>{{ evidenceHeadings.maintenanceEvidence }}:</strong><br />
     {% for item in maintenanceEvidence %}{{ evidenceTypeLabels[item] }},<br />{% endfor %}
+    {% endif %}
+    {% else %}
+    <p>{{ noEvidenceLabel }}</p>
     {% endif %}
   `,
 });
@@ -311,23 +316,7 @@ export const summaryList = GovUKSummaryList({
         ),
       },
       value: { html: evidenceOfExpenditureList },
-      visibleWhen: and(
-        Answer("doYouHaveEvidence").match(Condition.Equals("yes")),
-        or(
-          Answer("employedEvidence").match(
-            Condition.Array.IsArray(Answer("employedEvidence")),
-          ),
-          Answer("housingCostsEvidence").match(
-            Condition.Array.IsArray(Answer("housingCostsEvidence")),
-          ),
-          Answer("childCareEvidence").match(
-            Condition.Array.IsArray(Answer("childCareEvidence")),
-          ),
-          Answer("maintenanceEvidence").match(
-            Condition.Array.IsArray(Answer("maintenanceEvidence")),
-          ),
-        ),
-      ),
+      visibleWhen: Answer("doYouHaveEvidence").match(Condition.Equals("yes")),
     },
   ],
 });

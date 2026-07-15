@@ -311,6 +311,7 @@
           "evidenceOfIncome": "Income",
           "evidenceOfExpenditure": "Expenditure"
         },
+        "noEvidenceProvided": "No evidence provided",
         "changeLink": {
           "change": "Change"
         }

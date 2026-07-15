@@ -15,7 +15,7 @@ import {
 import {
   childCareEvidenceGroup,
   description,
-  employedEvidenceGroup,
+  incomeEvidenceGroup,
   heading,
   housingCostsEvidenceGroup,
   label,
@@ -33,7 +33,7 @@ export const evidenceOfExpenditure = (
       heading,
       description,
       label,
-      employedEvidenceGroup,
+      incomeEvidenceGroup,
       housingCostsEvidenceGroup,
       childCareEvidenceGroup,
       maintenanceEvidenceGroup,

@@ -24,8 +24,8 @@ export const label = GovUKBody({
   text: t("journeys.evidence.evidenceOfExpenditure.hint"),
 });
 
-export const employedEvidenceGroup = GovUKCheckboxInput({
-  code: "employedEvidence",
+export const incomeEvidenceGroup = GovUKCheckboxInput({
+  code: "incomeEvidence",
   fieldset: {
     legend: {
       classes: "govuk-fieldset__legend--m",
