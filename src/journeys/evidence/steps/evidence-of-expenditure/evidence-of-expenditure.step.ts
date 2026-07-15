@@ -13,13 +13,13 @@ import {
   continueButton,
 } from "#/journeys/evidence/common.blocks.js";
 import {
+  childCareEvidenceGroup,
   description,
+  employedEvidenceGroup,
   heading,
   housingCostsEvidenceGroup,
-  childCareEvidenceGroup,
-  employedEvidenceGroup,
-  maintenanceEvidenceGroup,
   label,
+  maintenanceEvidenceGroup,
 } from "#/journeys/evidence/steps/evidence-of-expenditure/evidence-of-expenditure.blocks.js";
 import { t } from "#/lib/i18n.js";
 

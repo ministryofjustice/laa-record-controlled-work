@@ -14,7 +14,9 @@ export const heading = GovUKHeading({
 
 export const description = GovUKBody({
   classes: "govuk-hint",
-  text: t("journeys.evidence.evidenceOfExpenditure.description") + " " + `<a href="https://laa-means-match-prototype.apps.live.cloud-platform.service.justice.gov.uk/MVP/evidence-expenditure#" target="_blank">${t("journeys.evidence.evidenceOfExpenditure.linkText")}</a>`,
+  text:
+    `${t("journeys.evidence.evidenceOfExpenditure.description")} ` +
+    `<a href="https://laa-means-match-prototype.apps.live.cloud-platform.service.justice.gov.uk/MVP/evidence-expenditure#" target="_blank">${t("journeys.evidence.evidenceOfExpenditure.linkText")}</a>`,
 });
 
 export const label = GovUKBody({
@@ -35,7 +37,9 @@ export const employedEvidenceGroup = GovUKCheckboxInput({
   },
   items: [
     {
-      text: t("journeys.evidence.evidenceOfExpenditure.evidenceTypes.wageSlips"),
+      text: t(
+        "journeys.evidence.evidenceOfExpenditure.evidenceTypes.wageSlips",
+      ),
       value: "wageSlips",
     },
     {
@@ -132,10 +136,8 @@ export const maintenanceEvidenceGroup = GovUKCheckboxInput({
       value: "maintenanceOrder",
     },
     {
-      text: t(
-        "journeys.evidence.evidenceOfExpenditure.evidenceTypes.receipts",
-      ),
+      text: t("journeys.evidence.evidenceOfExpenditure.evidenceTypes.receipts"),
       value: "receipts",
-    }
+    },
   ],
 });
