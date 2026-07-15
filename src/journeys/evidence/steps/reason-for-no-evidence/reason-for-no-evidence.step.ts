@@ -38,7 +38,7 @@ export const reasonForNoEvidence = (
               goto: "check-answers",
               when: Query("returnTo").match(Condition.Equals("check-answers")),
             }),
-            redirect({ goto: "check-your-answers" }),
+            redirect({ goto: "check-answers" }),
           ],
         },
         validate: true,
