@@ -15,3 +15,7 @@ export const caption = HtmlBlock({
 });
 
 export const continueButton = GovUKButton({ text: t("common.continue") });
+
+export const submitButton = GovUKButton({
+  text: t("common.submit"),
+});

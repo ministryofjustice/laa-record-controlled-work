@@ -23,7 +23,7 @@ export const reasonForNoEvidence = (
 ): ReturnType<typeof step> =>
   step({
     blocks: [
-      backLink("/cases/evidence/do-you-have-evidence"),
+      backLink("/cases/evidence/have-evidence"),
       caption,
       reasonForNoEvidenceRadioInput,
       moreDetailsForNoEvidence,
@@ -38,7 +38,7 @@ export const reasonForNoEvidence = (
               goto: "check-answers",
               when: Query("returnTo").match(Condition.Equals("check-answers")),
             }),
-            redirect({ goto: "check-your-answers" }),
+            redirect({ goto: "check-answers" }),
           ],
         },
         validate: true,

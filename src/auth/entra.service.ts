@@ -1,9 +1,11 @@
 import {
+  type AccountInfo,
   type AuthenticationResult,
   type AuthorizationCodeRequest,
   type AuthorizationUrlRequest,
   ConfidentialClientApplication,
   CryptoProvider,
+  type ICachePlugin,
 } from "@azure/msal-node";
 import { randomUUID } from "node:crypto";
 
@@ -18,11 +20,18 @@ import {
   MsalError,
   PkceGenerationError,
   TokenAcquisitionError,
+  TokenRefreshError,
 } from "#/auth/auth.errors.js";
 import { createRelayState } from "#/auth/auth.relay.js";
 import config from "#/config.js";
 import { type Either, failure, success } from "#/lib/either.js";
 import { logger } from "#/logger.js";
+
+interface EntraServiceConfig {
+  cachePlugin?: ICachePlugin;
+  msalClient?: ConfidentialClientApplication;
+  requestHostname: string;
+}
 
 /**
  * Handles Microsoft Entra ID (MSAL) authentication flows including
@@ -36,28 +45,62 @@ export class EntraService {
   /**
    * Creates an EntraService instance.
    * @param {string} requestHostname - The hostname of the incoming request (e.g. "my-host.example.com").
-   * @param {ConfidentialClientApplication} msalClient - The MSAL confidential client application.
+   * @param {ConfidentialClientApplication} msalclient - The MSAL client instance to use for token acquisition and code exchange.
    */
   private constructor(
     requestHostname: string,
-    msalClient?: ConfidentialClientApplication,
+    msalclient: ConfidentialClientApplication,
   ) {
     this.requestHostname = requestHostname;
-    this.msalClient =
-      msalClient ?? new ConfidentialClientApplication(msalConfig);
+    this.msalClient = msalclient;
   }
 
   /**
-   * Factory method to create a new EntraService instance.
-   * @param {string} requestHostname - The hostname of the incoming request (e.g. "my-host.example.com").
-   * @param {ConfidentialClientApplication} msalClient - The MSAL confidential client application.
+   * Factory method to create a new EntraService instance with a default MSAL client.
+   * @param {config} config - Configuration for the EntraService, including optional cache plugin and request hostname.
    * @returns {EntraService} A new EntraService instance.
    */
-  public static create(
-    requestHostname: string,
-    msalClient?: ConfidentialClientApplication,
-  ): EntraService {
-    return new EntraService(requestHostname, msalClient);
+  public static create({
+    cachePlugin,
+    msalClient,
+    requestHostname,
+  }: EntraServiceConfig): EntraService {
+    const client =
+      msalClient ??
+      new ConfidentialClientApplication({
+        ...msalConfig,
+        cache: { cachePlugin },
+      });
+
+    return new EntraService(requestHostname, client);
+  }
+
+  /**
+   * Acquire a fresh access token using cached credentials.
+   * Cache serialization/deserialization is handled automatically by the ICachePlugin.
+   *
+   * @param account - The authenticated account from the session.
+   * @returns {Promise<Either<TokenRefreshError, TokenExchangeResult>>} The refreshed token set or an error.
+   */
+  public async acquireTokenSilent(
+    account: AccountInfo,
+  ): Promise<Either<TokenRefreshError, TokenExchangeResult>> {
+    try {
+      const result: AuthenticationResult =
+        await this.msalClient.acquireTokenSilent({
+          account,
+          scopes: authRequestDefaults.scopes,
+        });
+
+      return success({
+        accessToken: result.accessToken,
+        account: result.account ?? undefined,
+        idToken: result.idToken,
+      });
+    } catch (error) {
+      logger.error("Failed to silently acquire token", error);
+      return failure(TokenRefreshError.from(error));
+    }
   }
 
   /**
@@ -73,14 +116,13 @@ export class EntraService {
     const tokenRequest = { ...authCodeRequest, code };
 
     try {
-      const tokenCache = this.msalClient.getTokenCache().serialize();
-      const { account, idToken }: AuthenticationResult =
+      const { accessToken, account, idToken }: AuthenticationResult =
         await this.msalClient.acquireTokenByCode(tokenRequest);
 
       return success({
+        accessToken,
         account: account ?? undefined,
         idToken,
-        tokenCache,
       });
     } catch (error) {
       logger.error("Failed to handle Entra auth redirect", error);

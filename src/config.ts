@@ -77,10 +77,17 @@ export default {
     clientId: required.ENTRA_CLIENT_ID,
     clientSecret: required.ENTRA_CLIENT_SECRET,
     redirectUri: required.ENTRA_REDIRECT_URI,
+    scopes: [
+      "openid",
+      "profile",
+      "offline_access",
+      "https://devlexternal.onmicrosoft.com/laa-record-controlled-work-api-uat/Applications.Read",
+    ],
   } satisfies EntraConfig,
 
   redis: {
     enabled: optional.REDIS_ENABLED === "true",
+    maxAge: Math.ceil(SESSION_AGE_MAX / SECOND),
     maxRetryAttempts: REDIS_MAX_RETRY_ATTEMPTS,
     socketConnectionTimeout: REDIS_SOCKET_CONNECTION_TIMEOUT,
     url:
