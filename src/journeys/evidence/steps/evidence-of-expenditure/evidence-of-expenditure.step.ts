@@ -55,5 +55,8 @@ export const evidenceOfExpenditure = (
       }),
     ],
     path: "/evidence-of-expenditure",
+    reachability: {
+      entryWhen: Query("returnTo").match(Condition.Equals("check-answers")),
+    },
     title: t("journeys.evidence.evidenceOfExpenditure.title"),
   });

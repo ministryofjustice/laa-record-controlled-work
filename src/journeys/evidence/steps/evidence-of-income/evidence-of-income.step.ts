@@ -62,6 +62,9 @@ export const evidenceOfIncome = (
       }),
     ],
     path: "/evidence-of-income",
+    reachability: {
+      entryWhen: Query("returnTo").match(Condition.Equals("check-answers")),
+    },
     title: t("journeys.evidence.evidenceOfIncome.title"),
     validWhen: [
       validation({

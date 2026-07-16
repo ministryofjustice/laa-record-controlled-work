@@ -45,6 +45,8 @@ export const reasonForNoEvidence = (
       }),
     ],
     path: "/reason-for-no-evidence",
-    reachability: { entryWhen: true },
+    reachability: {
+      entryWhen: Query("returnTo").match(Condition.Equals("check-answers")),
+    },
     title: t("journeys.evidence.reasonForNoEvidence.title"),
   });
