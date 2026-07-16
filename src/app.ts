@@ -11,6 +11,8 @@ import compression from "compression";
 import express from "express";
 import session from "express-session";
 
+import type { CreateRedisStore, GetRedisClient } from "#/lib/redis.js";
+
 import { getApplications } from "#/api/client/schema/applications/applications.gen.js";
 import authRouter from "#/auth/auth.routes.js";
 import config from "#/config.js";
@@ -19,11 +21,7 @@ import createApplication from "#/journeys/create-application/create-application.
 import evidence from "#/journeys/evidence/evidence.index.js";
 import yourCases from "#/journeys/your-cases/your-cases.index.js";
 import * as redis from "#/lib/redis.js";
-import {
-  type CreateRedisClient,
-  type CreateRedisStore,
-  createSession,
-} from "#/lib/session.js";
+import { createSession } from "#/lib/session.js";
 import { requireAuth } from "#/middleware/requireAuth.js";
 import { setupConfig } from "#/middleware/setupConfigs.js";
 import { setupCsrf } from "#/middleware/setupCsrf.js";
@@ -40,11 +38,12 @@ import healthRouter from "#/routes/health.js";
 import indexRouter from "#/routes/index.js";
 import privateApiRouter from "#/routes/privateApi.js";
 import testRouter from "#/routes/test.js";
+
 const TRUST_FIRST_PROXY = 1;
 
 interface Dependencies {
-  createRedisClient?: CreateRedisClient;
   createRedisStore?: CreateRedisStore;
+  getRedisClient?: GetRedisClient;
 }
 
 /**
@@ -58,8 +57,8 @@ const createApp = async (
   dependencies: Dependencies = {},
 ): Promise<express.Application> => {
   const {
-    createRedisClient = redis.createRedisClient,
     createRedisStore = redis.createRedisStore,
+    getRedisClient = redis.getRedisClient,
   } = dependencies;
 
   const app = express();
@@ -117,7 +116,7 @@ const createApp = async (
 
   // Setup express-session using redis
   app.use(
-    session(await createSession(config, createRedisClient, createRedisStore)),
+    session(await createSession(config, getRedisClient, createRedisStore)),
   );
 
   app.use("/api/private", requireAuth, privateApiRouter);
