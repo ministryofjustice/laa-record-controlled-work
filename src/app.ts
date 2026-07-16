@@ -122,7 +122,32 @@ const createApp = async (): Promise<express.Application> => {
     app.use(livereload());
   }
 
-  app.use("/", createExpressRouter(forge, { nunjucksEnv }));
+  const forgeRouter = createExpressRouter(forge, { nunjucksEnv });
+
+  app.all("/cases/:id/task-list", (req, res, next) => {
+    const id = req.params.id;
+
+    if (id === "new" || id === "evidence") {
+      next();
+      return;
+    }
+
+    req.url = "/cases/new/task-list";
+    forgeRouter(req, res, next);
+  });
+
+  app.get("/cases/:id", (req, res, next) => {
+    const id = req.params.id;
+
+    if (id === "new" || id === "evidence") {
+      next();
+      return;
+    }
+
+    res.redirect(`/cases/${id}/task-list/`);
+  });
+
+  app.use("/", forgeRouter);
 
   return app;
 };

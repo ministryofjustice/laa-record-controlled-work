@@ -34,7 +34,7 @@ export const enterOverseasAddressStep = (
   step({
     blocks: [
       GovUKBackLink({
-        href: "/create-application/enter-address-manually",
+        href: "/cases/new/enter-address-manually",
       }),
       HtmlBlock({
         content: `<span class="govuk-caption-l">${t("journeys.createApplication.caption")}</span>`,

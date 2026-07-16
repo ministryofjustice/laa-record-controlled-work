@@ -19,9 +19,12 @@ export interface TaskListData {
   evidence: { status: Status };
   meansAssessment: { status: Status };
 }
+
+export const DEFAULT_CASE_REFERENCE_NUMBER = "CW-123456";
+
 // TODO: Hardcoded for now, will be dynamic in future
 const TASK_LIST_DATA: TaskListData = {
-  caseReferenceNumber: "CW-123456",
+  caseReferenceNumber: DEFAULT_CASE_REFERENCE_NUMBER,
   clientDetails: {
     clientName: "Joe Blogs",
     status: Status.Completed,

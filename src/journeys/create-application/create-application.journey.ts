@@ -23,7 +23,7 @@ export const createApplicationJourney = journey({
       effects: [JourneyEffects.LoadDraftAnswers(journeyCode)],
     }),
   ],
-  path: "/create-application",
+  path: "/cases/new",
   reachability: { disableReachabilityChecks: false },
   steps: [
     ecfStep(journeyCode),

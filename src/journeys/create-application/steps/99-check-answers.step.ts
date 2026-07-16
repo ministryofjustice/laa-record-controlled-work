@@ -14,6 +14,7 @@ import {
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
 import { submitButton } from "#/journeys/evidence/common.blocks.js";
+import { DEFAULT_CASE_REFERENCE_NUMBER } from "#/journeys/create-application/steps/task-list/task-list.step.js";
 import { t } from "#/lib/i18n.js";
 
 const ecfLabel = match(Answer("ecf"))
@@ -289,7 +290,7 @@ export const checkAnswersStep = (): ReturnType<typeof step> =>
         onAlways: {
           next: [
             redirect({
-              goto: "task-list",
+              goto: `/cases/${DEFAULT_CASE_REFERENCE_NUMBER}/task-list`,
             }),
           ],
         },

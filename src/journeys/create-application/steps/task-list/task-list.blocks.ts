@@ -65,7 +65,7 @@ export function taskList(taskListData: TaskListData): BlockDefinition[] {
           t(
             "journeys.createApplication.taskList.meansAssessment.taskItem.label",
           ),
-          "income-TODO",
+          `/cases/${taskListData.caseReferenceNumber}/eligibility/`,
           taskListData.meansAssessment.status,
         ),
       ],
