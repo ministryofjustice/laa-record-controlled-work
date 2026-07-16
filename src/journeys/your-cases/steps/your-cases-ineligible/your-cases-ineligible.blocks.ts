@@ -31,7 +31,6 @@ export const createCaseButton = GovUKLinkButton({
 export const subNavigation = MOJSubNavigation({
   items: [
     {
-      active: true,
       href: "/your-cases",
       text: t("pages.yourCases.tabs.inProgress"),
     },
@@ -40,6 +39,7 @@ export const subNavigation = MOJSubNavigation({
       text: t("pages.yourCases.tabs.recorded"),
     },
     {
+      active: true,
       href: "/your-cases-ineligible",
       text: t("pages.yourCases.tabs.ineligible"),
     },
@@ -51,7 +51,7 @@ export const casesTable = (cases: ChainableRef): GovUKTable =>
     head: [
       { text: t("pages.yourCases.table.columns.clientName") },
       { text: t("pages.yourCases.table.columns.referenceNumber") },
-      { text: t("pages.yourCases.table.columns.lastUpdated") },
+      { text: t("pages.yourCases.table.columns.dateRecorded") },
     ],
     rows: cases.each(
       Iterator.Map([
@@ -85,7 +85,7 @@ export const casesTable = (cases: ChainableRef): GovUKTable =>
   });
 
 export const noCasesMessage = GovUKBody({
-  text: t("pages.yourCases.table.emptyMessage.inProgress"),
+  text: t("pages.yourCases.table.emptyMessage.ineligible"),
   visibleWhen: Data("caseList")
     .pipe(Transformer.Array.Length())
     // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- self explanatory

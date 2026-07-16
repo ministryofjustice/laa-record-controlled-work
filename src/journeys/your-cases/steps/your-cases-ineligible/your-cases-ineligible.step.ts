@@ -14,7 +14,7 @@ import {
 import { YourCasesEffects } from "#/journeys/your-cases/your-cases.effects.js";
 import { t } from "#/lib/i18n.js";
 
-export const yourCasesStep = (): ReturnType<typeof step> =>
+export const yourCasesIneligibleStep = (): ReturnType<typeof step> =>
   step({
     blocks: [
       heading,
@@ -28,6 +28,6 @@ export const yourCasesStep = (): ReturnType<typeof step> =>
         effects: [YourCasesEffects.LoadYourCaseList()],
       }),
     ],
-    path: "/your-cases",
+    path: "/your-cases-ineligible",
     title: t("pages.yourCases.pageTitle"),
   });
