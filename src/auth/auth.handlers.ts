@@ -90,6 +90,11 @@ export async function signIn(
   res: Response,
   next: NextFunction,
 ): Promise<void> {
+  const returnToOverride = parseSafeReturnToOverride(req);
+  if (returnToOverride !== undefined) {
+    req.session.returnTo = returnToOverride;
+  }
+
   try {
     const entra = createEntraService(req);
     const result = await entra.initiateAuthCodeFlow(req.session.returnTo);
@@ -188,4 +193,26 @@ function handleRelay(
   res.set("Cache-Control", "no-store");
   res.redirect(targetUrl.toString());
   return true;
+}
+
+/**
+ * Validates that a redirect target is a same-origin app-relative path.
+ * @param path - Candidate redirect path.
+ * @returns `true` when the path is safe for local redirect usage.
+ */
+function isRelativePath(path: string): boolean {
+  return path.startsWith("/") && !path.startsWith("//");
+}
+
+/**
+ * Extracts a safe app-relative `returnTo` path from the signin query string.
+ * @param req - The Express request.
+ * @returns A validated relative path when present, otherwise `undefined`.
+ */
+function parseSafeReturnToOverride(req: Request): string | undefined {
+  const { returnTo } = req.query;
+  if (typeof returnTo !== "string") return undefined;
+
+  const normalizedReturnTo = returnTo.trim();
+  return isRelativePath(normalizedReturnTo) ? normalizedReturnTo : undefined;
 }

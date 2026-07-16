@@ -35,7 +35,7 @@
     "test": "yarn unit && yarn integration && yarn e2e"
   },
   "engines": {
-    "node": "26.4.0"
+    "node": "26.5.0"
   },
   "dependencies": {
     "@azure/msal-node": "^5.4.0",
@@ -53,7 +53,7 @@
     "express-session": "^1.19.0",
     "govuk-frontend": "^6.3.0",
     "helmet": "^8.2.0",
-    "i18next": "^26.3.4",
+    "i18next": "^26.3.5",
     "moment": "^2.30.1",
     "morgan": "~1.11.0",
     "nunjucks": "^3.2.4",
@@ -75,7 +75,7 @@
     "@types/express-session": "^1.19.0",
     "@types/mocha": "^10.0.10",
     "@types/morgan": "^1.9.10",
-    "@types/node": "^25.9.4",
+    "@types/node": "^25.9.5",
     "@types/nunjucks": "^3.2.6",
     "@types/sinon": "^21.0.1",
     "@types/supertest": "^7.2.0",
@@ -98,7 +98,7 @@
     "globals": "^17.7.0",
     "knip": "^6.25.0",
     "mocha": "^11.7.6",
-    "msw": "^2.14.7",
+    "msw": "^2.15.0",
     "nodemon": "^3.1.14",
     "orval": "^8.20.0",
     "playwright-core": "^1.61.1",
@@ -110,7 +110,7 @@
     "tsx": "^4.23.0",
     "typescript": "^6.0.3"
   },
-  "packageManager": "yarn@4.17.0+sha512.c2957de2f9025ab14d63b24d0d8be1f1655810e22c341042c27f7ecd017b180ec12db73d69ac366d71b304ef9f069349ce462de96f04f8f1da317f4f762c95ae",
+  "packageManager": "yarn@4.17.1",
   "resolutions": {
     "@isaacs/brace-expansion": "5.0.5",
     "brace-expansion": "5.0.7",
