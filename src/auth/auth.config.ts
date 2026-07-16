@@ -1,6 +1,14 @@
 import config from "#/config.js";
 
-export const scopes: string[] = ["openid", "profile"];
+export const msalConfig = {
+  auth: {
+    authority: config.entra.authority,
+    clientId: config.entra.clientId,
+    clientSecret: config.entra.clientSecret,
+  },
+};
+
+export const scopes: string[] = config.entra.scopes;
 export const authRequestDefaults = {
   prompt: "select_account",
   redirectUri: config.entra.redirectUri,

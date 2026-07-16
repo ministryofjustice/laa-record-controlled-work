@@ -38,6 +38,7 @@ import { setupRequestLogging } from "#/middleware/setupRequestLogging.js";
 import { standardMiddleware } from "#/middleware/standardMiddleware.js";
 import healthRouter from "#/routes/health.js";
 import indexRouter from "#/routes/index.js";
+import privateApiRouter from "#/routes/privateApi.js";
 import testRouter from "#/routes/test.js";
 const TRUST_FIRST_PROXY = 1;
 
@@ -118,6 +119,8 @@ const createApp = async (
   app.use(
     session(await createSession(config, createRedisClient, createRedisStore)),
   );
+
+  app.use("/api/private", requireAuth, privateApiRouter);
 
   setupCsrf(app);
 

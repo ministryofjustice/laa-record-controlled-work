@@ -2,6 +2,7 @@
   "common": {
     "continue": "Continue",
     "saveAndReturn": "Save and return later",
+    "submit": "Save and continue",
     "signOut": "Sign out",
     "yes": "Yes",
     "no": "No"
@@ -186,9 +187,6 @@
         },
         "changeLink": {
           "change": "Change"
-        },
-        "submitButton": {
-          "submit": "Save and continue"
         }
       },
       "taskList": {
@@ -279,6 +277,18 @@
         },
         "validation": {
           "required": " You must select an income evidence to continue"
+        }
+      },
+      "checkAnswers": {
+        "title": "Check your answers",
+        "answerLabels": {
+          "doYouHaveEvidence": "Do you have evidence?",
+          "reasonForNoEvidence": "Reason for not having evidence",
+          "evidenceOfIncome": "Income",
+          "evidenceOfExpenditureAndCapital": "Expenditure and capital"
+        },
+        "changeLink": {
+          "change": "Change"
         }
       }
     }

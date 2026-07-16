@@ -1,6 +1,7 @@
 import {
   Answer,
   Condition,
+  or,
   Query,
   redirect,
   step,
@@ -54,7 +55,7 @@ export const evidenceOfIncome = (
               goto: "check-answers",
               when: Query("returnTo").match(Condition.Equals("check-answers")),
             }),
-            redirect({ goto: "evidence-of-expenditure-and-capital" }),
+            redirect({ goto: "check-answers" }),
           ],
         },
         validate: true,
@@ -65,7 +66,15 @@ export const evidenceOfIncome = (
     title: t("journeys.evidence.evidenceOfIncome.title"),
     validWhen: [
       validation({
-        condition: Answer("incomeEvidenceTypes").match(Condition.IsRequired()),
+        condition: or(
+          Answer("employedEvidence").match(Condition.IsRequired()),
+          Answer("selfEmployedEvidence").match(Condition.IsRequired()),
+          Answer("benefitsInKindEvidence").match(Condition.IsRequired()),
+          Answer("otherEvidence").match(Condition.IsRequired()),
+          Answer("stateBenefitsEvidence").match(Condition.IsRequired()),
+          Answer("asylumSupportEvidence").match(Condition.IsRequired()),
+          Answer("taxCreditsEvidence").match(Condition.IsRequired()),
+        ),
         message: t("journeys.evidence.evidenceOfIncome.validation.required"),
       }),
     ],
