@@ -25,16 +25,22 @@ test("Your Cases step", async ({ page }) => {
   // Check the sub navigation
   const inProgressLink = page.getByRole("link", { name: "In progress" });
   const recordedLink = page.getByRole("link", { name: "Recorded" });
+  const ineligibleLink = page.getByRole("link", { name: "Ineligible" });
 
   // Check in progress link navigates to correct page and links have correct aria-current attribute
   await inProgressLink.click();
   await expect(page).toHaveURL("/your-cases");
   await expect(inProgressLink).toHaveAttribute("aria-current", "page");
   await expect(recordedLink).not.toHaveAttribute("aria-current", "page");
+  await expect(ineligibleLink).not.toHaveAttribute("aria-current", "page");
 
   // Check recorded link navigates to the correct page
   await recordedLink.click();
   await expect(page).toHaveURL("/your-cases-recorded");
+
+  // Check ineligible link navigates to the correct page
+  await ineligibleLink.click();
+  await expect(page).toHaveURL("/your-cases-ineligible");
 
   // Navigate back to the Your Cases page
   await page.goto("/your-cases");
