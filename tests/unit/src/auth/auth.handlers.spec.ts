@@ -71,6 +71,28 @@ describe("Auth Handlers", () => {
       expect(res.headers.location).to.equal(AUTH_CODE_URL);
     });
 
+    it("uses returnTo query parameter when it is a safe app-relative path", async () => {
+      const returnTo = "/create-application/task-list";
+
+      const res = await request(mockApp)
+        .get("/auth/signin")
+        .query({ returnTo });
+
+      expect(res.status).to.equal(FOUND);
+      expect(res.headers.location).to.equal(AUTH_CODE_URL);
+      expect(authServiceStub.initiateAuthCodeFlow.calledOnceWith(returnTo)).to.be.true;
+    });
+
+    it("ignores returnTo query parameter when it is not a safe app-relative path", async () => {
+      const res = await request(mockApp)
+        .get("/auth/signin")
+        .query({ returnTo: "https://example.com/evil" });
+
+      expect(res.status).to.equal(FOUND);
+      expect(res.headers.location).to.equal(AUTH_CODE_URL);
+      expect(authServiceStub.initiateAuthCodeFlow.calledOnceWith(undefined)).to.be.true;
+    });
+
     it("calls next(error) when initiateAuthCodeFlow() fails", async () => {
       const errorMessage = "MSAL failure";
       const error = new Error(errorMessage);
