@@ -1,6 +1,10 @@
-import { H1 } from "#/lib/constants/headings.js";
-import { GovUKHeading, GovUKLinkButton } from "@ministryofjustice/hmpps-forge/govuk-components";
+import {
+  GovUKHeading,
+  GovUKLinkButton,
+} from "@ministryofjustice/hmpps-forge/govuk-components";
 import { t } from "i18next";
+
+import { H1 } from "#/lib/constants/headings.js";
 
 export const heading = GovUKHeading({
   level: H1,
@@ -11,4 +15,3 @@ export const createCaseButton = GovUKLinkButton({
   href: "/create-application",
   text: t("pages.yourCases.createCaseButton"),
 });
-
