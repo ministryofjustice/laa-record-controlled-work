@@ -6,11 +6,11 @@ import {
 
 import {
   casesTable,
-  createCaseButton,
-  heading,
   noCasesMessage,
   subNavigation,
 } from "#/journeys/your-cases/steps/your-cases-recorded/your-cases-recorded.blocks.js";
+import { createCaseButton, heading } from "#/journeys/your-cases/common.blocks.js";
+
 import { YourCasesEffects } from "#/journeys/your-cases/your-cases.effects.js";
 import { t } from "#/lib/i18n.js";
 
