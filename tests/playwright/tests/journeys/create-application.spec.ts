@@ -235,7 +235,7 @@ test("create application flow", async ({ page }) => {
     "href",
     "enter-address-manually?returnTo=check-answers",
   );
-  changeAddressLink.click();
+  await changeAddressLink.click();
   
   // Verify redirection back to the enter address manually page
   await expect(page).toHaveURL("/cases/new/enter-address-manually?returnTo=check-answers");
@@ -245,7 +245,7 @@ test("create application flow", async ({ page }) => {
   // ==========================================================================
 
   // click the non-UK address link
-  await page.getByText("The address is not in the UK").click();
+  await page.getByRole("link", { name: "The address is not in the UK" }).click();
 
   // Verify redirection to the overseas address page
   await expect(page).toHaveURL("/cases/new/enter-overseas-address");
@@ -254,7 +254,6 @@ test("create application flow", async ({ page }) => {
   await expect(
     page.getByRole("heading", {
       name: /Enter your client's overseas home address/,
-      level: 1,
     }),
   ).toBeVisible();
 
