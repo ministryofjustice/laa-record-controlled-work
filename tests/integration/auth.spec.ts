@@ -7,6 +7,7 @@ import {
 } from "testcontainers";
 import request from "supertest";
 import { expect } from "chai";
+import { authRequestDefaults, msalConfig } from "#/auth/auth.config.js";
 import config from "#/config.js";
 import { SessionData } from "express-session";
 import { Agent, request as undiciRequest, setGlobalDispatcher } from "undici";
@@ -17,12 +18,70 @@ import { FOUND, OK } from "#/lib/constants/http.js";
 const REDIS_PORT = 6379;
 const IDP_PORT = 8080;
 
+type MockMsalMetadata = {
+  authorityMetadata: string;
+  cloudDiscoveryMetadata: string;
+};
+
+type MutableAuthRequestDefaults = {
+  redirectUri: string;
+};
+
+type MutableMsalConfig = {
+  auth: {
+    authority: string;
+    authorityMetadata?: string;
+    clientId: string;
+    clientSecret: string;
+    cloudDiscoveryMetadata?: string;
+  };
+};
+
+type MsalOriginalValues = {
+  authority: string;
+  authorityMetadata?: string;
+  cloudDiscoveryMetadata?: string;
+  redirectUri: string;
+};
+
+function buildMockIdpMsalMetadata(authority: string): MockMsalMetadata {
+  const authorityUrl = new URL(authority);
+  const hostWithPort = authorityUrl.host;
+  const normalizedAuthority = authority.replace(/\/+$/, "");
+
+  return {
+    authorityMetadata: JSON.stringify({
+      authorization_endpoint: `${normalizedAuthority}/oauth2/v2.0/authorize`,
+      code_challenge_methods_supported: ["S256"],
+      end_session_endpoint: `${normalizedAuthority}/oauth2/v2.0/logout`,
+      id_token_signing_alg_values_supported: ["RS256"],
+      issuer: `${normalizedAuthority}/v2.0`,
+      jwks_uri: `${normalizedAuthority}/discovery/v2.0/keys`,
+      response_modes_supported: ["query"],
+      response_types_supported: ["code"],
+      subject_types_supported: ["pairwise"],
+      token_endpoint: `${normalizedAuthority}/oauth2/v2.0/token`,
+    }),
+    cloudDiscoveryMetadata: JSON.stringify({
+      metadata: [
+        {
+          aliases: [hostWithPort],
+          preferred_cache: hostWithPort,
+          preferred_network: hostWithPort,
+        },
+      ],
+      tenant_discovery_endpoint: `${normalizedAuthority}/v2.0/.well-known/openid-configuration`,
+    }),
+  };
+}
+
 let redisContainer: StartedTestContainer;
 let idpContainer: StartedTestContainer;
 let app: Application;
 let authenticatedUser: ReturnType<typeof request.agent>;
 let unauthenticatedUser: ReturnType<typeof request.agent>;
 let sessionRedisClient: RedisClientType;
+let msalOriginalValues: MsalOriginalValues;
 
 describe("Auth Integration", () => {
   before(async function () {
@@ -54,22 +113,50 @@ describe("Auth Integration", () => {
 
     const idpPort = idpContainer.getMappedPort(IDP_PORT);
     const redisUrl = `redis://localhost:${redisContainer.getMappedPort(REDIS_PORT)}`;
+    const mutableMsalConfig = msalConfig as unknown as MutableMsalConfig;
+    const mutableAuthRequestDefaults =
+      authRequestDefaults as unknown as MutableAuthRequestDefaults;
 
     config.entra.authority = `https://localhost:${idpPort}/default`;
     config.entra.redirectUri = "http://127.0.0.1/auth/code/callback";
+    const { authorityMetadata, cloudDiscoveryMetadata } =
+      buildMockIdpMsalMetadata(config.entra.authority);
+
+    msalOriginalValues = {
+      authority: mutableMsalConfig.auth.authority,
+      authorityMetadata: mutableMsalConfig.auth.authorityMetadata,
+      cloudDiscoveryMetadata: mutableMsalConfig.auth.cloudDiscoveryMetadata,
+      redirectUri: mutableAuthRequestDefaults.redirectUri,
+    };
+
+    mutableMsalConfig.auth.authority = config.entra.authority;
+    mutableMsalConfig.auth.authorityMetadata = authorityMetadata;
+    mutableMsalConfig.auth.cloudDiscoveryMetadata = cloudDiscoveryMetadata;
+    mutableAuthRequestDefaults.redirectUri = config.entra.redirectUri;
+
     config.redis.enabled = true;
     config.redis.url = redisUrl;
     process.env.PLAYWRIGHT_TEST_SIGNIN = "true";
 
     app = await createApp({
-      createRedisClient: (redisConfig) => {
-        sessionRedisClient = createAppRedisClient(redisConfig);
+      getRedisClient: () => {
+        sessionRedisClient = createAppRedisClient(config.redis);
         return sessionRedisClient;
       },
     });
   });
 
   after(async () => {
+    const mutableMsalConfig = msalConfig as unknown as MutableMsalConfig;
+    const mutableAuthRequestDefaults =
+      authRequestDefaults as unknown as MutableAuthRequestDefaults;
+
+    mutableMsalConfig.auth.authority = msalOriginalValues.authority;
+    mutableMsalConfig.auth.authorityMetadata = msalOriginalValues.authorityMetadata;
+    mutableMsalConfig.auth.cloudDiscoveryMetadata =
+      msalOriginalValues.cloudDiscoveryMetadata;
+    mutableAuthRequestDefaults.redirectUri = msalOriginalValues.redirectUri;
+
     if (sessionRedisClient.isOpen) {
       await sessionRedisClient.quit();
     }
@@ -143,7 +230,13 @@ describe("Auth Integration", () => {
  
       // The mock server redirects to our app's callback with code & state.
       // Extract the path+query so we can send it to the app via supertest
-      const { pathname, search } = new URL(idpResponse.headers.location as string);
+      const location = idpResponse.headers.location;
+      const callbackLocation = Array.isArray(location) ? location[0] : location;
+      expect(callbackLocation, "IdP response location header").to.be.a("string");
+      const { pathname, search } = new URL(
+        callbackLocation as string,
+        config.entra.redirectUri,
+      );
     
       // Complete the OAuth2 callback by sending the code and state to callback endpoint
       const callbackRes = await unauthenticatedUser.get(pathname + search);

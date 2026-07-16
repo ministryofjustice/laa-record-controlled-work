@@ -15,7 +15,7 @@ import type {
   TokenExchangeResult,
 } from "#/auth/auth.types.js";
 
-import { authRequestDefaults } from "#/auth/auth.config.js";
+import { authRequestDefaults, msalConfig } from "#/auth/auth.config.js";
 import {
   MsalError,
   PkceGenerationError,
