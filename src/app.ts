@@ -125,7 +125,7 @@ const createApp = async (): Promise<express.Application> => {
   const forgeRouter = createExpressRouter(forge, { nunjucksEnv });
 
   app.all("/cases/:id/task-list", (req, res, next) => {
-    const id = req.params.id;
+    const { id } = req.params;
 
     if (id === "new" || id === "evidence") {
       next();
@@ -137,7 +137,7 @@ const createApp = async (): Promise<express.Application> => {
   });
 
   app.get("/cases/:id", (req, res, next) => {
-    const id = req.params.id;
+    const { id } = req.params;
 
     if (id === "new" || id === "evidence") {
       next();
