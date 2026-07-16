@@ -10,7 +10,7 @@ import { taskListStep } from "#/journeys/create-application/steps/task-list/task
 describe("Task list step", () => {
   const client = createForgeTestClient(
     "Record new case",
-    "/create-application/",
+    "/cases/new/",
     taskListStep(),
   );
   const session = {
@@ -19,7 +19,7 @@ describe("Task list step", () => {
     },
   };
 
-  describe("GET /create-application/task-list", () => {
+  describe("GET /cases/new/task-list", () => {
     let renderResult: TestRenderResult;
     let heading: RenderBlock;
     let body: RenderBlock;
@@ -27,7 +27,7 @@ describe("Task list step", () => {
     let submitButton: RenderBlock;
 
     before(async () => {
-      const result = await client.get("/create-application/task-list", {
+      const result = await client.get("/cases/new/task-list", {
         session,
       });
       expect(result.type).to.equal("render");
@@ -69,7 +69,7 @@ describe("Task list step", () => {
       }>;
       expect(items.length).to.equal(1);
       expect(items[0].title.text).to.equal("Income and capital");
-      expect(items[0].href).to.equal("income-TODO");
+      expect(items[0].href).to.equal("/cases/CW-123456/eligibility/");
       expect(items[0].status.tag.text).to.equal("Incomplete");
     });
 
@@ -92,9 +92,9 @@ describe("Task list step", () => {
     });
   });
 
-  describe("POST /create-application/task-list", () => {
+  describe("POST /cases/new/task-list", () => {
     it("redirects to the case list", async () => {
-      const result = await client.post("/create-application/task-list", {
+      const result = await client.post("/cases/new/task-list", {
         session,
       });
       expect(result.type).to.equal("redirect");

@@ -25,14 +25,14 @@ describe("Your Cases step", () => {
     sinon.restore();
   });
 
-  describe("GET /your-cases", () => {
+  describe("GET /cases", () => {
     let renderResult: TestRenderResult;
     let recordButton: RenderBlock;
     let table: RenderBlock;
     let subNavigation: RenderBlock;
 
     before(async () => {
-      const result = await client.get("/your-cases");
+      const result = await client.get("/cases");
       expect(result.type).to.equal("render");
       renderResult = result as TestRenderResult;
       [recordButton] = renderResult.getBlocksByVariant("govukLinkButton");
@@ -59,7 +59,7 @@ describe("Your Cases step", () => {
         active?: boolean;
       }[];
       expect(items[0].text).to.equal("In progress");
-      expect(items[0].href).to.equal("/your-cases");
+      expect(items[0].href).to.equal("/cases");
       expect(items[0].active).to.equal(true);
       expect(items[1].text).to.equal("Recorded");
       expect(items[1].href).to.equal("/your-cases-recorded");
@@ -89,7 +89,9 @@ describe("Your Cases step", () => {
       for (const [i, row] of rows.entries()) {
         const { name, applicationRefNumber, modifiedAt } = mockData[i];
         expect(row[0].html).to.include(name);
-        expect(row[0].html).to.include(`/cases/${applicationRefNumber}`);
+        expect(row[0].html).to.include(
+          `/cases/${applicationRefNumber}/task-list/`,
+        );
         expect(row[1].text).to.equal(applicationRefNumber);
         expect(row[2].text).to.equal(
           dateFormatter.format(new Date(modifiedAt)),
@@ -100,7 +102,7 @@ describe("Your Cases step", () => {
     it("renders empty value string when getApplications returns an empty array", async () => {
       getApplicationsStub.resolves({ status: 200, data: [] });
 
-      const result = await client.get("/your-cases");
+      const result = await client.get("/cases");
       expect(result.type).to.equal("render");
       const renderResult = result as TestRenderResult;
       const [emptyTable] = renderResult.getBlocksByVariant("govukTable");
