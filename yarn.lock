@@ -5268,7 +5268,7 @@ __metadata:
     mocha: "npm:^11.7.6"
     moment: "npm:^2.30.1"
     morgan: "npm:~1.11.0"
-    msw: "npm:^2.14.7"
+    msw: "npm:^2.15.0"
     nodemon: "npm:^3.1.14"
     nunjucks: "npm:^3.2.4"
     orval: "npm:^8.20.0"
@@ -5644,7 +5644,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"msw@npm:^2.14.7":
+"msw@npm:^2.15.0":
   version: 2.15.0
   resolution: "msw@npm:2.15.0"
   dependencies:
