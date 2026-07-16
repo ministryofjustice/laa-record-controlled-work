@@ -28,8 +28,9 @@ import { type Either, failure, success } from "#/lib/either.js";
 import { logger } from "#/logger.js";
 
 interface EntraServiceConfig {
-  cachePlugin?: ICachePlugin;
+  msalCachePlugin?: ICachePlugin;
   msalClient?: ConfidentialClientApplication;
+  redisEnabled?: boolean;
   requestHostname: string;
 }
 
@@ -61,10 +62,12 @@ export class EntraService {
    * @returns {EntraService} A new EntraService instance.
    */
   public static create({
-    cachePlugin,
+    msalCachePlugin,
     msalClient,
+    redisEnabled = true,
     requestHostname,
   }: EntraServiceConfig): EntraService {
+    const cachePlugin = redisEnabled ? msalCachePlugin : undefined;
     const client =
       msalClient ??
       new ConfidentialClientApplication({

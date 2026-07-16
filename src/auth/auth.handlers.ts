@@ -53,13 +53,14 @@ export async function authCodeCallback(
       return;
     }
 
-    const cachePlugin = new RedisCachePlugin(
+    const msalCachePlugin = new RedisCachePlugin(
       getRedisClient(),
       req.sessionID,
       config.redis.maxAge,
     );
     const entra = EntraService.create({
-      cachePlugin,
+      msalCachePlugin,
+      redisEnabled: config.redis.enabled,
       requestHostname: req.hostname,
     });
 
@@ -97,14 +98,15 @@ export async function signIn(
   res: Response,
   next: NextFunction,
 ): Promise<void> {
-  const cachePlugin = new RedisCachePlugin(
+  const msalCachePlugin = new RedisCachePlugin(
     getRedisClient(),
     req.sessionID,
     config.redis.maxAge,
   );
 
   const entra = EntraService.create({
-    cachePlugin,
+    msalCachePlugin,
+    redisEnabled: config.redis.enabled,
     requestHostname: req.hostname,
   });
 
