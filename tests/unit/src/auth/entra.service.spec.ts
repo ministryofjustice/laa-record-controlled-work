@@ -1,7 +1,6 @@
 import {
   ConfidentialClientApplication,
   CryptoProvider,
-  ICachePlugin,
 } from "@azure/msal-node";
 import { EntraService } from "#/auth/entra.service.js";
 import type {
@@ -36,13 +35,21 @@ describe("EntraService", () => {
     .hostname;
   const EPHEMERAL_HOSTNAME =
     "el-257-laa-record-controlled-work-uat.cloud-platform.service.justice.gov.uk";
-  const msalCachePlugin = {
-    beforeCacheAccess: sinon.stub().resolves(),
-    afterCacheAccess: sinon.stub().resolves(),
-  } as unknown as ICachePlugin;
 
   beforeEach(() => {
     msalStub = {
+      acquireTokenByCode: sinon.stub().resolves({
+        account: ACCOUNT,
+        idToken: ID_TOKEN,
+        accessToken: ACCESS_TOKEN,
+        expiresOn: TOKEN_EXPIRY,
+      }),
+      acquireTokenSilent: sinon.stub().resolves({
+        account: ACCOUNT,
+        idToken: ID_TOKEN,
+        accessToken: ACCESS_TOKEN,
+        expiresOn: TOKEN_EXPIRY,
+      }),
       getAuthCodeUrl: sinon.stub().resolves(AUTH_CODE_URL),
     };
 
@@ -60,15 +67,13 @@ describe("EntraService", () => {
   afterEach(() => sinon.restore());
 
   describe("create() factory method", () => {
-    it("returns an EntraService instance with a default MSAL client", () => {
+    it("returns an EntraService instance", () => {
       const result = EntraService.create({
         requestHostname: REDIRECT_URI_HOSTNAME,
+        msalClient: msalStub as ConfidentialClientApplication,
       });
 
       expect(result).to.be.an.instanceOf(EntraService);
-      expect(result.msalClient).to.be.an.instanceOf(
-        ConfidentialClientApplication,
-      );
     });
 
     it("uses the supplied msalClient when provided", () => {
@@ -82,25 +87,51 @@ describe("EntraService", () => {
       expect(result.msalClient).to.equal(providedClient);
     });
 
-    it("uses cachePlugin as token cache persistence", () => {
+    it("normalizes requestHostname to lowercase", async () => {
+      const mixedCaseHostname = REDIRECT_URI_HOSTNAME.toUpperCase();
       const result = EntraService.create({
-        requestHostname: REDIRECT_URI_HOSTNAME,
-        msalCachePlugin,
+        requestHostname: mixedCaseHostname,
+        msalClient: msalStub as ConfidentialClientApplication,
       });
 
-      expect(result.msalClient.getTokenCache().persistence).to.equal(
-        msalCachePlugin,
+      const flow = (await result.initiateAuthCodeFlow()) as Success<AuthCodeFlowState>;
+      expect(parseRelayState(flow.value.authState)).to.be.null;
+    });
+
+    it("throws when requestHostname is empty", () => {
+      expect(() =>
+        EntraService.create({
+          requestHostname: "   ",
+          msalClient: msalStub as ConfidentialClientApplication,
+        }),
+      ).to.throw(
+        TypeError,
+        "EntraService.create requires a non-empty requestHostname",
       );
     });
 
-    it("does not use cachePlugin persistence when redis is disabled", () => {
-      const result = EntraService.create({
-        requestHostname: REDIRECT_URI_HOSTNAME,
-        msalCachePlugin,
-        redisEnabled: false,
-      });
+    it("throws when requestHostname is not a hostname", () => {
+      expect(() =>
+        EntraService.create({
+          requestHostname: "https://example.com/callback",
+          msalClient: msalStub as ConfidentialClientApplication,
+        }),
+      ).to.throw(
+        TypeError,
+        "EntraService.create requires requestHostname to be a valid hostname",
+      );
+    });
 
-      expect(result.msalClient.getTokenCache().persistence).to.be.undefined;
+    it("throws when msalClient does not expose required methods", () => {
+      expect(() =>
+        EntraService.create({
+          requestHostname: REDIRECT_URI_HOSTNAME,
+          msalClient: {} as unknown as ConfidentialClientApplication,
+        }),
+      ).to.throw(
+        TypeError,
+        "EntraService.create requires an msalClient with MSAL auth methods",
+      );
     });
   });
 
@@ -186,6 +217,7 @@ describe("EntraService", () => {
     it("creates a relay state with target and sig when requestHostname differs from redirect URI hostname", async () => {
       const ephemeralService = EntraService.create({
         requestHostname: EPHEMERAL_HOSTNAME,
+        msalClient: msalStub as ConfidentialClientApplication,
       });
       const result =
         (await ephemeralService.initiateAuthCodeFlow()) as Success<AuthCodeFlowState>;

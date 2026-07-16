@@ -11,6 +11,7 @@ import {
 } from "#/auth/auth.relay.js";
 import { authCodeCallbackSchema } from "#/auth/auth.types.js";
 import { EntraService } from "#/auth/entra.service.js";
+import { createMsalClient } from "#/auth/msal.client.js";
 import { RedisCachePlugin } from "#/auth/msal.plugin.js";
 import config from "#/config.js";
 import {
@@ -53,16 +54,7 @@ export async function authCodeCallback(
       return;
     }
 
-    const msalCachePlugin = new RedisCachePlugin(
-      getRedisClient(),
-      req.sessionID,
-      config.redis.maxAge,
-    );
-    const entra = EntraService.create({
-      msalCachePlugin,
-      redisEnabled: config.redis.enabled,
-      requestHostname: req.hostname,
-    });
+    const entra = createEntraService(req);
 
     // exchange auth code for tokens and state
     const result = await entra.exchangeAuthCode(data.code, authCodeRequest);
@@ -98,19 +90,8 @@ export async function signIn(
   res: Response,
   next: NextFunction,
 ): Promise<void> {
-  const msalCachePlugin = new RedisCachePlugin(
-    getRedisClient(),
-    req.sessionID,
-    config.redis.maxAge,
-  );
-
-  const entra = EntraService.create({
-    msalCachePlugin,
-    redisEnabled: config.redis.enabled,
-    requestHostname: req.hostname,
-  });
-
   try {
+    const entra = createEntraService(req);
     const result = await entra.initiateAuthCodeFlow(req.session.returnTo);
     if (result.error) {
       res.status(INTERNAL_SERVER_ERROR).send(result.error.message);
@@ -152,6 +133,20 @@ export function signOut(req: Request, res: Response, next: NextFunction): void {
   } catch (error) {
     next(error);
   }
+}
+
+/**
+ * Creates an EntraService with an MSAL client configured for the current request session.
+ * @param req - The Express request.
+ * @returns A configured EntraService instance.
+ */
+function createEntraService(req: Request): EntraService {
+  const msalCachePlugin = config.redis.enabled
+    ? new RedisCachePlugin(getRedisClient(), req.sessionID, config.redis.maxAge)
+    : undefined;
+
+  const msalClient = createMsalClient({ msalCachePlugin });
+  return EntraService.create({ msalClient, requestHostname: req.hostname });
 }
 
 /**
