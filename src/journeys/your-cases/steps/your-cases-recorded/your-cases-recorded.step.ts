@@ -12,11 +12,11 @@ import {
   casesTable,
   noCasesMessage,
   subNavigation,
-} from "#/journeys/your-cases/steps/your-cases/your-cases.blocks.js";
+} from "#/journeys/your-cases/steps/your-cases-recorded/your-cases-recorded.blocks.js";
 import { YourCasesEffects } from "#/journeys/your-cases/your-cases.effects.js";
 import { t } from "#/lib/i18n.js";
 
-export const yourCasesStep = (): ReturnType<typeof step> =>
+export const yourCasesRecordedStep = (): ReturnType<typeof step> =>
   step({
     blocks: [
       heading,
@@ -30,6 +30,6 @@ export const yourCasesStep = (): ReturnType<typeof step> =>
         effects: [YourCasesEffects.LoadYourCaseList()],
       }),
     ],
-    path: "/your-cases",
+    path: "/your-cases-recorded",
     title: t("pages.yourCases.pageTitle"),
   });
