@@ -13,20 +13,30 @@ import {
   continueButton,
 } from "#/journeys/evidence/common.blocks.js";
 import {
-  moreDetailsForNoEvidence,
-  reasonForNoEvidenceRadioInput,
-} from "#/journeys/evidence/steps/reason-for-no-evidence/reason-for-no-evidence.blocks.js";
+  childCareEvidenceGroup,
+  description,
+  heading,
+  housingCostsEvidenceGroup,
+  incomeEvidenceGroup,
+  label,
+  maintenanceEvidenceGroup,
+} from "#/journeys/evidence/steps/evidence-of-expenditure/evidence-of-expenditure.blocks.js";
 import { t } from "#/lib/i18n.js";
 
-export const reasonForNoEvidence = (
+export const evidenceOfExpenditure = (
   journeyCode: string,
 ): ReturnType<typeof step> =>
   step({
     blocks: [
-      backLink("/cases/evidence/have-evidence"),
+      backLink("/cases/evidence/evidence-of-income"),
       caption,
-      reasonForNoEvidenceRadioInput,
-      moreDetailsForNoEvidence,
+      heading,
+      description,
+      label,
+      incomeEvidenceGroup,
+      housingCostsEvidenceGroup,
+      childCareEvidenceGroup,
+      maintenanceEvidenceGroup,
       continueButton,
     ],
     onSubmission: [
@@ -44,9 +54,9 @@ export const reasonForNoEvidence = (
         validate: true,
       }),
     ],
-    path: "/reason-for-no-evidence",
+    path: "/evidence-of-expenditure",
     reachability: {
       entryWhen: Query("returnTo").match(Condition.Equals("check-answers")),
     },
-    title: t("journeys.evidence.reasonForNoEvidence.title"),
+    title: t("journeys.evidence.evidenceOfExpenditure.title"),
   });

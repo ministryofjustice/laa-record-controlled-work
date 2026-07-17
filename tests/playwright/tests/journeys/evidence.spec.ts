@@ -31,7 +31,23 @@ test("evidence flow", async ({ page }) => {
   await page.getByRole("checkbox", { name: "Bank statements" }).check();
   await page.getByRole("button", { name: "Continue" }).click();
 
-  // Verify redirection to the evidence of expenditure and capital page
+  // Verify redirection to the evidence of expenditure page
+  await expect(page).toHaveURL("/cases/evidence/evidence-of-expenditure");
+
+  // Check for the question on the evidence of expenditure page
+  await expect(
+    page.getByRole("heading", {
+      name: /Evidence of your client's expenditure/,
+      level: 1,
+    }),
+  ).toBeVisible();
+
+  // Select "Wage slips" and "Bank statements" and submit
+  await page.getByRole("checkbox", { name: "Wage slips" }).check();
+  await page.getByRole("checkbox", { name: "Mortgage statement" }).check();
+  await page.getByRole("button", { name: "Continue" }).click();
+  
+  // Verify redirection to the check your answers page
   await expect(page).toHaveURL("/cases/evidence/check-answers");
 
   // Navigate back to the has evidence page

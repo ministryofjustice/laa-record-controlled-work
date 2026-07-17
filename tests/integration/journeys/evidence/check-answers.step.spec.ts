@@ -24,6 +24,8 @@ describe("Check answers step", () => {
         stateBenefitsEvidence: [],
         asylumSupportEvidence: [],
         taxCreditsEvidence: [],
+        incomeEvidence: ["wageSlips", "taxCalculationSheet"],
+        housingCostsEvidence: [],
       },
     },
   };
@@ -51,9 +53,10 @@ describe("Check answers step", () => {
       const rows = summaryList.properties.rows as Array<{
         key: { text: string };
       }>;
-      expect(rows.length).to.equal(3);
+      expect(rows.length).to.equal(4);
       expect(rows[0].key.text).to.equal("Do you have evidence?");
       expect(rows[2].key.text).to.equal("Income");
+      expect(rows[3].key.text).to.equal("Expenditure");
     });
 
     it("renders the evidence list when do you have evidence is 'yes'", () => {

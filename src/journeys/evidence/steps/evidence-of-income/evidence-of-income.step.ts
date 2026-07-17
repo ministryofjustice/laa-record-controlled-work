@@ -55,14 +55,16 @@ export const evidenceOfIncome = (
               goto: "check-answers",
               when: Query("returnTo").match(Condition.Equals("check-answers")),
             }),
-            redirect({ goto: "check-answers" }),
+            redirect({ goto: "evidence-of-expenditure" }),
           ],
         },
         validate: true,
       }),
     ],
     path: "/evidence-of-income",
-    reachability: { entryWhen: true },
+    reachability: {
+      entryWhen: Query("returnTo").match(Condition.Equals("check-answers")),
+    },
     title: t("journeys.evidence.evidenceOfIncome.title"),
     validWhen: [
       validation({
