@@ -2,7 +2,7 @@ import {
   GovUKHeading,
   GovUKLinkButton,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
-import { t } from "i18next";
+import { t } from "#/lib/i18n.js";
 
 import { H1 } from "#/lib/constants/headings.js";
 
