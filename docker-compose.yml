@@ -84,6 +84,7 @@ services:
       DISABLE_SECURE_COOKIES: true
 
       CCQ_MODE: embedded
+      CCQ_EMBEDDED_LAYOUT: rcw/application
       REDIS_URL: redis://redis-ccq:6379
       HOST_SERVICE_URL: http://rcw:3000
 
