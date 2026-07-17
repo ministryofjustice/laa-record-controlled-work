@@ -154,7 +154,9 @@ ccq:
     RAILS_ENV: production
     RAILS_SERVE_STATIC_FILES: "true"
     RAILS_LOG_TO_STDOUT: "true"
+
     CCQ_MODE: embedded
+    CCQ_EMBEDDED_LAYOUT: rcw/application
 
   resources:
     limits:
