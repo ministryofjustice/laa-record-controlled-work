@@ -17,7 +17,7 @@ describe("Your Cases Ineligible step", () => {
       .resolves({ status: 200, data: mockData });
     client = createForgeTestClientForCaseList(
       { getApplications: getApplicationsStub },
-      yourCasesIneligibleStep(),
+      yourCasesIneligibleStep,
     );
   });
 

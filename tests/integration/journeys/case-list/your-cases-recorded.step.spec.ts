@@ -17,7 +17,7 @@ describe("Your Cases recorded step", () => {
       .resolves({ status: 200, data: mockData });
     client = createForgeTestClientForCaseList(
       { getApplications: getApplicationsStub },
-      yourCasesRecordedStep(),
+      yourCasesRecordedStep,
     );
   });
 

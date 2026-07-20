@@ -21,7 +21,7 @@ describe("LoadYourCaseList", () => {
         .resolves({ status: 200, data: mockData });
       client = createForgeTestClientForCaseList(
         { getApplications: getApplicationsStub },
-        yourCasesStep(),
+        yourCasesStep,
       );
     });
 
@@ -50,7 +50,7 @@ describe("LoadYourCaseList", () => {
     ): Promise<unknown> {
       const client = createForgeTestClientForCaseList(
         { getApplications: stub },
-        yourCasesStep(),
+        yourCasesStep,
       );
       try {
         await client.get("/your-cases");
