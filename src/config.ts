@@ -100,7 +100,7 @@ export default {
       httpOnly: true,
       maxAge: SESSION_AGE_MAX,
       sameSite: "lax",
-      secure: useHttps,
+      secure: useHttps || "auto",
     },
     name: useHttps ? "__Host-rcw.sid" : "rcw.sid",
     resave: false,
