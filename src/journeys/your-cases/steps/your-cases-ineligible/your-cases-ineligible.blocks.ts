@@ -65,16 +65,10 @@ export const casesTable = (cases: ChainableRef): GovUKTable =>
         },
       ]),
     ),
-    visibleWhen: Data("caseList")
-      .pipe(Transformer.Array.Length())
-      // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- self explanatory
-      .match(Condition.Number.GreaterThan(0)),
+    visibleWhen: Data("caseList").match(Condition.IsRequired()),
   });
 
 export const noCasesMessage = GovUKBody({
   text: t("pages.yourCases.table.emptyMessage.ineligible"),
-  visibleWhen: Data("caseList")
-    .pipe(Transformer.Array.Length())
-    // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- self explanatory
-    .match(Condition.Number.LessThanOrEqual(0)),
+  visibleWhen: Data("caseList").not.match(Condition.IsRequired()),
 });
