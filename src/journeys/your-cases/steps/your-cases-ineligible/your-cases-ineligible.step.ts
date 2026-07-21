@@ -8,12 +8,12 @@ import {
   createCaseButton,
   heading,
 } from "#/journeys/your-cases/common.blocks.js";
-import { YourCasesEffects } from "#/journeys/your-cases/your-cases.effects.js";
 import {
   casesTable,
   noCasesMessage,
   subNavigation,
 } from "#/journeys/your-cases/steps/your-cases-ineligible/your-cases-ineligible.blocks.js";
+import { YourCasesEffects } from "#/journeys/your-cases/your-cases.effects.js";
 import { t } from "#/lib/i18n.js";
 
 export const yourCasesIneligibleStep = step({
