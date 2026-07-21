@@ -3,10 +3,10 @@ import { describe, it } from "mocha";
 import { yourCasesStep } from "#/journeys/your-cases/steps/your-cases/your-cases.step.js";
 import sinon from "sinon";
 import { createForgeTestClientForCaseList } from "../../../../integration/utils/helpers.js";
-import { getGetApplicationsResponseMock } from "../../../../mocks/api/fakers/applications/applications.faker.gen.js";
 import { TestRenderResult } from "@ministryofjustice/hmpps-forge/core/testing";
 import { ApiResponseError, ApiValidationError } from "#/api/api.errors.js";
 import { logger } from "#/logger.js";
+import { getGetApplicationsResponseMock } from "../../../../mocks/api/rcw/fakers/applications/applications.faker.gen.js";
 
 const mockData = getGetApplicationsResponseMock();
 

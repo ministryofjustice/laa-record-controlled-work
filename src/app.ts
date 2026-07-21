@@ -11,7 +11,7 @@ import compression from "compression";
 import express from "express";
 import session from "express-session";
 
-import { getApplications } from "#/api/client/schema/applications/applications.gen.js";
+import { getApplications } from "#/api/clients/rcw/schema/applications/applications.gen.js";
 import authRouter from "#/auth/auth.routes.js";
 import config from "#/config.js";
 import { autocomplete } from "#/journeys/components/autocomplete/autocomplete.component.js";

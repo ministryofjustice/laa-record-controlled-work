@@ -4,9 +4,9 @@ import type {
 } from "#/journeys/your-cases/your-cases.types.js";
 
 import { ApiResponseError, ApiValidationError } from "#/api/api.errors.js";
-import { Applications } from "#/api/client/model/applications.zod.gen.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
+import { Applications } from "#/api/clients/rcw/model/applications.zod.gen.js";
 
 export const loadYourCaseList =
   (deps: YourCasesEffectsDeps) => async (context: CaseListContext) => {

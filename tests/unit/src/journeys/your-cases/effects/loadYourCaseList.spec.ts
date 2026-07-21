@@ -3,7 +3,6 @@ import chaiAsPromised from "chai-as-promised";
 import { describe, it } from "mocha";
 import { loadYourCaseList } from "#/journeys/your-cases/effects/loadYourCaseList.js";
 import sinon from "sinon";
-import { getGetApplicationsResponseMock } from "../../../../../mocks/api/fakers/applications/applications.faker.gen.js";
 import { ApiResponseError, ApiValidationError } from "#/api/api.errors.js";
 import {
   CaseListContext,
@@ -11,6 +10,7 @@ import {
 } from "#/journeys/your-cases/your-cases.types.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
+import { getGetApplicationsResponseMock } from "../../../../../mocks/api/rcw/fakers/applications/applications.faker.gen.js";
 
 const { expect } = chai;
 chai.use(chaiAsPromised);
