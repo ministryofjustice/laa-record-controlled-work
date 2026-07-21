@@ -29,14 +29,20 @@
       "createCaseButton": "Record a new case",
       "tabs": {
         "inProgress": "In progress",
-        "recorded": "Recorded"
+        "recorded": "Recorded",
+        "ineligible": "Ineligible"
       },
       "table": {
-        "emptyMessage": "You have no cases in progress",
+        "emptyMessage": {
+          "inProgress": "You have no cases in progress",
+          "recorded": "You have no recorded cases",
+          "ineligible": "You have no ineligible cases"
+        },
         "columns": {
           "referenceNumber": "Reference number",
           "clientName": "Client name",
-          "lastUpdated": "Last updated"
+          "lastUpdated": "Last updated",
+          "dateRecorded": "Date recorded"
         }
       }
     }

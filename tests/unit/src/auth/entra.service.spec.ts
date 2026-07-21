@@ -1,7 +1,6 @@
 import {
   ConfidentialClientApplication,
   CryptoProvider,
-  ICachePlugin,
 } from "@azure/msal-node";
 import { EntraService } from "#/auth/entra.service.js";
 import type {
@@ -39,10 +38,25 @@ describe("EntraService", () => {
 
   beforeEach(() => {
     msalStub = {
+      acquireTokenByCode: sinon.stub().resolves({
+        account: ACCOUNT,
+        idToken: ID_TOKEN,
+        accessToken: ACCESS_TOKEN,
+        expiresOn: TOKEN_EXPIRY,
+      }),
+      acquireTokenSilent: sinon.stub().resolves({
+        account: ACCOUNT,
+        idToken: ID_TOKEN,
+        accessToken: ACCESS_TOKEN,
+        expiresOn: TOKEN_EXPIRY,
+      }),
       getAuthCodeUrl: sinon.stub().resolves(AUTH_CODE_URL),
     };
 
-    service = EntraService.create({ requestHostname: REDIRECT_URI_HOSTNAME, msalClient: msalStub as ConfidentialClientApplication});
+    service = EntraService.create({
+      requestHostname: REDIRECT_URI_HOSTNAME,
+      msalClient: msalStub as ConfidentialClientApplication,
+    });
 
     sinon.stub(CryptoProvider.prototype, "generatePkceCodes").resolves({
       verifier: VERIFIER,
@@ -53,13 +67,13 @@ describe("EntraService", () => {
   afterEach(() => sinon.restore());
 
   describe("create() factory method", () => {
-    it("returns an EntraService instance with a default MSAL client", () => {
-      const result = EntraService.create({ requestHostname: REDIRECT_URI_HOSTNAME});
+    it("returns an EntraService instance", () => {
+      const result = EntraService.create({
+        requestHostname: REDIRECT_URI_HOSTNAME,
+        msalClient: msalStub as ConfidentialClientApplication,
+      });
 
       expect(result).to.be.an.instanceOf(EntraService);
-      expect(result.msalClient).to.be.an.instanceOf(
-        ConfidentialClientApplication,
-      );
     });
 
     it("uses the supplied msalClient when provided", () => {
@@ -73,18 +87,51 @@ describe("EntraService", () => {
       expect(result.msalClient).to.equal(providedClient);
     });
 
-    it("uses cachePlugin as token cache persistence", () => {
-      const cachePlugin = {
-        beforeCacheAccess: sinon.stub().resolves(),
-        afterCacheAccess: sinon.stub().resolves(),
-      } as unknown as ICachePlugin;
-
+    it("normalizes requestHostname to lowercase", async () => {
+      const mixedCaseHostname = REDIRECT_URI_HOSTNAME.toUpperCase();
       const result = EntraService.create({
-        requestHostname: REDIRECT_URI_HOSTNAME,
-        cachePlugin,
+        requestHostname: mixedCaseHostname,
+        msalClient: msalStub as ConfidentialClientApplication,
       });
 
-      expect(result.msalClient.getTokenCache().persistence).to.equal(cachePlugin);
+      const flow = (await result.initiateAuthCodeFlow()) as Success<AuthCodeFlowState>;
+      expect(parseRelayState(flow.value.authState)).to.be.null;
+    });
+
+    it("throws when requestHostname is empty", () => {
+      expect(() =>
+        EntraService.create({
+          requestHostname: "   ",
+          msalClient: msalStub as ConfidentialClientApplication,
+        }),
+      ).to.throw(
+        TypeError,
+        "EntraService.create requires a non-empty requestHostname",
+      );
+    });
+
+    it("throws when requestHostname is not a hostname", () => {
+      expect(() =>
+        EntraService.create({
+          requestHostname: "https://example.com/callback",
+          msalClient: msalStub as ConfidentialClientApplication,
+        }),
+      ).to.throw(
+        TypeError,
+        "EntraService.create requires requestHostname to be a valid hostname",
+      );
+    });
+
+    it("throws when msalClient does not expose required methods", () => {
+      expect(() =>
+        EntraService.create({
+          requestHostname: REDIRECT_URI_HOSTNAME,
+          msalClient: {} as unknown as ConfidentialClientApplication,
+        }),
+      ).to.throw(
+        TypeError,
+        "EntraService.create requires an msalClient with MSAL auth methods",
+      );
     });
   });
 
@@ -168,7 +215,10 @@ describe("EntraService", () => {
     });
 
     it("creates a relay state with target and sig when requestHostname differs from redirect URI hostname", async () => {
-      const ephemeralService = EntraService.create({requestHostname: EPHEMERAL_HOSTNAME})
+      const ephemeralService = EntraService.create({
+        requestHostname: EPHEMERAL_HOSTNAME,
+        msalClient: msalStub as ConfidentialClientApplication,
+      });
       const result =
         (await ephemeralService.initiateAuthCodeFlow()) as Success<AuthCodeFlowState>;
       const parsed = parseRelayState(result.value.authState);
@@ -193,14 +243,12 @@ describe("EntraService", () => {
         scopes: [],
         redirectUri: "http://localhost/auth/code/callback",
       };
-      msalStub.acquireTokenByCode = sinon
-        .stub()
-        .resolves({
-          account: ACCOUNT,
-          idToken: ID_TOKEN,
-          accessToken: ACCESS_TOKEN,
-          expiresOn: TOKEN_EXPIRY,
-        });
+      msalStub.acquireTokenByCode = sinon.stub().resolves({
+        account: ACCOUNT,
+        idToken: ID_TOKEN,
+        accessToken: ACCESS_TOKEN,
+        expiresOn: TOKEN_EXPIRY,
+      });
     });
 
     it("returns account and idToken", async () => {
@@ -244,13 +292,17 @@ describe("EntraService", () => {
     });
 
     it("returns a refreshed access token on success", async () => {
-      const result = (await service.acquireTokenSilent(ACCOUNT as any)) as Success<TokenExchangeResult>;
+      const result = (await service.acquireTokenSilent(
+        ACCOUNT as any,
+      )) as Success<TokenExchangeResult>;
       expect(result.error).to.be.undefined;
       expect(result.value.accessToken).to.equal(ACCESS_TOKEN);
     });
 
     it("returns the account and idToken", async () => {
-      const result = (await service.acquireTokenSilent(ACCOUNT as any)) as Success<TokenExchangeResult>;
+      const result = (await service.acquireTokenSilent(
+        ACCOUNT as any,
+      )) as Success<TokenExchangeResult>;
       expect(result.value.account).to.deep.equal(ACCOUNT);
       expect(result.value.idToken).to.equal(ID_TOKEN);
     });
@@ -274,139 +326,6 @@ describe("EntraService", () => {
         .to.be.an("error")
         .and.to.be.instanceOf(TokenRefreshError);
       expect(result.error?.cause).to.have.property("message", "silent failure");
-    });
-  });
-  
-  describe("initiateAuthCodeFlow()", () => {
-    it("returns a success with the URL from the MSAL client", async () => {
-      const result =
-        (await service.initiateAuthCodeFlow()) as Success<AuthCodeFlowState>;
-      expect(result.error).to.be.undefined;
-      expect(result.value.authCodeUrl).to.equal(AUTH_CODE_URL);
-    });
-
-    it("returns a random authState and passes it as the state parameter", async () => {
-      const result =
-        (await service.initiateAuthCodeFlow()) as Success<AuthCodeFlowState>;
-      expect(result.value.authState)
-        .to.be.a("string")
-        .with.length.greaterThan(0);
-      const [requestArg] = (msalStub.getAuthCodeUrl as sinon.SinonStub).args[0];
-      expect(requestArg.state).to.equal(result.value.authState);
-    });
-
-    it("defaults returnTo to / when no returnTo is provided", async () => {
-      const result =
-        (await service.initiateAuthCodeFlow()) as Success<AuthCodeFlowState>;
-      expect(result.value.returnTo).to.equal("/");
-    });
-
-    it("preserves a valid returnTo path", async () => {
-      const result = (await service.initiateAuthCodeFlow(
-        "/case/123",
-      )) as Success<AuthCodeFlowState>;
-      expect(result.value.returnTo).to.equal("/case/123");
-    });
-
-    it("preserves returnTo of /", async () => {
-      const result = (await service.initiateAuthCodeFlow(
-        "/",
-      )) as Success<AuthCodeFlowState>;
-      expect(result.value.returnTo).to.equal("/");
-    });
-
-    it("falls back to / when returnTo could redirect to an external site", async () => {
-      const result = (await service.initiateAuthCodeFlow(
-        "//external.com",
-      )) as Success<AuthCodeFlowState>;
-      expect(result.value.returnTo).to.equal("/");
-    });
-
-    it("returns a MsalError failure when MSAL throws", async () => {
-      (msalStub.getAuthCodeUrl as sinon.SinonStub).rejects(
-        new Error("MSAL failure"),
-      );
-      const result = await service.initiateAuthCodeFlow();
-      expect(result.error).to.exist;
-      expect(result.error).to.be.an("error").and.to.be.instanceOf(MsalError);
-      expect(result.error?.cause)
-        .to.be.an("error")
-        .and.to.have.property("message", "MSAL failure");
-    });
-
-    it("returns a PkceGenerationError failure when PKCE generation throws", async () => {
-      (CryptoProvider.prototype.generatePkceCodes as sinon.SinonStub).rejects(
-        new Error("PKCE failure"),
-      );
-
-      const result = await service.initiateAuthCodeFlow();
-
-      expect(result.error)
-        .to.be.an("error")
-        .and.to.be.instanceOf(PkceGenerationError);
-      expect(result.error?.cause)
-        .to.be.an("error")
-        .and.to.have.property("message", "PKCE failure");
-    });
-
-    it("creates a plain state when requestHostname matches the redirect URI hostname", async () => {
-      const result =
-        (await service.initiateAuthCodeFlow()) as Success<AuthCodeFlowState>;
-      const parsed = parseRelayState(result.value.authState);
-      expect(parsed).to.be.null;
-    });
-
-    it("creates a relay state with target and sig when requestHostname differs from redirect URI hostname", async () => {
-      const ephemeralService = EntraService.create({requestHostname: EPHEMERAL_HOSTNAME})
-      const result =
-        (await ephemeralService.initiateAuthCodeFlow()) as Success<AuthCodeFlowState>;
-      const parsed = parseRelayState(result.value.authState);
-      expect(parsed).to.not.be.null;
-      expect(parsed!.target).to.equal(`https://${EPHEMERAL_HOSTNAME}`);
-      expect(verifyRelayState(parsed!, SESSION_SECRET)).to.be.true;
-    });
-  });
-
-  describe("exchangeAuthCode()", () => {
-    let authCodeRequest: {
-      code: string;
-      codeVerifier: string;
-      scopes: string[];
-      redirectUri: string;
-    };
-
-    beforeEach(() => {
-      authCodeRequest = {
-        code: "",
-        codeVerifier: VERIFIER,
-        scopes: [],
-        redirectUri: "http://localhost/auth/code/callback",
-      };
-      msalStub.acquireTokenByCode = sinon
-        .stub()
-        .resolves({ account: ACCOUNT, idToken: ID_TOKEN });
-    });
-
-    it("returns account and idToken", async () => {
-      const result = (await service.exchangeAuthCode(
-        AUTH_CODE,
-        authCodeRequest,
-      )) as Success<TokenExchangeResult>;
-      expect(result.value.account).to.deep.equal(ACCOUNT);
-      expect(result.value.idToken).to.equal(ID_TOKEN);
-    });
-
-    it("returns a TokenAcquisitionError failure when MSAL throws", async () => {
-      // TODO remove stub once we remove console.error from the catch blocks in EntraService
-      sinon.stub(console, "error");
-
-      const msalError = new Error("MSAL failure");
-      (msalStub.acquireTokenByCode as sinon.SinonStub).rejects(msalError);
-
-      const result = await service.exchangeAuthCode(AUTH_CODE, authCodeRequest);
-      expect(result.error)
-        .to.be.an("error")
-        .and.to.be.instanceOf(TokenAcquisitionError);
     });
   });
 });

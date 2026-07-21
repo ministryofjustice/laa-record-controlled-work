@@ -12,11 +12,11 @@ import {
   casesTable,
   noCasesMessage,
   subNavigation,
-} from "#/journeys/your-cases/steps/your-cases/your-cases.blocks.js";
+} from "#/journeys/your-cases/steps/your-cases-ineligible/your-cases-ineligible.blocks.js";
 import { YourCasesEffects } from "#/journeys/your-cases/your-cases.effects.js";
 import { t } from "#/lib/i18n.js";
 
-export const yourCasesStep = step({
+export const yourCasesIneligibleStep = step({
   blocks: [
     heading,
     createCaseButton,
@@ -29,6 +29,6 @@ export const yourCasesStep = step({
       effects: [YourCasesEffects.loadYourCaseList()],
     }),
   ],
-  path: "/your-cases",
+  path: "/your-cases-ineligible",
   title: t("pages.yourCases.pageTitle"),
 });

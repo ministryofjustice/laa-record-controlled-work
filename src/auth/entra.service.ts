@@ -3,9 +3,8 @@ import {
   type AuthenticationResult,
   type AuthorizationCodeRequest,
   type AuthorizationUrlRequest,
-  ConfidentialClientApplication,
+  type ConfidentialClientApplication,
   CryptoProvider,
-  type ICachePlugin,
 } from "@azure/msal-node";
 import { randomUUID } from "node:crypto";
 
@@ -15,7 +14,7 @@ import type {
   TokenExchangeResult,
 } from "#/auth/auth.types.js";
 
-import { authRequestDefaults, msalConfig } from "#/auth/auth.config.js";
+import { authRequestDefaults } from "#/auth/auth.config.js";
 import {
   MsalError,
   PkceGenerationError,
@@ -28,10 +27,11 @@ import { type Either, failure, success } from "#/lib/either.js";
 import { logger } from "#/logger.js";
 
 interface EntraServiceConfig {
-  cachePlugin?: ICachePlugin;
-  msalClient?: ConfidentialClientApplication;
+  msalClient: ConfidentialClientApplication;
   requestHostname: string;
 }
+
+const EMPTY_HOSTNAME_LENGTH = 0;
 
 /**
  * Handles Microsoft Entra ID (MSAL) authentication flows including
@@ -56,23 +56,18 @@ export class EntraService {
   }
 
   /**
-   * Factory method to create a new EntraService instance with a default MSAL client.
-   * @param {config} config - Configuration for the EntraService, including optional cache plugin and request hostname.
+   * Factory method to create a new EntraService instance.
+   * @param {config} config - Configuration for the EntraService, including request hostname and an MSAL client.
    * @returns {EntraService} A new EntraService instance.
    */
   public static create({
-    cachePlugin,
     msalClient,
     requestHostname,
   }: EntraServiceConfig): EntraService {
-    const client =
-      msalClient ??
-      new ConfidentialClientApplication({
-        ...msalConfig,
-        cache: { cachePlugin },
-      });
+    validateMsalClient(msalClient);
+    const normalizedHostname = normalizeRequestHostname(requestHostname);
 
-    return new EntraService(requestHostname, client);
+    return new EntraService(normalizedHostname, msalClient);
   }
 
   /**
@@ -216,5 +211,71 @@ export class EntraService {
       pkceCodes,
       returnTo: validReturnTo,
     };
+  }
+}
+
+/**
+ * Validates the hostname format accepted by EntraService.
+ * @param hostname - Candidate hostname value.
+ * @returns True when the value is a valid bare hostname.
+ */
+function isValidHostname(hostname: string): boolean {
+  try {
+    const parsed = new URL(`https://${hostname}`);
+    return parsed.hostname === hostname;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Validates and normalizes the request hostname invariant.
+ * @param requestHostname - Raw request hostname from the caller.
+ * @returns A normalized, lowercase hostname.
+ */
+function normalizeRequestHostname(requestHostname: string): string {
+  const normalizedHostname = requestHostname.trim().toLowerCase();
+
+  if (normalizedHostname.length === EMPTY_HOSTNAME_LENGTH) {
+    throw new TypeError(
+      "EntraService.create requires a non-empty requestHostname",
+    );
+  }
+
+  if (!isValidHostname(normalizedHostname)) {
+    throw new TypeError(
+      "EntraService.create requires requestHostname to be a valid hostname",
+    );
+  }
+
+  return normalizedHostname;
+}
+
+/**
+ * Validates that the supplied client provides the MSAL methods required by the service.
+ * @param msalClient - Candidate MSAL client.
+ */
+function validateMsalClient(
+  msalClient: unknown,
+): asserts msalClient is ConfidentialClientApplication {
+  if (msalClient === undefined || msalClient === null) {
+    throw new TypeError("EntraService.create requires a configured msalClient");
+  }
+
+  const candidate = msalClient as Partial<
+    Record<
+      "acquireTokenByCode" | "acquireTokenSilent" | "getAuthCodeUrl",
+      unknown
+    >
+  >;
+
+  if (
+    typeof candidate.acquireTokenByCode !== "function" ||
+    typeof candidate.acquireTokenSilent !== "function" ||
+    typeof candidate.getAuthCodeUrl !== "function"
+  ) {
+    throw new TypeError(
+      "EntraService.create requires an msalClient with MSAL auth methods",
+    );
   }
 }

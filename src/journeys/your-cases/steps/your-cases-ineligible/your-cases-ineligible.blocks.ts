@@ -18,8 +18,7 @@ import { t } from "#/lib/i18n.js";
 export const subNavigation = MOJSubNavigation({
   items: [
     {
-      active: true,
-      href: "/cases",
+      href: "/your-cases",
       text: t("pages.yourCases.tabs.inProgress"),
     },
     {
@@ -27,6 +26,7 @@ export const subNavigation = MOJSubNavigation({
       text: t("pages.yourCases.tabs.recorded"),
     },
     {
+      active: true,
       href: "/your-cases-ineligible",
       text: t("pages.yourCases.tabs.ineligible"),
     },
@@ -38,13 +38,13 @@ export const casesTable = (cases: ChainableRef): GovUKTable =>
     head: [
       { text: t("pages.yourCases.table.columns.clientName") },
       { text: t("pages.yourCases.table.columns.referenceNumber") },
-      { text: t("pages.yourCases.table.columns.lastUpdated") },
+      { text: t("pages.yourCases.table.columns.dateRecorded") },
     ],
     rows: cases.each(
       Iterator.Map([
         {
           html: Format(
-            '<a class="govuk-link" href="/cases/%1/task-list/">%2</a>',
+            '<a class="govuk-link" href="/cases/%1">%2</a>',
             Item().path("applicationRefNumber"),
             Item().path("name"),
           ),
@@ -69,6 +69,6 @@ export const casesTable = (cases: ChainableRef): GovUKTable =>
   });
 
 export const noCasesMessage = GovUKBody({
-  text: t("pages.yourCases.table.emptyMessage.inProgress"),
+  text: t("pages.yourCases.table.emptyMessage.ineligible"),
   visibleWhen: Data("caseList").not.match(Condition.IsRequired()),
 });
