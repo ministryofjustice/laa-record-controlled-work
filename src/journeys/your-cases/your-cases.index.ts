@@ -11,7 +11,7 @@ import { yourCasesStep } from "#/journeys/your-cases/steps/your-cases/your-cases
 import { yourCasesEffectsRegistry } from "#/journeys/your-cases/your-cases.effects.js";
 
 const yourCasesJourney = journey({
-  code: "yourCases",
+  code: "cases",
   path: "/",
   reachability: { disableReachabilityChecks: true },
   steps: [yourCasesStep, yourCasesRecordedStep, yourCasesIneligibleStep],

@@ -23,11 +23,11 @@ export const subNavigation = MOJSubNavigation({
       text: t("pages.yourCases.tabs.inProgress"),
     },
     {
-      href: "/your-cases-recorded",
+      href: "/cases/recorded",
       text: t("pages.yourCases.tabs.recorded"),
     },
     {
-      href: "/your-cases-ineligible",
+      href: "/cases/ineligible",
       text: t("pages.yourCases.tabs.ineligible"),
     },
   ],

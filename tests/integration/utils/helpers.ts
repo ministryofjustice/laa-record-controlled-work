@@ -70,7 +70,7 @@ export function createForgeTestClientForCaseList(
   
   const testJourney = journey({
     code: "yourCases",
-    path: "/",
+    path: "/cases",
     reachability: { disableReachabilityChecks: true },
     steps,
     title: "Your Cases",

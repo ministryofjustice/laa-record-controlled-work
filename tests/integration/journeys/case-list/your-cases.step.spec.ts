@@ -62,9 +62,9 @@ describe("Your Cases step", () => {
       expect(items[0].href).to.equal("/cases");
       expect(items[0].active).to.equal(true);
       expect(items[1].text).to.equal("Recorded");
-      expect(items[1].href).to.equal("/your-cases-recorded");
+      expect(items[1].href).to.equal("/cases/recorded");
       expect(items[2].text).to.equal("Ineligible");
-      expect(items[2].href).to.equal("/your-cases-ineligible");
+      expect(items[2].href).to.equal("/cases/ineligible");
     });
 
     it("renders a table with the correct columns", () => {

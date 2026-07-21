@@ -129,7 +129,7 @@ const createApp = async (): Promise<express.Application> => {
   app.get("/cases/:id", (req, res, next) => {
     const { id } = req.params;
 
-    if (id === "new" || id === "evidence") {
+    if (id === "new" || id === "evidence" || id === "recorded" || id === "ineligible") {
       next();
       return;
     }

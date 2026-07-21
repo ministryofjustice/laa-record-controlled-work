@@ -36,11 +36,11 @@ test("Your Cases step", async ({ page }) => {
 
   // Check recorded link navigates to the correct page
   await recordedLink.click();
-  await expect(page).toHaveURL("/your-cases-recorded");
+  await expect(page).toHaveURL("/cases/recorded");
 
   // Check ineligible link navigates to the correct page
   await ineligibleLink.click();
-  await expect(page).toHaveURL("/your-cases-ineligible");
+  await expect(page).toHaveURL("/cases/ineligible");
 
   // Navigate back to the Your Cases page
   await page.goto("/cases");
