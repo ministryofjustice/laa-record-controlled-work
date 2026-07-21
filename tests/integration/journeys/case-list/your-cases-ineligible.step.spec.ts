@@ -17,7 +17,7 @@ describe("Your Cases Ineligible step", () => {
       .resolves({ status: 200, data: mockData });
     client = createForgeTestClientForCaseList(
       { getApplications: getApplicationsStub },
-      yourCasesIneligibleStep(),
+      yourCasesIneligibleStep,
     );
   });
 
@@ -105,14 +105,13 @@ describe("Your Cases Ineligible step", () => {
       const result = await client.get("/your-cases-ineligible");
       expect(result.type).to.equal("render");
       const renderResult = result as TestRenderResult;
-      const [emptyTable] = renderResult.getBlocksByVariant("govukTable");
+      const allTables = renderResult.getBlocksByVariant("govukTable");
+      const visibleTables = allTables.filter(
+        (b) => b.properties.visibleWhen !== false,
+      );
       const [_, body] = renderResult.getBlocksByVariant("html");
-      const rows = emptyTable.properties.rows as {
-        html?: string;
-        text?: string;
-      }[][];
 
-      expect(rows).to.have.length(0);
+      expect(visibleTables).to.have.length(0);
       expect(body.properties.content).to.equal("You have no ineligible cases");
     });
   });

@@ -17,7 +17,7 @@ describe("Your Cases step", () => {
       .resolves({ status: 200, data: mockData });
     client = createForgeTestClientForCaseList(
       { getApplications: getApplicationsStub },
-      yourCasesStep(),
+      yourCasesStep,
     );
   });
 
@@ -105,17 +105,14 @@ describe("Your Cases step", () => {
       const result = await client.get("/your-cases");
       expect(result.type).to.equal("render");
       const renderResult = result as TestRenderResult;
-      const [emptyTable] = renderResult.getBlocksByVariant("govukTable");
-      const [ _, body] = renderResult.getBlocksByVariant("html");
-      const rows = emptyTable.properties.rows as {
-        html?: string;
-        text?: string;
-      }[][];
-      
-      expect(rows).to.have.length(0);
-      expect(body.properties.content).to.equal(
-        "You have no cases in progress",
+      const allTables = renderResult.getBlocksByVariant("govukTable");
+      const visibleTables = allTables.filter(
+        (b) => b.properties.visibleWhen !== false,
       );
+      const [_, body] = renderResult.getBlocksByVariant("html");
+
+      expect(visibleTables).to.have.length(0);
+      expect(body.properties.content).to.equal("You have no cases in progress");
     });
   });
 });

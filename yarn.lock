@@ -748,15 +748,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ministryofjustice/hmpps-forge@npm:^0.1.0-alpha.23":
-  version: 0.1.0-alpha.23
-  resolution: "@ministryofjustice/hmpps-forge@npm:0.1.0-alpha.23"
+"@ministryofjustice/hmpps-forge@npm:^0.3.1":
+  version: 0.3.1
+  resolution: "@ministryofjustice/hmpps-forge@npm:0.3.1"
   dependencies:
     express: "npm:^4.21.0 || ^5.0.0"
     http-errors: "npm:^2.0.0"
     nunjucks: "npm:^3.2.4"
+    ws: "npm:^8.18.0"
     zod: "npm:^4.1.5"
-  checksum: 10c0/a61fdf632893b5478485101171b2d5da5a7366dda9a8a68fb83f7edd22f4a9cc7fb792dc501cd439083af594e91a7885e0407871ea362e1fcabae137b13d6453
+  checksum: 10c0/4e46917a3ada25391d53a935b60447121b4facbd7dd8cfe23cf403cabd01a0211a1d8216ff96115fe66b4724a2c166e837098db8bfcb801585efee8a28d49ace
   languageName: node
   linkType: hard
 
@@ -5230,7 +5231,7 @@ __metadata:
     "@faker-js/faker": "npm:^10.5.0"
     "@j178/prek": "npm:^0.4.9"
     "@ministryofjustice/frontend": "npm:9.0.0"
-    "@ministryofjustice/hmpps-forge": "npm:^0.1.0-alpha.23"
+    "@ministryofjustice/hmpps-forge": "npm:^0.3.1"
     "@playwright/test": "npm:^1.61.1"
     "@types/chai": "npm:^5.2.3"
     "@types/chai-as-promised": "npm:^8.0.2"
@@ -8166,6 +8167,21 @@ __metadata:
   version: 1.0.2
   resolution: "wrappy@npm:1.0.2"
   checksum: 10c0/56fece1a4018c6a6c8e28fbc88c87e0fbf4ea8fd64fc6c63b18f4acc4bd13e0ad2515189786dd2c30d3eec9663d70f4ecf699330002f8ccb547e4a18231fc9f0
+  languageName: node
+  linkType: hard
+
+"ws@npm:8.21.1":
+  version: 8.21.1
+  resolution: "ws@npm:8.21.1"
+  peerDependencies:
+    bufferutil: ^4.0.1
+    utf-8-validate: ">=5.0.2"
+  peerDependenciesMeta:
+    bufferutil:
+      optional: true
+    utf-8-validate:
+      optional: true
+  checksum: 10c0/c4c6f1d95f6d465262de2037c57c715725d67e078dd49420ede4e19115668aba159cb64d85c5e89c06eb2826be599e62e5095860ad6cc54ff42e8bd7684e1db8
   languageName: node
   linkType: hard
 

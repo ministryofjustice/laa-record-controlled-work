@@ -16,20 +16,19 @@ import {
 import { YourCasesEffects } from "#/journeys/your-cases/your-cases.effects.js";
 import { t } from "#/lib/i18n.js";
 
-export const yourCasesStep = (): ReturnType<typeof step> =>
-  step({
-    blocks: [
-      heading,
-      createCaseButton,
-      subNavigation,
-      casesTable(Data("caseList")),
-      noCasesMessage,
-    ],
-    onAccess: [
-      access({
-        effects: [YourCasesEffects.LoadYourCaseList()],
-      }),
-    ],
-    path: "/your-cases",
-    title: t("pages.yourCases.pageTitle"),
-  });
+export const yourCasesStep = step({
+  blocks: [
+    heading,
+    createCaseButton,
+    subNavigation,
+    casesTable(Data("caseList")),
+    noCasesMessage,
+  ],
+  onAccess: [
+    access({
+      effects: [YourCasesEffects.loadYourCaseList()],
+    }),
+  ],
+  path: "/your-cases",
+  title: t("pages.yourCases.pageTitle"),
+});
