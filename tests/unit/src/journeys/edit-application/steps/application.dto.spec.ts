@@ -10,7 +10,7 @@ const answers = {
   lastName: "Bloggs",
   dateOfBirth: "1990-01-01",
   hasNINumber: "yes",
-  niNumber: "ZZ123456C", // gitleaks:allow - fake NI number used to test data mapping
+  niNumber: "QQ123456C", // gitleaks:allow - fake NI number used to test data mapping
   haveAHomeAddress: "yes",
   addressLine1: "123 Test Street",
   addressLine2: "Test Area",
@@ -28,7 +28,7 @@ describe("fromAnswers method", () => {
         firstName: "Jane",
         lastName: "Bloggs",
         dateOfBirth: "1990-01-01",
-        niNumber: "ZZ123456C",// gitleaks:allow - fake NI number used to test data mapping
+        niNumber: "QQ123456C", // gitleaks:allow - fake NI number used to test data mapping
         hasFixedAddress: true,
         address: {
           addressLine1: "123 Test Street",
