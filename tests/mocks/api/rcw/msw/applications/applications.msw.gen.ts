@@ -9,17 +9,17 @@ import { faker } from "@faker-js/faker";
 import { HttpResponse, http } from "msw";
 import type { RequestHandlerOptions } from "msw";
 
-import type { Application } from "../../../../../src/api/client/model/application.zod.gen.js";
+import type { Application } from "../../../../../../src/api/clients/rcw/model/application.zod.gen.js";
 
-import { ApplicationStatus } from "../../../../../src/api/client/model/applicationStatus.zod.gen.js";
+import { ApplicationStatus } from "../../../../../../src/api/clients/rcw/model/applicationStatus.zod.gen.js";
 
-import type { Applications } from "../../../../../src/api/client/model/applications.zod.gen.js";
+import type { Applications } from "../../../../../../src/api/clients/rcw/model/applications.zod.gen.js";
 
-import { ClientDeclarationStatus } from "../../../../../src/api/client/model/clientDeclarationStatus.zod.gen.js";
+import { ClientDeclarationStatus } from "../../../../../../src/api/clients/rcw/model/clientDeclarationStatus.zod.gen.js";
 
-import type { CreateApplicationResponseBody } from "../../../../../src/api/client/model/createApplicationResponseBody.zod.gen.js";
+import type { CreateApplicationResponseBody } from "../../../../../../src/api/clients/rcw/model/createApplicationResponseBody.zod.gen.js";
 
-import { EvidenceStatus } from "../../../../../src/api/client/model/evidenceStatus.zod.gen.js";
+import { EvidenceStatus } from "../../../../../../src/api/clients/rcw/model/evidenceStatus.zod.gen.js";
 
 export const getGetApplicationsResponseMock = (): Applications =>
   Array.from(
