@@ -8,9 +8,9 @@ import {
   GovUKTaskList,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
-import type { TaskListData } from "#/journeys/create-application/steps/task-list/task-list.step.js";
+import type { TaskListData } from "#/journeys/edit-application/steps/task-list/task-list.step.js";
 
-import { taskItem } from "#/journeys/create-application/steps/task-list/task-list.helpers.js";
+import { taskItem } from "#/journeys/edit-application/steps/task-list/task-list.helpers.js";
 import { H2 } from "#/lib/constants/headings.js";
 import { t } from "#/lib/i18n.js";
 
@@ -49,7 +49,7 @@ export function taskList(taskListData: TaskListData): BlockDefinition[] {
       items: [
         taskItem(
           t("journeys.createApplication.taskList.clientDetails.taskItem.label"),
-          "check-answers",
+          "/cases/new/check-answers",
           taskListData.clientDetails.status,
         ),
       ],

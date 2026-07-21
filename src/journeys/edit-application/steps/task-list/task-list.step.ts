@@ -9,7 +9,7 @@ import {
   heading,
   saveAndReturnButton,
   taskList,
-} from "#/journeys/create-application/steps/task-list/task-list.blocks.js";
+} from "#/journeys/edit-application/steps/task-list/task-list.blocks.js";
 import { Status } from "#/journeys/journey.types.js";
 
 export interface TaskListData {
@@ -61,5 +61,8 @@ export const taskListStep = (): ReturnType<typeof step> =>
       }),
     ],
     path: "/task-list",
+    reachability: {
+      entryWhen: true,
+    },
     title: "Task List",
   });
