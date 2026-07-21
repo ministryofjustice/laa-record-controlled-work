@@ -8,7 +8,7 @@ import {
   createCaseButton,
   heading,
 } from "#/journeys/your-cases/common.blocks.js";
-import { YourCasesEffects } from "#/journeys/your-cases/effects/registry.js";
+import { YourCasesEffects } from "#/journeys/your-cases/your-cases.effects.js";
 import {
   casesTable,
   noCasesMessage,

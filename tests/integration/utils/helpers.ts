@@ -18,7 +18,7 @@ import {
   JourneyEffectsImplementations,
 } from "#/journeys/effects.js";
 import { YourCasesEffectsDeps } from "#/journeys/your-cases/your-cases.types.js";
-import { yourCasesEffectsRegistry } from "#/journeys/your-cases/effects/registry.js";
+import { yourCasesEffectsRegistry } from "#/journeys/your-cases/your-cases.effects.js";
 
 /**
  * Creates a test client for a single-step journey under /create-application.
