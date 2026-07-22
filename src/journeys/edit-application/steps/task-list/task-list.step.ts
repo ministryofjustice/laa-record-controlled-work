@@ -9,7 +9,7 @@ import {
   heading,
   saveAndReturnButton,
   taskList,
-} from "#/journeys/create-application/steps/task-list/task-list.blocks.js";
+} from "#/journeys/edit-application/steps/task-list/task-list.blocks.js";
 import { Status } from "#/journeys/journey.types.js";
 
 export interface TaskListData {
@@ -19,9 +19,12 @@ export interface TaskListData {
   evidence: { status: Status };
   meansAssessment: { status: Status };
 }
+
+export const DEFAULT_CASE_REFERENCE_NUMBER = "CW-123456";
+
 // TODO: Hardcoded for now, will be dynamic in future
 const TASK_LIST_DATA: TaskListData = {
-  caseReferenceNumber: "CW-123456",
+  caseReferenceNumber: DEFAULT_CASE_REFERENCE_NUMBER,
   clientDetails: {
     clientName: "Joe Blogs",
     status: Status.Completed,
@@ -58,5 +61,8 @@ export const taskListStep = (): ReturnType<typeof step> =>
       }),
     ],
     path: "/task-list",
+    reachability: {
+      entryWhen: true,
+    },
     title: "Task List",
   });

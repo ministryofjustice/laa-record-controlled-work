@@ -10,16 +10,16 @@ import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 describe("Legal aid before step", () => {
   const client = createForgeTestClient(
     "Record new case",
-    "/create-application/",
+    "/cases/new/",
     legalAidBeforeStep("testJourney"),
   );
 
-  describe("GET /create-application/legal-aid-before", () => {
+  describe("GET /cases/new/legal-aid-before", () => {
     let renderResult: TestRenderResult;
     let radioInput: RenderBlock;
 
     before(async () => {
-      const result = await client.get("/create-application/legal-aid-before");
+      const result = await client.get("/cases/new/legal-aid-before");
       expect(result.type).to.equal("render");
       renderResult = result as TestRenderResult;
       [radioInput] = renderResult.getBlocksByVariant("govukRadioInput");
@@ -40,11 +40,11 @@ describe("Legal aid before step", () => {
     });
   });
 
-  describe("POST /create-application/legal-aid-before", () => {
+  describe("POST /cases/new/legal-aid-before", () => {
     const fieldCode = "legalAidBefore";
 
     it("should show validation error if no option is selected", async () => {
-      const result = await client.post("/create-application/legal-aid-before", {
+      const result = await client.post("/cases/new/legal-aid-before", {
         body: {},
       });
       expect(result.type).to.equal("render");
@@ -56,7 +56,7 @@ describe("Legal aid before step", () => {
     });
 
     it("should redirect to legal aid last 6 months step if yes, same matter", async () => {
-      const result = await client.post("/create-application/legal-aid-before", {
+      const result = await client.post("/cases/new/legal-aid-before", {
         body: {
           legalAidBefore: "yesSameMatter",
         },
@@ -64,30 +64,30 @@ describe("Legal aid before step", () => {
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
       expect(redirectResult.url).to.equal(
-        "/create-application/legal-aid-last-6-months",
+        "/cases/new/legal-aid-last-6-months",
       );
     });
 
     it("should redirect to client details step if yes, different matter", async () => {
-      const result = await client.post("/create-application/legal-aid-before", {
+      const result = await client.post("/cases/new/legal-aid-before", {
         body: {
           legalAidBefore: "yesDifferentMatter",
         },
       });
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
-      expect(redirectResult.url).to.equal("/create-application/client-details");
+      expect(redirectResult.url).to.equal("/cases/new/client-details");
     });
 
     it("should redirect to client details step if no, different matter", async () => {
-      const result = await client.post("/create-application/legal-aid-before", {
+      const result = await client.post("/cases/new/legal-aid-before", {
         body: {
           legalAidBefore: "no",
         },
       });
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
-      expect(redirectResult.url).to.equal("/create-application/client-details");
+      expect(redirectResult.url).to.equal("/cases/new/client-details");
     });
   });
 });

@@ -28,7 +28,7 @@ export const enterAddressManuallyStep = (
   step({
     blocks: [
       GovUKBackLink({
-        href: "/create-application/have-a-home-address",
+        href: "/cases/new/have-a-home-address",
       }),
       HtmlBlock({
         content: `<span class="govuk-caption-l">${t("journeys.createApplication.caption")}</span>`,
@@ -119,7 +119,7 @@ export const enterAddressManuallyStep = (
         },
       }),
       HtmlBlock({
-        content: `<p class="govuk-body"><a class="govuk-link" href="/create-application/enter-overseas-address">${t("journeys.createApplication.enterAddressManually.nonUkAddress")}</a></p>`,
+        content: `<p class="govuk-body"><a class="govuk-link" href="/cases/new/enter-overseas-address">${t("journeys.createApplication.enterAddressManually.nonUkAddress")}</a></p>`,
       }),
       GovUKButton({ text: t("common.continue") }),
     ],

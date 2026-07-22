@@ -21,7 +21,7 @@ export const doYouHaveEvidence = (
 ): ReturnType<typeof step> =>
   step({
     blocks: [
-      backLink("/create-application/task-list"),
+      backLink("/cases/new/task-list"),
       caption,
       doYouHaveEvidenceRadioInput,
       continueButton,

@@ -16,6 +16,7 @@ import authRouter from "#/auth/auth.routes.js";
 import config from "#/config.js";
 import { autocomplete } from "#/journeys/components/autocomplete/autocomplete.component.js";
 import createApplication from "#/journeys/create-application/create-application.index.js";
+import editApplication from "#/journeys/edit-application/edit-application.index.js";
 import evidence from "#/journeys/evidence/evidence.index.js";
 import yourCases from "#/journeys/your-cases/your-cases.index.js";
 import { createSession } from "#/lib/session.js";
@@ -89,6 +90,7 @@ const createApp = async (): Promise<express.Application> => {
     .registerGlobalFunctions(nunjucksFunctions)
     .registerPackage(yourCases, { getApplications })
     .registerPackage(createApplication)
+    .registerPackage(editApplication)
     .registerPackage(evidence);
 
   // Set up rate limiting
@@ -122,7 +124,25 @@ const createApp = async (): Promise<express.Application> => {
     app.use(livereload());
   }
 
-  app.use("/", createExpressRouter(forge, { nunjucksEnv }));
+  const forgeRouter = createExpressRouter(forge, { nunjucksEnv });
+
+  app.get("/cases/:id", (req, res, next) => {
+    const { id } = req.params;
+
+    if (
+      id === "new" ||
+      id === "evidence" ||
+      id === "recorded" ||
+      id === "ineligible"
+    ) {
+      next();
+      return;
+    }
+
+    res.redirect(`/cases/${id}/task-list/`);
+  });
+
+  app.use("/", forgeRouter);
 
   return app;
 };

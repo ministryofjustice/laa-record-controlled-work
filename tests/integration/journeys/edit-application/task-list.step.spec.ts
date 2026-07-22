@@ -5,12 +5,12 @@ import {
 import { expect } from "chai";
 import { createForgeTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
-import { taskListStep } from "#/journeys/create-application/steps/task-list/task-list.step.js";
+import { taskListStep } from "#/journeys/edit-application/steps/task-list/task-list.step.js";
 
 describe("Task list step", () => {
   const client = createForgeTestClient(
-    "Record new case",
-    "/create-application/",
+    "Edit case",
+    "/cases/CW-123456/",
     taskListStep(),
   );
   const session = {
@@ -19,7 +19,7 @@ describe("Task list step", () => {
     },
   };
 
-  describe("GET /create-application/task-list", () => {
+  describe("GET /cases/CW-123456/task-list", () => {
     let renderResult: TestRenderResult;
     let heading: RenderBlock;
     let body: RenderBlock;
@@ -27,7 +27,7 @@ describe("Task list step", () => {
     let submitButton: RenderBlock;
 
     before(async () => {
-      const result = await client.get("/create-application/task-list", {
+      const result = await client.get("/cases/CW-123456/task-list", {
         session,
       });
       expect(result.type).to.equal("render");
@@ -57,7 +57,7 @@ describe("Task list step", () => {
       }>;
       expect(items.length).to.equal(1);
       expect(items[0].title.text).to.equal("Client details");
-      expect(items[0].href).to.equal("check-answers");
+      expect(items[0].href).to.equal("/cases/new/check-answers");
       expect(items[0].status.text).to.equal("Completed");
     });
 
@@ -69,7 +69,7 @@ describe("Task list step", () => {
       }>;
       expect(items.length).to.equal(1);
       expect(items[0].title.text).to.equal("Income and capital");
-      expect(items[0].href).to.equal("income-TODO");
+      expect(items[0].href).to.equal("/cases/CW-123456/eligibility/");
       expect(items[0].status.tag.text).to.equal("Incomplete");
     });
 
@@ -92,9 +92,9 @@ describe("Task list step", () => {
     });
   });
 
-  describe("POST /create-application/task-list", () => {
+  describe("POST /cases/CW-123456/task-list", () => {
     it("redirects to the case list", async () => {
-      const result = await client.post("/create-application/task-list", {
+      const result = await client.post("/cases/CW-123456/task-list", {
         session,
       });
       expect(result.type).to.equal("redirect");

@@ -12,6 +12,6 @@ export const heading = GovUKHeading({
 });
 
 export const createCaseButton = GovUKLinkButton({
-  href: "/create-application",
+  href: "/cases/new/",
   text: t("pages.yourCases.createCaseButton"),
 });

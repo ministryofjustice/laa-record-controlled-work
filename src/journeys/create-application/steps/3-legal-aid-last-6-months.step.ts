@@ -27,7 +27,7 @@ export const legalAidLast6MonthsStep = (
   step({
     blocks: [
       GovUKBackLink({
-        href: "/create-application/legal-aid-before",
+        href: "/cases/new/legal-aid-before",
       }),
       HtmlBlock({
         content: `<span class="govuk-caption-l">${t("journeys.createApplication.caption")}</span>`,

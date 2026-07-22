@@ -11,17 +11,17 @@ import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 describe("ECF step", () => {
   const client = createForgeTestClient(
     "Record new case",
-    "/create-application/",
+    "/cases/new/",
     ecfStep("testJourney"),
     ineligibleStep("testJourney"),
   );
 
-  describe("GET /create-application/ecf", () => {
+  describe("GET /cases/new/ecf", () => {
     let renderResult: TestRenderResult;
     let radioInput: RenderBlock;
 
     before(async () => {
-      const result = await client.get("/create-application/ecf");
+      const result = await client.get("/cases/new/ecf");
       expect(result.type).to.equal("render");
       renderResult = result as TestRenderResult;
       [radioInput] = renderResult.getBlocksByVariant("govukRadioInput");
@@ -41,11 +41,11 @@ describe("ECF step", () => {
     });
   });
 
-  describe("POST /create-application/ecf", () => {
+  describe("POST /cases/new/ecf", () => {
     const fieldCode = "ecf";
     
     it("should show validation error if no option is selected", async () => {
-      const result = await client.post("/create-application/ecf");
+      const result = await client.post("/cases/new/ecf");
       expect(result.type).to.equal("render");
       const renderResult = result as TestRenderResult;
       expect(renderResult.context.showValidationFailures).to.equal(true);
@@ -55,18 +55,18 @@ describe("ECF step", () => {
     });
 
     it("should redirect to ineligible step if ECF is not required", async () => {
-      const result = await client.post("/create-application/ecf", {
+      const result = await client.post("/cases/new/ecf", {
         body: {
           ecf: "yes",
         },
       });
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
-      expect(redirectResult.url).to.equal("/create-application/ecf-dropout");
+      expect(redirectResult.url).to.equal("/cases/new/ecf-dropout");
     });
 
     it("should redirect to legal aid before step if ECF is not required", async () => {
-      const result = await client.post("/create-application/ecf", {
+      const result = await client.post("/cases/new/ecf", {
         body: {
           ecf: "no",
         },
@@ -74,7 +74,7 @@ describe("ECF step", () => {
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
       expect(redirectResult.url).to.equal(
-        "/create-application/legal-aid-before",
+        "/cases/new/legal-aid-before",
       );
     });
   });
