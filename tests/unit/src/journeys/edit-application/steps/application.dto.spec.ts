@@ -25,12 +25,14 @@ describe("fromAnswers method", () => {
     const expected = {
       ecfFlag: false,
       clientDetails: {
+        id: "",
         firstName: "Jane",
         lastName: "Bloggs",
         dateOfBirth: "1990-01-01",
         niNumber: "QQ123456C", // gitleaks:allow - fake NI number used to test data mapping
         hasFixedAddress: true,
         address: {
+          id: "",
           addressLine1: "123 Test Street",
           addressLine2: "Test Area",
           addressLine3: undefined,

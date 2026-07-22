@@ -3,8 +3,7 @@ import type { EffectFunctionContext } from "@ministryofjustice/hmpps-forge/core"
 import { fromAnswers } from "#/journeys/create-application/Application.dto.js";
 import { isJourneySession } from "#/journeys/effects.js";
 import { CreateApplicationEffectsDeps } from "#/journeys/create-application/create-application.types.js";
-import { ApiResponseError, ApiValidationError } from "#/api/api.errors.js";
-import { HTTP_STATUS } from "#/lib/constants/http.js";
+import { ApiValidationError } from "#/api/api.errors.js";
 import { logger } from "#/logger.js";
 import { CreateApplicationResponseBody } from "#/api/client/model/createApplicationResponseBody.zod.gen.js";
 
@@ -39,13 +38,6 @@ export const createApplication =
         error,
       );
       throw error;
-    }
-
-    if (response.status !== HTTP_STATUS.OK) {
-      logger.error("createApplication did not return 200", response, {
-        api: "createApplication",
-      });
-      throw new ApiResponseError();
     }
 
     const result = CreateApplicationResponseBody.safeParse(response);
