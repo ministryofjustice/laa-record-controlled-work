@@ -7,24 +7,35 @@
 import { z as zod } from "zod";
 
 export const CreateApplicationBody = zod.object({
-  ecf: zod.string(),
+  ecfFlag: zod.boolean(),
   legalAidBefore: zod.string(),
-  legalAidLast6Months: zod.string().optional(),
-  reasonForYes: zod.string().optional(),
-  firstName: zod.string(),
-  lastName: zod.string(),
-  dateOfBirth: zod.iso.date(),
-  hasNINumber: zod.string(),
-  niNumber: zod.string().optional(),
-  haveAHomeAddress: zod.string(),
-  addressLine1: zod.string(),
-  addressLine2: zod.string().optional(),
-  addressLine3: zod.string().optional(),
-  addressLine4: zod.string().optional(),
-  townOrCity: zod.string().optional(),
-  county: zod.string().optional(),
-  postcode: zod.string().optional(),
-  country: zod.string(),
+  legalAidLast6Months: zod.boolean().optional(),
+  reasonForReapplication: zod.string().optional(),
+  clientDetails: zod.object({
+    id: zod.uuid().optional(),
+    firstName: zod.string(),
+    lastName: zod.string(),
+    dateOfBirth: zod.iso.date(),
+    niNumber: zod.string().optional(),
+    hasFixedAddress: zod.boolean(),
+    address: zod
+      .object({
+        id: zod.uuid(),
+        addressLine1: zod.string(),
+        addressLine2: zod.string().optional(),
+        addressLine3: zod.string().optional(),
+        addressLine4: zod.string().optional(),
+        townOrCity: zod.string().optional(),
+        postCode: zod.string().optional(),
+        county: zod.string().optional(),
+        country: zod.string(),
+        createdAt: zod.iso.datetime({ offset: true }).optional(),
+        modifiedAt: zod.iso.datetime({ offset: true }).optional(),
+      })
+      .optional(),
+    createdAt: zod.iso.datetime({ offset: true }).optional(),
+    modifiedAt: zod.iso.datetime({ offset: true }).optional(),
+  }),
 });
 
 export type CreateApplicationBody = zod.input<typeof CreateApplicationBody>;

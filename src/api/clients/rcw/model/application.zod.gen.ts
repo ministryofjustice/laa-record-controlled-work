@@ -14,11 +14,11 @@ export const Application = zod.object({
   meansAssessmentId: zod.uuid().optional(),
   clientDetails: zod.object({
     id: zod.uuid().optional(),
-    firstName: zod.string().optional(),
-    lastName: zod.string().optional(),
-    dateOfBirth: zod.iso.date().optional(),
+    firstName: zod.string(),
+    lastName: zod.string(),
+    dateOfBirth: zod.iso.date(),
     niNumber: zod.string().optional(),
-    hasFixedAddress: zod.boolean().optional(),
+    hasFixedAddress: zod.boolean(),
     address: zod
       .object({
         id: zod.uuid(),
@@ -37,7 +37,7 @@ export const Application = zod.object({
     createdAt: zod.iso.datetime({ offset: true }).optional(),
     modifiedAt: zod.iso.datetime({ offset: true }).optional(),
   }),
-  applicationStatus: zod.enum(["DRAFT"]).optional(),
+  applicationStatus: zod.enum(["DRAFT", "COMPLETE"]).optional(),
   declaration: zod
     .object({
       id: zod.uuid().optional(),

@@ -8,11 +8,11 @@ import { z as zod } from "zod";
 
 export const ClientDetails = zod.object({
   id: zod.uuid().optional(),
-  firstName: zod.string().optional(),
-  lastName: zod.string().optional(),
-  dateOfBirth: zod.iso.date().optional(),
+  firstName: zod.string(),
+  lastName: zod.string(),
+  dateOfBirth: zod.iso.date(),
   niNumber: zod.string().optional(),
-  hasFixedAddress: zod.boolean().optional(),
+  hasFixedAddress: zod.boolean(),
   address: zod
     .object({
       id: zod.uuid(),
