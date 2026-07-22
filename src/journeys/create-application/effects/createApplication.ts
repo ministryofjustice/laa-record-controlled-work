@@ -1,11 +1,12 @@
 import type { EffectFunctionContext } from "@ministryofjustice/hmpps-forge/core";
 
+import type { CreateApplicationEffectsDeps } from "#/journeys/create-application/create-application.types.js";
+
+import { ApiValidationError } from "#/api/api.errors.js";
+import { CreateApplicationResponseBody } from "#/api/client/model/createApplicationResponseBody.zod.gen.js";
 import { fromAnswers } from "#/journeys/create-application/Application.dto.js";
 import { isJourneySession } from "#/journeys/effects.js";
-import { CreateApplicationEffectsDeps } from "#/journeys/create-application/create-application.types.js";
-import { ApiValidationError } from "#/api/api.errors.js";
 import { logger } from "#/logger.js";
-import { CreateApplicationResponseBody } from "#/api/client/model/createApplicationResponseBody.zod.gen.js";
 
 export const createApplication =
   (deps: CreateApplicationEffectsDeps) =>
@@ -23,17 +24,12 @@ export const createApplication =
       return;
     }
 
-    console.log(
-      `Saving answers for journey ${journeyCode} to API:`,
-      journeyAnswers,
-    );
-
     const applicationDto = fromAnswers(journeyAnswers);
 
     try {
       response = deps.createApplication(applicationDto);
     } catch (error) {
-      console.error(
+      logger.error(
         `Error creating application for journey ${journeyCode}:`,
         error,
       );
@@ -52,8 +48,4 @@ export const createApplication =
 
     context.setData("caseId", result.data.id);
 
-    console.log(
-      `Mapped application DTO for journey ${journeyCode}:`,
-      applicationDto,
-    );
   };

@@ -9,10 +9,14 @@ export const createApplicationEffectsRegistry =
   new EffectRegistry<CreateApplicationEffectsDeps>();
 
 export const CreateApplicationEffects = {
+  clearAllDraftAnswers:
+    createApplicationEffectsRegistry.register(clearAllDraftAnswers),
+  clearFieldAnswers:
+    createApplicationEffectsRegistry.register(clearAllDraftAnswers),
   createApplication:
     createApplicationEffectsRegistry.register(createApplication),
-    clearAllDraftAnswers: createApplicationEffectsRegistry.register(clearAllDraftAnswers),
-    clearFieldAnswers: createApplicationEffectsRegistry.register(clearAllDraftAnswers),
-    loadDraftAnswers: createApplicationEffectsRegistry.register(clearAllDraftAnswers),
-    saveDraftAnswers: createApplicationEffectsRegistry.register(clearAllDraftAnswers),
+  loadDraftAnswers:
+    createApplicationEffectsRegistry.register(clearAllDraftAnswers),
+  saveDraftAnswers:
+    createApplicationEffectsRegistry.register(clearAllDraftAnswers),
 };

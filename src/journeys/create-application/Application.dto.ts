@@ -1,13 +1,13 @@
 import { ADDRESS_FIELD } from "#/journeys/journey.constants.js";
 
 export interface AddressDto {
-  id: string;
   addressLine1: string;
   addressLine2?: string;
   addressLine3?: string;
   addressLine4?: string;
   country: string;
   county?: string;
+  id: string;
   postcode?: string;
   townOrCity: string;
 }
@@ -21,11 +21,11 @@ export interface ApplicationDto {
 }
 
 export interface ClientDetailsDto {
-  id: string;
   address: AddressDto;
   dateOfBirth: string;
   firstName: string;
   hasFixedAddress: boolean;
+  id: string;
   lastName: string;
   niNumber?: string;
 }
@@ -35,16 +35,16 @@ export const fromAnswers = (
 ): ApplicationDto => {
   const mapped: ApplicationDto = {
     clientDetails: {
-      id: "",
       address: {
-        id: "",
         addressLine1: "",
         country: "",
+        id: "",
         townOrCity: "",
       },
       dateOfBirth: "",
       firstName: "",
       hasFixedAddress: false,
+      id: "",
       lastName: "",
     },
     ecfFlag: false,
@@ -66,13 +66,13 @@ export const fromAnswers = (
 
   if (answers[ADDRESS_FIELD.addressLine1] !== undefined) {
     mapped.clientDetails.address = {
-      id: "",
       addressLine1: answers[ADDRESS_FIELD.addressLine1] as string,
       addressLine2: answers[ADDRESS_FIELD.addressLine2] as string | undefined,
       addressLine3: answers[ADDRESS_FIELD.addressLine3] as string | undefined,
       addressLine4: answers[ADDRESS_FIELD.addressLine4] as string | undefined,
       country: answers[ADDRESS_FIELD.country] as string,
       county: answers[ADDRESS_FIELD.county] as string | undefined,
+      id: "",
       postcode: answers[ADDRESS_FIELD.postcode] as string | undefined,
       townOrCity: answers[ADDRESS_FIELD.townOrCity] as string,
     };
