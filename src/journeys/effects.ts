@@ -5,7 +5,6 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
 import type { JourneySession } from "./context.type.ts";
-import { fromAnswers } from "#/journeys/create-application/Application.dto.js";
 
 export const isJourneySession = (value: unknown): value is JourneySession =>
   typeof value === "object" && value !== null;
@@ -22,8 +21,6 @@ export interface JourneyEffectShape {
   LoadDraftAnswers: (journeyCode: string) => EffectFunctionExpr;
   /** Persists the current answers into the session as a draft, kept separately from committed answers. */
   SaveDraftAnswers: (journeyCode: string) => EffectFunctionExpr;
-  /** Persists the current answers into the API as a committed submission. */
-  CreateApplication: (journeyCode: string) => EffectFunctionExpr;
 }
 
 export const clearAllDraftAnswers =
@@ -120,27 +117,6 @@ export const saveDraftAnswers =
     };
   };
 
-export const createApplication = () =>
-  (context: EffectFunctionContext, journeyCode: string): void => {
-    const session = context.getSession();
-
-    if (!isJourneySession(session)) {
-      return;
-    }
-
-    const journeyAnswers = session.journeyDrafts?.[journeyCode];
-
-    if (!journeyAnswers) {
-      return;
-    }
-    
-    console.log(`Saving answers for journey ${journeyCode} to API:`, journeyAnswers);
-
-    const applicationDto = fromAnswers(journeyAnswers);
-
-    console.log(`Mapped application DTO for journey ${journeyCode}:`, applicationDto);
-  };
-
 export const {
   effects: JourneyEffects,
   implementations: JourneyEffectsImplementations,
@@ -149,5 +125,4 @@ export const {
   ClearFieldAnswers: clearFieldAnswers,
   LoadDraftAnswers: loadDraftAnswers,
   SaveDraftAnswers: saveDraftAnswers,
-  CreateApplication: createApplication,
 });
