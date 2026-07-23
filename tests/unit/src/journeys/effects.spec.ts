@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { describe, it } from "mocha";
 import { createForgeTestClient } from "../../../integration/utils/helpers.js";
-import { ecfStep } from "#/journeys/create-application/steps/1-ecf.step.js";
+import { ecfStep } from "#/journeys/create-application/steps/2-ecf.step.js";
 import { TestRenderResult } from "@ministryofjustice/hmpps-forge/core/testing";
 import { JourneyEffects } from "#/journeys/effects.js";
 import { access, step } from "@ministryofjustice/hmpps-forge/core/authoring";

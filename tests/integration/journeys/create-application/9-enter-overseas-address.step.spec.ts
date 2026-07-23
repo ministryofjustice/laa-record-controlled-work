@@ -5,42 +5,43 @@ import {
 import { expect } from "chai";
 import { createForgeTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
-import { enterAddressManuallyStep } from "#/journeys/create-application/steps/7-enter-address-manually.step.js";
+import { enterOverseasAddressStep } from "#/journeys/create-application/steps/9-enter-overseas-address.step.js";
 
-describe("Enter address manually step", () => {
+describe("Enter overseas address step", () => {
   const client = createForgeTestClient(
     "Record new case",
     "/cases/new/",
-    enterAddressManuallyStep("testJourney"),
+    enterOverseasAddressStep("testJourney"),
   );
 
-  describe("GET /cases/new/enter-address-manually", () => {
+  describe("GET /cases/new/enter-overseas-address", () => {
     let renderResult: TestRenderResult;
+    let countryInput: RenderBlock;
     let addressLine1Input: RenderBlock;
     let addressLine2Input: RenderBlock;
-    let townOrCityInput: RenderBlock;
-    let countyInput: RenderBlock;
-    let postcodeInput: RenderBlock;
+    let addressLine3Input: RenderBlock;
+    let addressLine4Input: RenderBlock;
 
     before(async () => {
-      const result = await client.get("/cases/new/enter-address-manually");
+      const result = await client.get("/cases/new/enter-overseas-address");
       expect(result.type).to.equal("render");
       renderResult = result as TestRenderResult;
-      [addressLine1Input, addressLine2Input, townOrCityInput, countyInput, postcodeInput] =
+
+      const [autocompleteBlock] = renderResult.getBlocksByVariant("autocomplete");
+
+      countryInput = autocompleteBlock.properties.field as RenderBlock;
+      [addressLine1Input, addressLine2Input, addressLine3Input, addressLine4Input] =
         renderResult.getBlocksByVariant("govukTextInput");
     });
 
     it("has the correct title", () => {
-      expect(renderResult.context.step.title).to.equal("Enter your client's home address");
+      expect(renderResult.context.step.title).to.equal("Enter your client's overseas home address");
     });
 
-    it("renders a link to the overseas address page", () => {
-      const linkBlock = renderResult
-        .getBlocksByVariant("html")
-        .find((b) => (b.properties.content as string).includes("/enter-overseas-address"));
-      expect(linkBlock).to.exist;
-      expect(linkBlock!.properties.content as string).to.contain("The address is not in the UK");
-    });
+    it("renders a country input", () => {
+      const label = countryInput.properties.label as { text: string };
+      expect(label.text).to.equal("Country");
+    });    
 
     it("renders an address line 1 input", () => {
       const label = addressLine1Input.properties.label as { text: string };
@@ -52,33 +53,28 @@ describe("Enter address manually step", () => {
       expect(label.text).to.equal("Address line 2 (optional)");
     });
 
-    it("renders a town or city input", () => {
-      const label = townOrCityInput.properties.label as { text: string };
-      expect(label.text).to.equal("Town or city");
+    it("renders an address line 3 input", () => {
+      const label = addressLine3Input.properties.label as { text: string };
+      expect(label.text).to.equal("Address line 3 (optional)");
     });
-
-    it("renders a county input", () => {
-      const label = countyInput.properties.label as { text: string };
-      expect(label.text).to.equal("County (optional)");
-    });
-
-    it("renders a postcode input", () => {
-      const label = postcodeInput.properties.label as { text: string };
-      expect(label.text).to.equal("Postcode");
-    });
+    
+    it("renders an address line 4 input", () => {
+      const label = addressLine4Input.properties.label as { text: string };
+      expect(label.text).to.equal("Address line 4 (optional)");
+    });    
   });
 
-  describe("POST /cases/new/enter-address-manually", () => {
+  describe("POST /cases/new/enter-overseas-address", () => {
     const validBody = {
+      country: "Ireland",
       addressLine1: "10 Some Street",
       addressLine2: "",
-      townOrCity: "SomeCity",
-      county: "",
-      postcode: "AB1 2CD",
+      addressLine3: "",
+      addressLine4: "",
     };
 
     it("should redirect to check-answers when given valid data", async () => {
-      const result = await client.post("/cases/new/enter-address-manually", {
+      const result = await client.post("/cases/new/enter-overseas-address", {
         body: validBody,
       });
 
@@ -100,22 +96,16 @@ describe("Enter address manually step", () => {
         fieldCode: "addressLine1",
       },
       {
-        description: "town or city is missing",
-        body: { ...validBody, townOrCity: "" },
-        expectedMessage: "Enter town or city",
-        fieldCode: "townOrCity",
-      },
-      {
-        description: "postcode is missing",
-        body: { ...validBody,postcode: "" },
-        expectedMessage: "Enter postcode",
-        fieldCode: "postcode",
+        description: "country is missing",
+        body: { ...validBody, country: "" },
+        expectedMessage: "Enter country",
+        fieldCode: "country",
       },
     ];
 
     for (const { description, body, expectedMessage, fieldCode } of validationErrorTests) {
       it(`should show validation error when ${description}`, async () => {
-        const result = await client.post("/cases/new/enter-address-manually", {
+        const result = await client.post("/cases/new/enter-overseas-address", {
           body,
         });
 

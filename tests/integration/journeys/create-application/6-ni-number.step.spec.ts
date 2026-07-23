@@ -3,7 +3,7 @@ import {
   TestRedirectResult,
 } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
-import { niNumberStep } from "#/journeys/create-application/steps/5-ni-number.step.js";
+import { niNumberStep } from "#/journeys/create-application/steps/6-ni-number.step.js";
 import { createForgeTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 
