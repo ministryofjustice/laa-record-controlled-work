@@ -6,7 +6,7 @@ import { expect } from "chai";
 
 import { declarationStep } from "#/journeys/create-application/steps/1-declaration.step.js";
 import { ecfStep } from "#/journeys/create-application/steps/2-ecf.step.js";
-import { createForgeTestClient } from "../../../../../integration/utils/helpers.js";
+import { createForgeTestClient } from "../../utils/helpers.js";
 
 describe("Declaration step", () => {
   const client = createForgeTestClient(
