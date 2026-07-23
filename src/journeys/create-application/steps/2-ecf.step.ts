@@ -22,7 +22,7 @@ export const ecfStep = (journeyCode: string): ReturnType<typeof step> =>
   step({
     blocks: [
       GovUKBackLink({
-        href: "/",
+        href: "/cases/new/provider-declaration",
       }),
       HtmlBlock({
         content: `<span class="govuk-caption-l">${t("journeys.createApplication.caption")}</span>`,
