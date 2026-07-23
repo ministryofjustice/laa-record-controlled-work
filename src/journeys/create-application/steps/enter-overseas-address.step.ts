@@ -17,13 +17,13 @@ import {
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
 import { Autocomplete } from "#/journeys/components/autocomplete/autocomplete.component.js";
-import { JourneyEffects } from "#/journeys/effects.js";
 import {
   ADDRESS_FIELD,
   UK_EXCLUSIVE_ADDRESS_FIELDS,
 } from "#/journeys/journey.constants.js";
 import countries from "#/lib/constants/FCDOGeographicalNamesIndexSeptember2025.json" with { type: "json" };
 import { t } from "#/lib/i18n.js";
+import { CreateApplicationEffects } from "#/journeys/create-application/create-application.effects.js";
 
 const MINIMUM_AUTOCOMPLETE_CHARACTERS = 2;
 const COUNTRY_NAMES = countries.map((country) => country.name);
@@ -125,11 +125,11 @@ export const enterOverseasAddressStep = (
       submit({
         onValid: {
           effects: [
-            JourneyEffects.ClearFieldAnswers(
+            CreateApplicationEffects.clearFieldAnswers(
               journeyCode,
               UK_EXCLUSIVE_ADDRESS_FIELDS,
             ),
-            JourneyEffects.SaveDraftAnswers(journeyCode),
+            CreateApplicationEffects.saveDraftAnswers(journeyCode),
           ],
           next: [
             redirect({

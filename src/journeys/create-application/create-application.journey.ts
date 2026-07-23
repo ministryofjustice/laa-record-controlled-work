@@ -6,7 +6,6 @@ import { enterAddressManuallyStep } from "#/journeys/create-application/steps/en
 import { enterOverseasAddressStep } from "#/journeys/create-application/steps/enter-overseas-address.step.js";
 import { haveAHomeAddressStep } from "#/journeys/create-application/steps/have-a-home-address.step.js";
 import { legalAidLast6MonthsStep } from "#/journeys/create-application/steps/legal-aid-last-6-months.step.js";
-import { JourneyEffects } from "#/journeys/effects.js";
 
 import { checkAnswersStep } from "./steps/check-answers.step.js";
 import { ineligibleStep } from "./steps/ecf-dropout.step.js";
@@ -14,13 +13,15 @@ import { ecfStep } from "./steps/ecf.step.js";
 import { legalAidBeforeStep } from "./steps/legal-aid-before.step.js";
 import { niNumberStep } from "./steps/ni-number.step.js";
 
+import { CreateApplicationEffects } from "#/journeys/create-application/create-application.effects.js";
+
 const journeyCode = "createApplication";
 
 export const createApplicationJourney = journey({
   code: "createApplication",
   onAccess: [
     access({
-      effects: [JourneyEffects.LoadDraftAnswers(journeyCode)],
+      effects: [CreateApplicationEffects.loadDraftAnswers(journeyCode)],
     }),
   ],
   path: "/cases/new",

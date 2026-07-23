@@ -16,8 +16,8 @@ import {
   GovUKRadioInput,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
-import { JourneyEffects } from "#/journeys/effects.js";
 import { t } from "#/lib/i18n.js";
+import { CreateApplicationEffects } from "#/journeys/create-application/create-application.effects.js";
 
 const REASON_MAX_LENGTH = 500;
 
@@ -83,7 +83,7 @@ export const legalAidLast6MonthsStep = (
     onSubmission: [
       submit({
         onValid: {
-          effects: [JourneyEffects.SaveDraftAnswers(journeyCode)],
+          effects: [CreateApplicationEffects.saveDraftAnswers(journeyCode)],
           next: [
             redirect({
               goto: "check-answers",

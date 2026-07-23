@@ -6,6 +6,8 @@ import { createApplicationEffectsRegistry } from "#/journeys/create-application/
 import { createApplicationJourney } from "#/journeys/create-application/create-application.journey.js";
 
 export default createForgePackage<CreateApplicationEffectsDeps>({
-  functions: [createApplicationEffectsRegistry],
+  functions: [
+    createApplicationEffectsRegistry,
+  ],
   journey: createApplicationJourney,
 });
