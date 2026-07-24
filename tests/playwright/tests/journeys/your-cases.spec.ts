@@ -1,5 +1,5 @@
 import { test, expect } from "../../fixtures/index.js";
-import { applications } from "../../fixtures/applications.fixtures.js";
+import { applications } from "../../fixtures/rcw.fixtures.js";
 
 test("Your Cases step", async ({ page }) => {
   // Navigate to the Your Cases page

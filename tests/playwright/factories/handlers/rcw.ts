@@ -6,6 +6,6 @@
  */
 
 import { getGetApplicationsMockHandler } from "../../../mocks/api/rcw/msw/applications/applications.msw.gen.js";
-import { applications } from "../../fixtures/applications.fixtures.js";
+import { applications } from "../../fixtures/rcw.fixtures.js";
 
-export const apiHandlers = [getGetApplicationsMockHandler(applications)];
+export const rcwHandlers = [getGetApplicationsMockHandler(applications)];

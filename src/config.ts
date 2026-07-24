@@ -33,8 +33,10 @@ const useHttps = ["production", "staging", "uat"].includes(required.NODE_ENV);
 
 export default {
   api: {
-    baseUrl: optional.API_BASE_URL ?? DEFAULT_API_BASE_URL,
     mode: optional.API_MODE ?? DEFAULT_API_MODE,
+    rcw: {
+      baseUrl: optional.API_BASE_URL ?? DEFAULT_API_BASE_URL,
+    },
   } satisfies ApiConfig,
 
   app: {

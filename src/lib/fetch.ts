@@ -11,7 +11,7 @@ const getBody = async (c: Request | Response): Promise<unknown> => {
 };
 
 const getUrl = (contextUrl: string): string => {
-  const { baseUrl } = config.api;
+  const { baseUrl } = config.api.rcw;
 
   const requestUrl = new URL(`${baseUrl}${contextUrl}`);
   return requestUrl.toString();

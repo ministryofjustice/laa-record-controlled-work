@@ -28,6 +28,7 @@ const sharedOutputConfig = (client: string): OutputOptions => ({
     ],
     mock: {
       nonNullable: true,
+      required: true,
     },
     mutator: {
       extension: ".js",

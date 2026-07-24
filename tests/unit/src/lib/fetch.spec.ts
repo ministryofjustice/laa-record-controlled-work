@@ -46,7 +46,7 @@ describe("fetcher()", () => {
   });
 
   it("prepends the configured base URL to the path", async () => {
-    config.api.baseUrl = BASE_URL;
+    config.api.rcw.baseUrl = BASE_URL;
     await fetcher("/resource/1", { method: "GET" });
 
     sinon.assert.calledWithMatch(fetchStub, `${BASE_URL}/resource/1`);

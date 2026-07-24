@@ -21,7 +21,33 @@ import type { CreateApplicationResponseBody } from "../../../../../../src/api/cl
 
 import { EvidenceStatus } from "../../../../../../src/api/clients/rcw/model/evidenceStatus.zod.gen.js";
 
-export const getGetApplicationsResponseMock = (): Applications =>
+export type KeysWithNull<O> = {
+  [K in keyof O]-?: null extends O[K] ? K : never;
+}[keyof O];
+
+export type MockWithNullableOverrides<
+  T,
+  O extends Partial<T>,
+  M extends Record<keyof T, unknown>,
+> = Omit<M, Extract<KeysWithNull<O>, keyof T>> & {
+  [K in Extract<KeysWithNull<O>, keyof T>]: M[K] | null;
+};
+
+export type ApplicationsMock = Applications;
+
+export type CreateApplicationResponseBodyMock = {
+  [
+    K in keyof Required<NonNullable<CreateApplicationResponseBody>>
+  ]: NonNullable<Required<NonNullable<CreateApplicationResponseBody>>[K]>;
+};
+
+export type ApplicationMock = {
+  [K in keyof Required<NonNullable<Application>>]: NonNullable<
+    Required<NonNullable<Application>>[K]
+  >;
+};
+
+export const getGetApplicationsResponseMock = (): ApplicationsMock =>
   Array.from(
     { length: faker.number.int({ min: 1, max: 10 }) },
     (_, i) => i + 1,
@@ -32,269 +58,116 @@ export const getGetApplicationsResponseMock = (): Applications =>
     modifiedAt: faker.date.past().toISOString().slice(0, 19) + "Z",
   }));
 
-export const getCreateApplicationResponseMock = (
-  overrideResponse: Partial<
-    Extract<CreateApplicationResponseBody, object>
-  > = {},
-): CreateApplicationResponseBody => ({
-  id: faker.helpers.arrayElement([faker.string.uuid(), undefined]),
-  ecf: faker.helpers.arrayElement([
-    faker.string.alpha({ length: { min: 10, max: 20 } }),
-    undefined,
-  ]),
-  legalAidBefore: faker.helpers.arrayElement([
-    faker.string.alpha({ length: { min: 10, max: 20 } }),
-    undefined,
-  ]),
-  legalAidLast6Months: faker.helpers.arrayElement([
-    faker.string.alpha({ length: { min: 10, max: 20 } }),
-    undefined,
-  ]),
-  reasonForYes: faker.helpers.arrayElement([
-    faker.string.alpha({ length: { min: 10, max: 20 } }),
-    undefined,
-  ]),
-  firstName: faker.helpers.arrayElement([
-    faker.string.alpha({ length: { min: 10, max: 20 } }),
-    undefined,
-  ]),
-  lastName: faker.helpers.arrayElement([
-    faker.string.alpha({ length: { min: 10, max: 20 } }),
-    undefined,
-  ]),
-  dateOfBirth: faker.helpers.arrayElement([
-    faker.date.past().toISOString().slice(0, 10),
-    undefined,
-  ]),
-  hasNINumber: faker.helpers.arrayElement([
-    faker.string.alpha({ length: { min: 10, max: 20 } }),
-    undefined,
-  ]),
-  niNumber: faker.helpers.arrayElement([
-    faker.string.alpha({ length: { min: 10, max: 20 } }),
-    undefined,
-  ]),
-  haveAHomeAddress: faker.helpers.arrayElement([
-    faker.string.alpha({ length: { min: 10, max: 20 } }),
-    undefined,
-  ]),
-  addressLine1: faker.helpers.arrayElement([
-    faker.string.alpha({ length: { min: 10, max: 20 } }),
-    undefined,
-  ]),
-  addressLine2: faker.helpers.arrayElement([
-    faker.string.alpha({ length: { min: 10, max: 20 } }),
-    undefined,
-  ]),
-  addressLine3: faker.helpers.arrayElement([
-    faker.string.alpha({ length: { min: 10, max: 20 } }),
-    undefined,
-  ]),
-  addressLine4: faker.helpers.arrayElement([
-    faker.string.alpha({ length: { min: 10, max: 20 } }),
-    undefined,
-  ]),
-  townOrCity: faker.helpers.arrayElement([
-    faker.string.alpha({ length: { min: 10, max: 20 } }),
-    undefined,
-  ]),
-  county: faker.helpers.arrayElement([
-    faker.string.alpha({ length: { min: 10, max: 20 } }),
-    undefined,
-  ]),
-  postcode: faker.helpers.arrayElement([
-    faker.string.alpha({ length: { min: 10, max: 20 } }),
-    undefined,
-  ]),
-  country: faker.helpers.arrayElement([
-    faker.string.alpha({ length: { min: 10, max: 20 } }),
-    undefined,
-  ]),
-  ...overrideResponse,
-});
+export const getCreateApplicationResponseMock = <
+  O extends Partial<Extract<CreateApplicationResponseBody, object>> = {},
+>(
+  overrideResponse?: O,
+): MockWithNullableOverrides<
+  CreateApplicationResponseBody,
+  O,
+  CreateApplicationResponseBodyMock
+> =>
+  ({
+    id: faker.string.uuid(),
+    ecf: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    legalAidBefore: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    legalAidLast6Months: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    reasonForYes: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    firstName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    lastName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    dateOfBirth: faker.date.past().toISOString().slice(0, 10),
+    hasNINumber: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    niNumber: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    haveAHomeAddress: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    addressLine1: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    addressLine2: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    addressLine3: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    addressLine4: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    townOrCity: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    county: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    postcode: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    country: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    ...overrideResponse,
+  }) as MockWithNullableOverrides<
+    CreateApplicationResponseBody,
+    O,
+    CreateApplicationResponseBodyMock
+  >;
 
-export const getGetApplicationResponseMock = (
-  overrideResponse: Partial<Extract<Application, object>> = {},
-): Application => ({
-  id: faker.string.uuid(),
-  individualLegalAidNumber: faker.string.uuid(),
-  providerFirmId: faker.string.uuid(),
-  providerOfficeId: faker.string.uuid(),
-  meansAssessmentId: faker.helpers.arrayElement([
-    faker.string.uuid(),
-    undefined,
-  ]),
-  clientDetails: {
-    id: faker.helpers.arrayElement([faker.string.uuid(), undefined]),
-    firstName: faker.helpers.arrayElement([
-      faker.string.alpha({ length: { min: 10, max: 20 } }),
-      undefined,
-    ]),
-    lastName: faker.helpers.arrayElement([
-      faker.string.alpha({ length: { min: 10, max: 20 } }),
-      undefined,
-    ]),
-    dateOfBirth: faker.helpers.arrayElement([
-      faker.date.past().toISOString().slice(0, 10),
-      undefined,
-    ]),
-    niNumber: faker.helpers.arrayElement([
-      faker.string.alpha({ length: { min: 10, max: 20 } }),
-      undefined,
-    ]),
-    hasFixedAddress: faker.helpers.arrayElement([
-      faker.datatype.boolean(),
-      undefined,
-    ]),
-    address: faker.helpers.arrayElement([
-      {
+export const getGetApplicationResponseMock = <
+  O extends Partial<Extract<Application, object>> = {},
+>(
+  overrideResponse?: O,
+): MockWithNullableOverrides<Application, O, ApplicationMock> =>
+  ({
+    id: faker.string.uuid(),
+    individualLegalAidNumber: faker.string.uuid(),
+    providerFirmId: faker.string.uuid(),
+    providerOfficeId: faker.string.uuid(),
+    meansAssessmentId: faker.string.uuid(),
+    clientDetails: {
+      id: faker.string.uuid(),
+      firstName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      lastName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      dateOfBirth: faker.date.past().toISOString().slice(0, 10),
+      niNumber: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      hasFixedAddress: faker.datatype.boolean(),
+      address: {
         id: faker.string.uuid(),
         addressLine1: faker.string.alpha({ length: { min: 10, max: 20 } }),
-        addressLine2: faker.helpers.arrayElement([
-          faker.string.alpha({ length: { min: 10, max: 20 } }),
-          undefined,
-        ]),
-        addressLine3: faker.helpers.arrayElement([
-          faker.string.alpha({ length: { min: 10, max: 20 } }),
-          undefined,
-        ]),
-        addressLine4: faker.helpers.arrayElement([
-          faker.string.alpha({ length: { min: 10, max: 20 } }),
-          undefined,
-        ]),
-        townOrCity: faker.helpers.arrayElement([
-          faker.string.alpha({ length: { min: 10, max: 20 } }),
-          undefined,
-        ]),
-        postCode: faker.helpers.arrayElement([
-          faker.string.alpha({ length: { min: 10, max: 20 } }),
-          undefined,
-        ]),
-        county: faker.helpers.arrayElement([
-          faker.string.alpha({ length: { min: 10, max: 20 } }),
-          undefined,
-        ]),
+        addressLine2: faker.string.alpha({ length: { min: 10, max: 20 } }),
+        addressLine3: faker.string.alpha({ length: { min: 10, max: 20 } }),
+        addressLine4: faker.string.alpha({ length: { min: 10, max: 20 } }),
+        townOrCity: faker.string.alpha({ length: { min: 10, max: 20 } }),
+        postCode: faker.string.alpha({ length: { min: 10, max: 20 } }),
+        county: faker.string.alpha({ length: { min: 10, max: 20 } }),
         country: faker.string.alpha({ length: { min: 10, max: 20 } }),
-        createdAt: faker.helpers.arrayElement([
-          faker.date.past().toISOString().slice(0, 19) + "Z",
-          undefined,
-        ]),
-        modifiedAt: faker.helpers.arrayElement([
-          faker.date.past().toISOString().slice(0, 19) + "Z",
-          undefined,
-        ]),
+        createdAt: faker.date.past().toISOString().slice(0, 19) + "Z",
+        modifiedAt: faker.date.past().toISOString().slice(0, 19) + "Z",
       },
-      undefined,
-    ]),
-    createdAt: faker.helpers.arrayElement([
-      faker.date.past().toISOString().slice(0, 19) + "Z",
-      undefined,
-    ]),
-    modifiedAt: faker.helpers.arrayElement([
-      faker.date.past().toISOString().slice(0, 19) + "Z",
-      undefined,
-    ]),
-  },
-  applicationStatus: faker.helpers.arrayElement([
-    faker.helpers.arrayElement(Object.values(ApplicationStatus)),
-    undefined,
-  ]),
-  declaration: faker.helpers.arrayElement([
-    {
-      id: faker.helpers.arrayElement([faker.string.uuid(), undefined]),
-      clientDeclarationStatus: faker.helpers.arrayElement([
-        faker.helpers.arrayElement(Object.values(ClientDeclarationStatus)),
-        undefined,
-      ]),
-      declarationConfirmation: faker.helpers.arrayElement([
-        faker.datatype.boolean(),
-        undefined,
-      ]),
-      createdAt: faker.helpers.arrayElement([
-        faker.date.past().toISOString().slice(0, 19) + "Z",
-        undefined,
-      ]),
-      createdBy: faker.helpers.arrayElement([
-        faker.string.alpha({ length: { min: 10, max: 20 } }),
-        undefined,
-      ]),
-      modifiedAt: faker.helpers.arrayElement([
-        faker.date.past().toISOString().slice(0, 19) + "Z",
-        undefined,
-      ]),
-      modifiedBy: faker.helpers.arrayElement([
-        faker.string.alpha({ length: { min: 10, max: 20 } }),
-        undefined,
-      ]),
+      createdAt: faker.date.past().toISOString().slice(0, 19) + "Z",
+      modifiedAt: faker.date.past().toISOString().slice(0, 19) + "Z",
     },
-    undefined,
-  ]),
-  evidence: faker.helpers.arrayElement([
-    {
-      id: faker.helpers.arrayElement([faker.string.uuid(), undefined]),
-      evidenceStatus: faker.helpers.arrayElement([
-        faker.helpers.arrayElement(Object.values(EvidenceStatus)),
-        undefined,
-      ]),
-      payeIncomeEvidence: faker.helpers.arrayElement([
-        faker.datatype.boolean(),
-        undefined,
-      ]),
-      otherIncomeEvidence: faker.helpers.arrayElement([
-        faker.datatype.boolean(),
-        undefined,
-      ]),
-      housingCostsEvidence: faker.helpers.arrayElement([
-        faker.datatype.boolean(),
-        undefined,
-      ]),
-      capitalEvidence: faker.helpers.arrayElement([
-        faker.datatype.boolean(),
-        undefined,
-      ]),
-      createdAt: faker.helpers.arrayElement([
-        faker.date.past().toISOString().slice(0, 19) + "Z",
-        undefined,
-      ]),
-      createdBy: faker.helpers.arrayElement([
-        faker.string.alpha({ length: { min: 10, max: 20 } }),
-        undefined,
-      ]),
-      modifiedAt: faker.helpers.arrayElement([
-        faker.date.past().toISOString().slice(0, 19) + "Z",
-        undefined,
-      ]),
-      modifiedBy: faker.helpers.arrayElement([
-        faker.string.alpha({ length: { min: 10, max: 20 } }),
-        undefined,
-      ]),
+    applicationStatus: faker.helpers.arrayElement(
+      Object.values(ApplicationStatus),
+    ),
+    declaration: {
+      id: faker.string.uuid(),
+      clientDeclarationStatus: faker.helpers.arrayElement(
+        Object.values(ClientDeclarationStatus),
+      ),
+      declarationConfirmation: faker.datatype.boolean(),
+      createdAt: faker.date.past().toISOString().slice(0, 19) + "Z",
+      createdBy: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      modifiedAt: faker.date.past().toISOString().slice(0, 19) + "Z",
+      modifiedBy: faker.string.alpha({ length: { min: 10, max: 20 } }),
     },
-    undefined,
-  ]),
-  reasonForReapplication: faker.helpers.arrayElement([
-    faker.string.alpha({ length: { min: 10, max: 20 } }),
-    undefined,
-  ]),
-  meansAssessmentRequired: faker.helpers.arrayElement([
-    faker.datatype.boolean(),
-    undefined,
-  ]),
-  typeOfNonMeans: faker.helpers.arrayElement([
-    faker.datatype.boolean(),
-    undefined,
-  ]),
-  ecfFlag: faker.datatype.boolean(),
-  contribution: faker.helpers.arrayElement([
-    faker.string.alpha({ length: { min: 10, max: 20 } }),
-    undefined,
-  ]),
-  applicationType: faker.string.alpha({ length: { min: 10, max: 20 } }),
-  createdAt: faker.date.past().toISOString().slice(0, 19) + "Z",
-  createdBy: faker.string.alpha({ length: { min: 10, max: 20 } }),
-  modifiedAt: faker.date.past().toISOString().slice(0, 19) + "Z",
-  modifiedBy: faker.string.alpha({ length: { min: 10, max: 20 } }),
-  ...overrideResponse,
-});
+    evidence: {
+      id: faker.string.uuid(),
+      evidenceStatus: faker.helpers.arrayElement(Object.values(EvidenceStatus)),
+      payeIncomeEvidence: faker.datatype.boolean(),
+      otherIncomeEvidence: faker.datatype.boolean(),
+      housingCostsEvidence: faker.datatype.boolean(),
+      capitalEvidence: faker.datatype.boolean(),
+      createdAt: faker.date.past().toISOString().slice(0, 19) + "Z",
+      createdBy: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      modifiedAt: faker.date.past().toISOString().slice(0, 19) + "Z",
+      modifiedBy: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    },
+    reasonForReapplication: faker.string.alpha({
+      length: { min: 10, max: 20 },
+    }),
+    meansAssessmentRequired: faker.datatype.boolean(),
+    typeOfNonMeans: faker.datatype.boolean(),
+    ecfFlag: faker.datatype.boolean(),
+    contribution: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    applicationType: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    createdAt: faker.date.past().toISOString().slice(0, 19) + "Z",
+    createdBy: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    modifiedAt: faker.date.past().toISOString().slice(0, 19) + "Z",
+    modifiedBy: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    ...overrideResponse,
+  }) as MockWithNullableOverrides<Application, O, ApplicationMock>;
 
 export const getGetApplicationsMockHandler = (
   overrideResponse?:

@@ -10,8 +10,9 @@
 import { http, HttpResponse } from "msw";
 
 // Import the actual API handlers
-import { apiHandlers } from "./api.js";
 import { entraHandlers } from "./entra.js";
+import { rcwHandlers } from "./rcw.js";
+import { pdaApiHandlers } from "./pda.js";
 
 // Add debug handler to log all intercepted requests
 const debugHandler = http.all("*", ({ request }) => {
@@ -24,7 +25,8 @@ const debugHandler = http.all("*", ({ request }) => {
  */
 export const handlers = [
   debugHandler,
-  ...apiHandlers,
+  ...rcwHandlers,
+  ...pdaApiHandlers,
   ...entraHandlers,
 
   // Health check endpoint for testing
