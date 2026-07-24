@@ -9,6 +9,7 @@ router.get("/signin", (req, res, next) => {
   req.session.account = {
     environment: "login.microsoftonline.com",
     homeAccountId: "test-uid.test-tenant-id",
+    idToken: "test-id-token",
     idTokenClaims: {},
     localAccountId: "test-uid",
     name: "Test User",
