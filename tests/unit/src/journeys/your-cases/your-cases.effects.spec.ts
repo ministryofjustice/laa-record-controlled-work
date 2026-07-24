@@ -10,6 +10,14 @@ import { logger } from "#/logger.js";
 
 const mockData = getGetApplicationsResponseMock();
 
+const authenticatedContext = {
+  session: {
+    account: {
+      idToken: "test-id-token",
+    }
+  }
+};
+
 describe("LoadYourCaseList", () => {
   describe("when getApplications succeeds", () => {
     let client: ReturnType<typeof createForgeTestClientForCaseList>;
@@ -19,6 +27,7 @@ describe("LoadYourCaseList", () => {
       getApplicationsStub = sinon
         .stub()
         .resolves({ status: 200, data: mockData });
+
       client = createForgeTestClientForCaseList(
         { getApplications: getApplicationsStub },
         yourCasesStep,
@@ -28,12 +37,12 @@ describe("LoadYourCaseList", () => {
     after(() => sinon.restore());
 
     it("calls getApplications", async () => {
-      await client.get("/cases");
+      await client.get("/cases", authenticatedContext);
       expect(getApplicationsStub.calledOnce).to.be.true;
     });
 
     it("sets caseList in context", async () => {
-      const result = await client.get("/cases");
+      const result = await client.get("/cases", authenticatedContext);
       expect(result.type).to.equal("render");
       const renderResult = result as TestRenderResult;
       expect(renderResult.context.data.caseList).to.deep.equal(mockData);
@@ -53,7 +62,7 @@ describe("LoadYourCaseList", () => {
         yourCasesStep,
       );
       try {
-        await client.get("/cases");
+        await client.get("/cases", authenticatedContext);
       } catch (err) {
         return err;
       }
