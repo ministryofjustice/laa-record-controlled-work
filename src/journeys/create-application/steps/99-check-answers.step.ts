@@ -9,11 +9,12 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 import { NunjucksGenerators } from "@ministryofjustice/hmpps-forge/express-nunjucks";
 import {
-  GovUKButton,
   GovUKHeading,
   GovUKSummaryList,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
+import { DEFAULT_CASE_REFERENCE_NUMBER } from "#/journeys/edit-application/steps/task-list/task-list.step.js";
+import { submitButton } from "#/journeys/evidence/common.blocks.js";
 import { t } from "#/lib/i18n.js";
 
 const ecfLabel = match(Answer("ecf"))
@@ -281,9 +282,7 @@ export const checkAnswersStep = (): ReturnType<typeof step> =>
           },
         ],
       }),
-      GovUKButton({
-        text: t("journeys.createApplication.checkAnswers.submitButton.submit"),
-      }),
+      submitButton,
     ],
     code: "check-answers",
     onSubmission: [
@@ -291,7 +290,7 @@ export const checkAnswersStep = (): ReturnType<typeof step> =>
         onAlways: {
           next: [
             redirect({
-              goto: "task-list",
+              goto: `/cases/${DEFAULT_CASE_REFERENCE_NUMBER}/task-list`,
             }),
           ],
         },

@@ -83,13 +83,13 @@ describe("Evidence of income step", () => {
     it("should redirect to evidence of expenditure and capital step if at least one option is selected", async () => {
       const result = await client.post("/cases/evidence/evidence-of-income", {
         body: {
-          incomeEvidenceTypes: ["wageSlips", "bankStatements"],
+          employedEvidence: ["wageSlips"],
         },
       });
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
       expect(redirectResult.url).to.equal(
-        "/cases/evidence/evidence-of-expenditure-and-capital",
+        "/cases/evidence/evidence-of-expenditure",
       );
     });
   });

@@ -11,12 +11,15 @@ import {
 } from "#/auth/auth.relay.js";
 import { authCodeCallbackSchema } from "#/auth/auth.types.js";
 import { EntraService } from "#/auth/entra.service.js";
+import { createMsalClient } from "#/auth/msal.client.js";
+import { RedisCachePlugin } from "#/auth/msal.plugin.js";
 import config from "#/config.js";
 import {
   BAD_REQUEST,
   INTERNAL_SERVER_ERROR,
   UNAUTHORIZED,
 } from "#/lib/constants/http.js";
+import { getRedisClient } from "#/lib/redis.js";
 import { logger } from "#/logger.js";
 
 /**
@@ -51,8 +54,9 @@ export async function authCodeCallback(
       return;
     }
 
+    const entra = createEntraService(req);
+
     // exchange auth code for tokens and state
-    const entra = EntraService.create(req.hostname);
     const result = await entra.exchangeAuthCode(data.code, authCodeRequest);
     if (result.error) {
       res.status(UNAUTHORIZED).send(result.error.message);
@@ -66,7 +70,8 @@ export async function authCodeCallback(
         return;
       }
 
-      Object.assign(req.session, result.value, { isAuthenticated: true });
+      const { account } = result.value;
+      Object.assign(req.session, { account, isAuthenticated: true });
       res.redirect(returnTo ?? "/");
     });
   } catch (error) {
@@ -85,9 +90,13 @@ export async function signIn(
   res: Response,
   next: NextFunction,
 ): Promise<void> {
-  const entra = EntraService.create(req.hostname);
+  const returnToOverride = parseSafeReturnToOverride(req);
+  if (returnToOverride !== undefined) {
+    req.session.returnTo = returnToOverride;
+  }
 
   try {
+    const entra = createEntraService(req);
     const result = await entra.initiateAuthCodeFlow(req.session.returnTo);
     if (result.error) {
       res.status(INTERNAL_SERVER_ERROR).send(result.error.message);
@@ -132,6 +141,20 @@ export function signOut(req: Request, res: Response, next: NextFunction): void {
 }
 
 /**
+ * Creates an EntraService with an MSAL client configured for the current request session.
+ * @param req - The Express request.
+ * @returns A configured EntraService instance.
+ */
+function createEntraService(req: Request): EntraService {
+  const msalCachePlugin = config.redis.enabled
+    ? new RedisCachePlugin(getRedisClient(), req.sessionID, config.redis.maxAge)
+    : undefined;
+
+  const msalClient = createMsalClient({ msalCachePlugin });
+  return EntraService.create({ msalClient, requestHostname: req.hostname });
+}
+
+/**
  * If the state encodes a signed relay target for a different host, validates
  * the signature and redirects the callback to that ephemeral environment.
  * @param data - The parsed auth code response.
@@ -170,4 +193,26 @@ function handleRelay(
   res.set("Cache-Control", "no-store");
   res.redirect(targetUrl.toString());
   return true;
+}
+
+/**
+ * Validates that a redirect target is a same-origin app-relative path.
+ * @param path - Candidate redirect path.
+ * @returns `true` when the path is safe for local redirect usage.
+ */
+function isRelativePath(path: string): boolean {
+  return path.startsWith("/") && !path.startsWith("//");
+}
+
+/**
+ * Extracts a safe app-relative `returnTo` path from the signin query string.
+ * @param req - The Express request.
+ * @returns A validated relative path when present, otherwise `undefined`.
+ */
+function parseSafeReturnToOverride(req: Request): string | undefined {
+  const { returnTo } = req.query;
+  if (typeof returnTo !== "string") return undefined;
+
+  const normalizedReturnTo = returnTo.trim();
+  return isRelativePath(normalizedReturnTo) ? normalizedReturnTo : undefined;
 }

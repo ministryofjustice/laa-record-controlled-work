@@ -23,7 +23,7 @@ export const niNumberStep = (journeyCode: string): ReturnType<typeof step> =>
   step({
     blocks: [
       GovUKBackLink({
-        href: "/create-application/client-details",
+        href: "/cases/new/client-details",
       }),
       HtmlBlock({
         content: `<span class="govuk-caption-l">${t("journeys.createApplication.caption")}</span>`,

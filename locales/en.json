@@ -2,6 +2,7 @@
   "common": {
     "continue": "Continue",
     "saveAndReturn": "Save and return later",
+    "submit": "Save and continue",
     "signOut": "Sign out",
     "yes": "Yes",
     "no": "No"
@@ -28,14 +29,20 @@
       "createCaseButton": "Record a new case",
       "tabs": {
         "inProgress": "In progress",
-        "recorded": "Recorded"
+        "recorded": "Recorded",
+        "ineligible": "Ineligible"
       },
       "table": {
-        "emptyMessage": "You have no cases in progress",
+        "emptyMessage": {
+          "inProgress": "You have no cases in progress",
+          "recorded": "You have no recorded cases",
+          "ineligible": "You have no ineligible cases"
+        },
         "columns": {
           "referenceNumber": "Reference number",
           "clientName": "Client name",
-          "lastUpdated": "Last updated"
+          "lastUpdated": "Last updated",
+          "dateRecorded": "Date recorded"
         }
       }
     }
@@ -186,9 +193,6 @@
         },
         "changeLink": {
           "change": "Change"
-        },
-        "submitButton": {
-          "submit": "Save and continue"
         }
       },
       "taskList": {
@@ -279,6 +283,43 @@
         },
         "validation": {
           "required": " You must select an income evidence to continue"
+        }
+      },
+      "evidenceOfExpenditure": {
+        "title": "Evidence of your client's expenditure",
+        "hint": "Select all that apply.",
+        "linkText": "Check the risk-based evidence guidelines (opens in a new window or tab).",
+        "description": "You only need to gather evidence of your client's expenditure if they are close to the threshold and there is a risk of them being ineligible.",
+        "groupsOfEvidence": {
+          "incomeTaxAndNationalInsurance": "Income Tax and National Insurance",
+          "housingCosts": "Housing costs",
+          "childCare": "Child Care costs in excess of £600 per month",
+          "maintenance": "Maintenance"
+        },
+        "evidenceTypes": {
+          "wageSlips": "Wage slips",
+          "taxCalculationSheet": "Tax calculation sheet form SA302",
+          "bankStatementsHousing": "Bank statement",
+          "mortgageStatement": "Mortgage statement",
+          "rentStatement": "Rent book or tenancy agreement",
+          "bankStatementsChildCare": "Bank statement",
+          "agreementOrContract": "Agreement or contract",
+          "bankStatementsMaintenance": "Bank statement",
+          "maintenanceOrder": "Maintenance order",
+          "receipts": "Receipts"
+        }
+      },
+      "checkAnswers": {
+        "title": "Check your answers",
+        "answerLabels": {
+          "doYouHaveEvidence": "Do you have evidence?",
+          "reasonForNoEvidence": "Reason for not having evidence",
+          "evidenceOfIncome": "Income",
+          "evidenceOfExpenditure": "Expenditure"
+        },
+        "noEvidenceProvided": "No evidence provided",
+        "changeLink": {
+          "change": "Change"
         }
       }
     }

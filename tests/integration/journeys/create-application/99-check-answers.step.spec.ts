@@ -10,7 +10,7 @@ import { checkAnswersStep } from "#/journeys/create-application/steps/99-check-a
 describe("Check answers step", () => {
   const client = createForgeTestClient(
     "Record new case",
-    "/create-application/",
+    "/cases/new/",
     checkAnswersStep(),
   );
   const session = {
@@ -32,13 +32,13 @@ describe("Check answers step", () => {
     },
   };
 
-  describe("GET /create-application/check-answers", () => {
+  describe("GET /cases/new/check-answers", () => {
     let renderResult: TestRenderResult;
     let summaryList: RenderBlock;
     let submitButton: RenderBlock;
 
     before(async () => {
-      const result = await client.get("/create-application/check-answers", {
+      const result = await client.get("/cases/new/check-answers", {
         session,
       });
       expect(result.type).to.equal("render");
@@ -105,14 +105,14 @@ describe("Check answers step", () => {
     });
   });
 
-  describe("POST /create-application/check-answers", () => {
+  describe("POST /cases/new/check-answers", () => {
     it("redirects to the confirmation step", async () => {
-      const result = await client.post("/create-application/check-answers", {
+      const result = await client.post("/cases/new/check-answers", {
         session,
       });
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
-      expect(redirectResult.url).to.equal("/create-application/task-list");
+      expect(redirectResult.url).to.equal("/cases/CW-123456/task-list");
     });
   });
 });

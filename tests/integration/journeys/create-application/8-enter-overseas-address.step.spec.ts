@@ -10,11 +10,11 @@ import { enterOverseasAddressStep } from "#/journeys/create-application/steps/8-
 describe("Enter overseas address step", () => {
   const client = createForgeTestClient(
     "Record new case",
-    "/create-application/",
+    "/cases/new/",
     enterOverseasAddressStep("testJourney"),
   );
 
-  describe("GET /create-application/enter-overseas-address", () => {
+  describe("GET /cases/new/enter-overseas-address", () => {
     let renderResult: TestRenderResult;
     let countryInput: RenderBlock;
     let addressLine1Input: RenderBlock;
@@ -23,7 +23,7 @@ describe("Enter overseas address step", () => {
     let addressLine4Input: RenderBlock;
 
     before(async () => {
-      const result = await client.get("/create-application/enter-overseas-address");
+      const result = await client.get("/cases/new/enter-overseas-address");
       expect(result.type).to.equal("render");
       renderResult = result as TestRenderResult;
 
@@ -64,7 +64,7 @@ describe("Enter overseas address step", () => {
     });    
   });
 
-  describe("POST /create-application/enter-overseas-address", () => {
+  describe("POST /cases/new/enter-overseas-address", () => {
     const validBody = {
       country: "Ireland",
       addressLine1: "10 Some Street",
@@ -74,13 +74,13 @@ describe("Enter overseas address step", () => {
     };
 
     it("should redirect to check-answers when given valid data", async () => {
-      const result = await client.post("/create-application/enter-overseas-address", {
+      const result = await client.post("/cases/new/enter-overseas-address", {
         body: validBody,
       });
 
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
-      expect(redirectResult.url).to.equal("/create-application/check-answers");
+      expect(redirectResult.url).to.equal("/cases/new/check-answers");
     });
 
     const validationErrorTests: Array<{
@@ -105,7 +105,7 @@ describe("Enter overseas address step", () => {
 
     for (const { description, body, expectedMessage, fieldCode } of validationErrorTests) {
       it(`should show validation error when ${description}`, async () => {
-        const result = await client.post("/create-application/enter-overseas-address", {
+        const result = await client.post("/cases/new/enter-overseas-address", {
           body,
         });
 

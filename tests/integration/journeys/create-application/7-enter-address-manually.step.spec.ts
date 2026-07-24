@@ -10,11 +10,11 @@ import { enterAddressManuallyStep } from "#/journeys/create-application/steps/7-
 describe("Enter address manually step", () => {
   const client = createForgeTestClient(
     "Record new case",
-    "/create-application/",
+    "/cases/new/",
     enterAddressManuallyStep("testJourney"),
   );
 
-  describe("GET /create-application/enter-address-manually", () => {
+  describe("GET /cases/new/enter-address-manually", () => {
     let renderResult: TestRenderResult;
     let addressLine1Input: RenderBlock;
     let addressLine2Input: RenderBlock;
@@ -23,7 +23,7 @@ describe("Enter address manually step", () => {
     let postcodeInput: RenderBlock;
 
     before(async () => {
-      const result = await client.get("/create-application/enter-address-manually");
+      const result = await client.get("/cases/new/enter-address-manually");
       expect(result.type).to.equal("render");
       renderResult = result as TestRenderResult;
       [addressLine1Input, addressLine2Input, townOrCityInput, countyInput, postcodeInput] =
@@ -68,7 +68,7 @@ describe("Enter address manually step", () => {
     });
   });
 
-  describe("POST /create-application/enter-address-manually", () => {
+  describe("POST /cases/new/enter-address-manually", () => {
     const validBody = {
       addressLine1: "10 Some Street",
       addressLine2: "",
@@ -78,13 +78,13 @@ describe("Enter address manually step", () => {
     };
 
     it("should redirect to check-answers when given valid data", async () => {
-      const result = await client.post("/create-application/enter-address-manually", {
+      const result = await client.post("/cases/new/enter-address-manually", {
         body: validBody,
       });
 
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
-      expect(redirectResult.url).to.equal("/create-application/check-answers");
+      expect(redirectResult.url).to.equal("/cases/new/check-answers");
     });
 
     const validationErrorTests: Array<{
@@ -115,7 +115,7 @@ describe("Enter address manually step", () => {
 
     for (const { description, body, expectedMessage, fieldCode } of validationErrorTests) {
       it(`should show validation error when ${description}`, async () => {
-        const result = await client.post("/create-application/enter-address-manually", {
+        const result = await client.post("/cases/new/enter-address-manually", {
           body,
         });
 

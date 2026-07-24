@@ -17,7 +17,7 @@ export const ineligibleStep = (journeyCode: string): ReturnType<typeof step> =>
   step({
     blocks: [
       GovUKBackLink({
-        href: "/create-application/ecf",
+        href: "/cases/new/ecf",
       }),
       GovUKHeading({
         level: H1,

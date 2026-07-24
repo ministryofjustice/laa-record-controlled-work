@@ -103,7 +103,7 @@ describe("Reason for no evidence step", () => {
       );
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
-      expect(redirectResult.url).to.equal("/cases/evidence/check-your-answers");
+      expect(redirectResult.url).to.equal("/cases/evidence/check-answers");
     });
 
     it("should redirect to check answers step if personal circumstances is selected", async () => {
@@ -118,7 +118,7 @@ describe("Reason for no evidence step", () => {
       );
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
-      expect(redirectResult.url).to.equal("/cases/evidence/check-your-answers");
+      expect(redirectResult.url).to.equal("/cases/evidence/check-answers");
     });
 
     it("should redirect to check answers step if advice over phone is selected", async () => {
@@ -133,7 +133,7 @@ describe("Reason for no evidence step", () => {
       );
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
-      expect(redirectResult.url).to.equal("/cases/evidence/check-your-answers");
+      expect(redirectResult.url).to.equal("/cases/evidence/check-answers");
     });
   });
 });

@@ -4,9 +4,9 @@ import { yourCasesStep } from "#/journeys/your-cases/steps/your-cases/your-cases
 
 export const yourCasesJourney = journey({
   code: "yourCases",
-  path: "/your-cases",
+  path: "/cases",
   reachability: { disableReachabilityChecks: true },
-  steps: [yourCasesStep()],
+  steps: [yourCasesStep],
   title: "Your Cases",
   view: { template: "partials/case-list-step" },
 });

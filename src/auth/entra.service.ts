@@ -1,8 +1,9 @@
 import {
+  type AccountInfo,
   type AuthenticationResult,
   type AuthorizationCodeRequest,
   type AuthorizationUrlRequest,
-  ConfidentialClientApplication,
+  type ConfidentialClientApplication,
   CryptoProvider,
 } from "@azure/msal-node";
 import { randomUUID } from "node:crypto";
@@ -13,16 +14,24 @@ import type {
   TokenExchangeResult,
 } from "#/auth/auth.types.js";
 
-import { authRequestDefaults, msalConfig } from "#/auth/auth.config.js";
+import { authRequestDefaults } from "#/auth/auth.config.js";
 import {
   MsalError,
   PkceGenerationError,
   TokenAcquisitionError,
+  TokenRefreshError,
 } from "#/auth/auth.errors.js";
 import { createRelayState } from "#/auth/auth.relay.js";
 import config from "#/config.js";
 import { type Either, failure, success } from "#/lib/either.js";
 import { logger } from "#/logger.js";
+
+interface EntraServiceConfig {
+  msalClient: ConfidentialClientApplication;
+  requestHostname: string;
+}
+
+const EMPTY_HOSTNAME_LENGTH = 0;
 
 /**
  * Handles Microsoft Entra ID (MSAL) authentication flows including
@@ -36,28 +45,57 @@ export class EntraService {
   /**
    * Creates an EntraService instance.
    * @param {string} requestHostname - The hostname of the incoming request (e.g. "my-host.example.com").
-   * @param {ConfidentialClientApplication} msalClient - The MSAL confidential client application.
+   * @param {ConfidentialClientApplication} msalclient - The MSAL client instance to use for token acquisition and code exchange.
    */
   private constructor(
     requestHostname: string,
-    msalClient?: ConfidentialClientApplication,
+    msalclient: ConfidentialClientApplication,
   ) {
     this.requestHostname = requestHostname;
-    this.msalClient =
-      msalClient ?? new ConfidentialClientApplication(msalConfig);
+    this.msalClient = msalclient;
   }
 
   /**
    * Factory method to create a new EntraService instance.
-   * @param {string} requestHostname - The hostname of the incoming request (e.g. "my-host.example.com").
-   * @param {ConfidentialClientApplication} msalClient - The MSAL confidential client application.
+   * @param {config} config - Configuration for the EntraService, including request hostname and an MSAL client.
    * @returns {EntraService} A new EntraService instance.
    */
-  public static create(
-    requestHostname: string,
-    msalClient?: ConfidentialClientApplication,
-  ): EntraService {
-    return new EntraService(requestHostname, msalClient);
+  public static create({
+    msalClient,
+    requestHostname,
+  }: EntraServiceConfig): EntraService {
+    validateMsalClient(msalClient);
+    const normalizedHostname = normalizeRequestHostname(requestHostname);
+
+    return new EntraService(normalizedHostname, msalClient);
+  }
+
+  /**
+   * Acquire a fresh access token using cached credentials.
+   * Cache serialization/deserialization is handled automatically by the ICachePlugin.
+   *
+   * @param account - The authenticated account from the session.
+   * @returns {Promise<Either<TokenRefreshError, TokenExchangeResult>>} The refreshed token set or an error.
+   */
+  public async acquireTokenSilent(
+    account: AccountInfo,
+  ): Promise<Either<TokenRefreshError, TokenExchangeResult>> {
+    try {
+      const result: AuthenticationResult =
+        await this.msalClient.acquireTokenSilent({
+          account,
+          scopes: authRequestDefaults.scopes,
+        });
+
+      return success({
+        accessToken: result.accessToken,
+        account: result.account ?? undefined,
+        idToken: result.idToken,
+      });
+    } catch (error) {
+      logger.error("Failed to silently acquire token", error);
+      return failure(TokenRefreshError.from(error));
+    }
   }
 
   /**
@@ -73,14 +111,13 @@ export class EntraService {
     const tokenRequest = { ...authCodeRequest, code };
 
     try {
-      const tokenCache = this.msalClient.getTokenCache().serialize();
-      const { account, idToken }: AuthenticationResult =
+      const { accessToken, account, idToken }: AuthenticationResult =
         await this.msalClient.acquireTokenByCode(tokenRequest);
 
       return success({
+        accessToken,
         account: account ?? undefined,
         idToken,
-        tokenCache,
       });
     } catch (error) {
       logger.error("Failed to handle Entra auth redirect", error);
@@ -174,5 +211,71 @@ export class EntraService {
       pkceCodes,
       returnTo: validReturnTo,
     };
+  }
+}
+
+/**
+ * Validates the hostname format accepted by EntraService.
+ * @param hostname - Candidate hostname value.
+ * @returns True when the value is a valid bare hostname.
+ */
+function isValidHostname(hostname: string): boolean {
+  try {
+    const parsed = new URL(`https://${hostname}`);
+    return parsed.hostname === hostname;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Validates and normalizes the request hostname invariant.
+ * @param requestHostname - Raw request hostname from the caller.
+ * @returns A normalized, lowercase hostname.
+ */
+function normalizeRequestHostname(requestHostname: string): string {
+  const normalizedHostname = requestHostname.trim().toLowerCase();
+
+  if (normalizedHostname.length === EMPTY_HOSTNAME_LENGTH) {
+    throw new TypeError(
+      "EntraService.create requires a non-empty requestHostname",
+    );
+  }
+
+  if (!isValidHostname(normalizedHostname)) {
+    throw new TypeError(
+      "EntraService.create requires requestHostname to be a valid hostname",
+    );
+  }
+
+  return normalizedHostname;
+}
+
+/**
+ * Validates that the supplied client provides the MSAL methods required by the service.
+ * @param msalClient - Candidate MSAL client.
+ */
+function validateMsalClient(
+  msalClient: unknown,
+): asserts msalClient is ConfidentialClientApplication {
+  if (msalClient === undefined || msalClient === null) {
+    throw new TypeError("EntraService.create requires a configured msalClient");
+  }
+
+  const candidate = msalClient as Partial<
+    Record<
+      "acquireTokenByCode" | "acquireTokenSilent" | "getAuthCodeUrl",
+      unknown
+    >
+  >;
+
+  if (
+    typeof candidate.acquireTokenByCode !== "function" ||
+    typeof candidate.acquireTokenSilent !== "function" ||
+    typeof candidate.getAuthCodeUrl !== "function"
+  ) {
+    throw new TypeError(
+      "EntraService.create requires an msalClient with MSAL auth methods",
+    );
   }
 }

@@ -8,13 +8,13 @@ chai.use(chaiAsPromised)
 import { expect } from "chai";
 import { RedisClientType } from "redis";
 describe("session Middleware", () => {
-  let createRedisClientStub: sinon.SinonStub;
+  let getRedisClientStub: sinon.SinonStub;
   let createRedisStoreStub: sinon.SinonStub;
   let mockRedisClient = {} as RedisClientType;
   let mockRedisStore = {} as RedisStore;
 
   beforeEach(() => {
-    createRedisClientStub = sinon.stub().returns(mockRedisClient);
+    getRedisClientStub = sinon.stub().returns(mockRedisClient);
     createRedisStoreStub = sinon.stub().resolves(mockRedisStore);
   });
 
@@ -27,7 +27,7 @@ describe("session Middleware", () => {
       config.redis.enabled = false;
       const result = await createSession(
         config,
-        createRedisClientStub,
+        getRedisClientStub,
         createRedisStoreStub,
       );
       expect(result).to.deep.equal(config.session);
@@ -39,7 +39,7 @@ describe("session Middleware", () => {
       await expect(
         createSession(
           config,
-          createRedisClientStub,
+          getRedisClientStub,
           createRedisStoreStub,
         ),
       ).to.be.rejectedWith("Redis expected in production");
@@ -47,16 +47,14 @@ describe("session Middleware", () => {
   });
 
   describe("if redis is enabled", () => {
-    it("creates a redis store using the redis app config", async () => {
+    it("creates a redis store using the redis client", async () => {
       config.redis.enabled = true;
-      const expectedConfig = { ...config.session, store: mockRedisStore };
-      const result = await createSession(
+      await createSession(
         config,
-        createRedisClientStub,
+        getRedisClientStub,
         createRedisStoreStub,
       );
-      expect(createRedisClientStub.calledOnceWithExactly(config.redis)).to.be
-        .true;
+      expect(getRedisClientStub.calledOnce).to.be.true;
       expect(createRedisStoreStub.calledOnceWithExactly(mockRedisClient)).to.be
         .true;
     });
@@ -65,7 +63,7 @@ describe("session Middleware", () => {
       const expectedConfig = { ...config.session, store: mockRedisStore };
       const result = await createSession(
         config,
-        createRedisClientStub,
+        getRedisClientStub,
         createRedisStoreStub,
       );
       expect(result).to.deep.equal(expectedConfig);

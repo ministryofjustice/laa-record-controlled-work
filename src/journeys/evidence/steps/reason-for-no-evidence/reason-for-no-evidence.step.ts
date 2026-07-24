@@ -38,13 +38,15 @@ export const reasonForNoEvidence = (
               goto: "check-answers",
               when: Query("returnTo").match(Condition.Equals("check-answers")),
             }),
-            redirect({ goto: "check-your-answers" }),
+            redirect({ goto: "check-answers" }),
           ],
         },
         validate: true,
       }),
     ],
     path: "/reason-for-no-evidence",
-    reachability: { entryWhen: true },
+    reachability: {
+      entryWhen: Query("returnTo").match(Condition.Equals("check-answers")),
+    },
     title: t("journeys.evidence.reasonForNoEvidence.title"),
   });

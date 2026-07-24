@@ -24,7 +24,7 @@ export const haveAHomeAddressStep = (
   step({
     blocks: [
       GovUKBackLink({
-        href: "/create-application/ni-number",
+        href: "/cases/new/ni-number",
       }),
       HtmlBlock({
         content: `<span class="govuk-caption-l">${t("journeys.createApplication.caption")}</span>`,
