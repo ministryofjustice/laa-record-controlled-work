@@ -2,7 +2,7 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: {{ include "laa-record-controlled-work.fullname" . }}-rcw-ingress
+  name: {{ include "laa-record-controlled-work.fullname" . }}-rcw-policy
   labels:
     {{- include "laa-record-controlled-work.labels" . | nindent 4 }}
 spec:
@@ -22,29 +22,6 @@ spec:
             matchLabels:
               {{- include "laa-record-controlled-work.selectorLabels" . | nindent 14 }}
               app.kubernetes.io/component: ccq
-      ports:
-        - protocol: TCP
-          port: 3000
----
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: {{ include "laa-record-controlled-work.fullname" . }}-ccq-ingress
-  labels:
-    {{- include "laa-record-controlled-work.labels" . | nindent 4 }}
-spec:
-  podSelector:
-    matchLabels:
-      {{- include "laa-record-controlled-work.selectorLabels" . | nindent 6 }}
-      app.kubernetes.io/component: ccq
-  policyTypes:
-    - Ingress
-  ingress:
-    - from:
-        - podSelector:
-            matchLabels:
-              {{- include "laa-record-controlled-work.selectorLabels" . | nindent 14 }}
-              app.kubernetes.io/component: nginx
       ports:
         - protocol: TCP
           port: 3000
