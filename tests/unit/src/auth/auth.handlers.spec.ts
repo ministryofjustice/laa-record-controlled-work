@@ -9,7 +9,9 @@ import {
 import sinon from "sinon";
 import { EntraService } from "#/auth/entra.service.js";
 import { createRelayState } from "#/auth/auth.relay.js";
+import config from "#/config.js";
 import { failure, success } from "#/lib/either.js";
+import * as redis from "#/lib/redis.js";
 import { expect } from "chai";
 import { TokenAcquisitionError } from "#/auth/auth.errors.js";
 import { createMockApp } from "../../utils.js";
@@ -254,5 +256,21 @@ describe("Auth Handlers", () => {
         cookies.some((cookie) => cookie.includes("Expires=Thu, 01 Jan 1970")),
       ).to.be.true;
     });
+
+    it("deletes the session MSAL cache key from Redis when Redis is enabled", async () => {
+      const redisClient = redis.getRedisClient();
+      const del = sinon.stub(redisClient, "del").resolves(1);
+      sinon.stub(config.redis, "enabled").value(true);
+
+      const agent = request.agent(mockApp);
+      await agent.get("/auth/signin");
+      const res = await agent.get("/auth/signout");
+
+      expect(res.status).to.equal(FOUND);
+      expect(del.calledOnce).to.be.true;
+      const [key] = del.firstCall.args as [string];
+      expect(key.startsWith("msal:")).to.be.true;
+    });
   });
 });
+

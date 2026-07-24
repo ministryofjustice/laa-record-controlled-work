@@ -1,5 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 
+import { promisify } from "node:util";
+
 import {
   MissingAuthCodeRequestError,
   StateMismatchError,
@@ -11,6 +13,7 @@ import {
 } from "#/auth/auth.relay.js";
 import { authCodeCallbackSchema } from "#/auth/auth.types.js";
 import { EntraService } from "#/auth/entra.service.js";
+import { getMsalCacheKey } from "#/auth/msal.cache-key.js";
 import { createMsalClient } from "#/auth/msal.client.js";
 import { RedisCachePlugin } from "#/auth/msal.plugin.js";
 import config from "#/config.js";
@@ -54,6 +57,10 @@ export async function authCodeCallback(
       return;
     }
 
+    // establish a new session ID before token exchange so MSAL cache keys
+    // align with the authenticated session ID.
+    await regenerateSession(req);
+
     const entra = createEntraService(req);
 
     // exchange auth code for tokens and state
@@ -63,22 +70,13 @@ export async function authCodeCallback(
       return;
     }
 
-    // establish a new session ID
-    req.session.regenerate((error: Error | null | undefined) => {
-      if (error) {
-        next(error);
-        return;
-      }
-
-      const { account } = result.value;
-      Object.assign(req.session, { account, isAuthenticated: true });
-      res.redirect(returnTo ?? "/");
-    });
+    const { account } = result.value;
+    Object.assign(req.session, { account, isAuthenticated: true });
+    res.redirect(returnTo ?? "/");
   } catch (error) {
     next(error);
   }
 }
-
 /**
  * Initiates the Entra sign-in flow by generating a PKCE auth code URL.
  * @param req - The Express request.
@@ -125,6 +123,8 @@ export async function signIn(
  * @param next - The Express next function.
  */
 export function signOut(req: Request, res: Response, next: NextFunction): void {
+  const sessionId = req.sessionID;
+
   try {
     req.session.destroy((error: Error | null) => {
       if (error) {
@@ -132,8 +132,12 @@ export function signOut(req: Request, res: Response, next: NextFunction): void {
         return;
       }
 
-      res.clearCookie(config.session.name);
-      res.redirect("/");
+      void deleteMsalCache(sessionId)
+        .then(() => {
+          res.clearCookie(config.session.name);
+          res.redirect("/");
+        })
+        .catch(next);
     });
   } catch (error) {
     next(error);
@@ -152,6 +156,17 @@ function createEntraService(req: Request): EntraService {
 
   const msalClient = createMsalClient({ msalCachePlugin });
   return EntraService.create({ msalClient, requestHostname: req.hostname });
+}
+
+/**
+ * Deletes MSAL session cache from Redis when enabled.
+ * @param sessionId - The express-session ID.
+ */
+async function deleteMsalCache(sessionId: string): Promise<void> {
+  if (!config.redis.enabled) return;
+
+  const key = getMsalCacheKey(sessionId);
+  await getRedisClient().del(key);
 }
 
 /**
@@ -215,4 +230,17 @@ function parseSafeReturnToOverride(req: Request): string | undefined {
 
   const normalizedReturnTo = returnTo.trim();
   return isRelativePath(normalizedReturnTo) ? normalizedReturnTo : undefined;
+}
+
+/**
+ * Rotates the current express-session ID and replaces `req.session`.
+ * @param req - The Express request.
+ */
+async function regenerateSession(req: Request): Promise<void> {
+  const regenerate = promisify(
+    (callback: (error?: Error | null) => void): void => {
+      req.session.regenerate(callback);
+    },
+  );
+  await regenerate();
 }

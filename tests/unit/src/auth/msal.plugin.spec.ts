@@ -3,13 +3,14 @@ import type { RedisClientType } from "redis";
 import { expect } from "chai";
 import sinon from "sinon";
 
-import {  RedisCachePlugin } from "#/auth/msal.plugin.js";
 import { TokenCacheContext } from "@azure/msal-node";
+import { getMsalCacheKey } from "#/auth/msal.cache-key.js";
+import { RedisCachePlugin } from "#/auth/msal.plugin.js";
 describe("CachePlugin", () => {
   describe("Redis", () => {
     const SESSION_ID = "test-session-id-123";
     const TTL_SECONDS = 3600;
-    const CACHE_KEY = `msal:${SESSION_ID}`;
+    const CACHE_KEY = getMsalCacheKey(SESSION_ID);
     const SERIALIZED_CACHE = "serialized-cache-blob";
 
     let redisStub: sinon.SinonStubbedInstance<RedisClientType>;
