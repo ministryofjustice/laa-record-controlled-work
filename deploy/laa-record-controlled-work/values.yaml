@@ -20,6 +20,9 @@ ingress:
     external-dns.alpha.kubernetes.io/set-identifier: ""
     external-dns.alpha.kubernetes.io/aws-weight: "100"
 
+networkPolicy:
+  enabled: true
+
 rcw:
   replicaCount: 1
 
