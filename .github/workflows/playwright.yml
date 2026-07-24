@@ -1,4 +1,4 @@
-name: Playwright Tests
+name: Playwright
 on:
   workflow_dispatch: # Allow manual triggering only
   workflow_call: # Allow this workflow to be called by other workflows
@@ -9,19 +9,16 @@ on:
         default: ''
 
 jobs:
-  playwright:
-    name: Playwright Tests
-    timeout-minutes: 60
+  setup:
+    name: Setup
     runs-on: ubuntu-latest
-    # Mark this job as required for PR checks
-    outputs:
-      status: ${{ job.status }}
+    permissions:
+      contents: read
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           ref: ${{ inputs.sha || github.sha }}
-          fetch-depth: 0 # Fetch all history for proper change detection
 
       - name: Setup Node and Dependencies
         uses: ./.github/actions/setup-node
@@ -29,18 +26,52 @@ jobs:
       - name: Build application
         run: yarn build
 
-      - name: Install Playwright Chromium
-        run: yarn playwright install chromium --with-deps
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: build-artifacts
+          path: public/
+          retention-days: 1
+          overwrite: true
+
+  playwright:
+    name: Tests
+    needs: setup
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      status: ${{ job.status }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+        with:
+          ref: ${{ inputs.sha || github.sha }}
+
+      - name: Setup Node and Dependencies
+        uses: ./.github/actions/setup-node
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          name: build-artifacts
+          path: public/
 
       - name: Cache Playwright browsers
+        id: playwright-cache
         uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5
         with:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-chromium-${{ hashFiles('**/yarn.lock') }}
 
+      - name: Install Playwright Chromium
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: yarn playwright install chromium --with-deps
+
       - name: Set env vars from values
         run: |
-          yq '.rcw.env | to_entries[] | .key + "=" + (.value | tostring)' \
+          yq '.rcw.env | to_entries[] | select(.value != "") | .key + "=" + (.value | tostring)' \
             ./deploy/laa-record-controlled-work/values.yaml >> $GITHUB_ENV
 
       - name: Run Playwright tests
@@ -51,6 +82,7 @@ jobs:
           NODE_ENV: "test"
           SESSION_SECRET: "playwright-test-secret"
           SESSION_ENCRYPTION_KEY: "playwright-test-encryption-key"
+
       - name: Upload trace artifacts
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
@@ -66,35 +98,43 @@ jobs:
         run: echo "::error::Playwright tests failed! Check the test report for details."
 
   accessibility:
-    name: Accessibility Tests
+    name: Accessibility
+    needs: setup
     timeout-minutes: 30
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     outputs:
       status: ${{ job.status }}
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
-          fetch-depth: 0
+          ref: ${{ inputs.sha || github.sha }}
 
       - name: Setup Node and Dependencies
         uses: ./.github/actions/setup-node
 
-      - name: Build application
-        run: yarn build
-
-      - name: Install Playwright Chromium
-        run: yarn playwright install chromium --with-deps
+      - name: Download build artifacts
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          name: build-artifacts
+          path: public/
 
       - name: Cache Playwright browsers
+        id: playwright-cache
         uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5
         with:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-chromium-${{ hashFiles('**/yarn.lock') }}
 
+      - name: Install Playwright Chromium
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: yarn playwright install chromium --with-deps
+
       - name: Set env vars from values
         run: |
-          yq '.rcw.env | to_entries[] | .key + "=" + (.value | tostring)' \
+          yq '.rcw.env | to_entries[] | select(.value != "") | .key + "=" + (.value | tostring)' \
             ./deploy/laa-record-controlled-work/values.yaml >> $GITHUB_ENV
 
       - name: Run Accessibility Tests

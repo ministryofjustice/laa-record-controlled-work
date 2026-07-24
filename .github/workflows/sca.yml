@@ -1,9 +1,3 @@
-# Workflow: SCA ⚡️
-# Description:
-#   Scheduled and on-demand Security Composition Analysis run.
-#   - Triggers: daily cron, PRs to main, workflow dispatch, branch protection rule.
-#   - sca: Checks out repo, installs node, runs npm ci, executes ministryofjustice/sca action with dependency review configuration.
-
 name: SCA ⚡️
 run-name: Software Composition Analysis ⚡️
 
@@ -15,6 +9,8 @@ on:
     branches: ["main"]
 
   merge_group:
+    branches: ["main"]
+
 
   workflow_dispatch:
   workflow_call:
@@ -22,6 +18,7 @@ on:
 jobs:
   sca:
     name: Software Composition Analysis
+    if: github.event_name != 'merge_group'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
@@ -31,16 +28,10 @@ jobs:
       security-events: write
       actions: read
     steps:
-      - name: Skip in merge queue
-        if: github.event_name == 'merge_group'
-        run: echo "Skipping SCA in merge queue"
-
-      - name: Repository
-        if: github.event_name != 'merge_group'
+      - name: Checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
       - name: ⚡️ SCA
-        if: github.event_name != 'merge_group'
         uses: ministryofjustice/devsecops-actions/sca@7dc13c20e2bf541b8a77fa1320a04983b18846f6 # v1.6.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
