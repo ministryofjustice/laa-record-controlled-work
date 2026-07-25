@@ -5,7 +5,7 @@ import {
 import { expect } from "chai";
 import { createForgeTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
-import { checkAnswersStep } from "#/journeys/create-application/steps/99-check-answers.step.js";
+import { checkAnswersStep } from "#/journeys/create-application/steps/check-answers.step.js";
 
 describe("Check answers step", () => {
   const client = createForgeTestClient(

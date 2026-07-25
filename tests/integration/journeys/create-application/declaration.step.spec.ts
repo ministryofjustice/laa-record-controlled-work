@@ -4,8 +4,8 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
 
-import { declarationStep } from "#/journeys/create-application/steps/1-declaration.step.js";
-import { ecfStep } from "#/journeys/create-application/steps/2-ecf.step.js";
+import { declarationStep } from "#/journeys/create-application/steps/declaration.step.js";
+import { ecfStep } from "#/journeys/create-application/steps/ecf.step.js";
 import { createForgeTestClient } from "../../utils/helpers.js";
 
 describe("Declaration step", () => {
