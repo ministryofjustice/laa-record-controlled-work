@@ -5,6 +5,7 @@ import type {
 
 import { ApiResponseError, ApiValidationError } from "#/api/api.errors.js";
 import { Applications } from "#/api/clients/rcw/model/applications.zod.gen.js";
+import { AuthContext } from "#/authContext.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
 
@@ -13,7 +14,16 @@ export const loadYourCaseList =
     let response;
 
     try {
-      response = await deps.getApplications();
+      const authContext = AuthContext.fromForgeContext(context);
+      const headers = await authContext.appendAuthorizationHeader(
+        new Headers(),
+      );
+
+      const opts: RequestInit = {
+        headers,
+      };
+
+      response = await deps.getApplications(opts);
     } catch (error) {
       logger.error("Error fetching applications", error, {
         api: "getApplications",
