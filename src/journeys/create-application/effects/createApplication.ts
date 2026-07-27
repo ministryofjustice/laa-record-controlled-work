@@ -8,10 +8,24 @@ import { fromAnswers } from "#/journeys/create-application/Application.dto.js";
 import { isJourneySession } from "#/journeys/effects.js";
 import { logger } from "#/logger.js";
 
+import type { AccountInfo } from "@azure/msal-node";
+import type { Session } from "express-session";
+
+interface SessionInterface extends Session {
+  /** @property account User account, retrieved from MSAL/Entra after successful authentication. */
+  account: AccountInfo | undefined;
+  /** @property isAuthenticated True when the user has been successfully authenticated. */
+  isAuthenticated: boolean | undefined;
+  /** @property journeyDrafts Forge drafts of the user's current journey. */
+  journeyDrafts: Record<string, unknown> | undefined;
+  /** @property returnTo URI to return to after authentication flow completes. */
+  returnTo: string | undefined;
+}
+
 export const createApplication =
   (deps: CreateApplicationEffectsDeps) =>
-  (context: EffectFunctionContext, journeyCode: string): void => {
-    const session = context.getSession();
+  async (context: EffectFunctionContext, journeyCode: string): Promise<void> => {
+    const session = context.getSession() as SessionInterface;
     let response;
 
     if (!isJourneySession(session)) {
@@ -25,9 +39,16 @@ export const createApplication =
     }
 
     const applicationDto = fromAnswers(journeyAnswers);
-
     try {
-      response = deps.createApplication(applicationDto);
+      const token: string | undefined = session.account?.idToken;
+
+      const opts: RequestInit = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
+
+      response = await deps.createApplication(applicationDto, opts);
     } catch (error) {
       logger.error(
         `Error creating application for journey ${journeyCode}:`,
@@ -36,8 +57,10 @@ export const createApplication =
       throw error;
     }
 
-    const result = CreateApplicationResponseBody.safeParse(response);
+console.log({ response: response });
 
+    const result = CreateApplicationResponseBody.safeParse(response);
+ 
     if (!result.success) {
       logger.error(
         "createApplication response data failed validation",
@@ -48,4 +71,5 @@ export const createApplication =
 
     context.setData("caseId", result.data.id);
 
+    console.log({ result: result });
   };
