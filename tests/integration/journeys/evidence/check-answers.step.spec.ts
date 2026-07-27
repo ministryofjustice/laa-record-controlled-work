@@ -26,7 +26,7 @@ describe("Check answers step", () => {
         taxCreditsEvidence: [],
         incomeEvidence: ["wageSlips", "taxCalculationSheet"],
         housingCostsEvidence: [],
-        capitalEvidence: ["bankStatement", "shareCertificate"],
+        capitalEvidence: ["bankStatementCapital", "shareCertificate"],
       },
     },
   };

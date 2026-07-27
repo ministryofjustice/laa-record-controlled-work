@@ -237,8 +237,8 @@ const evidenceOfCapitalList = NunjucksGenerators.String({
   data: {
     capitalEvidence: Answer("capitalEvidence"),
     evidenceTypeLabels: {
-      bankStatementsCapital: t(
-        "journeys.evidence.evidenceOfCapital.evidenceTypes.bankStatementsCapital",
+      bankStatementCapital: t(
+        "journeys.evidence.evidenceOfCapital.evidenceTypes.bankStatementCapital",
       ),
       premiumBondsStatement: t(
         "journeys.evidence.evidenceOfCapital.evidenceTypes.premiumBondsStatement",

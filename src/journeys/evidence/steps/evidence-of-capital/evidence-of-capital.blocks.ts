@@ -27,9 +27,9 @@ export const capitalEvidenceGroup = GovUKCheckboxInput({
   items: [
     {
       text: t(
-        "journeys.evidence.evidenceOfCapital.evidenceTypes.bankStatementsCapital",
+        "journeys.evidence.evidenceOfCapital.evidenceTypes.bankStatementCapital",
       ),
-      value: "bankStatementsCapital",
+      value: "bankStatementCapital",
     },
     {
       text: t(

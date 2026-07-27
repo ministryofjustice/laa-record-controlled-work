@@ -313,7 +313,7 @@
         "title": "Evidence of your client's capital",
         "hint": "Select all that apply.",
         "evidenceTypes": {
-          "bankStatementsCapital": "Bank statement",
+          "bankStatementCapital": "Bank statement",
           "savingsCertificatePassbook": "National savings certificate or passbook",
           "premiumBondsStatement": "Premium bonds statement",
           "shareCertificate": "Share certificate"
