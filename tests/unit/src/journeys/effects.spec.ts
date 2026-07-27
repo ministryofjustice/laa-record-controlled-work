@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { describe, it } from "mocha";
 import { createForgeTestClient } from "../../../integration/utils/helpers.js";
-import { ecfStep } from "#/journeys/create-application/steps/1-ecf.step.js";
+import { ecfStep } from "#/journeys/create-application/steps/ecf.step.js";
 import { TestRenderResult } from "@ministryofjustice/hmpps-forge/core/testing";
 import { JourneyEffects } from "#/journeys/effects.js";
 import { access, step } from "@ministryofjustice/hmpps-forge/core/authoring";
@@ -37,7 +37,7 @@ const clearAnswerStep = step({
 
 const client = createForgeTestClient(
   "Record new case",
-  "/create-application/",
+  "/cases/new/",
   ecfStep("testJourney"),
   clearDraftStep,
   clearAnswerStep,
@@ -50,7 +50,7 @@ beforeEach(() => {
 
 describe("SaveDraftAnswers", () => {
   it("persists draft answers in the session under the journey key", async () => {
-    await client.post("/create-application/ecf", {
+    await client.post("/cases/new/ecf", {
       session,
       body: { ecf: "yes" },
     });
@@ -67,7 +67,7 @@ describe("SaveDraftAnswers", () => {
       anotherJourney: { someAnswer: "yes" },
     };
 
-    await client.post("/create-application/ecf", {
+    await client.post("/cases/new/ecf", {
       session,
       body: { ecf: "yes" },
     });
@@ -86,7 +86,7 @@ describe("SaveDraftAnswers", () => {
       testJourney: { existingAnswer: "foo" },
     };
 
-    await client.post("/create-application/ecf", {
+    await client.post("/cases/new/ecf", {
       session,
       body: { ecf: "yes" },
     });
@@ -105,7 +105,7 @@ describe("SaveDraftAnswers", () => {
       testJourney: { ecf: "no" },
     };
 
-    await client.post("/create-application/ecf", {
+    await client.post("/cases/new/ecf", {
       session,
       body: { ecf: "yes" },
     });
@@ -125,7 +125,7 @@ describe("LoadDraftAnswers", () => {
       testJourney: { ecf: "yes" },
     };
 
-    const result = await client.get("/create-application/ecf", {
+    const result = await client.get("/cases/new/ecf", {
       session,
     });
     expect(result.type).to.equal("render");
@@ -139,7 +139,7 @@ describe("LoadDraftAnswers", () => {
     session.journeyDrafts = {
       testJourney: {},
     };
-    const result = await client.get("/create-application/ecf", {
+    const result = await client.get("/cases/new/ecf", {
       session,
     });
     expect(result.type).to.equal("render");
@@ -156,7 +156,7 @@ describe("ClearAllDraftAnswers", () => {
       testJourney: { ecf: "yes" },
     };
 
-    await client.get("/create-application/clear-draft", { session });
+    await client.get("/cases/new/clear-draft", { session });
 
     const drafts = session.journeyDrafts as Record<string, unknown>;
     expect(drafts.testJourney).to.be.undefined;
@@ -168,7 +168,7 @@ describe("ClearAllDraftAnswers", () => {
       anotherJourney: { someAnswer: "yes" },
     };
 
-    await client.get("/create-application/clear-draft", { session });
+    await client.get("/cases/new/clear-draft", { session });
 
     const drafts = session.journeyDrafts as Record<string, unknown>;
     expect(
@@ -179,7 +179,7 @@ describe("ClearAllDraftAnswers", () => {
   it("does nothing when no draft exists for the journey", async () => {
     session.journeyDrafts = { anotherJourney: { someAnswer: "yes" } };
 
-    await client.get("/create-application/clear-draft", { session });
+    await client.get("/cases/new/clear-draft", { session });
 
     const drafts = session.journeyDrafts as Record<string, unknown>;
     expect(drafts.anotherJourney).to.exist;
@@ -196,7 +196,7 @@ describe("ClearFieldAnswers", () => {
       },
     };
 
-    await client.get("/create-application/clear-answers", { session });
+    await client.get("/cases/new/clear-answers", { session });
     const drafts = session.journeyDrafts as Record<string, unknown>;
     expect(
       (drafts.testJourney as Record<string, unknown>).adressLine1,

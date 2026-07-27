@@ -3,7 +3,8 @@ import {
   GovUKBackLink,
   GovUKButton,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
-import { t } from "i18next";
+
+import { t } from "#/lib/i18n.js";
 
 export const backLink = (url: string): GovUKBackLink =>
   GovUKBackLink({

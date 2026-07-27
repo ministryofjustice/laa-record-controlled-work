@@ -17,10 +17,11 @@ import {
   JourneyEffects,
   JourneyEffectsImplementations,
 } from "#/journeys/effects.js";
-import { YourCasesEffectImplementations, type YourCasesEffectsDeps } from "#/journeys/your-cases/your-cases.effects.js";
+import { YourCasesEffectsDeps } from "#/journeys/your-cases/your-cases.types.js";
+import { yourCasesEffectsRegistry } from "#/journeys/your-cases/your-cases.effects.js";
 
 /**
- * Creates a test client for a single-step journey under /create-application.
+ * Creates a test client for a single-step journey under /cases/new.
  * @param {...any} steps - Step definitions to include in the test journey.
  * @returns {ForgeTestClient} A configured test client.
  */
@@ -57,7 +58,7 @@ export function createForgeTestClient(
 }
 
 /**
- * Creates a test client for a single-step journey under /case-list.
+ * Creates a test client for a single-step journey under /cases.
  * @param {Record<string, FunctionEvaluator>} mockYourCasesEffectsDeps - mock implementations for the journey's effect functions
  * @param {...any} steps - Step definitions to include in the test journey.
  * @returns {ForgeTestClient} A configured test client.
@@ -66,9 +67,10 @@ export function createForgeTestClientForCaseList(
   mockYourCasesEffectsDeps: YourCasesEffectsDeps,
   ...steps: StepDefinition[]
 ): ForgeTestClient {
+  
   const testJourney = journey({
     code: "yourCases",
-    path: "/your-cases",
+    path: "/",
     reachability: { disableReachabilityChecks: true },
     steps,
     title: "Your Cases",
@@ -76,7 +78,7 @@ export function createForgeTestClientForCaseList(
   });
 
   const testPackage = createTestPackage({
-    functions: YourCasesEffectImplementations,
+    functions: yourCasesEffectsRegistry,
     journey: testJourney,
   });
 

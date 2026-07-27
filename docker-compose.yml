@@ -85,12 +85,13 @@ services:
       DISABLE_SECURE_COOKIES: true
 
       CCQ_MODE: embedded
+      CCQ_EMBEDDED_LAYOUT: rcw/application
       REDIS_URL: redis://redis-ccq:6379
       HOST_SERVICE_URL: http://rcw:3000
 
   redis-rcw:
     container_name: rcw-session-redis
-    image: "redis:8.8-alpine@sha256:9d317178eceac8454a2284a9e6df2466b93c745529947f0cd42a0fa9609d7005"
+    image: "redis:8.8-alpine@sha256:8096655e437712b07503796fb64d81359256cfcff0ab29d95a7da72863786efb"
     ports:
       - 6379:6379
     command: >
@@ -107,7 +108,7 @@ services:
 
   redis-ccq:
     container_name: rcw-ccq-cache-redis
-    image: "redis:8.8-alpine@sha256:9d317178eceac8454a2284a9e6df2466b93c745529947f0cd42a0fa9609d7005"
+    image: "redis:8.8-alpine@sha256:8096655e437712b07503796fb64d81359256cfcff0ab29d95a7da72863786efb"
     ports:
       - 6380:6379
     command: >

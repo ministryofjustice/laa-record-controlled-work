@@ -20,13 +20,16 @@ ingress:
     external-dns.alpha.kubernetes.io/set-identifier: ""
     external-dns.alpha.kubernetes.io/aws-weight: "100"
 
+networkPolicy:
+  enabled: true
+
 rcw:
   replicaCount: 1
 
   image:
     repository: nginx
     pullPolicy: Always
-    tag: "@sha256:fa25dc4482506b0786a17a167b25348e6ca303ae0213404416db35441c75af29"
+    tag: "@sha256:5a88c9c45479443d7be2eadc894b4ed0a9801bae03d97a5760ae13b5c2005942"
 
   imagePullSecrets: []
   podAnnotations: {}
@@ -116,7 +119,7 @@ rcw:
     RATE_LIMIT_MAX: 100
     RATE_WINDOW_MS: 900000
     NODE_ENV: ""
-    API_BASE_URL: ""
+    RCW_API_BASE_URL: ""
     ENTRA_AUTHORITY_BASE_URL: "https://login.microsoftonline.com/"
     ENTRA_REDIRECT_URI: ""
     REDIS_ENABLED: true  
@@ -154,7 +157,9 @@ ccq:
     RAILS_ENV: production
     RAILS_SERVE_STATIC_FILES: "true"
     RAILS_LOG_TO_STDOUT: "true"
+
     CCQ_MODE: embedded
+    CCQ_EMBEDDED_LAYOUT: rcw/application
 
   resources:
     limits:
@@ -171,7 +176,7 @@ nginx:
     # Overridden at deploy time to ECR; see deploy.sh and docker-images.env
     repository: nginxinc/nginx-unprivileged
     pullPolicy: Always
-    tag: alpine@sha256:a718212f9cf21e241f14067333000a3f0930292f5354fe0db269e9a2a2596b9e
+    tag: alpine@sha256:59ccf0943b0b8e8d9e6ea9039a39555730f544701a655c596f7df7d096c593f5
 
   resources:
     limits:

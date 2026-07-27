@@ -69,7 +69,7 @@ describe("Evidence of expenditure step", () => {
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
       expect(redirectResult.url).to.equal(
-        "/cases/evidence/check-answers",
+        "/cases/evidence/evidence-of-capital",
       );
     });
   });

@@ -3,10 +3,10 @@ import { describe, it } from "mocha";
 import { yourCasesStep } from "#/journeys/your-cases/steps/your-cases/your-cases.step.js";
 import sinon from "sinon";
 import { createForgeTestClientForCaseList } from "../../../../integration/utils/helpers.js";
-import { getGetApplicationsResponseMock } from "../../../../mocks/api/fakers/applications/applications.faker.gen.js";
 import { TestRenderResult } from "@ministryofjustice/hmpps-forge/core/testing";
 import { ApiResponseError, ApiValidationError } from "#/api/api.errors.js";
 import { logger } from "#/logger.js";
+import { getGetApplicationsResponseMock } from "../../../../mocks/api/rcw/fakers/applications/applications.faker.gen.js";
 
 const mockData = getGetApplicationsResponseMock();
 
@@ -21,19 +21,19 @@ describe("LoadYourCaseList", () => {
         .resolves({ status: 200, data: mockData });
       client = createForgeTestClientForCaseList(
         { getApplications: getApplicationsStub },
-        yourCasesStep(),
+        yourCasesStep,
       );
     });
 
     after(() => sinon.restore());
 
     it("calls getApplications", async () => {
-      await client.get("/your-cases");
+      await client.get("/cases");
       expect(getApplicationsStub.calledOnce).to.be.true;
     });
 
     it("sets caseList in context", async () => {
-      const result = await client.get("/your-cases");
+      const result = await client.get("/cases");
       expect(result.type).to.equal("render");
       const renderResult = result as TestRenderResult;
       expect(renderResult.context.data.caseList).to.deep.equal(mockData);
@@ -50,10 +50,10 @@ describe("LoadYourCaseList", () => {
     ): Promise<unknown> {
       const client = createForgeTestClientForCaseList(
         { getApplications: stub },
-        yourCasesStep(),
+        yourCasesStep,
       );
       try {
-        await client.get("/your-cases");
+        await client.get("/cases");
       } catch (err) {
         return err;
       }
