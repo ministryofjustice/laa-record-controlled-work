@@ -4,7 +4,7 @@ import { yourCasesIneligibleStep } from "#/journeys/your-cases/steps/your-cases-
 import { createForgeTestClientForCaseList } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import sinon from "sinon";
-import { getGetApplicationsResponseMock } from "../../../mocks/api/fakers/applications/applications.faker.gen.js";
+import { getGetApplicationsResponseMock } from "../../../mocks/api/rcw/fakers/applications/applications.faker.gen.js";
 
 describe("Your Cases Ineligible step", () => {
   let getApplicationsStub: sinon.SinonStub;

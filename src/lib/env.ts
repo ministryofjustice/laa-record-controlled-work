@@ -4,7 +4,6 @@ import z from "zod";
 import { logger } from "#/logger.js";
 
 const optionalEnvSchema = z.object({
-  API_BASE_URL: z.url().optional(),
   API_MODE: z.enum(["msw", "api"]).optional(),
   AUTH_RATE_LIMIT_MAX: z.coerce.number().optional(),
   CONTACT_EMAIL: z.string().optional(),
@@ -16,6 +15,7 @@ const optionalEnvSchema = z.object({
   RATE_WINDOW_MS: z.coerce.number().optional(),
   RATELIMIT_HEADERS_ENABLED: z.string().optional(),
   RATELIMIT_STORAGE_URI: z.string().optional(),
+  RCW_API_BASE_URL: z.url().optional(),
   REDIS_ENABLED: z.string().optional(),
   REDIS_URL: z.url().optional(),
   SERVICE_NAME: z.string().optional(),

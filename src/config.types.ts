@@ -1,8 +1,10 @@
 import type { SessionOptions } from "express-session";
 
 export interface ApiConfig {
-  baseUrl: string;
   mode: string;
+  rcw: {
+    baseUrl: string;
+  };
 }
 
 export interface AppConfig {
