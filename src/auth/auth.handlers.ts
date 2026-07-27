@@ -1,5 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 
+import { promisify } from "node:util";
+
 import {
   MissingAuthCodeRequestError,
   StateMismatchError,
@@ -54,7 +56,11 @@ export async function authCodeCallback(
       return;
     }
 
-    const entra = createEntraService(req);
+    // establish a new session ID before token exchange so MSAL cache keys
+    // align with the authenticated session ID.
+    await regenerateSession(req);
+
+    const entra = EntraService.create({ sessionId: req.sessionID });
 
     // exchange auth code for tokens and state
     const result = await entra.exchangeAuthCode(data.code, authCodeRequest);
@@ -63,17 +69,9 @@ export async function authCodeCallback(
       return;
     }
 
-    // establish a new session ID
-    req.session.regenerate((error: Error | null | undefined) => {
-      if (error) {
-        next(error);
-        return;
-      }
-
-      const { account } = result.value;
-      Object.assign(req.session, { account, isAuthenticated: true });
-      res.redirect(returnTo ?? "/");
-    });
+    const { account } = result.value;
+    Object.assign(req.session, { account, isAuthenticated: true });
+    res.redirect(returnTo ?? "/");
   } catch (error) {
     next(error);
   }
@@ -151,7 +149,7 @@ function createEntraService(req: Request): EntraService {
     : undefined;
 
   const msalClient = createMsalClient({ msalCachePlugin });
-  return EntraService.create({ msalClient, requestHostname: req.hostname });
+  return EntraService.create({ msalClient });
 }
 
 /**
@@ -215,4 +213,17 @@ function parseSafeReturnToOverride(req: Request): string | undefined {
 
   const normalizedReturnTo = returnTo.trim();
   return isRelativePath(normalizedReturnTo) ? normalizedReturnTo : undefined;
+}
+
+/**
+ * Rotates the current express-session ID and replaces `req.session`.
+ * @param req - The Express request.
+ */
+async function regenerateSession(req: Request): Promise<void> {
+  const regenerate = promisify(
+    (callback: (error?: Error | null) => void): void => {
+      req.session.regenerate(callback);
+    },
+  );
+  await regenerate();
 }
