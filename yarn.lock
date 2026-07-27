@@ -895,6 +895,31 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@orval/core@npm:^8.21.0":
+  version: 8.22.0
+  resolution: "@orval/core@npm:8.22.0"
+  dependencies:
+    "@scalar/openapi-types": "npm:0.8.0"
+    acorn: "npm:^8.15.0"
+    compare-versions: "npm:^6.1.1"
+    debug: "npm:^4.4.3"
+    esbuild: "npm:^0.28.0"
+    esutils: "npm:2.0.3"
+    fs-extra: "npm:^11.3.2"
+    jiti: "npm:^2.6.1"
+    jsesc: "npm:^3.0.0"
+    remeda: "npm:^2.33.6"
+    tinyglobby: "npm:^0.2.16"
+    typedoc: "npm:^0.28.19"
+  peerDependencies:
+    "@faker-js/faker": ">=10"
+  peerDependenciesMeta:
+    "@faker-js/faker":
+      optional: true
+  checksum: 10c0/ac73528d71a9b9dbb78707acaff2391536c2c26d28d71cfc9e13a79ed1a448c6d701e6ab7a8546ef879408166bfcb1105326890a0ccd7c7aa743bc41f3d59375
+  languageName: node
+  linkType: hard
+
 "@orval/effect@npm:8.21.0":
   version: 8.21.0
   resolution: "@orval/effect@npm:8.21.0"
@@ -5232,6 +5257,7 @@ __metadata:
     "@j178/prek": "npm:^0.4.9"
     "@ministryofjustice/frontend": "npm:9.0.0"
     "@ministryofjustice/hmpps-forge": "npm:^0.3.1"
+    "@orval/core": "npm:^8.21.0"
     "@playwright/test": "npm:^1.61.1"
     "@types/chai": "npm:^5.2.3"
     "@types/chai-as-promised": "npm:^8.0.2"

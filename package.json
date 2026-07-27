@@ -65,6 +65,7 @@
     "@axe-core/playwright": "^4.12.1",
     "@faker-js/faker": "^10.5.0",
     "@j178/prek": "^0.4.9",
+    "@orval/core": "^8.21.0",
     "@playwright/test": "^1.61.1",
     "@types/chai": "^5.2.3",
     "@types/chai-as-promised": "^8.0.2",
