@@ -57,7 +57,7 @@ jobs:
       - name: Generate Orval Code
         run: yarn api:generate
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Check for API specification drift
         run: |
