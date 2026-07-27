@@ -7,7 +7,7 @@ import type {
 import type { PKCECodes } from "#/auth/auth.types.js";
 
 declare module "express-session" {
-  interface SessionData {
+  interface SessionData extends Session {
     account?: AccountInfo;
     authCodeRequest?: AuthorizationCodeRequest;
     authCodeUrlRequest?: AuthorizationUrlRequest;
