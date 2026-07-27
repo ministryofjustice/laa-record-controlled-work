@@ -52,15 +52,24 @@ describe("fetcher()", () => {
     sinon.assert.calledWithMatch(fetchStub, `${BASE_URL}/resource/1`);
   });
 
-  it("merges caller-supplied headers with the Authorization header", async () => {
+  it("passes caller-supplied headers through unchanged", async () => {
     await fetcher("/test", {
       method: "GET",
-      headers: { "x-custom": "value" },
+      headers: {
+        Authorization: "Bearer explicit-token",
+        "x-custom": "value",
+      },
     });
 
     expect(fetchStub.calledOnce).to.be.true;
-    sinon.assert.calledWithMatch(fetchStub, `${BASE_URL}/test`, {
-      headers: { "x-custom": "value" },
-    });
+    const [, requestInit] = fetchStub.firstCall.args as [
+      string,
+      RequestInit,
+    ];
+
+    expect(new Headers(requestInit.headers).get("authorization")).to.equal(
+      "Bearer explicit-token",
+    );
+    expect(new Headers(requestInit.headers).get("x-custom")).to.equal("value");
   });
 });

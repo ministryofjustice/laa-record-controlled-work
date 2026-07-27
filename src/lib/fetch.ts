@@ -22,8 +22,7 @@ const getHeaders = (headers?: HeadersInit): Record<string, string> => {
   new Headers(headers).forEach((value, key) => {
     base[key] = value;
   });
-  // Spread passed headers over our defaults so that per-request
-  // values (e.g. Authorization: Bearer <token>) take precedence.
+
   return {
     ...base,
   };

@@ -11,7 +11,7 @@ import compression from "compression";
 import express from "express";
 import session from "express-session";
 
-import { getApplications } from "#/api/client/schema/applications/applications.gen.js";
+import { RcwApiClient } from "#/api/rcw-api.client.js";
 import authRouter from "#/auth/auth.routes.js";
 import config from "#/config.js";
 import { autocomplete } from "#/journeys/components/autocomplete/autocomplete.component.js";
@@ -30,6 +30,7 @@ import {
   createAuthLimiter,
   setupRateLimit,
 } from "#/middleware/setupRateLimit.js";
+import { setupRcwApiAuthContext } from "#/middleware/setupRcwApiAuthContext.js";
 import { setupRequestLogging } from "#/middleware/setupRequestLogging.js";
 import { standardMiddleware } from "#/middleware/standardMiddleware.js";
 import healthRouter from "#/routes/health.js";
@@ -79,16 +80,17 @@ const createApp = async (): Promise<express.Application> => {
   // Set up locale middleware for internationalization
   app.use(setupLocaleMiddleware);
 
+  const rcwApiAuthContextMiddleware = setupRcwApiAuthContext();
+  const rcwApiClient = RcwApiClient.create();
   // Set up Nunjucks as the template engine and forge
   const nunjucksEnv = setupNunjucks(app);
   const forge = new Forge({});
-
   forge
     .registerGlobalComponents(govukComponents)
     .registerGlobalComponents(mojComponents)
     .registerGlobalComponents([autocomplete])
     .registerGlobalFunctions(nunjucksFunctions)
-    .registerPackage(yourCases, { getApplications })
+    .registerPackage(yourCases, { rcwApiClient })
     .registerPackage(createApplication)
     .registerPackage(editApplication)
     .registerPackage(evidence);
@@ -116,6 +118,7 @@ const createApp = async (): Promise<express.Application> => {
 
   app.use("/auth", createAuthLimiter(config), authRouter);
   app.use(requireAuth);
+  app.use(rcwApiAuthContextMiddleware);
   app.use("/", indexRouter);
 
   // Enable live-reload middleware in development mode

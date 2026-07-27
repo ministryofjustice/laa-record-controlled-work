@@ -3,19 +3,17 @@ import { describe, it } from "mocha";
 import { yourCasesStep } from "#/journeys/your-cases/steps/your-cases/your-cases.step.js";
 import sinon from "sinon";
 import { createForgeTestClientForCaseList } from "../../../../integration/utils/helpers.js";
+import { RCW_API_AUTH_CONTEXT_STATE_KEY } from "#/api/rcw-api-auth-context.js";
 import { getGetApplicationsResponseMock } from "../../../../mocks/api/fakers/applications/applications.faker.gen.js";
 import { TestRenderResult } from "@ministryofjustice/hmpps-forge/core/testing";
 import { ApiResponseError, ApiValidationError } from "#/api/api.errors.js";
 import { logger } from "#/logger.js";
 
 const mockData = getGetApplicationsResponseMock();
-
-const authenticatedContext = {
-  session: {
-    account: {
-      idToken: "test-id-token",
-    }
-  }
+const requestState = {
+  [RCW_API_AUTH_CONTEXT_STATE_KEY]: {
+    getBearerToken: async () => "test-user-access-token",
+  },
 };
 
 describe("LoadYourCaseList", () => {
@@ -29,7 +27,7 @@ describe("LoadYourCaseList", () => {
         .resolves({ status: 200, data: mockData });
 
       client = createForgeTestClientForCaseList(
-        { getApplications: getApplicationsStub },
+        { rcwApiClient: { getApplications: getApplicationsStub } },
         yourCasesStep,
       );
     });
@@ -37,12 +35,12 @@ describe("LoadYourCaseList", () => {
     after(() => sinon.restore());
 
     it("calls getApplications", async () => {
-      await client.get("/cases", authenticatedContext);
+      await client.get("/cases", { state: requestState });
       expect(getApplicationsStub.calledOnce).to.be.true;
     });
 
     it("sets caseList in context", async () => {
-      const result = await client.get("/cases", authenticatedContext);
+      const result = await client.get("/cases", { state: requestState });
       expect(result.type).to.equal("render");
       const renderResult = result as TestRenderResult;
       expect(renderResult.context.data.caseList).to.deep.equal(mockData);
@@ -58,11 +56,11 @@ describe("LoadYourCaseList", () => {
       stub: sinon.SinonStub,
     ): Promise<unknown> {
       const client = createForgeTestClientForCaseList(
-        { getApplications: stub },
+        { rcwApiClient: { getApplications: stub } },
         yourCasesStep,
       );
       try {
-        await client.get("/cases", authenticatedContext);
+        await client.get("/cases", { state: requestState });
       } catch (err) {
         return err;
       }

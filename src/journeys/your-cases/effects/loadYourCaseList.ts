@@ -1,4 +1,3 @@
-import type { SessionInterface } from "#/app/session.types.js";
 import type {
   CaseListContext,
   YourCasesEffectsDeps,
@@ -6,7 +5,6 @@ import type {
 
 import { ApiResponseError, ApiValidationError } from "#/api/api.errors.js";
 import { Applications } from "#/api/client/model/applications.zod.gen.js";
-import { NotAuthenticatedError } from "#/auth/auth.errors.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
 
@@ -15,25 +13,7 @@ export const loadYourCaseList =
     let response;
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Defining correctly as our session definition.
-      const session = context.getSession() as SessionInterface;
-      const token: string | undefined = session.account?.idToken;
-
-      if (token === undefined) {
-        logger.error(
-          "Failed to get expected idToken from session, user may not be authenticated",
-          undefined,
-        );
-        throw new NotAuthenticatedError();
-      }
-
-      const opts: RequestInit = {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      };
-
-      response = await deps.getApplications(opts);
+      response = await deps.rcwApiClient.getApplications(context);
     } catch (error) {
       logger.error("Error fetching applications", error, {
         api: "getApplications",

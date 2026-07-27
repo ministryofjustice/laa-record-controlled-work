@@ -77,7 +77,13 @@ describe("Auth Handlers", () => {
 
       expect(res.status).to.equal(FOUND);
       expect(res.headers.location).to.equal(AUTH_CODE_URL);
-      expect(authServiceStub.initiateAuthCodeFlow.calledOnceWith(returnTo)).to.be.true;
+      expect(authServiceStub.initiateAuthCodeFlow.calledOnce).to.be.true;
+      expect(authServiceStub.initiateAuthCodeFlow.firstCall.firstArg).to.equal(
+        returnTo,
+      );
+      expect(authServiceStub.initiateAuthCodeFlow.firstCall.args[1]).to.have.property(
+        "callbackHostname",
+      );
     });
 
     it("ignores returnTo query parameter when it is not a safe app-relative path", async () => {
@@ -87,7 +93,13 @@ describe("Auth Handlers", () => {
 
       expect(res.status).to.equal(FOUND);
       expect(res.headers.location).to.equal(AUTH_CODE_URL);
-      expect(authServiceStub.initiateAuthCodeFlow.calledOnceWith(undefined)).to.be.true;
+      expect(authServiceStub.initiateAuthCodeFlow.calledOnce).to.be.true;
+      expect(authServiceStub.initiateAuthCodeFlow.firstCall.firstArg).to.equal(
+        undefined,
+      );
+      expect(authServiceStub.initiateAuthCodeFlow.firstCall.args[1]).to.have.property(
+        "callbackHostname",
+      );
     });
 
     it("calls next(error) when initiateAuthCodeFlow() fails", async () => {
