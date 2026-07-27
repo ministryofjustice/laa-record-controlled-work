@@ -19,15 +19,15 @@ export const subNavigation = MOJSubNavigation({
   items: [
     {
       active: true,
-      href: "/your-cases",
+      href: "/cases",
       text: t("pages.yourCases.tabs.inProgress"),
     },
     {
-      href: "/your-cases-recorded",
+      href: "/cases/recorded",
       text: t("pages.yourCases.tabs.recorded"),
     },
     {
-      href: "/your-cases-ineligible",
+      href: "/cases/ineligible",
       text: t("pages.yourCases.tabs.ineligible"),
     },
   ],
@@ -44,7 +44,7 @@ export const casesTable = (cases: ChainableRef): GovUKTable =>
       Iterator.Map([
         {
           html: Format(
-            '<a class="govuk-link" href="/cases/%1">%2</a>',
+            '<a class="govuk-link" href="/cases/%1/task-list/">%2</a>',
             Item().path("applicationRefNumber"),
             Item().path("name"),
           ),

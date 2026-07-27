@@ -10,17 +10,17 @@ import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 describe("Have A Home Address Step", () => {
   const client = createForgeTestClient(
     "Record new case",
-    "/create-application/",
+    "/cases/new/",
     haveAHomeAddressStep("testJourney"),
   );
 
-  describe("GET /create-application/have-a-home-address", () => {
+  describe("GET /cases/new/have-a-home-address", () => {
     let renderResult: TestRenderResult;
     let radioInput: RenderBlock;
 
     before(async () => {
       const result = await client.get(
-        "/create-application/have-a-home-address",
+        "/cases/new/have-a-home-address",
       );
       expect(result.type).to.equal("render");
       renderResult = result as TestRenderResult;
@@ -48,12 +48,12 @@ describe("Have A Home Address Step", () => {
     });
   });
 
-  describe("POST /create-application/have-a-home-address", () => {
+  describe("POST /cases/new/have-a-home-address", () => {
     const fieldCode = "haveAHomeAddress";
     
     it("should show validation error if no option is selected", async () => {
       const result = await client.post(
-        "/create-application/have-a-home-address",
+        "/cases/new/have-a-home-address",
       );
 
       expect(result.type).to.equal("render");
@@ -67,7 +67,7 @@ describe("Have A Home Address Step", () => {
 
     it("should redirect to Enter address manually step if yes", async () => {
       const result = await client.post(
-        "/create-application/have-a-home-address",
+        "/cases/new/have-a-home-address",
         {
           body: {
             haveAHomeAddress: "yes",
@@ -77,13 +77,13 @@ describe("Have A Home Address Step", () => {
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
       expect(redirectResult.url).to.equal(
-        "/create-application/enter-address-manually",
+        "/cases/new/enter-address-manually",
       );
     });
 
     it("should redirect to Need means assessment step if no", async () => {
       const result = await client.post(
-        "/create-application/have-a-home-address",
+        "/cases/new/have-a-home-address",
         {
           body: {
             haveAHomeAddress: "no",
@@ -93,7 +93,7 @@ describe("Have A Home Address Step", () => {
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
       expect(redirectResult.url).to.equal(
-        "/create-application/need-means-assessment",
+        "/cases/new/need-means-assessment",
       );
     });
   });

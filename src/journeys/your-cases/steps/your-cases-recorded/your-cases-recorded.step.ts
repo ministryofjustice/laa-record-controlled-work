@@ -29,6 +29,6 @@ export const yourCasesRecordedStep = step({
       effects: [YourCasesEffects.loadYourCaseList()],
     }),
   ],
-  path: "/your-cases-recorded",
+  path: "/cases/recorded",
   title: t("pages.yourCases.pageTitle"),
 });

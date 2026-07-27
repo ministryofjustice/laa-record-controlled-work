@@ -10,18 +10,16 @@ import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 describe("Legal aid before 6 months step", () => {
   const client = createForgeTestClient(
     "Record new case",
-    "/create-application/",
+    "/cases/new/",
     legalAidLast6MonthsStep("testJourney"),
   );
 
-  describe("GET /create-application/legal-aid-last-6-months", () => {
+  describe("GET /cases/new/legal-aid-last-6-months", () => {
     let renderResult: TestRenderResult;
     let radioInput: RenderBlock;
 
     before(async () => {
-      const result = await client.get(
-        "/create-application/legal-aid-last-6-months",
-      );
+      const result = await client.get("/cases/new/legal-aid-last-6-months");
       expect(result.type).to.equal("render");
       renderResult = result as TestRenderResult;
       [radioInput] = renderResult.getBlocksByVariant("govukRadioInput");
@@ -41,13 +39,13 @@ describe("Legal aid before 6 months step", () => {
     });
   });
 
-  describe("POST /create-application/legal-aid-last-6-months", () => {
+  describe("POST /cases/new/legal-aid-last-6-months", () => {
     const legalAidLast6MonthsfieldCode = "legalAidLast6Months";
     const reasonForYesFieldCode = "reasonForYes";
 
     it("should show validation error if no option is selected", async () => {
       const result = await client.post(
-        "/create-application/legal-aid-last-6-months",
+        "/cases/new/legal-aid-last-6-months",
       );
       expect(result.type).to.equal("render");
       const renderResult = result as TestRenderResult;
@@ -61,7 +59,7 @@ describe("Legal aid before 6 months step", () => {
 
     it("should show validation error if yes is selected but no reason is given", async () => {
       const result = await client.post(
-        "/create-application/legal-aid-last-6-months",
+        "/cases/new/legal-aid-last-6-months",
         {
           body: { legalAidLast6Months: "yes" },
         },
@@ -78,7 +76,7 @@ describe("Legal aid before 6 months step", () => {
 
     it("should redirect to legal aid last 6 months step if yes", async () => {
       const result = await client.post(
-        "/create-application/legal-aid-last-6-months",
+        "/cases/new/legal-aid-last-6-months",
         {
           body: {
             legalAidLast6Months: "yes",
@@ -88,12 +86,12 @@ describe("Legal aid before 6 months step", () => {
       );
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
-      expect(redirectResult.url).to.equal("/create-application/client-details");
+      expect(redirectResult.url).to.equal("/cases/new/client-details");
     });
 
     it("should redirect to client details step if no, different matter", async () => {
       const result = await client.post(
-        "/create-application/legal-aid-last-6-months",
+        "/cases/new/legal-aid-last-6-months",
         {
           body: {
             legalAidLast6Months: "no",
@@ -102,7 +100,7 @@ describe("Legal aid before 6 months step", () => {
       );
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
-      expect(redirectResult.url).to.equal("/create-application/client-details");
+      expect(redirectResult.url).to.equal("/cases/new/client-details");
     });
   });
 });

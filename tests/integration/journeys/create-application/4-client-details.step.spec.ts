@@ -10,18 +10,18 @@ import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 describe("Client details step", () => {
   const client = createForgeTestClient(
     "Record new case",
-    "/create-application/",
+    "/cases/new/",
     clientDetailsStep("testJourney"),
   );
 
-  describe("GET /create-application/client-details", () => {
+  describe("GET /cases/new/client-details", () => {
     let renderResult: TestRenderResult;
     let firstNameInput: RenderBlock;
     let lastNameInput: RenderBlock;
     let dateInput: RenderBlock;
 
     before(async () => {
-      const result = await client.get("/create-application/client-details");
+      const result = await client.get("/cases/new/client-details");
       expect(result.type).to.equal("render");
       renderResult = result as TestRenderResult;
       [firstNameInput, lastNameInput] =
@@ -56,9 +56,9 @@ describe("Client details step", () => {
     });
   });
 
-  describe("POST /create-application/client-details", () => {
+  describe("POST /cases/new/client-details", () => {
     it("should redirect to the check answers page when given valid data", async () => {
-      const result = await client.post("/create-application/client-details", {
+      const result = await client.post("/cases/new/client-details", {
         body: {
           firstName: "John",
           lastName: "Doe",
@@ -68,7 +68,7 @@ describe("Client details step", () => {
 
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
-      expect(redirectResult.url).to.equal("/create-application/ni-number");
+      expect(redirectResult.url).to.equal("/cases/new/ni-number");
     });
 
     const validationErrorTests: Array<{
@@ -176,7 +176,7 @@ describe("Client details step", () => {
       fieldCode,
     } of validationErrorTests) {
       it(`should show validation error when ${description}`, async () => {
-        const result = await client.post("/create-application/client-details", {
+        const result = await client.post("/cases/new/client-details", {
           body: body as unknown as Record<string, string | string[]>,
         });
 

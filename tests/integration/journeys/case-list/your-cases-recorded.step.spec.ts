@@ -25,14 +25,14 @@ describe("Your Cases recorded step", () => {
     sinon.restore();
   });
 
-  describe("GET /your-cases-recorded", () => {
+  describe("GET /cases/recorded", () => {
     let renderResult: TestRenderResult;
     let recordButton: RenderBlock;
     let table: RenderBlock;
     let subNavigation: RenderBlock;
 
     before(async () => {
-      const result = await client.get("/your-cases-recorded");
+      const result = await client.get("/cases/recorded");
       expect(result.type).to.equal("render");
       renderResult = result as TestRenderResult;
       [recordButton] = renderResult.getBlocksByVariant("govukLinkButton");
@@ -59,12 +59,12 @@ describe("Your Cases recorded step", () => {
         active?: boolean;
       }[];
       expect(items[0].text).to.equal("In progress");
-      expect(items[0].href).to.equal("/your-cases");
+      expect(items[0].href).to.equal("/cases");
       expect(items[1].text).to.equal("Recorded");
-      expect(items[1].href).to.equal("/your-cases-recorded");
+      expect(items[1].href).to.equal("/cases/recorded");
       expect(items[1].active).to.equal(true);
       expect(items[2].text).to.equal("Ineligible");
-      expect(items[2].href).to.equal("/your-cases-ineligible");
+      expect(items[2].href).to.equal("/cases/ineligible");
     });
 
     it("renders a table with the correct columns", () => {
@@ -102,7 +102,7 @@ describe("Your Cases recorded step", () => {
     it("renders empty value string when getApplications returns an empty array", async () => {
       getApplicationsStub.resolves({ status: 200, data: [] });
 
-      const result = await client.get("/your-cases-recorded");
+      const result = await client.get("/cases/recorded");
       expect(result.type).to.equal("render");
       const renderResult = result as TestRenderResult;
       const allTables = renderResult.getBlocksByVariant("govukTable");

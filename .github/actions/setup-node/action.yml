@@ -4,24 +4,28 @@ description: Setup Node.js, enable Corepack, and install dependencies
 runs:
   using: "composite"
   steps:
-    - name: Read Node version from .nvmrc
-      run: echo "NODE_VERSION=$(cat .nvmrc)" >> $GITHUB_ENV
-      shell: bash
 
     - name: Set up Node.js
       uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
       with:
-        node-version: ${{ env.NODE_VERSION }}
+        node-version-file: .nvmrc
 
-    - name: Enable Corepack and prepare Yarn
-      run: |
-        corepack enable
-        corepack prepare yarn@4.9.2 --activate
+    - name: Enable Corepack
+      run: corepack enable
       shell: bash
 
+    - name: Cache node_modules
+      id: node-modules-cache
+      uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
+      with:
+        path: node_modules
+        key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
+
     - name: SLSA Supply Chain Security
+      if: steps.node-modules-cache.outputs.cache-hit != 'true'
       uses: ministryofjustice/devsecops-actions/sca/slsa@4cd163be7859cd130800d6719d925318826038ea
 
     - name: Install dependencies
+      if: steps.node-modules-cache.outputs.cache-hit != 'true'
       run: yarn install --immutable
       shell: bash

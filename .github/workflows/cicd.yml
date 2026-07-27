@@ -10,12 +10,25 @@ on:
   workflow_dispatch: # Allows manual triggering of the workflow
 
 jobs:
-  code-linting:
-    name: Code Linting
+  setup:
+    name: Install dependencies
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Setup Node and Dependencies
+        uses: ./.github/actions/setup-node
+
+  code-linting:
+    name: Code Linting
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
@@ -30,10 +43,11 @@ jobs:
 
   verify-api-code-generation:
     name: Verify API Code Generation
+    needs: setup
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
@@ -61,10 +75,11 @@ jobs:
 
   code-security-audit:
     name: Code Security Audit
+    needs: setup
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
@@ -79,7 +94,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
@@ -98,18 +113,20 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
   snyk-infra:
-    name: Snyk Infra Scan
+    name: Snyk
     uses: ./.github/workflows/snyk-infra.yml
     secrets: inherit
 
-  mocha-unit-tests:
-    name: Mocha Unit Tests
+  mocha-tests:
+    name: Tests
+    needs: setup
     uses: ./.github/workflows/mocha.yml
     with:
       sha: ${{ github.event.pull_request.head.sha || github.sha }}
 
   playwright:
-    name: Playwright Tests
+    name: Playwright
+    needs: setup
     uses: ./.github/workflows/playwright.yml
     with:
       sha: ${{ github.event.pull_request.head.sha || github.sha }}
@@ -122,7 +139,7 @@ jobs:
       contents: read
     steps:
       - name: Checkout code
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
@@ -164,12 +181,12 @@ jobs:
       - code-security-audit
       - snyk
       - snyk-infra
-      - mocha-unit-tests
+      - mocha-tests
       - playwright
       - build-image
     steps:
       - name: Checkout code
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       - name: Notify Slack on CI failure
         uses: ./.github/actions/notify-slack
@@ -186,6 +203,7 @@ jobs:
             Run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/attempts/${{ github.run_attempt }}
 
   deploy-uat:
+    name: Deploy
     if: github.event_name != 'merge_group' && !(github.event_name == 'pull_request' && github.actor == 'renovate[bot]')
     uses: ./.github/workflows/deploy-environment.yml
     with:
@@ -200,7 +218,7 @@ jobs:
       - code-security-audit
       - snyk
       - build-image
-      - mocha-unit-tests
+      - mocha-tests
       - playwright
       - snyk-infra
     secrets: inherit

@@ -29,6 +29,6 @@ export const yourCasesStep = step({
       effects: [YourCasesEffects.loadYourCaseList()],
     }),
   ],
-  path: "/your-cases",
+  path: "/cases",
   title: t("pages.yourCases.pageTitle"),
 });

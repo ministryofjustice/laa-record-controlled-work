@@ -29,6 +29,6 @@ export const yourCasesIneligibleStep = step({
       effects: [YourCasesEffects.loadYourCaseList()],
     }),
   ],
-  path: "/your-cases-ineligible",
+  path: "/cases/ineligible",
   title: t("pages.yourCases.pageTitle"),
 });

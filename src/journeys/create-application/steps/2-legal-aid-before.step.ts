@@ -24,7 +24,7 @@ export const legalAidBeforeStep = (
   step({
     blocks: [
       GovUKBackLink({
-        href: "/create-application/ecf",
+        href: "/cases/new/ecf",
       }),
       HtmlBlock({
         content: `<span class="govuk-caption-l">${t("journeys.createApplication.caption")}</span>`,

@@ -18,16 +18,16 @@ import { t } from "#/lib/i18n.js";
 export const subNavigation = MOJSubNavigation({
   items: [
     {
-      href: "/your-cases",
+      href: "/cases",
       text: t("pages.yourCases.tabs.inProgress"),
     },
     {
       active: true,
-      href: "/your-cases-recorded",
+      href: "/cases/recorded",
       text: t("pages.yourCases.tabs.recorded"),
     },
     {
-      href: "/your-cases-ineligible",
+      href: "/cases/ineligible",
       text: t("pages.yourCases.tabs.ineligible"),
     },
   ],
