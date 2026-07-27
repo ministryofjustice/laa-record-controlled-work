@@ -14,8 +14,6 @@ import {
 import { authCodeCallbackSchema } from "#/auth/auth.types.js";
 import { EntraService } from "#/auth/entra.service.js";
 import { getMsalCacheKey } from "#/auth/msal.cache-key.js";
-import { createMsalClient } from "#/auth/msal.client.js";
-import { RedisCachePlugin } from "#/auth/msal.plugin.js";
 import config from "#/config.js";
 import {
   BAD_REQUEST,
@@ -61,7 +59,7 @@ export async function authCodeCallback(
     // align with the authenticated session ID.
     await regenerateSession(req);
 
-    const entra = createEntraService(req);
+    const entra = EntraService.create({ sessionId: req.sessionID });
 
     // exchange auth code for tokens and state
     const result = await entra.exchangeAuthCode(data.code, authCodeRequest);
@@ -94,8 +92,10 @@ export async function signIn(
   }
 
   try {
-    const entra = createEntraService(req);
-    const result = await entra.initiateAuthCodeFlow(req.session.returnTo);
+    const entra = EntraService.create({ sessionId: req.sessionID });
+    const result = await entra.initiateAuthCodeFlow(req.session.returnTo, {
+      callbackHostname: req.hostname,
+    });
     if (result.error) {
       res.status(INTERNAL_SERVER_ERROR).send(result.error.message);
       return;
@@ -142,20 +142,6 @@ export function signOut(req: Request, res: Response, next: NextFunction): void {
   } catch (error) {
     next(error);
   }
-}
-
-/**
- * Creates an EntraService with an MSAL client configured for the current request session.
- * @param req - The Express request.
- * @returns A configured EntraService instance.
- */
-function createEntraService(req: Request): EntraService {
-  const msalCachePlugin = config.redis.enabled
-    ? new RedisCachePlugin(getRedisClient(), req.sessionID, config.redis.maxAge)
-    : undefined;
-
-  const msalClient = createMsalClient({ msalCachePlugin });
-  return EntraService.create({ msalClient, requestHostname: req.hostname });
 }
 
 /**

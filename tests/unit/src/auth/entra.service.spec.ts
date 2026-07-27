@@ -54,7 +54,6 @@ describe("EntraService", () => {
     };
 
     service = EntraService.create({
-      requestHostname: REDIRECT_URI_HOSTNAME,
       msalClient: msalStub as ConfidentialClientApplication,
     });
 
@@ -69,7 +68,6 @@ describe("EntraService", () => {
   describe("create() factory method", () => {
     it("returns an EntraService instance", () => {
       const result = EntraService.create({
-        requestHostname: REDIRECT_URI_HOSTNAME,
         msalClient: msalStub as ConfidentialClientApplication,
       });
 
@@ -80,52 +78,15 @@ describe("EntraService", () => {
       const providedClient = msalStub as ConfidentialClientApplication;
 
       const result = EntraService.create({
-        requestHostname: REDIRECT_URI_HOSTNAME,
         msalClient: providedClient,
       });
 
       expect(result.msalClient).to.equal(providedClient);
     });
 
-    it("normalizes requestHostname to lowercase", async () => {
-      const mixedCaseHostname = REDIRECT_URI_HOSTNAME.toUpperCase();
-      const result = EntraService.create({
-        requestHostname: mixedCaseHostname,
-        msalClient: msalStub as ConfidentialClientApplication,
-      });
-
-      const flow = (await result.initiateAuthCodeFlow()) as Success<AuthCodeFlowState>;
-      expect(parseRelayState(flow.value.authState)).to.be.null;
-    });
-
-    it("throws when requestHostname is empty", () => {
-      expect(() =>
-        EntraService.create({
-          requestHostname: "   ",
-          msalClient: msalStub as ConfidentialClientApplication,
-        }),
-      ).to.throw(
-        TypeError,
-        "EntraService.create requires a non-empty requestHostname",
-      );
-    });
-
-    it("throws when requestHostname is not a hostname", () => {
-      expect(() =>
-        EntraService.create({
-          requestHostname: "https://example.com/callback",
-          msalClient: msalStub as ConfidentialClientApplication,
-        }),
-      ).to.throw(
-        TypeError,
-        "EntraService.create requires requestHostname to be a valid hostname",
-      );
-    });
-
     it("throws when msalClient does not expose required methods", () => {
       expect(() =>
         EntraService.create({
-          requestHostname: REDIRECT_URI_HOSTNAME,
           msalClient: {} as unknown as ConfidentialClientApplication,
         }),
       ).to.throw(
@@ -209,22 +170,65 @@ describe("EntraService", () => {
 
     it("creates a plain state when requestHostname matches the redirect URI hostname", async () => {
       const result =
-        (await service.initiateAuthCodeFlow()) as Success<AuthCodeFlowState>;
+        (await service.initiateAuthCodeFlow(undefined, {
+          callbackHostname: REDIRECT_URI_HOSTNAME,
+        })) as Success<AuthCodeFlowState>;
       const parsed = parseRelayState(result.value.authState);
       expect(parsed).to.be.null;
     });
 
     it("creates a relay state with target and sig when requestHostname differs from redirect URI hostname", async () => {
       const ephemeralService = EntraService.create({
-        requestHostname: EPHEMERAL_HOSTNAME,
         msalClient: msalStub as ConfidentialClientApplication,
       });
       const result =
-        (await ephemeralService.initiateAuthCodeFlow()) as Success<AuthCodeFlowState>;
+        (await ephemeralService.initiateAuthCodeFlow(undefined, {
+          callbackHostname: EPHEMERAL_HOSTNAME,
+        })) as Success<AuthCodeFlowState>;
       const parsed = parseRelayState(result.value.authState);
       expect(parsed).to.not.be.null;
       expect(parsed!.target).to.equal(`https://${EPHEMERAL_HOSTNAME}`);
       expect(verifyRelayState(parsed!, SESSION_SECRET)).to.be.true;
+    });
+
+    it("normalizes callbackHostname to lowercase", async () => {
+      const mixedCaseHostname = REDIRECT_URI_HOSTNAME.toUpperCase();
+      const result = (await service.initiateAuthCodeFlow(undefined, {
+        callbackHostname: mixedCaseHostname,
+      })) as Success<AuthCodeFlowState>;
+      expect(parseRelayState(result.value.authState)).to.be.null;
+    });
+
+    it("throws when callbackHostname is empty", async () => {
+      let error: unknown;
+      try {
+        await service.initiateAuthCodeFlow(undefined, {
+          callbackHostname: "   ",
+        });
+      } catch (caught) {
+        error = caught;
+      }
+
+      expect(error).to.be.instanceOf(TypeError);
+      expect((error as Error).message).to.equal(
+        "EntraService.initiateAuthCodeFlow requires a non-empty callbackHostname",
+      );
+    });
+
+    it("throws when callbackHostname is not a hostname", async () => {
+      let error: unknown;
+      try {
+        await service.initiateAuthCodeFlow(undefined, {
+          callbackHostname: "https://example.com/callback",
+        });
+      } catch (caught) {
+        error = caught;
+      }
+
+      expect(error).to.be.instanceOf(TypeError);
+      expect((error as Error).message).to.equal(
+        "EntraService.initiateAuthCodeFlow requires callbackHostname to be a valid hostname",
+      );
     });
   });
 
