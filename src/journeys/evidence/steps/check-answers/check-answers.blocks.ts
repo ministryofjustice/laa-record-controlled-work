@@ -233,6 +233,34 @@ const evidenceOfExpenditureList = NunjucksGenerators.String({
   `,
 });
 
+const evidenceOfCapitalList = NunjucksGenerators.String({
+  data: {
+    capitalEvidence: Answer("capitalEvidence"),
+    evidenceTypeLabels: {
+      bankStatementsCapital: t(
+        "journeys.evidence.evidenceOfCapital.evidenceTypes.bankStatementsCapital",
+      ),
+      savingsCertificatePassbook: t(
+        "journeys.evidence.evidenceOfCapital.evidenceTypes.savingsCertificatePassbook",
+      ),
+      premiumBondsStatement: t(
+        "journeys.evidence.evidenceOfCapital.evidenceTypes.premiumBondsStatement",
+      ),
+      shareCertificate: t(
+        "journeys.evidence.evidenceOfCapital.evidenceTypes.shareCertificate",
+      ),
+    },
+    noEvidenceLabel: t("journeys.evidence.checkAnswers.noEvidenceProvided"),
+  },
+  template: `
+    {% if capitalEvidence.length > 0 %}
+    {% for item in capitalEvidence %}{{ evidenceTypeLabels[item] }},<br />{% endfor %}
+    {% else %}
+    <p>{{ noEvidenceLabel }}</p>
+    {% endif %}
+  `,
+});
+
 export const heading = GovUKHeading({
   text: t("journeys.evidence.checkAnswers.title"),
 });
@@ -314,6 +342,26 @@ export const summaryList = GovUKSummaryList({
         ),
       },
       value: { html: evidenceOfExpenditureList },
+      visibleWhen: Answer("doYouHaveEvidence").match(Condition.Equals("yes")),
+    },
+        {
+      actions: {
+        items: [
+          {
+            href: "/cases/evidence/evidence-of-capital?returnTo=check-answers",
+            text: t("journeys.evidence.checkAnswers.changeLink.change"),
+            visuallyHiddenText: t(
+              "journeys.evidence.checkAnswers.answerLabels.evidenceOfCapital",
+            ),
+          },
+        ],
+      },
+      key: {
+        text: t(
+          "journeys.evidence.checkAnswers.answerLabels.evidenceOfCapital",
+        ),
+      },
+      value: { html: evidenceOfCapitalList },
       visibleWhen: Answer("doYouHaveEvidence").match(Condition.Equals("yes")),
     },
   ],
