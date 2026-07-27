@@ -1,5 +1,5 @@
 import { test, expect } from "../../fixtures/index.js";
-import { applications } from "../../fixtures/applications.fixtures.js";
+import { applications } from "../../fixtures/rcw.fixtures.js";
 
 test("Your Cases step", async ({ page }) => {
   // Navigate to the Your Cases page
@@ -16,8 +16,8 @@ test("Your Cases step", async ({ page }) => {
   // Check the button
   await page.getByRole("button", { name: "Record a new case" }).click();
 
-  // Verify redirection to the ECF page
-  await expect(page).toHaveURL("/cases/new/ecf");
+  // Verify redirection to the provider declaration page
+  await expect(page).toHaveURL("/cases/new/provider-declaration");
 
   // Navigate back to the your cases page
   await page.goto("/cases");

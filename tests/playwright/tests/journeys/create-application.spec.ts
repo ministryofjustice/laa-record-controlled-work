@@ -1,6 +1,30 @@
 import { test, expect } from "../../fixtures/index.js";
 
 test("create application flow", async ({ page }) => {
+
+  // ==========================================================================
+  // Provider Declaration page
+  // ==========================================================================
+
+  // Navigate to the provider declaration page
+  await page.goto("/cases/new/provider-declaration");
+
+  // Check for the question
+  await expect(
+    page.getByRole("heading", {
+      name: /Declaration/,
+      level: 1,
+    }),
+  ).toBeVisible();
+
+  await page.getByRole("button", { name: "Agree and continue" }).click();
+
+  // Verify redirection to the ECF page
+  await expect(page).toHaveURL("/cases/new/ecf");
+
+  // Navigate back to the provider declaration page
+  await page.goto("/cases/new/provider-declaration");
+
   // ==========================================================================
   // ECF page
   // ==========================================================================

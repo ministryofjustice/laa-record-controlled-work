@@ -1,10 +1,10 @@
 import { fetcher } from "#/lib/fetch.js";
-import type { getApplicationsResponseSuccess } from "#/api/client/schema/applications/applications.gen.js";
 import { HttpResponse } from "msw";
 import { expect } from "chai";
 import sinon from "sinon";
-import { getGetApplicationsResponseMock } from "../../../mocks/api/fakers/applications/applications.faker.gen.js";
 import config from "#/config.js";
+import { getGetApplicationsResponseMock } from "../../../mocks/api/rcw/fakers/applications/applications.faker.gen.js";
+import { getApplicationsResponseSuccess } from "#/api/clients/rcw/schema/applications/applications.gen.js";
 
 const BASE_URL = "http://example.com";
 
@@ -46,7 +46,7 @@ describe("fetcher()", () => {
   });
 
   it("prepends the configured base URL to the path", async () => {
-    config.api.baseUrl = BASE_URL;
+    config.api.rcw.baseUrl = BASE_URL;
     await fetcher("/resource/1", { method: "GET" });
 
     sinon.assert.calledWithMatch(fetchStub, `${BASE_URL}/resource/1`);

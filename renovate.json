@@ -34,6 +34,12 @@
       "automergeType": "pr",
 
       "minimumReleaseAge": null
+    },
+    {
+      "description": "Ignore Yarn resolutions",
+      "matchManagers": ["npm"],
+      "matchDepTypes": ["resolutions"],
+      "enabled": false
     }
   ]
 }

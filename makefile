@@ -3,7 +3,7 @@ export
 
 MOCHA    := ./node_modules/.bin/mocha
 
-.PHONY: install prek-install dev watch docker-up docker-down build api-generate lint lint-fix integration integration-watch e2e e2e-ui test-all coverage unit unit-watch
+.PHONY: install prek-install dev watch docker-up docker-down build pda-spec api-generate knip lint lint-fix integration integration-watch e2e e2e-ui test-all coverage unit unit-watch
 
 # 	op run --env-file=.env uses 1Password to load environment variables securely
 # 	you can --no-masking flag means that varaibles is not masked in the output which can be used for debugging
@@ -29,13 +29,19 @@ docker-down:
 build:
 	yarn build
 
+pda-spec:
+	yarn api:pda
+
 api-generate:
 	yarn api:generate
 
-lint: 
+knip:
+	yarn knip
+
+lint: knip
 	yarn lint
 
-lint-fix: 
+lint-fix: knip
 	yarn lint:fix
 
 integration:
