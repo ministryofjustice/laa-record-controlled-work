@@ -1296,119 +1296,111 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@parcel/watcher-android-arm64@npm:2.5.6":
-  version: 2.5.6
-  resolution: "@parcel/watcher-android-arm64@npm:2.5.6"
+"@parcel/watcher-android-arm64@npm:2.6.0":
+  version: 2.6.0
+  resolution: "@parcel/watcher-android-arm64@npm:2.6.0"
   conditions: os=android & cpu=arm64
   languageName: node
   linkType: hard
 
-"@parcel/watcher-darwin-arm64@npm:2.5.6":
-  version: 2.5.6
-  resolution: "@parcel/watcher-darwin-arm64@npm:2.5.6"
+"@parcel/watcher-darwin-arm64@npm:2.6.0":
+  version: 2.6.0
+  resolution: "@parcel/watcher-darwin-arm64@npm:2.6.0"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
-"@parcel/watcher-darwin-x64@npm:2.5.6":
-  version: 2.5.6
-  resolution: "@parcel/watcher-darwin-x64@npm:2.5.6"
+"@parcel/watcher-darwin-x64@npm:2.6.0":
+  version: 2.6.0
+  resolution: "@parcel/watcher-darwin-x64@npm:2.6.0"
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
-"@parcel/watcher-freebsd-x64@npm:2.5.6":
-  version: 2.5.6
-  resolution: "@parcel/watcher-freebsd-x64@npm:2.5.6"
+"@parcel/watcher-freebsd-x64@npm:2.6.0":
+  version: 2.6.0
+  resolution: "@parcel/watcher-freebsd-x64@npm:2.6.0"
   conditions: os=freebsd & cpu=x64
   languageName: node
   linkType: hard
 
-"@parcel/watcher-linux-arm-glibc@npm:2.5.6":
-  version: 2.5.6
-  resolution: "@parcel/watcher-linux-arm-glibc@npm:2.5.6"
+"@parcel/watcher-linux-arm-glibc@npm:2.6.0":
+  version: 2.6.0
+  resolution: "@parcel/watcher-linux-arm-glibc@npm:2.6.0"
   conditions: os=linux & cpu=arm & libc=glibc
   languageName: node
   linkType: hard
 
-"@parcel/watcher-linux-arm-musl@npm:2.5.6":
-  version: 2.5.6
-  resolution: "@parcel/watcher-linux-arm-musl@npm:2.5.6"
+"@parcel/watcher-linux-arm-musl@npm:2.6.0":
+  version: 2.6.0
+  resolution: "@parcel/watcher-linux-arm-musl@npm:2.6.0"
   conditions: os=linux & cpu=arm & libc=musl
   languageName: node
   linkType: hard
 
-"@parcel/watcher-linux-arm64-glibc@npm:2.5.6":
-  version: 2.5.6
-  resolution: "@parcel/watcher-linux-arm64-glibc@npm:2.5.6"
+"@parcel/watcher-linux-arm64-glibc@npm:2.6.0":
+  version: 2.6.0
+  resolution: "@parcel/watcher-linux-arm64-glibc@npm:2.6.0"
   conditions: os=linux & cpu=arm64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@parcel/watcher-linux-arm64-musl@npm:2.5.6":
-  version: 2.5.6
-  resolution: "@parcel/watcher-linux-arm64-musl@npm:2.5.6"
+"@parcel/watcher-linux-arm64-musl@npm:2.6.0":
+  version: 2.6.0
+  resolution: "@parcel/watcher-linux-arm64-musl@npm:2.6.0"
   conditions: os=linux & cpu=arm64 & libc=musl
   languageName: node
   linkType: hard
 
-"@parcel/watcher-linux-x64-glibc@npm:2.5.6":
-  version: 2.5.6
-  resolution: "@parcel/watcher-linux-x64-glibc@npm:2.5.6"
+"@parcel/watcher-linux-x64-glibc@npm:2.6.0":
+  version: 2.6.0
+  resolution: "@parcel/watcher-linux-x64-glibc@npm:2.6.0"
   conditions: os=linux & cpu=x64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@parcel/watcher-linux-x64-musl@npm:2.5.6":
-  version: 2.5.6
-  resolution: "@parcel/watcher-linux-x64-musl@npm:2.5.6"
+"@parcel/watcher-linux-x64-musl@npm:2.6.0":
+  version: 2.6.0
+  resolution: "@parcel/watcher-linux-x64-musl@npm:2.6.0"
   conditions: os=linux & cpu=x64 & libc=musl
   languageName: node
   linkType: hard
 
-"@parcel/watcher-win32-arm64@npm:2.5.6":
-  version: 2.5.6
-  resolution: "@parcel/watcher-win32-arm64@npm:2.5.6"
+"@parcel/watcher-win32-arm64@npm:2.6.0":
+  version: 2.6.0
+  resolution: "@parcel/watcher-win32-arm64@npm:2.6.0"
   conditions: os=win32 & cpu=arm64
   languageName: node
   linkType: hard
 
-"@parcel/watcher-win32-ia32@npm:2.5.6":
-  version: 2.5.6
-  resolution: "@parcel/watcher-win32-ia32@npm:2.5.6"
-  conditions: os=win32 & cpu=ia32
-  languageName: node
-  linkType: hard
-
-"@parcel/watcher-win32-x64@npm:2.5.6":
-  version: 2.5.6
-  resolution: "@parcel/watcher-win32-x64@npm:2.5.6"
+"@parcel/watcher-win32-x64@npm:2.6.0":
+  version: 2.6.0
+  resolution: "@parcel/watcher-win32-x64@npm:2.6.0"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
 
 "@parcel/watcher@npm:^2.4.1":
-  version: 2.5.6
-  resolution: "@parcel/watcher@npm:2.5.6"
+  version: 2.6.0
+  resolution: "@parcel/watcher@npm:2.6.0"
   dependencies:
-    "@parcel/watcher-android-arm64": "npm:2.5.6"
-    "@parcel/watcher-darwin-arm64": "npm:2.5.6"
-    "@parcel/watcher-darwin-x64": "npm:2.5.6"
-    "@parcel/watcher-freebsd-x64": "npm:2.5.6"
-    "@parcel/watcher-linux-arm-glibc": "npm:2.5.6"
-    "@parcel/watcher-linux-arm-musl": "npm:2.5.6"
-    "@parcel/watcher-linux-arm64-glibc": "npm:2.5.6"
-    "@parcel/watcher-linux-arm64-musl": "npm:2.5.6"
-    "@parcel/watcher-linux-x64-glibc": "npm:2.5.6"
-    "@parcel/watcher-linux-x64-musl": "npm:2.5.6"
-    "@parcel/watcher-win32-arm64": "npm:2.5.6"
-    "@parcel/watcher-win32-ia32": "npm:2.5.6"
-    "@parcel/watcher-win32-x64": "npm:2.5.6"
+    "@parcel/watcher-android-arm64": "npm:2.6.0"
+    "@parcel/watcher-darwin-arm64": "npm:2.6.0"
+    "@parcel/watcher-darwin-x64": "npm:2.6.0"
+    "@parcel/watcher-freebsd-x64": "npm:2.6.0"
+    "@parcel/watcher-linux-arm-glibc": "npm:2.6.0"
+    "@parcel/watcher-linux-arm-musl": "npm:2.6.0"
+    "@parcel/watcher-linux-arm64-glibc": "npm:2.6.0"
+    "@parcel/watcher-linux-arm64-musl": "npm:2.6.0"
+    "@parcel/watcher-linux-x64-glibc": "npm:2.6.0"
+    "@parcel/watcher-linux-x64-musl": "npm:2.6.0"
+    "@parcel/watcher-win32-arm64": "npm:2.6.0"
+    "@parcel/watcher-win32-x64": "npm:2.6.0"
     detect-libc: "npm:^2.0.3"
     is-glob: "npm:^4.0.3"
     node-addon-api: "npm:^7.0.0"
     node-gyp: "npm:latest"
-    picomatch: "npm:^4.0.3"
+    picomatch: "npm:^4.0.4"
   dependenciesMeta:
     "@parcel/watcher-android-arm64":
       optional: true
@@ -1432,11 +1424,9 @@ __metadata:
       optional: true
     "@parcel/watcher-win32-arm64":
       optional: true
-    "@parcel/watcher-win32-ia32":
-      optional: true
     "@parcel/watcher-win32-x64":
       optional: true
-  checksum: 10c0/1e1d91f92e94e4640089a7cead243b2b81ca9aa8e1c862a97a25f589e84fbf1ad93abeb503f325c43a8c0e024ae0e74b48ec42c1cd84e8e423a3a87d25ded4f2
+  checksum: 10c0/0d6799bdf7d59a1ab5e4a79859035f387a66078586d9543eef0b9bd01c9d61cebe3b64eb96f0bd1f8bf50f07ed7266a1628604b66dc63025a3cee19be2e60d65
   languageName: node
   linkType: hard
 
@@ -1532,39 +1522,39 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@scalar/helpers@npm:0.9.1":
-  version: 0.9.1
-  resolution: "@scalar/helpers@npm:0.9.1"
-  checksum: 10c0/0002a29ae99bb8f55f108b83ebd1134798b0c7c76875688c9807e5cbbaeda079221dd69b688bbcf44e606b6334ec9aca866050a8ef78e6c33957548a1d9b992e
+"@scalar/helpers@npm:0.9.2":
+  version: 0.9.2
+  resolution: "@scalar/helpers@npm:0.9.2"
+  checksum: 10c0/8694d5862ac0f7a8cbb2887e1f78071904c9f1b8ab788d8d2417904e23d59b40b922d19de1f703081f7803d6e0276b9a70c23e97481caf5b804953b03091ed2e
   languageName: node
   linkType: hard
 
-"@scalar/json-magic@npm:0.12.18, @scalar/json-magic@npm:^0.12.16":
-  version: 0.12.18
-  resolution: "@scalar/json-magic@npm:0.12.18"
+"@scalar/json-magic@npm:0.12.19, @scalar/json-magic@npm:^0.12.16":
+  version: 0.12.19
+  resolution: "@scalar/json-magic@npm:0.12.19"
   dependencies:
-    "@scalar/helpers": "npm:0.9.1"
+    "@scalar/helpers": "npm:0.9.2"
     pathe: "npm:^2.0.3"
     yaml: "npm:^2.8.3"
-  checksum: 10c0/4547e78c9fd3b553b281d2590f2ea5e9b1f9b32dc163148b45c9a466f2bbfbe27d4d094df3b69b9701ba050b31e2103f64b121712a54f11c446ebeea3c87113d
+  checksum: 10c0/dfd45c381d468e524bcd509472144e9be144a22a417ee9710d6381a35ecd6b3eafcb66cdf83cebabf2ae5ec53361ca855fe79c4cda74bbee3caaeffbb1c48c5f
   languageName: node
   linkType: hard
 
 "@scalar/openapi-parser@npm:^0.28.7":
-  version: 0.28.9
-  resolution: "@scalar/openapi-parser@npm:0.28.9"
+  version: 0.28.10
+  resolution: "@scalar/openapi-parser@npm:0.28.10"
   dependencies:
-    "@scalar/helpers": "npm:0.9.1"
-    "@scalar/json-magic": "npm:0.12.18"
-    "@scalar/openapi-types": "npm:0.9.2"
-    "@scalar/openapi-upgrader": "npm:0.2.10"
+    "@scalar/helpers": "npm:0.9.2"
+    "@scalar/json-magic": "npm:0.12.19"
+    "@scalar/openapi-types": "npm:0.9.3"
+    "@scalar/openapi-upgrader": "npm:0.2.11"
     ajv: "npm:^8.17.1"
     ajv-draft-04: "npm:^1.0.0"
     ajv-formats: "npm:^3.0.1"
     jsonpointer: "npm:^5.0.1"
     leven: "npm:^4.0.0"
     yaml: "npm:^2.8.3"
-  checksum: 10c0/e2e99f7b551bce4113414ecf24183b7950863dece3c750d264a76641bac103c76daae8f4cbe463249dc2450ae6a8584adfdc3397f26bb4604e04adeb5d0f5aea
+  checksum: 10c0/8783aad89472a85a49d3664527dfeeb430b5e43db988a91436b6b991450d0a30859defdc2bf513fc315451e9f27179a621724a2ae7b08efae8d6910851f5ebc1
   languageName: node
   linkType: hard
 
@@ -1575,19 +1565,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@scalar/openapi-types@npm:0.9.2":
-  version: 0.9.2
-  resolution: "@scalar/openapi-types@npm:0.9.2"
-  checksum: 10c0/29a37feccb54df6fe6db624a7d15ead89d52e077f576cdc74abaee8fc2779c3f02dbce267582b0de3300f4ea198e35eebe6b42c63c447f97e0fae6e63d3a8b0c
+"@scalar/openapi-types@npm:0.9.3":
+  version: 0.9.3
+  resolution: "@scalar/openapi-types@npm:0.9.3"
+  checksum: 10c0/579bf2bcd088395feca820c15718fc98b276a26374d5b0eda08f84154ecb8795c3f1b50feaeae2418421cdde16ae08db5921696dec1e3976c49b6a0718108800
   languageName: node
   linkType: hard
 
-"@scalar/openapi-upgrader@npm:0.2.10":
-  version: 0.2.10
-  resolution: "@scalar/openapi-upgrader@npm:0.2.10"
+"@scalar/openapi-upgrader@npm:0.2.11":
+  version: 0.2.11
+  resolution: "@scalar/openapi-upgrader@npm:0.2.11"
   dependencies:
-    "@scalar/openapi-types": "npm:0.9.2"
-  checksum: 10c0/466898815a68743ce07ca69c548115306f4616581f27c7da2c805c8db2c01857b0a8339d245667cfbe49b088c35b892590ef6600589f6930a568cd9241087d64
+    "@scalar/openapi-types": "npm:0.9.3"
+  checksum: 10c0/99dc8d5debdb1f49541a1260c2a8b29d8c9920a2387881e07e14fe2a8cf8afb8a2995c9b354faa74da0e1288e1e6f453ad3142a2a88187ef2d86781a5385645f
   languageName: node
   linkType: hard
 
@@ -3167,12 +3157,12 @@ __metadata:
   linkType: hard
 
 "enhanced-resolve@npm:^5.17.1":
-  version: 5.24.2
-  resolution: "enhanced-resolve@npm:5.24.2"
+  version: 5.24.3
+  resolution: "enhanced-resolve@npm:5.24.3"
   dependencies:
     graceful-fs: "npm:^4.2.4"
     tapable: "npm:^2.3.3"
-  checksum: 10c0/eede58444780fc10d881af1c6bfdf6be561a834445e96f433de357a996fced4f58500674f3763679bf7242d775c24742f4fe858366950e7c238512ea51d7d23b
+  checksum: 10c0/907a1c4b35901539613e080c77274e354f668da3124f7e0f595e6efed46e730c732049f500b771d2657a1f16a4a220b9852e475884b1951b6e4f1389f0d58bb1
   languageName: node
   linkType: hard
 
@@ -3838,13 +3828,14 @@ __metadata:
   linkType: hard
 
 "express-rate-limit@npm:^8.5.2":
-  version: 8.5.2
-  resolution: "express-rate-limit@npm:8.5.2"
+  version: 8.6.0
+  resolution: "express-rate-limit@npm:8.6.0"
   dependencies:
+    debug: "npm:^4.4.3"
     ip-address: "npm:^10.2.0"
   peerDependencies:
     express: ">= 4.11"
-  checksum: 10c0/c98c49b93e94627940cf5e7c2578718b94d77163357161c3343d148e46257136c988933a96d6e1e728a010683133a58f68cad46928b063cf8d99521c8772578d
+  checksum: 10c0/cce72e87963d90797ddced59de71046b90ca3ca088ab8e73587b50e812aaefa0b79f5a779743034f3ada01fd27d5c7f82063992a02981c7bc9ac74f8b01bb41a
   languageName: node
   linkType: hard
 
@@ -3965,9 +3956,9 @@ __metadata:
   linkType: hard
 
 "fast-uri@npm:^3.0.1":
-  version: 3.1.3
-  resolution: "fast-uri@npm:3.1.3"
-  checksum: 10c0/0ce405815546770ad7e730b8f8fd58db80cefe4533ee99ee1a3263f11d2ccc3b8a0cf10d6cd9ba590e9746eb43b60f2ef2631d0c379a9ebba063ce0d4076b109
+  version: 3.1.4
+  resolution: "fast-uri@npm:3.1.4"
+  checksum: 10c0/f90948821ceb49980f64f89b8216ba498f5957f26035be813526a55b6145d26cbd63ef5618d5205a3292b31edc9c08589749350cd72bd86c7095eb434dceb757
   languageName: node
   linkType: hard
 
@@ -6321,7 +6312,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"picomatch@npm:^4.0.3, picomatch@npm:^4.0.4":
+"picomatch@npm:^4.0.4":
   version: 4.0.5
   resolution: "picomatch@npm:4.0.5"
   checksum: 10c0/947bc6b6e1ff1e6c5aaf95b107a0839d12802f4f7b867663f67d47accba939ca1cb582cf99dfc30438efa1c4648ac5990967e783e8929c36b03e8440704ef1bd
