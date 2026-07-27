@@ -2,7 +2,7 @@ import type { NextFunction, Request, Response } from "express";
 
 import express from "express";
 
-import { BAD_REQUEST } from "#/lib/constants/http.js";
+import { BAD_REQUEST, OK } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
 
 const router = express.Router();
@@ -15,6 +15,10 @@ router.use(logFailureStatusCodes);
 
 router.get("/load", (_req: Request, res: Response): void => {
   res.json({ return_url: "http://localhost:8080" });
+});
+
+router.get("/save", (_, res: Response) => {
+  res.status(OK);
 });
 
 router.use(logRouteErrors);
