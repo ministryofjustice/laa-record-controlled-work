@@ -38,6 +38,15 @@ server {
     access_log  off;
   }
 
+  # Never expose internal-only RCW private API routes via ingress.
+  location = /api/private {
+    return 404;
+  }
+
+  location ^~ /api/private/ {
+    return 404;
+  }
+
   location / {
     include     /etc/nginx/proxy.conf;
     proxy_pass  http://${NGINX_UPSTREAM_RCW};

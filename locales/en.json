@@ -49,6 +49,11 @@
   },
   "journeys": {
     "createApplication": {
+      "declaration": {
+        "title": "Declaration",
+        "text": "By continuing, you agree that:<br><ul><li>your client has instructed you, the provider, to act on their behalf</li><li>your client has read the LAA privacy policy (opens in a new window or tab)</li><li>you'll give complete and correct information</li></ul>",
+        "continue": "Agree and continue"
+      },
       "caption": "Client and case details",
       "ecf": {
         "title": "Does this case require Exceptional Case Funding?",
@@ -309,13 +314,27 @@
           "receipts": "Receipts"
         }
       },
+      "evidenceOfCapital": {
+        "title": "Evidence of your client's capital",
+        "hint": "Select all that apply.",
+        "evidenceTypes": {
+          "bankStatementCapital": "Bank statement",
+          "savingsCertificatePassbook": "National savings certificate or passbook",
+          "premiumBondsStatement": "Premium bonds statement",
+          "shareCertificate": "Share certificate"
+        },
+        "validation": {
+          "required": "You must select a capital evidence to continue"
+        }
+      },
       "checkAnswers": {
         "title": "Check your answers",
         "answerLabels": {
           "doYouHaveEvidence": "Do you have evidence?",
           "reasonForNoEvidence": "Reason for not having evidence",
           "evidenceOfIncome": "Income",
-          "evidenceOfExpenditure": "Expenditure"
+          "evidenceOfExpenditure": "Expenditure",
+          "evidenceOfCapital": "Capital"
         },
         "noEvidenceProvided": "No evidence provided",
         "changeLink": {

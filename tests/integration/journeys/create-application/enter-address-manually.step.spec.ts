@@ -5,7 +5,7 @@ import {
 import { expect } from "chai";
 import { createForgeTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
-import { enterAddressManuallyStep } from "#/journeys/create-application/steps/7-enter-address-manually.step.js";
+import { enterAddressManuallyStep } from "#/journeys/create-application/steps/enter-address-manually.step.js";
 
 describe("Enter address manually step", () => {
   const client = createForgeTestClient(

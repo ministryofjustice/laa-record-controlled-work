@@ -3,7 +3,7 @@ import {
   TestRedirectResult,
 } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
-import { haveAHomeAddressStep } from "#/journeys/create-application/steps/6-have-a-home-address.step.js";
+import { haveAHomeAddressStep } from "#/journeys/create-application/steps/have-a-home-address.step.js";
 import { createForgeTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 

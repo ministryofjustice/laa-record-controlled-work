@@ -20,6 +20,9 @@ ingress:
     external-dns.alpha.kubernetes.io/set-identifier: ""
     external-dns.alpha.kubernetes.io/aws-weight: "100"
 
+networkPolicy:
+  enabled: true
+
 rcw:
   replicaCount: 1
 
@@ -116,7 +119,7 @@ rcw:
     RATE_LIMIT_MAX: 100
     RATE_WINDOW_MS: 900000
     NODE_ENV: ""
-    API_BASE_URL: ""
+    RCW_API_BASE_URL: ""
     ENTRA_AUTHORITY_BASE_URL: "https://login.microsoftonline.com/"
     ENTRA_REDIRECT_URI: ""
     REDIS_ENABLED: true  
@@ -173,7 +176,7 @@ nginx:
     # Overridden at deploy time to ECR; see deploy.sh and docker-images.env
     repository: nginxinc/nginx-unprivileged
     pullPolicy: Always
-    tag: alpine@sha256:18d67281256ded39ff65e010ae4f831be18f19356f83c60bc546492c7eb6dd23
+    tag: alpine@sha256:59ccf0943b0b8e8d9e6ea9039a39555730f544701a655c596f7df7d096c593f5
 
   resources:
     limits:

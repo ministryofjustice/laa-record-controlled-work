@@ -652,7 +652,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@j178/prek@npm:^0.4.9":
+"@j178/prek@npm:^0.4.10":
   version: 0.4.10
   resolution: "@j178/prek@npm:0.4.10"
   dependencies:
@@ -870,7 +870,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@orval/core@npm:8.22.0":
+"@orval/core@npm:8.22.0, @orval/core@npm:^8.21.0":
   version: 8.22.0
   resolution: "@orval/core@npm:8.22.0"
   dependencies:
@@ -2477,12 +2477,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"brace-expansion@npm:5.0.7":
-  version: 5.0.7
-  resolution: "brace-expansion@npm:5.0.7"
+"brace-expansion@npm:5.0.8":
+  version: 5.0.8
+  resolution: "brace-expansion@npm:5.0.8"
   dependencies:
     balanced-match: "npm:^4.0.2"
-  checksum: 10c0/4769109c3c082de178e449a371bcad50d51ab468f644bce2dd9188efe0cf0a080ed102105d7fc8577382cedc45bad7e6443a91bf3d8102264ee8cf927dbaf205
+  checksum: 10c0/73304caafd00fdc5b0168e693ac15bf25b6357dec76d1195fcd628fe2cf99c46f9c889a7ecfa3cfe236dbd2d5ce3e27a6ccc4370b46d475d0d19081e11f86019
   languageName: node
   linkType: hard
 
@@ -3578,9 +3578,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-jsdoc@npm:^63.0.13":
-  version: 63.0.13
-  resolution: "eslint-plugin-jsdoc@npm:63.0.13"
+"eslint-plugin-jsdoc@npm:^63.2.0":
+  version: 63.2.0
+  resolution: "eslint-plugin-jsdoc@npm:63.2.0"
   dependencies:
     "@es-joy/jsdoccomment": "npm:~0.88.0"
     "@es-joy/resolve.exports": "npm:1.2.0"
@@ -3598,7 +3598,7 @@ __metadata:
     to-valid-identifier: "npm:^1.0.0"
   peerDependencies:
     eslint: ^7.0.0 || ^8.0.0 || ^9.0.0 || ^10.0.0
-  checksum: 10c0/5abeb767d9d26bde94eb93858b84b9f510bf79d3f5eec631552c0490c1fbab45f456be455ea9de4f3127cdc0ac14889294092080af83ae283ec0f1a6f4ae13c7
+  checksum: 10c0/ad71133c7996aea470bb3a7ed59d1ebcf3739b9fc5e85c5f81bace17cd2c8cee563cdbec0a49616b4932e6f1eab1d1e4591e8c9c465703dc47eaf43acffef129
   languageName: node
   linkType: hard
 
@@ -3837,14 +3837,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"express-rate-limit@npm:^8.5.2":
-  version: 8.5.2
-  resolution: "express-rate-limit@npm:8.5.2"
+"express-rate-limit@npm:^8.6.0":
+  version: 8.6.0
+  resolution: "express-rate-limit@npm:8.6.0"
   dependencies:
+    debug: "npm:^4.4.3"
     ip-address: "npm:^10.2.0"
   peerDependencies:
     express: ">= 4.11"
-  checksum: 10c0/c98c49b93e94627940cf5e7c2578718b94d77163357161c3343d148e46257136c988933a96d6e1e728a010683133a58f68cad46928b063cf8d99521c8772578d
+  checksum: 10c0/cce72e87963d90797ddced59de71046b90ca3ca088ab8e73587b50e812aaefa0b79f5a779743034f3ada01fd27d5c7f82063992a02981c7bc9ac74f8b01bb41a
   languageName: node
   linkType: hard
 
@@ -4435,7 +4436,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"govuk-frontend@npm:^6.3.0":
+"govuk-frontend@npm:^6.4.0":
   version: 6.4.0
   resolution: "govuk-frontend@npm:6.4.0"
   checksum: 10c0/0bbf3e9960e6759a9fc39a7b03d3730c35ea0fa612d83a335822b9813c725f05cab349e2ca23a3d188c2251db96a8ddb6b5b9499061fcda5cf3f8bb07dcb28b7
@@ -5229,9 +5230,10 @@ __metadata:
     "@axe-core/playwright": "npm:^4.12.1"
     "@azure/msal-node": "npm:^5.4.1"
     "@faker-js/faker": "npm:^10.5.0"
-    "@j178/prek": "npm:^0.4.9"
+    "@j178/prek": "npm:^0.4.10"
     "@ministryofjustice/frontend": "npm:9.0.0"
     "@ministryofjustice/hmpps-forge": "npm:^0.3.2"
+    "@orval/core": "npm:^8.21.0"
     "@playwright/test": "npm:^1.61.1"
     "@types/chai": "npm:^5.2.3"
     "@types/chai-as-promised": "npm:^8.0.2"
@@ -5265,15 +5267,15 @@ __metadata:
     eslint: "npm:^10.7.0"
     eslint-config-love: "npm:^154.1.0"
     eslint-config-prettier: "npm:^10.1.8"
-    eslint-plugin-jsdoc: "npm:^63.0.13"
+    eslint-plugin-jsdoc: "npm:^63.2.0"
     eslint-plugin-jsonc: "npm:^3.3.0"
     eslint-plugin-perfectionist: "npm:^5.10.0"
     eslint-plugin-prettier: "npm:^5.5.6"
     express: "npm:^5.2.1"
-    express-rate-limit: "npm:^8.5.2"
+    express-rate-limit: "npm:^8.6.0"
     express-session: "npm:^1.19.0"
     globals: "npm:^17.7.0"
-    govuk-frontend: "npm:^6.3.0"
+    govuk-frontend: "npm:^6.4.0"
     helmet: "npm:^8.3.0"
     i18next: "npm:^26.3.6"
     knip: "npm:^6.27.0"

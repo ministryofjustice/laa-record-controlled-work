@@ -5,7 +5,7 @@ import {
 import { expect } from "chai";
 import { createForgeTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
-import { enterOverseasAddressStep } from "#/journeys/create-application/steps/8-enter-overseas-address.step.js";
+import { enterOverseasAddressStep } from "#/journeys/create-application/steps/enter-overseas-address.step.js";
 
 describe("Enter overseas address step", () => {
   const client = createForgeTestClient(
