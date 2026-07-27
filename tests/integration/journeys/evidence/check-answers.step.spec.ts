@@ -26,6 +26,7 @@ describe("Check answers step", () => {
         taxCreditsEvidence: [],
         incomeEvidence: ["wageSlips", "taxCalculationSheet"],
         housingCostsEvidence: [],
+        capitalEvidence: ["bankStatement", "shareCertificate"],
       },
     },
   };
@@ -53,10 +54,11 @@ describe("Check answers step", () => {
       const rows = summaryList.properties.rows as Array<{
         key: { text: string };
       }>;
-      expect(rows.length).to.equal(4);
+      expect(rows.length).to.equal(5);
       expect(rows[0].key.text).to.equal("Do you have evidence?");
       expect(rows[2].key.text).to.equal("Income");
       expect(rows[3].key.text).to.equal("Expenditure");
+      expect(rows[4].key.text).to.equal("Capital");
     });
 
     it("renders the evidence list when do you have evidence is 'yes'", () => {

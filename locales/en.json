@@ -317,6 +317,9 @@
           "savingsCertificatePassbook": "National savings certificate or passbook",
           "premiumBondsStatement": "Premium bonds statement",
           "shareCertificate": "Share certificate"
+        },
+        "validation": {
+          "required": "You must select a capital evidence to continue"
         }
       },
       "checkAnswers": {

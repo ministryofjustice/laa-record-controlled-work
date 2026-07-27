@@ -13,8 +13,8 @@ import {
   continueButton,
 } from "#/journeys/evidence/common.blocks.js";
 import {
-  heading,
   capitalEvidenceGroup,
+  heading,
   label,
 } from "#/journeys/evidence/steps/evidence-of-capital/evidence-of-capital.blocks.js";
 import { t } from "#/lib/i18n.js";

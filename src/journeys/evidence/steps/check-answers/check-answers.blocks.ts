@@ -240,11 +240,11 @@ const evidenceOfCapitalList = NunjucksGenerators.String({
       bankStatementsCapital: t(
         "journeys.evidence.evidenceOfCapital.evidenceTypes.bankStatementsCapital",
       ),
-      savingsCertificatePassbook: t(
-        "journeys.evidence.evidenceOfCapital.evidenceTypes.savingsCertificatePassbook",
-      ),
       premiumBondsStatement: t(
         "journeys.evidence.evidenceOfCapital.evidenceTypes.premiumBondsStatement",
+      ),
+      savingsCertificatePassbook: t(
+        "journeys.evidence.evidenceOfCapital.evidenceTypes.savingsCertificatePassbook",
       ),
       shareCertificate: t(
         "journeys.evidence.evidenceOfCapital.evidenceTypes.shareCertificate",
@@ -344,7 +344,7 @@ export const summaryList = GovUKSummaryList({
       value: { html: evidenceOfExpenditureList },
       visibleWhen: Answer("doYouHaveEvidence").match(Condition.Equals("yes")),
     },
-        {
+    {
       actions: {
         items: [
           {

@@ -1,4 +1,9 @@
 import {
+  Condition,
+  Self,
+  validation,
+} from "@ministryofjustice/hmpps-forge/core/authoring";
+import {
   GovUKBody,
   GovUKCheckboxInput,
   GovUKHeading,
@@ -44,5 +49,11 @@ export const capitalEvidenceGroup = GovUKCheckboxInput({
       ),
       value: "shareCertificate",
     },
+  ],
+  validWhen: [
+    validation({
+      condition: Self().match(Condition.IsRequired()),
+      message: t("journeys.evidence.evidenceOfCapital.validation.required"),
+    }),
   ],
 });
