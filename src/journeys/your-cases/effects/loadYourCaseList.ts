@@ -18,7 +18,8 @@ export const loadYourCaseList =
       // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Session shape is constrained by app session typing.
       const session = context.getSession() as SessionInterface | undefined;
       const opts = await getRcwApiDefaultOptions({
-        session,
+        homeAccountId: session?.msal?.homeAccountId,
+        sessionId: session?.id,
       });
       response = await deps.getApplications(opts);
     } catch (error) {

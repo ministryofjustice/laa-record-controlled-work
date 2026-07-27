@@ -1,10 +1,10 @@
 import {
-  type AccountInfo,
   type AuthenticationResult,
   type AuthorizationCodeRequest,
   type AuthorizationUrlRequest,
   type ConfidentialClientApplication,
   CryptoProvider,
+  InteractionRequiredAuthError,
 } from "@azure/msal-node";
 import { randomUUID } from "node:crypto";
 
@@ -17,6 +17,7 @@ import type {
 import { authRequestDefaults } from "#/auth/auth.config.js";
 import {
   MsalError,
+  NotAuthenticatedError,
   PkceGenerationError,
   TokenAcquisitionError,
   TokenRefreshError,
@@ -38,7 +39,7 @@ interface InitiateAuthCodeFlowOptions {
   callbackHostname?: string;
 }
 
-const EMPTY_HOSTNAME_LENGTH = 0;
+const EMPTY_STRING_LENGTH = 0;
 
 /**
  * Handles Microsoft Entra ID (MSAL) authentication flows including
@@ -84,28 +85,60 @@ export class EntraService {
   }
 
   /**
-   * Acquire a fresh access token using cached credentials.
-   * Cache serialization/deserialization is handled automatically by the ICachePlugin.
+   * Acquire a downstream API access token using the MSAL account resolved from
+   * the session-scoped token cache partition.
    *
-   * @param account - The authenticated account from the session.
-   * @returns {Promise<Either<TokenRefreshError, TokenExchangeResult>>} The refreshed token set or an error.
+   * @param homeAccountId - Session-persisted MSAL homeAccountId reference.
+   * @param scopes - Downstream API scopes to request.
+   * @returns Access token or a reauthentication/refresh error.
    */
-  public async acquireTokenSilent(
-    account: AccountInfo,
-  ): Promise<Either<TokenRefreshError, TokenExchangeResult>> {
+  public async acquireDownstreamAccessToken(
+    homeAccountId: string,
+    scopes: readonly string[],
+  ): Promise<Either<NotAuthenticatedError | TokenRefreshError, string>> {
+    if (homeAccountId.trim().length === EMPTY_STRING_LENGTH) {
+      return failure(
+        NotAuthenticatedError.from(
+          new Error("The authenticated session has no MSAL account reference"),
+        ),
+      );
+    }
+
     try {
+      const account = await this.msalClient
+        .getTokenCache()
+        .getAccountByHomeId(homeAccountId);
+      if (account === null) {
+        logger.warn("No MSAL account found for session account reference", {
+          hasCachedAccount: false,
+          hasHomeAccountId: true,
+          scopes,
+        });
+        return failure(
+          NotAuthenticatedError.from(
+            new Error(
+              "The MSAL account was not found in the session token cache",
+            ),
+          ),
+        );
+      }
+
       const result: AuthenticationResult =
         await this.msalClient.acquireTokenSilent({
           account,
-          scopes: authRequestDefaults.scopes,
+          scopes: [...scopes],
         });
 
-      return success({
-        accessToken: result.accessToken,
-        account: result.account ?? undefined,
-        idToken: result.idToken,
-      });
+      return success(result.accessToken);
     } catch (error) {
+      if (error instanceof InteractionRequiredAuthError) {
+        logger.info("MSAL interaction required for silent token acquisition", {
+          hasHomeAccountId: true,
+          scopes,
+        });
+        return failure(NotAuthenticatedError.from(error));
+      }
+
       logger.error("Failed to silently acquire token", error);
       return failure(TokenRefreshError.from(error));
     }
@@ -263,7 +296,7 @@ function isValidHostname(hostname: string): boolean {
 function normalizeCallbackHostname(callbackHostname: string): string {
   const normalizedHostname = callbackHostname.trim().toLowerCase();
 
-  if (normalizedHostname.length === EMPTY_HOSTNAME_LENGTH) {
+  if (normalizedHostname.length === EMPTY_STRING_LENGTH) {
     throw new TypeError(
       "EntraService.initiateAuthCodeFlow requires a non-empty callbackHostname",
     );
@@ -291,7 +324,10 @@ function validateMsalClient(
 
   const candidate = msalClient as Partial<
     Record<
-      "acquireTokenByCode" | "acquireTokenSilent" | "getAuthCodeUrl",
+      | "acquireTokenByCode"
+      | "acquireTokenSilent"
+      | "getAuthCodeUrl"
+      | "getTokenCache",
       unknown
     >
   >;
@@ -299,7 +335,8 @@ function validateMsalClient(
   if (
     typeof candidate.acquireTokenByCode !== "function" ||
     typeof candidate.acquireTokenSilent !== "function" ||
-    typeof candidate.getAuthCodeUrl !== "function"
+    typeof candidate.getAuthCodeUrl !== "function" ||
+    typeof candidate.getTokenCache !== "function"
   ) {
     throw new TypeError(
       "EntraService.create requires an msalClient with MSAL auth methods",

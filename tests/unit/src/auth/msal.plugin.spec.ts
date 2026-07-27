@@ -9,8 +9,10 @@ import { RedisCachePlugin } from "#/auth/msal.plugin.js";
 describe("CachePlugin", () => {
   describe("Redis", () => {
     const SESSION_ID = "test-session-id-123";
+    const OTHER_SESSION_ID = "other-session-id-456";
     const TTL_SECONDS = 3600;
     const CACHE_KEY = getMsalCacheKey(SESSION_ID);
+    const OTHER_CACHE_KEY = getMsalCacheKey(OTHER_SESSION_ID);
     const SERIALIZED_CACHE = "serialized-cache-blob";
 
     let redisStub: sinon.SinonStubbedInstance<RedisClientType>;
@@ -89,6 +91,52 @@ describe("CachePlugin", () => {
         );
 
         expect(redisStub.get.calledWith(CACHE_KEY)).to.be.true;
+      });
+
+      it("should isolate cache partitions between different session IDs", async () => {
+        const otherPlugin = new RedisCachePlugin(
+          redisStub,
+          OTHER_SESSION_ID,
+          TTL_SECONDS,
+        );
+
+        const thisSessionContext = {
+          cacheHasChanged: false,
+          tokenCache: {
+            deserialize: sinon.stub(),
+            serialize: sinon.stub(),
+          },
+        };
+        const otherSessionContext = {
+          cacheHasChanged: false,
+          tokenCache: {
+            deserialize: sinon.stub(),
+            serialize: sinon.stub(),
+          },
+        };
+
+        redisStub.get.withArgs(CACHE_KEY).resolves(SERIALIZED_CACHE);
+        redisStub.get.withArgs(OTHER_CACHE_KEY).resolves("other-serialized");
+
+        await plugin.beforeCacheAccess(
+          thisSessionContext as unknown as TokenCacheContext,
+        );
+        await otherPlugin.beforeCacheAccess(
+          otherSessionContext as unknown as TokenCacheContext,
+        );
+
+        expect(redisStub.get.calledWith(CACHE_KEY)).to.be.true;
+        expect(redisStub.get.calledWith(OTHER_CACHE_KEY)).to.be.true;
+        expect(
+          thisSessionContext.tokenCache.deserialize.calledOnceWithExactly(
+            SERIALIZED_CACHE,
+          ),
+        ).to.be.true;
+        expect(
+          otherSessionContext.tokenCache.deserialize.calledOnceWithExactly(
+            "other-serialized",
+          ),
+        ).to.be.true;
       });
     });
 

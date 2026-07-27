@@ -1,4 +1,5 @@
 import express from "express";
+import type { Request, Response } from "express";
 import request from "supertest";
 import {
   BAD_REQUEST,
@@ -8,6 +9,7 @@ import {
 } from "#/lib/constants/http.js";
 import sinon from "sinon";
 import { EntraService } from "#/auth/entra.service.js";
+import { authCodeCallback } from "#/auth/auth.handlers.js";
 import { createRelayState } from "#/auth/auth.relay.js";
 import config from "#/config.js";
 import { failure, success } from "#/lib/either.js";
@@ -27,7 +29,6 @@ describe("Auth Handlers", () => {
 
   before(() => {
     mockApp = createMockApp();
-
   });
 
   beforeEach(() => {
@@ -45,9 +46,15 @@ describe("Auth Handlers", () => {
         authCodeRequest: {},
       })),
       exchangeAuthCode: sinon.stub().resolves(success({
-        tokenCache: "{}",
+        accessToken: "access-token",
         idToken: "id-token",
-        account: undefined,
+        account: {
+          environment: "login.microsoftonline.com",
+          homeAccountId: "test-uid.test-tenant-id",
+          localAccountId: "test-uid",
+          tenantId: "test-tenant-id",
+          username: "testuser@example.com",
+        },
       })),
     };
 
@@ -77,7 +84,8 @@ describe("Auth Handlers", () => {
 
       expect(res.status).to.equal(FOUND);
       expect(res.headers.location).to.equal(AUTH_CODE_URL);
-      expect(authServiceStub.initiateAuthCodeFlow.calledOnceWith(returnTo)).to.be.true;
+      expect(authServiceStub.initiateAuthCodeFlow.calledOnceWith(returnTo)).to.be
+        .true;
     });
 
     it("ignores returnTo query parameter when it is not a safe app-relative path", async () => {
@@ -87,7 +95,9 @@ describe("Auth Handlers", () => {
 
       expect(res.status).to.equal(FOUND);
       expect(res.headers.location).to.equal(AUTH_CODE_URL);
-      expect(authServiceStub.initiateAuthCodeFlow.calledOnceWith(undefined)).to.be.true;
+      expect(
+        authServiceStub.initiateAuthCodeFlow.calledOnceWith(undefined),
+      ).to.be.true;
     });
 
     it("calls next(error) when initiateAuthCodeFlow() fails", async () => {
@@ -114,6 +124,26 @@ describe("Auth Handlers", () => {
       expect(res.headers.location).to.equal("/");
     });
 
+    it("stores account and msal homeAccountId in session without token fields", async () => {
+      const agent = request.agent(mockApp);
+
+      const callbackResponse = await agent
+        .get("/auth/code/callback")
+        .query(QUERY_PARAMS);
+      expect(callbackResponse.status).to.equal(FOUND);
+
+      const sessionResponse = await agent.get("/test/session");
+      expect(sessionResponse.status).to.equal(200);
+      expect(sessionResponse.body.account).to.include({
+        homeAccountId: "test-uid.test-tenant-id",
+      });
+      expect(sessionResponse.body.msal).to.deep.equal({
+        homeAccountId: "test-uid.test-tenant-id",
+      });
+      expect(sessionResponse.body).to.not.have.property("accessToken");
+      expect(sessionResponse.body).to.not.have.property("idToken");
+    });
+
     it("responds with 400 when auth request body doesn't match schema", async () => {
       const wrongQueryParams = { missing: "property" };
 
@@ -136,6 +166,64 @@ describe("Auth Handlers", () => {
 
       expect(res.status).to.equal(UNAUTHORIZED);
       expect(res.text).to.equal("Token acquisition failed");
+    });
+
+    it("responds with 401 when token exchange result has no account homeAccountId", async () => {
+      authServiceStub.exchangeAuthCode.resolves(
+        success({
+          accessToken: "access-token",
+          account: undefined,
+          idToken: "id-token",
+        }),
+      );
+
+      const res = await request(mockApp)
+        .get("/auth/code/callback")
+        .query(QUERY_PARAMS);
+
+      expect(res.status).to.equal(UNAUTHORIZED);
+      expect(res.text).to.equal("Token acquisition failed");
+    });
+
+    it("uses the rotated session ID when creating the MSAL client for code exchange", async () => {
+      const next = sinon.stub();
+      const createStub = EntraService.create as unknown as sinon.SinonStub;
+      createStub.resetHistory();
+
+      const req = {
+        hostname: "localhost",
+        query: QUERY_PARAMS,
+        session: {
+          authCodeRequest: {
+            code: "",
+            codeVerifier: "verifier",
+            redirectUri: "http://localhost/auth/code/callback",
+            scopes: ["scope.read"],
+          },
+          authState: QUERY_PARAMS.state,
+          regenerate: (callback: (error?: Error | null) => void): void => {
+            req.sessionID = "new-session-id";
+            callback();
+          },
+          returnTo: "/",
+        },
+        sessionID: "old-session-id",
+      } as unknown as Request;
+
+      const res = {
+        redirect: sinon.stub(),
+        send: sinon.stub().returnsThis(),
+        set: sinon.stub().returnsThis(),
+        status: sinon.stub().returnsThis(),
+      } as unknown as Response;
+
+      await authCodeCallback(req, res, next);
+
+      expect(createStub.calledOnceWithExactly({ sessionId: "new-session-id" }))
+        .to.be.true;
+      expect((res.redirect as sinon.SinonStub).calledOnceWithExactly("/"))
+        .to.be.true;
+      expect(next.called).to.be.false;
     });
 
     describe("session guards", () => {
@@ -169,7 +257,11 @@ describe("Auth Handlers", () => {
         "https://mem-257-xyz-laa-record-controlled-work-uat.cloud-platform.service.justice.gov.uk";
 
       it("redirects to the relay target when state contains a valid signed target for a different host", async () => {
-        const state = createRelayState("nonce-id", VALID_EPHEMERAL_TARGET, SESSION_SECRET);
+        const state = createRelayState(
+          "nonce-id",
+          VALID_EPHEMERAL_TARGET,
+          SESSION_SECRET,
+        );
 
         const res = await request(mockApp)
           .get("/auth/code/callback")
@@ -180,13 +272,19 @@ describe("Auth Handlers", () => {
           `${VALID_EPHEMERAL_TARGET}/auth/code/callback`,
         );
         expect(res.headers.location).to.include("code=auth-code");
-        expect(res.headers.location).to.include(`state=${encodeURIComponent(state)}`);
+        expect(res.headers.location).to.include(
+          `state=${encodeURIComponent(state)}`,
+        );
         expect(res.headers["cache-control"]).to.equal("no-store");
         expect(authServiceStub.exchangeAuthCode.called).to.be.false;
       });
 
       it("responds with 400 when the relay signature is invalid", async () => {
-        const state = createRelayState("nonce-id", VALID_EPHEMERAL_TARGET, "wrong-secret");
+        const state = createRelayState(
+          "nonce-id",
+          VALID_EPHEMERAL_TARGET,
+          "wrong-secret",
+        );
 
         const res = await request(mockApp)
           .get("/auth/code/callback")
@@ -197,7 +295,11 @@ describe("Auth Handlers", () => {
       });
 
       it("responds with 400 when the relay target is not in the allowlist", async () => {
-        const state = createRelayState("nonce-id", "https://invalid.com", SESSION_SECRET);
+        const state = createRelayState(
+          "nonce-id",
+          "https://invalid.com",
+          SESSION_SECRET,
+        );
 
         const res = await request(mockApp)
           .get("/auth/code/callback")
@@ -209,7 +311,11 @@ describe("Auth Handlers", () => {
 
       it("processes the callback normally when the relay target matches the current host", async () => {
         const ephemeralHost = new URL(VALID_EPHEMERAL_TARGET).hostname;
-        const state = createRelayState("nonce-id", `https://${ephemeralHost}`, SESSION_SECRET);
+        const state = createRelayState(
+          "nonce-id",
+          `https://${ephemeralHost}`,
+          SESSION_SECRET,
+        );
 
         const res = await request(mockApp)
           .get("/auth/code/callback")

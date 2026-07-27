@@ -8,6 +8,12 @@ export interface SessionInterface extends Session {
   isAuthenticated: boolean | undefined;
   /** @property journeyDrafts Forge drafts of the user's current journey. */
   journeyDrafts: Record<string, unknown> | undefined;
+  /** @property msal MSAL account reference used to resolve cached accounts for silent token acquisition. */
+  msal: SessionMsalReference | undefined;
   /** @property returnTo URI to return to after authentication flow completes. */
   returnTo: string | undefined;
+}
+
+export interface SessionMsalReference {
+  homeAccountId: string;
 }

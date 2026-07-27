@@ -1,12 +1,13 @@
 import type { getApplications } from "#/api/clients/rcw/schema/applications/applications.gen.js";
-import type { SessionInterface } from "#/app/session.types.js";
 
 import { NotAuthenticatedError } from "#/auth/auth.errors.js";
 import { EntraService } from "#/auth/entra.service.js";
+import config from "#/config.js";
 import { logger } from "#/logger.js";
 
-export interface GetRcwApiDefaultOptionsParams {
-  session: SessionInterface | undefined;
+export interface RcwApiAuthParams {
+  homeAccountId: string | undefined;
+  sessionId: string | undefined;
 }
 
 type RcwApiDefaultOptions = typeof getApplications extends (
@@ -15,6 +16,7 @@ type RcwApiDefaultOptions = typeof getApplications extends (
   ? NonNullable<TOptions>
   : never;
 
+const EMPTY_STRING_LENGTH = 0;
 const TEST_ACCESS_TOKEN = "test-access-token";
 
 /**
@@ -23,7 +25,7 @@ const TEST_ACCESS_TOKEN = "test-access-token";
  * @returns API request options with the Authorization bearer token header.
  */
 export async function getRcwApiDefaultOptions(
-  params: GetRcwApiDefaultOptionsParams,
+  params: RcwApiAuthParams,
 ): Promise<RcwApiDefaultOptions> {
   if (process.env.NODE_ENV === "test") {
     return {
@@ -33,18 +35,8 @@ export async function getRcwApiDefaultOptions(
     };
   }
 
-  const { session } = params;
-  const account = session?.account;
-  if (account === undefined) {
-    logger.error(
-      "Failed to get expected account from session, user may not be authenticated",
-      undefined,
-    );
-    throw new NotAuthenticatedError();
-  }
-
-  const sessionId = session?.id;
-  if (sessionId === undefined) {
+  const sessionId = params.sessionId?.trim();
+  if (sessionId === undefined || sessionId.length === EMPTY_STRING_LENGTH) {
     logger.error(
       "Failed to get expected session id for Entra token refresh",
       undefined,
@@ -52,24 +44,30 @@ export async function getRcwApiDefaultOptions(
     throw new NotAuthenticatedError();
   }
 
+  const homeAccountId = params.homeAccountId?.trim();
+  if (
+    homeAccountId === undefined ||
+    homeAccountId.length === EMPTY_STRING_LENGTH
+  ) {
+    logger.warn("Authenticated session missing MSAL account reference", {
+      hasHomeAccountId: false,
+      sessionId,
+    });
+    throw new NotAuthenticatedError();
+  }
+
   const entraService = EntraService.create({ sessionId });
-  const tokenResult = await entraService.acquireTokenSilent(account);
+  const tokenResult = await entraService.acquireDownstreamAccessToken(
+    homeAccountId,
+    config.entra.scopes,
+  );
   if (tokenResult.error) {
     throw tokenResult.error;
   }
 
-  const { accessToken } = tokenResult.value;
-  if (accessToken === undefined) {
-    logger.error(
-      "Failed to get expected accessToken from Entra token refresh",
-      undefined,
-    );
-    throw new NotAuthenticatedError();
-  }
-
   return {
     headers: {
-      Authorization: `Bearer ${accessToken}`,
+      Authorization: `Bearer ${tokenResult.value}`,
     },
   };
 }

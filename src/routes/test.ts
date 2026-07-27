@@ -16,6 +16,9 @@ router.get("/signin", (req, res, next) => {
     tenantId: "test-tenant-id",
     username: "testuser@example.com",
   };
+  req.session.msal = {
+    homeAccountId: "test-uid.test-tenant-id",
+  };
 
   req.session.save((err: unknown) => {
     if (err !== undefined) {

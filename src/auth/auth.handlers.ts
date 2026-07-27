@@ -23,6 +23,8 @@ import {
 import { getRedisClient } from "#/lib/redis.js";
 import { logger } from "#/logger.js";
 
+const EMPTY_STRING_LENGTH = 0;
+
 /**
  * Handles the Entra auth code callback, exchanging the code for tokens.
  * @param req - The Express request.
@@ -35,25 +37,12 @@ export async function authCodeCallback(
   next: NextFunction,
 ): Promise<void> {
   try {
-    const { data, success } = authCodeCallbackSchema.safeParse(req.query);
-    if (!success) {
-      res.status(BAD_REQUEST).send("Invalid redirect payload");
+    const callbackState = getValidatedCallbackState(req, res);
+    if (callbackState === undefined) {
       return;
     }
 
-    // exit early if callback is relayed to ephemeral env
-    if (handleRelay(data, req, res)) return;
-
-    // verify that session contains correct flow state
-    const { authCodeRequest, authState, returnTo } = req.session;
-    if (authCodeRequest === undefined) {
-      res.status(BAD_REQUEST).send(new MissingAuthCodeRequestError().message);
-      return;
-    }
-    if (authState === undefined || data.state !== authState) {
-      res.status(BAD_REQUEST).send(new StateMismatchError().message);
-      return;
-    }
+    const { authCodeRequest, data, returnTo } = callbackState;
 
     // establish a new session ID before token exchange so MSAL cache keys
     // align with the authenticated session ID.
@@ -69,7 +58,26 @@ export async function authCodeCallback(
     }
 
     const { account } = result.value;
-    Object.assign(req.session, { account, isAuthenticated: true });
+    const homeAccountId = account?.homeAccountId.trim();
+    if (
+      homeAccountId === undefined ||
+      homeAccountId.length === EMPTY_STRING_LENGTH
+    ) {
+      logger.error(
+        "Token exchange succeeded without an account homeAccountId",
+        undefined,
+      );
+      res.status(UNAUTHORIZED).send("Token acquisition failed");
+      return;
+    }
+
+    Object.assign(req.session, {
+      account,
+      isAuthenticated: true,
+      msal: {
+        homeAccountId,
+      },
+    });
     res.redirect(returnTo ?? "/");
   } catch (error) {
     next(error);
@@ -153,6 +161,52 @@ async function deleteMsalCache(sessionId: string): Promise<void> {
 
   const key = getMsalCacheKey(sessionId);
   await getRedisClient().del(key);
+}
+
+/**
+ * Validates callback payload, relay behavior, and session flow state.
+ * @param req - Express request.
+ * @param res - Express response.
+ * @returns Callback state when valid; otherwise undefined after response is handled.
+ */
+function getValidatedCallbackState(
+  req: Request,
+  res: Response,
+):
+  | undefined
+  | {
+      authCodeRequest: NonNullable<Request["session"]["authCodeRequest"]>;
+      data: { code: string; state: string };
+      returnTo: string | undefined;
+    } {
+  const parsed = authCodeCallbackSchema.safeParse(req.query);
+  if (!parsed.success) {
+    res.status(BAD_REQUEST).send("Invalid redirect payload");
+    return undefined;
+  }
+
+  // exit early if callback is relayed to ephemeral env
+  if (handleRelay(parsed.data, req, res)) {
+    return undefined;
+  }
+
+  // verify that session contains correct flow state
+  const { authCodeRequest, authState, returnTo } = req.session;
+  if (authCodeRequest === undefined) {
+    res.status(BAD_REQUEST).send(new MissingAuthCodeRequestError().message);
+    return undefined;
+  }
+
+  if (authState === undefined || parsed.data.state !== authState) {
+    res.status(BAD_REQUEST).send(new StateMismatchError().message);
+    return undefined;
+  }
+
+  return {
+    authCodeRequest,
+    data: parsed.data,
+    returnTo,
+  };
 }
 
 /**

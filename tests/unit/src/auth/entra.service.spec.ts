@@ -1,6 +1,8 @@
 import {
   ConfidentialClientApplication,
   CryptoProvider,
+  InteractionRequiredAuthError,
+  type AccountInfo,
 } from "@azure/msal-node";
 import { EntraService } from "#/auth/entra.service.js";
 import type {
@@ -14,6 +16,7 @@ import { parseRelayState, verifyRelayState } from "#/auth/auth.relay.js";
 import { Success } from "#/lib/either.js";
 import {
   MsalError,
+  NotAuthenticatedError,
   PkceGenerationError,
   TokenAcquisitionError,
   TokenRefreshError,
@@ -21,6 +24,7 @@ import {
 
 describe("EntraService", () => {
   let msalStub: Partial<ConfidentialClientApplication>;
+  let tokenCacheStub: { getAccountByHomeId: sinon.SinonStub };
   const AUTH_CODE_URL = "https://login.microsoftonline.com/auth/";
   let service: EntraService;
   const AUTH_CODE = "auth-code";
@@ -28,7 +32,15 @@ describe("EntraService", () => {
   const VERIFIER = "test-verifier";
   const ID_TOKEN = "id-token";
   const ACCESS_TOKEN = "access-token";
-  const ACCOUNT = { username: "user" };
+  const HOME_ACCOUNT_ID = "uid.tenant";
+  const ACCOUNT: AccountInfo = {
+    environment: "login.microsoftonline.com",
+    homeAccountId: HOME_ACCOUNT_ID,
+    localAccountId: "uid",
+    tenantId: "tenant",
+    username: "user@example.com",
+  };
+  const DOWNSTREAM_SCOPES = ["api://rcw/Applications.Read"];
   const TOKEN_EXPIRY = new Date(Date.now() + 3600 * 1000);
   const SESSION_SECRET = process.env.SESSION_SECRET as string;
   const REDIRECT_URI_HOSTNAME = new URL(authRequestDefaults.redirectUri)
@@ -37,6 +49,10 @@ describe("EntraService", () => {
     "el-257-laa-record-controlled-work-uat.cloud-platform.service.justice.gov.uk";
 
   beforeEach(() => {
+    tokenCacheStub = {
+      getAccountByHomeId: sinon.stub().resolves(ACCOUNT),
+    };
+
     msalStub = {
       acquireTokenByCode: sinon.stub().resolves({
         account: ACCOUNT,
@@ -51,6 +67,7 @@ describe("EntraService", () => {
         expiresOn: TOKEN_EXPIRY,
       }),
       getAuthCodeUrl: sinon.stub().resolves(AUTH_CODE_URL),
+      getTokenCache: sinon.stub().returns(tokenCacheStub),
     };
 
     service = EntraService.create({
@@ -285,7 +302,7 @@ describe("EntraService", () => {
     });
   });
 
-  describe("acquireTokenSilent()", () => {
+  describe("acquireDownstreamAccessToken()", () => {
     beforeEach(() => {
       msalStub.acquireTokenSilent = sinon.stub().resolves({
         account: ACCOUNT,
@@ -293,39 +310,101 @@ describe("EntraService", () => {
         accessToken: ACCESS_TOKEN,
         expiresOn: TOKEN_EXPIRY,
       });
+      tokenCacheStub.getAccountByHomeId.resolves(ACCOUNT);
     });
 
     it("returns a refreshed access token on success", async () => {
-      const result = (await service.acquireTokenSilent(
-        ACCOUNT as any,
-      )) as Success<TokenExchangeResult>;
+      const result = await service.acquireDownstreamAccessToken(
+        HOME_ACCOUNT_ID,
+        DOWNSTREAM_SCOPES,
+      );
+
       expect(result.error).to.be.undefined;
-      expect(result.value.accessToken).to.equal(ACCESS_TOKEN);
+      if (result.error !== undefined) {
+        throw result.error;
+      }
+      expect(result.value).to.equal(ACCESS_TOKEN);
     });
 
-    it("returns the account and idToken", async () => {
-      const result = (await service.acquireTokenSilent(
-        ACCOUNT as any,
-      )) as Success<TokenExchangeResult>;
-      expect(result.value.account).to.deep.equal(ACCOUNT);
-      expect(result.value.idToken).to.equal(ID_TOKEN);
+    it("resolves account from cache using getAccountByHomeId", async () => {
+      await service.acquireDownstreamAccessToken(
+        HOME_ACCOUNT_ID,
+        DOWNSTREAM_SCOPES,
+      );
+
+      expect(
+        tokenCacheStub.getAccountByHomeId.calledOnceWithExactly(HOME_ACCOUNT_ID),
+      ).to.be.true;
     });
 
-    it("passes the correct scopes to acquireTokenSilent", async () => {
-      await service.acquireTokenSilent(ACCOUNT as any);
+    it("passes the cached AccountInfo and scopes to acquireTokenSilent", async () => {
+      await service.acquireDownstreamAccessToken(
+        HOME_ACCOUNT_ID,
+        DOWNSTREAM_SCOPES,
+      );
+
       const [requestArg] = (msalStub.acquireTokenSilent as sinon.SinonStub)
         .args[0];
-      expect(requestArg.scopes).to.include("openid");
-      expect(requestArg.scopes).to.include("profile");
-      expect(requestArg.scopes).to.include("offline_access");
+      expect(requestArg.account).to.equal(ACCOUNT);
+      expect(requestArg.scopes).to.deep.equal(DOWNSTREAM_SCOPES);
     });
 
-    it("returns a TokenRefreshError failure when acquireTokenSilent throws", async () => {
+    it("returns NotAuthenticatedError when homeAccountId is missing", async () => {
+      const result = await service.acquireDownstreamAccessToken(
+        "  ",
+        DOWNSTREAM_SCOPES,
+      );
+
+      expect(result.error)
+        .to.be.an("error")
+        .and.to.be.instanceOf(NotAuthenticatedError);
+      expect(tokenCacheStub.getAccountByHomeId.called).to.be.false;
+      expect((msalStub.acquireTokenSilent as sinon.SinonStub).called).to.be
+        .false;
+    });
+
+    it("returns NotAuthenticatedError when cached account cannot be found", async () => {
+      tokenCacheStub.getAccountByHomeId.resolves(null);
+
+      const result = await service.acquireDownstreamAccessToken(
+        HOME_ACCOUNT_ID,
+        DOWNSTREAM_SCOPES,
+      );
+
+      expect(result.error)
+        .to.be.an("error")
+        .and.to.be.instanceOf(NotAuthenticatedError);
+      expect((msalStub.acquireTokenSilent as sinon.SinonStub).called).to.be
+        .false;
+    });
+
+    it("returns NotAuthenticatedError when interaction is required", async () => {
+      (msalStub.acquireTokenSilent as sinon.SinonStub).rejects(
+        new InteractionRequiredAuthError("interaction_required", "reauth"),
+      );
+
+      const result = await service.acquireDownstreamAccessToken(
+        HOME_ACCOUNT_ID,
+        DOWNSTREAM_SCOPES,
+      );
+
+      expect(result.error)
+        .to.be.an("error")
+        .and.to.be.instanceOf(NotAuthenticatedError);
+      expect((msalStub.acquireTokenSilent as sinon.SinonStub).calledOnce).to.be
+        .true;
+    });
+
+    it("returns a TokenRefreshError failure when acquireTokenSilent throws unexpectedly", async () => {
       (msalStub.acquireTokenSilent as sinon.SinonStub).rejects(
         new Error("silent failure"),
       );
 
-      const result = await service.acquireTokenSilent(ACCOUNT as any);
+      const result = await service.acquireDownstreamAccessToken(
+        HOME_ACCOUNT_ID,
+        DOWNSTREAM_SCOPES,
+      );
+
       expect(result.error)
         .to.be.an("error")
         .and.to.be.instanceOf(TokenRefreshError);
