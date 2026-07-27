@@ -1,4 +1,4 @@
-import type { getApplications } from "#/api/client/schema/applications/applications.gen.js";
+import type { getApplications } from "#/api/clients/rcw/schema/applications/applications.gen.js";
 import type { SessionInterface } from "#/app/session.types.js";
 
 import { NotAuthenticatedError } from "#/auth/auth.errors.js";
