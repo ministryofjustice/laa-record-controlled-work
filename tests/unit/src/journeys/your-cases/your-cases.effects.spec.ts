@@ -7,6 +7,8 @@ import { RCW_API_AUTH_CONTEXT_STATE_KEY } from "#/api/rcw-api-auth-context.js";
 import { getGetApplicationsResponseMock } from "../../../../mocks/api/fakers/applications/applications.faker.gen.js";
 import { TestRenderResult } from "@ministryofjustice/hmpps-forge/core/testing";
 import { ApiResponseError, ApiValidationError } from "#/api/api.errors.js";
+import { RcwApiClient } from "#/api/rcw-api.client.js";
+import { NotAuthenticatedError } from "#/auth/auth.errors.js";
 import { logger } from "#/logger.js";
 
 const mockData = getGetApplicationsResponseMock();
@@ -88,6 +90,32 @@ describe("LoadYourCaseList", () => {
       expect(error).to.be.instanceOf(ApiValidationError);
       const apiError = error as ApiValidationError;
       expect(apiError.message).to.include("failed schema validation");
+    });
+
+    it("throws ApiResponseError when request state has no auth context", async () => {
+      const getApplicationsStub = sinon
+        .stub()
+        .resolves({ status: 200, data: mockData });
+      const rcwApiClient = RcwApiClient.create({
+        operations: { getApplications: getApplicationsStub },
+      });
+
+      const client = createForgeTestClientForCaseList(
+        { rcwApiClient },
+        yourCasesStep,
+      );
+
+      let error: unknown;
+      try {
+        await client.get("/cases", {});
+      } catch (caughtError) {
+        error = caughtError;
+      }
+
+      expect(error).to.be.instanceOf(ApiResponseError);
+      const apiError = error as ApiResponseError;
+      expect(apiError.cause).to.be.instanceOf(NotAuthenticatedError);
+      expect(getApplicationsStub.called).to.be.false;
     });
   });
 });
