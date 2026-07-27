@@ -17,6 +17,7 @@ import { TokenAcquisitionError } from "#/auth/auth.errors.js";
 import { createMockApp } from "../../utils.js";
 
 const AUTH_CODE_URL = "https://login.microsoftonline.com/auth";
+const CALLBACK_HOSTNAME = "callback.example.test";
 
 describe("Auth Handlers", () => {
   let authServiceStub: {
@@ -27,7 +28,6 @@ describe("Auth Handlers", () => {
 
   before(() => {
     mockApp = createMockApp();
-
   });
 
   beforeEach(() => {
@@ -73,6 +73,7 @@ describe("Auth Handlers", () => {
 
       const res = await request(mockApp)
         .get("/auth/signin")
+        .set("Host", CALLBACK_HOSTNAME)
         .query({ returnTo });
 
       expect(res.status).to.equal(FOUND);
@@ -81,14 +82,15 @@ describe("Auth Handlers", () => {
       expect(authServiceStub.initiateAuthCodeFlow.firstCall.firstArg).to.equal(
         returnTo,
       );
-      expect(authServiceStub.initiateAuthCodeFlow.firstCall.args[1]).to.have.property(
-        "callbackHostname",
-      );
+      expect(authServiceStub.initiateAuthCodeFlow.firstCall.args[1]).to.deep.equal({
+        callbackHostname: CALLBACK_HOSTNAME,
+      });
     });
 
     it("ignores returnTo query parameter when it is not a safe app-relative path", async () => {
       const res = await request(mockApp)
         .get("/auth/signin")
+        .set("Host", CALLBACK_HOSTNAME)
         .query({ returnTo: "https://example.com/evil" });
 
       expect(res.status).to.equal(FOUND);
@@ -97,9 +99,9 @@ describe("Auth Handlers", () => {
       expect(authServiceStub.initiateAuthCodeFlow.firstCall.firstArg).to.equal(
         undefined,
       );
-      expect(authServiceStub.initiateAuthCodeFlow.firstCall.args[1]).to.have.property(
-        "callbackHostname",
-      );
+      expect(authServiceStub.initiateAuthCodeFlow.firstCall.args[1]).to.deep.equal({
+        callbackHostname: CALLBACK_HOSTNAME,
+      });
     });
 
     it("calls next(error) when initiateAuthCodeFlow() fails", async () => {
