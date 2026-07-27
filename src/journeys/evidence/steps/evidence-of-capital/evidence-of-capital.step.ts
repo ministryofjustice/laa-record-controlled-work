@@ -13,30 +13,22 @@ import {
   continueButton,
 } from "#/journeys/evidence/common.blocks.js";
 import {
-  childCareEvidenceGroup,
-  description,
+  capitalEvidenceGroup,
   heading,
-  housingCostsEvidenceGroup,
-  incomeEvidenceGroup,
   label,
-  maintenanceEvidenceGroup,
-} from "#/journeys/evidence/steps/evidence-of-expenditure/evidence-of-expenditure.blocks.js";
+} from "#/journeys/evidence/steps/evidence-of-capital/evidence-of-capital.blocks.js";
 import { t } from "#/lib/i18n.js";
 
-export const evidenceOfExpenditure = (
+export const evidenceOfCapital = (
   journeyCode: string,
 ): ReturnType<typeof step> =>
   step({
     blocks: [
-      backLink("/cases/evidence/evidence-of-income"),
+      backLink("/cases/evidence/evidence-of-expenditure"),
       caption,
       heading,
-      description,
       label,
-      incomeEvidenceGroup,
-      housingCostsEvidenceGroup,
-      childCareEvidenceGroup,
-      maintenanceEvidenceGroup,
+      capitalEvidenceGroup,
       continueButton,
     ],
     onSubmission: [
@@ -48,15 +40,15 @@ export const evidenceOfExpenditure = (
               goto: "check-answers",
               when: Query("returnTo").match(Condition.Equals("check-answers")),
             }),
-            redirect({ goto: "evidence-of-capital" }),
+            redirect({ goto: "check-answers" }),
           ],
         },
         validate: true,
       }),
     ],
-    path: "/evidence-of-expenditure",
+    path: "/evidence-of-capital",
     reachability: {
       entryWhen: Query("returnTo").match(Condition.Equals("check-answers")),
     },
-    title: t("journeys.evidence.evidenceOfExpenditure.title"),
+    title: t("journeys.evidence.evidenceOfCapital.title"),
   });
