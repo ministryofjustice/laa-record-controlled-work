@@ -46,27 +46,26 @@ const sharedOutputConfig = (client: string): OutputOptions => ({
 });
 
 export default defineConfig({
-  // TODO will be re-enabled in next pr
-  // pda: {
-  //   input: {
-  //     filters: {
-  //       mode: "include",
-  //       schemas: ["ProviderFirmOfficeListDto"],
-  //     },
-  //     override: {
-  //       transformer: (spec) => {
-  //         const targetPath = "/api/v1/provider-firms/{firmId}/provider-offices";
-  //         const pathItem = spec.paths?.[targetPath];
-  //         return {
-  //           ...spec,
-  //           paths: pathItem ? { [targetPath]: pathItem } : {},
-  //         };
-  //       },
-  //     },
-  //     target: process.env.PDA_API_SPEC_URL ?? "",
-  //   },
-  //   output: sharedOutputConfig("pda"),
-  // },
+  pda: {
+    input: {
+      filters: {
+        mode: "include",
+        schemas: ["ProviderFirmOfficeListDto"],
+      },
+      override: {
+        transformer: (spec) => {
+          const targetPath = "/provider-firms/{firmId}/provider-offices";
+          const pathItem = spec.paths?.[targetPath];
+          return {
+            ...spec,
+            paths: pathItem ? { [targetPath]: pathItem } : {},
+          };
+        },
+      },
+      target: ".pda-api/open-api-specification.yml",
+    },
+    output: sharedOutputConfig("pda"),
+  },
   rcw: {
     input: {
       filters: {
