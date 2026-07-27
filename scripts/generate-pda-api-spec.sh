@@ -2,7 +2,7 @@
 set -e
 
 PDA_API_VERSION_FILE=".pda-api-version"
-PDA_API_REF="${PDA_API_REF:-$(tr -d '[:space:]' < "${PDA_API_VERSION_FILE}")}"
+PDA_API_REF="$(tr -d '[:space:]' < "${PDA_API_VERSION_FILE}")"
 PDA_API_DIR=".pda-api"
 PDA_API_FILE="${PDA_API_DIR}/open-api-specification.yml"
 

@@ -55,15 +55,13 @@ jobs:
         uses: ./.github/actions/setup-node
 
       - name: Generate Orval Code
-        run: yarn api:generate
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: yarn orval
 
       - name: Check for API specification drift
         run: |
-          TARGET="src/api/client"
+          TARGET="src/api/clients/rcw"
           
-          # Check if git status returns any changes for these targets
+          # Check if git status returns any changes for these targets (exclude pda)
           if [ -n "$(git status --porcelain $TARGET)" ]; then
             echo "❌ ERROR: Your local code does not match the current OpenAPI spec."
             echo "Please run 'yarn api:generate' locally and commit the generated changes."

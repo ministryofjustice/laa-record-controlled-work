@@ -1,7 +1,11 @@
-import type { OpenApiInfoObject, OutputOptions } from "@orval/core";
+import type {
+  OpenApiDocument,
+  OpenApiInfoObject,
+  OutputOptions,
+} from "@orval/core";
 
 import "dotenv/config";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { defineConfig } from "orval";
 
 const API_SHA = readFileSync(".rcw-api-version", "utf-8").trim();
@@ -45,35 +49,44 @@ const sharedOutputConfig = (client: string): OutputOptions => ({
   tsconfig: "./tsconfig.json",
 });
 
-export default defineConfig({
-  pda: {
-    input: {
-      filters: {
-        mode: "include",
-        schemas: ["ProviderFirmOfficeListDto"],
-      },
-      override: {
-        transformer: (spec) => {
-          const targetPath = "/provider-firms/{firmId}/provider-offices";
-          const pathItem = spec.paths?.[targetPath];
-          return {
-            ...spec,
-            paths: pathItem ? { [targetPath]: pathItem } : {},
-          };
-        },
-      },
-      target: ".pda-api/open-api-specification.yml",
+const rcwConfig = {
+  input: {
+    filters: {
+      mode: "exclude" as const,
+      tags: ["items"],
     },
-    output: sharedOutputConfig("pda"),
+    target: `https://raw.githubusercontent.com/ministryofjustice/laa-record-controlled-work-api/${API_SHA}/record-controlled-work-api/open-api-specification.yml`,
   },
-  rcw: {
-    input: {
-      filters: {
-        mode: "exclude",
-        tags: ["items"],
-      },
-      target: `https://raw.githubusercontent.com/ministryofjustice/laa-record-controlled-work-api/${API_SHA}/record-controlled-work-api/open-api-specification.yml`,
+  output: sharedOutputConfig("rcw"),
+};
+
+const pdaConfig = {
+  input: {
+    filters: {
+      mode: "include" as const,
+      schemas: ["ProviderFirmOfficeListDto"],
     },
-    output: sharedOutputConfig("rcw"),
+    override: {
+      transformer: (spec: OpenApiDocument): OpenApiDocument => {
+        const targetPath = "/provider-firms/{firmId}/provider-offices";
+        const pathItem = spec.paths?.[targetPath];
+        return {
+          ...spec,
+          paths: pathItem ? { [targetPath]: pathItem } : {},
+        };
+      },
+    },
+    target: ".pda-api/open-api-specification.yml",
   },
-});
+  output: sharedOutputConfig("pda"),
+};
+
+const buildConfig = (): ReturnType<typeof defineConfig> => {
+  const config = { rcwConfig };
+  if (existsSync(".pda-api/open-api-specification.yml")) {
+    Object.assign(config, { pdaConfig });
+  }
+  return config;
+};
+
+export default defineConfig(buildConfig());
