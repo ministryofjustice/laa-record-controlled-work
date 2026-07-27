@@ -51,6 +51,7 @@ export class RedisCachePlugin implements ICachePlugin {
     const cached = await this.redisClient.get(this.key);
     if (cached) {
       cacheContext.tokenCache.deserialize(cached);
+      await this.redisClient.expire(this.key, this.ttlSeconds);
     }
   }
 }

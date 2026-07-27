@@ -22,6 +22,7 @@ describe("CachePlugin", () => {
 
     beforeEach(() => {
       redisStub = {
+        expire: sinon.stub(),
         get: sinon.stub(),
         set: sinon.stub(),
       } as sinon.SinonStubbedInstance<RedisClientType>;
@@ -63,6 +64,7 @@ describe("CachePlugin", () => {
 
         expect(redisStub.get.calledWith(CACHE_KEY)).to.be.true;
         expect(cacheContextStub.tokenCache.deserialize.called).to.be.false;
+        expect(redisStub.expire.called).to.be.false;
       });
 
       it("should deserialize when Redis cache hit", async () => {
@@ -76,6 +78,7 @@ describe("CachePlugin", () => {
         expect(
           cacheContextStub.tokenCache.deserialize.calledWith(SERIALIZED_CACHE),
         ).to.be.true;
+        expect(redisStub.expire.calledWith(CACHE_KEY, TTL_SECONDS)).to.be.true;
       });
 
       it("should read from Redis using session ID key", async () => {
