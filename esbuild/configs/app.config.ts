@@ -21,6 +21,8 @@ const externalModules: string[] = [
   "figlet",
   "csrf-sync",
   "http-errors",
+  "tty",
+  "debug",
   "*.node",
   "connect-redis",
   "redis",
