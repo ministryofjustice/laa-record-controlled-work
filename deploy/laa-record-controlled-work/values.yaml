@@ -116,7 +116,7 @@ rcw:
     RATE_LIMIT_MAX: 100
     RATE_WINDOW_MS: 900000
     NODE_ENV: ""
-    API_BASE_URL: ""
+    RCW_API_BASE_URL: ""
     ENTRA_AUTHORITY_BASE_URL: "https://login.microsoftonline.com/"
     ENTRA_REDIRECT_URI: ""
     REDIS_ENABLED: true  

@@ -1,8 +1,9 @@
-import { faker } from "@faker-js/faker";
-import { getGetApplicationsResponseMock } from "../../mocks/api/rcw/fakers/applications/applications.faker.gen.js";
-import { getGetAllProviderOfficesResponseMock } from "../../mocks/api/pda/msw/provider-firms-endpoints/provider-firms-endpoints.msw.gen.js";
+// TODO will re-enable in next pr
+// import { faker } from "@faker-js/faker";
+// import { getGetApplicationsResponseMock } from "../../mocks/api/rcw/fakers/applications/applications.faker.gen.js";
+// import { getGetAllProviderOfficesResponseMock } from "../../mocks/api/pda/msw/provider-firms-endpoints/provider-firms-endpoints.msw.gen.js";
 
-// keeps the faker data consistent across test runs, so that the same mock data is used for each test run and msw handlers
-faker.seed(12345);
+// // keeps the faker data consistent across test runs, so that the same mock data is used for each test run and msw handlers
+// faker.seed(12345);
 
-export const providerOffices = getGetAllProviderOfficesResponseMock()
+// export const providerOffices = getGetAllProviderOfficesResponseMock()

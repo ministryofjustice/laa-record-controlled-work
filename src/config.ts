@@ -20,7 +20,7 @@ const DEFAULT_PORT = 3000;
 const REDIS_MAX_RETRY_ATTEMPTS = 10;
 const DEFAULT_REDIS_PORT = 6379;
 const DEFAULT_REDIS_HOST = "localhost";
-const DEFAULT_API_BASE_URL = "http://localhost:8081";
+const DEFAULT_RCW_API_BASE_URL = "http://localhost:8081";
 const DEFAULT_API_MODE = "msw";
 
 /* eslint-disable @typescript-eslint/no-magic-numbers -- time constants are intuitive */
@@ -35,7 +35,7 @@ export default {
   api: {
     mode: optional.API_MODE ?? DEFAULT_API_MODE,
     rcw: {
-      baseUrl: optional.API_BASE_URL ?? DEFAULT_API_BASE_URL,
+      baseUrl: optional.RCW_API_BASE_URL ?? DEFAULT_RCW_API_BASE_URL,
     },
   } satisfies ApiConfig,
 
