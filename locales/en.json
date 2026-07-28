@@ -27,6 +27,7 @@
         "heading": "You have no cases"
       },
       "createCaseButton": "Record a new case",
+      "office": "Office",
       "tabs": {
         "inProgress": "In progress",
         "recorded": "Recorded",
