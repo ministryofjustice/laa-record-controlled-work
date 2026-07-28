@@ -135,5 +135,5 @@ services:
     environment:
       - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
       - SPRING_PROFILES_ACTIVE=local
-      - ISSUER=https://sts.windows.net/${ENTRA_TENANT_ID}/
-      - AUDIENCE=https://devlexternal.onmicrosoft.com/laa-record-controlled-work-api-uat
+      - ISSUER=https://login.microsoftonline.com/${ENTRA_TENANT_ID}/v2.0
+      - AUDIENCE=${ENTRA_API_AUDIENCE}
