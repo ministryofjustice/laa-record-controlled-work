@@ -28,6 +28,7 @@ describe("Your Cases Ineligible step", () => {
   describe("GET /cases/ineligible", () => {
     let renderResult: TestRenderResult;
     let recordButton: RenderBlock;
+    let selectedOffice: RenderBlock;
     let table: RenderBlock;
     let subNavigation: RenderBlock;
 
@@ -36,6 +37,11 @@ describe("Your Cases Ineligible step", () => {
       expect(result.type).to.equal("render");
       renderResult = result as TestRenderResult;
       [recordButton] = renderResult.getBlocksByVariant("govukLinkButton");
+      selectedOffice = renderResult
+        .getBlocksByVariant("html")
+        .find((b) =>
+          String(b.properties.content).includes("Office:"),
+        ) as RenderBlock;
       [table] = renderResult.getBlocksByVariant("govukTable");
       [subNavigation] = renderResult.getBlocksByVariant("mojSubNavigation");
     });
@@ -50,6 +56,10 @@ describe("Your Cases Ineligible step", () => {
 
     it("renders a link button", () => {
       expect(recordButton.properties.text).to.equal("Record a new case");
+    });
+
+    it("renders a selected office block", () => {
+      expect(selectedOffice).to.exist;
     });
 
     it("renders a sub navigation with the correct items", () => {
@@ -109,10 +119,14 @@ describe("Your Cases Ineligible step", () => {
       const visibleTables = allTables.filter(
         (b) => b.properties.visibleWhen !== false,
       );
-      const [_, body] = renderResult.getBlocksByVariant("html");
+      const body = renderResult
+        .getBlocksByVariant("html")
+        .find((b) =>
+          String(b.properties.content).includes("You have no ineligible cases"),
+        ) as RenderBlock;
 
       expect(visibleTables).to.have.length(0);
-      expect(body.properties.content).to.equal("You have no ineligible cases");
+      expect(body).to.exist;
     });
   });
 });

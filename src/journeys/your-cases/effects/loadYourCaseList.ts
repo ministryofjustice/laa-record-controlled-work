@@ -5,6 +5,7 @@ import type {
 
 import { ApiResponseError, ApiValidationError } from "#/api/api.errors.js";
 import { Applications } from "#/api/clients/rcw/model/applications.zod.gen.js";
+import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
 
@@ -38,5 +39,5 @@ export const loadYourCaseList =
       throw ApiValidationError.from(result.error);
     }
     const caseList: Applications = result.data;
-    context.setData("caseList", caseList);
+    context.setData(CONTEXT_DATA_KEYS.caseList, caseList);
   };

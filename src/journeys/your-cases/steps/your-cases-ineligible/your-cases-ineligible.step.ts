@@ -4,9 +4,11 @@ import {
   step,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
+import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import {
   createCaseButton,
   heading,
+  selectedOffice,
 } from "#/journeys/your-cases/common.blocks.js";
 import {
   casesTable,
@@ -19,14 +21,18 @@ import { t } from "#/lib/i18n.js";
 export const yourCasesIneligibleStep = step({
   blocks: [
     heading,
+    selectedOffice,
     createCaseButton,
     subNavigation,
-    casesTable(Data("caseList")),
+    casesTable(Data(CONTEXT_DATA_KEYS.caseList)),
     noCasesMessage,
   ],
   onAccess: [
     access({
-      effects: [YourCasesEffects.loadYourCaseList()],
+      effects: [
+        YourCasesEffects.loadYourCaseList(),
+        YourCasesEffects.setSelectedOffice(),
+      ],
     }),
   ],
   path: "/cases/ineligible",
