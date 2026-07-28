@@ -98,6 +98,7 @@ rcw:
     - ENTRA_CLIENT_ID
     - ENTRA_CLIENT_SECRET
     - ENTRA_TENANT_ID
+    - PDA_API_KEY
 
   # Plain env vars injected directly into the container. Add new vars 
   # here only, they are automatically picked up by the Helm template and 
