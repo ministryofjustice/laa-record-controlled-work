@@ -42,6 +42,7 @@ const requiredEnvSchema = z.object({
     "staging",
     "production",
   ]),
+  PDA_API_KEY: injected.nonempty(),
   SESSION_SECRET: z.string().nonempty(),
 });
 

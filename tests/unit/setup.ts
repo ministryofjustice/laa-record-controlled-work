@@ -5,6 +5,7 @@ process.env.ENTRA_TENANT_ID ??= "test-tenant-id";
 process.env.ENTRA_CLIENT_SECRET ??= "test-client-secret";
 process.env.ENTRA_REDIRECT_URI ??= "http://localhost/auth/callback";
 process.env.ENTRA_AUTHORITY_BASE_URL ??= "https://login.microsoftonline.com/";
+process.env.PDA_API_KEY ??= "test-pda-api-key";
 // Configure Axios to ignore proxies
 // SLSA uses safe-chain which proxies package managers
 // and sets HTTPS_PROXY on the environment, which breaks

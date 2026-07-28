@@ -1,21 +1,13 @@
-const TEST_API_KEY = "test-api-key";
+import config from "#/config.js";
 
 /**
  * Builds default authenticated options for downstream PDA API requests.
  * @returns API request options with the Authorization header.
  */
 export function getPdaApiDefaultOptions(): RequestInit {
-  if (process.env.NODE_ENV === "test") {
-    return {
-      headers: {
-        Authorization: TEST_API_KEY,
-      },
-    };
-  }
-
   return {
     headers: {
-      Authorization: "StaticToken ",
+      Authorization: config.api.pda.key,
     },
   };
 }

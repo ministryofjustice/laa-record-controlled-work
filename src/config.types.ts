@@ -2,6 +2,9 @@ import type { SessionOptions } from "express-session";
 
 export interface ApiConfig {
   mode: string;
+  pda: {
+    key: string;
+  };
   rcw: {
     baseUrl: string;
   };

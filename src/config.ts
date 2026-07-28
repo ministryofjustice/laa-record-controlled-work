@@ -34,6 +34,9 @@ const useHttps = ["production", "staging", "uat"].includes(required.NODE_ENV);
 export default {
   api: {
     mode: optional.API_MODE ?? DEFAULT_API_MODE,
+    pda: {
+      key: required.PDA_API_KEY,
+    },
     rcw: {
       baseUrl: optional.RCW_API_BASE_URL ?? DEFAULT_RCW_API_BASE_URL,
     },
