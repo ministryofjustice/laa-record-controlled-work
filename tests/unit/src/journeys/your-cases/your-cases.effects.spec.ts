@@ -5,10 +5,19 @@ import sinon from "sinon";
 import { createForgeTestClientForCaseList } from "../../../../integration/utils/helpers.js";
 import { TestRenderResult } from "@ministryofjustice/hmpps-forge/core/testing";
 import { ApiResponseError, ApiValidationError } from "#/api/api.errors.js";
+import { AuthContext } from "#/auth/auth.context.js";
 import { logger } from "#/logger.js";
 import { getGetApplicationsResponseMock } from "../../../../mocks/api/rcw/fakers/applications/applications.faker.gen.js";
 
 const mockData = getGetApplicationsResponseMock();
+
+function stubAuthContext(): void {
+  sinon.stub(AuthContext, "fromForgeContext").returns({
+    appendAuthorizationHeader: sinon
+      .stub()
+      .callsFake(async (headers: Headers) => headers),
+  } as unknown as AuthContext);
+}
 
 describe("LoadYourCaseList", () => {
   describe("when getApplications succeeds", () => {
@@ -16,6 +25,7 @@ describe("LoadYourCaseList", () => {
     let getApplicationsStub: sinon.SinonStub;
 
     before(() => {
+      stubAuthContext();
       getApplicationsStub = sinon
         .stub()
         .resolves({ status: 200, data: mockData });
@@ -42,7 +52,10 @@ describe("LoadYourCaseList", () => {
 
   describe("when getApplications throws", () => {
     // stubbing logger.error to avoid logging the error to the console during tests
-    before(() => sinon.stub(logger, "error"));
+    before(() => {
+      stubAuthContext();
+      sinon.stub(logger, "error");
+    });
     after(() => sinon.restore());
 
     async function getErrorFromYourCases(

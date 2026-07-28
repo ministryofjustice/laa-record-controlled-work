@@ -1,10 +1,19 @@
 import { TestRenderResult } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
 import { yourCasesStep } from "#/journeys/your-cases/steps/your-cases/your-cases.step.js";
+import { AuthContext } from "#/auth/auth.context.js";
 import { createForgeTestClientForCaseList } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import sinon from "sinon";
 import { getGetApplicationsResponseMock } from "../../../mocks/api/rcw/fakers/applications/applications.faker.gen.js";
+
+function stubAuthContext(): void {
+  sinon.stub(AuthContext, "fromForgeContext").returns({
+    appendAuthorizationHeader: sinon
+      .stub()
+      .callsFake(async (headers: Headers) => headers),
+  } as unknown as AuthContext);
+}
 
 describe("Your Cases step", () => {
   let getApplicationsStub: sinon.SinonStub;
@@ -12,6 +21,7 @@ describe("Your Cases step", () => {
   const mockData = getGetApplicationsResponseMock();
 
   before(() => {
+    stubAuthContext();
     getApplicationsStub = sinon
       .stub()
       .resolves({ status: 200, data: mockData });

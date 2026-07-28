@@ -9,7 +9,6 @@ import type {
 } from "#/auth/auth.types.js";
 import { expect } from "chai";
 import sinon from "sinon";
-import { authRequestDefaults } from "#/auth/auth.config.js";
 import { parseRelayState, verifyRelayState } from "#/auth/auth.relay.js";
 import { Success } from "#/lib/either.js";
 import {
@@ -31,8 +30,6 @@ describe("EntraService", () => {
   const ACCOUNT = { username: "user" };
   const TOKEN_EXPIRY = new Date(Date.now() + 3600 * 1000);
   const SESSION_SECRET = process.env.SESSION_SECRET as string;
-  const REDIRECT_URI_HOSTNAME = new URL(authRequestDefaults.redirectUri)
-    .hostname;
   const EPHEMERAL_HOSTNAME =
     "el-257-laa-record-controlled-work-uat.cloud-platform.service.justice.gov.uk";
 
@@ -180,7 +177,9 @@ describe("EntraService", () => {
         msalClient: msalStub as ConfidentialClientApplication,
       });
       const result =
-        (await ephemeralService.initiateAuthCodeFlow()) as Success<AuthCodeFlowState>;
+        (await ephemeralService.initiateAuthCodeFlow(undefined, {
+          callbackHostname: EPHEMERAL_HOSTNAME,
+        })) as Success<AuthCodeFlowState>;
       const parsed = parseRelayState(result.value.authState);
       expect(parsed).to.not.be.null;
       expect(parsed!.target).to.equal(`https://${EPHEMERAL_HOSTNAME}`);

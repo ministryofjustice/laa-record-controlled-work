@@ -4,6 +4,7 @@ import { describe, it } from "mocha";
 import { loadYourCaseList } from "#/journeys/your-cases/effects/loadYourCaseList.js";
 import sinon from "sinon";
 import { ApiResponseError, ApiValidationError } from "#/api/api.errors.js";
+import { AuthContext } from "#/auth/auth.context.js";
 import {
   CaseListContext,
   YourCasesEffectsDeps,
@@ -30,6 +31,11 @@ describe("LoadYourCaseList", () => {
     getApplicationsStub = sinon
       .stub()
       .resolves({ status: 200, data: mockData });
+    sinon.stub(AuthContext, "fromForgeContext").returns({
+      appendAuthorizationHeader: sinon
+        .stub()
+        .callsFake(async (headers: Headers) => headers),
+    } as unknown as AuthContext);
     deps = {
       getApplications: getApplicationsStub,
     };
