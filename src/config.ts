@@ -39,6 +39,7 @@ export default {
     rcw: {
       baseUrl: optional.RCW_API_BASE_URL ?? DEFAULT_RCW_API_BASE_URL,
     },
+    useMockAccessToken: required.NODE_ENV === "test",
   } satisfies ApiConfig,
 
   app: {

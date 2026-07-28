@@ -27,7 +27,7 @@ const TEST_ACCESS_TOKEN = "test-access-token";
 export async function getRcwApiDefaultOptions(
   params: RcwApiAuthParams,
 ): Promise<RcwApiDefaultOptions> {
-  if (process.env.NODE_ENV === "test") {
+  if (config.api.useMockAccessToken) {
     return {
       headers: {
         Authorization: `Bearer ${TEST_ACCESS_TOKEN}`,
