@@ -32,7 +32,8 @@ services:
       - .env # load from .env first
     environment: # set overrides
       - NODE_ENV=docker
-      - API_BASE_URL=http://rcw-api:8081
+      - API_MODE=api
+      - RCW_API_BASE_URL=http://rcw-api:8081
       - REDIS_ENABLED=true
       - REDIS_URL=redis://redis-rcw:6379
       - REDIS_AUTH_TOKEN=${REDIS_AUTH_TOKEN:-redis_password}
@@ -125,7 +126,7 @@ services:
 
   rcw-api:
     container_name: rcw-api
-    image: "laa-record-controlled-work-api-rcw-api:latest"
+    image: laa-record-controlled-work-api:latest
     pull_policy: never # clone laa-record-controlled-work-api, `make build`
     ports:
       - "8081:8081"
