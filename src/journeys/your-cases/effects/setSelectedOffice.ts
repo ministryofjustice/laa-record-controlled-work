@@ -1,5 +1,7 @@
 import type { CaseListContext } from "#/journeys/your-cases/your-cases.types.js";
 
+import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
+
 export const setSelectedOffice = () => (context: CaseListContext) => {
   const selectedOffice = {
     address: "123 Fake Street",
@@ -7,5 +9,5 @@ export const setSelectedOffice = () => (context: CaseListContext) => {
     displayName: "London Office",
   };
 
-  context.setData("selectedOffice", selectedOffice);
+  context.setData(CONTEXT_DATA_KEYS.selectedOffice, selectedOffice);
 };

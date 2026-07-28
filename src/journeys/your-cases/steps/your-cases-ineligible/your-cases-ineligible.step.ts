@@ -4,6 +4,7 @@ import {
   step,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
+import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import {
   createCaseButton,
   heading,
@@ -23,7 +24,7 @@ export const yourCasesIneligibleStep = step({
     selectedOffice,
     createCaseButton,
     subNavigation,
-    casesTable(Data("caseList")),
+    casesTable(Data(CONTEXT_DATA_KEYS.caseList)),
     noCasesMessage,
   ],
   onAccess: [
