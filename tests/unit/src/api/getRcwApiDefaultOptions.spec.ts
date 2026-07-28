@@ -26,6 +26,8 @@ function createParams(
   };
 }
 
+
+
 afterEach(() => {
   sinon.restore();
 
@@ -38,8 +40,13 @@ afterEach(() => {
 });
 
 describe("getRcwApiDefaultOptions", () => {
+  beforeEach(() => {
+    sinon.stub(config.api, "useMockAccessToken").value(false);
+  })
+
   it("returns a bearer Authorization header in test environment", async () => {
     process.env.NODE_ENV = "test";
+    sinon.stub(config.api, "useMockAccessToken").value(true);
 
     const options = await getRcwApiDefaultOptions(createParams());
 
