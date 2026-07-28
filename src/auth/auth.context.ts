@@ -8,6 +8,8 @@ import { RedisCachePlugin } from "#/auth/msal.plugin.js";
 import config from "#/config.js";
 import { getRedisClient } from "#/lib/redis.js";
 
+const PLAYWRIGHT_TEST_ACCESS_TOKEN = "test-token-bypass";
+
 /**
  * Auth context container.
  *
@@ -65,6 +67,11 @@ export class AuthContext {
    * @returns object Headers object.
    */
   async appendAuthorizationHeader(headers: Headers): Promise<Headers> {
+    if (isPlaywrightTestSigninEnabled()) {
+      headers.set("Authorization", `Bearer: ${PLAYWRIGHT_TEST_ACCESS_TOKEN}`);
+      return headers;
+    }
+
     if (!this.account) {
       throw new Error("Missing account");
     }
@@ -82,3 +89,15 @@ export class AuthContext {
     return headers;
   }
 }
+
+/**
+ * Check if we're in a Playwright test where auth isn't available.
+ * @returns boolean
+ */
+function isPlaywrightTestSigninEnabled(): boolean {
+  return (
+    process.env.NODE_ENV === "test" &&
+    process.env.PLAYWRIGHT_TEST_SIGNIN === "true"
+  );
+}
+
