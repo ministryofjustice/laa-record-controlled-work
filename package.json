@@ -1,6 +1,8 @@
 {
   "name": "laa-record-controlled-work",
   "version": "1.0.1",
+  "description": "LAA Record Controlled Work UI",
+  "repository": "git@github.com:ministryofjustice/laa-record-controlled-work.git",
   "private": true,
   "license": "MIT",
   "main": "public/app.js",
