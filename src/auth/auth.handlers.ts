@@ -184,7 +184,7 @@ function getValidatedCallbackState(
     const parsedError = authCodeCallbackErrorSchema.safeParse(req.query);
     if (parsedError.success) {
       const description = parsedError.data.error_description?.trim();
-      const errorMessage = description || parsedError.data.error;
+      const errorMessage = description ?? parsedError.data.error;
       logger.warn("Entra auth callback returned an error", {
         entraError: parsedError.data.error,
         entraErrorDescription: description,
