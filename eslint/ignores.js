@@ -25,6 +25,7 @@ export default {
     "tests/playwright/pages/*", // Page object models
     "tests/playwright/utils/*", // Test utilities and helpers
     "tests/playwright/playwright.config.ts", // Playwright configuration file
+    "playwright-report/*", // Playwright test report artifacts
     "tests/helpers/*", // Test helper utilities (if any remain)
     "tests/integration/utils/*", // Integration test utilities and helpers
     "docs/source/javascripts/application.js", // Parsing error: not found by the project service
