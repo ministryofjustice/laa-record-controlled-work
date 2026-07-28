@@ -32,10 +32,6 @@ describe("Auth Handlers", () => {
   });
 
   beforeEach(() => {
-    // adding console stubs to hide purposely thrown errors and relay logs from terminal
-    sinon.stub(console, "error");
-    sinon.stub(console, "info");
-
     authServiceStub = {
       initiateAuthCodeFlow: sinon.stub().resolves(success({
         authCodeUrl: AUTH_CODE_URL,
@@ -154,6 +150,22 @@ describe("Auth Handlers", () => {
       expect(authServiceStub.exchangeAuthCode.called).to.be.false;
       expect(res.status).to.equal(BAD_REQUEST);
       expect(res.text).to.equal("Invalid redirect payload");
+    });
+
+    it("responds with 400 and the Entra callback error description when auth provider returns an error", async () => {
+      const res = await request(mockApp)
+        .get("/auth/code/callback")
+        .query({
+          error: "invalid_scope",
+          error_description:
+            "AADSTS650053: The application requested scope is invalid",
+        });
+
+      expect(authServiceStub.exchangeAuthCode.called).to.be.false;
+      expect(res.status).to.equal(BAD_REQUEST);
+      expect(res.text).to.equal(
+        "Entra sign-in failed: AADSTS650053: The application requested scope is invalid",
+      );
     });
 
     it("responds with 401 when token exchange fails", async () => {

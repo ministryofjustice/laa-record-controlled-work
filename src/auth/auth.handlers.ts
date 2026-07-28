@@ -11,7 +11,10 @@ import {
   parseRelayState,
   verifyRelayState,
 } from "#/auth/auth.relay.js";
-import { authCodeCallbackSchema } from "#/auth/auth.types.js";
+import {
+  authCodeCallbackErrorSchema,
+  authCodeCallbackSchema,
+} from "#/auth/auth.types.js";
 import { EntraService } from "#/auth/entra.service.js";
 import { getMsalCacheKey } from "#/auth/msal.cache-key.js";
 import config from "#/config.js";
@@ -63,10 +66,7 @@ export async function authCodeCallback(
       homeAccountId === undefined ||
       homeAccountId.length === EMPTY_STRING_LENGTH
     ) {
-      logger.error(
-        "Token exchange succeeded without an account homeAccountId",
-        undefined,
-      );
+      logger.error("Token exchange succeeded without an account homeAccountId");
       res.status(UNAUTHORIZED).send("Token acquisition failed");
       return;
     }
@@ -181,6 +181,18 @@ function getValidatedCallbackState(
     } {
   const parsed = authCodeCallbackSchema.safeParse(req.query);
   if (!parsed.success) {
+    const parsedError = authCodeCallbackErrorSchema.safeParse(req.query);
+    if (parsedError.success) {
+      const description = parsedError.data.error_description?.trim();
+      const errorMessage = description || parsedError.data.error;
+      logger.warn("Entra auth callback returned an error", {
+        entraError: parsedError.data.error,
+        entraErrorDescription: description,
+      });
+      res.status(BAD_REQUEST).send(`Entra sign-in failed: ${errorMessage}`);
+      return undefined;
+    }
+
     res.status(BAD_REQUEST).send("Invalid redirect payload");
     return undefined;
   }
