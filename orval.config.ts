@@ -10,7 +10,20 @@ import { defineConfig } from "orval";
 
 const API_SHA = readFileSync(".rcw-api-version", "utf-8").trim();
 
-const sharedOutputConfig = (client: string): OutputOptions => ({
+const sharedOutputConfig = (
+  client: string,
+  runtimeBaseUrl: string,
+): OutputOptions => ({
+  baseUrl: {
+    imports: [
+      {
+        default: true,
+        importPath: "#/config.js",
+        name: "config",
+      },
+    ],
+    runtime: runtimeBaseUrl,
+  },
   clean: true,
   client: "fetch",
   fileExtension: ".gen.ts",
@@ -34,11 +47,6 @@ const sharedOutputConfig = (client: string): OutputOptions => ({
       nonNullable: true,
       required: true,
     },
-    mutator: {
-      extension: ".js",
-      name: "fetcher",
-      path: "./src/lib/fetch.ts",
-    },
   },
   schemaFileExtension: ".zod.gen.ts",
   schemas: {
@@ -57,7 +65,7 @@ const rcwConfig = {
     },
     target: `https://raw.githubusercontent.com/ministryofjustice/laa-record-controlled-work-api/${API_SHA}/record-controlled-work-api/open-api-specification.yml`,
   },
-  output: sharedOutputConfig("rcw"),
+  output: sharedOutputConfig("rcw", "config.api.rcw.baseUrl"),
 };
 
 const pdaConfig = {
@@ -78,7 +86,7 @@ const pdaConfig = {
     },
     target: ".pda-api/open-api-specification.yml",
   },
-  output: sharedOutputConfig("pda"),
+  output: sharedOutputConfig("pda", "config.api.pda.baseUrl"),
 };
 
 const buildConfig = (): ReturnType<typeof defineConfig> => {
