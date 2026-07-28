@@ -1,4 +1,5 @@
-import type { SessionInterface } from "#/app/session.types.js";
+import type { Session, SessionData } from "express-session";
+
 import type {
   CaseListContext,
   YourCasesEffectsDeps,
@@ -17,7 +18,8 @@ export const loadYourCaseList =
 
     try {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Session shape is constrained by app session typing.
-      const session = context.getSession() as SessionInterface | undefined;
+      const session = context.getSession() as
+        (Partial<SessionData> & Session) | undefined;
       const opts = await getRcwApiDefaultOptions({
         homeAccountId: session?.msal?.homeAccountId,
         sessionId: session?.id,

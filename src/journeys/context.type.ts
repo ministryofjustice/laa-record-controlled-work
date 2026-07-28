@@ -1,5 +1,5 @@
 import type { EffectFunctionContext } from "@ministryofjustice/hmpps-forge/core/authoring";
-import type { Session } from "express-session";
+import type { Session, SessionData } from "express-session";
 
 export type JourneyEffectContext = EffectFunctionContext<
   Record<string, unknown>,
@@ -13,7 +13,4 @@ export type JourneyEffectContext = EffectFunctionContext<
  *
  * Each journey owns a key under `session.journeys` so journeys cannot collide.
  */
-export type JourneySession = Session & {
-  journeyDrafts?: Record<string, Record<string, unknown>>;
-  journeySubmitted?: Record<string, boolean>;
-};
+export type JourneySession = Partial<SessionData> & Session;

@@ -4,8 +4,11 @@ import type {
   AuthorizationUrlRequest,
 } from "@azure/msal-node";
 
-import type { SessionMsalReference } from "#/app/session.types.js";
 import type { PKCECodes } from "#/auth/auth.types.js";
+
+interface SessionMsalReference {
+  homeAccountId: string;
+}
 
 declare module "express-session" {
   interface SessionData {
@@ -14,6 +17,8 @@ declare module "express-session" {
     authCodeUrlRequest?: AuthorizationUrlRequest;
     authState?: string;
     isAuthenticated?: boolean;
+    journeyDrafts?: Record<string, Record<string, unknown>>;
+    journeySubmitted?: Record<string, boolean>;
     msal?: SessionMsalReference;
     pkceCodes?: PKCECodes;
     returnTo?: string;
