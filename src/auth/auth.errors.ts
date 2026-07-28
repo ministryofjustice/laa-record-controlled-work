@@ -17,6 +17,14 @@ export class MsalError extends DomainError {
   }
 }
 
+export class NotAuthenticatedError extends DomainError {
+  public readonly name = "NotAuthenticatedError";
+
+  constructor(cause?: unknown) {
+    super("User not authenticated", cause);
+  }
+}
+
 export class PkceGenerationError extends DomainError {
   public readonly name = "PkceGenerationError";
 

@@ -17,7 +17,7 @@ import {
   JourneyEffects,
   JourneyEffectsImplementations,
 } from "#/journeys/effects.js";
-import { YourCasesEffectsDeps } from "#/journeys/your-cases/your-cases.types.js";
+import type { YourCasesEffectsDeps } from "#/journeys/your-cases/your-cases.types.js";
 import { yourCasesEffectsRegistry } from "#/journeys/your-cases/your-cases.effects.js";
 
 /**
@@ -67,7 +67,6 @@ export function createForgeTestClientForCaseList(
   mockYourCasesEffectsDeps: YourCasesEffectsDeps,
   ...steps: StepDefinition[]
 ): ForgeTestClient {
-  
   const testJourney = journey({
     code: "yourCases",
     path: "/",

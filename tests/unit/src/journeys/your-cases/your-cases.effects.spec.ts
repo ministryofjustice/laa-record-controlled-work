@@ -19,6 +19,7 @@ describe("LoadYourCaseList", () => {
       getApplicationsStub = sinon
         .stub()
         .resolves({ status: 200, data: mockData });
+
       client = createForgeTestClientForCaseList(
         { getApplications: getApplicationsStub },
         yourCasesStep,

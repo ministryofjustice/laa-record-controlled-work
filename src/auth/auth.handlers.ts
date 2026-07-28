@@ -1,5 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 
+import { promisify } from "node:util";
+
 import {
   MissingAuthCodeRequestError,
   StateMismatchError,
@@ -9,10 +11,12 @@ import {
   parseRelayState,
   verifyRelayState,
 } from "#/auth/auth.relay.js";
-import { authCodeCallbackSchema } from "#/auth/auth.types.js";
+import {
+  authCodeCallbackErrorSchema,
+  authCodeCallbackSchema,
+} from "#/auth/auth.types.js";
 import { EntraService } from "#/auth/entra.service.js";
-import { createMsalClient } from "#/auth/msal.client.js";
-import { RedisCachePlugin } from "#/auth/msal.plugin.js";
+import { getMsalCacheKey } from "#/auth/msal.cache-key.js";
 import config from "#/config.js";
 import {
   BAD_REQUEST,
@@ -21,6 +25,14 @@ import {
 } from "#/lib/constants/http.js";
 import { getRedisClient } from "#/lib/redis.js";
 import { logger } from "#/logger.js";
+
+const EMPTY_STRING_LENGTH = 0;
+
+interface ValidatedCallbackState {
+  authCodeRequest: NonNullable<Request["session"]["authCodeRequest"]>;
+  data: { code: string; state: string };
+  returnTo: string | undefined;
+}
 
 /**
  * Handles the Entra auth code callback, exchanging the code for tokens.
@@ -34,27 +46,18 @@ export async function authCodeCallback(
   next: NextFunction,
 ): Promise<void> {
   try {
-    const { data, success } = authCodeCallbackSchema.safeParse(req.query);
-    if (!success) {
-      res.status(BAD_REQUEST).send("Invalid redirect payload");
+    const callbackState = getValidatedCallbackState(req, res);
+    if (callbackState === undefined) {
       return;
     }
 
-    // exit early if callback is relayed to ephemeral env
-    if (handleRelay(data, req, res)) return;
+    const { authCodeRequest, data, returnTo } = callbackState;
 
-    // verify that session contains correct flow state
-    const { authCodeRequest, authState, returnTo } = req.session;
-    if (authCodeRequest === undefined) {
-      res.status(BAD_REQUEST).send(new MissingAuthCodeRequestError().message);
-      return;
-    }
-    if (authState === undefined || data.state !== authState) {
-      res.status(BAD_REQUEST).send(new StateMismatchError().message);
-      return;
-    }
+    // establish a new session ID before token exchange so MSAL cache keys
+    // align with the authenticated session ID.
+    await regenerateSession(req);
 
-    const entra = createEntraService(req);
+    const entra = EntraService.create({ sessionId: req.sessionID });
 
     // exchange auth code for tokens and state
     const result = await entra.exchangeAuthCode(data.code, authCodeRequest);
@@ -63,17 +66,25 @@ export async function authCodeCallback(
       return;
     }
 
-    // establish a new session ID
-    req.session.regenerate((error: Error | null | undefined) => {
-      if (error) {
-        next(error);
-        return;
-      }
+    const { account } = result.value;
+    const homeAccountId = account?.homeAccountId.trim();
+    if (
+      homeAccountId === undefined ||
+      homeAccountId.length === EMPTY_STRING_LENGTH
+    ) {
+      logger.error("Token exchange succeeded without an account homeAccountId");
+      res.status(UNAUTHORIZED).send("Token acquisition failed");
+      return;
+    }
 
-      const { account } = result.value;
-      Object.assign(req.session, { account, isAuthenticated: true });
-      res.redirect(returnTo ?? "/");
+    Object.assign(req.session, {
+      account,
+      isAuthenticated: true,
+      msal: {
+        homeAccountId,
+      },
     });
+    res.redirect(returnTo ?? "/");
   } catch (error) {
     next(error);
   }
@@ -96,8 +107,10 @@ export async function signIn(
   }
 
   try {
-    const entra = createEntraService(req);
-    const result = await entra.initiateAuthCodeFlow(req.session.returnTo);
+    const entra = EntraService.create({ sessionId: req.sessionID });
+    const result = await entra.initiateAuthCodeFlow(req.session.returnTo, {
+      callbackHostname: req.hostname,
+    });
     if (result.error) {
       res.status(INTERNAL_SERVER_ERROR).send(result.error.message);
       return;
@@ -125,6 +138,8 @@ export async function signIn(
  * @param next - The Express next function.
  */
 export function signOut(req: Request, res: Response, next: NextFunction): void {
+  const sessionId = req.sessionID;
+
   try {
     req.session.destroy((error: Error | null) => {
       if (error) {
@@ -132,8 +147,12 @@ export function signOut(req: Request, res: Response, next: NextFunction): void {
         return;
       }
 
-      res.clearCookie(config.session.name);
-      res.redirect("/");
+      void deleteMsalCache(sessionId)
+        .then(() => {
+          res.clearCookie(config.session.name);
+          res.redirect("/");
+        })
+        .catch(next);
     });
   } catch (error) {
     next(error);
@@ -141,17 +160,66 @@ export function signOut(req: Request, res: Response, next: NextFunction): void {
 }
 
 /**
- * Creates an EntraService with an MSAL client configured for the current request session.
- * @param req - The Express request.
- * @returns A configured EntraService instance.
+ * Deletes MSAL session cache from Redis when enabled.
+ * @param sessionId - The express-session ID.
  */
-function createEntraService(req: Request): EntraService {
-  const msalCachePlugin = config.redis.enabled
-    ? new RedisCachePlugin(getRedisClient(), req.sessionID, config.redis.maxAge)
-    : undefined;
+async function deleteMsalCache(sessionId: string): Promise<void> {
+  if (!config.redis.enabled) return;
 
-  const msalClient = createMsalClient({ msalCachePlugin });
-  return EntraService.create({ msalClient, requestHostname: req.hostname });
+  const key = getMsalCacheKey(sessionId);
+  await getRedisClient().del(key);
+}
+
+/**
+ * Validates callback payload, relay behavior, and session flow state.
+ * @param req - Express request.
+ * @param res - Express response.
+ * @returns Callback state when valid; otherwise undefined after response is handled.
+ */
+function getValidatedCallbackState(
+  req: Request,
+  res: Response,
+): undefined | ValidatedCallbackState {
+  const parsed = authCodeCallbackSchema.safeParse(req.query);
+  if (!parsed.success) {
+    const parsedError = authCodeCallbackErrorSchema.safeParse(req.query);
+    if (parsedError.success) {
+      const description = parsedError.data.error_description?.trim();
+      const errorMessage = description ?? parsedError.data.error;
+      logger.warn("Entra auth callback returned an error", {
+        entraError: parsedError.data.error,
+        entraErrorDescription: description,
+      });
+      res.status(BAD_REQUEST).send(`Entra sign-in failed: ${errorMessage}`);
+      return undefined;
+    }
+
+    res.status(BAD_REQUEST).send("Invalid redirect payload");
+    return undefined;
+  }
+
+  // exit early if callback is relayed to ephemeral env
+  if (handleRelay(parsed.data, req, res)) {
+    return undefined;
+  }
+
+  // verify that session contains correct flow state
+  const { authCodeRequest, authState, returnTo } = req.session;
+  if (authCodeRequest === undefined) {
+    res.status(BAD_REQUEST).send(new MissingAuthCodeRequestError().message);
+    return undefined;
+  }
+
+  if (authState === undefined || parsed.data.state !== authState) {
+    res.status(BAD_REQUEST).send(new StateMismatchError().message);
+    return undefined;
+  }
+
+  return {
+    authCodeRequest,
+    data: parsed.data,
+    returnTo,
+  };
 }
 
 /**
@@ -215,4 +283,17 @@ function parseSafeReturnToOverride(req: Request): string | undefined {
 
   const normalizedReturnTo = returnTo.trim();
   return isRelativePath(normalizedReturnTo) ? normalizedReturnTo : undefined;
+}
+
+/**
+ * Rotates the current express-session ID and replaces `req.session`.
+ * @param req - The Express request.
+ */
+async function regenerateSession(req: Request): Promise<void> {
+  const regenerate = promisify(
+    (callback: (error?: Error | null) => void): void => {
+      req.session.regenerate(callback);
+    },
+  );
+  await regenerate();
 }

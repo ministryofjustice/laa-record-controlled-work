@@ -13,6 +13,12 @@ export const authCodeCallbackSchema = z.object({
   state: z.string().min(1),
 });
 
+export const authCodeCallbackErrorSchema = z.object({
+  error: z.string().min(1),
+  error_description: z.string().optional(),
+  state: z.string().optional(),
+});
+
 export interface AuthCodeFlowState {
   authCodeRequest: AuthorizationCodeRequest;
   authCodeUrl: string;

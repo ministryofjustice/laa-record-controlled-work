@@ -1,10 +1,10 @@
 import {
-  type AccountInfo,
   type AuthenticationResult,
   type AuthorizationCodeRequest,
   type AuthorizationUrlRequest,
   type ConfidentialClientApplication,
   CryptoProvider,
+  InteractionRequiredAuthError,
 } from "@azure/msal-node";
 import { randomUUID } from "node:crypto";
 
@@ -17,21 +17,29 @@ import type {
 import { authRequestDefaults } from "#/auth/auth.config.js";
 import {
   MsalError,
+  NotAuthenticatedError,
   PkceGenerationError,
   TokenAcquisitionError,
   TokenRefreshError,
 } from "#/auth/auth.errors.js";
 import { createRelayState } from "#/auth/auth.relay.js";
+import { createMsalClient } from "#/auth/msal.client.js";
+import { RedisCachePlugin } from "#/auth/msal.plugin.js";
 import config from "#/config.js";
 import { type Either, failure, success } from "#/lib/either.js";
+import { getRedisClient } from "#/lib/redis.js";
 import { logger } from "#/logger.js";
 
 interface EntraServiceConfig {
-  msalClient: ConfidentialClientApplication;
-  requestHostname: string;
+  msalClient?: ConfidentialClientApplication;
+  sessionId?: string;
 }
 
-const EMPTY_HOSTNAME_LENGTH = 0;
+interface InitiateAuthCodeFlowOptions {
+  callbackHostname?: string;
+}
+
+const EMPTY_STRING_LENGTH = 0;
 
 /**
  * Handles Microsoft Entra ID (MSAL) authentication flows including
@@ -40,59 +48,97 @@ const EMPTY_HOSTNAME_LENGTH = 0;
 export class EntraService {
   public msalClient: ConfidentialClientApplication;
   private readonly cryptoProvider: CryptoProvider = new CryptoProvider();
-  private readonly requestHostname: string;
 
   /**
    * Creates an EntraService instance.
-   * @param {string} requestHostname - The hostname of the incoming request (e.g. "my-host.example.com").
    * @param {ConfidentialClientApplication} msalclient - The MSAL client instance to use for token acquisition and code exchange.
    */
-  private constructor(
-    requestHostname: string,
-    msalclient: ConfidentialClientApplication,
-  ) {
-    this.requestHostname = requestHostname;
+  private constructor(msalclient: ConfidentialClientApplication) {
     this.msalClient = msalclient;
   }
 
   /**
    * Factory method to create a new EntraService instance.
-   * @param {config} config - Configuration for the EntraService, including request hostname and an MSAL client.
+   * @param options - Optional explicit config or session-scoped cache context.
    * @returns {EntraService} A new EntraService instance.
    */
-  public static create({
-    msalClient,
-    requestHostname,
-  }: EntraServiceConfig): EntraService {
-    validateMsalClient(msalClient);
-    const normalizedHostname = normalizeRequestHostname(requestHostname);
+  public static create(options: EntraServiceConfig = {}): EntraService {
+    if (options.sessionId !== undefined) {
+      const msalCachePlugin = config.redis.enabled
+        ? new RedisCachePlugin(
+            getRedisClient(),
+            options.sessionId,
+            config.redis.maxAge,
+          )
+        : undefined;
 
-    return new EntraService(normalizedHostname, msalClient);
+      return new EntraService(createMsalClient({ msalCachePlugin }));
+    }
+
+    if (options.msalClient === undefined) {
+      return new EntraService(createMsalClient());
+    }
+
+    const { msalClient } = options;
+    validateMsalClient(msalClient);
+    return new EntraService(msalClient);
   }
 
   /**
-   * Acquire a fresh access token using cached credentials.
-   * Cache serialization/deserialization is handled automatically by the ICachePlugin.
+   * Acquire a downstream API access token using the MSAL account resolved from
+   * the session-scoped token cache partition.
    *
-   * @param account - The authenticated account from the session.
-   * @returns {Promise<Either<TokenRefreshError, TokenExchangeResult>>} The refreshed token set or an error.
+   * @param homeAccountId - Session-persisted MSAL homeAccountId reference.
+   * @param scopes - Downstream API scopes to request.
+   * @returns Access token or a reauthentication/refresh error.
    */
-  public async acquireTokenSilent(
-    account: AccountInfo,
-  ): Promise<Either<TokenRefreshError, TokenExchangeResult>> {
+  public async acquireDownstreamAccessToken(
+    homeAccountId: string,
+    scopes: readonly string[],
+  ): Promise<Either<NotAuthenticatedError | TokenRefreshError, string>> {
+    if (homeAccountId.trim().length === EMPTY_STRING_LENGTH) {
+      return failure(
+        NotAuthenticatedError.from(
+          new Error("The authenticated session has no MSAL account reference"),
+        ),
+      );
+    }
+
     try {
+      const account = await this.msalClient
+        .getTokenCache()
+        .getAccountByHomeId(homeAccountId);
+      if (account === null) {
+        logger.warn("No MSAL account found for session account reference", {
+          hasCachedAccount: false,
+          hasHomeAccountId: true,
+          scopes,
+        });
+        return failure(
+          NotAuthenticatedError.from(
+            new Error(
+              "The MSAL account was not found in the session token cache",
+            ),
+          ),
+        );
+      }
+
       const result: AuthenticationResult =
         await this.msalClient.acquireTokenSilent({
           account,
-          scopes: authRequestDefaults.scopes,
+          scopes: [...scopes],
         });
 
-      return success({
-        accessToken: result.accessToken,
-        account: result.account ?? undefined,
-        idToken: result.idToken,
-      });
+      return success(result.accessToken);
     } catch (error) {
+      if (error instanceof InteractionRequiredAuthError) {
+        logger.info("MSAL interaction required for silent token acquisition", {
+          hasHomeAccountId: true,
+          scopes,
+        });
+        return failure(NotAuthenticatedError.from(error));
+      }
+
       logger.error("Failed to silently acquire token", error);
       return failure(TokenRefreshError.from(error));
     }
@@ -128,10 +174,12 @@ export class EntraService {
   /**
    * Generates the Microsoft Entra ID authorisation URL to begin the PKCE sign-in flow.
    * @param {string} [returnTo] - The path to redirect to after successful authentication.
+   * @param options - Optional flow context, including callback hostname for relay-state targeting.
    * @returns {Promise<Either<AuthError, AuthCodeFlowState>>} The auth flow initialisation data or an auth error.
    */
   public async initiateAuthCodeFlow(
     returnTo?: string,
+    options: InitiateAuthCodeFlowOptions = {},
   ): Promise<Either<MsalError | PkceGenerationError, AuthCodeFlowState>> {
     let pkceCodes: PKCECodes;
     try {
@@ -143,7 +191,11 @@ export class EntraService {
       return failure(PkceGenerationError.from(error));
     }
 
-    const prepared = this.prepareFlowState(pkceCodes, returnTo);
+    const prepared = this.prepareFlowState(
+      pkceCodes,
+      returnTo,
+      options.callbackHostname,
+    );
     try {
       const authCodeUrl = await this.msalClient.getAuthCodeUrl(
         prepared.authCodeUrlRequest,
@@ -157,15 +209,17 @@ export class EntraService {
 
   /**
    * Builds the MSAL authorisation URL request and related auth flow state.
-   * When the request hostname differs from the configured redirect URI hostname (ephemeral environments),
+   * When the callback hostname differs from the configured redirect URI hostname (ephemeral environments),
    * the state parameter includes a signed relay target so UAT can forward the callback.
    * @param pkceCodes - The PKCE code verifier, challenge, and challenge method.
    * @param returnTo - The post-authentication redirect path to validate.
+   * @param callbackHostname - Optional current request hostname used for relay-state targeting.
    * @returns The auth flow state (excluding the auth code URL, which requires an MSAL call).
    */
   private prepareFlowState(
     pkceCodes: PKCECodes,
     returnTo?: string,
+    callbackHostname?: string,
   ): Omit<AuthCodeFlowState, "authCodeUrl"> {
     const { challenge, challengeMethod, verifier } = pkceCodes;
 
@@ -179,12 +233,18 @@ export class EntraService {
     // Encoded as base64(JSON) so MSAL's parseRequestState can parse it without throwing invalid_state.
     const nonce = randomUUID();
     const redirectHostname = new URL(authRequestDefaults.redirectUri).hostname;
-    const isRelay = this.requestHostname !== redirectHostname;
+    const normalizedCallbackHostname =
+      callbackHostname === undefined
+        ? undefined
+        : normalizeCallbackHostname(callbackHostname);
+    const isRelay =
+      normalizedCallbackHostname !== undefined &&
+      normalizedCallbackHostname !== redirectHostname;
 
     const authState = isRelay
       ? createRelayState(
           nonce,
-          `https://${this.requestHostname}`,
+          `https://${normalizedCallbackHostname}`,
           config.session.secret,
         )
       : this.cryptoProvider.base64Encode(JSON.stringify({ nonce }));
@@ -230,21 +290,21 @@ function isValidHostname(hostname: string): boolean {
 
 /**
  * Validates and normalizes the request hostname invariant.
- * @param requestHostname - Raw request hostname from the caller.
+ * @param callbackHostname - Raw callback hostname from the caller.
  * @returns A normalized, lowercase hostname.
  */
-function normalizeRequestHostname(requestHostname: string): string {
-  const normalizedHostname = requestHostname.trim().toLowerCase();
+function normalizeCallbackHostname(callbackHostname: string): string {
+  const normalizedHostname = callbackHostname.trim().toLowerCase();
 
-  if (normalizedHostname.length === EMPTY_HOSTNAME_LENGTH) {
+  if (normalizedHostname.length === EMPTY_STRING_LENGTH) {
     throw new TypeError(
-      "EntraService.create requires a non-empty requestHostname",
+      "EntraService.initiateAuthCodeFlow requires a non-empty callbackHostname",
     );
   }
 
   if (!isValidHostname(normalizedHostname)) {
     throw new TypeError(
-      "EntraService.create requires requestHostname to be a valid hostname",
+      "EntraService.initiateAuthCodeFlow requires callbackHostname to be a valid hostname",
     );
   }
 
@@ -264,7 +324,10 @@ function validateMsalClient(
 
   const candidate = msalClient as Partial<
     Record<
-      "acquireTokenByCode" | "acquireTokenSilent" | "getAuthCodeUrl",
+      | "acquireTokenByCode"
+      | "acquireTokenSilent"
+      | "getAuthCodeUrl"
+      | "getTokenCache",
       unknown
     >
   >;
@@ -272,7 +335,8 @@ function validateMsalClient(
   if (
     typeof candidate.acquireTokenByCode !== "function" ||
     typeof candidate.acquireTokenSilent !== "function" ||
-    typeof candidate.getAuthCodeUrl !== "function"
+    typeof candidate.getAuthCodeUrl !== "function" ||
+    typeof candidate.getTokenCache !== "function"
   ) {
     throw new TypeError(
       "EntraService.create requires an msalClient with MSAL auth methods",
