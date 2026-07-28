@@ -65,10 +65,10 @@ export class EntraService {
     if (options.sessionId !== undefined) {
       const msalCachePlugin = config.redis.enabled
         ? new RedisCachePlugin(
-          getRedisClient(),
-          options.sessionId,
-          config.redis.maxAge,
-        )
+            getRedisClient(),
+            options.sessionId,
+            config.redis.maxAge,
+          )
         : undefined;
 
       return new EntraService(createMsalClient({ msalCachePlugin }));
@@ -210,10 +210,10 @@ export class EntraService {
 
     const authState = isRelay
       ? createRelayState(
-        nonce,
-        `https://${normalizedCallbackHostname}`,
-        config.session.secret,
-      )
+          nonce,
+          `https://${normalizedCallbackHostname}`,
+          config.session.secret,
+        )
       : this.cryptoProvider.base64Encode(JSON.stringify({ nonce }));
 
     return {
