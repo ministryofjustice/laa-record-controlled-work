@@ -21,6 +21,7 @@ const REDIS_MAX_RETRY_ATTEMPTS = 10;
 const DEFAULT_REDIS_PORT = 6379;
 const DEFAULT_REDIS_HOST = "localhost";
 const DEFAULT_RCW_API_BASE_URL = "http://localhost:8081";
+const DEFAULT_PDA_API_BASE_URL = "http://localhost:8081";
 const DEFAULT_API_MODE = "msw";
 
 /* eslint-disable @typescript-eslint/no-magic-numbers -- time constants are intuitive */
@@ -35,6 +36,7 @@ export default {
   api: {
     mode: optional.API_MODE ?? DEFAULT_API_MODE,
     pda: {
+      baseUrl: optional.PDA_API_BASE_URL ?? DEFAULT_PDA_API_BASE_URL,
       key: required.PDA_API_KEY,
     },
     rcw: {
