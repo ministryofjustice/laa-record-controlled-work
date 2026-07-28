@@ -7,6 +7,7 @@ import type {
 import { ApiResponseError, ApiValidationError } from "#/api/api.errors.js";
 import { Applications } from "#/api/clients/rcw/model/applications.zod.gen.js";
 import { getRcwApiDefaultOptions } from "#/api/getRcwApiDefaultOptions.js";
+import { getAuthDebugHeaders } from "#/auth/auth.debug.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
 
@@ -30,9 +31,17 @@ export const loadYourCaseList =
     }
 
     if (response.status !== HTTP_STATUS.OK) {
-      logger.error("getApplications did not return 200", response, {
-        api: "getApplications",
-      });
+      logger.error(
+        "getApplications did not return 200",
+        {
+          authHeaders: getAuthDebugHeaders(response.headers),
+          data: response.data,
+          status: response.status,
+        },
+        {
+          api: "getApplications",
+        },
+      );
       throw new ApiResponseError();
     }
 
