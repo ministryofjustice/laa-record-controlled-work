@@ -38,7 +38,7 @@ services:
       - REDIS_URL=redis://redis-rcw:6379
       - REDIS_AUTH_TOKEN=${REDIS_AUTH_TOKEN:-redis_password}
       - ENTRA_REDIRECT_URI=http://localhost:8080/auth/code/callback
-      # secrets injected by 1Password CLI
+      # secrets injected by 1Password CLI via .env
       # op run --env-file=.env -- docker compose up -d
       - ENTRA_CLIENT_ID
       - ENTRA_TENANT_ID
@@ -133,8 +133,7 @@ services:
       - "8181:8181"
       - "5005:5005"
     environment:
-      - ISSUER=${ENTRA_ISSUER} # injected by 1Password CLI
-      - AUDIENCE=${API_AUDIENCE} # injected by 1Password CLI
-      - SERVER_PORT=8081
-      - SPRING_PROFILES_ACTIVE=local
       - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
+      - SPRING_PROFILES_ACTIVE=local
+      - ISSUER=https://sts.windows.net/${ENTRA_TENANT_ID}/
+      - AUDIENCE=https://devlexternal.onmicrosoft.com/laa-record-controlled-work-api-uat
