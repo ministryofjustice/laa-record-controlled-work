@@ -100,4 +100,3 @@ function isPlaywrightTestSigninEnabled(): boolean {
     process.env.PLAYWRIGHT_TEST_SIGNIN === "true"
   );
 }
-
