@@ -44,7 +44,10 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: process.env.CI === "true" ? "yarn tsx scripts/test-server-with-msw.ts" : "yarn build && yarn tsx scripts/test-server-with-msw.ts",
+    command:
+      process.env.CI === "true"
+        ? "yarn tsx scripts/test-server-with-msw.ts"
+        : "yarn build && yarn tsx scripts/test-server-with-msw.ts",
     url: "http://127.0.0.1:3001/health",
     reuseExistingServer: process.env.CI !== "true",
     stdout: "pipe",
@@ -59,6 +62,7 @@ export default defineConfig({
       SERVICE_NAME: "Record civil controlled work",
       DEPARTMENT_NAME: "Legal Aid Agency",
       SERVICE_PHASE: "Beta",
+      PDA_API_KEY: "test-api-key",
 
       // Fake but valid-format Entra credentials for tests.
       // MSAL validates these are HTTPS URIs at startup — op:// references
