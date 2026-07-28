@@ -1,6 +1,8 @@
 import {
   ConfidentialClientApplication,
   CryptoProvider,
+  InteractionRequiredAuthError,
+  type AccountInfo,
 } from "@azure/msal-node";
 import { EntraService } from "#/auth/entra.service.js";
 import type {
@@ -14,6 +16,7 @@ import { parseRelayState, verifyRelayState } from "#/auth/auth.relay.js";
 import { Success } from "#/lib/either.js";
 import {
   MsalError,
+  NotAuthenticatedError,
   PkceGenerationError,
   TokenAcquisitionError,
   TokenRefreshError,
@@ -21,6 +24,7 @@ import {
 
 describe("EntraService", () => {
   let msalStub: Partial<ConfidentialClientApplication>;
+  let tokenCacheStub: { getAccountByHomeId: sinon.SinonStub };
   const AUTH_CODE_URL = "https://login.microsoftonline.com/auth/";
   let service: EntraService;
   const AUTH_CODE = "auth-code";
@@ -28,7 +32,15 @@ describe("EntraService", () => {
   const VERIFIER = "test-verifier";
   const ID_TOKEN = "id-token";
   const ACCESS_TOKEN = "access-token";
-  const ACCOUNT = { username: "user" };
+  const HOME_ACCOUNT_ID = "uid.tenant";
+  const ACCOUNT: AccountInfo = {
+    environment: "login.microsoftonline.com",
+    homeAccountId: HOME_ACCOUNT_ID,
+    localAccountId: "uid",
+    tenantId: "tenant",
+    username: "user@example.com",
+  };
+  const DOWNSTREAM_SCOPES = ["api://rcw/Applications.Read"];
   const TOKEN_EXPIRY = new Date(Date.now() + 3600 * 1000);
   const SESSION_SECRET = process.env.SESSION_SECRET as string;
   const REDIRECT_URI_HOSTNAME = new URL(authRequestDefaults.redirectUri)
@@ -37,6 +49,10 @@ describe("EntraService", () => {
     "el-257-laa-record-controlled-work-uat.cloud-platform.service.justice.gov.uk";
 
   beforeEach(() => {
+    tokenCacheStub = {
+      getAccountByHomeId: sinon.stub().resolves(ACCOUNT),
+    };
+
     msalStub = {
       acquireTokenByCode: sinon.stub().resolves({
         account: ACCOUNT,
@@ -51,10 +67,10 @@ describe("EntraService", () => {
         expiresOn: TOKEN_EXPIRY,
       }),
       getAuthCodeUrl: sinon.stub().resolves(AUTH_CODE_URL),
+      getTokenCache: sinon.stub().returns(tokenCacheStub),
     };
 
     service = EntraService.create({
-      requestHostname: REDIRECT_URI_HOSTNAME,
       msalClient: msalStub as ConfidentialClientApplication,
     });
 
@@ -69,7 +85,6 @@ describe("EntraService", () => {
   describe("create() factory method", () => {
     it("returns an EntraService instance", () => {
       const result = EntraService.create({
-        requestHostname: REDIRECT_URI_HOSTNAME,
         msalClient: msalStub as ConfidentialClientApplication,
       });
 
@@ -80,52 +95,15 @@ describe("EntraService", () => {
       const providedClient = msalStub as ConfidentialClientApplication;
 
       const result = EntraService.create({
-        requestHostname: REDIRECT_URI_HOSTNAME,
         msalClient: providedClient,
       });
 
       expect(result.msalClient).to.equal(providedClient);
     });
 
-    it("normalizes requestHostname to lowercase", async () => {
-      const mixedCaseHostname = REDIRECT_URI_HOSTNAME.toUpperCase();
-      const result = EntraService.create({
-        requestHostname: mixedCaseHostname,
-        msalClient: msalStub as ConfidentialClientApplication,
-      });
-
-      const flow = (await result.initiateAuthCodeFlow()) as Success<AuthCodeFlowState>;
-      expect(parseRelayState(flow.value.authState)).to.be.null;
-    });
-
-    it("throws when requestHostname is empty", () => {
-      expect(() =>
-        EntraService.create({
-          requestHostname: "   ",
-          msalClient: msalStub as ConfidentialClientApplication,
-        }),
-      ).to.throw(
-        TypeError,
-        "EntraService.create requires a non-empty requestHostname",
-      );
-    });
-
-    it("throws when requestHostname is not a hostname", () => {
-      expect(() =>
-        EntraService.create({
-          requestHostname: "https://example.com/callback",
-          msalClient: msalStub as ConfidentialClientApplication,
-        }),
-      ).to.throw(
-        TypeError,
-        "EntraService.create requires requestHostname to be a valid hostname",
-      );
-    });
-
     it("throws when msalClient does not expose required methods", () => {
       expect(() =>
         EntraService.create({
-          requestHostname: REDIRECT_URI_HOSTNAME,
           msalClient: {} as unknown as ConfidentialClientApplication,
         }),
       ).to.throw(
@@ -209,22 +187,65 @@ describe("EntraService", () => {
 
     it("creates a plain state when requestHostname matches the redirect URI hostname", async () => {
       const result =
-        (await service.initiateAuthCodeFlow()) as Success<AuthCodeFlowState>;
+        (await service.initiateAuthCodeFlow(undefined, {
+          callbackHostname: REDIRECT_URI_HOSTNAME,
+        })) as Success<AuthCodeFlowState>;
       const parsed = parseRelayState(result.value.authState);
       expect(parsed).to.be.null;
     });
 
     it("creates a relay state with target and sig when requestHostname differs from redirect URI hostname", async () => {
       const ephemeralService = EntraService.create({
-        requestHostname: EPHEMERAL_HOSTNAME,
         msalClient: msalStub as ConfidentialClientApplication,
       });
       const result =
-        (await ephemeralService.initiateAuthCodeFlow()) as Success<AuthCodeFlowState>;
+        (await ephemeralService.initiateAuthCodeFlow(undefined, {
+          callbackHostname: EPHEMERAL_HOSTNAME,
+        })) as Success<AuthCodeFlowState>;
       const parsed = parseRelayState(result.value.authState);
       expect(parsed).to.not.be.null;
       expect(parsed!.target).to.equal(`https://${EPHEMERAL_HOSTNAME}`);
       expect(verifyRelayState(parsed!, SESSION_SECRET)).to.be.true;
+    });
+
+    it("normalizes callbackHostname to lowercase", async () => {
+      const mixedCaseHostname = REDIRECT_URI_HOSTNAME.toUpperCase();
+      const result = (await service.initiateAuthCodeFlow(undefined, {
+        callbackHostname: mixedCaseHostname,
+      })) as Success<AuthCodeFlowState>;
+      expect(parseRelayState(result.value.authState)).to.be.null;
+    });
+
+    it("throws when callbackHostname is empty", async () => {
+      let error: unknown;
+      try {
+        await service.initiateAuthCodeFlow(undefined, {
+          callbackHostname: "   ",
+        });
+      } catch (caught) {
+        error = caught;
+      }
+
+      expect(error).to.be.instanceOf(TypeError);
+      expect((error as Error).message).to.equal(
+        "EntraService.initiateAuthCodeFlow requires a non-empty callbackHostname",
+      );
+    });
+
+    it("throws when callbackHostname is not a hostname", async () => {
+      let error: unknown;
+      try {
+        await service.initiateAuthCodeFlow(undefined, {
+          callbackHostname: "https://example.com/callback",
+        });
+      } catch (caught) {
+        error = caught;
+      }
+
+      expect(error).to.be.instanceOf(TypeError);
+      expect((error as Error).message).to.equal(
+        "EntraService.initiateAuthCodeFlow requires callbackHostname to be a valid hostname",
+      );
     });
   });
 
@@ -281,7 +302,7 @@ describe("EntraService", () => {
     });
   });
 
-  describe("acquireTokenSilent()", () => {
+  describe("acquireDownstreamAccessToken()", () => {
     beforeEach(() => {
       msalStub.acquireTokenSilent = sinon.stub().resolves({
         account: ACCOUNT,
@@ -289,39 +310,101 @@ describe("EntraService", () => {
         accessToken: ACCESS_TOKEN,
         expiresOn: TOKEN_EXPIRY,
       });
+      tokenCacheStub.getAccountByHomeId.resolves(ACCOUNT);
     });
 
     it("returns a refreshed access token on success", async () => {
-      const result = (await service.acquireTokenSilent(
-        ACCOUNT as any,
-      )) as Success<TokenExchangeResult>;
+      const result = await service.acquireDownstreamAccessToken(
+        HOME_ACCOUNT_ID,
+        DOWNSTREAM_SCOPES,
+      );
+
       expect(result.error).to.be.undefined;
-      expect(result.value.accessToken).to.equal(ACCESS_TOKEN);
+      if (result.error !== undefined) {
+        throw result.error;
+      }
+      expect(result.value).to.equal(ACCESS_TOKEN);
     });
 
-    it("returns the account and idToken", async () => {
-      const result = (await service.acquireTokenSilent(
-        ACCOUNT as any,
-      )) as Success<TokenExchangeResult>;
-      expect(result.value.account).to.deep.equal(ACCOUNT);
-      expect(result.value.idToken).to.equal(ID_TOKEN);
+    it("resolves account from cache using getAccountByHomeId", async () => {
+      await service.acquireDownstreamAccessToken(
+        HOME_ACCOUNT_ID,
+        DOWNSTREAM_SCOPES,
+      );
+
+      expect(
+        tokenCacheStub.getAccountByHomeId.calledOnceWithExactly(HOME_ACCOUNT_ID),
+      ).to.be.true;
     });
 
-    it("passes the correct scopes to acquireTokenSilent", async () => {
-      await service.acquireTokenSilent(ACCOUNT as any);
+    it("passes the cached home account ID and scopes to acquireTokenSilent", async () => {
+      await service.acquireDownstreamAccessToken(
+        HOME_ACCOUNT_ID,
+        DOWNSTREAM_SCOPES,
+      );
+
       const [requestArg] = (msalStub.acquireTokenSilent as sinon.SinonStub)
         .args[0];
-      expect(requestArg.scopes).to.include("openid");
-      expect(requestArg.scopes).to.include("profile");
-      expect(requestArg.scopes).to.include("offline_access");
+      expect(requestArg.account).to.equal(ACCOUNT);
+      expect(requestArg.scopes).to.deep.equal(DOWNSTREAM_SCOPES);
     });
 
-    it("returns a TokenRefreshError failure when acquireTokenSilent throws", async () => {
+    it("returns NotAuthenticatedError when homeAccountId is missing", async () => {
+      const result = await service.acquireDownstreamAccessToken(
+        "  ",
+        DOWNSTREAM_SCOPES,
+      );
+
+      expect(result.error)
+        .to.be.an("error")
+        .and.to.be.instanceOf(NotAuthenticatedError);
+      expect(tokenCacheStub.getAccountByHomeId.called).to.be.false;
+      expect((msalStub.acquireTokenSilent as sinon.SinonStub).called).to.be
+        .false;
+    });
+
+    it("returns NotAuthenticatedError when cached account cannot be found", async () => {
+      tokenCacheStub.getAccountByHomeId.resolves(null);
+
+      const result = await service.acquireDownstreamAccessToken(
+        HOME_ACCOUNT_ID,
+        DOWNSTREAM_SCOPES,
+      );
+
+      expect(result.error)
+        .to.be.an("error")
+        .and.to.be.instanceOf(NotAuthenticatedError);
+      expect((msalStub.acquireTokenSilent as sinon.SinonStub).called).to.be
+        .false;
+    });
+
+    it("returns NotAuthenticatedError when interaction is required", async () => {
+      (msalStub.acquireTokenSilent as sinon.SinonStub).rejects(
+        new InteractionRequiredAuthError("interaction_required", "reauth"),
+      );
+
+      const result = await service.acquireDownstreamAccessToken(
+        HOME_ACCOUNT_ID,
+        DOWNSTREAM_SCOPES,
+      );
+
+      expect(result.error)
+        .to.be.an("error")
+        .and.to.be.instanceOf(NotAuthenticatedError);
+      expect((msalStub.acquireTokenSilent as sinon.SinonStub).calledOnce).to.be
+        .true;
+    });
+
+    it("returns a TokenRefreshError failure when acquireTokenSilent throws unexpectedly", async () => {
       (msalStub.acquireTokenSilent as sinon.SinonStub).rejects(
         new Error("silent failure"),
       );
 
-      const result = await service.acquireTokenSilent(ACCOUNT as any);
+      const result = await service.acquireDownstreamAccessToken(
+        HOME_ACCOUNT_ID,
+        DOWNSTREAM_SCOPES,
+      );
+
       expect(result.error)
         .to.be.an("error")
         .and.to.be.instanceOf(TokenRefreshError);

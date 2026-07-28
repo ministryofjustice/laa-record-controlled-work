@@ -22,7 +22,7 @@ export class AppLogger {
   debug(message: string, fields: LogFields = {}): void {
     this.logger.debug({ context: fields }, message);
   }
-  error(message: string, error: unknown, fields: LogFields = {}): void {
+  error(message: string, error?: unknown, fields: LogFields = {}): void {
     this.logger.error({ context: fields, err: error }, message);
   }
   fatal(message: string, error: unknown, fields: LogFields = {}): void {

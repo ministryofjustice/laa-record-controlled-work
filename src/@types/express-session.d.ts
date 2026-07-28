@@ -6,6 +6,10 @@ import type {
 
 import type { PKCECodes } from "#/auth/auth.types.js";
 
+interface SessionMsalReference {
+  homeAccountId: string;
+}
+
 declare module "express-session" {
   interface SessionData {
     account?: AccountInfo;
@@ -13,6 +17,9 @@ declare module "express-session" {
     authCodeUrlRequest?: AuthorizationUrlRequest;
     authState?: string;
     isAuthenticated?: boolean;
+    journeyDrafts?: Record<string, Record<string, unknown>>;
+    journeySubmitted?: Record<string, boolean>;
+    msal?: SessionMsalReference;
     pkceCodes?: PKCECodes;
     returnTo?: string;
   }

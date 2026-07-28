@@ -5,6 +5,7 @@ export interface ApiConfig {
   rcw: {
     baseUrl: string;
   };
+  useMockAccessToken: boolean;
 }
 
 export interface AppConfig {

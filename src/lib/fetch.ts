@@ -17,28 +17,14 @@ const getUrl = (contextUrl: string): string => {
   return requestUrl.toString();
 };
 
-const getHeaders = (headers?: HeadersInit): Record<string, string> => {
-  const base: Record<string, string> = {};
-  new Headers(headers).forEach((value, key) => {
-    base[key] = value;
-  });
-  // Spread passed headers over our defaults so that per-request
-  // values (e.g. Authorization: Bearer <token>) take precedence.
-  return {
-    ...base,
-  };
-};
-
 export const fetcher = async <T>(
   url: string,
   options: RequestInit,
 ): Promise<T> => {
   const requestUrl = getUrl(url);
-  const requestHeaders = getHeaders(options.headers);
 
   const requestInit: RequestInit = {
     ...options,
-    headers: requestHeaders,
   };
 
   const response = await fetch(requestUrl, requestInit);

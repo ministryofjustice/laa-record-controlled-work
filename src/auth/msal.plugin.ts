@@ -1,7 +1,7 @@
 import type { ICachePlugin, TokenCacheContext } from "@azure/msal-node";
 import type { RedisClientType } from "redis";
 
-const CACHE_KEY_PREFIX = "msal:";
+import { getMsalCacheKey } from "#/auth/msal.cache-key.js";
 
 /**
  * MSAL cache plugin that persists the token cache to Redis.
@@ -22,7 +22,7 @@ export class RedisCachePlugin implements ICachePlugin {
     sessionId: string,
     private readonly ttlSeconds: number,
   ) {
-    this.key = `${CACHE_KEY_PREFIX}${sessionId}`;
+    this.key = getMsalCacheKey(sessionId);
   }
 
   /**
@@ -51,6 +51,7 @@ export class RedisCachePlugin implements ICachePlugin {
     const cached = await this.redisClient.get(this.key);
     if (cached) {
       cacheContext.tokenCache.deserialize(cached);
+      await this.redisClient.expire(this.key, this.ttlSeconds);
     }
   }
 }

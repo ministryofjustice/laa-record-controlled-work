@@ -9,6 +9,7 @@ This repo was generated from [laa-express-typescript-template](https://ministryo
 ### Prerequisites
 
 - [Node 25.9.0](https://nodejs.org/en/blog/release/v25.9.0/)
+- [Github CLI](https://cli.github.com/)
 
 #### Installing Yarn
 

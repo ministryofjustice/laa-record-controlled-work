@@ -27,6 +27,7 @@
         "heading": "You have no cases"
       },
       "createCaseButton": "Record a new case",
+      "office": "Office",
       "tabs": {
         "inProgress": "In progress",
         "recorded": "Recorded",
@@ -314,13 +315,27 @@
           "receipts": "Receipts"
         }
       },
+      "evidenceOfCapital": {
+        "title": "Evidence of your client's capital",
+        "hint": "Select all that apply.",
+        "evidenceTypes": {
+          "bankStatementCapital": "Bank statement",
+          "savingsCertificatePassbook": "National savings certificate or passbook",
+          "premiumBondsStatement": "Premium bonds statement",
+          "shareCertificate": "Share certificate"
+        },
+        "validation": {
+          "required": "You must select a capital evidence to continue"
+        }
+      },
       "checkAnswers": {
         "title": "Check your answers",
         "answerLabels": {
           "doYouHaveEvidence": "Do you have evidence?",
           "reasonForNoEvidence": "Reason for not having evidence",
           "evidenceOfIncome": "Income",
-          "evidenceOfExpenditure": "Expenditure"
+          "evidenceOfExpenditure": "Expenditure",
+          "evidenceOfCapital": "Capital"
         },
         "noEvidenceProvided": "No evidence provided",
         "changeLink": {
