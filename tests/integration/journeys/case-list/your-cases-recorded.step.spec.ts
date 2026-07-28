@@ -6,14 +6,6 @@ import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import sinon from "sinon";
 import { getGetApplicationsResponseMock } from "../../../mocks/api/rcw/fakers/applications/applications.faker.gen.js";
 
-const authenticatedContext = {
-  session: {
-    account: {
-      idToken: "test-id-token",
-    }
-  }
-};
-
 describe("Your Cases recorded step", () => {
   let getApplicationsStub: sinon.SinonStub;
   let client: ReturnType<typeof createForgeTestClientForCaseList>;
@@ -39,8 +31,7 @@ describe("Your Cases recorded step", () => {
     let table: RenderBlock;
     let subNavigation: RenderBlock;
 
-    before(async () => {
-      const result = await client.get("/cases/recorded", authenticatedContext);
+    before(async () => {      const result = await client.get("/cases/recorded");
       expect(result.type).to.equal("render");
       renderResult = result as TestRenderResult;
       [recordButton] = renderResult.getBlocksByVariant("govukLinkButton");
@@ -110,7 +101,7 @@ describe("Your Cases recorded step", () => {
     it("renders empty value string when getApplications returns an empty array", async () => {
       getApplicationsStub.resolves({ status: 200, data: [] });
 
-      const result = await client.get("/cases/recorded", authenticatedContext);
+      const result = await client.get("/cases/recorded");
       expect(result.type).to.equal("render");
       const renderResult = result as TestRenderResult;
       const allTables = renderResult.getBlocksByVariant("govukTable");

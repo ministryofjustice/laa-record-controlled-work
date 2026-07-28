@@ -10,14 +10,6 @@ import { getGetApplicationsResponseMock } from "../../../../mocks/api/rcw/fakers
 
 const mockData = getGetApplicationsResponseMock();
 
-const authenticatedContext = {
-  session: {
-    account: {
-      idToken: "test-id-token",
-    }
-  }
-};
-
 describe("LoadYourCaseList", () => {
   describe("when getApplications succeeds", () => {
     let client: ReturnType<typeof createForgeTestClientForCaseList>;
@@ -37,12 +29,12 @@ describe("LoadYourCaseList", () => {
     after(() => sinon.restore());
 
     it("calls getApplications", async () => {
-      await client.get("/cases", authenticatedContext);
+      await client.get("/cases");
       expect(getApplicationsStub.calledOnce).to.be.true;
     });
 
     it("sets caseList in context", async () => {
-      const result = await client.get("/cases", authenticatedContext);
+      const result = await client.get("/cases");
       expect(result.type).to.equal("render");
       const renderResult = result as TestRenderResult;
       expect(renderResult.context.data.caseList).to.deep.equal(mockData);
@@ -62,7 +54,7 @@ describe("LoadYourCaseList", () => {
         yourCasesStep,
       );
       try {
-        await client.get("/cases", authenticatedContext);
+        await client.get("/cases");
       } catch (err) {
         return err;
       }
