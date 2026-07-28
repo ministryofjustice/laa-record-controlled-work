@@ -12,7 +12,7 @@ export const ENTRA_TEST_CONFIG = {
  * Configuration values for MSW handlers
  */
 export const MSW_CONFIG = {
-  API_BASE_URL: "https://test.cloud-platform.service.justice.gov.uk",
+  RCW_API_BASE_URL: "https://test.cloud-platform.service.justice.gov.uk",
   API_PREFIX: "/latest/mock",
 };
 
