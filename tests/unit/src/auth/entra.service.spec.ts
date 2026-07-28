@@ -337,7 +337,7 @@ describe("EntraService", () => {
       ).to.be.true;
     });
 
-    it("passes the cached AccountInfo and scopes to acquireTokenSilent", async () => {
+    it("passes the cached home account ID and scopes to acquireTokenSilent", async () => {
       await service.acquireDownstreamAccessToken(
         HOME_ACCOUNT_ID,
         DOWNSTREAM_SCOPES,
