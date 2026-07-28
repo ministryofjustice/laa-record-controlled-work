@@ -28,7 +28,10 @@ export const yourCasesIneligibleStep = step({
   ],
   onAccess: [
     access({
-      effects: [YourCasesEffects.loadYourCaseList()],
+      effects: [
+        YourCasesEffects.loadYourCaseList(),
+        YourCasesEffects.setSelectedOffice(),
+      ],
     }),
   ],
   path: "/cases/ineligible",
