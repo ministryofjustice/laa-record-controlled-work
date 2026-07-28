@@ -2,7 +2,7 @@ import type {
   CaseListContext,
 } from "#/journeys/your-cases/your-cases.types.js";
 
-export const loadSelectedOffice =
+export const setSelectedOffice =
   () => (context: CaseListContext) => {
 
     const selectedOffice = {
