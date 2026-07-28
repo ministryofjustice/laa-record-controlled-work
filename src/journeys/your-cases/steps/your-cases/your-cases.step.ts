@@ -7,6 +7,7 @@ import {
 import {
   createCaseButton,
   heading,
+  selectedOffice,
 } from "#/journeys/your-cases/common.blocks.js";
 import {
   casesTable,
@@ -19,6 +20,7 @@ import { t } from "#/lib/i18n.js";
 export const yourCasesStep = step({
   blocks: [
     heading,
+    selectedOffice,
     createCaseButton,
     subNavigation,
     casesTable(Data("caseList")),
@@ -26,7 +28,7 @@ export const yourCasesStep = step({
   ],
   onAccess: [
     access({
-      effects: [YourCasesEffects.loadYourCaseList()],
+      effects: [YourCasesEffects.loadYourCaseList(), YourCasesEffects.loadSelectedOffice()],
     }),
   ],
   path: "/cases",
