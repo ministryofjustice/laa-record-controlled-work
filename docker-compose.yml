@@ -32,6 +32,7 @@ services:
       - .env # load from .env first
     environment: # set overrides
       - NODE_ENV=docker
+      - API_BASE_URL=http://rcw-api:8081
       - REDIS_ENABLED=true
       - REDIS_URL=redis://redis-rcw:6379
       - REDIS_AUTH_TOKEN=${REDIS_AUTH_TOKEN:-redis_password}
@@ -121,3 +122,18 @@ services:
       interval: 5s
       timeout: 3s
       retries: 5
+
+  rcw-api:
+    container_name: rcw-api
+    image: "laa-record-controlled-work-api-rcw-api:latest"
+    pull_policy: never # clone laa-record-controlled-work-api, `make build`
+    ports:
+      - "8081:8081"
+      - "8181:8181"
+      - "5005:5005"
+    environment:
+      - ISSUER=${ENTRA_ISSUER} # injected by 1Password CLI
+      - AUDIENCE=${API_AUDIENCE} # injected by 1Password CLI
+      - SERVER_PORT=8081
+      - SPRING_PROFILES_ACTIVE=local
+      - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
