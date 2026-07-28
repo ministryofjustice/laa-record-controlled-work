@@ -1,3 +1,5 @@
+import type { Session, SessionData } from "express-session";
+
 import type {
   CaseListContext,
   YourCasesEffectsDeps,
@@ -5,6 +7,8 @@ import type {
 
 import { ApiResponseError, ApiValidationError } from "#/api/api.errors.js";
 import { Applications } from "#/api/clients/rcw/model/applications.zod.gen.js";
+import { getRcwApiDefaultOptions } from "#/api/getRcwApiDefaultOptions.js";
+import { getAuthDebugHeaders } from "#/auth/auth.debug.js";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
@@ -14,7 +18,14 @@ export const loadYourCaseList =
     let response;
 
     try {
-      response = await deps.getApplications();
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Session shape is constrained by app session typing.
+      const session = context.getSession() as
+        (Partial<SessionData> & Session) | undefined;
+      const opts = await getRcwApiDefaultOptions({
+        homeAccountId: session?.msal?.homeAccountId,
+        sessionId: session?.id,
+      });
+      response = await deps.getApplications(opts);
     } catch (error) {
       logger.error("Error fetching applications", error, {
         api: "getApplications",
@@ -23,9 +34,17 @@ export const loadYourCaseList =
     }
 
     if (response.status !== HTTP_STATUS.OK) {
-      logger.error("getApplications did not return 200", response, {
-        api: "getApplications",
-      });
+      logger.error(
+        "getApplications did not return 200",
+        {
+          authHeaders: getAuthDebugHeaders(response.headers),
+          data: response.data,
+          status: response.status,
+        },
+        {
+          api: "getApplications",
+        },
+      );
       throw new ApiResponseError();
     }
 

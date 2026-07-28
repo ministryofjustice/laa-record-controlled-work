@@ -32,8 +32,7 @@ describe("Your Cases recorded step", () => {
     let table: RenderBlock;
     let subNavigation: RenderBlock;
 
-    before(async () => {
-      const result = await client.get("/cases/recorded");
+    before(async () => {      const result = await client.get("/cases/recorded");
       expect(result.type).to.equal("render");
       renderResult = result as TestRenderResult;
       [recordButton] = renderResult.getBlocksByVariant("govukLinkButton");
