@@ -10,6 +10,10 @@ import { getRedisClient } from "#/lib/redis.js";
 
 /**
  * Auth context container.
+ *
+ * Wraps Entra Service auth, allowing:
+ * - Creation from various contexts (e.g. Forge effect)
+ * - Generation of useful outputs (e.g. request headers)
  */
 export class AuthContext {
   account: AccountInfo | undefined;

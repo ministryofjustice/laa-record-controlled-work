@@ -5,7 +5,7 @@ import type {
 
 import { ApiResponseError, ApiValidationError } from "#/api/api.errors.js";
 import { Applications } from "#/api/clients/rcw/model/applications.zod.gen.js";
-import { AuthContext } from "#/authContext.js";
+import { AuthContext } from "#/auth/auth.context.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
 
@@ -19,11 +19,9 @@ export const loadYourCaseList =
         new Headers(),
       );
 
-      const opts: RequestInit = {
+      response = await deps.getApplications({
         headers,
-      };
-
-      response = await deps.getApplications(opts);
+      });
     } catch (error) {
       logger.error("Error fetching applications", error, {
         api: "getApplications",
