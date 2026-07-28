@@ -28,6 +28,12 @@ import { logger } from "#/logger.js";
 
 const EMPTY_STRING_LENGTH = 0;
 
+interface ValidatedCallbackState {
+  authCodeRequest: NonNullable<Request["session"]["authCodeRequest"]>;
+  data: { code: string; state: string };
+  returnTo: string | undefined;
+}
+
 /**
  * Handles the Entra auth code callback, exchanging the code for tokens.
  * @param req - The Express request.
@@ -83,6 +89,7 @@ export async function authCodeCallback(
     next(error);
   }
 }
+
 /**
  * Initiates the Entra sign-in flow by generating a PKCE auth code URL.
  * @param req - The Express request.
@@ -172,13 +179,7 @@ async function deleteMsalCache(sessionId: string): Promise<void> {
 function getValidatedCallbackState(
   req: Request,
   res: Response,
-):
-  | undefined
-  | {
-      authCodeRequest: NonNullable<Request["session"]["authCodeRequest"]>;
-      data: { code: string; state: string };
-      returnTo: string | undefined;
-    } {
+): undefined | ValidatedCallbackState {
   const parsed = authCodeCallbackSchema.safeParse(req.query);
   if (!parsed.success) {
     const parsedError = authCodeCallbackErrorSchema.safeParse(req.query);
