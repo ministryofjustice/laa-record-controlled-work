@@ -49,7 +49,7 @@
     }
   },
   "journeys": {
-    "officeSelection": {
+    "selectOffice": {
       "title": "Select the office you're recording cases from",
       "validation": {
         "required": "Select the office you're recording cases from"
