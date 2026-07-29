@@ -4,7 +4,7 @@ import "dotenv/config";
 
 import config from "#/config.js";
 
-import { loadGitHubOpenApiSpec } from "../scripts/loadGitHubOpenApiSpec.js";
+import { loadGitHubOpenApiSpec } from "./loadGitHubOpenApiSpec.js";
 import { sharedOutputConfig } from "./shared.orval.js";
 
 /**

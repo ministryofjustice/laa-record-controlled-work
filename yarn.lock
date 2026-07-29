@@ -870,7 +870,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@orval/core@npm:8.22.0, @orval/core@npm:^8.22.0":
+"@orval/core@npm:8.22.0":
   version: 8.22.0
   resolution: "@orval/core@npm:8.22.0"
   dependencies:
@@ -5317,7 +5317,6 @@ __metadata:
     "@j178/prek": "npm:^0.4.10"
     "@ministryofjustice/frontend": "npm:9.0.0"
     "@ministryofjustice/hmpps-forge": "npm:^0.3.2"
-    "@orval/core": "npm:^8.22.0"
     "@playwright/test": "npm:^1.61.1"
     "@types/chai": "npm:^5.2.3"
     "@types/chai-as-promised": "npm:^8.0.2"
