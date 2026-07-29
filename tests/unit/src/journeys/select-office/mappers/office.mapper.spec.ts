@@ -1,6 +1,6 @@
 import { expect } from "chai";
 
-import { mapOffices } from "#/journeys/select-office/mappers/office.mapper.js";
+import { mapOffices } from "#/journeys/select-office/mappers/office.dto.js";
 import type { OfficeDto } from "#/journeys/select-office/select-office.types.js";
 
 describe("mapOffices", () => {

@@ -5,28 +5,38 @@ import type { ProviderFirmOfficeListDto } from "#/api/clients/pda/model/provider
 import { ApiResponseError, ApiValidationError } from "#/api/api.errors.js";
 import { getPdaApiDefaultOptions } from "#/api/getPdaApiDefaultOptions.js";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
+import { InvalidFirmCodeClaimError } from "#/journeys/journey.errors.js";
 import { loadOffices } from "#/journeys/select-office/effects/loadOffices.js";
 import type {
-  OfficesContext,
+  SelectOfficesContext,
   SelectOfficeEffectsDeps,
 } from "#/journeys/select-office/select-office.types.js";
 import { logger } from "#/logger.js";
 
 describe("loadOffices", () => {
   let getAllProviderOffices: sinon.SinonStub;
+  let getSession: sinon.SinonStub;
   let setData: sinon.SinonStub;
   let deps: SelectOfficeEffectsDeps;
-  let context: OfficesContext;
+  let context: SelectOfficesContext;
 
   beforeEach(() => {
     getAllProviderOffices = sinon.stub();
+    getSession = sinon.stub().returns({
+      account: {
+        idTokenClaims: {
+          FIRM_CODE: "123",
+        },
+      },
+    });
     setData = sinon.stub();
     deps = {
       getAllProviderOffices,
     } as unknown as SelectOfficeEffectsDeps;
     context = {
+      getSession,
       setData,
-    } as unknown as OfficesContext;
+    } as unknown as SelectOfficesContext;
   });
 
   afterEach(() => sinon.restore());
@@ -121,6 +131,23 @@ describe("loadOffices", () => {
       expect.fail("Expected loadOffices to throw ApiValidationError");
     } catch (error) {
       expect(error).to.be.instanceOf(ApiValidationError);
+    }
+  });
+
+  it("throws InvalidFirmCodeClaimError when FIRM_CODE claim is missing", async () => {
+    sinon.stub(logger, "error");
+    getSession.returns({
+      account: {
+        idTokenClaims: {},
+      },
+    });
+
+    try {
+      await loadOffices(deps)(context);
+      expect.fail("Expected loadOffices to throw InvalidFirmCodeClaimError");
+    } catch (error) {
+      expect(error).to.be.instanceOf(InvalidFirmCodeClaimError);
+      expect(getAllProviderOffices.notCalled).to.equal(true);
     }
   });
 });

@@ -13,11 +13,11 @@ export interface Offices extends Record<string, unknown> {
   officeList: Office[];
 }
 
-export type OfficesContext = EffectFunctionContext<Offices>;
-
 export interface SelectOfficeEffectsDeps {
   getAllProviderOffices: typeof getAllProviderOffices;
 }
+
+export type SelectOfficesContext = EffectFunctionContext<Offices>;
 
 /**
  * Schema for the mapped office output
@@ -32,3 +32,7 @@ export const OfficeSchema = z.object({
 export const OFFICE_FIELD = OfficeSchema.keyof().enum;
 
 export type Office = z.infer<typeof OfficeSchema>;
+
+export type SelectOfficeSession = ReturnType<
+  SelectOfficesContext["getSession"]
+>;
