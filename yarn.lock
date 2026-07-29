@@ -23,13 +23,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@azure/msal-node@npm:^5.4.1":
-  version: 5.4.1
-  resolution: "@azure/msal-node@npm:5.4.1"
+"@azure/msal-node@npm:^5.4.2":
+  version: 5.4.2
+  resolution: "@azure/msal-node@npm:5.4.2"
   dependencies:
     "@azure/msal-common": "npm:16.11.2"
     jsonwebtoken: "npm:^9.0.0"
-  checksum: 10c0/be0454893b32454d2f3cb5c7e0cbcb622a6b714482c7dc36d36ae977860f7053fd47e55aa6dfe212bfbcd6d78ee2e24874a42997662be551215ae260e3f0c4aa
+  checksum: 10c0/c8a068e1e6584637eaf2b1d36554d13222002e314cfcac80790274bedd6134d3d57531c2636c6489817f332314ba0309d02faa3eb5333f2e8da0a74a518e04c0
   languageName: node
   linkType: hard
 
@@ -5302,7 +5302,7 @@ __metadata:
   resolution: "laa-record-controlled-work@workspace:."
   dependencies:
     "@axe-core/playwright": "npm:^4.12.1"
-    "@azure/msal-node": "npm:^5.4.1"
+    "@azure/msal-node": "npm:^5.4.2"
     "@faker-js/faker": "npm:^10.5.0"
     "@j178/prek": "npm:^0.4.10"
     "@ministryofjustice/frontend": "npm:9.0.0"
