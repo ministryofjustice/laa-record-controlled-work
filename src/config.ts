@@ -40,16 +40,6 @@ export default {
     pda: {
       baseUrl: optional.PDA_API_BASE_URL ?? DEFAULT_PDA_API_BASE_URL,
       key: required.PDA_API_KEY,
-      spec: {
-        host: optional.GH_HOST ?? "github.com",
-        path:
-          optional.PDA_API_SPEC_PATH ??
-          "providers-api/open-api-specification.yml",
-        ref: optional.PDA_API_SPEC_REF ?? "v1.51.0",
-        repo:
-          optional.PDA_API_REPOSITORY ??
-          "ministryofjustice/laa-data-provider-data",
-      },
     },
     rcw: {
       baseUrl: optional.RCW_API_BASE_URL ?? DEFAULT_RCW_API_BASE_URL,

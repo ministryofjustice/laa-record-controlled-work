@@ -2,8 +2,6 @@ import type { OpenApiDocument, Options } from "@orval/core";
 
 import "dotenv/config";
 
-import config from "#/config.js";
-
 import { loadGitHubOpenApiSpec } from "./loadGitHubOpenApiSpec.js";
 import { sharedOutputConfig } from "./shared.orval.js";
 
@@ -14,10 +12,14 @@ import { sharedOutputConfig } from "./shared.orval.js";
  */
 export function createPdaConfig(): Options {
   const pdaApiSpec = loadGitHubOpenApiSpec({
-    hostname: config.api.pda.spec.host,
-    path: config.api.pda.spec.path,
-    ref: config.api.pda.spec.ref,
-    repository: config.api.pda.spec.repo,
+    hostname: process.env.GH_HOST ?? "github.com",
+    path:
+      process.env.PDA_API_SPEC_PATH ??
+      "providers-api/open-api-specification.yml",
+    ref: process.env.PDA_API_SPEC_REF ?? "v1.51.0",
+    repository:
+      process.env._PDA_API_REPOSITORY ??
+      "ministryofjustice/laa-data-provider-data",
   });
 
   return {

@@ -5,12 +5,6 @@ export interface ApiConfig {
   pda: {
     baseUrl: string;
     key: string;
-    spec: {
-      host: string;
-      path: string;
-      ref: string;
-      repo: string;
-    };
   };
   rcw: {
     baseUrl: string;
