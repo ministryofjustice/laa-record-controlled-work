@@ -1,5 +1,3 @@
-import type { getApplications } from "#/api/clients/rcw/schema/applications/applications.gen.js";
-
 import { NotAuthenticatedError } from "#/auth/auth.errors.js";
 import { EntraService } from "#/auth/entra.service.js";
 import config from "#/config.js";
