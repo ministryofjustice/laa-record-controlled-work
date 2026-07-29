@@ -1,5 +1,3 @@
-import type { getApplications } from "#/api/clients/rcw/schema/applications/applications.gen.js";
-
 import { NotAuthenticatedError } from "#/auth/auth.errors.js";
 import { EntraService } from "#/auth/entra.service.js";
 import config from "#/config.js";
@@ -9,12 +7,6 @@ export interface RcwApiAuthParams {
   homeAccountId: string | undefined;
   sessionId: string | undefined;
 }
-
-type RcwApiDefaultOptions = typeof getApplications extends (
-  options?: infer TOptions,
-) => unknown
-  ? NonNullable<TOptions>
-  : never;
 
 const EMPTY_STRING_LENGTH = 0;
 const TEST_ACCESS_TOKEN = "test-access-token";
@@ -26,7 +18,7 @@ const TEST_ACCESS_TOKEN = "test-access-token";
  */
 export async function getRcwApiDefaultOptions(
   params: RcwApiAuthParams,
-): Promise<RcwApiDefaultOptions> {
+): Promise<RequestInit> {
   if (config.api.useMockAccessToken) {
     return {
       headers: {
