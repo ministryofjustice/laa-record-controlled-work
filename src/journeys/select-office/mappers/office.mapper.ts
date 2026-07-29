@@ -24,12 +24,12 @@ function mapOffice(office: OfficeDto): Office {
     office.addressLine3,
     office.addressLine4,
     office.city,
-    office.postCode,
   ].filter(Boolean);
 
   return {
     address: addressParts.join(", "),
     code: office.firmOfficeCode ?? "",
     officeName: office.officeName ?? "",
+    postCode: office.postCode ?? "",
   };
 }

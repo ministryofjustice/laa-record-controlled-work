@@ -26,6 +26,9 @@ export const OfficeSchema = z.object({
   address: z.string(),
   code: z.string(),
   officeName: z.string(),
+  postCode: z.string(),
 });
+
+export const OFFICE_FIELD = OfficeSchema.keyof().enum;
 
 export type Office = z.infer<typeof OfficeSchema>;
