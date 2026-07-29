@@ -14,6 +14,8 @@ import type { CreateApplicationRequestBody } from "../../model/createApplication
 
 import type { CreateApplicationResponseBody } from "../../model/createApplicationResponseBody.zod.gen.js";
 
+import type { GetApplicationsParams } from "../../model/getApplicationsParams.zod.gen.js";
+
 export type getApplicationsResponse200 = {
   data: Applications;
   status: 200;
@@ -54,8 +56,20 @@ export type getApplicationsResponseError = (
 export type getApplicationsResponse =
   getApplicationsResponseSuccess | getApplicationsResponseError;
 
-export const getGetApplicationsUrl = () => {
-  return `${config.api.rcw.baseUrl}/api/v1/applications`;
+export const getGetApplicationsUrl = (params?: GetApplicationsParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `${config.api.rcw.baseUrl}/api/v1/applications?${stringifiedParams}`
+    : `${config.api.rcw.baseUrl}/api/v1/applications`;
 };
 
 /**
@@ -64,7 +78,7 @@ export const getGetApplicationsUrl = () => {
 export const getApplications = async (
   options?: RequestInit,
 ): Promise<getApplicationsResponse> => {
-  const res = await fetch(getGetApplicationsUrl(), {
+  const res = await fetch(getGetApplicationsUrl(params), {
     ...options,
     method: "GET",
   });
