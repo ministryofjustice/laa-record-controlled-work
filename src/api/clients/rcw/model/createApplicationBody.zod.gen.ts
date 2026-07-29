@@ -20,7 +20,7 @@ export const CreateApplicationBody = zod.object({
     hasFixedAddress: zod.boolean(),
     address: zod
       .object({
-        id: zod.uuid(),
+        id: zod.uuid().optional(),
         addressLine1: zod.string(),
         addressLine2: zod.string().optional(),
         addressLine3: zod.string().optional(),

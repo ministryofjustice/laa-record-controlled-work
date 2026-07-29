@@ -53,9 +53,9 @@ export const createApplication =
       throw ApiResponseError.from(error);
     }
 
-    if (response.status !== HTTP_STATUS.OK) {
+    if (response.status !== HTTP_STATUS.CREATED) {
       logger.error(
-        "createApplication did not return 200",
+        "createApplication did not return 201",
         {
           authHeaders: getAuthDebugHeaders(response.headers),
           data: response.data,

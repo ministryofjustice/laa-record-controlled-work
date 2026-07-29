@@ -93,9 +93,9 @@ export const getApplications = async (
   } as getApplicationsResponse;
 };
 
-export type createApplicationResponse200 = {
+export type createApplicationResponse201 = {
   data: CreateApplicationResponseBody;
-  status: 200;
+  status: 201;
 };
 
 export type createApplicationResponse400 = {
@@ -123,7 +123,7 @@ export type createApplicationResponse500 = {
   status: 500;
 };
 
-export type createApplicationResponseSuccess = createApplicationResponse200 & {
+export type createApplicationResponseSuccess = createApplicationResponse201 & {
   headers: Headers;
 };
 export type createApplicationResponseError = (

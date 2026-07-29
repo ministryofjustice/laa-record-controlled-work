@@ -222,7 +222,7 @@ export const getCreateApplicationMockHandler = (
             ? await overrideResponse(info)
             : overrideResponse
           : getCreateApplicationResponseMock(),
-        { status: 200 },
+        { status: 201 },
       );
     },
     options,
