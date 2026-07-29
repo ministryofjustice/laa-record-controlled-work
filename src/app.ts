@@ -11,6 +11,7 @@ import compression from "compression";
 import express from "express";
 import session from "express-session";
 
+import { getAllProviderOffices } from "#/api/clients/pda/schema/provider-firms-endpoints/provider-firms-endpoints.gen.js";
 import { getApplications } from "#/api/clients/rcw/schema/applications/applications.gen.js";
 import authRouter from "#/auth/auth.routes.js";
 import config from "#/config.js";
@@ -18,6 +19,7 @@ import { autocomplete } from "#/journeys/components/autocomplete/autocomplete.co
 import createApplication from "#/journeys/create-application/create-application.index.js";
 import editApplication from "#/journeys/edit-application/edit-application.index.js";
 import evidence from "#/journeys/evidence/evidence.index.js";
+import selectOffice from "#/journeys/select-office/select-office.index.js";
 import yourCases from "#/journeys/your-cases/your-cases.index.js";
 import { createSession } from "#/lib/session.js";
 import { requireAuth } from "#/middleware/requireAuth.js";
@@ -89,6 +91,8 @@ const createApp = async (): Promise<express.Application> => {
     .registerGlobalComponents([autocomplete])
     .registerGlobalFunctions(nunjucksFunctions)
     .registerPackage(yourCases, { getApplications })
+    .registerPackage(selectOffice, { getAllProviderOffices })
+
     .registerPackage(createApplication)
     .registerPackage(editApplication)
     .registerPackage(evidence);
