@@ -3,13 +3,14 @@ import type { EffectFunctionContext } from "@ministryofjustice/hmpps-forge/core"
 import type { CreateApplicationEffectsDeps } from "#/journeys/create-application/create-application.types.js";
 
 import { ApiValidationError } from "#/api/api.errors.js";
-import { CreateApplicationResponseBody } from "#/api/client/model/createApplicationResponseBody.zod.gen.js";
+
 import { fromAnswers } from "#/journeys/create-application/Application.dto.js";
 import { isJourneySession } from "#/journeys/effects.js";
 import { logger } from "#/logger.js";
 
 import type { AccountInfo } from "@azure/msal-node";
 import type { Session } from "express-session";
+import { CreateApplicationResponseBody } from "#/api/clients/rcw/model/createApplicationResponseBody.zod.gen.js";
 
 interface SessionInterface extends Session {
   /** @property account User account, retrieved from MSAL/Entra after successful authentication. */
