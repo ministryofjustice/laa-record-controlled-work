@@ -6,11 +6,11 @@ import type { CreateApplicationEffectsDeps } from "#/journeys/create-application
 import { ApiResponseError, ApiValidationError } from "#/api/api.errors.js";
 import { CreateApplicationResponseBody } from "#/api/clients/rcw/model/createApplicationResponseBody.zod.gen.js";
 import { getRcwApiDefaultOptions } from "#/api/getRcwApiDefaultOptions.js";
+import { getAuthDebugHeaders } from "#/auth/auth.debug.js";
 import { fromAnswers } from "#/journeys/create-application/Application.dto.js";
 import { isJourneySession } from "#/journeys/effects.js";
-import { logger } from "#/logger.js";
-import { getAuthDebugHeaders } from "#/auth/auth.debug.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
+import { logger } from "#/logger.js";
 
 export const createApplication =
   (deps: CreateApplicationEffectsDeps) =>
