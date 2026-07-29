@@ -9,6 +9,8 @@ import { getRcwApiDefaultOptions } from "#/api/getRcwApiDefaultOptions.js";
 import { fromAnswers } from "#/journeys/create-application/Application.dto.js";
 import { isJourneySession } from "#/journeys/effects.js";
 import { logger } from "#/logger.js";
+import { getAuthDebugHeaders } from "#/auth/auth.debug.js";
+import { HTTP_STATUS } from "#/lib/constants/http.js";
 
 export const createApplication =
   (deps: CreateApplicationEffectsDeps) =>
@@ -49,6 +51,21 @@ export const createApplication =
         },
       );
       throw ApiResponseError.from(error);
+    }
+
+    if (response.status !== HTTP_STATUS.OK) {
+      logger.error(
+        "createApplication did not return 200",
+        {
+          authHeaders: getAuthDebugHeaders(response.headers),
+          data: response.data,
+          status: response.status,
+        },
+        {
+          api: "createApplication",
+        },
+      );
+      throw new ApiResponseError();
     }
 
     console.log({ response });
