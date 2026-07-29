@@ -23,7 +23,8 @@
     "src/**/*.ts",
     "tests/**/*.ts",
     "esbuild/**/*.ts",
-    "orval.config.ts"
+    "orval.config.ts",
+    "orval/**/*.ts"
   ],
   "exclude": ["node_modules", "public", "**/*.js"]
 }

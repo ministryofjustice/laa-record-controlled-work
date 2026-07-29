@@ -98,6 +98,7 @@ rcw:
     - ENTRA_CLIENT_ID
     - ENTRA_CLIENT_SECRET
     - ENTRA_TENANT_ID
+    - PDA_API_KEY
 
   # Plain env vars injected directly into the container. Add new vars 
   # here only, they are automatically picked up by the Helm template and 
@@ -120,6 +121,7 @@ rcw:
     RATE_WINDOW_MS: 900000
     NODE_ENV: ""
     RCW_API_BASE_URL: ""
+    PDA_API_BASE_URL: ""
     ENTRA_AUTHORITY_BASE_URL: "https://login.microsoftonline.com/"
     ENTRA_REDIRECT_URI: ""
     REDIS_ENABLED: true  

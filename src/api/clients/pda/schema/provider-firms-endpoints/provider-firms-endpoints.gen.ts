@@ -4,9 +4,9 @@
  * Provider Details API r1
  * OpenAPI spec version: 0.27.2
  */
-import type { ProviderFirmOfficeListDto } from "../../model/providerFirmOfficeListDto.zod.gen.js";
+import config from "#/config.js";
 
-import { fetcher } from "../../../../../lib/fetch.js";
+import type { ProviderFirmOfficeListDto } from "../../model/providerFirmOfficeListDto.zod.gen.js";
 
 export type getAllProviderOfficesResponse200 = {
   data: ProviderFirmOfficeListDto;
@@ -43,7 +43,7 @@ export type getAllProviderOfficesResponse =
   getAllProviderOfficesResponseSuccess | getAllProviderOfficesResponseError;
 
 export const getGetAllProviderOfficesUrl = (firmId: number) => {
-  return `/provider-firms/${firmId}/provider-offices`;
+  return `${config.api.pda.baseUrl}/provider-firms/${firmId}/provider-offices`;
 };
 
 /**
@@ -58,11 +58,19 @@ export const getAllProviderOffices = async (
   firmId: number,
   options?: RequestInit,
 ): Promise<getAllProviderOfficesResponse> => {
-  return fetcher<getAllProviderOfficesResponse>(
-    getGetAllProviderOfficesUrl(firmId),
-    {
-      ...options,
-      method: "GET",
-    },
-  );
+  const res = await fetch(getGetAllProviderOfficesUrl(firmId), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getAllProviderOfficesResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getAllProviderOfficesResponse;
 };
