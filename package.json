@@ -10,8 +10,7 @@
   },
   "scripts": {
     "postinstall": "[ -n \"${CI:-}\" ] || [ -n \"${DOCKER:-}\" ] || yarn prek:install",
-    "api:pda": "sh ./scripts/generate-pda-api-spec.sh",
-    "api:generate": "yarn api:pda && yarn orval",
+    "api:generate": "op run --env-file=.env -- yarn orval",
     "gitleaks:install": "sh ./scripts/install-gitleaks.sh",
     "prek:patch-hook-path": "sh ./scripts/patch-precommit-hook-path.sh",
     "prek:install": "yarn gitleaks:install && prek install && yarn prek:patch-hook-path",
