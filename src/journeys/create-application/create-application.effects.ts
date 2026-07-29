@@ -20,8 +20,6 @@ export const CreateApplicationEffects = {
     createApplicationEffectsRegistry.register(clearFieldAnswers),
   createApplication:
     createApplicationEffectsRegistry.register(createApplication),
-  loadDraftAnswers:
-    createApplicationEffectsRegistry.register(loadDraftAnswers),
-  saveDraftAnswers:
-    createApplicationEffectsRegistry.register(saveDraftAnswers),
+  loadDraftAnswers: createApplicationEffectsRegistry.register(loadDraftAnswers),
+  saveDraftAnswers: createApplicationEffectsRegistry.register(saveDraftAnswers),
 };

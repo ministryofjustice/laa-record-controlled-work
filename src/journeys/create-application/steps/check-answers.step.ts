@@ -13,8 +13,8 @@ import {
   GovUKSummaryList,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
-import { DEFAULT_CASE_REFERENCE_NUMBER } from "#/journeys/edit-application/steps/task-list/task-list.step.js";
 import { CreateApplicationEffects } from "#/journeys/create-application/create-application.effects.js";
+import { DEFAULT_CASE_REFERENCE_NUMBER } from "#/journeys/edit-application/steps/task-list/task-list.step.js";
 import { submitButton } from "#/journeys/evidence/common.blocks.js";
 import { t } from "#/lib/i18n.js";
 

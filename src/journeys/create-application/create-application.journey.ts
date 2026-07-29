@@ -1,5 +1,6 @@
 import { access, journey } from "@ministryofjustice/hmpps-forge/core/authoring";
 
+import { CreateApplicationEffects } from "#/journeys/create-application/create-application.effects.js";
 import { clientDetailsStep } from "#/journeys/create-application/steps/client-details.step.js";
 import { declarationStep } from "#/journeys/create-application/steps/declaration.step.js";
 import { enterAddressManuallyStep } from "#/journeys/create-application/steps/enter-address-manually.step.js";
@@ -12,8 +13,6 @@ import { ineligibleStep } from "./steps/ecf-dropout.step.js";
 import { ecfStep } from "./steps/ecf.step.js";
 import { legalAidBeforeStep } from "./steps/legal-aid-before.step.js";
 import { niNumberStep } from "./steps/ni-number.step.js";
-
-import { CreateApplicationEffects } from "#/journeys/create-application/create-application.effects.js";
 
 const journeyCode = "createApplication";
 

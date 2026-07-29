@@ -10,8 +10,8 @@ import {
   GovUKHeading,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
-import { H1 } from "#/lib/constants/headings.js";
 import { CreateApplicationEffects } from "#/journeys/create-application/create-application.effects.js";
+import { H1 } from "#/lib/constants/headings.js";
 
 export const ineligibleStep = (journeyCode: string): ReturnType<typeof step> =>
   step({

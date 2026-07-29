@@ -16,8 +16,8 @@ import {
   GovUKTextInput,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
-import { t } from "#/lib/i18n.js";
 import { CreateApplicationEffects } from "#/journeys/create-application/create-application.effects.js";
+import { t } from "#/lib/i18n.js";
 
 export const niNumberStep = (journeyCode: string): ReturnType<typeof step> =>
   step({
