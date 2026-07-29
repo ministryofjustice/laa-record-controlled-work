@@ -10,7 +10,7 @@ export type OfficeDto = NonNullable<
 >[number];
 
 export interface Offices extends Record<string, unknown> {
-  offices: ProviderFirmOfficeListDto;
+  officeList: Office[];
 }
 
 export type OfficesContext = EffectFunctionContext<Offices>;
