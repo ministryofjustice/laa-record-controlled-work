@@ -36,8 +36,8 @@ export const selectOfficeRadioInput = GovUKRadioInput({
       text: t("journeys.selectOffice.title"),
     },
   },
-  // TODO fix type issue
-  // @ts-expect-error Forge runtime supports dynamic iterable expressions for items
+  // @ts-expect-error Forge 0.3.2 - forges runtime supports dynamic iterable expressions for items
+  // radioInput currently doesnt have ResolvableArray as an expected type like SelectInput does.
   items: officeItems,
   validWhen: [
     validation({

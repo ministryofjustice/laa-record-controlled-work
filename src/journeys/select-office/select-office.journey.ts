@@ -26,7 +26,7 @@ export const selectOfficeJourney = journey({
   view: { template: "partials/form-step" },
 });
 
-export default createForgePackage<SelectOfficeEffectsDeps>({
+export const selectOfficePacakge = createForgePackage<SelectOfficeEffectsDeps>({
   functions: [selectOfficeEffectsRegistry],
   journey: selectOfficeJourney,
 });
