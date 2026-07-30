@@ -7,7 +7,8 @@ import { ApiResponseError, ApiValidationError } from "#/api/api.errors.js";
 import { CreateApplicationResponseBody } from "#/api/clients/rcw/model/createApplicationResponseBody.zod.gen.js";
 import { getRcwApiDefaultOptions } from "#/api/getRcwApiDefaultOptions.js";
 import { getAuthDebugHeaders } from "#/auth/auth.debug.js";
-import { fromAnswers } from "#/journeys/create-application/Application.dto.js";
+import { Answers } from "#/journeys/create-application/data/answers.zod.js";
+import { fromAnswers } from "#/journeys/create-application/data/Application.dto.js";
 import { isJourneySession } from "#/journeys/effects.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
@@ -34,7 +35,17 @@ export const createApplication =
         return;
       }
 
-      const applicationDto = fromAnswers(journeyAnswers);
+      const answersFormatted = Answers.safeParse(journeyAnswers);
+
+      if (!answersFormatted.success) {
+        logger.error(
+          `Journey answers for journey ${journeyCode} failed validation`,
+          answersFormatted.error,
+        );
+        throw ApiValidationError.from(answersFormatted.error);
+      }
+
+      const applicationDto = fromAnswers(answersFormatted.data);
 
       const opts = await getRcwApiDefaultOptions({
         homeAccountId: session?.msal?.homeAccountId,

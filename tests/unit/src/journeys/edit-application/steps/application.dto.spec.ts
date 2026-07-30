@@ -1,4 +1,4 @@
-import { fromAnswers } from "#/journeys/create-application/Application.dto.js";
+import { fromAnswers } from "#/journeys/create-application/data/Application.dto.js";
 import { expect } from "chai";
 
 const answers = {
