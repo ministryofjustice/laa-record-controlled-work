@@ -43,7 +43,7 @@ export function createForgeTestClient(
     const mockData = getCreateApplicationResponseMock();
         createApplicationStub = sinon
           .stub()
-          .resolves({ status: 200, data: mockData });
+          .resolves({ status: 201, data: mockData });
 
   const testJourney = journey({
     code: "testJourney",
