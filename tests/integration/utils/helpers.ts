@@ -17,6 +17,9 @@ import {
   JourneyEffects,
   JourneyEffectsImplementations,
 } from "#/journeys/effects.js";
+import type { SelectOfficeEffectsDeps } from "#/journeys/select-office/select-office.types.js";
+import { selectOfficeEffectsRegistry } from "#/journeys/select-office/select-office.effects.js";
+import { selectOfficeJourney } from "#/journeys/select-office/select-office.journey.js";
 import type { YourCasesEffectsDeps } from "#/journeys/your-cases/your-cases.types.js";
 import { yourCasesEffectsRegistry } from "#/journeys/your-cases/your-cases.effects.js";
 
@@ -54,6 +57,26 @@ export function createForgeTestClient(
     .registerGlobalComponents([autocomplete])
     .registerGlobalFunctions(nunjucksFunctions)
     .registerPackage(testPackage)
+    .createClient();
+}
+
+/**
+ * Creates a test client for the select office journey.
+ * @param {SelectOfficeEffectsDeps} mockDeps - mock implementations for the journey's effect functions
+ * @returns {ForgeTestClient} A configured test client.
+ */
+export function createForgeTestClientForSelectOffice(
+  mockDeps: SelectOfficeEffectsDeps,
+): ForgeTestClient {
+  const testPackage = createTestPackage({
+    functions: selectOfficeEffectsRegistry,
+    journey: selectOfficeJourney,
+  });
+
+  return new ForgeTestHarness()
+    .registerGlobalComponents(govukComponents)
+    .registerGlobalFunctions(nunjucksFunctions)
+    .registerPackage(testPackage, mockDeps)
     .createClient();
 }
 
