@@ -76,6 +76,7 @@ export const getGetApplicationsUrl = (params?: GetApplicationsParams) => {
  * @summary Get all applications
  */
 export const getApplications = async (
+  params?: GetApplicationsParams,
   options?: RequestInit,
 ): Promise<getApplicationsResponse> => {
   const res = await fetch(getGetApplicationsUrl(params), {
