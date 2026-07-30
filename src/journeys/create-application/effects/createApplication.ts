@@ -1,17 +1,36 @@
 import type { EffectFunctionContext } from "@ministryofjustice/hmpps-forge/core";
 import type { Session, SessionData } from "express-session";
 
+import type { ApplicationDtoInterface } from "#/dto/application/application.dto.interface.js";
 import type { CreateApplicationEffectsDeps } from "#/journeys/create-application/create-application.types.js";
 
 import { ApiResponseError, ApiValidationError } from "#/api/api.errors.js";
 import { CreateApplicationResponseBody } from "#/api/clients/rcw/model/createApplicationResponseBody.zod.gen.js";
 import { getRcwApiDefaultOptions } from "#/api/getRcwApiDefaultOptions.js";
 import { getAuthDebugHeaders } from "#/auth/auth.debug.js";
+import { ApplicationDto } from "#/dto/application/application.dto.js";
 import { Answers } from "#/journeys/create-application/data/answers.zod.js";
 import { isJourneySession } from "#/journeys/effects.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
-import { ApplicationDto } from "#/dto/application/application.dto.js";
+
+const buildApplicationData = (
+  journeyAnswers: Record<string, unknown>,
+  journeyCode: string,
+): ApplicationDtoInterface => {
+  const answersFormatted = Answers.safeParse(journeyAnswers);
+
+  if (!answersFormatted.success) {
+    logger.error(
+      `Journey answers for journey ${journeyCode} failed validation`,
+      answersFormatted.error,
+    );
+    throw ApiValidationError.from(answersFormatted.error);
+  }
+
+  const applicationDto = ApplicationDto.fromAnswers(answersFormatted.data);
+  return applicationDto.toRcwApi();
+};
 
 export const createApplication =
   (deps: CreateApplicationEffectsDeps) =>
@@ -36,22 +55,11 @@ export const createApplication =
         return;
       }
 
-      const answersFormatted = Answers.safeParse(journeyAnswers);
-
-      if (!answersFormatted.success) {
-        logger.error(
-          `Journey answers for journey ${journeyCode} failed validation`,
-          answersFormatted.error,
-        );
-        throw ApiValidationError.from(answersFormatted.error);
-      }
-
-      const applicationDto = ApplicationDto.fromAnswers(answersFormatted.data);
-      const dataForApi = applicationDto.toRcwApi();
+      const dataForApi = buildApplicationData(journeyAnswers, journeyCode);
 
       const opts = await getRcwApiDefaultOptions({
-        homeAccountId: session?.msal?.homeAccountId,
-        sessionId: session?.id,
+        homeAccountId: session.msal?.homeAccountId,
+        sessionId: session.id,
       });
 
       response = await deps.createApplication(dataForApi, opts);
@@ -81,8 +89,6 @@ export const createApplication =
       throw new ApiResponseError();
     }
 
-    console.log({ response });
-
     const result = CreateApplicationResponseBody.safeParse(response.data);
 
     if (!result.success) {
@@ -92,6 +98,4 @@ export const createApplication =
       );
       throw ApiValidationError.from(result.error);
     }
-
-    console.log({ result });
   };

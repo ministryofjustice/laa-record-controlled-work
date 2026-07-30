@@ -1,4 +1,4 @@
-import { AddressDto } from "#/dto/address/address.dto.interface.js";
+import type { AddressDto } from "#/dto/address/address.dto.interface.js";
 
 export interface ClientDetailsDto {
   address: AddressDto;

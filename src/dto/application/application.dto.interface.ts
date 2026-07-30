@@ -1,4 +1,4 @@
-import { ClientDetailsDto } from "#/dto/clientDetails/clientDetails.dto.interface.js";
+import type { ClientDetailsDto } from "#/dto/clientDetails/clientDetails.dto.interface.js";
 
 export interface ApplicationDtoInterface {
   clientDetails: ClientDetailsDto;
