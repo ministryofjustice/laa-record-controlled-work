@@ -1,5 +1,4 @@
 import {
-  access,
   redirect,
   step,
   submit,
@@ -21,6 +20,6 @@ export const selectOfficeStep = step({
       validate: true,
     }),
   ],
-  path: "/cases",
+  path: "/",
   title: t("journeys.selectOffice.title"),
 });
