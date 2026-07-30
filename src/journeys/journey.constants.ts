@@ -27,4 +27,5 @@ export const OVERSEAS_EXCLUSIVE_ADDRESS_FIELDS = Object.values(
 export const CONTEXT_DATA_KEYS = {
   caseList: "caseList",
   selectedOffice: "selectedOffice",
+  singleOffice: "singleOffice",
 };
