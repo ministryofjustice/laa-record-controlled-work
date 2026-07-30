@@ -21,9 +21,12 @@ export const loadOffices =
   (deps: SelectOfficeEffectsDeps) => async (context: SelectOfficeContext) => {
     let response;
     const firmId = getFirmIdFromSession(context);
+    const correlationId = context
+      .getRequestHeader("x-correlation-id")
+      ?.toString();
 
     try {
-      const opts = getPdaApiDefaultOptions();
+      const opts = getPdaApiDefaultOptions(correlationId);
       response = await deps.getAllProviderOffices(firmId, opts);
     } catch (error) {
       logger.error("Error fetching offices", error, {

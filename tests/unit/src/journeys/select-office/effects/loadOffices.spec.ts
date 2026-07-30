@@ -16,25 +16,30 @@ import { logger } from "#/logger.js";
 describe("loadOffices", () => {
   let getAllProviderOffices: sinon.SinonStub;
   let getSession: sinon.SinonStub;
+  let getRequestHeader: sinon.SinonStub;
   let setData: sinon.SinonStub;
   let deps: SelectOfficeEffectsDeps;
   let context: SelectOfficeContext;
 
+  const FIRM_CODE = 123;
+  
   beforeEach(() => {
     getAllProviderOffices = sinon.stub();
     getSession = sinon.stub().returns({
       account: {
         idTokenClaims: {
-          FIRM_CODE: "123",
+          FIRM_CODE,
         },
       },
     });
+    getRequestHeader = sinon.stub().returns(undefined);
     setData = sinon.stub();
     deps = {
       getAllProviderOffices,
     } as unknown as SelectOfficeEffectsDeps;
     context = {
       getSession,
+      getRequestHeader,
       setData,
     } as unknown as SelectOfficeContext;
   });
@@ -61,7 +66,7 @@ describe("loadOffices", () => {
 
     expect(
       getAllProviderOffices.calledOnceWithExactly(
-        123,
+        FIRM_CODE,
         getPdaApiDefaultOptions(),
       ),
     ).to.equal(true);
@@ -74,6 +79,24 @@ describe("loadOffices", () => {
         postCode: "LS1 1AA",
       },
     ])).to.equal(true);
+  });
+
+  it("forwards the x-correlation-id request header to the API call", async () => {
+    const correlationId = "test-correlation-id";
+    getRequestHeader.withArgs("x-correlation-id").returns(correlationId);
+    getAllProviderOffices.resolves({
+      data: {} satisfies ProviderFirmOfficeListDto,
+      status: 200,
+    });
+
+    await loadOffices(deps)(context);
+
+    expect(
+      getAllProviderOffices.calledOnceWithExactly(
+        FIRM_CODE,
+        getPdaApiDefaultOptions(correlationId),
+      ),
+    ).to.equal(true);
   });
 
   it("sets an empty office list when the response does not include offices", async () => {
