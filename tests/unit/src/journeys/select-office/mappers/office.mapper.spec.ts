@@ -1,11 +1,11 @@
 import { expect } from "chai";
 
 import { mapOffices } from "#/journeys/select-office/mappers/office.dto.js";
-import type { OfficeDto } from "#/journeys/select-office/select-office.types.js";
+import type { PdaOffice } from "#/journeys/select-office/select-office.types.js";
 
 describe("mapOffices", () => {
   it("maps office fields and joins populated address parts", () => {
-    const offices: OfficeDto[] = [
+    const offices: PdaOffice[] = [
       {
         addressLine1: "1 High Street",
         addressLine2: "Floor 3",
@@ -31,7 +31,7 @@ describe("mapOffices", () => {
   });
 
   it("falls back to empty strings when office code or name are missing", () => {
-    const offices: OfficeDto[] = [
+    const offices: PdaOffice[] = [
       {
         addressLine1: "100 Market Road",
       },

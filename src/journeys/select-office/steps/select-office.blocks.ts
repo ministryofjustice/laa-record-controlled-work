@@ -23,7 +23,7 @@ const officeItems = Data(CONTEXT_DATA_KEYS.officeList).each(
       Item().path(OFFICE_FIELD.officeName),
       Item().path(OFFICE_FIELD.address),
     ),
-    value: Item(),
+    value: Item().path(OFFICE_FIELD.code),
   }),
 );
 

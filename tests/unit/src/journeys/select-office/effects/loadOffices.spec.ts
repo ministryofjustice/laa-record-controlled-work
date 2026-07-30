@@ -8,7 +8,7 @@ import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import { InvalidFirmCodeClaimError } from "#/journeys/journey.errors.js";
 import { loadOffices } from "#/journeys/select-office/effects/loadOffices.js";
 import type {
-  SelectOfficesContext,
+  SelectOfficeContext,
   SelectOfficeEffectsDeps,
 } from "#/journeys/select-office/select-office.types.js";
 import { logger } from "#/logger.js";
@@ -18,7 +18,7 @@ describe("loadOffices", () => {
   let getSession: sinon.SinonStub;
   let setData: sinon.SinonStub;
   let deps: SelectOfficeEffectsDeps;
-  let context: SelectOfficesContext;
+  let context: SelectOfficeContext;
 
   beforeEach(() => {
     getAllProviderOffices = sinon.stub();
@@ -36,7 +36,7 @@ describe("loadOffices", () => {
     context = {
       getSession,
       setData,
-    } as unknown as SelectOfficesContext;
+    } as unknown as SelectOfficeContext;
   });
 
   afterEach(() => sinon.restore());

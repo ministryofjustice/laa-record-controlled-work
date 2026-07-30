@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 import type {
   Office,
   SelectOfficeContext,
@@ -7,7 +9,17 @@ import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import { MissingSessionError } from "#/journeys/journey.errors.js";
 
 export const setSelectedOffice = () => (context: SelectOfficeContext) => {
-  const selectedOffice: Office = context.getAnswer("selectOffice");
+  const selectedOfficeCode = context.getAnswer("selectOffice");
+  const officeList = context.getData<Office[]>(CONTEXT_DATA_KEYS.officeList);
+
+  const selectedOffice: Office | undefined = officeList.find(
+    (office) => office.code === selectedOfficeCode,
+  );
+
+  if (!selectedOffice) {
+    // TODO error
+    throw new Error(`Office not found for code: ${selectedOfficeCode}`);
+  }
 
   const session = context.getSession();
 

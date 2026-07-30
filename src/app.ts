@@ -20,7 +20,7 @@ import createApplication from "#/journeys/create-application/create-application.
 import editApplication from "#/journeys/edit-application/edit-application.index.js";
 import evidence from "#/journeys/evidence/evidence.index.js";
 import { selectOfficePacakge } from "#/journeys/select-office/select-office.journey.js";
-import yourCases from "#/journeys/your-cases/your-cases.index.js";
+import { yourCasesPackage } from "#/journeys/your-cases/your-cases.journey.js";
 import { createSession } from "#/lib/session.js";
 import { requireAuth } from "#/middleware/requireAuth.js";
 import { setupConfig } from "#/middleware/setupConfigs.js";
@@ -90,7 +90,7 @@ const createApp = async (): Promise<express.Application> => {
     .registerGlobalComponents(mojComponents)
     .registerGlobalComponents([autocomplete])
     .registerGlobalFunctions(nunjucksFunctions)
-    .registerPackage(yourCases, { getApplications })
+    .registerPackage(yourCasesPackage, { getApplications })
     .registerPackage(selectOfficePacakge, { getAllProviderOffices })
 
     .registerPackage(createApplication)

@@ -11,7 +11,7 @@ export type PdaOffice = NonNullable<
 >[number];
 
 export interface SelectOfficeAnswers extends Record<string, unknown> {
-  selectOffice: Office;
+  selectOffice: string;
 }
 
 export type SelectOfficeContext = EffectFunctionContext<

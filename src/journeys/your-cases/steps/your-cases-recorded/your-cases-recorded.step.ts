@@ -15,7 +15,7 @@ import {
   noCasesMessage,
   subNavigation,
 } from "#/journeys/your-cases/steps/your-cases-recorded/your-cases-recorded.blocks.js";
-import { YourCasesEffects } from "#/journeys/your-cases/your-cases.effects.js";
+import { yourCasesEffects } from "#/journeys/your-cases/your-cases.effects.js";
 import { t } from "#/lib/i18n.js";
 
 export const yourCasesRecordedStep = step({
@@ -29,10 +29,7 @@ export const yourCasesRecordedStep = step({
   ],
   onAccess: [
     access({
-      effects: [
-        YourCasesEffects.loadYourCaseList(),
-        YourCasesEffects.setSelectedOffice(),
-      ],
+      effects: [yourCasesEffects.loadYourCaseList()],
     }),
   ],
   path: "/cases/recorded",
