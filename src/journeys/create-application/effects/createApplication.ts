@@ -8,10 +8,10 @@ import { CreateApplicationResponseBody } from "#/api/clients/rcw/model/createApp
 import { getRcwApiDefaultOptions } from "#/api/getRcwApiDefaultOptions.js";
 import { getAuthDebugHeaders } from "#/auth/auth.debug.js";
 import { Answers } from "#/journeys/create-application/data/answers.zod.js";
-import { fromAnswers } from "#/journeys/create-application/data/Application.dto.js";
 import { isJourneySession } from "#/journeys/effects.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
+import { ApplicationDto } from "#/dto/application/application.dto.js";
 
 export const createApplication =
   (deps: CreateApplicationEffectsDeps) =>
@@ -22,6 +22,7 @@ export const createApplication =
     let response;
 
     try {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Session shape is constrained by app session typing.
       const session = context.getSession() as
         (Partial<SessionData> & Session) | undefined;
 
@@ -45,14 +46,15 @@ export const createApplication =
         throw ApiValidationError.from(answersFormatted.error);
       }
 
-      const applicationDto = fromAnswers(answersFormatted.data);
+      const applicationDto = ApplicationDto.fromAnswers(answersFormatted.data);
+      const dataForApi = applicationDto.toRcwApi();
 
       const opts = await getRcwApiDefaultOptions({
         homeAccountId: session?.msal?.homeAccountId,
         sessionId: session?.id,
       });
 
-      response = await deps.createApplication(applicationDto, opts);
+      response = await deps.createApplication(dataForApi, opts);
     } catch (error) {
       logger.error(
         `Error creating application for journey ${journeyCode}:`,
