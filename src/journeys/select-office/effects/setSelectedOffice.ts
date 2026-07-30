@@ -1,14 +1,21 @@
-import type { OfficesContext } from "#/journeys/select-office/select-office.types.js";
+import type {
+  Office,
+  SelectOfficeContext,
+} from "#/journeys/select-office/select-office.types.js";
 
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
+import { MissingSessionError } from "#/journeys/journey.errors.js";
 
-export const setSelectedOffice = () => (context: OfficesContext) => {
-  const selectedOffice = {
-    address: "123 Fake Street",
-    code: "A123456",
-    displayName: "London Office",
-  };
+export const setSelectedOffice = () => (context: SelectOfficeContext) => {
+  const selectedOffice: Office = context.getAnswer("selectOffice");
 
-  // TODO add to session
+  const session = context.getSession();
+
+  if (!session) {
+    throw new MissingSessionError();
+  }
+
+  session.selectedOffice = selectedOffice;
+
   context.setData(CONTEXT_DATA_KEYS.selectedOffice, selectedOffice);
 };

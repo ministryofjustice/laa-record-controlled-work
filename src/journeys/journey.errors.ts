@@ -8,3 +8,11 @@ export class InvalidFirmCodeClaimError extends DomainError {
     super("Missing or invalid FIRM_CODE claim", cause);
   }
 }
+
+export class MissingSessionError extends DomainError {
+  public readonly name = "MissingSessionError";
+
+  constructor(cause?: unknown) {
+    super("Missing or invalid session data", cause);
+  }
+}

@@ -1,8 +1,7 @@
 import type {
   Office,
+  SelectOfficeContext,
   SelectOfficeEffectsDeps,
-  SelectOfficesContext,
-  SelectOfficeSession,
 } from "#/journeys/select-office/select-office.types.js";
 
 import { ApiResponseError, ApiValidationError } from "#/api/api.errors.js";
@@ -10,13 +9,16 @@ import { ProviderFirmOfficeListDto } from "#/api/clients/pda/model/providerFirmO
 import { getPdaApiDefaultOptions } from "#/api/getPdaApiDefaultOptions.js";
 import { ID_TOKEN_CLAIMS } from "#/auth/auth.constant.js";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
-import { InvalidFirmCodeClaimError } from "#/journeys/journey.errors.js";
+import {
+  InvalidFirmCodeClaimError,
+  MissingSessionError,
+} from "#/journeys/journey.errors.js";
 import { mapOffices } from "#/journeys/select-office/mappers/office.dto.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
 
 export const loadOffices =
-  (deps: SelectOfficeEffectsDeps) => async (context: SelectOfficesContext) => {
+  (deps: SelectOfficeEffectsDeps) => async (context: SelectOfficeContext) => {
     let response;
     const firmId = getFirmIdFromSession(context);
 
@@ -65,12 +67,23 @@ export const loadOffices =
  * @param context Journey effect context containing the current session.
  * @returns Firm identifier required by the PDA provider offices API.
  */
-function getFirmIdFromSession(context: SelectOfficesContext): number {
+function getFirmIdFromSession(context: SelectOfficeContext): number {
   const session = context.getSession();
-  const claims = getTokenClaims(session);
+  if (!session) {
+    throw new MissingSessionError();
+  }
+
+  const claims = session.account?.idTokenClaims;
+
   const firmCode = claims?.[ID_TOKEN_CLAIMS.firmCode];
 
   if (typeof firmCode !== "number" && typeof firmCode !== "string") {
+    logger.error(
+      "Missing or invalid FIRM_CODE claim in authenticated account",
+      {
+        claims,
+      },
+    );
     throw new InvalidFirmCodeClaimError();
   }
   if (typeof firmCode === "string") {
@@ -80,39 +93,4 @@ function getFirmIdFromSession(context: SelectOfficesContext): number {
   }
 
   return firmCode;
-}
-
-/**
- * Safely extracts ID token claims from the authenticated session account.
- * @param session Current journey session.
- * @returns Claims object when present.
- */
-function getTokenClaims(
-  session: SelectOfficeSession,
-): Record<string, unknown> | undefined {
-  if (!isRecord(session)) {
-    return undefined;
-  }
-
-  const { account } = session;
-  if (!isRecord(account)) {
-    return undefined;
-  }
-
-  const { idTokenClaims } = account;
-
-  if (!isRecord(idTokenClaims)) {
-    return undefined;
-  }
-
-  return idTokenClaims;
-}
-
-/**
- * Type guard for plain object-like values.
- * @param value Unknown runtime value.
- * @returns True when value is a non-null object.
- */
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null;
 }

@@ -1,6 +1,6 @@
 import type {
   Office,
-  OfficeDto,
+  PdaOffice,
 } from "#/journeys/select-office/select-office.types.js";
 
 /**
@@ -8,7 +8,7 @@ import type {
  * @param offices Array of offices from the API
  * @returns Array of mapped offices in the application format
  */
-export function mapOffices(offices: OfficeDto[]): Office[] {
+export function mapOffices(offices: PdaOffice[]): Office[] {
   return offices.map(mapOffice);
 }
 
@@ -17,7 +17,7 @@ export function mapOffices(offices: OfficeDto[]): Office[] {
  * @param office Office object from the API
  * @returns Mapped office in the application format
  */
-function mapOffice(office: OfficeDto): Office {
+function mapOffice(office: PdaOffice): Office {
   const addressParts = [
     office.addressLine1,
     office.addressLine2,

@@ -1,4 +1,9 @@
-import { access, step } from "@ministryofjustice/hmpps-forge/core/authoring";
+import {
+  access,
+  redirect,
+  step,
+  submit,
+} from "@ministryofjustice/hmpps-forge/core/authoring";
 
 import { continueButton } from "#/journeys/common.blocks.js";
 import { selectOfficeEffects } from "#/journeys/select-office/select-office.effects.js";
@@ -7,9 +12,13 @@ import { t } from "#/lib/i18n.js";
 
 export const selectOfficeStep = step({
   blocks: [selectOfficeRadioInput, continueButton],
-  onAccess: [
-    access({
-      effects: [selectOfficeEffects.loadOffices()],
+  onSubmission: [
+    submit({
+      onValid: {
+        effects: [selectOfficeEffects.setSelectedOffice()],
+        next: [redirect({ goto: "/cases" })],
+      },
+      validate: true,
     }),
   ],
   path: "/cases",
