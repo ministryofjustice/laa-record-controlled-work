@@ -8,8 +8,8 @@ import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import {
   createCaseButton,
   heading,
-  selectedOfficeSingle,
   selectedOfficeMultiple,
+  selectedOfficeSingle,
 } from "#/journeys/your-cases/common.blocks.js";
 import {
   casesTable,
