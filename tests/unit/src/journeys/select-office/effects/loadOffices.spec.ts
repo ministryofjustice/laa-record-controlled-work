@@ -73,10 +73,8 @@ describe("loadOffices", () => {
     
     expect(setData.calledOnceWithExactly(CONTEXT_DATA_KEYS.officeList, [
       {
-        address: "1 High Street, Leeds",
+        address: "1 High Street, Leeds, LS1 1AA",
         code: "LEEDS-01",
-        officeName: "Leeds Office",
-        postCode: "LS1 1AA",
       },
     ])).to.equal(true);
   });

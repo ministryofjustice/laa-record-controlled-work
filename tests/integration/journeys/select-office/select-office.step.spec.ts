@@ -76,13 +76,12 @@ describe("Select Office step", () => {
           office.addressLine3,
           office.addressLine4,
           office.city,
+          office.postCode,
         ].filter(Boolean);
 
-        expect(radioItems[i].text).to.equal(
-          `${office.officeName}, ${addressParts.join(", ")}`,
-        );
+        expect(radioItems[i].text).to.equal(addressParts.join(", "));
         expect(radioItems[i].value).to.equal(office.firmOfficeCode);
-        expect(radioItems[i].hint.text).to.equal(office.postCode);
+        expect(radioItems[i].hint.text).to.equal(office.firmOfficeCode);
       }
     });
 
@@ -90,7 +89,10 @@ describe("Select Office step", () => {
       const singleOfficeResponse = getGetAllProviderOfficesResponseMock({
         offices: [mockOffices[0]],
       });
-      getAllProviderOfficesStub.resolves({ status: 200, data: singleOfficeResponse });
+      getAllProviderOfficesStub.resolves({
+        status: 200,
+        data: singleOfficeResponse,
+      });
       const result = await client.get("/select-office/", { session });
       expect(result.type).to.equal("redirect");
       expect((result as TestRedirectResult).url).to.equal("/cases");

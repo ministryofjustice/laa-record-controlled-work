@@ -1,9 +1,11 @@
 import { test, expect } from "../../fixtures/index.js";
 import { applications } from "../../fixtures/rcw.fixtures.js";
+import { getMappedOffices } from "../../fixtures/pda.fixtures.js";
 
-test("Your Cases step", async ({ page }) => {
-  // Set a selected office in session (required by the Your Cases journey)
-  await page.goto("/test/set-office");
+const [selectedOffice] = getMappedOffices(1);
+
+
+test("Your Cases step", async ({ withSelectedOffice: page }) => {
 
   // Navigate to the Your Cases page
   await page.goto("/cases");
@@ -16,8 +18,9 @@ test("Your Cases step", async ({ page }) => {
     }),
   ).toBeVisible();
 
-  // Check the selected office is displayed
-  await expect(page.getByText("Office: Test Office (1T001X)")).toBeVisible();
+  // Check the selected office is displayed using the seeded MSW mock data
+  await expect(page.getByText(selectedOffice.address)).toBeVisible();
+  await expect(page.getByText(selectedOffice.code)).toBeVisible();
 
   // Check the button
   await page.getByRole("button", { name: "Record a new case" }).click();

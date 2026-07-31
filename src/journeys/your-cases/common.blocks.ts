@@ -19,7 +19,7 @@ export const selectedOffice = GovUKBody({
   text: Format(
     "%1: %2 (%3)",
     t("pages.yourCases.office"),
-    Data(CONTEXT_DATA_KEYS.selectedOffice).path(OFFICE_FIELD.officeName),
+    Data(CONTEXT_DATA_KEYS.selectedOffice).path(OFFICE_FIELD.address),
     Data(CONTEXT_DATA_KEYS.selectedOffice).path(OFFICE_FIELD.code),
   ),
 });

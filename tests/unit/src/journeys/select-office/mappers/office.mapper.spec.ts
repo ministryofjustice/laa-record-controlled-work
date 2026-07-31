@@ -22,10 +22,8 @@ describe("mapOffices", () => {
 
     expect(result).to.deep.equal([
       {
-        address: "1 High Street, Floor 3, West Wing, London",
+        address: "1 High Street, Floor 3, West Wing, London, SW1A 1AA",
         code: "OFF-123",
-        officeName: "Central Office",
-        postCode: "SW1A 1AA",
       },
     ]);
   });
@@ -43,8 +41,6 @@ describe("mapOffices", () => {
       {
         address: "100 Market Road",
         code: "",
-        officeName: "",
-        postCode: "",
       },
     ]);
   });

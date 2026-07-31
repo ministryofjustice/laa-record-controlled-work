@@ -33,21 +33,4 @@ router.get("/signin", (req, res, next) => {
   });
 });
 
-router.get("/set-office", (req, res, next) => {
-  req.session.selectedOffice = {
-    address: "1 Test Street, Test City",
-    code: "1T001X",
-    officeName: "Test Office",
-    postCode: "T1 1TT",
-  };
-
-  req.session.save((err: unknown) => {
-    if (err !== undefined) {
-      next(err);
-      return;
-    }
-    res.status(OK).send("Office set in session");
-  });
-});
-
 export default router;

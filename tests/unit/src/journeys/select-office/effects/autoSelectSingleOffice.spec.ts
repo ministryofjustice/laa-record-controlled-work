@@ -7,15 +7,13 @@ import { autoSelectSingleOffice } from "#/journeys/select-office/effects/autoSel
 import type { Office, SelectOfficeContext } from "#/journeys/select-office/select-office.types.js";
 
 const mockOffice: Office = {
-  address: "1 High Street, Leeds",
+  address: "1 High Street, Leeds, LS1 1AA",
   code: "LEEDS-01",
-  officeName: "Leeds Office",
-  postCode: "LS1 1AA",
 };
 
 const mockOffices: Office[] = [
   mockOffice,
-  { address: "2 King Street, Manchester", code: "MCR-01", officeName: "Manchester Office", postCode: "M1 1BB" },
+  { address: "2 King Street, Manchester, M1 1BB", code: "MCR-01" },
 ];
 
 describe("autoSelectSingleOffice", () => {

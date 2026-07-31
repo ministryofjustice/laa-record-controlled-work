@@ -9,10 +9,8 @@ import { logger } from "#/logger.js";
 import { OfficeNotFoundError } from "#/journeys/journey.errors.js";
 
 const validOffice: Office = {
-  address: "1 High Street, Leeds",
+  address: "1 High Street, Leeds, LS1 1AA",
   code: "LEEDS-01",
-  officeName: "Leeds Office",
-  postCode: "LS1 1AA",
 };
 
 describe("loadSelectedOffice", () => {

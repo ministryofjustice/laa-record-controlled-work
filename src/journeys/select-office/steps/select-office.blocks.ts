@@ -16,13 +16,9 @@ import { t } from "#/lib/i18n.js";
 const officeItems = Data(CONTEXT_DATA_KEYS.officeList).each(
   Iterator.Map({
     hint: {
-      text: Item().path(OFFICE_FIELD.postCode),
+      text: Item().path(OFFICE_FIELD.code),
     },
-    text: Format(
-      "%1, %2",
-      Item().path(OFFICE_FIELD.officeName),
-      Item().path(OFFICE_FIELD.address),
-    ),
+    text: Item().path(OFFICE_FIELD.address),
     value: Item().path(OFFICE_FIELD.code),
   }),
 );
