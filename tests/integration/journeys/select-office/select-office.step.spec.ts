@@ -85,6 +85,16 @@ describe("Select Office step", () => {
         expect(radioItems[i].hint.text).to.equal(office.postCode);
       }
     });
+
+    it("redirects straight to /cases when only one office is returned", async () => {
+      const singleOfficeResponse = getGetAllProviderOfficesResponseMock({
+        offices: [mockOffices[0]],
+      });
+      getAllProviderOfficesStub.resolves({ status: 200, data: singleOfficeResponse });
+      const result = await client.get("/select-office/", { session });
+      expect(result.type).to.equal("redirect");
+      expect((result as TestRedirectResult).url).to.equal("/cases");
+    });
   });
 
   describe("POST /select-office/", () => {

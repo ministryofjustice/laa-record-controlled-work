@@ -6,6 +6,7 @@ import { loadSelectedOffice } from "#/journeys/your-cases/effects/loadSelectedOf
 import type { CaseListContext } from "#/journeys/your-cases/your-cases.types.js";
 import type { Office } from "#/journeys/select-office/select-office.types.js";
 import { logger } from "#/logger.js";
+import { OfficeNotFoundError } from "#/journeys/journey.errors.js";
 
 const validOffice: Office = {
   address: "1 High Street, Leeds",
@@ -44,7 +45,7 @@ describe("loadSelectedOffice", () => {
     getSession.returns({});
 
     expect(() => loadSelectedOffice()(context))
-      .to.throw(Error, "Selected office in session is invalid");
+      .to.throw(OfficeNotFoundError);
   });
 
   it("throws Error when selectedOffice in session fails schema validation", () => {
@@ -54,6 +55,6 @@ describe("loadSelectedOffice", () => {
     });
 
     expect(() => loadSelectedOffice()(context))
-      .to.throw(Error, "Selected office in session is invalid");
+      .to.throw(OfficeNotFoundError);
   });
 });

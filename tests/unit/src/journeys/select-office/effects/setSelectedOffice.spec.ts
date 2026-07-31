@@ -2,7 +2,7 @@ import { expect } from "chai";
 import sinon from "sinon";
 
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
-import { MissingSessionError } from "#/journeys/journey.errors.js";
+import { MissingSessionError, OfficeNotFoundError } from "#/journeys/journey.errors.js";
 import { setSelectedOffice } from "#/journeys/select-office/effects/setSelectedOffice.js";
 import type { Office, SelectOfficeContext } from "#/journeys/select-office/select-office.types.js";
 
@@ -50,11 +50,11 @@ describe("setSelectedOffice", () => {
     ).to.equal(true);
   });
 
-  it("throws Error when the selected office code is not in the office list", () => {
+  it("throws OfficeNotFoundError when the selected office code is not in the office list", () => {
     getAnswer.withArgs("selectOffice").returns("UNKNOWN-CODE");
 
     expect(() => setSelectedOffice()(context))
-      .to.throw(Error, "Office not found for code: UNKNOWN-CODE");
+      .to.throw(OfficeNotFoundError);
   });
 
   it("throws MissingSessionError when session is not available", () => {
