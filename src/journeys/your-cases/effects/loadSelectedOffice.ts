@@ -1,6 +1,7 @@
 import type { CaseListContext } from "#/journeys/your-cases/your-cases.types.js";
 
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
+import { OfficeNotFoundError } from "#/journeys/journey.errors.js";
 import { OfficeSchema } from "#/journeys/select-office/select-office.types.js";
 import { logger } from "#/logger.js";
 
@@ -12,10 +13,7 @@ export const loadSelectedOffice = () => (context: CaseListContext) => {
     logger.error("Selected office in session is invalid", result.error, {
       selectedOffice,
     });
-    // TODO new error
-    throw new Error(
-      `Selected office in session is invalid: ${result.error.message}`,
-    );
+    throw new OfficeNotFoundError(result.error);
   }
 
   context.setData(CONTEXT_DATA_KEYS.selectedOffice, result.data);

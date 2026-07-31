@@ -16,3 +16,11 @@ export class MissingSessionError extends DomainError {
     super("Missing or invalid session data", cause);
   }
 }
+
+export class OfficeNotFoundError extends DomainError {
+  public readonly name = "OfficeNotFoundError";
+
+  constructor(cause?: unknown) {
+    super("Office not found", cause);
+  }
+}

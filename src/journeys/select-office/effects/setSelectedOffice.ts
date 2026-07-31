@@ -4,7 +4,11 @@ import type {
 } from "#/journeys/select-office/select-office.types.js";
 
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
-import { MissingSessionError } from "#/journeys/journey.errors.js";
+import {
+  MissingSessionError,
+  OfficeNotFoundError,
+} from "#/journeys/journey.errors.js";
+import { logger } from "#/logger.js";
 
 export const setSelectedOffice = () => (context: SelectOfficeContext) => {
   const selectedOfficeCode = context.getAnswer("selectOffice");
@@ -15,8 +19,10 @@ export const setSelectedOffice = () => (context: SelectOfficeContext) => {
   );
 
   if (!selectedOffice) {
-    // TODO error
-    throw new Error(`Office not found for code: ${selectedOfficeCode}`);
+    logger.error("Office not found", undefined, {
+      officeCode: selectedOfficeCode,
+    });
+    throw new OfficeNotFoundError();
   }
 
   const session = context.getSession();
