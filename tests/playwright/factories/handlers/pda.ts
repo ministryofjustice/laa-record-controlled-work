@@ -5,6 +5,9 @@
  * to external APIs and serve mock responses.
  */
 
+import { getGetAllProviderOfficesMockHandler } from "../../../mocks/api/pda/msw/provider-firms-endpoints/provider-firms-endpoints.msw.gen.js";
 import { getProviderOfficesResponse } from "../../fixtures/pda.fixtures.js";
 
-export const pdaApiHandlers = [getProviderOfficesResponse(10)];
+export const pdaApiHandlers = [
+	getGetAllProviderOfficesMockHandler(getProviderOfficesResponse(10)),
+];
