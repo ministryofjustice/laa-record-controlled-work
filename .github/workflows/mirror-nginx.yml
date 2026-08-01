@@ -144,18 +144,10 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       - name: Update docker-images.env
-        id: open-pr
-        env:
-          GH_TOKEN: ${{ github.token }}
         run: |
           TAG="${{ needs.check.outputs.tag }}"
           ECR_DIGEST="${{ needs.scan-and-mirror.outputs.ecr_digest }}" # - deploy.sh SHA-pinned deployments
           DOCKERHUB_DIGEST="${{ needs.check.outputs.amd64_digest }}" # - SCA image scanning
-          BRANCH="chore/mirror-nginx-${TAG}"
-
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout -b "$BRANCH"
 
           sed -i "s|^NGINX_IMAGE_TAG=.*|NGINX_IMAGE_TAG=${TAG}|" docker-images.env
           sed -i \
@@ -167,21 +159,70 @@ jobs:
             docker-images.json > docker-images.json.tmp
           mv docker-images.json.tmp docker-images.json
 
-          git add docker-images.env docker-images.json
-          git commit -m "chore: mirror nginx-unprivileged@${TAG} to ECR"
-          git push origin "$BRANCH"
+      - name: Commit changes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="${{ needs.check.outputs.tag }}"
+          BRANCH="chore/mirror-nginx-${TAG}"
+          BASE_SHA=$(git rev-parse HEAD)
 
+          # Create the branch and commit via the GraphQL API rather than `git push`, so the
+          # commit is authored and signed by GitHub itself and shows as "Verified" - this repo
+          # requires verified signatures, which a plain git-authored commit can't satisfy.
+          gh api "repos/${{ github.repository }}/git/refs" \
+            -f ref="refs/heads/${BRANCH}" \
+            -f sha="${BASE_SHA}"
+
+          jq -n \
+            --arg repo "${{ github.repository }}" \
+            --arg branch "$BRANCH" \
+            --arg headline "chore: mirror nginx-unprivileged@${TAG} to ECR" \
+            --arg oid "$BASE_SHA" \
+            --arg envContent "$(base64 -i docker-images.env)" \
+            --arg jsonContent "$(base64 -i docker-images.json)" \
+            '{
+              branch: { repositoryNameWithOwner: $repo, branchName: $branch },
+              message: { headline: $headline },
+              expectedHeadOid: $oid,
+              fileChanges: {
+                additions: [
+                  { path: "docker-images.env", contents: $envContent },
+                  { path: "docker-images.json", contents: $jsonContent }
+                ]
+              }
+            }' > /tmp/commit-input.json
+
+          gh api graphql \
+            -f query='
+              mutation($input: CreateCommitOnBranchInput!) {
+                createCommitOnBranch(input: $input) {
+                  commit { oid }
+                }
+              }' \
+            -F input=@/tmp/commit-input.json
+
+      - name: Create pull request
+        id: create-pr
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="${{ needs.check.outputs.tag }}"
+          ECR_DIGEST="${{ needs.scan-and-mirror.outputs.ecr_digest }}"
+          DOCKERHUB_DIGEST="${{ needs.check.outputs.amd64_digest }}"
+          BRANCH="chore/mirror-nginx-${TAG}"
           TAG_URL="https://hub.docker.com/layers/nginxinc/nginx-unprivileged/${TAG}"
-          BODY="Mirrors [nginxinc/nginx-unprivileged@${TAG}](${TAG_URL}) to ECR."
-          BODY+=$'\n\n''Updates `docker-images.env`:'
-          BODY+=$'\n- ''`NGINX_IMAGE_TAG` to `'"${TAG}"'`'
-          BODY+=$'\n- ''`NGINX_ECR_IMAGE_DIGEST_AMD64` to `'"${ECR_DIGEST}"'`'
-          BODY+=$'\n\n''Updates `docker-images.json` nginx entry to `docker.io/nginxinc/nginx-unprivileged@'"${DOCKERHUB_DIGEST}"'`.'
-          BODY+=$'\n\n''> [!NOTE]'
-          BODY+=$'\n''> Required workflows will not trigger automatically on this PR. Run the following to trigger them:'
-          BODY+=$'\n''> ```'
-          BODY+=$'\n''> ./scripts/trigger-ci-on-branch.sh '"${BRANCH}"
-          BODY+=$'\n''> ```'
+
+          BODY=$(cat <<EOF
+          Mirrors [nginxinc/nginx-unprivileged@${TAG}](${TAG_URL}) to ECR.
+
+          Updates \`docker-images.env\`:
+          - \`NGINX_IMAGE_TAG\` to \`${TAG}\`
+          - \`NGINX_ECR_IMAGE_DIGEST_AMD64\` to \`${ECR_DIGEST}\`
+
+          Updates \`docker-images.json\` nginx entry to \`docker.io/nginxinc/nginx-unprivileged@${DOCKERHUB_DIGEST}\`.
+          EOF
+          )
 
           PR_URL=$(gh pr create \
             --head "$BRANCH" \
@@ -194,12 +235,12 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          NEW_PR_NUMBER=$(echo "${{ steps.open-pr.outputs.pr_url }}" | grep -o '[0-9]*$')
+          NEW_PR_NUMBER=$(echo "${{ steps.create-pr.outputs.pr_url }}" | grep -o '[0-9]*$')
           gh pr list \
             --search "Mirror nginx-unprivileged in:title" \
             --state open \
             --json number \
             --jq ".[].number | select(. != $NEW_PR_NUMBER)" \
           | while read -r number; do
-              gh pr close "$number" --comment "Superseded by ${{ steps.open-pr.outputs.pr_url }}"
+              gh pr close "$number" --comment "Superseded by ${{ steps.create-pr.outputs.pr_url }}"
             done
