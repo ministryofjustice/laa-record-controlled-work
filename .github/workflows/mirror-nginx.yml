@@ -179,8 +179,8 @@ jobs:
             --arg branch "$BRANCH" \
             --arg headline "chore: mirror nginx-unprivileged@${TAG} to ECR" \
             --arg oid "$BASE_SHA" \
-            --arg envContent "$(base64 -i docker-images.env)" \
-            --arg jsonContent "$(base64 -i docker-images.json)" \
+            --arg envContent "$(base64 -w0 docker-images.env)" \
+            --arg jsonContent "$(base64 -w0 docker-images.json)" \
             '{
               branch: { repositoryNameWithOwner: $repo, branchName: $branch },
               message: { headline: $headline },
