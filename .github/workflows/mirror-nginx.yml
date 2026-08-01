@@ -182,25 +182,25 @@ jobs:
             --arg envContent "$(base64 -w0 docker-images.env)" \
             --arg jsonContent "$(base64 -w0 docker-images.json)" \
             '{
-              branch: { repositoryNameWithOwner: $repo, branchName: $branch },
-              message: { headline: $headline },
-              expectedHeadOid: $oid,
-              fileChanges: {
-                additions: [
-                  { path: "docker-images.env", contents: $envContent },
-                  { path: "docker-images.json", contents: $jsonContent }
-                ]
+              query: "mutation($input: CreateCommitOnBranchInput!) { createCommitOnBranch(input: $input) { commit { oid } } }",
+              variables: {
+                input: {
+                  branch: { repositoryNameWithOwner: $repo, branchName: $branch },
+                  message: { headline: $headline },
+                  expectedHeadOid: $oid,
+                  fileChanges: {
+                    additions: [
+                      { path: "docker-images.env", contents: $envContent },
+                      { path: "docker-images.json", contents: $jsonContent }
+                    ]
+                  }
+                }
               }
             }' > /tmp/commit-input.json
 
-          gh api graphql \
-            -f query='
-              mutation($input: CreateCommitOnBranchInput!) {
-                createCommitOnBranch(input: $input) {
-                  commit { oid }
-                }
-              }' \
-            -F input=@/tmp/commit-input.json
+          # Pass the pre-built request body via --input rather than -F, since -F sends a
+          # file's contents as a string value rather than parsing it into the variables object.
+          gh api graphql --input /tmp/commit-input.json
 
       - name: Create pull request
         id: create-pr
