@@ -14,7 +14,6 @@ import type {
 import { logger } from "#/logger.js";
 
 describe("loadOffices", () => {
-  // TODO will reapply getAllProviderOffices in next pr
   let getAllProviderOffices: sinon.SinonStub;
   let getSession: sinon.SinonStub;
   let getRequestHeader: sinon.SinonStub;
@@ -48,134 +47,128 @@ describe("loadOffices", () => {
   afterEach(() => sinon.restore());
 
   it("loads mapped offices into context", async () => {
-    // TODO will reapply getAllProviderOffices in next pr
-    // getAllProviderOffices.resolves({
-    //   data: {
-    //     offices: [
-    //       {
-    //         addressLine1: "1 High Street",
-    //         city: "Leeds",
-    //         postCode: "LS1 1AA",
-    //         firmOfficeCode: "LEEDS-01",
-    //         officeName: "Leeds Office",
-    //       },
-    //     ],
-    //   } satisfies ProviderFirmOfficeListDto,
-    //   status: 200,
-    // });
+    getAllProviderOffices.resolves({
+      data: {
+        offices: [
+          {
+            addressLine1: "1 High Street",
+            city: "Leeds",
+            postCode: "LS1 1AA",
+            firmOfficeCode: "LEEDS-01",
+            officeName: "Leeds Office",
+          },
+        ],
+      } satisfies ProviderFirmOfficeListDto,
+      status: 200,
+    });
 
     await loadOffices(deps)(context);
 
-    // expect(
-    //   getAllProviderOffices.calledOnceWithExactly(
-    //     FIRM_CODE,
-    //     getPdaApiDefaultOptions(),
-    //   ),
-    // ).to.equal(true);
+    expect(
+      getAllProviderOffices.calledOnceWithExactly(
+        FIRM_CODE,
+        getPdaApiDefaultOptions(),
+      ),
+    ).to.equal(true);
     
     expect(setData.calledOnceWithExactly(CONTEXT_DATA_KEYS.officeList, [
       {
         address: "1 High Street, Leeds, LS1 1AA",
         code: "LEEDS-01",
       },
-      {
-        address: "2 High Street, Leeds, LS1 1AA",
-        code: "LEEDS-02",
-      },
     ])).to.equal(true);
   });
 
-  // TODO will reapply getAllProviderOffices in next pr
-  // it("forwards the x-correlation-id request header to the API call", async () => {
-  //   const correlationId = "test-correlation-id";
-  //   getRequestHeader.withArgs("x-correlation-id").returns(correlationId);
-  //   getAllProviderOffices.resolves({
-  //     data: {} satisfies ProviderFirmOfficeListDto,
-  //     status: 200,
-  //   });
+  it("forwards the x-correlation-id request header to the API call", async () => {
+    const correlationId = "test-correlation-id";
+    getRequestHeader.withArgs("x-correlation-id").returns(correlationId);
+    getAllProviderOffices.resolves({
+      data: {} satisfies ProviderFirmOfficeListDto,
+      status: 200,
+    });
 
-  //   await loadOffices(deps)(context);
+    await loadOffices(deps)(context);
 
-  //   expect(
-  //     getAllProviderOffices.calledOnceWithExactly(
-  //       FIRM_CODE,
-  //       getPdaApiDefaultOptions(correlationId),
-  //     ),
-  //   ).to.equal(true);
-  // });
+    expect(
+      getAllProviderOffices.calledOnceWithExactly(
+        FIRM_CODE,
+        getPdaApiDefaultOptions(correlationId),
+      ),
+    ).to.equal(true);
+  });
 
-  // it("sets an empty office list when the response does not include offices", async () => {
-  //   getAllProviderOffices.resolves({
-  //     data: {} satisfies ProviderFirmOfficeListDto,
-  //     status: 200,
-  //   });
+  it("sets an empty office list when the response does not include offices", async () => {
+    getAllProviderOffices.resolves({
+      data: {} satisfies ProviderFirmOfficeListDto,
+      status: 200,
+    });
 
-  //   await loadOffices(deps)(context);
+    await loadOffices(deps)(context);
 
-  //   expect(setData.calledOnceWithExactly(CONTEXT_DATA_KEYS.officeList, [])).to
-  //     .equal(true);
-  // });
+    expect(setData.calledOnceWithExactly(CONTEXT_DATA_KEYS.officeList, [])).to
+      .equal(true);
+  });
 
-  // it("throws ApiResponseError when getAllProviderOffices rejects", async () => {
-  //   sinon.stub(logger, "error");
-  //   const cause = new Error("network error");
-  //   getAllProviderOffices.rejects(cause);
+  it("throws ApiResponseError when getAllProviderOffices rejects", async () => {
+    sinon.stub(logger, "error");
+    const cause = new Error("network error");
+    getAllProviderOffices.rejects(cause);
 
-  //   try {
-  //     await loadOffices(deps)(context);
-  //     expect.fail("Expected loadOffices to throw ApiResponseError");
-  //   } catch (error) {
-  //     expect(error).to.be.instanceOf(ApiResponseError);
-  //     expect((error as ApiResponseError).cause).to.equal(cause);
-  //   }
-  // });
+    try {
+      await loadOffices(deps)(context);
+      expect.fail("Expected loadOffices to throw ApiResponseError");
+    } catch (error) {
+      expect(error).to.be.instanceOf(ApiResponseError);
+      expect((error as ApiResponseError).cause).to.equal(cause);
+    }
+  });
 
-  // it("throws ApiResponseError when getAllProviderOffices returns a non-200 status", async () => {
-  //   sinon.stub(logger, "error");
-  //   getAllProviderOffices.resolves({
-  //     data: {},
-  //     status: 500,
-  //   });
+  it("throws ApiResponseError when getAllProviderOffices returns a non-200 status", async () => {
+    sinon.stub(logger, "error");
+    getAllProviderOffices.resolves({
+      data: {},
+      status: 500,
+    });
 
-  //   try {
-  //     await loadOffices(deps)(context);
-  //     expect.fail("Expected loadOffices to throw ApiResponseError");
-  //   } catch (error) {
-  //     expect(error).to.be.instanceOf(ApiResponseError);
-  //   }
-  // });
+    try {
+      await loadOffices(deps)(context);
+      expect.fail("Expected loadOffices to throw ApiResponseError");
+    } catch (error) {
+      expect(error).to.be.instanceOf(ApiResponseError);
+    }
+  });
 
-  // it("throws ApiValidationError when API response data fails schema validation", async () => {
-  //   sinon.stub(logger, "error");
-  //   getAllProviderOffices.resolves({
-  //     data: {
-  //       offices: "not-an-array",
-  //     },
-  //     status: 200,
-  //   });
+  it("throws ApiValidationError when API response data fails schema validation", async () => {
+    sinon.stub(logger, "error");
+    getAllProviderOffices.resolves({
+      data: {
+        offices: "not-an-array",
+      },
+      status: 200,
+    });
 
-  //   try {
-  //     await loadOffices(deps)(context);
-  //     expect.fail("Expected loadOffices to throw ApiValidationError");
-  //   } catch (error) {
-  //     expect(error).to.be.instanceOf(ApiValidationError);
-  //   }
-  // });
+    try {
+      await loadOffices(deps)(context);
+      expect.fail("Expected loadOffices to throw ApiValidationError");
+    } catch (error) {
+      expect(error).to.be.instanceOf(ApiValidationError);
+    }
+  });
 
-  // it("throws InvalidFirmCodeClaimError when FIRM_CODE claim is missing", async () => {
-  //   sinon.stub(logger, "error");
-  //   getSession.returns({
-  //     account: {
-  //       idTokenClaims: {},
-  //     },
-  //   });
+  it("throws InvalidFirmCodeClaimError when FIRM_CODE claim is missing", async () => {
+    sinon.stub(logger, "error");
+    getSession.returns({
+      account: {
+        idTokenClaims: {},
+      },
+    });
 
-  //   try {
-  //     await loadOffices(deps)(context);
-  //     expect.fail("Expected loadOffices to throw InvalidFirmCodeClaimError");
-  //   } catch (error) {
-  //     expect(error).to.be.instanceOf(InvalidFirmCodeClaimError);
-  //     expect(getAllProviderOffices.notCalled).to.equal(true);
-  //   }
-  // });
+    try {
+      await loadOffices(deps)(context);
+      expect.fail("Expected loadOffices to throw InvalidFirmCodeClaimError");
+    } catch (error) {
+      expect(error).to.be.instanceOf(InvalidFirmCodeClaimError);
+      expect(getAllProviderOffices.notCalled).to.equal(true);
+    }
+  });
 });

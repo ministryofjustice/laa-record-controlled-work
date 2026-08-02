@@ -8,22 +8,11 @@ import sinon from "sinon";
 
 import { getGetAllProviderOfficesResponseMock } from "../../../mocks/api/pda/fakers/provider-firms-endpoints/provider-firms-endpoints.faker.gen.js";
 import { createForgeTestClientForSelectOffice } from "../../utils/helpers.js";
-import { Office } from "#/journeys/select-office/select-office.types.js";
 
 faker.seed(12345);
-// TODO will reapply getAllProviderOffices in next pr
-// const mockResponse = getGetAllProviderOfficesResponseMock();
-// const mockOffices = mockResponse.offices!;
-const mockOffices: Office[] = [
-  {
-    address: "1 High Street, Leeds, LS1 1AA",
-    code: "LEEDS-01",
-  },
-  {
-    address: "2 High Street, Leeds, LS1 1AA",
-    code: "LEEDS-02",
-  },
-];
+
+const mockResponse = getGetAllProviderOfficesResponseMock();
+const mockOffices = mockResponse.offices!;
 
 const session = {
   account: {
@@ -38,8 +27,9 @@ describe("Select Office step", () => {
   let client: ReturnType<typeof createForgeTestClientForSelectOffice>;
 
   before(() => {
-    getAllProviderOfficesStub = sinon.stub();
-    // .resolves({ status: 200, data: mockResponse });
+    getAllProviderOfficesStub = sinon
+      .stub()
+      .resolves({ status: 200, data: mockResponse });
 
     client = createForgeTestClientForSelectOffice({
       getAllProviderOffices: getAllProviderOfficesStub,
@@ -59,9 +49,9 @@ describe("Select Office step", () => {
       renderResult = result as TestRenderResult;
     });
 
-    // afterEach(() => {
-    //   getAllProviderOfficesStub.resolves({ status: 200, data: mockResponse });
-    // });
+    afterEach(() => {
+      getAllProviderOfficesStub.resolves({ status: 200, data: mockResponse });
+    });
 
     it("has the correct title", () => {
       expect(renderResult.context.step.title).to.equal(
@@ -77,48 +67,43 @@ describe("Select Office step", () => {
         hint: { text: string };
       }[];
 
-      // expect(getAllProviderOfficesStub.calledOnce).to.equal(true);
+      expect(getAllProviderOfficesStub.calledOnce).to.equal(true);
       expect(radioItems).to.have.length(mockOffices.length);
 
-      expect(radioItems[0].text).to.equal(mockOffices[0].address);
-      expect(radioItems[0].value).to.equal(mockOffices[0].code);
-      expect(radioItems[0].hint.text).to.equal(mockOffices[0].code);
+      for (const [i, office] of mockOffices.entries()) {
+        const addressParts = [
+          office.addressLine1,
+          office.addressLine2,
+          office.addressLine3,
+          office.addressLine4,
+          office.city,
+          office.postCode,
+        ].filter(Boolean);
 
-      // TODO will reapply getAllProviderOffices in next pr
-      // for (const [i, office] of mockOffices.entries()) {
-      //   const addressParts = [
-      //     office.addressLine1,
-      //     office.addressLine2,
-      //     office.addressLine3,
-      //     office.addressLine4,
-      //     office.city,
-      //     office.postCode,
-      //   ].filter(Boolean);
-
-      //   expect(radioItems[i].text).to.equal(addressParts.join(", "));
-      //   expect(radioItems[i].value).to.equal(office.firmOfficeCode);
-      //   expect(radioItems[i].hint.text).to.equal(office.firmOfficeCode);
-      // }
+        expect(radioItems[i].text).to.equal(addressParts.join(", "));
+        expect(radioItems[i].value).to.equal(office.firmOfficeCode);
+        expect(radioItems[i].hint.text).to.equal(office.firmOfficeCode);
+      }
     });
 
-  //   it("redirects straight to /cases when only one office is returned", async () => {
-  //     const singleOfficeResponse = getGetAllProviderOfficesResponseMock({
-  //       offices: [mockOffices[0]],
-  //     });
-  //     getAllProviderOfficesStub.resolves({
-  //       status: 200,
-  //       data: singleOfficeResponse,
-  //     });
-  //     const result = await client.get("/select-office/", { session });
-  //     expect(result.type).to.equal("redirect");
-  //     expect((result as TestRedirectResult).url).to.equal("/cases");
-  //   });
+      it("redirects straight to /cases when only one office is returned", async () => {
+        const singleOfficeResponse = getGetAllProviderOfficesResponseMock({
+          offices: [mockOffices[0]],
+        });
+        getAllProviderOfficesStub.resolves({
+          status: 200,
+          data: singleOfficeResponse,
+        });
+        const result = await client.get("/select-office/", { session });
+        expect(result.type).to.equal("redirect");
+        expect((result as TestRedirectResult).url).to.equal("/cases");
+      });
   });
 
   describe("POST /select-office/", () => {
-    // afterEach(() => {
-    //   getAllProviderOfficesStub.resolves({ status: 200, data: mockResponse });
-    // });
+    afterEach(() => {
+      getAllProviderOfficesStub.resolves({ status: 200, data: mockResponse });
+    });
 
     it("shows a validation error when no office is selected", async () => {
       const result = await client.post("/select-office/", { session });
@@ -130,14 +115,14 @@ describe("Select Office step", () => {
       ).to.equal("Select the office you're recording cases from");
     });
 
-    // it("redirects to /cases after a valid office is selected", async () => {
-    //   const result = await client.post("/select-office/", {
-    //     session,
-    //     body: { selectOffice: mockOffices[0].firmOfficeCode },
-    //   });
-    //   expect(result.type).to.equal("redirect");
-    //   const redirectResult = result as TestRedirectResult;
-    //   expect(redirectResult.url).to.equal("/cases");
-    // });
+    it("redirects to /cases after a valid office is selected", async () => {
+      const result = await client.post("/select-office/", {
+        session,
+        body: { selectOffice: mockOffices[0].firmOfficeCode },
+      });
+      expect(result.type).to.equal("redirect");
+      const redirectResult = result as TestRedirectResult;
+      expect(redirectResult.url).to.equal("/cases");
+    });
   });
 });
