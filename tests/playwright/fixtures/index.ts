@@ -15,6 +15,11 @@ interface TestFixtures {
   checkAccessibility: () => Promise<void>;
   pages: PageFactory;
   unauthenticated: { page: import("@playwright/test").Page };
+  /**
+   * A signed-in page with an office already selected in session.
+   * Use this instead of `page` for journeys that require a selected office.
+   */
+  withSelectedOffice: import("@playwright/test").Page;
 }
 
 export const test = base.extend<TestFixtures>({
@@ -70,6 +75,14 @@ export const test = base.extend<TestFixtures>({
   pages: async ({ page }, use): Promise<void> => {
     const pageFactory = new PageFactory(page);
     await use(pageFactory);
+  },
+
+  withSelectedOffice: async ({ page }, use): Promise<void> => {
+    await page.goto("/select-office/");
+    await page.getByRole("radio").first().check();
+    await page.getByRole("button", { name: "Continue" }).click();
+    await expect(page).toHaveURL("/cases");
+    await use(page);
   },
 });
 

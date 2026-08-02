@@ -1,7 +1,15 @@
 import { test, expect } from "../../fixtures/index.js";
 import { applications } from "../../fixtures/rcw.fixtures.js";
+// import { getMappedOffices } from "../../fixtures/pda.fixtures.js";
 
-test("Your Cases step", async ({ page }) => {
+// TODO readd for msw mocking in next pr
+// const [selectedOffice] = getMappedOffices(1);
+const selectedOffice = {
+  address: "1 High Street, Leeds, LS1 1AA",
+  code: "LEEDS-01",
+};
+
+test("Your Cases step", async ({ withSelectedOffice: page }) => {
   // Navigate to the Your Cases page
   await page.goto("/cases");
 
@@ -12,6 +20,10 @@ test("Your Cases step", async ({ page }) => {
       level: 1,
     }),
   ).toBeVisible();
+
+  // Check the selected office is displayed using the seeded MSW mock data
+  await expect(page.getByText(selectedOffice.address)).toBeVisible();
+  await expect(page.getByText(selectedOffice.code)).toBeVisible();
 
   // Check the button
   await page.getByRole("button", { name: "Record a new case" }).click();
@@ -47,7 +59,9 @@ test("Your Cases step", async ({ page }) => {
 
   // Check the table renders mock data correctly
   const table = page.getByRole("table");
-  const rows = table.getByRole("row").filter({ hasNot: page.getByRole("columnheader") }); // Exclude the header row
+  const rows = table
+    .getByRole("row")
+    .filter({ hasNot: page.getByRole("columnheader") }); // Exclude the header row
 
   await expect(rows).toHaveCount(applications.length);
 
@@ -64,7 +78,9 @@ test("Your Cases step", async ({ page }) => {
       "href",
       `/cases/${app.applicationRefNumber}/task-list/`,
     );
-    await expect(row.getByRole("cell").nth(1)).toHaveText(app.applicationRefNumber);
+    await expect(row.getByRole("cell").nth(1)).toHaveText(
+      app.applicationRefNumber,
+    );
     await expect(row.getByRole("cell").nth(2)).toHaveText(formattedDate);
   }
 });
