@@ -8,6 +8,11 @@ import { logger } from "#/logger.js";
 export const loadSelectedOffice = () => (context: CaseListContext) => {
   const session = context.getSession();
   const selectedOffice = session?.selectedOffice;
+
+  if (selectedOffice === undefined) {
+    return;
+  }
+
   const result = OfficeSchema.safeParse(selectedOffice);
   if (!result.success) {
     logger.error("Selected office in session is invalid", result.error, {

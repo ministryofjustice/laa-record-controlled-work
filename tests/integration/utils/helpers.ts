@@ -21,7 +21,7 @@ import type { SelectOfficeEffectsDeps } from "#/journeys/select-office/select-of
 import { selectOfficeEffectsRegistry } from "#/journeys/select-office/select-office.effects.js";
 import { selectOfficeJourney } from "#/journeys/select-office/select-office.journey.js";
 import type { YourCasesEffectsDeps } from "#/journeys/your-cases/your-cases.types.js";
-import { yourCasesEffectsRegistry } from "#/journeys/your-cases/your-cases.effects.js";
+import { yourCasesPackage } from "#/journeys/your-cases/your-cases.journey.js";
 
 /**
  * Creates a test client for a single-step journey under /cases/new.
@@ -88,26 +88,11 @@ export function createForgeTestClientForSelectOffice(
  */
 export function createForgeTestClientForCaseList(
   mockYourCasesEffectsDeps: YourCasesEffectsDeps,
-  ...steps: StepDefinition[]
 ): ForgeTestClient {
-  const testJourney = journey({
-    code: "yourCases",
-    path: "/",
-    reachability: { disableReachabilityChecks: true },
-    steps,
-    title: "Your Cases",
-    view: { template: "partials/case-list-step" },
-  });
-
-  const testPackage = createTestPackage({
-    functions: yourCasesEffectsRegistry,
-    journey: testJourney,
-  });
-
   return new ForgeTestHarness()
     .registerGlobalComponents(govukComponents)
     .registerGlobalComponents(mojComponents)
     .registerGlobalFunctions(nunjucksFunctions)
-    .registerPackage(testPackage, mockYourCasesEffectsDeps)
+    .registerPackage(yourCasesPackage, mockYourCasesEffectsDeps)
     .createClient();
 }

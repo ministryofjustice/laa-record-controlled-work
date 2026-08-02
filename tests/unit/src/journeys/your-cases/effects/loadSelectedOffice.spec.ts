@@ -38,12 +38,12 @@ describe("loadSelectedOffice", () => {
     ).to.equal(true);
   });
 
-  it("throws Error when selectedOffice is missing from session", () => {
-    sinon.stub(logger, "error");
+  it("does not set selectedOffice when selectedOffice is missing from session", () => {
     getSession.returns({});
 
-    expect(() => loadSelectedOffice()(context))
-      .to.throw(OfficeNotFoundError);
+    loadSelectedOffice()(context);
+
+    expect(setData.called).to.equal(false);
   });
 
   it("throws Error when selectedOffice in session fails schema validation", () => {
