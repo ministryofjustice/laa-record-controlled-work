@@ -1,7 +1,6 @@
 import {
   Condition,
   Data,
-  Format,
   Item,
   Iterator,
   Self,
