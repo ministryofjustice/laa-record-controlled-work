@@ -28,7 +28,10 @@ export function requireAuth(
     next();
     return;
   }
-
   req.session.returnTo = originalUrl;
+
+  if (session.selectedOffice === undefined) {
+    req.session.returnTo = "/select-office";
+  }
   res.redirect("/auth/signin");
 }
