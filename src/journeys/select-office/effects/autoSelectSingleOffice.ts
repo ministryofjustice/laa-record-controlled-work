@@ -7,7 +7,9 @@ import { MissingSessionError } from "#/journeys/journey.errors.js";
 const SINGLE_OFFICE = 1;
 
 export const autoSelectSingleOffice = () => (context: SelectOfficeContext) => {
-  const officeList = context.getData<OfficeData[]>(CONTEXT_DATA_KEYS.officeList);
+  const officeList = context.getData<OfficeData[]>(
+    CONTEXT_DATA_KEYS.officeList,
+  );
   const session = context.getSession();
 
   if (!session) {
