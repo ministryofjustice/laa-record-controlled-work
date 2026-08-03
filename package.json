@@ -37,7 +37,7 @@
     "test": "yarn unit && yarn integration && yarn e2e"
   },
   "engines": {
-    "node": "26.5.0"
+    "node": "26.5.1"
   },
   "dependencies": {
     "@azure/msal-node": "^5.4.2",
@@ -79,7 +79,7 @@
     "@types/morgan": "^1.9.10",
     "@types/node": "^25.9.5",
     "@types/nunjucks": "^3.2.6",
-    "@types/sinon": "^21.0.1",
+    "@types/sinon": "^22.0.0",
     "@types/supertest": "^7.2.1",
     "@typescript-eslint/parser": "^8.65.0",
     "c8": "^11.0.0",
@@ -90,19 +90,19 @@
     "esbuild": "^0.28.1",
     "esbuild-plugin-copy": "^2.1.1",
     "esbuild-sass-plugin": "^3.7.0",
-    "eslint": "^10.7.0",
+    "eslint": "^10.8.0",
     "eslint-config-love": "^154.1.0",
     "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-jsdoc": "^63.2.2",
+    "eslint-plugin-jsdoc": "^63.3.0",
     "eslint-plugin-jsonc": "^3.3.0",
     "eslint-plugin-perfectionist": "^5.10.0",
     "eslint-plugin-prettier": "^5.5.6",
-    "globals": "^17.7.0",
+    "globals": "^17.8.0",
     "knip": "^6.29.0",
     "mocha": "^11.7.6",
     "msw": "^2.15.0",
     "nodemon": "^3.1.14",
-    "orval": "^8.22.0",
+    "orval": "^8.23.0",
     "playwright-core": "^1.62.0",
     "prettier": "^3.9.6",
     "rimraf": "^6.1.3",
