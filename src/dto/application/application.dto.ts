@@ -1,3 +1,4 @@
+import { CreateApplicationRequestBody } from "#/api/clients/rcw/model/createApplicationRequestBody.zod.gen.js";
 import type { AnswersOutput } from "#/journeys/create-application/data/answers.zod.js";
 
 import { ADDRESS_FIELD } from "#/journeys/journey.constants.js";
@@ -102,7 +103,7 @@ export class ApplicationDto {
    * Converts the ApplicationDto instance to an object that conforms to the data structure expected by the RCW API.
    * @returns ApplicationDtoInterface.
    */
-  public toRcwApi(): ApplicationDtoInterface {
+  public toRcwApi(): CreateApplicationRequestBody {
     return {
       clientDetails: {
         address: {
@@ -112,7 +113,7 @@ export class ApplicationDto {
           addressLine4: this.addressLine4,
           country: this.country,
           county: this.county,
-          postcode: this.postcode,
+          postCode: this.postcode,
           townOrCity: this.townOrCity,
         },
         dateOfBirth: this.dateOfBirth,

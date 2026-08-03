@@ -37,7 +37,7 @@ describe("fromAnswers method", () => {
           addressLine4: undefined,
           townOrCity: "Manchester",
           county: "Greater Manchester",
-          postcode: "A12 3BC",
+          postCode: "A12 3BC",
           country: "United Kingdom",
         },
       },
