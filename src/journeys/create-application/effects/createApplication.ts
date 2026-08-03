@@ -1,7 +1,7 @@
 import type { EffectFunctionContext } from "@ministryofjustice/hmpps-forge/core";
 import type { Session, SessionData } from "express-session";
 
-import type { ApplicationDtoInterface } from "#/dto/application/application.dto.interface.js";
+import type { CreateApplicationRequestBody } from "#/api/clients/rcw/model/createApplicationRequestBody.zod.gen.js";
 import type { CreateApplicationEffectsDeps } from "#/journeys/create-application/create-application.types.js";
 
 import { ApiResponseError, ApiValidationError } from "#/api/api.errors.js";
@@ -17,7 +17,7 @@ import { logger } from "#/logger.js";
 const buildApplicationData = (
   journeyAnswers: Record<string, unknown>,
   journeyCode: string,
-): ApplicationDtoInterface => {
+): CreateApplicationRequestBody => {
   const answersFormatted = Answers.safeParse(journeyAnswers);
 
   if (!answersFormatted.success) {
