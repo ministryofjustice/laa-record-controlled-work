@@ -5,7 +5,7 @@ import type {
 } from "@azure/msal-node";
 
 import type { PKCECodes } from "#/auth/auth.types.js";
-import type { Office } from "#/dto/office/office.dto.ts";
+import type { OfficeData } from "#/dto/office/office.dto.ts";
 
 interface SessionMsalReference {
   homeAccountId: string;
@@ -23,7 +23,7 @@ declare module "express-session" {
     msal?: SessionMsalReference;
     pkceCodes?: PKCECodes;
     returnTo?: string;
-    selectedOffice?: Office;
+    selectedOffice?: OfficeData;
     singleOffice?: boolean;
   }
 }

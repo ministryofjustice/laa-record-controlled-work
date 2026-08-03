@@ -7,7 +7,7 @@ import { ApiResponseError, ApiValidationError } from "#/api/api.errors.js";
 import { ProviderFirmOfficeListDto } from "#/api/clients/pda/model/providerFirmOfficeListDto.zod.gen.js";
 import { getPdaApiDefaultOptions } from "#/api/getPdaApiDefaultOptions.js";
 import { ID_TOKEN_CLAIMS_KEYS } from "#/auth/auth.constants.js";
-import { type Office, OfficeDto } from "#/dto/office/office.dto.js";
+import { Office, type OfficeData } from "#/dto/office/office.dto.js";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import {
   InvalidFirmCodeClaimError,
@@ -59,7 +59,7 @@ export const loadOffices =
     }
     const officeList: ProviderFirmOfficeListDto = result.data;
 
-    const mappedOffices: Office[] = OfficeDto.mapOffices(officeList);
+    const mappedOffices: OfficeData[] = Office.fromPdaOfficeList(officeList);
 
     context.setData(CONTEXT_DATA_KEYS.officeList, mappedOffices);
   };

@@ -5,9 +5,9 @@ import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import { MissingSessionError, OfficeNotFoundError } from "#/journeys/journey.errors.js";
 import { setSelectedOffice } from "#/journeys/select-office/effects/setSelectedOffice.js";
 import type { SelectOfficeContext } from "#/journeys/select-office/select-office.types.js";
-import { Office } from "#/dto/office/office.dto.js";
+import type { OfficeData } from "#/dto/office/office.dto.js";
 
-const mockOffices: Office[] = [
+const mockOffices: OfficeData[] = [
   { address: "1 High Street, Leeds, LS1 1AA", code: "LEEDS-01" },
   { address: "2 King Street, Manchester, M1 1BB", code: "MCR-01"},
 ];

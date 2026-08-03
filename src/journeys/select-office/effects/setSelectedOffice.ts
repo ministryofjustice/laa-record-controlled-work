@@ -1,4 +1,4 @@
-import type { Office } from "#/dto/office/office.dto.js";
+import type { OfficeData } from "#/dto/office/office.dto.js";
 import type { SelectOfficeContext } from "#/journeys/select-office/select-office.types.js";
 
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
@@ -10,9 +10,9 @@ import { logger } from "#/logger.js";
 
 export const setSelectedOffice = () => (context: SelectOfficeContext) => {
   const selectedOfficeCode = context.getAnswer("selectOffice");
-  const officeList = context.getData<Office[]>(CONTEXT_DATA_KEYS.officeList);
+  const officeList = context.getData<OfficeData[]>(CONTEXT_DATA_KEYS.officeList);
 
-  const selectedOffice: Office | undefined = officeList.find(
+  const selectedOffice: OfficeData | undefined = officeList.find(
     (office) => office.code === selectedOfficeCode,
   );
 

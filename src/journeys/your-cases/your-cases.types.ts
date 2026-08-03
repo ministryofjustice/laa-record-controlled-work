@@ -2,7 +2,7 @@ import type { EffectFunctionContext } from "@ministryofjustice/hmpps-forge/core"
 
 import type { Applications } from "#/api/clients/rcw/model/applications.zod.gen.js";
 import type { getApplications } from "#/api/clients/rcw/schema/applications/applications.gen.js";
-import type { Office } from "#/dto/office/office.dto.js";
+import type { OfficeData } from "#/dto/office/office.dto.js";
 import type { JourneySession } from "#/journeys/context.type.js";
 
 export type CaseListContext = EffectFunctionContext<
@@ -13,7 +13,7 @@ export type CaseListContext = EffectFunctionContext<
 
 export interface CaseListData extends Record<string, unknown> {
   caseList: Applications;
-  selectOffice: Office;
+  selectOffice: OfficeData;
 }
 
 export interface YourCasesEffectsDeps {
