@@ -15,6 +15,7 @@ describe("Your Cases step", () => {
     getApplicationsStub = sinon
       .stub()
       .resolves({ status: 200, data: mockData });
+      
     client = createForgeTestClientForCaseList(
       { getApplications: getApplicationsStub },
       yourCasesStep,
@@ -60,6 +61,13 @@ describe("Your Cases step", () => {
 
     it("renders a selected office block", () => {
       expect(selectedOffice).to.exist;
+    });
+
+    it("renders the change link when singleOffice is false", () => {
+      const changeLink = String(selectedOffice.properties.content).includes(
+        'href="/select-office/"',
+      );
+      expect(changeLink).to.be.true;
     });
 
     it("renders a sub navigation with the correct items", () => {
@@ -124,7 +132,9 @@ describe("Your Cases step", () => {
       const body = renderResult
         .getBlocksByVariant("html")
         .find((b) =>
-          String(b.properties.content).includes("You have no cases in progress"),
+          String(b.properties.content).includes(
+            "You have no cases in progress",
+          ),
         ) as RenderBlock;
 
       expect(visibleTables).to.have.length(0);

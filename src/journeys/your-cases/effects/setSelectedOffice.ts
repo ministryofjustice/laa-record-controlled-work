@@ -10,4 +10,5 @@ export const setSelectedOffice = () => (context: CaseListContext) => {
   };
 
   context.setData(CONTEXT_DATA_KEYS.selectedOffice, selectedOffice);
+  context.setData(CONTEXT_DATA_KEYS.singleOffice, false);
 };

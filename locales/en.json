@@ -5,7 +5,8 @@
     "submit": "Save and continue",
     "signOut": "Sign out",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "change": "Change"
   },
   "components": {
     "phaseBanner": {
@@ -196,9 +197,6 @@
           "dateOfBirth": "Date of birth",
           "niNumber": "National Insurance number",
           "address": "Address"
-        },
-        "changeLink": {
-          "change": "Change"
         }
       },
       "taskList": {
