@@ -10,7 +10,7 @@ const SINGLE_OFFICE = 1;
 
 export const autoSelectSingleOffice = () => (context: SelectOfficeContext) => {
   const officeList = context.getData<Office[]>(CONTEXT_DATA_KEYS.officeList);
- const session = context.getSession();
+  const session = context.getSession();
 
   if (!session) {
     throw new MissingSessionError();
@@ -22,7 +22,7 @@ export const autoSelectSingleOffice = () => (context: SelectOfficeContext) => {
   }
 
   const [office] = officeList;
- 
+
   session.selectedOffice = office;
   session.singleOffice = true;
   context.setData(CONTEXT_DATA_KEYS.selectedOffice, office);
