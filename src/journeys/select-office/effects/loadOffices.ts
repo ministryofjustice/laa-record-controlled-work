@@ -7,15 +7,12 @@ import { ApiResponseError, ApiValidationError } from "#/api/api.errors.js";
 import { ProviderFirmOfficeListDto } from "#/api/clients/pda/model/providerFirmOfficeListDto.zod.gen.js";
 import { getPdaApiDefaultOptions } from "#/api/getPdaApiDefaultOptions.js";
 import { ID_TOKEN_CLAIMS_KEYS } from "#/auth/auth.constants.js";
+import { type Office, OfficeDto } from "#/dto/office/office.dto.js";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import {
   InvalidFirmCodeClaimError,
   MissingSessionError,
 } from "#/journeys/journey.errors.js";
-import {
-  type Office,
-  OfficeDto,
-} from "#/journeys/select-office/mappers/office.dto.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
 

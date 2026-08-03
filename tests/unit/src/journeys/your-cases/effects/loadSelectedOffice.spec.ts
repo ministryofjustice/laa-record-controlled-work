@@ -2,7 +2,7 @@ import { expect } from "chai";
 import sinon from "sinon";
 
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
-import type { Office } from "#/journeys/select-office/mappers/office.dto.js";
+import type { Office } from "#/dto/office/office.dto.js";
 import { OfficeNotFoundError } from "#/journeys/journey.errors.js";
 import { loadSelectedOffice } from "#/journeys/your-cases/effects/loadSelectedOffice.js";
 import type { CaseListContext } from "#/journeys/your-cases/your-cases.types.js";

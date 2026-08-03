@@ -1,4 +1,4 @@
-import { Office } from "#/journeys/select-office/mappers/office.dto.js";
+import { Office } from "#/dto/office/office.dto.js";
 import { requireAuth } from "#/middleware/requireAuth.js";
 import { expect } from "chai";
 import type { Request, Response } from "express";

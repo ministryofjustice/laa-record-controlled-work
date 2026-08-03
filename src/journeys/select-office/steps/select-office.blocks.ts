@@ -8,8 +8,8 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 import { GovUKRadioInput } from "@ministryofjustice/hmpps-forge/govuk-components";
 
+import { OFFICE_FIELD } from "#/dto/office/office.dto.js";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
-import { OFFICE_FIELD } from "#/journeys/select-office/mappers/office.dto.js";
 import { t } from "#/lib/i18n.js";
 
 const officeItems = Data(CONTEXT_DATA_KEYS.officeList).each(

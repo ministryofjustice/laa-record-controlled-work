@@ -1,11 +1,11 @@
 import type { CaseListContext } from "#/journeys/your-cases/your-cases.types.js";
 
+import { OfficeSchema } from "#/dto/office/office.dto.js";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import {
   MissingSessionError,
   OfficeNotFoundError,
 } from "#/journeys/journey.errors.js";
-import { OfficeSchema } from "#/journeys/select-office/mappers/office.dto.js";
 import { logger } from "#/logger.js";
 
 export const loadSelectedOffice = () => (context: CaseListContext) => {

@@ -9,8 +9,8 @@ import {
   GovUKLinkButton,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
+import { OFFICE_FIELD } from "#/dto/office/office.dto.js";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
-import { OFFICE_FIELD } from "#/journeys/select-office/mappers/office.dto.js";
 import { H1 } from "#/lib/constants/headings.js";
 import { t } from "#/lib/i18n.js";
 
