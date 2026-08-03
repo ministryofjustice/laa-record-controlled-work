@@ -3,8 +3,6 @@ import type { AnswersOutput } from "#/journeys/create-application/data/answers.z
 
 import { ADDRESS_FIELD } from "#/journeys/journey.constants.js";
 
-import type { ApplicationDtoInterface } from "./application.dto.interface.js";
-
 interface Application {
   addressLine1: string;
   addressLine2?: string;
@@ -48,27 +46,11 @@ export class ApplicationDto {
   public reasonForReapplication?: string;
   public townOrCity?: string;
 
-  private readonly requiredKeys: string[] = [
-    "firstName",
-    "lastName",
-    "dateOfBirth",
-    "hasFixedAddress",
-    "addressLine1",
-    "country",
-    "ecfFlag",
-    "legalAidBefore",
-  ];
-
   /**
    * Constructs an ApplicationDto instance from the given application data.
    * @param application - The application data to be transferred.
    */
   public constructor(application: Application) {
-    this.requiredKeys.forEach((key) => {
-      if (!(key in application)) {
-        throw new Error(`Missing required property: ${key}`);
-      }
-    });
     Object.assign(this, application);
   }
 
@@ -101,7 +83,7 @@ export class ApplicationDto {
 
   /**
    * Converts the ApplicationDto instance to an object that conforms to the data structure expected by the RCW API.
-   * @returns ApplicationDtoInterface.
+   * @returns CreateApplicationRequestBody.
    */
   public toRcwApi(): CreateApplicationRequestBody {
     return {
