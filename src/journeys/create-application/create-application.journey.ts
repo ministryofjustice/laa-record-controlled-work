@@ -1,7 +1,7 @@
 import { access, journey } from "@ministryofjustice/hmpps-forge/core/authoring";
 
 import { checkAnswersStep } from "#/journeys/create-application/steps/check-answers/check-answers.step.js";
-import { clientDetailsStep } from "#/journeys/create-application/steps/client-details.step.js";
+import { clientDetailsStep } from "#/journeys/create-application/steps/client-details/client-details.step.js";
 import { declarationStep } from "#/journeys/create-application/steps/declaration.step.js";
 import { enterAddressManuallyStep } from "#/journeys/create-application/steps/enter-address-manually.step.js";
 import { enterOverseasAddressStep } from "#/journeys/create-application/steps/enter-overseas-address.step.js";
