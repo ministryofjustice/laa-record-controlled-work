@@ -5257,7 +5257,7 @@ __metadata:
     nunjucks: "npm:^3.2.4"
     orval: "npm:^8.22.0"
     pino: "npm:^10.3.1"
-    playwright-core: "npm:^1.61.1"
+    playwright-core: "npm:^1.62.0"
     prettier: "npm:^3.9.6"
     redis: "npm:^6.1.0"
     rimraf: "npm:^6.1.3"
@@ -6337,21 +6337,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"playwright-core@npm:1.62.0":
+"playwright-core@npm:1.62.0, playwright-core@npm:^1.62.0":
   version: 1.62.0
   resolution: "playwright-core@npm:1.62.0"
   bin:
     playwright-core: cli.js
   checksum: 10c0/bc7c770cc4118a7ea65d2c357fc271aaef49af6b5b8964aa19d765d4ea3473e56af926f693123fd63ed6e580830059905722ac68fbf22a31a5b1533e11600228
-  languageName: node
-  linkType: hard
-
-"playwright-core@npm:^1.61.1":
-  version: 1.61.1
-  resolution: "playwright-core@npm:1.61.1"
-  bin:
-    playwright-core: cli.js
-  checksum: 10c0/c28896ba82a602182e240ed4f9c467fb0dd9cb57d510f8aba9f25183fe1cde3a0105725a29baffa4157fe885bbb11e228032a2aad0424111584fde45303f07bd
   languageName: node
   linkType: hard
 
