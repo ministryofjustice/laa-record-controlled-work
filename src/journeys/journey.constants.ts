@@ -28,4 +28,5 @@ export const CONTEXT_DATA_KEYS = {
   caseList: "caseList",
   officeList: "officeList",
   selectedOffice: "selectedOffice",
+  singleOffice: "singleOffice",
 };

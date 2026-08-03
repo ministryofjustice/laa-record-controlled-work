@@ -13,6 +13,7 @@ const session = {
     address: "1 High Street, Leeds, LS1 1AA",
     code: "LEEDS-01",
   },
+  singleOffice: false,
 };
 
 describe("Your Cases step", () => {
@@ -24,9 +25,9 @@ describe("Your Cases step", () => {
     getApplicationsStub = sinon
       .stub()
       .resolves({ status: 200, data: mockData });
-    client = createForgeTestClientForCaseList({
-      getApplications: getApplicationsStub,
-    });
+    client = createForgeTestClientForCaseList(
+      { getApplications: getApplicationsStub },
+    );
   });
 
   after(() => {
@@ -68,6 +69,40 @@ describe("Your Cases step", () => {
 
     it("renders a selected office block", () => {
       expect(selectedOffice).to.exist;
+    });
+
+    it("renders the change link when singleOffice is false", () => {
+      const changeLink = String(selectedOffice.properties.content).includes(
+        'href="/select-office/"',
+      );
+      expect(changeLink).to.be.true;
+    });
+
+    it("does not render the change link when singleOffice is true", async () => {
+      const result = await client.get("/cases", {
+        session: {
+          selectedOffice: {
+            address: "1 High Street, Leeds, LS1 1AA",
+            code: "LEEDS-01",
+          },
+          singleOffice: true,
+        },
+      });
+      expect(result.type).to.equal("render");
+
+      const renderResult = result as TestRenderResult;
+      const selectedOfficeBlock = renderResult
+        .getBlocksByVariant("html")
+        .find((b) =>
+          String(b.properties.content).includes("Office:"),
+        ) as RenderBlock;
+
+      expect(selectedOfficeBlock).to.exist;
+
+      const changeLink = String(selectedOfficeBlock.properties.content).includes(
+        'href="/select-office/"',
+      );
+      expect(changeLink).to.be.false;
     });
 
     it("renders a sub navigation with the correct items", () => {
@@ -132,7 +167,9 @@ describe("Your Cases step", () => {
       const body = renderResult
         .getBlocksByVariant("html")
         .find((b) =>
-          String(b.properties.content).includes("You have no cases in progress"),
+          String(b.properties.content).includes(
+            "You have no cases in progress",
+          ),
         ) as RenderBlock;
 
       expect(visibleTables).to.have.length(0);

@@ -22,4 +22,5 @@ export const loadSelectedOffice = () => (context: CaseListContext) => {
   }
 
   context.setData(CONTEXT_DATA_KEYS.selectedOffice, result.data);
+  context.setData(CONTEXT_DATA_KEYS.singleOffice, session?.singleOffice);
 };

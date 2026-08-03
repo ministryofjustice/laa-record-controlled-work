@@ -8,7 +8,8 @@ import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import {
   createCaseButton,
   heading,
-  selectedOffice,
+  selectedOfficeMultiple,
+  selectedOfficeSingle,
 } from "#/journeys/your-cases/common.blocks.js";
 import {
   casesTable,
@@ -21,7 +22,8 @@ import { t } from "#/lib/i18n.js";
 export const yourCasesStep = step({
   blocks: [
     heading,
-    selectedOffice,
+    selectedOfficeSingle,
+    selectedOfficeMultiple,
     createCaseButton,
     subNavigation,
     casesTable(Data(CONTEXT_DATA_KEYS.caseList)),

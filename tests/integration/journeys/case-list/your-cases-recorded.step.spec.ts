@@ -10,6 +10,7 @@ const session = {
     address: "1 High Street, Leeds, LS1 1AA",
     code: "LEEDS-01",
   },
+  singleOffice: false,
 };
 
 describe("Your Cases recorded step", () => {
