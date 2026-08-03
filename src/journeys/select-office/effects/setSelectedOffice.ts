@@ -1,7 +1,5 @@
-import type {
-  Office,
-  SelectOfficeContext,
-} from "#/journeys/select-office/select-office.types.js";
+import type { Office } from "#/journeys/select-office/mappers/office.dto.js";
+import type { SelectOfficeContext } from "#/journeys/select-office/select-office.types.js";
 
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import {

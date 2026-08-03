@@ -5,7 +5,7 @@ import type {
 } from "@azure/msal-node";
 
 import type { PKCECodes } from "#/auth/auth.types.js";
-import type { Office } from "#/journeys/select-office/select-office.types.js";
+import type { Office } from "#/journeys/select-office/mappers/office.dto.js";
 
 interface SessionMsalReference {
   homeAccountId: string;

@@ -49,6 +49,9 @@ describe("loadOffices", () => {
   it("loads mapped offices into context", async () => {
     getAllProviderOffices.resolves({
       data: {
+        firm: {
+          firmName: "Acme Legal LLP",
+        },
         offices: [
           {
             addressLine1: "1 High Street",
@@ -75,6 +78,7 @@ describe("loadOffices", () => {
       {
         address: "1 High Street, Leeds, LS1 1AA",
         code: "LEEDS-01",
+        firmName: "Acme Legal LLP",
       },
     ])).to.equal(true);
   });

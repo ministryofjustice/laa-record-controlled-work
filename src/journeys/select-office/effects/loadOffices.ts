@@ -1,5 +1,4 @@
 import type {
-  Office,
   SelectOfficeContext,
   SelectOfficeEffectsDeps,
 } from "#/journeys/select-office/select-office.types.js";
@@ -13,7 +12,10 @@ import {
   InvalidFirmCodeClaimError,
   MissingSessionError,
 } from "#/journeys/journey.errors.js";
-import { mapOffices } from "#/journeys/select-office/mappers/office.dto.js";
+import {
+  type Office,
+  OfficeDto,
+} from "#/journeys/select-office/mappers/office.dto.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
 
@@ -60,7 +62,7 @@ export const loadOffices =
     }
     const officeList: ProviderFirmOfficeListDto = result.data;
 
-    const mappedOffices: Office[] = mapOffices(officeList.offices ?? []);
+    const mappedOffices: Office[] = OfficeDto.mapOffices(officeList);
 
     context.setData(CONTEXT_DATA_KEYS.officeList, mappedOffices);
   };

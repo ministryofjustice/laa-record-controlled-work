@@ -4,7 +4,8 @@ import sinon from "sinon";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import { MissingSessionError } from "#/journeys/journey.errors.js";
 import { autoSelectSingleOffice } from "#/journeys/select-office/effects/autoSelectSingleOffice.js";
-import type { Office, SelectOfficeContext } from "#/journeys/select-office/select-office.types.js";
+import type { SelectOfficeContext } from "#/journeys/select-office/select-office.types.js";
+import { Office } from "#/journeys/select-office/mappers/office.dto.js";
 
 const mockOffice: Office = {
   address: "1 High Street, Leeds, LS1 1AA",
@@ -25,7 +26,10 @@ describe("autoSelectSingleOffice", () => {
 
   beforeEach(() => {
     session = {};
-    getData = sinon.stub().withArgs(CONTEXT_DATA_KEYS.officeList).returns([mockOffice]);
+    getData = sinon
+      .stub()
+      .withArgs(CONTEXT_DATA_KEYS.officeList)
+      .returns([mockOffice]);
     getSession = sinon.stub().returns(session);
     setData = sinon.stub();
 
@@ -44,14 +48,19 @@ describe("autoSelectSingleOffice", () => {
 
       expect(session.selectedOffice).to.deep.equal(mockOffice);
       expect(
-        setData.calledOnceWithExactly(CONTEXT_DATA_KEYS.selectedOffice, mockOffice),
+        setData.calledOnceWithExactly(
+          CONTEXT_DATA_KEYS.selectedOffice,
+          mockOffice,
+        ),
       ).to.equal(true);
     });
 
     it("throws MissingSessionError when session is not available", () => {
       getSession.returns(null);
 
-      expect(() => autoSelectSingleOffice()(context)).to.throw(MissingSessionError);
+      expect(() => autoSelectSingleOffice()(context)).to.throw(
+        MissingSessionError,
+      );
     });
   });
 

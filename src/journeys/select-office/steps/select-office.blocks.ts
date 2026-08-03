@@ -9,7 +9,7 @@ import {
 import { GovUKRadioInput } from "@ministryofjustice/hmpps-forge/govuk-components";
 
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
-import { OFFICE_FIELD } from "#/journeys/select-office/select-office.types.js";
+import { OFFICE_FIELD } from "#/journeys/select-office/mappers/office.dto.js";
 import { t } from "#/lib/i18n.js";
 
 const officeItems = Data(CONTEXT_DATA_KEYS.officeList).each(
