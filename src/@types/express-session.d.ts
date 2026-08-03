@@ -24,5 +24,6 @@ declare module "express-session" {
     pkceCodes?: PKCECodes;
     returnTo?: string;
     selectedOffice?: Office;
+    singleOffice?: boolean;
   }
 }

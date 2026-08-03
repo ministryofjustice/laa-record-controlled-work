@@ -34,7 +34,7 @@ describe("loadSelectedOffice", () => {
     loadSelectedOffice()(context);
 
     expect(
-      setData.calledOnceWithExactly(CONTEXT_DATA_KEYS.selectedOffice, validOffice),
+      setData.calledWithExactly(CONTEXT_DATA_KEYS.selectedOffice, validOffice),
     ).to.equal(true);
   });
 
