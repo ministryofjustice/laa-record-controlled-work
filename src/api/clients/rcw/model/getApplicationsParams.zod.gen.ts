@@ -9,8 +9,8 @@ import { z as zod } from "zod";
 export const getApplicationsParamsPageDefault = 0;
 export const getApplicationsParamsSizeDefault = 25;
 export const GetApplicationsParams = zod.object({
-  page: zod.number().default(getApplicationsParamsPageDefault),
-  size: zod.number().default(getApplicationsParamsSizeDefault),
+  page: zod.int().default(getApplicationsParamsPageDefault),
+  size: zod.int().default(getApplicationsParamsSizeDefault),
   officeId: zod.uuid().optional(),
   status: zod.enum(["DRAFT", "COMPLETE"]).optional(),
 });
