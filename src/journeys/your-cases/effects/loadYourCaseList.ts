@@ -21,7 +21,7 @@ export const loadYourCaseList =
         homeAccountId: session?.msal?.homeAccountId,
         sessionId: session?.id,
       });
-      response = await deps.getApplications(opts);
+      response = await deps.getApplications({}, opts);
     } catch (error) {
       logger.error("Error fetching applications", error, {
         api: "getApplications",

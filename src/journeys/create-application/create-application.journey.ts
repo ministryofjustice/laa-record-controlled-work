@@ -1,12 +1,12 @@
 import { access, journey } from "@ministryofjustice/hmpps-forge/core/authoring";
 
+import { CreateApplicationEffects } from "#/journeys/create-application/create-application.effects.js";
 import { clientDetailsStep } from "#/journeys/create-application/steps/client-details.step.js";
 import { declarationStep } from "#/journeys/create-application/steps/declaration.step.js";
 import { enterAddressManuallyStep } from "#/journeys/create-application/steps/enter-address-manually.step.js";
 import { enterOverseasAddressStep } from "#/journeys/create-application/steps/enter-overseas-address.step.js";
 import { haveAHomeAddressStep } from "#/journeys/create-application/steps/have-a-home-address.step.js";
 import { legalAidLast6MonthsStep } from "#/journeys/create-application/steps/legal-aid-last-6-months.step.js";
-import { JourneyEffects } from "#/journeys/effects.js";
 
 import { checkAnswersStep } from "./steps/check-answers.step.js";
 import { ineligibleStep } from "./steps/ecf-dropout.step.js";
@@ -20,7 +20,7 @@ export const createApplicationJourney = journey({
   code: "createApplication",
   onAccess: [
     access({
-      effects: [JourneyEffects.LoadDraftAnswers(journeyCode)],
+      effects: [CreateApplicationEffects.loadDraftAnswers(journeyCode)],
     }),
   ],
   path: "/cases/new",
@@ -36,7 +36,7 @@ export const createApplicationJourney = journey({
     haveAHomeAddressStep(journeyCode),
     enterAddressManuallyStep(journeyCode),
     enterOverseasAddressStep(journeyCode),
-    checkAnswersStep(),
+    checkAnswersStep(journeyCode),
   ],
   title: "Record new case",
   view: { template: "partials/form-step" },

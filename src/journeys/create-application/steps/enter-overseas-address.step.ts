@@ -17,7 +17,7 @@ import {
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
 import { Autocomplete } from "#/journeys/components/autocomplete/autocomplete.component.js";
-import { JourneyEffects } from "#/journeys/effects.js";
+import { CreateApplicationEffects } from "#/journeys/create-application/create-application.effects.js";
 import {
   ADDRESS_FIELD,
   UK_EXCLUSIVE_ADDRESS_FIELDS,
@@ -125,11 +125,11 @@ export const enterOverseasAddressStep = (
       submit({
         onValid: {
           effects: [
-            JourneyEffects.ClearFieldAnswers(
+            CreateApplicationEffects.clearFieldAnswers(
               journeyCode,
               UK_EXCLUSIVE_ADDRESS_FIELDS,
             ),
-            JourneyEffects.SaveDraftAnswers(journeyCode),
+            CreateApplicationEffects.saveDraftAnswers(journeyCode),
           ],
           next: [
             redirect({

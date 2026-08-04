@@ -22,9 +22,15 @@ import { selectOfficeEffectsRegistry } from "#/journeys/select-office/select-off
 import { selectOfficeJourney } from "#/journeys/select-office/select-office.journey.js";
 import type { YourCasesEffectsDeps } from "#/journeys/your-cases/your-cases.types.js";
 import { yourCasesPackage } from "#/journeys/your-cases/your-cases.journey.js";
+import { createApplicationEffectsRegistry } from "#/journeys/create-application/create-application.effects.js";
+import sinon from "sinon";
+import { getCreateApplicationResponseMock } from "../../mocks/api/rcw/fakers/applications/applications.faker.gen.js";
 
 /**
- * Creates a test client for a single-step journey under /cases/new.
+
+ * Creates a test client for a single-step journey under /create-application.
+ * @param {string} title - The title of the journey.
+ * @param {string} path - The path of the journey.
  * @param {...any} steps - Step definitions to include in the test journey.
  * @returns {ForgeTestClient} A configured test client.
  */
@@ -33,6 +39,12 @@ export function createForgeTestClient(
   path: string,
   ...steps: StepDefinition[]
 ): ForgeTestClient {
+    let createApplicationStub: sinon.SinonStub;
+    const mockData = getCreateApplicationResponseMock();
+        createApplicationStub = sinon
+          .stub()
+          .resolves({ status: 201, data: mockData });
+
   const testJourney = journey({
     code: "testJourney",
     path: path,
@@ -48,7 +60,7 @@ export function createForgeTestClient(
   });
 
   const testPackage = createTestPackage({
-    functions: JourneyEffectsImplementations,
+    functions: createApplicationEffectsRegistry,
     journey: testJourney,
   });
 
@@ -56,8 +68,9 @@ export function createForgeTestClient(
     .registerGlobalComponents(govukComponents)
     .registerGlobalComponents([autocomplete])
     .registerGlobalFunctions(nunjucksFunctions)
-    .registerPackage(testPackage)
-    .createClient();
+    .registerGlobalFunctions(JourneyEffectsImplementations)
+    .registerPackage(testPackage, { createApplication: createApplicationStub })
+    .createClient();  
 }
 
 /**
@@ -94,5 +107,6 @@ export function createForgeTestClientForCaseList(
     .registerGlobalComponents(mojComponents)
     .registerGlobalFunctions(nunjucksFunctions)
     .registerPackage(yourCasesPackage, mockYourCasesEffectsDeps)
+    .registerGlobalFunctions(JourneyEffectsImplementations)
     .createClient();
 }
