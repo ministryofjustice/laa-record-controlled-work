@@ -74,7 +74,7 @@ export const loadOffices =
 // function getFirmIdFromSession(context: SelectOfficeContext): number {
 //   const session = context.getSession();
 //   if (!session) {
-//     throw new MissingSessionError();
+//     throw new InvalidSessionError();
 //   }
 
 //   const claims = session.account?.idTokenClaims;

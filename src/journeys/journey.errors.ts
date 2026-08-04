@@ -2,25 +2,25 @@
 import { DomainError } from "#/lib/errors/domainError.js";
 
 export class InvalidFirmCodeClaimError extends DomainError {
-  public readonly name = "MissingFirmCodeClaimError";
+  public readonly name = "InvalidFirmCodeClaimError";
 
   constructor(cause?: unknown) {
     super("Missing or invalid FIRM_CODE claim", cause);
   }
 }
 
-export class MissingSessionError extends DomainError {
-  public readonly name = "MissingSessionError";
+export class InvalidSessionError extends DomainError {
+  public readonly name = "InvalidSessionError";
 
   constructor(cause?: unknown) {
     super("Missing or invalid session data", cause);
   }
 }
 
-export class OfficeNotFoundError extends DomainError {
-  public readonly name = "OfficeNotFoundError";
+export class SelectedOfficeNotFoundError extends DomainError {
+  public readonly name = "SelectedOfficeNotFoundError";
 
   constructor(cause?: unknown) {
-    super("Office not found", cause);
+    super("Selected Office not found", cause);
   }
 }

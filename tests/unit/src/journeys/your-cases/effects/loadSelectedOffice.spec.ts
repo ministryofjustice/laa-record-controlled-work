@@ -6,7 +6,7 @@ import { loadSelectedOffice } from "#/journeys/your-cases/effects/loadSelectedOf
 import type { CaseListContext } from "#/journeys/your-cases/your-cases.types.js";
 import type { Office } from "#/journeys/select-office/select-office.types.js";
 import { logger } from "#/logger.js";
-import { OfficeNotFoundError } from "#/journeys/journey.errors.js";
+import { SelectedOfficeNotFoundError } from "#/journeys/journey.errors.js";
 
 const validOffice: Office = {
   address: "1 High Street, Leeds, LS1 1AA",
@@ -53,6 +53,6 @@ describe("loadSelectedOffice", () => {
     });
 
     expect(() => loadSelectedOffice()(context))
-      .to.throw(OfficeNotFoundError);
+      .to.throw(SelectedOfficeNotFoundError);
   });
 });

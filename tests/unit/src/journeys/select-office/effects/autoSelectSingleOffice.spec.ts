@@ -2,7 +2,7 @@ import { expect } from "chai";
 import sinon from "sinon";
 
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
-import { MissingSessionError } from "#/journeys/journey.errors.js";
+import { InvalidSessionError } from "#/journeys/journey.errors.js";
 import { autoSelectSingleOffice } from "#/journeys/select-office/effects/autoSelectSingleOffice.js";
 import type { Office, SelectOfficeContext } from "#/journeys/select-office/select-office.types.js";
 
@@ -48,10 +48,10 @@ describe("autoSelectSingleOffice", () => {
       ).to.equal(true);
     });
 
-    it("throws MissingSessionError when session is not available", () => {
+    it("throws InvalidSessionError when session is not available", () => {
       getSession.returns(null);
 
-      expect(() => autoSelectSingleOffice()(context)).to.throw(MissingSessionError);
+      expect(() => autoSelectSingleOffice()(context)).to.throw(InvalidSessionError);
     });
   });
 
