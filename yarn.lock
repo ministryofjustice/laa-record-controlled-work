@@ -3549,7 +3549,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-jsdoc@npm:^63.3.0":
+"eslint-plugin-jsdoc@npm:^63.3.1":
   version: 63.3.1
   resolution: "eslint-plugin-jsdoc@npm:63.3.1"
   dependencies:
@@ -5237,7 +5237,7 @@ __metadata:
     eslint: "npm:^10.8.0"
     eslint-config-love: "npm:^154.1.0"
     eslint-config-prettier: "npm:^10.1.8"
-    eslint-plugin-jsdoc: "npm:^63.3.0"
+    eslint-plugin-jsdoc: "npm:^63.3.1"
     eslint-plugin-jsonc: "npm:^3.3.0"
     eslint-plugin-perfectionist: "npm:^5.10.0"
     eslint-plugin-prettier: "npm:^5.5.6"
