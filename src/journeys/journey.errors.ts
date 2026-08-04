@@ -9,18 +9,18 @@ export class InvalidFirmCodeClaimError extends DomainError {
   }
 }
 
+export class InvalidSelectedOfficeError extends DomainError {
+  public readonly name = "InvalidSelectedOfficeError";
+
+  constructor(cause?: unknown) {
+    super("Missing or invalid Selected Office", cause);
+  }
+}
+
 export class InvalidSessionError extends DomainError {
   public readonly name = "InvalidSessionError";
 
   constructor(cause?: unknown) {
     super("Missing or invalid session data", cause);
-  }
-}
-
-export class SelectedOfficeNotFoundError extends DomainError {
-  public readonly name = "SelectedOfficeNotFoundError";
-
-  constructor(cause?: unknown) {
-    super("Selected Office not found", cause);
   }
 }

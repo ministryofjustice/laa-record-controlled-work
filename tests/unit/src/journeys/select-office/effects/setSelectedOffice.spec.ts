@@ -5,7 +5,7 @@ import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import { setSelectedOffice } from "#/journeys/select-office/effects/setSelectedOffice.js";
 import type { SelectOfficeContext } from "#/journeys/select-office/select-office.types.js";
 import type { OfficeData } from "#/dto/office/office.dto.js";
-import { InvalidSessionError, SelectedOfficeNotFoundError } from "#/journeys/journey.errors.js";
+import { InvalidSessionError, InvalidSelectedOfficeError } from "#/journeys/journey.errors.js";
 
 const mockOffices: OfficeData[] = [
   { address: "1 High Street, Leeds, LS1 1AA", code: "LEEDS-01" },
@@ -51,11 +51,11 @@ describe("setSelectedOffice", () => {
     ).to.equal(true);
   });
 
-  it("throws SelectedOfficeNotFoundError when the selected office code is not in the office list", () => {
+  it("throws InvalidSelectedOfficeError when the selected office code is not in the office list", () => {
     getAnswer.withArgs("selectOffice").returns("UNKNOWN-CODE");
 
     expect(() => setSelectedOffice()(context))
-      .to.throw(SelectedOfficeNotFoundError);
+      .to.throw(InvalidSelectedOfficeError);
   });
 
   it("throws InvalidSessionError when session is not available", () => {
