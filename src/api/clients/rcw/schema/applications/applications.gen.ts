@@ -14,6 +14,8 @@ import type { CreateApplicationRequestBody } from "../../model/createApplication
 
 import type { CreateApplicationResponseBody } from "../../model/createApplicationResponseBody.zod.gen.js";
 
+import type { GetApplicationsParams } from "../../model/getApplicationsParams.zod.gen.js";
+
 export type getApplicationsResponse200 = {
   data: Applications;
   status: 200;
@@ -54,17 +56,30 @@ export type getApplicationsResponseError = (
 export type getApplicationsResponse =
   getApplicationsResponseSuccess | getApplicationsResponseError;
 
-export const getGetApplicationsUrl = () => {
-  return `${config.api.rcw.baseUrl}/api/v1/applications`;
+export const getGetApplicationsUrl = (params?: GetApplicationsParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `${config.api.rcw.baseUrl}/api/v1/applications?${stringifiedParams}`
+    : `${config.api.rcw.baseUrl}/api/v1/applications`;
 };
 
 /**
  * @summary Get all applications
  */
 export const getApplications = async (
+  params?: GetApplicationsParams,
   options?: RequestInit,
 ): Promise<getApplicationsResponse> => {
-  const res = await fetch(getGetApplicationsUrl(), {
+  const res = await fetch(getGetApplicationsUrl(params), {
     ...options,
     method: "GET",
   });
@@ -79,9 +94,9 @@ export const getApplications = async (
   } as getApplicationsResponse;
 };
 
-export type createApplicationResponse200 = {
+export type createApplicationResponse201 = {
   data: CreateApplicationResponseBody;
-  status: 200;
+  status: 201;
 };
 
 export type createApplicationResponse400 = {
@@ -109,7 +124,7 @@ export type createApplicationResponse500 = {
   status: 500;
 };
 
-export type createApplicationResponseSuccess = createApplicationResponse200 & {
+export type createApplicationResponseSuccess = createApplicationResponse201 & {
   headers: Headers;
 };
 export type createApplicationResponseError = (

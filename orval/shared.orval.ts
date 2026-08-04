@@ -29,7 +29,11 @@ export function sharedOutputConfig(
     mock: {
       generators: [
         { path: `./tests/mocks/api/${client}/msw`, type: "msw" },
-        { path: `./tests/mocks/api/${client}/fakers`, type: "faker" },
+        {
+          operationResponses: false,
+          path: `./tests/mocks/api/${client}/fakers`,
+          type: "faker",
+        },
       ],
     },
     mode: "tags-split",

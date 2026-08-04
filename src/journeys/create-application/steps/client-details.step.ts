@@ -18,7 +18,7 @@ import {
   GovUKValidations,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
-import { JourneyEffects } from "#/journeys/effects.js";
+import { CreateApplicationEffects } from "#/journeys/create-application/create-application.effects.js";
 import { t } from "#/lib/i18n.js";
 
 export const clientDetailsStep = (
@@ -122,7 +122,7 @@ export const clientDetailsStep = (
     onSubmission: [
       submit({
         onValid: {
-          effects: [JourneyEffects.SaveDraftAnswers(journeyCode)],
+          effects: [CreateApplicationEffects.saveDraftAnswers(journeyCode)],
           next: [
             redirect({
               goto: "check-answers",

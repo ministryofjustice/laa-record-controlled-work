@@ -10,7 +10,7 @@ import {
   GovUKHeading,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
-import { JourneyEffects } from "#/journeys/effects.js";
+import { CreateApplicationEffects } from "#/journeys/create-application/create-application.effects.js";
 import { H1 } from "#/lib/constants/headings.js";
 
 export const ineligibleStep = (journeyCode: string): ReturnType<typeof step> =>
@@ -36,7 +36,7 @@ export const ineligibleStep = (journeyCode: string): ReturnType<typeof step> =>
     onSubmission: [
       submit({
         onValid: {
-          effects: [JourneyEffects.ClearAllDraftAnswers(journeyCode)],
+          effects: [CreateApplicationEffects.clearAllDraftAnswers(journeyCode)],
           next: [redirect({ goto: "/" })],
         },
         validate: true,

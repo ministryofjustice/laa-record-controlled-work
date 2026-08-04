@@ -12,11 +12,14 @@ import express from "express";
 import session from "express-session";
 
 import { getAllProviderOffices } from "#/api/clients/pda/schema/provider-firms-endpoints/provider-firms-endpoints.gen.js";
-import { getApplications } from "#/api/clients/rcw/schema/applications/applications.gen.js";
+import {
+  createApplication,
+  getApplications,
+} from "#/api/clients/rcw/schema/applications/applications.gen.js";
 import authRouter from "#/auth/auth.routes.js";
 import config from "#/config.js";
 import { autocomplete } from "#/journeys/components/autocomplete/autocomplete.component.js";
-import createApplication from "#/journeys/create-application/create-application.index.js";
+import createApplicationJourney from "#/journeys/create-application/create-application.index.js";
 import editApplication from "#/journeys/edit-application/edit-application.index.js";
 import evidence from "#/journeys/evidence/evidence.index.js";
 import { selectOfficePackage } from "#/journeys/select-office/select-office.journey.js";
@@ -92,9 +95,8 @@ const createApp = async (): Promise<express.Application> => {
     .registerGlobalFunctions(nunjucksFunctions)
     .registerPackage(yourCasesPackage, { getApplications })
     .registerPackage(selectOfficePackage, { getAllProviderOffices })
-
-    .registerPackage(createApplication)
     .registerPackage(editApplication)
+    .registerPackage(createApplicationJourney, { createApplication })
     .registerPackage(evidence);
 
   // Set up rate limiting
