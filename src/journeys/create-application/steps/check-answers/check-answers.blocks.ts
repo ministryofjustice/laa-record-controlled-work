@@ -7,44 +7,77 @@ import {
 import { NunjucksGenerators } from "@ministryofjustice/hmpps-forge/express-nunjucks";
 import { GovUKSummaryList } from "@ministryofjustice/hmpps-forge/govuk-components";
 
+import { ANSWER_CODES, ANSWER_VALUES } from "#/journeys/journey.constants.js";
 import { t } from "#/lib/i18n.js";
 
-const ecfLabel = match(Answer("ecf"))
-  .branch(Condition.Equals("yes"), t("common.yes"))
-  .otherwise(t("common.no"));
+const changeButtonText = t("common.change");
+const noText = t("common.no");
+const yesText = t("common.yes");
+const addressLabel = t(
+  "journeys.createApplication.checkAnswers.answerLabels.address",
+);
+const dateOfBirthLabel = t(
+  "journeys.createApplication.checkAnswers.answerLabels.dateOfBirth",
+);
+const ecfAnswerLabel = t(
+  "journeys.createApplication.checkAnswers.answerLabels.ecf",
+);
+const firstNameLabel = t(
+  "journeys.createApplication.checkAnswers.answerLabels.firstName",
+);
+const lastNameLabel = t(
+  "journeys.createApplication.checkAnswers.answerLabels.lastName",
+);
+const legalAidBeforeAnswerLabel = t(
+  "journeys.createApplication.checkAnswers.answerLabels.legalAidBefore",
+);
+const legalAidLast6MonthsAnswerLabel = t(
+  "journeys.createApplication.checkAnswers.answerLabels.legalAidLast6Months",
+);
+const legalAidLast6MonthsReasonForYesLabel = t(
+  "journeys.createApplication.checkAnswers.answerLabels.legalAidLast6MonthsReasonForYes",
+);
+const niNumberLabel = t(
+  "journeys.createApplication.checkAnswers.answerLabels.niNumber",
+);
+const yesDifferentMatterText = t(
+  "journeys.createApplication.legalAidBefore.radioButton.yesDifferentMatter",
+);
+const yesSameMatterText = t(
+  "journeys.createApplication.legalAidBefore.radioButton.yesSameMatter",
+);
 
-const legalAidBeforeLabel = match(Answer("legalAidBefore"))
+const ecfLabel = match(Answer(ANSWER_CODES.ecf))
+  .branch(Condition.Equals(ANSWER_VALUES.yes), yesText)
+  .otherwise(noText);
+
+const legalAidBeforeLabel = match(Answer(ANSWER_CODES.legalAidBefore))
+  .branch(Condition.Equals(ANSWER_VALUES.yesSameMatter), yesSameMatterText)
   .branch(
-    Condition.Equals("yesSameMatter"),
-    t("journeys.createApplication.legalAidBefore.radioButton.yesSameMatter"),
+    Condition.Equals(ANSWER_VALUES.yesDifferentMatter),
+    yesDifferentMatterText,
   )
-  .branch(
-    Condition.Equals("yesDifferentMatter"),
-    t(
-      "journeys.createApplication.legalAidBefore.radioButton.yesDifferentMatter",
-    ),
-  )
-  .otherwise(t("common.no"));
+  .otherwise(noText);
 
-const legalAidLast6MonthsLabel = match(Answer("legalAidLast6Months"))
-  .branch(Condition.Equals("yes"), t("common.yes"))
-  .otherwise(t("common.no"));
+const legalAidLast6MonthsLabel = match(Answer(ANSWER_CODES.legalAidLast6Months))
+  .branch(Condition.Equals(ANSWER_VALUES.yes), yesText)
+  .otherwise(noText);
 
-const dateOfBirthDisplay = Answer("dateOfBirth").pipe(
+const dateOfBirthDisplay = Answer(ANSWER_CODES.dateOfBirth).pipe(
   Transformer.String.ToDate(),
   Transformer.Date.Format("D MMMM YYYY"),
 );
 
 const addressDisplay = NunjucksGenerators.String({
   data: {
-    country: Answer("country"),
-    county: Answer("county"),
-    line1: Answer("addressLine1"),
-    line2: Answer("addressLine2"),
-    line3: Answer("addressLine3"),
-    line4: Answer("addressLine4"),
-    postcode: Answer("postcode"),
-    town: Answer("townOrCity"),
+    country: Answer(ANSWER_CODES.country),
+    county: Answer(ANSWER_CODES.county),
+    line1: Answer(ANSWER_CODES.addressLine1),
+    line2: Answer(ANSWER_CODES.addressLine2),
+    line3: Answer(ANSWER_CODES.addressLine3),
+    line4: Answer(ANSWER_CODES.addressLine4),
+    postcode: Answer(ANSWER_CODES.postcode),
+    town: Answer(ANSWER_CODES.townOrCity),
   },
   template: `
     {{ line1 }},<br />
@@ -58,187 +91,86 @@ const addressDisplay = NunjucksGenerators.String({
   `,
 });
 
-const changeAddressRedirect = match(Answer("postcode"))
+const changeAddressRedirect = match(Answer(ANSWER_CODES.postcode))
   .branch(
     Condition.IsRequired(),
     "enter-address-manually?returnTo=check-answers",
   )
   .otherwise("enter-overseas-address?returnTo=check-answers");
 
+const rows = [
+  {
+    href: "ecf?returnTo=check-answers",
+    label: ecfAnswerLabel,
+    value: { text: ecfLabel },
+  },
+  {
+    href: "legal-aid-before?returnTo=check-answers",
+    label: legalAidBeforeAnswerLabel,
+    value: { text: legalAidBeforeLabel },
+  },
+  {
+    href: "legal-aid-last-6-months?returnTo=check-answers",
+    label: legalAidLast6MonthsAnswerLabel,
+    value: { text: legalAidLast6MonthsLabel },
+    visibleWhen: Answer(ANSWER_CODES.legalAidBefore).match(
+      Condition.Equals(ANSWER_VALUES.yesSameMatter),
+    ),
+  },
+  {
+    href: "legal-aid-last-6-months?returnTo=check-answers",
+    label: legalAidLast6MonthsReasonForYesLabel,
+    value: { text: Answer(ANSWER_CODES.reasonForYes) },
+    visibleWhen: Answer(ANSWER_CODES.legalAidLast6Months).match(
+      Condition.Equals(ANSWER_VALUES.yes),
+    ),
+  },
+  {
+    href: "client-details?returnTo=check-answers",
+    label: firstNameLabel,
+    value: { text: Answer(ANSWER_CODES.firstName) },
+  },
+  {
+    href: "client-details?returnTo=check-answers",
+    label: lastNameLabel,
+    value: { text: Answer(ANSWER_CODES.lastName) },
+  },
+  {
+    href: "client-details?returnTo=check-answers",
+    label: dateOfBirthLabel,
+    value: { text: dateOfBirthDisplay },
+  },
+  {
+    href: "ni-number?returnTo=check-answers",
+    label: niNumberLabel,
+    value: { text: Answer(ANSWER_CODES.niNumber) },
+    visibleWhen: Answer(ANSWER_CODES.hasNINumber).match(
+      Condition.Equals(ANSWER_VALUES.yes),
+    ),
+  },
+  {
+    href: changeAddressRedirect,
+    label: addressLabel,
+    value: { html: addressDisplay },
+    visibleWhen: Answer(ANSWER_CODES.haveAHomeAddress).match(
+      Condition.Equals(ANSWER_VALUES.yes),
+    ),
+  },
+];
+
 export const summaryList = GovUKSummaryList({
-  rows: [
-    {
-      actions: {
-        items: [
-          {
-            href: "ecf?returnTo=check-answers",
-            text: t("common.change"),
-            visuallyHiddenText: t(
-              "journeys.createApplication.checkAnswers.answerLabels.ecf",
-            ),
-          },
-        ],
-      },
-      key: {
-        text: t("journeys.createApplication.checkAnswers.answerLabels.ecf"),
-      },
-      value: { text: ecfLabel },
+  rows: rows.map(({ href, label, value, visibleWhen }) => ({
+    actions: {
+      items: [
+        {
+          href,
+          text: changeButtonText,
+          visuallyHiddenText: label,
+        },
+      ],
     },
-    {
-      actions: {
-        items: [
-          {
-            href: "legal-aid-before?returnTo=check-answers",
-            text: t("common.change"),
-            visuallyHiddenText: t(
-              "journeys.createApplication.checkAnswers.answerLabels.legalAidBefore",
-            ),
-          },
-        ],
-      },
-      key: {
-        text: t(
-          "journeys.createApplication.checkAnswers.answerLabels.legalAidBefore",
-        ),
-      },
-      value: { text: legalAidBeforeLabel },
-    },
-    {
-      actions: {
-        items: [
-          {
-            href: "legal-aid-last-6-months?returnTo=check-answers",
-            text: t("common.change"),
-            visuallyHiddenText: t(
-              "journeys.createApplication.checkAnswers.answerLabels.legalAidLast6Months",
-            ),
-          },
-        ],
-      },
-      key: {
-        text: t(
-          "journeys.createApplication.checkAnswers.answerLabels.legalAidLast6Months",
-        ),
-      },
-      value: { text: legalAidLast6MonthsLabel },
-      visibleWhen: Answer("legalAidBefore").match(
-        Condition.Equals("yesSameMatter"),
-      ),
-    },
-    {
-      actions: {
-        items: [
-          {
-            href: "legal-aid-last-6-months?returnTo=check-answers",
-            text: t("common.change"),
-            visuallyHiddenText: t(
-              "journeys.createApplication.checkAnswers.answerLabels.legalAidLast6MonthsReasonForYes",
-            ),
-          },
-        ],
-      },
-      key: {
-        text: t(
-          "journeys.createApplication.checkAnswers.answerLabels.legalAidLast6MonthsReasonForYes",
-        ),
-      },
-      value: { text: Answer("reasonForYes") },
-      visibleWhen: Answer("legalAidLast6Months").match(Condition.Equals("yes")),
-    },
-    {
-      actions: {
-        items: [
-          {
-            href: "client-details?returnTo=check-answers",
-            text: t("common.change"),
-            visuallyHiddenText: t(
-              "journeys.createApplication.checkAnswers.answerLabels.firstName",
-            ),
-          },
-        ],
-      },
-      key: {
-        text: t(
-          "journeys.createApplication.checkAnswers.answerLabels.firstName",
-        ),
-      },
-      value: { text: Answer("firstName") },
-    },
-    {
-      actions: {
-        items: [
-          {
-            href: "client-details?returnTo=check-answers",
-            text: t("common.change"),
-            visuallyHiddenText: t(
-              "journeys.createApplication.checkAnswers.answerLabels.lastName",
-            ),
-          },
-        ],
-      },
-      key: {
-        text: t(
-          "journeys.createApplication.checkAnswers.answerLabels.lastName",
-        ),
-      },
-      value: { text: Answer("lastName") },
-    },
-    {
-      actions: {
-        items: [
-          {
-            href: "client-details?returnTo=check-answers",
-            text: t("common.change"),
-            visuallyHiddenText: t(
-              "journeys.createApplication.checkAnswers.answerLabels.dateOfBirth",
-            ),
-          },
-        ],
-      },
-      key: {
-        text: t(
-          "journeys.createApplication.checkAnswers.answerLabels.dateOfBirth",
-        ),
-      },
-      value: { text: dateOfBirthDisplay },
-    },
-    {
-      actions: {
-        items: [
-          {
-            href: "ni-number?returnTo=check-answers",
-            text: t("common.change"),
-            visuallyHiddenText: t(
-              "journeys.createApplication.checkAnswers.answerLabels.niNumber",
-            ),
-          },
-        ],
-      },
-      key: {
-        text: t(
-          "journeys.createApplication.checkAnswers.answerLabels.niNumber",
-        ),
-      },
-      value: { text: Answer("niNumber") },
-      visibleWhen: Answer("hasNINumber").match(Condition.Equals("yes")),
-    },
-    {
-      actions: {
-        items: [
-          {
-            href: changeAddressRedirect,
-            text: t("common.change"),
-            visuallyHiddenText: t(
-              "journeys.createApplication.checkAnswers.answerLabels.address",
-            ),
-          },
-        ],
-      },
-      key: {
-        text: t("journeys.createApplication.checkAnswers.answerLabels.address"),
-      },
-      value: { html: addressDisplay },
-      visibleWhen: Answer("haveAHomeAddress").match(Condition.Equals("yes")),
-    },
-  ],
+    key: { text: label },
+    value,
+    ...(visibleWhen ? { visibleWhen } : {}),
+  })),
 });
