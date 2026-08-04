@@ -15,6 +15,10 @@ export const loadSelectedOffice = () => (context: CaseListContext) => {
   }
   const { selectedOffice } = session;
 
+  if (selectedOffice === undefined) {
+    return;
+  }
+
   const result = OfficeSchema.safeParse(selectedOffice);
   if (!result.success) {
     logger.error("Selected office in session is invalid", result.error, {

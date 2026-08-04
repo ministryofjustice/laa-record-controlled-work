@@ -46,7 +46,7 @@ describe("loadSelectedOffice", () => {
     expect(setData.called).to.equal(false);
   });
 
-  it("throws Error when selectedOffice in session fails schema validation", () => {
+  it("throws InvalidSelectedOfficeError when selectedOffice in session fails schema validation", () => {
     sinon.stub(logger, "error");
     getSession.returns({
       selectedOffice: { code: "LEEDS-01" }, // missing required fields
