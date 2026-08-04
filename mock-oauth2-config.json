@@ -1,0 +1,21 @@
+{
+  "interactiveLogin": true,
+  "loginPagePath": "/etc/mock-oauth2-login.html",
+  "tokenCallbacks": [
+    {
+      "issuerId": "default",
+      "tokenExpiry": 3600,
+      "requestMappings": [
+        {
+          "requestParam": "grant_type",
+          "match": "urn:ietf:params:oauth:grant-type:jwt-bearer",
+          "claims": {
+            "aud": "default",
+            "scp": "DataStore.Access",
+            "FIRM_CODE": "123456"
+          }
+        }
+      ]
+    }
+  ]
+}
