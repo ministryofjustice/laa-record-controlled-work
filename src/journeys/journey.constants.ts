@@ -29,3 +29,31 @@ export const CONTEXT_DATA_KEYS = {
   selectedOffice: "selectedOffice",
   singleOffice: "singleOffice",
 };
+
+export const ANSWER_CODES = {
+  addressLine1: "addressLine1",
+  addressLine2: "addressLine2",
+  addressLine3: "addressLine3",
+  addressLine4: "addressLine4",
+  country: "country",
+  county: "county",
+  dateOfBirth: "dateOfBirth",
+  ecf: "ecf",
+  firstName: "firstName",
+  hasNINumber: "hasNINumber",
+  haveAHomeAddress: "haveAHomeAddress",
+  lastName: "lastName",
+  legalAidBefore: "legalAidBefore",
+  legalAidLast6Months: "legalAidLast6Months",
+  niNumber: "niNumber",
+  postcode: "postcode",
+  reasonForYes: "reasonForYes",
+  townOrCity: "townOrCity",
+} as const;
+
+export const ANSWER_VALUES = {
+  no: "no",
+  yes: "yes",
+  yesDifferentMatter: "yesDifferentMatter",
+  yesSameMatter: "yesSameMatter",
+} as const;

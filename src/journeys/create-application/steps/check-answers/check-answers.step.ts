@@ -9,13 +9,11 @@ import { summaryList } from "#/journeys/create-application/steps/check-answers/c
 import { DEFAULT_CASE_REFERENCE_NUMBER } from "#/journeys/edit-application/steps/task-list/task-list.step.js";
 import { t } from "#/lib/i18n.js";
 
+const title = t("journeys.createApplication.checkAnswers.title");
+
 export const checkAnswersStep = (): ReturnType<typeof step> =>
   step({
-    blocks: [
-      heading(t("journeys.createApplication.checkAnswers.title")),
-      summaryList,
-      submitButton,
-    ],
+    blocks: [heading(title), summaryList, submitButton],
     code: "check-answers",
     onSubmission: [
       submit({
