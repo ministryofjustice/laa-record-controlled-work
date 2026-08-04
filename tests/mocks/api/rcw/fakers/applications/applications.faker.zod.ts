@@ -6,20 +6,17 @@
  */
 import { faker } from "@faker-js/faker";
 
-import { HttpResponse, http } from "msw";
-import type { RequestHandlerOptions } from "msw";
+import type { Application } from "../../../../../../src/api/clients/rcw/model/application.zod.zod.js";
 
-import type { Application } from "../../../../../../src/api/clients/rcw/model/application.zod.gen.js";
+import { ApplicationStatus } from "../../../../../../src/api/clients/rcw/model/applicationStatus.zod.zod.js";
 
-import { ApplicationStatus } from "../../../../../../src/api/clients/rcw/model/applicationStatus.zod.gen.js";
+import type { Applications } from "../../../../../../src/api/clients/rcw/model/applications.zod.zod.js";
 
-import type { Applications } from "../../../../../../src/api/clients/rcw/model/applications.zod.gen.js";
+import { ClientDeclarationStatus } from "../../../../../../src/api/clients/rcw/model/clientDeclarationStatus.zod.zod.js";
 
-import { ClientDeclarationStatus } from "../../../../../../src/api/clients/rcw/model/clientDeclarationStatus.zod.gen.js";
+import type { CreateApplicationResponseBody } from "../../../../../../src/api/clients/rcw/model/createApplicationResponseBody.zod.zod.js";
 
-import type { CreateApplicationResponseBody } from "../../../../../../src/api/clients/rcw/model/createApplicationResponseBody.zod.gen.js";
-
-import { EvidenceStatus } from "../../../../../../src/api/clients/rcw/model/evidenceStatus.zod.gen.js";
+import { EvidenceStatus } from "../../../../../../src/api/clients/rcw/model/evidenceStatus.zod.zod.js";
 
 export type KeysWithNull<O> = {
   [K in keyof O]-?: null extends O[K] ? K : never;
@@ -179,81 +176,3 @@ export const getGetApplicationResponseMock = <
     modifiedBy: faker.string.alpha({ length: { min: 10, max: 20 } }),
     ...overrideResponse,
   }) as MockWithNullableOverrides<Application, O, ApplicationMock>;
-
-export const getGetApplicationsMockHandler = (
-  overrideResponse?:
-    | Applications
-    | ((
-        info: Parameters<Parameters<typeof http.get>[1]>[0],
-      ) => Promise<Applications> | Applications),
-  options?: RequestHandlerOptions,
-) => {
-  return http.get(
-    "*/api/v1/applications",
-    async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
-      return HttpResponse.json(
-        overrideResponse !== undefined
-          ? typeof overrideResponse === "function"
-            ? await overrideResponse(info)
-            : overrideResponse
-          : getGetApplicationsResponseMock(),
-        { status: 200 },
-      );
-    },
-    options,
-  );
-};
-
-export const getCreateApplicationMockHandler = (
-  overrideResponse?:
-    | CreateApplicationResponseBody
-    | ((
-        info: Parameters<Parameters<typeof http.post>[1]>[0],
-      ) =>
-        Promise<CreateApplicationResponseBody> | CreateApplicationResponseBody),
-  options?: RequestHandlerOptions,
-) => {
-  return http.post(
-    "*/api/v1/applications",
-    async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
-      return HttpResponse.json(
-        overrideResponse !== undefined
-          ? typeof overrideResponse === "function"
-            ? await overrideResponse(info)
-            : overrideResponse
-          : getCreateApplicationResponseMock(),
-        { status: 201 },
-      );
-    },
-    options,
-  );
-};
-
-export const getGetApplicationMockHandler = (
-  overrideResponse?:
-    | Application
-    | ((
-        info: Parameters<Parameters<typeof http.get>[1]>[0],
-      ) => Promise<Application> | Application),
-  options?: RequestHandlerOptions,
-) => {
-  return http.get(
-    "*/api/v1/applications/:id",
-    async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
-      return HttpResponse.json(
-        overrideResponse !== undefined
-          ? typeof overrideResponse === "function"
-            ? await overrideResponse(info)
-            : overrideResponse
-          : getGetApplicationResponseMock(),
-        { status: 200 },
-      );
-    },
-    options,
-  );
-};
-export const getApplicationsMock = () => [
-  getGetApplicationsMockHandler(),
-  getCreateApplicationMockHandler(),
-  getGetApplicationMockHandler(),
-];
