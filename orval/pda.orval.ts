@@ -24,6 +24,9 @@ export function createPdaConfig(): Options {
   });
 
   return {
+    hooks: {
+      afterAllFilesWrite: "tsx orval/processZodFile.ts",
+    },
     input: {
       filters: {
         mode: "include" as const,
@@ -34,6 +37,8 @@ export function createPdaConfig(): Options {
       },
       target: pdaApiSpec,
     },
-    output: sharedOutputConfig("pda", "config.api.pda.baseUrl"),
+    output: {
+      ...sharedOutputConfig("pda", "config.api.pda.baseUrl"),
+    },
   };
 }

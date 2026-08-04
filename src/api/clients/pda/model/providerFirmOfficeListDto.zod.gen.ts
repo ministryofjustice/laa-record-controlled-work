@@ -21,7 +21,7 @@ export const ProviderFirmOfficeListDto = zod.object({
       barCouncilRoll: zod.string().nullish(),
       companyHouseNumber: zod.string().nullish(),
     })
-    .optional(),
+    .nullish(),
   offices: zod
     .array(
       zod.object({
