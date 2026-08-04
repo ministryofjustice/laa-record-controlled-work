@@ -8,13 +8,15 @@ services:
   # docker-compose.yml), so it issues tokens with an https `iss` claim - override
   # include.api.yml's http defaults to match, and trust its self-signed cert for the JVM's
   # issuer/JWK discovery and OBO token calls.
+  # Values use ${VAR:-...} fallbacks (not literals) so docker-up-entra's .env.entra ISSUER
+  # values still take effect - this file is also merged in for that stack.
   info-and-advice-api:
     ports: !override
       - "8082:8080"
     volumes:
       - ./docker/certs/mock-oauth2-server.crt.pem:/etc/mock-oauth2-server.crt.pem:ro
     environment:
-      - LAA_OAUTH2_ISSUER_URI=https://host.docker.internal:9090/default
+      - LAA_OAUTH2_ISSUER_URI=${LAA_OAUTH2_ISSUER_URI:-https://host.docker.internal:9090/default}
     command:
       - sh
       - -c
@@ -28,8 +30,8 @@ services:
     volumes:
       - ./docker/certs/mock-oauth2-server.crt.pem:/etc/mock-oauth2-server.crt.pem:ro
     environment:
-      - ISSUER=https://host.docker.internal:9090/default
-      - DATASTORE_TOKEN_URI=https://host.docker.internal:9090/default/token
+      - ISSUER=${ISSUER:-https://host.docker.internal:9090/default}
+      - DATASTORE_TOKEN_URI=${DATASTORE_TOKEN_URI:-https://host.docker.internal:9090/default/token}
     command:
       - sh
       - -c
