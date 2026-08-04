@@ -11,7 +11,7 @@ describe("Check answers step", () => {
   const client = createForgeTestClient(
     "Record new case",
     "/cases/new/",
-    checkAnswersStep(),
+    checkAnswersStep("testJourney"),
   );
   const session = {
     journeyDrafts: {
@@ -25,9 +25,11 @@ describe("Check answers step", () => {
         dateOfBirth: "1990-01-01",
         hasNINumber: "yes",
         niNumber: "AB123456C",
+        haveAHomeAddress: "yes",
         addressLine1: "123 Test Street",
         townOrCity: "Testville",
         postcode: "TE5 7ST",
+        country: "United Kingdom",
       },
     },
   };

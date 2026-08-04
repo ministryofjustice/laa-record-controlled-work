@@ -15,7 +15,7 @@ import {
   GovUKTextInput,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
-import { JourneyEffects } from "#/journeys/effects.js";
+import { CreateApplicationEffects } from "#/journeys/create-application/create-application.effects.js";
 import {
   ADDRESS_FIELD,
   OVERSEAS_EXCLUSIVE_ADDRESS_FIELDS,
@@ -127,11 +127,11 @@ export const enterAddressManuallyStep = (
       submit({
         onValid: {
           effects: [
-            JourneyEffects.ClearFieldAnswers(
+            CreateApplicationEffects.clearFieldAnswers(
               journeyCode,
               OVERSEAS_EXCLUSIVE_ADDRESS_FIELDS,
             ),
-            JourneyEffects.SaveDraftAnswers(journeyCode),
+            CreateApplicationEffects.saveDraftAnswers(journeyCode),
           ],
           next: [
             redirect({

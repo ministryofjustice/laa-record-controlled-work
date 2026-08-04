@@ -6,7 +6,7 @@
  */
 import { z as zod } from "zod";
 
-export const ApplicationStatus = zod.enum(["DRAFT"]);
+export const ApplicationStatus = zod.enum(["DRAFT", "COMPLETE"]);
 
 export type ApplicationStatus = zod.input<typeof ApplicationStatus>;
 export type ApplicationStatusOutput = zod.output<typeof ApplicationStatus>;
