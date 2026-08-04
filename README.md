@@ -116,6 +116,55 @@ docker ps                      # get container ID
 docker stop {container_id}
 ```
 
+#### Running the full stack with Docker Compose
+
+Add `host.docker.internal` to your `/etc/hosts` if you haven't already (Docker Desktop on Mac does not add this automatically - it's required to reach the mock OAuth2 server from your browser):
+
+```bash
+echo '127.0.0.1 host.docker.internal' | sudo tee -a /etc/hosts
+```
+
+`make docker-up` (`yarn dev:docker`) runs RCW together with the RCW API, the datastore and CCQ, composed via `include` from those repos' own compose files (see [docker-compose.yml](docker-compose.yml)). This requires sibling checkouts, each with their own `.env`:
+
+- `../laa-record-controlled-work-api` (see its README/.env.example)
+- `../laa-info-and-advice-datastore` (see its README/.env.example)
+- `../laa-check-client-qualifies` (built via `make build` there - see its README)
+
+Building the `rcw-api` image requires a `GITHUB_TOKEN` with `read:packages` scope - see
+`laa-record-controlled-work-api/.env.example` (picked up via the `--env-file` chain below).
+
+Since `dev:docker` always passes `--build`, this rebuilds the API image (and re-authenticates against
+GitHub Packages) on every `make docker-up`.
+
+Docker Compose's `include` only picks up an included file's own `.env` if it lives alongside the orchestrating compose file. Sibling repos' `.env` files live at their repo root, not next to the
+`docker/compose/*.yml` files being included, so they aren't picked up automatically. 
+
+Instead, `dev:docker` runs everything through a single `op run` invocation with one `--env-file` per repo, so each repo's secrets are resolved from its own 1Password vault items and exported as real environment variables before `docker compose` runs - that's why the command chains `--env-file=../laa-record-controlled-work-api/.env --env-file=../laa-info-and-advice-datastore/.env --env-file=.env`. 
+
+If you add a new variable to `include.*.yml` in another repo, either export it another way, or add it to that repo's own `.env`/`.env.example`, which is already covered by this chain.
+
+#### Switching between the mock IdP and real Entra ID
+
+By default, `make docker-up` signs in via the `mock-oauth2-server` container that RCW defines
+(see [docker/compose/include.mock-oauth.yml](docker/compose/include.mock-oauth.yml)). `rcw-api` and
+`info-and-advice-api` both trust this same container for resource-server validation and the OBO
+exchange, so the whole stack works without any real Entra app registrations.
+
+To sign in via real Entra ID instead (e.g. to test against a real app registration), copy `.env.entra.example` to `.env.entra` here, in `../laa-record-controlled-work-api`
+and in `../laa-info-and-advice-datastore`. You shouldn't need to change anything in it (it only ever
+holds 1Password references, never real secret values, so there's nothing developer-specific to set
+up).
+
+Run `make docker-up-entra` (`yarn dev:docker:entra`) - this switches the whole request chain (RCW sign-in -> rcw-api resource-server validation -> OBO exchange -> datastore resource-server validation) to point at the real Entra ID by chaining all three repos' `.env.entra` files through a single `op run` before merging in [docker-compose.entra.yml](docker-compose.entra.yml).
+
+This only needs to override RCW's own sign-in authority - `rcw-api` and `info-and-advice-api` already fall back to their own `.env.entra` values via the `${VAR:-mock-default}` pattern in their own compose files.
+
+`rcw-api` and `info-and-advice-api` each own their own resource-server validation config in their
+own `.env.entra` (see their READMEs) - each repo's Entra config keeps a single source of truth,
+whether that component is run as part of this full stack or using their own docker-compose stack. 
+
+This also means each `.env.entra` can be reviewed and diffed independently when something doesn't line up (for example, a mismatched tenant or audience value is a common cause of hard-to-diagnose auth errors) rather than hunting through compose overrides in multiple repos.
+
 ### 1Password CLI Setup
 
 ```sh
