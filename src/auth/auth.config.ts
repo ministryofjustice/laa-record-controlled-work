@@ -1,12 +1,25 @@
-import { ConfidentialClientApplication } from "@azure/msal-node";
+import { ConfidentialClientApplication, ProtocolMode } from "@azure/msal-node";
 
 import config from "#/config.js";
+
+const ENTRA_AUTHORITY_HOST = "login.microsoftonline.com";
+
+const authorityHost = new URL(config.entra.authority).host;
+const isEntraAuthority = authorityHost.endsWith(ENTRA_AUTHORITY_HOST);
 
 export const msalConfig = {
   auth: {
     authority: config.entra.authority,
     clientId: config.entra.clientId,
     clientSecret: config.entra.clientSecret,
+    // Non-Entra authorities (e.g. mock-oauth2-server, used for local Docker sign-in) need
+    // explicit OIDC discovery - MSAL otherwise assumes an Azure AD authority.
+    ...(isEntraAuthority
+      ? {}
+      : {
+          knownAuthorities: [authorityHost],
+          protocolMode: ProtocolMode.OIDC,
+        }),
   },
 };
 
