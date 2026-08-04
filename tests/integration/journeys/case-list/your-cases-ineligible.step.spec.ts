@@ -1,10 +1,17 @@
 import { TestRenderResult } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
-import { yourCasesIneligibleStep } from "#/journeys/your-cases/steps/your-cases-ineligible/your-cases-ineligible.step.js";
 import { createForgeTestClientForCaseList } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import sinon from "sinon";
 import { getGetApplicationsResponseMock } from "../../../mocks/api/rcw/fakers/applications/applications.faker.gen.js";
+
+const session = {
+  selectedOffice: {
+    address: "1 High Street, Leeds, LS1 1AA",
+    code: "LEEDS-01",
+  },
+  singleOffice: false,
+};
 
 describe("Your Cases Ineligible step", () => {
   let getApplicationsStub: sinon.SinonStub;
@@ -15,10 +22,9 @@ describe("Your Cases Ineligible step", () => {
     getApplicationsStub = sinon
       .stub()
       .resolves({ status: 200, data: mockData });
-    client = createForgeTestClientForCaseList(
-      { getApplications: getApplicationsStub },
-      yourCasesIneligibleStep,
-    );
+    client = createForgeTestClientForCaseList({
+      getApplications: getApplicationsStub,
+    });
   });
 
   after(() => {
@@ -33,7 +39,7 @@ describe("Your Cases Ineligible step", () => {
     let subNavigation: RenderBlock;
 
     before(async () => {
-      const result = await client.get("/cases/ineligible");
+      const result = await client.get("/cases/ineligible", { session });
       expect(result.type).to.equal("render");
       renderResult = result as TestRenderResult;
       [recordButton] = renderResult.getBlocksByVariant("govukLinkButton");
@@ -112,7 +118,7 @@ describe("Your Cases Ineligible step", () => {
     it("renders empty value string when getApplications returns an empty array", async () => {
       getApplicationsStub.resolves({ status: 200, data: [] });
 
-      const result = await client.get("/cases/ineligible");
+      const result = await client.get("/cases/ineligible", { session });
       expect(result.type).to.equal("render");
       const renderResult = result as TestRenderResult;
       const allTables = renderResult.getBlocksByVariant("govukTable");

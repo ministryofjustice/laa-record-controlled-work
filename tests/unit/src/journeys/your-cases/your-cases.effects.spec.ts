@@ -1,6 +1,5 @@
 import { expect } from "chai";
 import { describe, it } from "mocha";
-import { yourCasesStep } from "#/journeys/your-cases/steps/your-cases/your-cases.step.js";
 import sinon from "sinon";
 import { createForgeTestClientForCaseList } from "../../../../integration/utils/helpers.js";
 import {
@@ -12,6 +11,12 @@ import { logger } from "#/logger.js";
 import { getGetApplicationsResponseMock } from "../../../../mocks/api/rcw/fakers/applications/applications.faker.gen.js";
 
 const mockData = getGetApplicationsResponseMock();
+const session = {
+  selectedOffice: {
+    address: "1 High Street, Leeds, LS1 1AA",
+    code: "LEEDS-01",
+  },
+};
 
 describe("LoadYourCaseList", () => {
   describe("when getApplications succeeds", () => {
@@ -23,21 +28,20 @@ describe("LoadYourCaseList", () => {
         .stub()
         .resolves({ status: 200, data: mockData });
 
-      client = createForgeTestClientForCaseList(
-        { getApplications: getApplicationsStub },
-        yourCasesStep,
-      );
+      client = createForgeTestClientForCaseList({
+        getApplications: getApplicationsStub,
+      });
     });
 
     after(() => sinon.restore());
 
     it("calls getApplications", async () => {
-      await client.get("/cases");
+      await client.get("/cases", { session });
       expect(getApplicationsStub.calledOnce).to.be.true;
     });
 
     it("sets caseList in context", async () => {
-      const result = await client.get("/cases");
+      const result = await client.get("/cases", { session });
       expect(result.type).to.equal("render");
       const renderResult = result as TestRenderResult;
       expect(renderResult.context.data.caseList).to.deep.equal(mockData);
@@ -52,10 +56,9 @@ describe("LoadYourCaseList", () => {
     async function getErrorFromYourCases(
       stub: sinon.SinonStub,
     ): Promise<TestResult> {
-      const client = createForgeTestClientForCaseList(
-        { getApplications: stub },
-        yourCasesStep,
-      );
+      const client = createForgeTestClientForCaseList({
+        getApplications: stub,
+      });
       return await client.get("/cases");
     }
 

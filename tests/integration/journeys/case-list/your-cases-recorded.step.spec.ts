@@ -1,10 +1,17 @@
 import { TestRenderResult } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
-import { yourCasesRecordedStep } from "#/journeys/your-cases/steps/your-cases-recorded/your-cases-recorded.step.js";
 import { createForgeTestClientForCaseList } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import sinon from "sinon";
 import { getGetApplicationsResponseMock } from "../../../mocks/api/rcw/fakers/applications/applications.faker.gen.js";
+
+const session = {
+  selectedOffice: {
+    address: "1 High Street, Leeds, LS1 1AA",
+    code: "LEEDS-01",
+  },
+  singleOffice: false,
+};
 
 describe("Your Cases recorded step", () => {
   let getApplicationsStub: sinon.SinonStub;
@@ -15,10 +22,9 @@ describe("Your Cases recorded step", () => {
     getApplicationsStub = sinon
       .stub()
       .resolves({ status: 200, data: mockData });
-    client = createForgeTestClientForCaseList(
-      { getApplications: getApplicationsStub },
-      yourCasesRecordedStep,
-    );
+    client = createForgeTestClientForCaseList({
+      getApplications: getApplicationsStub,
+    });
   });
 
   after(() => {
@@ -32,7 +38,7 @@ describe("Your Cases recorded step", () => {
     let table: RenderBlock;
     let subNavigation: RenderBlock;
 
-    before(async () => {      const result = await client.get("/cases/recorded");
+    before(async () => {      const result = await client.get("/cases/recorded", { session });
       expect(result.type).to.equal("render");
       renderResult = result as TestRenderResult;
       [recordButton] = renderResult.getBlocksByVariant("govukLinkButton");
@@ -111,7 +117,7 @@ describe("Your Cases recorded step", () => {
     it("renders empty value string when getApplications returns an empty array", async () => {
       getApplicationsStub.resolves({ status: 200, data: [] });
 
-      const result = await client.get("/cases/recorded");
+      const result = await client.get("/cases/recorded", { session });
       expect(result.type).to.equal("render");
       const renderResult = result as TestRenderResult;
       const allTables = renderResult.getBlocksByVariant("govukTable");

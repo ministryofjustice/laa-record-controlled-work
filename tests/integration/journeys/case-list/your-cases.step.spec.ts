@@ -1,10 +1,20 @@
-import { TestRenderResult } from "@ministryofjustice/hmpps-forge/core/testing";
+import {
+  TestRedirectResult,
+  TestRenderResult,
+} from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
-import { yourCasesStep } from "#/journeys/your-cases/steps/your-cases/your-cases.step.js";
 import { createForgeTestClientForCaseList } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import sinon from "sinon";
 import { getGetApplicationsResponseMock } from "../../../mocks/api/rcw/fakers/applications/applications.faker.gen.js";
+
+const session = {
+  selectedOffice: {
+    address: "1 High Street, Leeds, LS1 1AA",
+    code: "LEEDS-01",
+  },
+  singleOffice: false,
+};
 
 describe("Your Cases step", () => {
   let getApplicationsStub: sinon.SinonStub;
@@ -15,10 +25,8 @@ describe("Your Cases step", () => {
     getApplicationsStub = sinon
       .stub()
       .resolves({ status: 200, data: mockData });
-      
     client = createForgeTestClientForCaseList(
       { getApplications: getApplicationsStub },
-      yourCasesStep,
     );
   });
 
@@ -34,7 +42,7 @@ describe("Your Cases step", () => {
     let subNavigation: RenderBlock;
 
     before(async () => {
-      const result = await client.get("/cases");
+      const result = await client.get("/cases", { session });
       expect(result.type).to.equal("render");
       renderResult = result as TestRenderResult;
       [recordButton] = renderResult.getBlocksByVariant("govukLinkButton");
@@ -68,6 +76,33 @@ describe("Your Cases step", () => {
         'href="/select-office/"',
       );
       expect(changeLink).to.be.true;
+    });
+
+    it("does not render the change link when singleOffice is true", async () => {
+      const result = await client.get("/cases", {
+        session: {
+          selectedOffice: {
+            address: "1 High Street, Leeds, LS1 1AA",
+            code: "LEEDS-01",
+          },
+          singleOffice: true,
+        },
+      });
+      expect(result.type).to.equal("render");
+
+      const renderResult = result as TestRenderResult;
+      const selectedOfficeBlock = renderResult
+        .getBlocksByVariant("html")
+        .find((b) =>
+          String(b.properties.content).includes("Office:"),
+        ) as RenderBlock;
+
+      expect(selectedOfficeBlock).to.exist;
+
+      const changeLink = String(selectedOfficeBlock.properties.content).includes(
+        'href="/select-office/"',
+      );
+      expect(changeLink).to.be.false;
     });
 
     it("renders a sub navigation with the correct items", () => {
@@ -122,7 +157,7 @@ describe("Your Cases step", () => {
     it("renders empty value string when getApplications returns an empty array", async () => {
       getApplicationsStub.resolves({ status: 200, data: [] });
 
-      const result = await client.get("/cases");
+      const result = await client.get("/cases", { session });
       expect(result.type).to.equal("render");
       const renderResult = result as TestRenderResult;
       const allTables = renderResult.getBlocksByVariant("govukTable");
@@ -139,6 +174,12 @@ describe("Your Cases step", () => {
 
       expect(visibleTables).to.have.length(0);
       expect(body).to.exist;
+    });
+
+    it("redirects to /select-office when selected office is missing", async () => {
+      const result = await client.get("/cases", { session: {} });
+      expect(result.type).to.equal("redirect");
+      expect((result as TestRedirectResult).url).to.equal("/select-office");
     });
   });
 });
