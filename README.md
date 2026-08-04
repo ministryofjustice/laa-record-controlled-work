@@ -118,17 +118,7 @@ docker stop {container_id}
 
 #### Running the full stack with Docker Compose
 
-Add `host.docker.internal` to your `/etc/hosts` if you haven't already (Docker Desktop on Mac does not add this automatically - it's required to reach the mock OAuth2 server from your browser):
-
-```bash
-echo '127.0.0.1 host.docker.internal' | sudo tee -a /etc/hosts
-```
-
-`make docker-up` (`yarn dev:docker`) runs RCW together with the RCW API, the datastore and CCQ, composed via `include` from those repos' own compose files (see [docker-compose.yml](docker-compose.yml)). This requires sibling checkouts, each with their own `.env`:
-
-- `../laa-record-controlled-work-api` (see its README/.env.example)
-- `../laa-info-and-advice-datastore` (see its README/.env.example)
-- `../laa-check-client-qualifies` (built via `make build` there - see its README)
+`make docker-up` (`yarn dev:docker`) runs RCW together with the RCW API, the datastore and CCQ, composed via `include` from those repos' own compose files (see [docker-compose.yml](docker-compose.yml)). This needs sibling checkouts of `laa-record-controlled-work-api`, `laa-info-and-advice-datastore` and `laa-check-client-qualifies`, each with their own `.env` - [docker/compose/up](docker/compose/up) handles this automatically: it clones any missing sibling repo alongside this one, copies each repo's `.env.example`/`.env.entra.example` to `.env`/`.env.entra` if missing, builds the CCQ image if it hasn't been already, checks `/etc/hosts` for `host.docker.internal` (Docker Desktop on Mac doesn't add this automatically - it's required to reach the mock OAuth2 server from your browser), then runs the compose command below. `make docker-up`/`make docker-up-entra` both call this script - see its usage comment for running it directly.
 
 Building the `rcw-api` image requires a `GITHUB_TOKEN` with `read:packages` scope - see
 `laa-record-controlled-work-api/.env.example` (picked up via the `--env-file` chain below).
@@ -150,12 +140,12 @@ By default, `make docker-up` signs in via the `mock-oauth2-server` container tha
 `info-and-advice-api` both trust this same container for resource-server validation and the OBO
 exchange, so the whole stack works without any real Entra app registrations.
 
-To sign in via real Entra ID instead (e.g. to test against a real app registration), copy `.env.entra.example` to `.env.entra` here, in `../laa-record-controlled-work-api`
-and in `../laa-info-and-advice-datastore`. You shouldn't need to change anything in it (it only ever
+To sign in via real Entra ID instead (e.g. to test against a real app registration), run `make docker-up-entra` (`yarn dev:docker:entra`) - [docker/compose/up](docker/compose/up) copies `.env.entra.example` to `.env.entra` here, in `../laa-record-controlled-work-api`
+and in `../laa-info-and-advice-datastore` if missing. You shouldn't need to change anything in it (it only ever
 holds 1Password references, never real secret values, so there's nothing developer-specific to set
 up).
 
-Run `make docker-up-entra` (`yarn dev:docker:entra`) - this switches the whole request chain (RCW sign-in -> rcw-api resource-server validation -> OBO exchange -> datastore resource-server validation) to point at the real Entra ID by chaining all three repos' `.env.entra` files through a single `op run` before merging in [docker-compose.entra.yml](docker-compose.entra.yml).
+This switches the whole request chain (RCW sign-in -> rcw-api resource-server validation -> OBO exchange -> datastore resource-server validation) to point at the real Entra ID by chaining all three repos' `.env.entra` files through a single `op run` before merging in [docker-compose.entra.yml](docker-compose.entra.yml).
 
 This only needs to override RCW's own sign-in authority - `rcw-api` and `info-and-advice-api` already fall back to their own `.env.entra` values via the `${VAR:-mock-default}` pattern in their own compose files.
 
