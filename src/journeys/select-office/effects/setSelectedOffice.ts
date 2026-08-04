@@ -3,8 +3,8 @@ import type { SelectOfficeContext } from "#/journeys/select-office/select-office
 
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import {
-  MissingSessionError,
-  OfficeNotFoundError,
+  InvalidSessionError,
+  SelectedOfficeNotFoundError,
 } from "#/journeys/journey.errors.js";
 import { logger } from "#/logger.js";
 
@@ -22,13 +22,13 @@ export const setSelectedOffice = () => (context: SelectOfficeContext) => {
     logger.error("Office not found", undefined, {
       officeCode: selectedOfficeCode,
     });
-    throw new OfficeNotFoundError();
+    throw new SelectedOfficeNotFoundError();
   }
 
   const session = context.getSession();
 
   if (!session) {
-    throw new MissingSessionError();
+    throw new InvalidSessionError();
   }
 
   session.selectedOffice = selectedOffice;

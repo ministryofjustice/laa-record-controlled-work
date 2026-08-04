@@ -11,7 +11,7 @@ import { Office, type OfficeData } from "#/dto/office/office.dto.js";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import {
   InvalidFirmCodeClaimError,
-  MissingSessionError,
+  InvalidSessionError,
 } from "#/journeys/journey.errors.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
@@ -72,7 +72,7 @@ export const loadOffices =
 function getFirmIdFromSession(context: SelectOfficeContext): number {
   const session = context.getSession();
   if (!session) {
-    throw new MissingSessionError();
+    throw new InvalidSessionError();
   }
 
   const claims = session.account?.idTokenClaims;
