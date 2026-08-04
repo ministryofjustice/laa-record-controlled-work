@@ -15,6 +15,7 @@ import {
 } from "#/journeys/common.blocks.js";
 import { dateInput } from "#/journeys/create-application/steps/client-details/client-details.blocks.js";
 import { JourneyEffects } from "#/journeys/effects.js";
+import { ANSWER_CODES } from "#/journeys/journey.constants.js";
 import { t } from "#/lib/i18n.js";
 
 const captionTitle = t("journeys.createApplication.caption");
@@ -40,8 +41,12 @@ export const clientDetailsStep = (
       backLink("/cases/new/legal-aid-before"),
       caption(captionTitle),
       heading(title),
-      requiredTextInput("firstName", firstNameLabel, firstNameRequired),
-      requiredTextInput("lastName", lastNameLabel, lastNameRequired),
+      requiredTextInput(
+        ANSWER_CODES.firstName,
+        firstNameLabel,
+        firstNameRequired,
+      ),
+      requiredTextInput(ANSWER_CODES.lastName, lastNameLabel, lastNameRequired),
       dateInput,
       continueButton,
     ],

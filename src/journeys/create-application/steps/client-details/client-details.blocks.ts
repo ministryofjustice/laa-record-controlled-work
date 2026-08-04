@@ -4,6 +4,7 @@ import {
   GovUKValidations,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
+import { ANSWER_CODES } from "#/journeys/journey.constants.js";
 import { t } from "#/lib/i18n.js";
 
 const dobLabel = t(
@@ -30,7 +31,7 @@ const dobMustBePast = t(
 );
 
 export const dateInput = GovUKDateInputFull({
-  code: "dateOfBirth",
+  code: ANSWER_CODES.dateOfBirth,
   fieldset: {
     legend: {
       classes: GovUKUtilityClasses.Fieldset.MediumLabel,
