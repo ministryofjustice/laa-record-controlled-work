@@ -1,6 +1,15 @@
 {
   "interactiveLogin": true,
   "loginPagePath": "/etc/mock-oauth2-login.html",
+  "httpServer": {
+    "type": "NettyWrapper",
+    "ssl": {
+      "keyPassword": "changeit",
+      "keystoreFile": "/etc/mock-oauth2-server.p12",
+      "keystoreType": "PKCS12",
+      "keystorePassword": "changeit"
+    }
+  },
   "tokenCallbacks": [
     {
       "issuerId": "default",

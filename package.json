@@ -19,7 +19,7 @@
     "dev": "op run --env-file=.env -- npx tsx scripts/dev-server-with-msw.ts",
     "dev:watch": "op run --env-file=.env -- yarn watch",
     "dev:docker": "op run --env-file=../laa-record-controlled-work-api/.env --env-file=../laa-info-and-advice-datastore/.env --env-file=.env -- docker compose up --watch --build",
-    "dev:docker:entra": "op run --env-file=../laa-record-controlled-work-api/.env --env-file=../laa-record-controlled-work-api/.env.entra --env-file=../laa-info-and-advice-datastore/.env --env-file=../laa-info-and-advice-datastore/.env.entra --env-file=.env --env-file=.env.entra -- docker compose -f docker-compose.yml -f docker-compose.entra.yml up --watch --build",
+    "dev:docker:entra": "op run --env-file=../laa-record-controlled-work-api/.env --env-file=../laa-record-controlled-work-api/.env.entra --env-file=../laa-info-and-advice-datastore/.env --env-file=../laa-info-and-advice-datastore/.env.entra --env-file=.env --env-file=.env.entra -- docker compose -f docker-compose.yml -f docker-compose.override.yml -f docker-compose.entra.yml up --watch --build",
     "watch": "yarn build && concurrently \"tsc --watch\" \"node public/esbuild/esbuild.js --watch\" \"nodemon --exec 'npx tsx scripts/dev-server-with-msw.ts'\"",
     "build": "yarn clean && tsc && node public/esbuild/esbuild.js",
     "clean": "rimraf public",

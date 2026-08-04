@@ -39,6 +39,9 @@ services:
         condition: service_started
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    volumes:
+      # MSAL requires an https authority (even for the local mock IdP) - trust its self-signed cert.
+      - ./docker/certs/mock-oauth2-server.crt.pem:/etc/mock-oauth2-server.crt.pem:ro
     env_file:
       - .env # load from .env first
     environment: # set overrides
@@ -49,10 +52,12 @@ services:
       - REDIS_URL=redis://redis-rcw:6379
       - REDIS_AUTH_TOKEN=${REDIS_AUTH_TOKEN:-redis_password}
       - ENTRA_REDIRECT_URI=http://localhost:8080/auth/code/callback
+      - NODE_EXTRA_CA_CERTS=/etc/mock-oauth2-server.crt.pem
       # Signs in via the mock-oauth2-server container by default, matching rcw-api and
       # info-and-advice-api's own defaults - see docker-compose.entra.yml to sign in via real
-      # Entra ID instead.
-      - ENTRA_AUTHORITY_BASE_URL=http://host.docker.internal:9090/
+      # Entra ID instead. MSAL rejects non-https authorities, so the mock server terminates
+      # TLS with a self-signed cert (see docker/certs) covering host.docker.internal.
+      - ENTRA_AUTHORITY_BASE_URL=https://host.docker.internal:9090/
       - ENTRA_TENANT_ID=default
       - ENTRA_CLIENT_ID=rcw
       - ENTRA_CLIENT_SECRET=not-used-by-mock-oauth2-server

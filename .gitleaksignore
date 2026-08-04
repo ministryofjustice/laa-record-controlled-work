@@ -1,0 +1,2 @@
+# Self-signed dev-only cert/key for mock-oauth2-server (see docker/certs/), safe to commit.
+docker/certs/mock-oauth2-server.key.pem:private-key:1
