@@ -5,6 +5,9 @@ import type {
 
 import { ApiResponseError, ApiValidationError } from "#/api/api.errors.js";
 import { Applications } from "#/api/clients/rcw/model/applications.zod.gen.js";
+import { getRcwApiDefaultOptions } from "#/api/getRcwApiDefaultOptions.js";
+import { getAuthDebugHeaders } from "#/auth/auth.debug.js";
+import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
 
@@ -13,7 +16,12 @@ export const loadYourCaseList =
     let response;
 
     try {
-      response = await deps.getApplications();
+      const session = context.getSession();
+      const opts = await getRcwApiDefaultOptions({
+        homeAccountId: session?.msal?.homeAccountId,
+        sessionId: session?.id,
+      });
+      response = await deps.getApplications({}, opts);
     } catch (error) {
       logger.error("Error fetching applications", error, {
         api: "getApplications",
@@ -22,9 +30,17 @@ export const loadYourCaseList =
     }
 
     if (response.status !== HTTP_STATUS.OK) {
-      logger.error("getApplications did not return 200", response, {
-        api: "getApplications",
-      });
+      logger.error(
+        "getApplications did not return 200",
+        {
+          authHeaders: getAuthDebugHeaders(response.headers),
+          data: response.data,
+          status: response.status,
+        },
+        {
+          api: "getApplications",
+        },
+      );
       throw new ApiResponseError();
     }
 
@@ -38,5 +54,5 @@ export const loadYourCaseList =
       throw ApiValidationError.from(result.error);
     }
     const caseList: Applications = result.data;
-    context.setData("caseList", caseList);
+    context.setData(CONTEXT_DATA_KEYS.caseList, caseList);
   };

@@ -10,6 +10,7 @@ const optionalEnvSchema = z.object({
   CONTACT_PHONE: z.string().optional(),
   DEPARTMENT_NAME: z.string().optional(),
   DEPARTMENT_URL: z.url().optional(),
+  PDA_API_BASE_URL: z.url().optional(),
   PORT: z.coerce.number().optional(),
   RATE_LIMIT_MAX: z.coerce.number().optional(),
   RATE_WINDOW_MS: z.coerce.number().optional(),
@@ -42,6 +43,7 @@ const requiredEnvSchema = z.object({
     "staging",
     "production",
   ]),
+  PDA_API_KEY: injected.nonempty(),
   SESSION_SECRET: z.string().nonempty(),
 });
 

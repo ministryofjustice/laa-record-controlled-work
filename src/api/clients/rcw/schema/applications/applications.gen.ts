@@ -4,6 +4,8 @@
  * Record Controlled Work API
  * OpenAPI spec version: 1.0.0
  */
+import config from "#/config.js";
+
 import type { Application } from "../../model/application.zod.gen.js";
 
 import type { Applications } from "../../model/applications.zod.gen.js";
@@ -12,7 +14,7 @@ import type { CreateApplicationRequestBody } from "../../model/createApplication
 
 import type { CreateApplicationResponseBody } from "../../model/createApplicationResponseBody.zod.gen.js";
 
-import { fetcher } from "../../../../../lib/fetch.js";
+import type { GetApplicationsParams } from "../../model/getApplicationsParams.zod.gen.js";
 
 export type getApplicationsResponse200 = {
   data: Applications;
@@ -54,25 +56,47 @@ export type getApplicationsResponseError = (
 export type getApplicationsResponse =
   getApplicationsResponseSuccess | getApplicationsResponseError;
 
-export const getGetApplicationsUrl = () => {
-  return `/api/v1/applications`;
+export const getGetApplicationsUrl = (params?: GetApplicationsParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `${config.api.rcw.baseUrl}/api/v1/applications?${stringifiedParams}`
+    : `${config.api.rcw.baseUrl}/api/v1/applications`;
 };
 
 /**
  * @summary Get all applications
  */
 export const getApplications = async (
+  params?: GetApplicationsParams,
   options?: RequestInit,
 ): Promise<getApplicationsResponse> => {
-  return fetcher<getApplicationsResponse>(getGetApplicationsUrl(), {
+  const res = await fetch(getGetApplicationsUrl(params), {
     ...options,
     method: "GET",
   });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getApplicationsResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getApplicationsResponse;
 };
 
-export type createApplicationResponse200 = {
+export type createApplicationResponse201 = {
   data: CreateApplicationResponseBody;
-  status: 200;
+  status: 201;
 };
 
 export type createApplicationResponse400 = {
@@ -100,7 +124,7 @@ export type createApplicationResponse500 = {
   status: 500;
 };
 
-export type createApplicationResponseSuccess = createApplicationResponse200 & {
+export type createApplicationResponseSuccess = createApplicationResponse201 & {
   headers: Headers;
 };
 export type createApplicationResponseError = (
@@ -117,7 +141,7 @@ export type createApplicationResponse =
   createApplicationResponseSuccess | createApplicationResponseError;
 
 export const getCreateApplicationUrl = () => {
-  return `/api/v1/applications`;
+  return `${config.api.rcw.baseUrl}/api/v1/applications`;
 };
 
 /**
@@ -127,12 +151,21 @@ export const createApplication = async (
   createApplicationRequestBody?: CreateApplicationRequestBody,
   options?: RequestInit,
 ): Promise<createApplicationResponse> => {
-  return fetcher<createApplicationResponse>(getCreateApplicationUrl(), {
+  const res = await fetch(getCreateApplicationUrl(), {
     ...options,
     method: "POST",
     headers: { "Content-Type": "application/json", ...options?.headers },
     body: JSON.stringify(createApplicationRequestBody),
   });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: createApplicationResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as createApplicationResponse;
 };
 
 export type getApplicationResponse200 = {
@@ -176,7 +209,7 @@ export type getApplicationResponse =
   getApplicationResponseSuccess | getApplicationResponseError;
 
 export const getGetApplicationUrl = (id: string) => {
-  return `/api/v1/applications/${id}`;
+  return `${config.api.rcw.baseUrl}/api/v1/applications/${id}`;
 };
 
 /**
@@ -186,8 +219,17 @@ export const getApplication = async (
   id: string,
   options?: RequestInit,
 ): Promise<getApplicationResponse> => {
-  return fetcher<getApplicationResponse>(getGetApplicationUrl(id), {
+  const res = await fetch(getGetApplicationUrl(id), {
     ...options,
     method: "GET",
   });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getApplicationResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getApplicationResponse;
 };

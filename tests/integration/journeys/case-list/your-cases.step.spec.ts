@@ -1,10 +1,20 @@
-import { TestRenderResult } from "@ministryofjustice/hmpps-forge/core/testing";
+import {
+  TestRedirectResult,
+  TestRenderResult,
+} from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
-import { yourCasesStep } from "#/journeys/your-cases/steps/your-cases/your-cases.step.js";
 import { createForgeTestClientForCaseList } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import sinon from "sinon";
 import { getGetApplicationsResponseMock } from "../../../mocks/api/rcw/fakers/applications/applications.faker.gen.js";
+
+const session = {
+  selectedOffice: {
+    address: "1 High Street, Leeds, LS1 1AA",
+    code: "LEEDS-01",
+  },
+  singleOffice: false,
+};
 
 describe("Your Cases step", () => {
   let getApplicationsStub: sinon.SinonStub;
@@ -17,7 +27,6 @@ describe("Your Cases step", () => {
       .resolves({ status: 200, data: mockData });
     client = createForgeTestClientForCaseList(
       { getApplications: getApplicationsStub },
-      yourCasesStep,
     );
   });
 
@@ -28,14 +37,20 @@ describe("Your Cases step", () => {
   describe("GET /cases", () => {
     let renderResult: TestRenderResult;
     let recordButton: RenderBlock;
+    let selectedOffice: RenderBlock;
     let table: RenderBlock;
     let subNavigation: RenderBlock;
 
     before(async () => {
-      const result = await client.get("/cases");
+      const result = await client.get("/cases", { session });
       expect(result.type).to.equal("render");
       renderResult = result as TestRenderResult;
       [recordButton] = renderResult.getBlocksByVariant("govukLinkButton");
+      selectedOffice = renderResult
+        .getBlocksByVariant("html")
+        .find((b) =>
+          String(b.properties.content).includes("Office:"),
+        ) as RenderBlock;
       [table] = renderResult.getBlocksByVariant("govukTable");
       [subNavigation] = renderResult.getBlocksByVariant("mojSubNavigation");
     });
@@ -50,6 +65,44 @@ describe("Your Cases step", () => {
 
     it("renders a link button", () => {
       expect(recordButton.properties.text).to.equal("Record a new case");
+    });
+
+    it("renders a selected office block", () => {
+      expect(selectedOffice).to.exist;
+    });
+
+    it("renders the change link when singleOffice is false", () => {
+      const changeLink = String(selectedOffice.properties.content).includes(
+        'href="/select-office/"',
+      );
+      expect(changeLink).to.be.true;
+    });
+
+    it("does not render the change link when singleOffice is true", async () => {
+      const result = await client.get("/cases", {
+        session: {
+          selectedOffice: {
+            address: "1 High Street, Leeds, LS1 1AA",
+            code: "LEEDS-01",
+          },
+          singleOffice: true,
+        },
+      });
+      expect(result.type).to.equal("render");
+
+      const renderResult = result as TestRenderResult;
+      const selectedOfficeBlock = renderResult
+        .getBlocksByVariant("html")
+        .find((b) =>
+          String(b.properties.content).includes("Office:"),
+        ) as RenderBlock;
+
+      expect(selectedOfficeBlock).to.exist;
+
+      const changeLink = String(selectedOfficeBlock.properties.content).includes(
+        'href="/select-office/"',
+      );
+      expect(changeLink).to.be.false;
     });
 
     it("renders a sub navigation with the correct items", () => {
@@ -104,17 +157,29 @@ describe("Your Cases step", () => {
     it("renders empty value string when getApplications returns an empty array", async () => {
       getApplicationsStub.resolves({ status: 200, data: [] });
 
-      const result = await client.get("/cases");
+      const result = await client.get("/cases", { session });
       expect(result.type).to.equal("render");
       const renderResult = result as TestRenderResult;
       const allTables = renderResult.getBlocksByVariant("govukTable");
       const visibleTables = allTables.filter(
         (b) => b.properties.visibleWhen !== false,
       );
-      const [_, body] = renderResult.getBlocksByVariant("html");
+      const body = renderResult
+        .getBlocksByVariant("html")
+        .find((b) =>
+          String(b.properties.content).includes(
+            "You have no cases in progress",
+          ),
+        ) as RenderBlock;
 
       expect(visibleTables).to.have.length(0);
-      expect(body.properties.content).to.equal("You have no cases in progress");
+      expect(body).to.exist;
+    });
+
+    it("redirects to /select-office when selected office is missing", async () => {
+      const result = await client.get("/cases", { session: {} });
+      expect(result.type).to.equal("redirect");
+      expect((result as TestRedirectResult).url).to.equal("/select-office");
     });
   });
 });

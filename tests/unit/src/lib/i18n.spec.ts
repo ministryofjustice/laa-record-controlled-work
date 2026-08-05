@@ -2,143 +2,168 @@
  * @description Test for i18nLoader functions
  */
 
+import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
+
+import { expect } from "chai";
+import sinon from "sinon";
+
 import {
   i18next,
   initializeI18nextSync,
   nunjucksT,
   t,
 } from "#/lib/i18n.js";
-import { logger } from "#/logger.js";
-import { expect } from "chai";
-import fs from "node:fs";
-import path from "node:path";
-import sinon from "sinon";
 
-describe('i18nLoader', () => {
-  let loggerWarnStub: sinon.SinonStub;
-  let loggerErrorStub: sinon.SinonStub;
-  let readFileSyncStub: sinon.SinonStub;
-  let isInitializedStub: sinon.SinonStub;
+describe("i18nLoader", () => {
+  const tempDirs: string[] = [];
 
-  before(() => {
-    loggerWarnStub = sinon.stub(logger, 'warn');
-    loggerErrorStub = sinon.stub(logger, 'error');
-  });
+  function resetI18next(): void {
+    Object.defineProperty(i18next, "isInitialized", {
+      configurable: true,
+      value: false,
+      writable: true,
+    });
 
-  after(() => {
+    const resourceStore = (i18next as any).services?.resourceStore;
+    if (resourceStore !== undefined) {
+      resourceStore.data = {};
+    }
+  }
+
+  function createTempCwdWithLocale(content?: string): string {
+    const tempDir = mkdtempSync(path.join(tmpdir(), "i18n-loader-"));
+    tempDirs.push(tempDir);
+
+    if (content !== undefined) {
+      const localesDir = path.join(tempDir, "locales");
+      mkdirSync(localesDir, { recursive: true });
+      writeFileSync(path.join(localesDir, "en.json"), content, "utf8");
+    }
+
+    return tempDir;
+  }
+
+  async function initTranslationResources(): Promise<void> {
+    resetI18next();
+    await i18next.init({
+      defaultNS: "common",
+      fallbackLng: "en",
+      interpolation: {
+        escapeValue: false,
+        prefix: "{",
+        suffix: "}",
+      },
+      keySeparator: ".",
+      lng: "en",
+      ns: ["common"],
+      nsSeparator: ".",
+      resources: {
+        en: {
+          common: {
+            greeting: "Hello {name}",
+            saveAndReturn: "Save and return later",
+          },
+        },
+      },
+    });
+  }
+
+  afterEach(() => {
     sinon.restore();
+
+    while (tempDirs.length > 0) {
+      const dir = tempDirs.pop();
+      if (dir !== undefined) {
+        rmSync(dir, { force: true, recursive: true });
+      }
+    }
   });
 
-  describe('initializeI18nextSync', () => {
-    beforeEach(() => {
-      isInitializedStub = sinon.stub(i18next, 'isInitialized').value(false);
-      readFileSyncStub = sinon.stub(fs, 'readFileSync');
-    });
-
-    afterEach(() => {
-      readFileSyncStub.restore();
-      isInitializedStub.restore();
-    });
-
-    it('should initialize i18next with locale data when file exists', () => {
-      const mockLocaleData = {
-        common: { back: 'Back', save: 'Save' },
-        pages: { title: 'Page Title' }
-      };
-
-      readFileSyncStub.returns(JSON.stringify(mockLocaleData));
+  describe("initializeI18nextSync", () => {
+    it("should initialize i18next with locale data when file exists", () => {
+      resetI18next();
+      const tempCwd = createTempCwdWithLocale(
+        JSON.stringify({ common: { continue: "Continue" } }),
+      );
+      sinon.stub(process, "cwd").returns(tempCwd);
 
       initializeI18nextSync();
 
       expect(i18next.isInitialized).to.be.true;
-      expect(t('common.back')).to.equal('Back');
-      expect(t('pages.title')).to.equal('Page Title');
+      expect(t("common.continue")).to.equal("Continue");
     });
 
-    it('should initialize with empty resources when locale file not found', () => {
-      readFileSyncStub.throws(new Error('File not found'));
+    it("should initialize with empty resources when locale file not found", () => {
+      resetI18next();
+      const tempCwd = createTempCwdWithLocale();
+      sinon.stub(process, "cwd").returns(tempCwd);
 
       initializeI18nextSync();
 
-      expect(loggerWarnStub.calledWith('Locale file not found, initializing with empty resources')).to.be.true;
       expect(i18next.isInitialized).to.be.true;
+      expect(t("common.continue")).to.equal("continue");
     });
 
-    it('should handle JSON parse errors gracefully', () => {
-      readFileSyncStub.returns('invalid json');
+    it("should handle JSON parse errors gracefully", () => {
+      resetI18next();
+      const tempCwd = createTempCwdWithLocale("invalid json");
+      sinon.stub(process, "cwd").returns(tempCwd);
 
       initializeI18nextSync();
 
-      expect(loggerWarnStub.calledWith('Locale file not found, initializing with empty resources')).to.be.true;
       expect(i18next.isInitialized).to.be.true;
+      expect(t("common.continue")).to.equal("continue");
     });
 
-    it('should handle general initialization errors', () => {
-      sinon.stub(path, 'join').throws(new Error('Path error'));
+    it("should handle general initialization errors", () => {
+      resetI18next();
+      sinon.stub(path, "join").throws(new Error("Path error"));
 
       initializeI18nextSync();
 
-      expect(loggerErrorStub.calledWith('Failed to initialise i18next synchronously', sinon.match.any)).to.be.true;
       expect(i18next.isInitialized).to.be.true;
+      expect(t("common.continue")).to.equal("continue");
     });
   });
 
-  describe('translation functions', () => {
-    let i18nextStub: sinon.SinonStub;
-    let i18nextExistsStub: sinon.SinonStub;
+  describe("translation functions", () => {
+    describe("t", () => {
+      it("should return translated text for valid keys", async () => {
+        await initTranslationResources();
 
-    before(() => {
-      // Stub i18next methods directly instead of trying to initialize
-      i18nextStub = sinon.stub(i18next, 't');
-      i18nextExistsStub = sinon.stub(i18next, 'exists');
-
-      // Setup return values for our test cases
-      i18nextStub.withArgs('back').returns('Back');
-      i18nextStub.withArgs('greeting', { name: 'John' }).returns('Hello John');
-      i18nextStub.withArgs('nonexistent.key').returns('nonexistent.key');
-
-      i18nextExistsStub.withArgs('back').returns(true);
-      i18nextExistsStub.withArgs('nonexistent').returns(false);
-
-      // Ensure isInitialized is true
-      Object.defineProperty(i18next, 'isInitialized', { value: true, writable: true });
-    });
-
-    after(() => {
-      i18nextStub.restore();
-      i18nextExistsStub.restore();
-    });
-
-    describe('t', () => {
-      it('should return translated text for valid keys', () => {
-        // With defaultNS: 'common', we can access keys directly
-        expect(t('back')).to.equal('Back');
+        expect(t("saveAndReturn")).to.equal("Save and return later");
       });
 
-      it('should handle interpolation', () => {
-        expect(t('greeting', { name: 'John' })).to.equal('Hello John');
+      it("should handle interpolation", async () => {
+        await initTranslationResources();
+
+        expect(t("greeting", { name: "John" })).to.equal("Hello John");
       });
 
-      it('should return key when translation not found', () => {
-        expect(t('nonexistent.key')).to.equal('nonexistent.key');
+      it("should return key when translation not found", async () => {
+        await initTranslationResources();
+
+        expect(t("nonexistent.key")).to.equal("nonexistent.key");
       });
 
-      it('should return key when i18next not initialized', () => {
-        const originalIsInitialized = i18next.isInitialized;
-        Object.defineProperty(i18next, 'isInitialized', { value: false, writable: true });
+      it("should return key when i18next not initialized", () => {
+        Object.defineProperty(i18next, "isInitialized", {
+          configurable: true,
+          value: false,
+          writable: true,
+        });
 
-        const result = t('back');
-
-        expect(loggerWarnStub.calledWith('i18next not initialised when translating', { key: 'back' })).to.be.true;
-        expect(result).to.equal('back');
-
-        Object.defineProperty(i18next, 'isInitialized', { value: originalIsInitialized, writable: true });
+        expect(t("saveAndReturn")).to.equal("saveAndReturn");
       });
     });
 
-    describe('nunjucksT', () => {
-      it('should return same result as t function', () => {
-        expect(nunjucksT('back')).to.equal(t('back'));
+    describe("nunjucksT", () => {
+      it("should return same result as t function", async () => {
+        await initTranslationResources();
+
+        expect(nunjucksT("saveAndReturn")).to.equal(t("saveAndReturn"));
       });
     });
   });

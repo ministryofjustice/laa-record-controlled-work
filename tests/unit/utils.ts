@@ -22,6 +22,10 @@ export function createMockApp({ seedSession = true } = {}): Application {
     res.json({ csrfToken: req.csrfToken?.() });
   });
 
+  app.get("/test/session", (req, res) => {
+    res.json(req.session);
+  });
+
   // Seed auth flow state on the session so callback handler guards pass.
   // The state value must match the query param sent in the test request.
   // eslint-disable-next-line @typescript-eslint/no-empty-object-type -- only need to define query param

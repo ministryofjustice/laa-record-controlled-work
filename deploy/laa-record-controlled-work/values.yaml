@@ -19,6 +19,10 @@ ingress:
   annotations:
     external-dns.alpha.kubernetes.io/set-identifier: ""
     external-dns.alpha.kubernetes.io/aws-weight: "100"
+    nginx.ingress.kubernetes.io/hsts: "true"
+    nginx.ingress.kubernetes.io/hsts-max-age: "15552001"
+    nginx.ingress.kubernetes.io/hsts-include-subdomains: "true"
+    nginx.ingress.kubernetes.io/hsts-preload: "true"
 
 networkPolicy:
   enabled: true
@@ -29,7 +33,7 @@ rcw:
   image:
     repository: nginx
     pullPolicy: Always
-    tag: "@sha256:5a88c9c45479443d7be2eadc894b4ed0a9801bae03d97a5760ae13b5c2005942"
+    tag: "@sha256:21f8c0e3416b84eeec895c80077da69e2d25938cb0fc4bcc6a2ea33699b75703"
 
   imagePullSecrets: []
   podAnnotations: {}
@@ -98,6 +102,7 @@ rcw:
     - ENTRA_CLIENT_ID
     - ENTRA_CLIENT_SECRET
     - ENTRA_TENANT_ID
+    - PDA_API_KEY
 
   # Plain env vars injected directly into the container. Add new vars 
   # here only, they are automatically picked up by the Helm template and 
@@ -120,6 +125,7 @@ rcw:
     RATE_WINDOW_MS: 900000
     NODE_ENV: ""
     RCW_API_BASE_URL: ""
+    PDA_API_BASE_URL: ""
     ENTRA_AUTHORITY_BASE_URL: "https://login.microsoftonline.com/"
     ENTRA_REDIRECT_URI: ""
     REDIS_ENABLED: true  
@@ -176,7 +182,7 @@ nginx:
     # Overridden at deploy time to ECR; see deploy.sh and docker-images.env
     repository: nginxinc/nginx-unprivileged
     pullPolicy: Always
-    tag: alpine@sha256:59ccf0943b0b8e8d9e6ea9039a39555730f544701a655c596f7df7d096c593f5
+    tag: alpine@sha256:a6c3ec0c0d249d68b0682df854d4a9e222b90fb607dc3fcf2f1d2fcbc85d347e
 
   resources:
     limits:

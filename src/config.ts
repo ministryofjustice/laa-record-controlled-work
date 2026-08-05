@@ -21,7 +21,10 @@ const REDIS_MAX_RETRY_ATTEMPTS = 10;
 const DEFAULT_REDIS_PORT = 6379;
 const DEFAULT_REDIS_HOST = "localhost";
 const DEFAULT_RCW_API_BASE_URL = "http://localhost:8081";
+const DEFAULT_PDA_API_BASE_URL = "http://localhost:8081";
 const DEFAULT_API_MODE = "msw";
+const ENTRA_APPLICATIONS_READ_SCOPE =
+  "https://devlexternal.onmicrosoft.com/laa-record-controlled-work-api-uat/Applications.Read";
 
 /* eslint-disable @typescript-eslint/no-magic-numbers -- time constants are intuitive */
 const REDIS_SOCKET_CONNECTION_TIMEOUT = 10 * SECOND;
@@ -34,9 +37,14 @@ const useHttps = ["production", "staging", "uat"].includes(required.NODE_ENV);
 export default {
   api: {
     mode: optional.API_MODE ?? DEFAULT_API_MODE,
+    pda: {
+      baseUrl: optional.PDA_API_BASE_URL ?? DEFAULT_PDA_API_BASE_URL,
+      key: required.PDA_API_KEY,
+    },
     rcw: {
       baseUrl: optional.RCW_API_BASE_URL ?? DEFAULT_RCW_API_BASE_URL,
     },
+    useMockAccessToken: required.NODE_ENV === "test",
   } satisfies ApiConfig,
 
   app: {
@@ -83,7 +91,7 @@ export default {
       "openid",
       "profile",
       "offline_access",
-      "https://devlexternal.onmicrosoft.com/laa-record-controlled-work-api-uat/Applications.Read",
+      ENTRA_APPLICATIONS_READ_SCOPE,
     ],
   } satisfies EntraConfig,
 

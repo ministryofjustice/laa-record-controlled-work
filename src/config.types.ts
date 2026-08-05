@@ -2,9 +2,14 @@ import type { SessionOptions } from "express-session";
 
 export interface ApiConfig {
   mode: string;
+  pda: {
+    baseUrl: string;
+    key: string;
+  };
   rcw: {
     baseUrl: string;
   };
+  useMockAccessToken: boolean;
 }
 
 export interface AppConfig {

@@ -23,3 +23,10 @@ export const UK_EXCLUSIVE_ADDRESS_FIELDS = Object.values(
 export const OVERSEAS_EXCLUSIVE_ADDRESS_FIELDS = Object.values(
   OVERSEAS_EXCLUSIVE_ADDRESS_FIELD,
 );
+
+export const CONTEXT_DATA_KEYS = {
+  caseList: "caseList",
+  officeList: "officeList",
+  selectedOffice: "selectedOffice",
+  singleOffice: "singleOffice",
+};

@@ -5,7 +5,8 @@
     "submit": "Save and continue",
     "signOut": "Sign out",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "change": "Change"
   },
   "components": {
     "phaseBanner": {
@@ -27,6 +28,7 @@
         "heading": "You have no cases"
       },
       "createCaseButton": "Record a new case",
+      "office": "Office",
       "tabs": {
         "inProgress": "In progress",
         "recorded": "Recorded",
@@ -48,6 +50,12 @@
     }
   },
   "journeys": {
+    "selectOffice": {
+      "title": "Select the office you're recording cases from",
+      "validation": {
+        "required": "Select the office you're recording cases from"
+      }
+    },
     "createApplication": {
       "declaration": {
         "title": "Declaration",
@@ -195,9 +203,6 @@
           "dateOfBirth": "Date of birth",
           "niNumber": "National Insurance number",
           "address": "Address"
-        },
-        "changeLink": {
-          "change": "Change"
         }
       },
       "taskList": {

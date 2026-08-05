@@ -31,3 +31,6 @@ coverage/
 # Local workspace
 .local/
 **/*.cjs
+
+# PDA API spec
+.pda-api/

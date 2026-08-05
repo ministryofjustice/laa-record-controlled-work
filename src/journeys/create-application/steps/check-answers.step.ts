@@ -13,6 +13,7 @@ import {
   GovUKSummaryList,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
+import { CreateApplicationEffects } from "#/journeys/create-application/create-application.effects.js";
 import { DEFAULT_CASE_REFERENCE_NUMBER } from "#/journeys/edit-application/steps/task-list/task-list.step.js";
 import { submitButton } from "#/journeys/evidence/common.blocks.js";
 import { t } from "#/lib/i18n.js";
@@ -73,7 +74,9 @@ const changeAddressRedirect = match(Answer("postcode"))
   )
   .otherwise("enter-overseas-address?returnTo=check-answers");
 
-export const checkAnswersStep = (): ReturnType<typeof step> =>
+export const checkAnswersStep = (
+  journeyCode: string,
+): ReturnType<typeof step> =>
   step({
     blocks: [
       GovUKHeading({
@@ -86,9 +89,7 @@ export const checkAnswersStep = (): ReturnType<typeof step> =>
               items: [
                 {
                   href: "ecf?returnTo=check-answers",
-                  text: t(
-                    "journeys.createApplication.checkAnswers.changeLink.change",
-                  ),
+                  text: t("common.change"),
                   visuallyHiddenText: t(
                     "journeys.createApplication.checkAnswers.answerLabels.ecf",
                   ),
@@ -107,9 +108,7 @@ export const checkAnswersStep = (): ReturnType<typeof step> =>
               items: [
                 {
                   href: "legal-aid-before?returnTo=check-answers",
-                  text: t(
-                    "journeys.createApplication.checkAnswers.changeLink.change",
-                  ),
+                  text: t("common.change"),
                   visuallyHiddenText: t(
                     "journeys.createApplication.checkAnswers.answerLabels.legalAidBefore",
                   ),
@@ -128,9 +127,7 @@ export const checkAnswersStep = (): ReturnType<typeof step> =>
               items: [
                 {
                   href: "legal-aid-last-6-months?returnTo=check-answers",
-                  text: t(
-                    "journeys.createApplication.checkAnswers.changeLink.change",
-                  ),
+                  text: t("common.change"),
                   visuallyHiddenText: t(
                     "journeys.createApplication.checkAnswers.answerLabels.legalAidLast6Months",
                   ),
@@ -152,9 +149,7 @@ export const checkAnswersStep = (): ReturnType<typeof step> =>
               items: [
                 {
                   href: "legal-aid-last-6-months?returnTo=check-answers",
-                  text: t(
-                    "journeys.createApplication.checkAnswers.changeLink.change",
-                  ),
+                  text: t("common.change"),
                   visuallyHiddenText: t(
                     "journeys.createApplication.checkAnswers.answerLabels.legalAidLast6MonthsReasonForYes",
                   ),
@@ -176,9 +171,7 @@ export const checkAnswersStep = (): ReturnType<typeof step> =>
               items: [
                 {
                   href: "client-details?returnTo=check-answers",
-                  text: t(
-                    "journeys.createApplication.checkAnswers.changeLink.change",
-                  ),
+                  text: t("common.change"),
                   visuallyHiddenText: t(
                     "journeys.createApplication.checkAnswers.answerLabels.firstName",
                   ),
@@ -197,9 +190,7 @@ export const checkAnswersStep = (): ReturnType<typeof step> =>
               items: [
                 {
                   href: "client-details?returnTo=check-answers",
-                  text: t(
-                    "journeys.createApplication.checkAnswers.changeLink.change",
-                  ),
+                  text: t("common.change"),
                   visuallyHiddenText: t(
                     "journeys.createApplication.checkAnswers.answerLabels.lastName",
                   ),
@@ -218,9 +209,7 @@ export const checkAnswersStep = (): ReturnType<typeof step> =>
               items: [
                 {
                   href: "client-details?returnTo=check-answers",
-                  text: t(
-                    "journeys.createApplication.checkAnswers.changeLink.change",
-                  ),
+                  text: t("common.change"),
                   visuallyHiddenText: t(
                     "journeys.createApplication.checkAnswers.answerLabels.dateOfBirth",
                   ),
@@ -239,9 +228,7 @@ export const checkAnswersStep = (): ReturnType<typeof step> =>
               items: [
                 {
                   href: "ni-number?returnTo=check-answers",
-                  text: t(
-                    "journeys.createApplication.checkAnswers.changeLink.change",
-                  ),
+                  text: t("common.change"),
                   visuallyHiddenText: t(
                     "journeys.createApplication.checkAnswers.answerLabels.niNumber",
                   ),
@@ -261,9 +248,7 @@ export const checkAnswersStep = (): ReturnType<typeof step> =>
               items: [
                 {
                   href: changeAddressRedirect,
-                  text: t(
-                    "journeys.createApplication.checkAnswers.changeLink.change",
-                  ),
+                  text: t("common.change"),
                   visuallyHiddenText: t(
                     "journeys.createApplication.checkAnswers.answerLabels.address",
                   ),
@@ -288,6 +273,7 @@ export const checkAnswersStep = (): ReturnType<typeof step> =>
     onSubmission: [
       submit({
         onAlways: {
+          effects: [CreateApplicationEffects.createApplication(journeyCode)],
           next: [
             redirect({
               goto: `/cases/${DEFAULT_CASE_REFERENCE_NUMBER}/task-list`,

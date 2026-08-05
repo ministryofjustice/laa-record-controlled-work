@@ -13,6 +13,7 @@ import {
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 import { MOJSubNavigation } from "@ministryofjustice/hmpps-forge/moj-components";
 
+import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import { t } from "#/lib/i18n.js";
 
 export const subNavigation = MOJSubNavigation({
@@ -65,10 +66,12 @@ export const casesTable = (cases: ChainableRef): GovUKTable =>
         },
       ]),
     ),
-    visibleWhen: Data("caseList").match(Condition.IsRequired()),
+    visibleWhen: Data(CONTEXT_DATA_KEYS.caseList).match(Condition.IsRequired()),
   });
 
 export const noCasesMessage = GovUKBody({
   text: t("pages.yourCases.table.emptyMessage.recorded"),
-  visibleWhen: Data("caseList").not.match(Condition.IsRequired()),
+  visibleWhen: Data(CONTEXT_DATA_KEYS.caseList).not.match(
+    Condition.IsRequired(),
+  ),
 });

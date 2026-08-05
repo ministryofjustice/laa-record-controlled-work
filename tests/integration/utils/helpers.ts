@@ -17,11 +17,20 @@ import {
   JourneyEffects,
   JourneyEffectsImplementations,
 } from "#/journeys/effects.js";
-import { YourCasesEffectsDeps } from "#/journeys/your-cases/your-cases.types.js";
-import { yourCasesEffectsRegistry } from "#/journeys/your-cases/your-cases.effects.js";
+import type { SelectOfficeEffectsDeps } from "#/journeys/select-office/select-office.types.js";
+import { selectOfficeEffectsRegistry } from "#/journeys/select-office/select-office.effects.js";
+import { selectOfficeJourney } from "#/journeys/select-office/select-office.journey.js";
+import type { YourCasesEffectsDeps } from "#/journeys/your-cases/your-cases.types.js";
+import { yourCasesPackage } from "#/journeys/your-cases/your-cases.journey.js";
+import { createApplicationEffectsRegistry } from "#/journeys/create-application/create-application.effects.js";
+import sinon from "sinon";
+import { getCreateApplicationResponseMock } from "../../mocks/api/rcw/fakers/applications/applications.faker.gen.js";
 
 /**
- * Creates a test client for a single-step journey under /cases/new.
+
+ * Creates a test client for a single-step journey under /create-application.
+ * @param {string} title - The title of the journey.
+ * @param {string} path - The path of the journey.
  * @param {...any} steps - Step definitions to include in the test journey.
  * @returns {ForgeTestClient} A configured test client.
  */
@@ -30,6 +39,12 @@ export function createForgeTestClient(
   path: string,
   ...steps: StepDefinition[]
 ): ForgeTestClient {
+    let createApplicationStub: sinon.SinonStub;
+    const mockData = getCreateApplicationResponseMock();
+        createApplicationStub = sinon
+          .stub()
+          .resolves({ status: 201, data: mockData });
+
   const testJourney = journey({
     code: "testJourney",
     path: path,
@@ -45,7 +60,7 @@ export function createForgeTestClient(
   });
 
   const testPackage = createTestPackage({
-    functions: JourneyEffectsImplementations,
+    functions: createApplicationEffectsRegistry,
     journey: testJourney,
   });
 
@@ -53,7 +68,28 @@ export function createForgeTestClient(
     .registerGlobalComponents(govukComponents)
     .registerGlobalComponents([autocomplete])
     .registerGlobalFunctions(nunjucksFunctions)
-    .registerPackage(testPackage)
+    .registerGlobalFunctions(JourneyEffectsImplementations)
+    .registerPackage(testPackage, { createApplication: createApplicationStub })
+    .createClient();  
+}
+
+/**
+ * Creates a test client for the select office journey.
+ * @param {SelectOfficeEffectsDeps} mockDeps - mock implementations for the journey's effect functions
+ * @returns {ForgeTestClient} A configured test client.
+ */
+export function createForgeTestClientForSelectOffice(
+  mockDeps: SelectOfficeEffectsDeps,
+): ForgeTestClient {
+  const testPackage = createTestPackage({
+    functions: selectOfficeEffectsRegistry,
+    journey: selectOfficeJourney,
+  });
+
+  return new ForgeTestHarness()
+    .registerGlobalComponents(govukComponents)
+    .registerGlobalFunctions(nunjucksFunctions)
+    .registerPackage(testPackage, mockDeps)
     .createClient();
 }
 
@@ -65,27 +101,12 @@ export function createForgeTestClient(
  */
 export function createForgeTestClientForCaseList(
   mockYourCasesEffectsDeps: YourCasesEffectsDeps,
-  ...steps: StepDefinition[]
 ): ForgeTestClient {
-  
-  const testJourney = journey({
-    code: "yourCases",
-    path: "/",
-    reachability: { disableReachabilityChecks: true },
-    steps,
-    title: "Your Cases",
-    view: { template: "partials/case-list-step" },
-  });
-
-  const testPackage = createTestPackage({
-    functions: yourCasesEffectsRegistry,
-    journey: testJourney,
-  });
-
   return new ForgeTestHarness()
     .registerGlobalComponents(govukComponents)
     .registerGlobalComponents(mojComponents)
     .registerGlobalFunctions(nunjucksFunctions)
-    .registerPackage(testPackage, mockYourCasesEffectsDeps)
+    .registerPackage(yourCasesPackage, mockYourCasesEffectsDeps)
+    .registerGlobalFunctions(JourneyEffectsImplementations)
     .createClient();
 }
