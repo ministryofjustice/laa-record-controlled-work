@@ -39,11 +39,12 @@ export function createForgeTestClient(
   path: string,
   ...steps: StepDefinition[]
 ): ForgeTestClient {
-    let createApplicationStub: sinon.SinonStub;
-    const mockData = getCreateApplicationResponseMock();
-        createApplicationStub = sinon
-          .stub()
-          .resolves({ status: 201, data: mockData });
+  let createApplicationStub: sinon.SinonStub;
+  const uuid = "123e4567-e89b-12d3-a456-426614174000";
+  const mockData = getCreateApplicationResponseMock({id: uuid});
+  createApplicationStub = sinon
+    .stub()
+    .resolves({ status: 201, data: mockData });
 
   const testJourney = journey({
     code: "testJourney",
@@ -70,7 +71,7 @@ export function createForgeTestClient(
     .registerGlobalFunctions(nunjucksFunctions)
     .registerGlobalFunctions(JourneyEffectsImplementations)
     .registerPackage(testPackage, { createApplication: createApplicationStub })
-    .createClient();  
+    .createClient();
 }
 
 /**

@@ -1,3 +1,4 @@
+import type { ResolvableString } from "@ministryofjustice/hmpps-forge/core/components";
 import { Status, type TaskListItem } from "#/journeys/journey.types.js";
 import { t } from "#/lib/i18n.js";
 
@@ -10,7 +11,7 @@ import { t } from "#/lib/i18n.js";
  */
 export function taskItem(
   title: string,
-  href: string,
+  href: ResolvableString,
   status: Status,
 ): TaskListItem {
   switch (status) {

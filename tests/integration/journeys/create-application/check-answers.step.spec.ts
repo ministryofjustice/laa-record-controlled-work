@@ -114,7 +114,7 @@ describe("Check answers step", () => {
       });
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
-      expect(redirectResult.url).to.equal("/cases/CW-123456/task-list");
+      expect(redirectResult.url).to.equal("/cases/123e4567-e89b-12d3-a456-426614174000/task-list");
     });
   });
 });

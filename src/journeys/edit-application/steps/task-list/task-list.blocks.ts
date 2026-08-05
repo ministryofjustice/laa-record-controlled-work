@@ -3,7 +3,7 @@ import type {
   ResolvableString,
 } from "@ministryofjustice/hmpps-forge/core/components";
 
-import { Format } from "@ministryofjustice/hmpps-forge/core/authoring";
+import { Format, Params } from "@ministryofjustice/hmpps-forge/core/authoring";
 import {
   GovUKBody,
   GovUKButton,
@@ -16,6 +16,7 @@ import type { TaskListData } from "#/journeys/edit-application/steps/task-list/t
 import { taskItem } from "#/journeys/edit-application/steps/task-list/task-list.helpers.js";
 import { H2 } from "#/lib/constants/headings.js";
 import { t } from "#/lib/i18n.js";
+import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
 
 /**
  * Builds a GovUKBody block for the case reference number.
@@ -68,7 +69,7 @@ export function taskList(taskListData: TaskListData): BlockDefinition[] {
           t(
             "journeys.createApplication.taskList.meansAssessment.taskItem.label",
           ),
-          `/cases/${taskListData.caseReferenceNumber}/eligibility/`,
+          Format("`/cases/%1/eligibility/`", Params(PARAMS_KEYS.applicationID)),
           taskListData.meansAssessment.status,
         ),
       ],

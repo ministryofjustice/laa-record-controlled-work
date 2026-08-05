@@ -10,7 +10,7 @@ import { taskListStep } from "#/journeys/edit-application/steps/task-list/task-l
 describe("Task list step", () => {
   const client = createForgeTestClient(
     "Edit case",
-    "/cases/CW-123456/",
+    "/cases/123e4567-e89b-12d3-a456-426614174000/",
     taskListStep(),
   );
   const session = {
@@ -19,7 +19,7 @@ describe("Task list step", () => {
     },
   };
 
-  describe("GET /cases/CW-123456/task-list", () => {
+  describe("GET /cases/123e4567-e89b-12d3-a456-426614174000/task-list", () => {
     let renderResult: TestRenderResult;
     let heading: RenderBlock;
     let body: RenderBlock;
@@ -27,7 +27,7 @@ describe("Task list step", () => {
     let submitButton: RenderBlock;
 
     before(async () => {
-      const result = await client.get("/cases/CW-123456/task-list", {
+      const result = await client.get("/cases/123e4567-e89b-12d3-a456-426614174000/task-list", {
         session,
       });
       expect(result.type).to.equal("render");
@@ -42,7 +42,7 @@ describe("Task list step", () => {
     });
 
     it("renders the reference number", () => {
-      expect(body.properties.content).to.equal("Reference number: CW-123456");
+      expect(body.properties.content).to.equal("Reference number: 123e4567-e89b-12d3-a456-426614174000");
     });
 
     it("renders 3 task list sections", () => {
@@ -69,7 +69,7 @@ describe("Task list step", () => {
       }>;
       expect(items.length).to.equal(1);
       expect(items[0].title.text).to.equal("Income and capital");
-      expect(items[0].href).to.equal("/cases/CW-123456/eligibility/");
+      expect(items[0].href).to.equal("/cases/123e4567-e89b-12d3-a456-426614174000/eligibility/");
       expect(items[0].status.tag.text).to.equal("Incomplete");
     });
 
@@ -92,9 +92,9 @@ describe("Task list step", () => {
     });
   });
 
-  describe("POST /cases/CW-123456/task-list", () => {
+  describe("POST /cases/123e4567-e89b-12d3-a456-426614174000/task-list", () => {
     it("redirects to the case list", async () => {
-      const result = await client.post("/cases/CW-123456/task-list", {
+      const result = await client.post("/cases/123e4567-e89b-12d3-a456-426614174000/task-list", {
         session,
       });
       expect(result.type).to.equal("redirect");
