@@ -1,5 +1,5 @@
 import type { BlockDefinition } from "@ministryofjustice/hmpps-forge/core/components";
-
+import type { ResolvableString } from "@ministryofjustice/hmpps-forge/core/components";
 import { Format } from "@ministryofjustice/hmpps-forge/core/authoring";
 import {
   GovUKBody,
@@ -20,7 +20,7 @@ import { t } from "#/lib/i18n.js";
  * @returns A GovUKBody block definition.
  */
 export function caseReferenceNumber(
-  caseRefNumber: string,
+  caseRefNumber: ResolvableString,
 ): ReturnType<typeof GovUKBody> {
   return GovUKBody({ text: Format("Reference number: %1", caseRefNumber) });
 }

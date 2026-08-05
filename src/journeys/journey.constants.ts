@@ -29,4 +29,5 @@ export const CONTEXT_DATA_KEYS = {
   officeList: "officeList",
   selectedOffice: "selectedOffice",
   singleOffice: "singleOffice",
+  applicationID: "applicationID",
 };

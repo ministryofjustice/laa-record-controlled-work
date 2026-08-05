@@ -1,4 +1,6 @@
 import {
+  Format,
+  Params,
   redirect,
   step,
   submit,
@@ -11,20 +13,19 @@ import {
   taskList,
 } from "#/journeys/edit-application/steps/task-list/task-list.blocks.js";
 import { Status } from "#/journeys/journey.types.js";
+import { ResolvableString } from "@ministryofjustice/hmpps-forge/core/components";
 
 export interface TaskListData {
-  caseReferenceNumber: string;
+  caseReferenceNumber: ResolvableString;
   clientDetails: { clientName: string; status: Status };
   declaration: { status: Status };
   evidence: { status: Status };
   meansAssessment: { status: Status };
 }
 
-export const DEFAULT_CASE_REFERENCE_NUMBER = "CW-123456";
-
 // TODO: Hardcoded for now, will be dynamic in future
 const TASK_LIST_DATA: TaskListData = {
-  caseReferenceNumber: DEFAULT_CASE_REFERENCE_NUMBER,
+  caseReferenceNumber: Params("applicationID"),
   clientDetails: {
     clientName: "Joe Blogs",
     status: Status.Completed,
