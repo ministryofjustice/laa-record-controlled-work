@@ -114,8 +114,8 @@ ENV_FILES+=(--env-file="$DATASTORE_DIR/.env")
 ENV_FILES+=(--env-file=.env)
 [[ "$MODE" == "entra" ]] && ENV_FILES+=(--env-file=.env.entra)
 
-COMPOSE_FILES=(-f docker-compose.yml)
-[[ "$MODE" == "entra" ]] && COMPOSE_FILES+=(-f docker-compose.override.yml -f docker-compose.entra.yml)
+COMPOSE_FILES=(-f docker-compose.yml -f docker-compose.override.yml)
+[[ "$MODE" == "entra" ]] && COMPOSE_FILES+=(-f docker-compose.entra.yml)
 
 echo "==> Starting docker compose stack (mode: $MODE):"
 echo "      op run"
