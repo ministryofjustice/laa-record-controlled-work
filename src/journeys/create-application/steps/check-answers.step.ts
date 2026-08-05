@@ -17,8 +17,8 @@ import {
 
 import { CreateApplicationEffects } from "#/journeys/create-application/create-application.effects.js";
 import { submitButton } from "#/journeys/evidence/common.blocks.js";
-import { t } from "#/lib/i18n.js";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
+import { t } from "#/lib/i18n.js";
 
 const ecfLabel = match(Answer("ecf"))
   .branch(Condition.Equals("yes"), t("common.yes"))
@@ -280,7 +280,10 @@ export const checkAnswersStep = (
           effects: [CreateApplicationEffects.createApplication(journeyCode)],
           next: [
             redirect({
-              goto: Format('/cases/%1/task-list', Data(CONTEXT_DATA_KEYS.applicationID)),
+              goto: Format(
+                "/cases/%1/task-list",
+                Data(CONTEXT_DATA_KEYS.applicationID),
+              ),
             }),
           ],
         },

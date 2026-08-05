@@ -1,5 +1,8 @@
-import type { BlockDefinition } from "@ministryofjustice/hmpps-forge/core/components";
-import type { ResolvableString } from "@ministryofjustice/hmpps-forge/core/components";
+import type {
+  BlockDefinition,
+  ResolvableString,
+} from "@ministryofjustice/hmpps-forge/core/components";
+
 import { Format } from "@ministryofjustice/hmpps-forge/core/authoring";
 import {
   GovUKBody,
