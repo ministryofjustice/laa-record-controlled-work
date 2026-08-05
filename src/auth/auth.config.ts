@@ -4,10 +4,19 @@ import config from "#/config.js";
 
 const ENTRA_AUTHORITY_HOST = "login.microsoftonline.com";
 
+/**
+ * Determines whether host is an Entra authority or not
+ * @param host Hostname string
+ * @returns True for `login.microsoftonline.com` itself or any of its subdomains.
+ */
+export function isEntraAuthorityHost(host: string): boolean {
+  return (
+    host === ENTRA_AUTHORITY_HOST || host.endsWith(`.${ENTRA_AUTHORITY_HOST}`)
+  );
+}
+
 const authorityHost = new URL(config.entra.authority).host;
-const isEntraAuthority =
-  authorityHost === ENTRA_AUTHORITY_HOST ||
-  authorityHost.endsWith(`.${ENTRA_AUTHORITY_HOST}`);
+const isEntraAuthority = isEntraAuthorityHost(authorityHost);
 
 export const msalConfig = {
   auth: {
