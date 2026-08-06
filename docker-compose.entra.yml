@@ -1,0 +1,9 @@
+# Requires ENTRA_CLIENT_ID, ENTRA_TENANT_ID and ENTRA_CLIENT_SECRET to be resolved from
+# .env.entra (via `op run`)
+services:
+  rcw:
+    environment:
+      - ENTRA_AUTHORITY_BASE_URL=https://login.microsoftonline.com/
+      - ENTRA_TENANT_ID
+      - ENTRA_CLIENT_ID
+      - ENTRA_CLIENT_SECRET

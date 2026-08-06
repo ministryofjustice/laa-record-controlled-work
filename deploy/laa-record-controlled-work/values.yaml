@@ -33,7 +33,7 @@ rcw:
   image:
     repository: nginx
     pullPolicy: Always
-    tag: "@sha256:21f8c0e3416b84eeec895c80077da69e2d25938cb0fc4bcc6a2ea33699b75703"
+    tag: "@sha256:8541484afbc9c8a5a8a99b379568ebbc957f658583ec9448fc43104229c03cf8"
 
   imagePullSecrets: []
   podAnnotations: {}

@@ -13,3 +13,6 @@ docs/
 deploy/
 infrastructure/
 public/
+
+# Local-only mock IdP TLS material - not needed in the built image
+docker/certs/
