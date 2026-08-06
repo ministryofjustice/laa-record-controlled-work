@@ -14,9 +14,9 @@ import {
 import type { TaskListData } from "#/journeys/edit-application/steps/task-list/task-list.step.js";
 
 import { taskItem } from "#/journeys/edit-application/steps/task-list/task-list.helpers.js";
+import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
 import { H2 } from "#/lib/constants/headings.js";
 import { t } from "#/lib/i18n.js";
-import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
 
 /**
  * Builds a GovUKBody block for the case reference number.

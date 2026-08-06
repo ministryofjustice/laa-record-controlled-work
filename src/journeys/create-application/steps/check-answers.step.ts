@@ -76,7 +76,8 @@ const changeAddressRedirect = match(Answer("postcode"))
   )
   .otherwise("enter-overseas-address?returnTo=check-answers");
 
-const applicationId = Data("applicationID");
+  // TODO is this needed?
+// const applicationId = Data("applicationID");
 
 export const checkAnswersStep = (
   journeyCode: string,
