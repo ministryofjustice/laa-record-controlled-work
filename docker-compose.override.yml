@@ -1,0 +1,42 @@
+# Auto-merged by `docker compose` alongside docker-compose.yml (see yarn dev:docker).
+# Downstream services are included as-is to stay authoritative, but their standalone
+# host port defaults can collide with ports RCW's own stack needs (e.g. nginx on 8080).
+# Remap only the host-side publish here; other services still reach it via the
+# container network on its default port.
+services:
+  # mock-oauth2-server terminates TLS in this stack (see rcw's ENTRA_AUTHORITY_BASE_URL in
+  # docker-compose.yml), so it issues tokens with an https `iss` claim - override
+  # include.api.yml's http defaults to match, and trust its self-signed cert for the JVM's
+  # issuer/JWK discovery and OBO token calls.
+  # Values use ${VAR:-...} fallbacks (not literals) so docker-up-entra's .env.entra ISSUER
+  # values still take effect - this file is also merged in for that stack.
+  info-and-advice-api:
+    ports: !override
+      - "8082:8080"
+    volumes:
+      - ./docker/certs/mock-oauth2-server.crt.pem:/etc/mock-oauth2-server.crt.pem:ro
+    environment:
+      - LAA_OAUTH2_ISSUER_URI=${LAA_OAUTH2_ISSUER_URI:-https://host.docker.internal:9090/default}
+    command:
+      - sh
+      - -c
+      - >
+        cp $$JAVA_HOME/lib/security/cacerts /tmp/cacerts &&
+        keytool -importcert -noprompt -alias mock-oauth2-server -storepass changeit
+        -keystore /tmp/cacerts -file /etc/mock-oauth2-server.crt.pem &&
+        exec java -Djavax.net.ssl.trustStore=/tmp/cacerts -Djavax.net.ssl.trustStorePassword=changeit -jar app.jar
+
+  rcw-api:
+    volumes:
+      - ./docker/certs/mock-oauth2-server.crt.pem:/etc/mock-oauth2-server.crt.pem:ro
+    environment:
+      - ISSUER=${ISSUER:-https://host.docker.internal:9090/default}
+      - DATASTORE_TOKEN_URI=${DATASTORE_TOKEN_URI:-https://host.docker.internal:9090/default/token}
+    command:
+      - sh
+      - -c
+      - >
+        cp $$JAVA_HOME/lib/security/cacerts /tmp/cacerts &&
+        keytool -importcert -noprompt -alias mock-oauth2-server -storepass changeit
+        -keystore /tmp/cacerts -file /etc/mock-oauth2-server.crt.pem &&
+        exec java -Djavax.net.ssl.trustStore=/tmp/cacerts -Djavax.net.ssl.trustStorePassword=changeit -jar app.jar

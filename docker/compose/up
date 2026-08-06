@@ -1,0 +1,124 @@
+#!/usr/bin/env bash
+# Onboards the full local docker-compose stack: clones missing sibling repos, seeds any
+# missing .env files from their .env.example/.env.sample templates, builds the CCQ image
+# if it hasn't been already, then runs the `docker compose up` command.
+#
+# Every step that touches the filesystem, network or Docker is confirmed interactively
+# first - answer "n" or Ctrl-C out at any prompt, and re-running this script later will
+# pick up from whatever's still missing.
+#
+# Usage: docker/compose/up [mock-issuer|entra]
+set -euo pipefail
+
+MODE="${1:-mock-issuer}"
+case "$MODE" in
+  mock-issuer | entra) ;;
+  *)
+    echo "Usage: $0 [mock-issuer|entra]" >&2
+    exit 1
+    ;;
+esac
+
+confirm() {
+  local prompt="$1" reply
+  if [[ ! -t 0 ]]; then
+    echo "error: no interactive terminal available to confirm: $prompt" >&2
+    return 1
+  fi
+  read -r -p "$prompt [y/N] " reply
+  [[ "$reply" =~ ^[Yy]([Ee][Ss])?$ ]]
+}
+
+require_confirm() {
+  confirm "$1" || {
+    echo "Skipped - re-run this script once you're ready to continue." >&2
+    exit 1
+  }
+}
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+PARENT_DIR="$(dirname "$REPO_ROOT")"
+cd "$REPO_ROOT"
+
+for cmd in git docker op; do
+  command -v "$cmd" >/dev/null 2>&1 || {
+    echo "error: $cmd is required but not installed" >&2
+    exit 1
+  }
+done
+
+# Derive sibling clone URLs from this repo's own remote, so ssh/https and the org stay
+# consistent with whatever the developer already uses.
+ORG_URL="$(git remote get-url origin)"
+ORG_URL="${ORG_URL%/*}"
+
+API_DIR="$PARENT_DIR/laa-record-controlled-work-api"
+DATASTORE_DIR="$PARENT_DIR/laa-info-and-advice-datastore"
+CCQ_DIR="$PARENT_DIR/laa-check-client-qualifies"
+
+clone_if_missing() {
+  local dir="$1" name="$2" url="$ORG_URL/$2.git"
+  [[ -d "$dir" ]] && return 0
+  echo "$name is not checked out at $dir."
+  require_confirm "Run 'git clone $url $dir'?"
+  # Remove a partial clone if this is interrupted, so re-running this script retries cleanly.
+  trap 'rm -rf "$dir"' INT TERM
+  git clone "$url" "$dir"
+  trap - INT TERM
+}
+
+clone_if_missing "$API_DIR" laa-record-controlled-work-api
+clone_if_missing "$DATASTORE_DIR" laa-info-and-advice-datastore
+clone_if_missing "$CCQ_DIR" laa-check-client-qualifies
+
+ensure_env_file() {
+  local dir="$1" file="$2" example="$3"
+  [[ -f "$dir/$file" ]] && return 0
+  echo "$dir/$file is missing (holds only dev-only 1Password references, never real secrets)."
+  require_confirm "Create it by copying $example?"
+  # Copy via a temp file + mv so an interrupted copy can't leave a corrupt/partial .env behind.
+  cp "$dir/$example" "$dir/$file.tmp"
+  mv "$dir/$file.tmp" "$dir/$file"
+}
+
+ensure_env_file "$REPO_ROOT" .env .env.example
+ensure_env_file "$API_DIR" .env .env.example
+ensure_env_file "$DATASTORE_DIR" .env .env.example
+ensure_env_file "$CCQ_DIR" .env .env.sample
+
+if [[ "$MODE" == "entra" ]]; then
+  ensure_env_file "$REPO_ROOT" .env.entra .env.entra.example
+  ensure_env_file "$API_DIR" .env.entra .env.entra.example
+  ensure_env_file "$DATASTORE_DIR" .env.entra .env.entra.example
+fi
+
+# docker-compose.embedded.yml sets pull_policy: never - build the image locally if missing.
+if ! docker image inspect laa-check-client-qualifies:latest >/dev/null 2>&1; then
+  echo "laa-check-client-qualifies:latest image is missing."
+  require_confirm "Run 'make -C $CCQ_DIR build'?"
+  make -C "$CCQ_DIR" build
+fi
+
+# MSAL requires an https authority even for the mock IdP (see docker/certs) - Docker Desktop
+# on Mac doesn't add this automatically, but the browser needs it to reach the login page.
+if ! grep -qE '(^|[[:space:]])host\.docker\.internal([[:space:]]|$)' /etc/hosts 2>/dev/null; then
+  echo "warning: host.docker.internal not found in /etc/hosts - add it so the mock OAuth2 login page loads in your browser:" >&2
+  echo "  echo '127.0.0.1 host.docker.internal' | sudo tee -a /etc/hosts" >&2
+fi
+
+ENV_FILES=(--env-file="$API_DIR/.env")
+[[ "$MODE" == "entra" ]] && ENV_FILES+=(--env-file="$API_DIR/.env.entra")
+ENV_FILES+=(--env-file="$DATASTORE_DIR/.env")
+[[ "$MODE" == "entra" ]] && ENV_FILES+=(--env-file="$DATASTORE_DIR/.env.entra")
+ENV_FILES+=(--env-file=.env)
+[[ "$MODE" == "entra" ]] && ENV_FILES+=(--env-file=.env.entra)
+
+COMPOSE_FILES=(-f docker-compose.yml -f docker-compose.override.yml)
+[[ "$MODE" == "entra" ]] && COMPOSE_FILES+=(-f docker-compose.entra.yml)
+
+echo "==> Starting docker compose stack (mode: $MODE):"
+echo "      op run"
+printf '        %s\n' "${ENV_FILES[@]}"
+echo "        -- docker compose ${COMPOSE_FILES[*]} up --watch --build"
+exec op run "${ENV_FILES[@]}" -- docker compose "${COMPOSE_FILES[@]}" up --watch --build
