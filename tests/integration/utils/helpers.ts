@@ -23,6 +23,7 @@ import { selectOfficeJourney } from "#/journeys/select-office/select-office.jour
 import type { YourCasesEffectsDeps } from "#/journeys/your-cases/your-cases.types.js";
 import { yourCasesPackage } from "#/journeys/your-cases/your-cases.journey.js";
 import { createApplicationEffectsRegistry } from "#/journeys/create-application/create-application.effects.js";
+import type { CreateApplicationEffectsDeps } from "#/journeys/create-application/create-application.types.js";
 import sinon from "sinon";
 import { getCreateApplicationResponseMock } from "../../mocks/api/rcw/fakers/applications/applications.faker.gen.js";
 
@@ -37,12 +38,12 @@ import { getCreateApplicationResponseMock } from "../../mocks/api/rcw/fakers/app
 export function createForgeTestClient(
   title: string,
   path: string,
-  ...steps: StepDefinition[]
+  steps: StepDefinition[],
+  mockDeps?: CreateApplicationEffectsDeps,
 ): ForgeTestClient {
-  let createApplicationStub: sinon.SinonStub;
   const uuid = "123e4567-e89b-12d3-a456-426614174000";
   const mockData = getCreateApplicationResponseMock({id: uuid});
-  createApplicationStub = sinon
+  const createApplicationStub = sinon
     .stub()
     .resolves({ status: 201, data: mockData });
 
@@ -70,9 +71,10 @@ export function createForgeTestClient(
     .registerGlobalComponents([autocomplete])
     .registerGlobalFunctions(nunjucksFunctions)
     .registerGlobalFunctions(JourneyEffectsImplementations)
-    .registerPackage(testPackage, { createApplication: createApplicationStub })
+    .registerPackage(testPackage, mockDeps ?? { createApplication: createApplicationStub })
     .createClient();
 }
+
 
 /**
  * Creates a test client for the select office journey.

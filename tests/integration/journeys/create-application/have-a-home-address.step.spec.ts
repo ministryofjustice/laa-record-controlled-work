@@ -11,7 +11,7 @@ describe("Have A Home Address Step", () => {
   const client = createForgeTestClient(
     "Record new case",
     "/cases/new/",
-    haveAHomeAddressStep("testJourney"),
+    [haveAHomeAddressStep("testJourney")],
   );
 
   describe("GET /cases/new/have-a-home-address", () => {

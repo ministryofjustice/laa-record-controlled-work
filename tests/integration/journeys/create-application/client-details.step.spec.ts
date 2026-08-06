@@ -11,7 +11,7 @@ describe("Client details step", () => {
   const client = createForgeTestClient(
     "Record new case",
     "/cases/new/",
-    clientDetailsStep("testJourney"),
+    [clientDetailsStep("testJourney")],
   );
 
   describe("GET /cases/new/client-details", () => {

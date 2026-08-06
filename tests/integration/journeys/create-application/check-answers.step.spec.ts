@@ -6,12 +6,20 @@ import { expect } from "chai";
 import { createForgeTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import { checkAnswersStep } from "#/journeys/create-application/steps/check-answers.step.js";
+import sinon from "sinon";
+import { getCreateApplicationResponseMock } from "../../../mocks/api/rcw/fakers/applications/applications.faker.gen.js";
 
 describe("Check answers step", () => {
+  const uuid = "123e4567-e89b-12d3-a456-426614174000";
+  const createApplicationStub = sinon
+    .stub()
+    .resolves({ status: 201, data: getCreateApplicationResponseMock({ id: uuid }) });
+
   const client = createForgeTestClient(
     "Record new case",
     "/cases/new/",
-    checkAnswersStep("testJourney"),
+    [checkAnswersStep("testJourney")],
+    { createApplication: createApplicationStub },
   );
   const session = {
     journeyDrafts: {
@@ -114,7 +122,7 @@ describe("Check answers step", () => {
       });
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
-      expect(redirectResult.url).to.equal("/cases/123e4567-e89b-12d3-a456-426614174000/task-list");
+      expect(redirectResult.url).to.equal(`/cases/${uuid}/task-list`);
     });
   });
 });

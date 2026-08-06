@@ -69,7 +69,7 @@ export function taskList(taskListData: TaskListData): BlockDefinition[] {
           t(
             "journeys.createApplication.taskList.meansAssessment.taskItem.label",
           ),
-          Format("`/cases/%1/eligibility/`", Params(PARAMS_KEYS.applicationID)),
+          Format("/cases/%1/eligibility/", Params(PARAMS_KEYS.applicationID)),
           taskListData.meansAssessment.status,
         ),
       ],
