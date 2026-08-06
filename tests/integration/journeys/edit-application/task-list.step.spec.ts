@@ -3,13 +3,13 @@ import {
   TestRedirectResult,
 } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
-import { createForgeTestClient } from "../../utils/helpers.js";
+import { createForgeTestClientForEditApplication } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import { taskListStep } from "#/journeys/edit-application/steps/task-list/task-list.step.js";
 
 describe("Task list step", () => {
   const uuid = "123e4567-e89b-12d3-a456-426614174000";
-  const client = createForgeTestClient(
+  const client = createForgeTestClientForEditApplication(
     "Edit case",
     "/cases/:applicationID/",
     [taskListStep()],

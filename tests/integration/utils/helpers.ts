@@ -24,8 +24,10 @@ import type { YourCasesEffectsDeps } from "#/journeys/your-cases/your-cases.type
 import { yourCasesPackage } from "#/journeys/your-cases/your-cases.journey.js";
 import { createApplicationEffectsRegistry } from "#/journeys/create-application/create-application.effects.js";
 import type { CreateApplicationEffectsDeps } from "#/journeys/create-application/create-application.types.js";
+import { editApplicationEffectsRegistry } from "#/journeys/edit-application/editApplication.effects.js";
+import type { EditApplicationEffectsDeps } from "#/journeys/edit-application/editApplication.types.js";
 import sinon from "sinon";
-import { getCreateApplicationResponseMock } from "../../mocks/api/rcw/fakers/applications/applications.faker.gen.js";
+import { getCreateApplicationResponseMock, getGetApplicationResponseMock } from "../../mocks/api/rcw/fakers/applications/applications.faker.gen.js";
 
 /**
 
@@ -111,5 +113,70 @@ export function createForgeTestClientForCaseList(
     .registerGlobalFunctions(nunjucksFunctions)
     .registerPackage(yourCasesPackage, mockYourCasesEffectsDeps)
     .registerGlobalFunctions(JourneyEffectsImplementations)
+    .createClient();
+}
+
+/**
+ * Creates a test client for edit-application journey.
+ * @param {string} title - The title of the journey.
+ * @param {string} path - The path of the journey.
+ * @param {...any} steps - Step definitions to include in the test journey.
+ * @param {EditApplicationEffectsDeps} mockDeps - mock implementations for the journey's effect functions
+ * @returns {ForgeTestClient} A configured test client.
+ */
+export function createForgeTestClientForEditApplication(
+  title: string,
+  path: string,
+  steps: StepDefinition[],
+  mockDeps?: EditApplicationEffectsDeps,
+): ForgeTestClient {
+  const uuid = "123e4567-e89b-12d3-a456-426614174000";
+  const mockData = getGetApplicationResponseMock({
+    id: uuid,
+    applicationStatus: "DRAFT",
+    declaration: {
+      clientDeclarationStatus: "DRAFT",
+      declarationConfirmation: false,
+      createdAt: new Date().toISOString().slice(0, 19) + "Z",
+      createdBy: "test",
+      modifiedAt: new Date().toISOString().slice(0, 19) + "Z",
+      modifiedBy: "test",
+    },
+    evidence: {
+      evidenceStatus: "DRAFT",
+      payeIncomeEvidence: false,
+      otherIncomeEvidence: false,
+      housingCostsEvidence: false,
+      capitalEvidence: false,
+      createdAt: new Date().toISOString().slice(0, 19) + "Z",
+      createdBy: "test",
+      modifiedAt: new Date().toISOString().slice(0, 19) + "Z",
+      modifiedBy: "test",
+    },
+  });
+  const getApplicationStub = sinon
+    .stub()
+    .resolves({ status: 200, data: mockData });
+
+  const testJourney = journey({
+    code: "testJourney",
+    path: path,
+    reachability: { disableReachabilityChecks: true },
+    steps,
+    title: title,
+    view: { template: "partials/form-step" },
+  });
+
+  const testPackage = createTestPackage({
+    functions: editApplicationEffectsRegistry,
+    journey: testJourney,
+  });
+
+  return new ForgeTestHarness()
+    .registerGlobalComponents(govukComponents)
+    .registerGlobalComponents([autocomplete])
+    .registerGlobalFunctions(nunjucksFunctions)
+    .registerGlobalFunctions(JourneyEffectsImplementations)
+    .registerPackage(testPackage, mockDeps ?? { getApplication: getApplicationStub })
     .createClient();
 }
