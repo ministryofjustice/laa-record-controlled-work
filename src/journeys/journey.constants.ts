@@ -25,8 +25,13 @@ export const OVERSEAS_EXCLUSIVE_ADDRESS_FIELDS = Object.values(
 );
 
 export const CONTEXT_DATA_KEYS = {
+  applicationID: "applicationID",
   caseList: "caseList",
   officeList: "officeList",
   selectedOffice: "selectedOffice",
   singleOffice: "singleOffice",
+};
+
+export const PARAMS_KEYS = {
+  applicationID: "applicationID",
 };

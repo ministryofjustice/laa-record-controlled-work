@@ -1,4 +1,7 @@
+import type { ResolvableString } from "@ministryofjustice/hmpps-forge/core/components";
+
 import {
+  Params,
   redirect,
   step,
   submit,
@@ -10,21 +13,20 @@ import {
   saveAndReturnButton,
   taskList,
 } from "#/journeys/edit-application/steps/task-list/task-list.blocks.js";
+import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
 import { Status } from "#/journeys/journey.types.js";
 
 export interface TaskListData {
-  caseReferenceNumber: string;
+  caseReferenceNumber: ResolvableString;
   clientDetails: { clientName: string; status: Status };
   declaration: { status: Status };
   evidence: { status: Status };
   meansAssessment: { status: Status };
 }
 
-export const DEFAULT_CASE_REFERENCE_NUMBER = "CW-123456";
-
 // TODO: Hardcoded for now, will be dynamic in future
 const TASK_LIST_DATA: TaskListData = {
-  caseReferenceNumber: DEFAULT_CASE_REFERENCE_NUMBER,
+  caseReferenceNumber: Params(PARAMS_KEYS.applicationID),
   clientDetails: {
     clientName: "Joe Blogs",
     status: Status.Completed,

@@ -1,6 +1,9 @@
-import type { BlockDefinition } from "@ministryofjustice/hmpps-forge/core/components";
+import type {
+  BlockDefinition,
+  ResolvableString,
+} from "@ministryofjustice/hmpps-forge/core/components";
 
-import { Format } from "@ministryofjustice/hmpps-forge/core/authoring";
+import { Format, Params } from "@ministryofjustice/hmpps-forge/core/authoring";
 import {
   GovUKBody,
   GovUKButton,
@@ -11,6 +14,7 @@ import {
 import type { TaskListData } from "#/journeys/edit-application/steps/task-list/task-list.step.js";
 
 import { taskItem } from "#/journeys/edit-application/steps/task-list/task-list.helpers.js";
+import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
 import { H2 } from "#/lib/constants/headings.js";
 import { t } from "#/lib/i18n.js";
 
@@ -20,7 +24,7 @@ import { t } from "#/lib/i18n.js";
  * @returns A GovUKBody block definition.
  */
 export function caseReferenceNumber(
-  caseRefNumber: string,
+  caseRefNumber: ResolvableString,
 ): ReturnType<typeof GovUKBody> {
   return GovUKBody({ text: Format("Reference number: %1", caseRefNumber) });
 }
@@ -65,7 +69,7 @@ export function taskList(taskListData: TaskListData): BlockDefinition[] {
           t(
             "journeys.createApplication.taskList.meansAssessment.taskItem.label",
           ),
-          `/cases/${taskListData.caseReferenceNumber}/eligibility/`,
+          Format("/cases/%1/eligibility/", Params(PARAMS_KEYS.applicationID)),
           taskListData.meansAssessment.status,
         ),
       ],

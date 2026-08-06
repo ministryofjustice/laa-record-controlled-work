@@ -11,7 +11,7 @@ describe("Legal aid before 6 months step", () => {
   const client = createForgeTestClient(
     "Record new case",
     "/cases/new/",
-    legalAidLast6MonthsStep("testJourney"),
+    [legalAidLast6MonthsStep("testJourney")],
   );
 
   describe("GET /cases/new/legal-aid-last-6-months", () => {
