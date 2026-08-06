@@ -43,7 +43,7 @@
   "dependencies": {
     "@azure/msal-node": "^5.4.3",
     "@ministryofjustice/frontend": "9.0.0",
-    "@ministryofjustice/hmpps-forge": "^0.3.3",
+    "@ministryofjustice/hmpps-forge": "^0.3.4",
     "accessible-autocomplete": "^3.0.1",
     "body-parser": "^2.3.0",
     "compression": "^1.8.1",
