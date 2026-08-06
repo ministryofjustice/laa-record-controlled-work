@@ -1,12 +1,14 @@
 import type { ResolvableString } from "@ministryofjustice/hmpps-forge/core/components";
 
 import {
+  access,
   Params,
   redirect,
   step,
   submit,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
+import { editApplicationEffects } from "#/journeys/edit-application/editApplication.effects.js";
 import {
   caseReferenceNumber,
   heading,
@@ -49,6 +51,11 @@ export const taskListStep = (): ReturnType<typeof step> =>
       caseReferenceNumber(TASK_LIST_DATA.caseReferenceNumber),
       ...taskList(TASK_LIST_DATA),
       saveAndReturnButton,
+    ],
+    onAccess: [
+      access({
+        effects: [editApplicationEffects.loadApplication()],
+      }),
     ],
     onSubmission: [
       submit({
