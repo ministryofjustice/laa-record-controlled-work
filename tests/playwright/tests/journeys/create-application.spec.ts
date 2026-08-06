@@ -1,6 +1,8 @@
 import { test, expect } from "../../fixtures/index.js";
+import { createApplicationResponse } from "../../fixtures/rcw.fixtures.js";
 
 test("create application flow", async ({ page }) => {
+  const applicationId = createApplicationResponse.id;
 
   // ==========================================================================
   // Provider Declaration page
@@ -311,7 +313,7 @@ test("create application flow", async ({ page }) => {
   await submitButton.click();
 
   // Verify redirection to the task list page
-  await expect(page).toHaveURL("/cases/CW-123456/task-list");
+  await expect(page).toHaveURL(`/cases/${applicationId}/task-list`);
 
   // ==========================================================================
   // Task list page
@@ -337,7 +339,7 @@ test("create application flow", async ({ page }) => {
   await clientDetailsTask.locator("a").click();
   await expect(page).toHaveURL("/cases/new/check-answers");
   await page.getByRole("button", { name: "Save and continue" }).click();
-  await expect(page).toHaveURL("/cases/CW-123456/task-list");
+  await expect(page).toHaveURL(`/cases/${applicationId}/task-list`);
   await expect(clientDetailsTask.locator(".govuk-task-list__status")).toHaveText("Completed");
 
   // Check that the means assessment task is marked as incomplete
@@ -346,9 +348,9 @@ test("create application flow", async ({ page }) => {
 
   // click Incomplete link and verify redirection to the income page and return
   await meansAssessmentTask.locator("a").click();
-  await expect(page).toHaveURL("/cases/CW-123456/eligibility/");
+  await expect(page).toHaveURL(`/cases/${applicationId}/eligibility/`);
   
-  await page.goto("/cases/CW-123456/task-list");
+  await page.goto(`/cases/${applicationId}/task-list`);
 
   // Submit the task list form
   await page.getByRole("button", { name: "Save and return later" }).click();

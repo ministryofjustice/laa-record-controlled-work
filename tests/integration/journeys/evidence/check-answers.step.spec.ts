@@ -11,7 +11,7 @@ describe("Check answers step", () => {
   const client = createForgeTestClient(
     "Evidence",
     "/cases/evidence",
-    [checkAnswersStep("testJourney")],
+    [checkAnswersStep()],
   );
   const session = {
     journeyDrafts: {
