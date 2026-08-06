@@ -1,5 +1,12 @@
 # Injected secrets need to pull the env var from the host machine
 # This happens automatically if you provide only the env var name.
+include:
+  - path: ../laa-record-controlled-work-api/docker/compose/include.api.yml
+  - path: ../laa-info-and-advice-datastore/docker/compose/include.api.yml
+  - path: ../laa-info-and-advice-datastore/docker/compose/include.postgres.yml
+  - path: ../laa-check-client-qualifies/docker-compose.embedded.yml
+  - path: docker/compose/include.mock-oauth.yml
+
 services:
   nginx:
     container_name: nginx-reverse-proxy  
@@ -13,10 +20,10 @@ services:
       - ./deploy/laa-record-controlled-work/nginx/maps.conf:/etc/nginx/maps.conf:ro
     depends_on:
       - rcw
-      - ccq
+      - ccq-embedded
     environment:
       NGINX_UPSTREAM_RCW: rcw:3000
-      NGINX_UPSTREAM_CCQ: ccq:3000
+      NGINX_UPSTREAM_CCQ: ccq-embedded:3000
 
   rcw:
     build:
@@ -29,6 +36,13 @@ services:
     depends_on:
       redis-rcw:
         condition: service_healthy
+      mock-oauth2-server:
+        condition: service_started
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      # MSAL requires an https authority (even for the local mock IdP) - trust its self-signed cert.
+      - ./docker/certs/mock-oauth2-server.crt.pem:/etc/mock-oauth2-server.crt.pem:ro
     env_file:
       - .env # load from .env first
     environment: # set overrides
@@ -39,11 +53,17 @@ services:
       - REDIS_URL=redis://redis-rcw:6379
       - REDIS_AUTH_TOKEN=${REDIS_AUTH_TOKEN:-redis_password}
       - ENTRA_REDIRECT_URI=http://localhost:8080/auth/code/callback
+      - NODE_EXTRA_CA_CERTS=/etc/mock-oauth2-server.crt.pem
+      # Signs in via the mock-oauth2-server container by default, matching rcw-api and
+      # info-and-advice-api's own defaults - see docker-compose.entra.yml to sign in via real
+      # Entra ID instead. MSAL rejects non-https authorities, so the mock server terminates
+      # TLS with a self-signed cert (see docker/certs) covering host.docker.internal.
+      - ENTRA_AUTHORITY_BASE_URL=https://host.docker.internal:9090/
+      - ENTRA_TENANT_ID=default
+      - ENTRA_CLIENT_ID=rcw
+      - ENTRA_CLIENT_SECRET=not-used-by-mock-oauth2-server
       # secrets injected by 1Password CLI via .env
       # op run --env-file=.env -- docker compose up -d
-      - ENTRA_CLIENT_ID
-      - ENTRA_TENANT_ID
-      - ENTRA_CLIENT_SECRET
       - PDA_API_KEY
     develop:
       watch:
@@ -70,28 +90,6 @@ services:
         - action: rebuild
           path: yarn.lock
 
-  ccq:
-    image: laa-check-client-qualifies:latest
-    container_name: rcw-ccq
-    pull_policy: never # clone laa-check-client-qualifies, `make build`
-    platform: linux/amd64 # puppeteer doesn't work properly on ARM
-    expose:
-      - 3000
-    depends_on:
-      redis-ccq:
-        condition: service_healthy
-    environment:
-      RAILS_ENV: production
-      RAILS_SERVE_STATIC_FILES: true # won't serve assets without this
-      RAILS_LOG_TO_STDOUT: true # logs to a file without this
-      SECRET_KEY_BASE: dev-secret # doesn't work without it
-      DISABLE_SECURE_COOKIES: true
-
-      CCQ_MODE: embedded
-      CCQ_EMBEDDED_LAYOUT: rcw/application
-      REDIS_URL: redis://redis-ccq:6379
-      HOST_SERVICE_URL: http://rcw:3000
-
   redis-rcw:
     container_name: rcw-session-redis
     image: "redis:8.8-alpine@sha256:8096655e437712b07503796fb64d81359256cfcff0ab29d95a7da72863786efb"
@@ -108,34 +106,3 @@ services:
       interval: 5s
       timeout: 3s
       retries: 5
-
-  redis-ccq:
-    container_name: rcw-ccq-cache-redis
-    image: "redis:8.8-alpine@sha256:8096655e437712b07503796fb64d81359256cfcff0ab29d95a7da72863786efb"
-    ports:
-      - 6380:6379
-    command: >
-      redis-server
-      --maxmemory 256mb 
-      --maxmemory-policy allkeys-lru
-      --save ""
-      --appendonly no
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-      timeout: 3s
-      retries: 5
-
-  rcw-api:
-    container_name: rcw-api
-    image: laa-record-controlled-work-api:latest
-    pull_policy: never # clone laa-record-controlled-work-api, `make build`
-    ports:
-      - "8081:8081"
-      - "8181:8181"
-      - "5005:5005"
-    environment:
-      - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
-      - SPRING_PROFILES_ACTIVE=local
-      - ISSUER=https://login.microsoftonline.com/${ENTRA_TENANT_ID}/v2.0
-      - AUDIENCE=${ENTRA_API_AUDIENCE}

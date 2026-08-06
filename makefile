@@ -3,7 +3,7 @@ export
 
 MOCHA    := ./node_modules/.bin/mocha
 
-.PHONY: install prek-install dev watch docker-up docker-down build pda-spec api-generate knip lint lint-fix integration integration-watch e2e e2e-ui test-all coverage unit unit-watch
+.PHONY: install prek-install dev watch docker-up docker-up-entra docker-down build pda-spec api-generate knip lint lint-fix integration integration-watch e2e e2e-ui test-all coverage unit unit-watch
 
 # 	op run --env-file=.env uses 1Password to load environment variables securely
 # 	you can --no-masking flag means that varaibles is not masked in the output which can be used for debugging
@@ -22,6 +22,10 @@ watch:
 
 docker-up:
 	yarn dev:docker
+
+# Sign in via real Entra ID instead of the default mock-oauth2-server - see docker-compose.entra.yml.
+docker-up-entra:
+	yarn dev:docker:entra
 
 docker-down:
 	docker compose down

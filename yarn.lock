@@ -16,20 +16,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@azure/msal-common@npm:16.11.2":
-  version: 16.11.2
-  resolution: "@azure/msal-common@npm:16.11.2"
-  checksum: 10c0/9a9da282312232ccc09b79e92d78cb877bf2836745cffb1c865fae36d413d567143d8b7e86d062b7157578d5d924d141e25baa0104519cd10666d37d05deba25
+"@azure/msal-common@npm:16.11.3":
+  version: 16.11.3
+  resolution: "@azure/msal-common@npm:16.11.3"
+  checksum: 10c0/2c238b62b6f60668e2e8a54036156f860cb152575d76c2ab4cad0a710ac22efbebc233db3ad2ce1647234b41a981ff6c99b6b59743c3a33f2808e2bd8e05ef52
   languageName: node
   linkType: hard
 
-"@azure/msal-node@npm:^5.4.2":
-  version: 5.4.2
-  resolution: "@azure/msal-node@npm:5.4.2"
+"@azure/msal-node@npm:^5.4.3":
+  version: 5.4.3
+  resolution: "@azure/msal-node@npm:5.4.3"
   dependencies:
-    "@azure/msal-common": "npm:16.11.2"
+    "@azure/msal-common": "npm:16.11.3"
     jsonwebtoken: "npm:^9.0.0"
-  checksum: 10c0/c8a068e1e6584637eaf2b1d36554d13222002e314cfcac80790274bedd6134d3d57531c2636c6489817f332314ba0309d02faa3eb5333f2e8da0a74a518e04c0
+  checksum: 10c0/21aa1eaac458cdc8989539877e7cbc8a4387a582ecc4975c61d21e62694c788d1935cd9daf330e59b345c04917fe2dcc31481f6c329bc5c0ef67e0faa66cdd39
   languageName: node
   linkType: hard
 
@@ -790,16 +790,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ministryofjustice/hmpps-forge@npm:^0.3.3":
-  version: 0.3.3
-  resolution: "@ministryofjustice/hmpps-forge@npm:0.3.3"
+"@ministryofjustice/hmpps-forge@npm:^0.3.4":
+  version: 0.3.4
+  resolution: "@ministryofjustice/hmpps-forge@npm:0.3.4"
   dependencies:
     express: "npm:^4.21.0 || ^5.0.0"
-    http-errors: "npm:^2.0.0"
     nunjucks: "npm:^3.2.4"
     ws: "npm:^8.18.0"
     zod: "npm:^4.1.5"
-  checksum: 10c0/2f436b656884ab1887f2b5f875ccc8fc49ce1ccdbb9f5157beb31862b5b9ee90d9a1fd6cbf2782bb6b0383184ed8c571157b1f38642f75b1e1666fff851471c6
+  checksum: 10c0/5b437611e5a0aaffe43e16d31783278d95d468ebce6d5f98e30b80ed0fff64e03c4fff089f6b2038fa97481af9a306914b8eb80405fc39f266e06434af2c4558
   languageName: node
   linkType: hard
 
@@ -5308,9 +5307,9 @@ __metadata:
   linkType: hard
 
 "ip-address@npm:^10.2.0":
-  version: 10.2.0
-  resolution: "ip-address@npm:10.2.0"
-  checksum: 10c0/5a00aada6e922c9c69dfc800ed5d0fa3348675ebdeed0e1575f503f27ca385b5f534363c9af7ad1daf64c1f1409388cdd3cc2e9b9b0fe1c924a431378d55075a
+  version: 10.3.1
+  resolution: "ip-address@npm:10.3.1"
+  checksum: 10c0/45b1c31e2cc53d6354ea39f276d70c365a9b0332e7ca2140a9ad4cdb7fdb9d73b6a7ec0d8bf19993d8dce7ab636cd86c46c3e417b98db5ccb8c25546fe8c0b17
   languageName: node
   linkType: hard
 
@@ -5894,11 +5893,11 @@ __metadata:
   resolution: "laa-record-controlled-work@workspace:."
   dependencies:
     "@axe-core/playwright": "npm:^4.12.1"
-    "@azure/msal-node": "npm:^5.4.2"
+    "@azure/msal-node": "npm:^5.4.3"
     "@faker-js/faker": "npm:^10.5.0"
     "@j178/prek": "npm:^0.4.11"
     "@ministryofjustice/frontend": "npm:9.0.0"
-    "@ministryofjustice/hmpps-forge": "npm:^0.3.3"
+    "@ministryofjustice/hmpps-forge": "npm:^0.3.4"
     "@playwright/test": "npm:^1.62.0"
     "@types/chai": "npm:^5.2.3"
     "@types/chai-as-promised": "npm:^8.0.2"
