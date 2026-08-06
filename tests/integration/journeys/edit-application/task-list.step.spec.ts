@@ -14,11 +14,7 @@ describe("Task list step", () => {
     "/cases/:applicationID/",
     [taskListStep()],
   );
-  const session = {
-    journeyDrafts: {
-      testJourney: {},
-    },
-  };
+  const session = {};
 
   describe("GET /cases/123e4567-e89b-12d3-a456-426614174000/task-list", () => {
     let renderResult: TestRenderResult;
