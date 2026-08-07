@@ -24,7 +24,7 @@ const DEFAULT_REDIS_HOST = "localhost";
 const DEFAULT_RCW_API_BASE_URL = "http://localhost:8081";
 const DEFAULT_PDA_API_BASE_URL =
   "https://laa-provider-details-api-uat.apps.live.cloud-platform.service.justice.gov.uk";
-const DEFAULT_PDA_MSW_OFFICE_COUNT = 10;
+const DEFAULT_PDA_MSW_OFFICE_COUNT = 3;
 const ENTRA_APPLICATIONS_READ_SCOPE =
   "https://devlexternal.onmicrosoft.com/laa-record-controlled-work-api-uat/Applications.Read";
 
