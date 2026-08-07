@@ -1521,20 +1521,20 @@ __metadata:
   linkType: hard
 
 "@scalar/openapi-parser@npm:^0.28.7":
-  version: 0.28.10
-  resolution: "@scalar/openapi-parser@npm:0.28.10"
+  version: 0.28.11
+  resolution: "@scalar/openapi-parser@npm:0.28.11"
   dependencies:
     "@scalar/helpers": "npm:0.9.2"
     "@scalar/json-magic": "npm:0.12.19"
-    "@scalar/openapi-types": "npm:0.9.3"
-    "@scalar/openapi-upgrader": "npm:0.2.11"
+    "@scalar/openapi-types": "npm:0.9.4"
+    "@scalar/openapi-upgrader": "npm:0.2.12"
     ajv: "npm:^8.17.1"
     ajv-draft-04: "npm:^1.0.0"
     ajv-formats: "npm:^3.0.1"
     jsonpointer: "npm:^5.0.1"
     leven: "npm:^4.0.0"
     yaml: "npm:^2.8.3"
-  checksum: 10c0/8783aad89472a85a49d3664527dfeeb430b5e43db988a91436b6b991450d0a30859defdc2bf513fc315451e9f27179a621724a2ae7b08efae8d6910851f5ebc1
+  checksum: 10c0/f78dd34019acd02c2ffd0b7d9d7b7e4cd16f3f3030a61ea4431f7e6fccb68ad027250a6c0cdf88ec42ce1fbf8e8cd9bd3ec93a01c7bd32c5d5e4e0b57a62b9e1
   languageName: node
   linkType: hard
 
@@ -1545,19 +1545,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@scalar/openapi-types@npm:0.9.3":
-  version: 0.9.3
-  resolution: "@scalar/openapi-types@npm:0.9.3"
-  checksum: 10c0/579bf2bcd088395feca820c15718fc98b276a26374d5b0eda08f84154ecb8795c3f1b50feaeae2418421cdde16ae08db5921696dec1e3976c49b6a0718108800
+"@scalar/openapi-types@npm:0.9.4":
+  version: 0.9.4
+  resolution: "@scalar/openapi-types@npm:0.9.4"
+  checksum: 10c0/2b3c416d306320e09937b09c51cb9ea1a559a62c3352694543b9f87dfb5e8d0dedfcb7a20d3bac6d6c07c06b68395b9e94035e1cca0053e90191f61041b71242
   languageName: node
   linkType: hard
 
-"@scalar/openapi-upgrader@npm:0.2.11":
-  version: 0.2.11
-  resolution: "@scalar/openapi-upgrader@npm:0.2.11"
+"@scalar/openapi-upgrader@npm:0.2.12":
+  version: 0.2.12
+  resolution: "@scalar/openapi-upgrader@npm:0.2.12"
   dependencies:
-    "@scalar/openapi-types": "npm:0.9.3"
-  checksum: 10c0/99dc8d5debdb1f49541a1260c2a8b29d8c9920a2387881e07e14fe2a8cf8afb8a2995c9b354faa74da0e1288e1e6f453ad3142a2a88187ef2d86781a5385645f
+    "@scalar/openapi-types": "npm:0.9.4"
+  checksum: 10c0/885054950090033b41f788d386bb6deae09d7f7d2f98f1541b23a5d21c082fafb176a7d42d0d56bb3bd46f05535a0ed3ee04e123b473e1bef70e2807915df147
   languageName: node
   linkType: hard
 
@@ -7593,21 +7593,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tldts-core@npm:^7.4.9":
-  version: 7.4.9
-  resolution: "tldts-core@npm:7.4.9"
-  checksum: 10c0/6ada3e0d66661fb7ccedc4a1753d9224c1fb565086221af3ca29d51eaaf4745078e556c4fb30469140b0cb00b0102d1ca49de15ad29c069c7957463d0601028a
+"tldts-core@npm:^7.4.10":
+  version: 7.4.10
+  resolution: "tldts-core@npm:7.4.10"
+  checksum: 10c0/a5f42aad8aa8adfc57d33e9bd5c43094e9de226dce4851867ea7014d8679040b4c01c500b9947595ab22cdfe9783ea5d88a7c0be2092d19a14f75c7cd4671181
   languageName: node
   linkType: hard
 
 "tldts@npm:^7.0.5":
-  version: 7.4.9
-  resolution: "tldts@npm:7.4.9"
+  version: 7.4.10
+  resolution: "tldts@npm:7.4.10"
   dependencies:
-    tldts-core: "npm:^7.4.9"
+    tldts-core: "npm:^7.4.10"
   bin:
     tldts: bin/cli.js
-  checksum: 10c0/5df4d25696dfb8cc009c3e0bea0e00bc1957c3a201155e2ea2027ce50c82b985250d1a4a301f3e5b280dd49215df9e97a92304196084872a59789e3f122f0a0c
+  checksum: 10c0/a9a85d260bd0bfd046794f140667aae0975da4a3aa805d180b0808b672a6fa7de0fc9f36110c3bdeed87ad780e961e1e5bb1ed8b41f8aa3ad5d5fb469e70ba38
   languageName: node
   linkType: hard
 
