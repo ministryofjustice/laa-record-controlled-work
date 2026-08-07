@@ -25,7 +25,7 @@ export function createPdaConfig(): Options {
 
   return {
     hooks: {
-      afterAllFilesWrite: "tsx orval/processZodFile.ts",
+      afterAllFilesWrite: "tsx orval/convertOptionalToNullish.ts",
     },
     input: {
       filters: {
