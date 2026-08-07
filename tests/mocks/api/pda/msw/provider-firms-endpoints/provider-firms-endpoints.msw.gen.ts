@@ -4,12 +4,14 @@
  * Provider Details API r1
  * OpenAPI spec version: 0.27.2
  */
-import { faker } from "@faker-js/faker";
-
 import { HttpResponse, http } from "msw";
 import type { RequestHandlerOptions } from "msw";
 
 import type { ProviderFirmOfficeListDto } from "../../../../../../src/api/clients/pda/model/providerFirmOfficeListDto.zod.gen.js";
+
+import { getGetAllProviderOfficesResponseMock } from "../../fakers/provider-firms-endpoints/provider-firms-endpoints.faker.gen.js";
+
+export { getGetAllProviderOfficesResponseMock } from "../../fakers/provider-firms-endpoints/provider-firms-endpoints.faker.gen.js";
 
 export type KeysWithNull<O> = {
   [K in keyof O]-?: null extends O[K] ? K : never;
@@ -28,79 +30,6 @@ export type ProviderFirmOfficeListDtoMock = {
     Required<NonNullable<ProviderFirmOfficeListDto>>[K]
   >;
 };
-
-export const getGetAllProviderOfficesResponseMock = <
-  O extends Partial<Extract<ProviderFirmOfficeListDto, object>> = {},
->(
-  overrideResponse?: O,
-): MockWithNullableOverrides<
-  ProviderFirmOfficeListDto,
-  O,
-  ProviderFirmOfficeListDtoMock
-> =>
-  ({
-    firm: {
-      firmNumber: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      firmId: faker.number.int(),
-      ccmsFirmId: faker.number.int(),
-      parentFirmId: faker.number.int(),
-      firmName: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      firmType: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      constitutionalStatus: faker.string.alpha({
-        length: { min: 10, max: 20 },
-      }),
-      solicitorAdvocateYN: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      advocateLevel: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      barCouncilRoll: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      companyHouseNumber: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    },
-    offices: Array.from(
-      { length: faker.number.int({ min: 1, max: 10 }) },
-      (_, i) => i + 1,
-    ).map(() => ({
-      firmOfficeId: faker.number.int(),
-      ccmsFirmOfficeId: faker.number.int(),
-      firmOfficeCode: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      officeName: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      officeCodeAlt: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      type: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      addressLine1: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      addressLine2: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      addressLine3: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      addressLine4: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      city: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      county: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      postCode: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      dxCentre: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      dxNumber: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      telephoneAreaCode: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      telephoneNumber: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      faxAreaCode: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      faxNumber: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      emailAddress: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      vatRegistrationNumber: faker.string.alpha({
-        length: { min: 10, max: 20 },
-      }),
-      headOffice: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      creationDate: faker.date.past().toISOString().slice(0, 10),
-      lscRegion: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      lscBidZone: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      lscAreaOffice: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      cjsForceName: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      localAuthority: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      policeStationAreaName: faker.string.alpha({
-        length: { min: 10, max: 20 },
-      }),
-      dutySolicitorAreaName: faker.string.alpha({
-        length: { min: 10, max: 20 },
-      }),
-    })),
-    ...overrideResponse,
-  }) as MockWithNullableOverrides<
-    ProviderFirmOfficeListDto,
-    O,
-    ProviderFirmOfficeListDtoMock
-  >;
 
 export const getGetAllProviderOfficesMockHandler = (
   overrideResponse?:

@@ -30,7 +30,6 @@ export function sharedOutputConfig(
       generators: [
         { path: `./tests/mocks/api/${client}/msw`, type: "msw" },
         {
-          operationResponses: false,
           path: `./tests/mocks/api/${client}/fakers`,
           type: "faker",
         },
