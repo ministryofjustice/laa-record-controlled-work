@@ -4,22 +4,26 @@
  * Record Controlled Work API
  * OpenAPI spec version: 1.0.0
  */
-import { faker } from "@faker-js/faker";
-
 import { HttpResponse, http } from "msw";
 import type { RequestHandlerOptions } from "msw";
 
 import type { Application } from "../../../../../../src/api/clients/rcw/model/application.zod.gen.js";
 
-import { ApplicationState } from "../../../../../../src/api/clients/rcw/model/applicationState.zod.gen.js";
-
 import type { Applications } from "../../../../../../src/api/clients/rcw/model/applications.zod.gen.js";
-
-import { ClientDeclarationStatus } from "../../../../../../src/api/clients/rcw/model/clientDeclarationStatus.zod.gen.js";
 
 import type { CreateApplicationResponseBody } from "../../../../../../src/api/clients/rcw/model/createApplicationResponseBody.zod.gen.js";
 
-import { EvidenceStatus } from "../../../../../../src/api/clients/rcw/model/evidenceStatus.zod.gen.js";
+import {
+  getCreateApplicationResponseMock,
+  getGetApplicationResponseMock,
+  getGetApplicationsResponseMock,
+} from "../../fakers/applications/applications.faker.gen.js";
+
+export {
+  getGetApplicationsResponseMock,
+  getCreateApplicationResponseMock,
+  getGetApplicationResponseMock,
+} from "../../fakers/applications/applications.faker.gen.js";
 
 export type KeysWithNull<O> = {
   [K in keyof O]-?: null extends O[K] ? K : never;
@@ -46,139 +50,6 @@ export type ApplicationMock = {
     Required<NonNullable<Application>>[K]
   >;
 };
-
-export const getGetApplicationsResponseMock = (): ApplicationsMock =>
-  Array.from(
-    { length: faker.number.int({ min: 1, max: 10 }) },
-    (_, i) => i + 1,
-  ).map(() => ({
-    id: faker.string.uuid(),
-    name: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    applicationRefNumber: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    modifiedAt: faker.date.past().toISOString().slice(0, 19) + "Z",
-  }));
-
-export const getCreateApplicationResponseMock = <
-  O extends Partial<Extract<CreateApplicationResponseBody, object>> = {},
->(
-  overrideResponse?: O,
-): MockWithNullableOverrides<
-  CreateApplicationResponseBody,
-  O,
-  CreateApplicationResponseBodyMock
-> =>
-  ({
-    id: faker.string.uuid(),
-    ecfFlag: faker.datatype.boolean(),
-    legalAidBefore: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    legalAidLast6Months: faker.datatype.boolean(),
-    reasonForReapplication: faker.string.alpha({
-      length: { min: 10, max: 20 },
-    }),
-    clientDetails: {
-      id: faker.string.uuid(),
-      firstName: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      lastName: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      dateOfBirth: faker.date.past().toISOString().slice(0, 10),
-      niNumber: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      hasFixedAddress: faker.datatype.boolean(),
-      address: {
-        id: faker.string.uuid(),
-        addressLine1: faker.string.alpha({ length: { min: 10, max: 20 } }),
-        addressLine2: faker.string.alpha({ length: { min: 10, max: 20 } }),
-        addressLine3: faker.string.alpha({ length: { min: 10, max: 20 } }),
-        addressLine4: faker.string.alpha({ length: { min: 10, max: 20 } }),
-        townOrCity: faker.string.alpha({ length: { min: 10, max: 20 } }),
-        postCode: faker.string.alpha({ length: { min: 10, max: 20 } }),
-        county: faker.string.alpha({ length: { min: 10, max: 20 } }),
-        country: faker.string.alpha({ length: { min: 10, max: 20 } }),
-        createdAt: faker.date.past().toISOString().slice(0, 19) + "Z",
-        modifiedAt: faker.date.past().toISOString().slice(0, 19) + "Z",
-      },
-      createdAt: faker.date.past().toISOString().slice(0, 19) + "Z",
-      modifiedAt: faker.date.past().toISOString().slice(0, 19) + "Z",
-    },
-    ...overrideResponse,
-  }) as MockWithNullableOverrides<
-    CreateApplicationResponseBody,
-    O,
-    CreateApplicationResponseBodyMock
-  >;
-
-export const getGetApplicationResponseMock = <
-  O extends Partial<Extract<Application, object>> = {},
->(
-  overrideResponse?: O,
-): MockWithNullableOverrides<Application, O, ApplicationMock> =>
-  ({
-    id: faker.string.uuid(),
-    individualLegalAidNumber: faker.string.uuid(),
-    providerFirmCode: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    providerOfficeCode: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    meansAssessmentId: faker.string.uuid(),
-    clientDetails: {
-      id: faker.string.uuid(),
-      firstName: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      lastName: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      dateOfBirth: faker.date.past().toISOString().slice(0, 10),
-      niNumber: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      hasFixedAddress: faker.datatype.boolean(),
-      address: {
-        id: faker.string.uuid(),
-        addressLine1: faker.string.alpha({ length: { min: 10, max: 20 } }),
-        addressLine2: faker.string.alpha({ length: { min: 10, max: 20 } }),
-        addressLine3: faker.string.alpha({ length: { min: 10, max: 20 } }),
-        addressLine4: faker.string.alpha({ length: { min: 10, max: 20 } }),
-        townOrCity: faker.string.alpha({ length: { min: 10, max: 20 } }),
-        postCode: faker.string.alpha({ length: { min: 10, max: 20 } }),
-        county: faker.string.alpha({ length: { min: 10, max: 20 } }),
-        country: faker.string.alpha({ length: { min: 10, max: 20 } }),
-        createdAt: faker.date.past().toISOString().slice(0, 19) + "Z",
-        modifiedAt: faker.date.past().toISOString().slice(0, 19) + "Z",
-      },
-      createdAt: faker.date.past().toISOString().slice(0, 19) + "Z",
-      modifiedAt: faker.date.past().toISOString().slice(0, 19) + "Z",
-    },
-    applicationState: faker.helpers.arrayElement(
-      Object.values(ApplicationState),
-    ),
-    declaration: {
-      id: faker.string.uuid(),
-      clientDeclarationStatus: faker.helpers.arrayElement(
-        Object.values(ClientDeclarationStatus),
-      ),
-      declarationConfirmation: faker.datatype.boolean(),
-      createdAt: faker.date.past().toISOString().slice(0, 19) + "Z",
-      createdBy: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      modifiedAt: faker.date.past().toISOString().slice(0, 19) + "Z",
-      modifiedBy: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    },
-    evidence: {
-      id: faker.string.uuid(),
-      evidenceStatus: faker.helpers.arrayElement(Object.values(EvidenceStatus)),
-      payeIncomeEvidence: faker.datatype.boolean(),
-      otherIncomeEvidence: faker.datatype.boolean(),
-      housingCostsEvidence: faker.datatype.boolean(),
-      capitalEvidence: faker.datatype.boolean(),
-      createdAt: faker.date.past().toISOString().slice(0, 19) + "Z",
-      createdBy: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      modifiedAt: faker.date.past().toISOString().slice(0, 19) + "Z",
-      modifiedBy: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    },
-    reasonForReapplication: faker.string.alpha({
-      length: { min: 10, max: 20 },
-    }),
-    meansAssessmentRequired: faker.datatype.boolean(),
-    typeOfNonMeans: faker.datatype.boolean(),
-    ecfFlag: faker.datatype.boolean(),
-    contribution: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    applicationType: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    createdAt: faker.date.past().toISOString().slice(0, 19) + "Z",
-    createdBy: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    modifiedAt: faker.date.past().toISOString().slice(0, 19) + "Z",
-    modifiedBy: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    ...overrideResponse,
-  }) as MockWithNullableOverrides<Application, O, ApplicationMock>;
 
 export const getGetApplicationsMockHandler = (
   overrideResponse?:
