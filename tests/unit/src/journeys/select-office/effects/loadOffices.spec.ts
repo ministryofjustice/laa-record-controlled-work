@@ -5,7 +5,12 @@ import type { ProviderFirmOfficeListDto } from "#/api/clients/pda/model/provider
 import { ApiResponseError, ApiValidationError } from "#/api/api.errors.js";
 import { getPdaApiDefaultOptions } from "#/api/getPdaApiDefaultOptions.js";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
-import { InvalidFirmCodeClaimError } from "#/journeys/journey.errors.js";
+import {
+  InvalidFirmCodeClaimError,
+  InvalidOfficeError,
+  MissingFirmNameError,
+  NoAvailableOfficesError,
+} from "#/journeys/journey.errors.js";
 import { loadOffices } from "#/journeys/select-office/effects/loadOffices.js";
 import type {
   SelectOfficeContext,
@@ -74,7 +79,7 @@ describe("loadOffices", () => {
       ),
     ).to.equal(true);
     
-    expect(setData.calledOnceWithExactly(CONTEXT_DATA_KEYS.officeList, [
+    expect(setData.calledOnceWithExactly(CONTEXT_DATA_KEYS.availableOffices, [
       {
         address: "1 High Street, Leeds, LS1 1AA",
         code: "LEEDS-01",
@@ -87,7 +92,17 @@ describe("loadOffices", () => {
     const correlationId = "test-correlation-id";
     getRequestHeader.withArgs("x-correlation-id").returns(correlationId);
     getAllProviderOffices.resolves({
-      data: {} satisfies ProviderFirmOfficeListDto,
+      data: {
+        firm: {
+          firmName: "Acme Legal LLP",
+        },
+        offices: [
+          {
+            addressLine1: "1 High Street",
+            firmOfficeCode: "LEEDS-01",
+          },
+        ],
+      } satisfies ProviderFirmOfficeListDto,
       status: 200,
     });
 
@@ -101,16 +116,73 @@ describe("loadOffices", () => {
     ).to.equal(true);
   });
 
-  it("sets an empty office list when the response does not include offices", async () => {
+  it("throws NoAvailableOfficesError when the response does not include offices", async () => {
+    sinon.stub(logger, "error");
     getAllProviderOffices.resolves({
-      data: {} satisfies ProviderFirmOfficeListDto,
+      data: {
+        firm: {
+          firmName: "Acme Legal LLP",
+        },
+      } satisfies ProviderFirmOfficeListDto,
       status: 200,
     });
 
-    await loadOffices(deps)(context);
+    try {
+      await loadOffices(deps)(context);
+      expect.fail("Expected loadOffices to throw NoAvailableOfficesError");
+    } catch (error) {
+      expect(error).to.be.instanceOf(NoAvailableOfficesError);
+      expect(setData.notCalled).to.equal(true);
+    }
+  });
 
-    expect(setData.calledOnceWithExactly(CONTEXT_DATA_KEYS.officeList, [])).to
-      .equal(true);
+  it("throws MissingFirmNameError when the response does not include firm name", async () => {
+    sinon.stub(logger, "error");
+    getAllProviderOffices.resolves({
+      data: {
+        firm: {},
+        offices: [
+          {
+            addressLine1: "1 High Street",
+            firmOfficeCode: "LEEDS-01",
+          },
+        ],
+      } satisfies ProviderFirmOfficeListDto,
+      status: 200,
+    });
+
+    try {
+      await loadOffices(deps)(context);
+      expect.fail("Expected loadOffices to throw MissingFirmNameError");
+    } catch (error) {
+      expect(error).to.be.instanceOf(MissingFirmNameError);
+      expect(setData.notCalled).to.equal(true);
+    }
+  });
+
+  it("throws InvalidOfficeError when an office is missing code and address", async () => {
+    sinon.stub(logger, "error");
+    getAllProviderOffices.resolves({
+      data: {
+        firm: {
+          firmName: "Acme Legal LLP",
+        },
+        offices: [
+          {
+            officeName: "Leeds Office",
+          },
+        ],
+      } satisfies ProviderFirmOfficeListDto,
+      status: 200,
+    });
+
+    try {
+      await loadOffices(deps)(context);
+      expect.fail("Expected loadOffices to throw InvalidOfficeError");
+    } catch (error) {
+      expect(error).to.be.instanceOf(InvalidOfficeError);
+      expect(setData.notCalled).to.equal(true);
+    }
   });
 
   it("throws ApiResponseError when getAllProviderOffices rejects", async () => {
