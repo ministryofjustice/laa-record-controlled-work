@@ -9,6 +9,8 @@
 
 import { http, HttpResponse } from "msw";
 
+import config from "#/config.js";
+
 // Import the actual API handlers
 import { entraHandlers } from "./entra.js";
 import { rcwHandlers } from "./rcw.js";
@@ -25,8 +27,8 @@ const debugHandler = http.all("*", ({ request }) => {
  */
 export const handlers = [
   debugHandler,
-  ...rcwHandlers,
-  ...pdaApiHandlers,
+  ...(config.api.rcw.mode === "msw" ? rcwHandlers : []),
+  ...(config.api.pda.mode === "msw" ? pdaApiHandlers : []),
   ...entraHandlers,
 
   // Health check endpoint for testing

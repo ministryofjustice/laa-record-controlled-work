@@ -7,6 +7,7 @@ faker.seed(12345);
 
 export function getProviderOfficesResponse(limitNumberOfOffices: number) {
   const providerOfficesResponse = getGetAllProviderOfficesResponseMock();
+  // slice only trims - the generator itself yields 1-10 offices, so this is a ceiling, not an exact count.
   return {
     ...providerOfficesResponse,
     offices: providerOfficesResponse.offices.slice(0, limitNumberOfOffices),
