@@ -25,7 +25,10 @@ export function createPdaConfig(): Options {
 
   return {
     hooks: {
-      afterAllFilesWrite: "tsx orval/convertOptionalToNullish.ts",
+      afterAllFilesWrite: [
+        "tsx orval/convertOptionalToNullish.ts",
+        "tsx orval/fixDoubleGenImports.ts",
+      ],
     },
     input: {
       filters: {

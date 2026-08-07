@@ -8,6 +8,9 @@ const RCW_API_SHA = readFileSync(".rcw-api-version", "utf-8").trim();
  * Orval configuration for the Record Controlled Work API.
  */
 export const rcwConfig = {
+  hooks: {
+    afterAllFilesWrite: "tsx orval/fixDoubleGenImports.ts",
+  },
   input: {
     filters: {
       mode: "exclude" as const,
