@@ -10,11 +10,9 @@ import { logger } from "#/logger.js";
 
 export const setSelectedOffice = () => (context: SelectOfficeContext) => {
   const selectedOfficeCode = context.getAnswer("selectOffice");
-  const officeList = context.getData<OfficeData[]>(
-    CONTEXT_DATA_KEYS.officeList,
-  );
+  const availableOffices = context.getData(CONTEXT_DATA_KEYS.officeList);
 
-  const selectedOffice: OfficeData | undefined = officeList.find(
+  const selectedOffice: OfficeData | undefined = availableOffices.find(
     (office) => office.code === selectedOfficeCode,
   );
 

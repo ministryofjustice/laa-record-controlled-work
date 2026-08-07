@@ -1,4 +1,5 @@
 import type {
+  Office,
   SelectOfficeContext,
   SelectOfficeEffectsDeps,
 } from "#/journeys/select-office/select-office.types.js";
@@ -7,11 +8,13 @@ import { ApiResponseError, ApiValidationError } from "#/api/api.errors.js";
 import { ProviderFirmOfficeListDto } from "#/api/clients/pda/model/providerFirmOfficeListDto.zod.gen.js";
 import { getPdaApiDefaultOptions } from "#/api/getPdaApiDefaultOptions.js";
 import { ID_TOKEN_CLAIMS_KEYS } from "#/auth/auth.constants.js";
-import { Office, type OfficeData } from "#/dto/office/office.dto.js";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import {
   InvalidFirmCodeClaimError,
+  InvalidOfficeError,
   InvalidSessionError,
+  MissingFirmNameError,
+  NoAvailableOfficesError,
 } from "#/journeys/journey.errors.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
@@ -57,11 +60,9 @@ export const loadOffices =
       );
       throw ApiValidationError.from(result.error);
     }
-    const officeList: ProviderFirmOfficeListDto = result.data;
+    const mappedOffices = mapAvailableOffices(result.data);
 
-    const mappedOffices: OfficeData[] = Office.fromPdaOfficeList(officeList);
-
-    context.setData(CONTEXT_DATA_KEYS.officeList, mappedOffices);
+    context.setData(CONTEXT_DATA_KEYS.availableOffices, mappedOffices);
   };
 
 /**
@@ -95,4 +96,57 @@ function getFirmIdFromSession(context: SelectOfficeContext): number {
   }
 
   return firmCode;
+}
+
+/**
+ * Maps a ProviderFirmOfficeListDto response to the internal office data format.
+ * Returns undefined and logs if offices are absent (treated as a no-op).
+ * @param officeList Office list from the PDA API.
+ * @returns Mapped offices, or undefined if the offices field is missing.
+ */
+function mapAvailableOffices(officeList: ProviderFirmOfficeListDto): Office[] {
+  const EMPTY = 0;
+  const firmName = officeList.firm?.firmName;
+
+  if (!firmName) {
+    logger.error("ProviderFirmOfficeListDto response data missing firm name", {
+      data: officeList,
+    });
+    throw new MissingFirmNameError();
+  }
+
+  if (!officeList.offices || officeList.offices.length === EMPTY) {
+    logger.error("ProviderFirmOfficeListDto response data missing offices", {
+      data: officeList,
+    });
+
+    throw new NoAvailableOfficesError();
+  }
+
+  return officeList.offices.map((office) => {
+    const addressParts = [
+      office.addressLine1,
+      office.addressLine2,
+      office.addressLine3,
+      office.addressLine4,
+      office.city,
+      office.postCode,
+    ].filter(Boolean);
+
+    if (!office.firmOfficeCode || addressParts.length === EMPTY) {
+      logger.error(
+        "ProviderFirmOfficeListDto response data missing firm office code",
+        {
+          data: office,
+        },
+      );
+      throw new InvalidOfficeError();
+    }
+
+    return {
+      address: addressParts.join(", "),
+      code: office.firmOfficeCode,
+      firmName,
+    };
+  });
 }

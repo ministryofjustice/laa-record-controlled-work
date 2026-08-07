@@ -9,6 +9,14 @@ export class InvalidFirmCodeClaimError extends DomainError {
   }
 }
 
+export class InvalidOfficeError extends DomainError {
+  public readonly name = "InvalidOfficeError";
+
+  constructor(cause?: unknown) {
+    super("Office data is invalid", cause);
+  }
+}
+
 export class InvalidSelectedOfficeError extends DomainError {
   public readonly name = "InvalidSelectedOfficeError";
 
@@ -22,5 +30,20 @@ export class InvalidSessionError extends DomainError {
 
   constructor(cause?: unknown) {
     super("Missing or invalid session data", cause);
+  }
+}
+export class MissingFirmNameError extends DomainError {
+  public readonly name = "MissingFirmNameError";
+
+  constructor(cause?: unknown) {
+    super("Missing firm Name", cause);
+  }
+}
+
+export class NoAvailableOfficesError extends DomainError {
+  public readonly name = "NoAvailableOfficesError";
+
+  constructor(cause?: unknown) {
+    super("No Available Offices", cause);
   }
 }
