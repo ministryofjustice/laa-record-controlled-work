@@ -2,9 +2,9 @@ import { expect } from "chai";
 import sinon from "sinon";
 
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
-import { InvalidSessionError, SelectedOfficeNotFoundError } from "#/journeys/journey.errors.js";
 import { setSelectedOffice } from "#/journeys/select-office/effects/setSelectedOffice.js";
 import type { Office, SelectOfficeContext } from "#/journeys/select-office/select-office.types.js";
+import { InvalidSessionError, InvalidSelectedOfficeError } from "#/journeys/journey.errors.js";
 
 const mockOffices: Office[] = [
   { address: "1 High Street, Leeds, LS1 1AA", code: "LEEDS-01" },
@@ -22,7 +22,10 @@ describe("setSelectedOffice", () => {
   beforeEach(() => {
     session = {};
     getAnswer = sinon.stub().withArgs("selectOffice").returns("LEEDS-01");
-    getData = sinon.stub().withArgs(CONTEXT_DATA_KEYS.officeList).returns(mockOffices);
+    getData = sinon
+      .stub()
+      .withArgs(CONTEXT_DATA_KEYS.availableOffices)
+      .returns(mockOffices);
     getSession = sinon.stub().returns(session);
     setData = sinon.stub();
 
@@ -50,11 +53,11 @@ describe("setSelectedOffice", () => {
     ).to.equal(true);
   });
 
-  it("throws SelectedOfficeNotFoundError when the selected office code is not in the office list", () => {
+  it("throws InvalidSelectedOfficeError when the selected office code is not in the office list", () => {
     getAnswer.withArgs("selectOffice").returns("UNKNOWN-CODE");
 
     expect(() => setSelectedOffice()(context))
-      .to.throw(SelectedOfficeNotFoundError);
+      .to.throw(InvalidSelectedOfficeError);
   });
 
   it("throws InvalidSessionError when session is not available", () => {
