@@ -1431,7 +1431,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@playwright/test@npm:^1.62.0":
+"@playwright/test@npm:^1.62.1":
   version: 1.62.1
   resolution: "@playwright/test@npm:1.62.1"
   dependencies:
@@ -5203,7 +5203,7 @@ __metadata:
     "@j178/prek": "npm:^0.4.11"
     "@ministryofjustice/frontend": "npm:9.0.0"
     "@ministryofjustice/hmpps-forge": "npm:^0.3.4"
-    "@playwright/test": "npm:^1.62.0"
+    "@playwright/test": "npm:^1.62.1"
     "@types/chai": "npm:^5.2.3"
     "@types/chai-as-promised": "npm:^8.0.2"
     "@types/compression": "npm:^1.8.1"
