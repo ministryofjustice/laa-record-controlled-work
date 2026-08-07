@@ -19,14 +19,14 @@ import { logger } from "#/logger.js";
 export const loadOffices =
   (deps: SelectOfficeEffectsDeps) => async (context: SelectOfficeContext) => {
     let response;
-    const firmId = getFirmIdFromSession(context);
+    const firmCode = getFirmCodeFromSession(context);
     const correlationId = context
       .getRequestHeader("x-correlation-id")
       ?.toString();
 
     try {
       const opts = getPdaApiDefaultOptions(correlationId);
-      response = await deps.getAllProviderOffices(firmId, opts);
+      response = await deps.getAllProviderOffices(firmCode, opts);
     } catch (error) {
       logger.error("Error fetching offices", error, {
         api: "getAllProviderOffices",
@@ -63,11 +63,11 @@ export const loadOffices =
   };
 
 /**
- * Reads and validates the numeric firm identifier from the authenticated account claims.
+ * Reads and validates the numeric firm code from the authenticated account claims.
  * @param context Journey effect context containing the current session.
- * @returns Firm identifier required by the PDA provider offices API.
+ * @returns Firm code required by the PDA provider offices API.
  */
-function getFirmIdFromSession(context: SelectOfficeContext): number {
+function getFirmCodeFromSession(context: SelectOfficeContext): number {
   const session = context.getSession();
   if (!session) {
     throw new InvalidSessionError();
