@@ -30,7 +30,7 @@ export const selectOfficeJourney = journey({
       next: [
         redirect({
           goto: "/cases",
-          when: Data(CONTEXT_DATA_KEYS.officeList)
+          when: Data(CONTEXT_DATA_KEYS.availableOffices)
             .pipe(Transformer.Array.Length())
             .match(Condition.Equals(SINGLE_OFFICE)),
         }),

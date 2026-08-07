@@ -1,8 +1,9 @@
-import type { OpenApiDocument, Options } from "@orval/core";
+import type { Options } from "@orval/core";
 
 import "dotenv/config";
 
 import { loadGitHubOpenApiSpec } from "./loadGitHubOpenApiSpec.js";
+import { pdaTransformer } from "./pda.transformer.js";
 import { sharedOutputConfig } from "./shared.orval.js";
 
 /**
@@ -23,23 +24,21 @@ export function createPdaConfig(): Options {
   });
 
   return {
+    hooks: {
+      afterAllFilesWrite: "tsx orval/processZodFile.ts",
+    },
     input: {
       filters: {
         mode: "include" as const,
         schemas: ["ProviderFirmOfficeListDto"],
       },
       override: {
-        transformer: (spec: OpenApiDocument): OpenApiDocument => {
-          const targetPath = "/provider-firms/{firmId}/provider-offices";
-          const pathItem = spec.paths?.[targetPath];
-          return {
-            ...spec,
-            paths: pathItem ? { [targetPath]: pathItem } : {},
-          };
-        },
+        transformer: pdaTransformer,
       },
       target: pdaApiSpec,
     },
-    output: sharedOutputConfig("pda", "config.api.pda.baseUrl"),
+    output: {
+      ...sharedOutputConfig("pda", "config.api.pda.baseUrl"),
+    },
   };
 }

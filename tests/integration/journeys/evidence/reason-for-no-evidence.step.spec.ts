@@ -11,7 +11,7 @@ describe("Reason for no evidence step", () => {
   const client = createForgeTestClient(
     "Evidence",
     "/cases/evidence",
-    reasonForNoEvidence("testJourney"),
+    [reasonForNoEvidence("testJourney")],
   );
 
   describe("GET /cases/evidence/reason-for-no-evidence", () => {

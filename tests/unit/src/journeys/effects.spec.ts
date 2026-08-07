@@ -38,9 +38,11 @@ const clearAnswerStep = step({
 const client = createForgeTestClient(
   "Record new case",
   "/cases/new/",
-  ecfStep("testJourney"),
-  clearDraftStep,
-  clearAnswerStep,
+  [
+    ecfStep("testJourney"),
+    clearDraftStep,
+    clearAnswerStep,
+  ],
 );
 let session: Record<string, unknown> = {};
 

@@ -12,8 +12,10 @@ describe("ECF step", () => {
   const client = createForgeTestClient(
     "Record new case",
     "/cases/new/",
-    ecfStep("testJourney"),
-    ineligibleStep("testJourney"),
+    [
+      ecfStep("testJourney"),
+      ineligibleStep("testJourney"),
+    ],
   );
 
   describe("GET /cases/new/ecf", () => {

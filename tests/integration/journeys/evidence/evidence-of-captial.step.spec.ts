@@ -11,7 +11,7 @@ describe("Evidence of capital step", () => {
   const client = createForgeTestClient(
     "Evidence",
     "/cases/evidence",
-    evidenceOfCapital("testJourney"),
+    [evidenceOfCapital("testJourney")],
   );
 
   describe("GET /cases/evidence/evidence-of-capital", () => {

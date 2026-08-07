@@ -9,16 +9,16 @@ import {
 import { GovUKRadioInput } from "@ministryofjustice/hmpps-forge/govuk-components";
 
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
-import { OFFICE_FIELD } from "#/journeys/select-office/select-office.types.js";
+import { OFFICE_KEY } from "#/journeys/select-office/select-office.types.js";
 import { t } from "#/lib/i18n.js";
 
-const officeItems = Data(CONTEXT_DATA_KEYS.officeList).each(
+const officeItems = Data(CONTEXT_DATA_KEYS.availableOffices).each(
   Iterator.Map({
     hint: {
-      text: Item().path(OFFICE_FIELD.code),
+      text: Item().path(OFFICE_KEY.code),
     },
-    text: Item().path(OFFICE_FIELD.address),
-    value: Item().path(OFFICE_FIELD.code),
+    text: Item().path(OFFICE_KEY.address),
+    value: Item().path(OFFICE_KEY.code),
   }),
 );
 

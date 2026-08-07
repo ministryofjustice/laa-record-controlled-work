@@ -11,7 +11,7 @@ describe("Evidence of income step", () => {
   const client = createForgeTestClient(
     "Evidence",
     "/cases/evidence",
-    evidenceOfIncome("testJourney"),
+    [evidenceOfIncome("testJourney")],
   );
 
   describe("GET /cases/evidence/evidence-of-income", () => {

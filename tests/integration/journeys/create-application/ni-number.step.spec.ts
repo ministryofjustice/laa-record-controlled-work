@@ -11,7 +11,7 @@ describe("NI number step", () => {
   const client = createForgeTestClient(
     "Record new case",
     "/cases/new/",
-    niNumberStep("testJourney"),
+    [niNumberStep("testJourney")],
   );
 
   describe("GET /cases/new/ni-number", () => {
