@@ -1,147 +1,252 @@
-// TODO implement integration tests using testconatiners
-// import { AuthService } from "#/services/auth.js";
-// import { failure, success } from "#/lib/either.js";
-// import { expect } from "chai";
-// import express from "express";
-// import sinon from "sinon";
-// import request from "supertest";
-// import {
-//   BAD_REQUEST,
-//   FOUND,
-//   INTERNAL_SERVER_ERROR,
-//   UNAUTHORIZED,
-// } from "#/lib/constants/httpStatus.js";
+import createApp from "#/app.js";
+import { Application } from "express";
+import {
+  GenericContainer,
+  Wait,
+  type StartedTestContainer,
+} from "testcontainers";
+import request from "supertest";
+import { expect } from "chai";
+import { authRequestDefaults, msalConfig } from "#/auth/auth.config.js";
+import config from "#/config.js";
+import { SessionData } from "express-session";
+import { Agent, request as undiciRequest, setGlobalDispatcher } from "undici";
+import type { RedisClientType } from "redis";
+import { createRedisClient as createAppRedisClient } from "#/lib/redis.js";
+import { FOUND, OK } from "#/lib/constants/http.js";
 
-// import createApp from "#/app.js";
-// import { MissingAuthCodeRequestError, MsalError, StateMismatchError, TokenAcquisitionError } from "#/lib/errors/auth.js";
-// import { MS_IN_TWELVE_HOURS } from "#/lib/constants/timeEnums.js";
-// import SessionService from "#/services/sessionService.js";
+const REDIS_PORT = 6379;
+const IDP_PORT = 8080;
 
+type MockMsalMetadata = {
+  authorityMetadata: string;
+  cloudDiscoveryMetadata: string;
+};
 
-// describe("authRoutes", () => {
-//   let authServiceStub: {
-//     getAuthCodeUrl: sinon.SinonStub;
-//     processAuthCodeCallback: sinon.SinonStub;
-//   };
-//   let sessionServiceStub: {
-//     getSessionConfig: sinon.SinonStub;
-//   };
-//   let app: express.Application;
+type MutableAuthRequestDefaults = {
+  redirectUri: string;
+};
 
-//   before(async () => {
-//     sessionServiceStub = {
-//       getSessionConfig: sinon.stub().resolves({
-//         secret: "test-secret-3",
-//         resave: false,
-//         saveUninitialized: false,
-//         cookie: {
-//           secure: false,
-//           httpOnly: true,
-//           maxAge: MS_IN_TWELVE_HOURS,
-//         }, // NO REDIS
-//       }),
-//     };
+type MutableMsalConfig = {
+  auth: {
+    authority: string;
+    authorityMetadata?: string;
+    clientId: string;
+    clientSecret: string;
+    cloudDiscoveryMetadata?: string;
+  };
+};
 
-//     sinon
-//       .stub(SessionService, "create")
-//       .returns(sessionServiceStub as unknown as SessionService);
+type MsalOriginalValues = {
+  authority: string;
+  authorityMetadata?: string;
+  cloudDiscoveryMetadata?: string;
+  redirectUri: string;
+};
 
-//     app = await createApp();
-//   });
+function buildMockIdpMsalMetadata(authority: string): MockMsalMetadata {
+  const authorityUrl = new URL(authority);
+  const hostWithPort = authorityUrl.host;
+  const normalizedAuthority = authority.replace(/\/+$/, "");
 
-//   const AUTH_CODE_URL = "https://login.microsoftonline.com/auth/";
-//   const SUCCESS_REDIRECT = "/case/123";
+  return {
+    authorityMetadata: JSON.stringify({
+      authorization_endpoint: `${normalizedAuthority}/oauth2/v2.0/authorize`,
+      code_challenge_methods_supported: ["S256"],
+      end_session_endpoint: `${normalizedAuthority}/oauth2/v2.0/logout`,
+      id_token_signing_alg_values_supported: ["RS256"],
+      issuer: `${normalizedAuthority}/v2.0`,
+      jwks_uri: `${normalizedAuthority}/discovery/v2.0/keys`,
+      response_modes_supported: ["query"],
+      response_types_supported: ["code"],
+      subject_types_supported: ["pairwise"],
+      token_endpoint: `${normalizedAuthority}/oauth2/v2.0/token`,
+    }),
+    cloudDiscoveryMetadata: JSON.stringify({
+      metadata: [
+        {
+          aliases: [hostWithPort],
+          preferred_cache: hostWithPort,
+          preferred_network: hostWithPort,
+        },
+      ],
+      tenant_discovery_endpoint: `${normalizedAuthority}/v2.0/.well-known/openid-configuration`,
+    }),
+  };
+}
 
-//   beforeEach(() => {
-//     authServiceStub = {
-//       getAuthCodeUrl: sinon.stub().resolves(success(AUTH_CODE_URL)),
-//       processAuthCodeCallback: sinon
-//         .stub()
-//         .resolves(success(SUCCESS_REDIRECT)),
-//     };
-//     sinon
-//       .stub(AuthService, "create")
-//       .returns(authServiceStub as unknown as AuthService);
-//   });
+let redisContainer: StartedTestContainer;
+let idpContainer: StartedTestContainer;
+let app: Application;
+let authenticatedUser: ReturnType<typeof request.agent>;
+let unauthenticatedUser: ReturnType<typeof request.agent>;
+let sessionRedisClient: RedisClientType;
+let msalOriginalValues: MsalOriginalValues;
 
-//   afterEach(() => sinon.restore());
+describe("Auth Integration", () => {
+  before(async function () {
+    this.timeout(300_000); // containers may need to pull images on first run
+    // MSAL Node uses native fetch (backed by undici). setGlobalDispatcher patches
+    // undici's default dispatcher so fetch accepts the mock IdP's self-signed TLS cert.
+    setGlobalDispatcher(new Agent({ connect: { rejectUnauthorized: false } }));
 
-//   describe("POST /auth/code/callback", () => {
-//     it("calls processAuthCodeCallback() and redirects to successRedirect", async () => {
-//       const res = await request(app)
-//         .post("/auth/code/callback")
-//         .type("form")
-//         .send({ code: "auth-code-abc", state: "encoded-state" });
+    // Start Redis and IdP containers in parallel
+    [redisContainer, idpContainer] = await Promise.all([
+      new GenericContainer("redis:7-alpine")
+        .withExposedPorts(REDIS_PORT)
+        .withWaitStrategy(Wait.forLogMessage("Ready to accept connections"))
+        .start(),
 
-//       expect(authServiceStub.processAuthCodeCallback.calledOnce).to.be.true;
-//       expect(res.status).to.equal(FOUND);
-//       expect(res.headers.location).to.equal(SUCCESS_REDIRECT);
-//     });
+      new GenericContainer("ghcr.io/navikt/mock-oauth2-server:3.0.1")
+        .withExposedPorts(IDP_PORT)
+        .withEnvironment({
+          JSON_CONFIG: JSON.stringify({
+            interactiveLogin: true,
+            httpServer: { type: "NettyWrapper", ssl: {} },
+          }),
+        })
+        .withWaitStrategy(
+          Wait.forHttp("/isalive", IDP_PORT).usingTls().allowInsecure(),
+        )
+        .start(),
+    ]);
 
-//     it("responds with 400 when body.code is missing", async () => {
-//       const res = await request(app)
-//         .post("/auth/code/callback")
-//         .type("form")
-//         .send({ state: "encoded-state" });
+    const idpPort = idpContainer.getMappedPort(IDP_PORT);
+    const redisUrl = `redis://localhost:${redisContainer.getMappedPort(REDIS_PORT)}`;
+    const mutableMsalConfig = msalConfig as unknown as MutableMsalConfig;
+    const mutableAuthRequestDefaults =
+      authRequestDefaults as unknown as MutableAuthRequestDefaults;
 
-//       expect(authServiceStub.processAuthCodeCallback.called).to.be.false;
-//       expect(res.status).to.equal(BAD_REQUEST);
-//     });
+    config.entra.authority = `https://localhost:${idpPort}/default`;
+    config.entra.redirectUri = "http://127.0.0.1/auth/code/callback";
+    const { authorityMetadata, cloudDiscoveryMetadata } =
+      buildMockIdpMsalMetadata(config.entra.authority);
 
-//     it("responds with 400 when processAuthCodeCallback returns MissingAuthCodeRequest", async () => {
-//       authServiceStub.processAuthCodeCallback.resolves(
-//         failure(MissingAuthCodeRequestError),
-//       );
+    msalOriginalValues = {
+      authority: mutableMsalConfig.auth.authority,
+      authorityMetadata: mutableMsalConfig.auth.authorityMetadata,
+      cloudDiscoveryMetadata: mutableMsalConfig.auth.cloudDiscoveryMetadata,
+      redirectUri: mutableAuthRequestDefaults.redirectUri,
+    };
 
-//       const res = await request(app)
-//         .post("/auth/code/callback")
-//         .type("form")
-//         .send({ code: "auth-code-abc", state: "encoded-state" });
+    mutableMsalConfig.auth.authority = config.entra.authority;
+    mutableMsalConfig.auth.authorityMetadata = authorityMetadata;
+    mutableMsalConfig.auth.cloudDiscoveryMetadata = cloudDiscoveryMetadata;
+    mutableAuthRequestDefaults.redirectUri = config.entra.redirectUri;
 
-//       expect(res.status).to.equal(BAD_REQUEST);
-//     });
+    config.redis.enabled = true;
+    config.redis.url = redisUrl;
+    process.env.PLAYWRIGHT_TEST_SIGNIN = "true";
 
-//     it("responds with 400 when processAuthCodeCallback returns StateMismatchError", async () => {
-//       authServiceStub.processAuthCodeCallback.resolves(
-//         failure(StateMismatchError),
-//       );
+    app = await createApp({
+      getRedisClient: () => {
+        sessionRedisClient = createAppRedisClient(config.redis);
+        return sessionRedisClient;
+      },
+    });
+  });
 
-//       const res = await request(app)
-//         .post("/auth/code/callback")
-//         .type("form")
-//         .send({ code: "auth-code-abc", state: "encoded-state" });
+  after(async () => {
+    const mutableMsalConfig = msalConfig as unknown as MutableMsalConfig;
+    const mutableAuthRequestDefaults =
+      authRequestDefaults as unknown as MutableAuthRequestDefaults;
 
-//       expect(res.status).to.equal(BAD_REQUEST);
-//     });
+    mutableMsalConfig.auth.authority = msalOriginalValues.authority;
+    mutableMsalConfig.auth.authorityMetadata = msalOriginalValues.authorityMetadata;
+    mutableMsalConfig.auth.cloudDiscoveryMetadata =
+      msalOriginalValues.cloudDiscoveryMetadata;
+    mutableAuthRequestDefaults.redirectUri = msalOriginalValues.redirectUri;
 
-//     it("responds with 401 when processAuthCodeCallback returns TokenAcquisitionError", async () => {
-//       authServiceStub.processAuthCodeCallback.resolves(
-//         failure(TokenAcquisitionError.from(new Error("MSAL"))),
-//       );
+    if (sessionRedisClient.isOpen) {
+      await sessionRedisClient.quit();
+    }
 
-//       const res = await request(app)
-//         .post("/auth/code/callback")
-//         .type("form")
-//         .send({ code: "auth-code-abc", state: "encoded-state" });
+    await Promise.all([
+      redisContainer?.stop(),
+      idpContainer?.stop(),
+    ]);
+  });
 
-//       expect(res.status).to.equal(UNAUTHORIZED);
-//     });
-//   });
+  beforeEach(async () => {
+    authenticatedUser = request.agent(app);
+    await authenticatedUser.get("/test/signin");
+    unauthenticatedUser = request.agent(app);
+  });
 
-//   describe("GET /auth/signin", () => {
-//     it("redirects to the URL returned by authService.getAuthCodeUrl()", async () => {
-//       const response = await request(app).get("/auth/signin");
-//       expect(response.status).to.equal(FOUND);
-//       expect(response.headers.location).to.equal(AUTH_CODE_URL);
-//     });
+  afterEach(async () => {
+    await sessionRedisClient.flushAll();
+  });
 
-//     it("responds with 500 when getAuthCodeUrl returns a MsalError", async () => {
-//       authServiceStub.getAuthCodeUrl.resolves(
-//         failure(MsalError.from(new Error("MSAL failure"))),
-//       );
+  describe("GET /health", () => {
+    it("returns healthy without auth", async () => {
+      const res = await request(app).get("/health");
+      expect(res.status).to.equal(OK);
+      expect(res.text).to.equal("Healthy");
+    });
+  });
 
-//       const response = await request(app).get("/auth/signin");
-//       expect(response.status).to.equal(INTERNAL_SERVER_ERROR);
-//     });
-//   });
-// });
+  describe("Get /", () => {
+    it("redirects unauthenticated user to /auth/signin", async () => {
+      const res = await unauthenticatedUser.get("/");
+      expect(res.status).to.equal(FOUND);
+      expect(res.headers.location).to.equal("/auth/signin");
+    });
+
+    it("authenticated user lands on landing page", async () => {
+      const res = await authenticatedUser.get("/");
+      expect(res.status).to.equal(OK);
+      expect(res.text).to.include("Landing Page");
+    });
+
+    it("authenticated user will store session data in redis", async () => {
+      await authenticatedUser.get("/");
+      const keys = await sessionRedisClient.keys("sess:*");
+      const raw = await sessionRedisClient.get(keys[0]);
+      const session = JSON.parse(raw!) as SessionData;
+      expect(session.isAuthenticated).to.equal(true);
+      expect(session.account?.homeAccountId).to.equal(
+        "test-uid.test-tenant-id",
+      );
+    });
+  });
+
+  describe("OAuth2 Authorization Code Flow", () => {
+    it("unauthenticated user can complete full login flow via mock IdP", async () => {
+
+      const signinRes = await unauthenticatedUser.get("/auth/signin");
+      expect(signinRes.status).to.equal(FOUND);
+
+      // Extract the authorize URL from the redirect to send the next request to the IdP
+      const authorizeUrl = signinRes.headers.location as string;
+
+      // Bypass the mock server's login form by POSTing directly to the
+      // authorize endpoint with a username.
+      const postBody = new URLSearchParams({ username: "testuser" }).toString();
+      const idpResponse = await undiciRequest(authorizeUrl, {
+        method: "POST",
+        body: postBody,
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      });
+ 
+      // The mock server redirects to our app's callback with code & state.
+      // Extract the path+query so we can send it to the app via supertest
+      const location = idpResponse.headers.location;
+      const callbackLocation = Array.isArray(location) ? location[0] : location;
+      expect(callbackLocation, "IdP response location header").to.be.a("string");
+      const { pathname, search } = new URL(
+        callbackLocation as string,
+        config.entra.redirectUri,
+      );
+    
+      // Complete the OAuth2 callback by sending the code and state to callback endpoint
+      const callbackRes = await unauthenticatedUser.get(pathname + search);
+      expect(callbackRes.status).to.equal(FOUND);
+      expect(callbackRes.headers.location).to.equal("/");
+
+      // Verify the user is now authenticated and can reach the landing page
+      const landingRes = await unauthenticatedUser.get("/");
+      expect(landingRes.status).to.equal(OK);
+      expect(landingRes.text).to.include("Landing Page");
+    });
+  });
+});

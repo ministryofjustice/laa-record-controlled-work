@@ -9,6 +9,7 @@ include:
 
 services:
   nginx:
+    container_name: nginx-reverse-proxy  
     image: nginxinc/nginx-unprivileged:${NGINX_IMAGE_TAG:-alpine}
     container_name: rcw-nginx
     ports:

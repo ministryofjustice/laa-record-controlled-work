@@ -11,6 +11,8 @@ import compression from "compression";
 import express from "express";
 import session from "express-session";
 
+import type { CreateRedisStore, GetRedisClient } from "#/lib/redis.js";
+
 import { getAllProviderOffices } from "#/api/clients/pda/schema/provider-firms-endpoints/provider-firms-endpoints.gen.js";
 import {
   createApplication,
@@ -24,6 +26,7 @@ import editApplication from "#/journeys/edit-application/edit-application.index.
 import evidence from "#/journeys/evidence/evidence.index.js";
 import { selectOfficePackage } from "#/journeys/select-office/select-office.journey.js";
 import { yourCasesPackage } from "#/journeys/your-cases/your-cases.journey.js";
+import * as redis from "#/lib/redis.js";
 import { createSession } from "#/lib/session.js";
 import { requireAuth } from "#/middleware/requireAuth.js";
 import { setupConfig } from "#/middleware/setupConfigs.js";
@@ -43,16 +46,27 @@ import privateApiRouter from "#/routes/privateApi.js";
 import testRouter from "#/routes/test.js";
 
 const TRUST_FIRST_PROXY = 1;
-const ENABLE_PLAYWRIGHT_TEST_SIGNIN =
-  process.env.PLAYWRIGHT_TEST_SIGNIN === "true";
+
+interface Dependencies {
+  createRedisStore?: CreateRedisStore;
+  getRedisClient?: GetRedisClient;
+}
 
 /**
  * Creates and configures an Express application.
  * Server startup is handled separately in src/server.ts.
  *
+ * @param dependencies injected dependencies
  * @returns {Promise<import('express').Application>} The configured Express application
  */
-const createApp = async (): Promise<express.Application> => {
+const createApp = async (
+  dependencies: Dependencies = {},
+): Promise<express.Application> => {
+  const {
+    createRedisStore = redis.createRedisStore,
+    getRedisClient = redis.getRedisClient,
+  } = dependencies;
+
   const app = express();
 
   app.use("/", healthRouter);
@@ -109,14 +123,19 @@ const createApp = async (): Promise<express.Application> => {
   setupRequestLogging(app);
 
   // Setup express-session using redis
-  app.use(session(await createSession(config)));
+  app.use(
+    session(await createSession(config, getRedisClient, createRedisStore)),
+  );
 
   app.use("/api/private", requireAuth, privateApiRouter);
 
   setupCsrf(app);
 
   // Playwright-only route: sets an authenticated session without going through Entra.
-  if (ENABLE_PLAYWRIGHT_TEST_SIGNIN && process.env.NODE_ENV === "test") {
+  if (
+    process.env.PLAYWRIGHT_TEST_SIGNIN === "true" &&
+    process.env.NODE_ENV === "test"
+  ) {
     app.use("/test", testRouter);
   }
 

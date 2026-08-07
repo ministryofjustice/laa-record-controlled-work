@@ -31,7 +31,7 @@
     "unit": "./node_modules/.bin/mocha --recursive 'tests/unit/**/*.spec.ts'",
     "unit:watch": "./node_modules/.bin/mocha --watch --recursive 'tests/unit/**/*.spec.ts'",
     "unit:coverage": "c8 yarn unit --check-coverage",
-    "integration": "./node_modules/.bin/mocha --recursive 'tests/integration/**/*.spec.ts'",
+    "integration": "yarn build && ./node_modules/.bin/mocha --recursive 'tests/integration/**/*.spec.ts'",
     "integration:watch": "./node_modules/.bin/mocha --watch --recursive 'tests/integration/**/*.spec.ts'",
     "e2e": "yarn playwright test --config=tests/playwright/playwright.config.ts",
     "e2e:ui": "yarn playwright test --config=tests/playwright/playwright.config.ts --ui",
@@ -110,14 +110,18 @@
     "sass-embedded": "^1.100.0",
     "sinon": "^22.1.0",
     "supertest": "^7.2.2",
+    "testcontainers": "^12.0.4",
     "tsx": "^4.23.1",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "undici": "^8.9.0"
   },
   "packageManager": "yarn@4.18.0",
   "resolutions": {
     "brace-expansion": "5.0.9",
     "serialize-javascript": "7.0.7",
     "js-yaml": "4.3.0",
-    "ws": "8.21.1"
+    "ws": "8.21.1",
+    "undici": "8.9.0",
+    "tar": "^7.5.21"
   }
 }

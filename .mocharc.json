@@ -2,5 +2,6 @@
   "require": ["tests/unit/setup.ts"],
   "node-option": ["no-warnings", "import=tsx"],
   "extensions": ["ts", "tsx"],
-  "reporter": "list"
+  "reporter": "list",
+  "timeout": 60000
 }
