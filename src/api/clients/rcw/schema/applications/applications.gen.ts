@@ -16,6 +16,8 @@ import type { CreateApplicationResponseBody } from "../../model/createApplicatio
 
 import type { GetApplicationsParams } from "../../model/getApplicationsParams.zod.gen.js";
 
+import type { UpdateMeansDataRequestBody } from "../../model/updateMeansDataRequestBody.zod.gen.js";
+
 export type getApplicationsResponse200 = {
   data: Applications;
   status: 200;
@@ -232,4 +234,88 @@ export const getApplication = async (
     status: res.status,
     headers: res.headers,
   } as getApplicationResponse;
+};
+
+export type updateApplicationMeansResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type updateApplicationMeansResponse400 = {
+  data: void;
+  status: 400;
+};
+
+export type updateApplicationMeansResponse401 = {
+  data: void;
+  status: 401;
+};
+
+export type updateApplicationMeansResponse403 = {
+  data: void;
+  status: 403;
+};
+
+export type updateApplicationMeansResponse404 = {
+  data: void;
+  status: 404;
+};
+
+export type updateApplicationMeansResponse409 = {
+  data: void;
+  status: 409;
+};
+
+export type updateApplicationMeansResponse500 = {
+  data: void;
+  status: 500;
+};
+
+export type updateApplicationMeansResponseSuccess =
+  updateApplicationMeansResponse204 & {
+    headers: Headers;
+  };
+export type updateApplicationMeansResponseError = (
+  | updateApplicationMeansResponse400
+  | updateApplicationMeansResponse401
+  | updateApplicationMeansResponse403
+  | updateApplicationMeansResponse404
+  | updateApplicationMeansResponse409
+  | updateApplicationMeansResponse500
+) & {
+  headers: Headers;
+};
+
+export type updateApplicationMeansResponse =
+  updateApplicationMeansResponseSuccess | updateApplicationMeansResponseError;
+
+export const getUpdateApplicationMeansUrl = (id: string) => {
+  return `${config.api.rcw.baseUrl}/api/v1/applications/${id}/means`;
+};
+
+/**
+ * @summary Update the means data for an application
+ */
+export const updateApplicationMeans = async (
+  id: string,
+  updateMeansDataRequestBody: UpdateMeansDataRequestBody,
+  options?: RequestInit,
+): Promise<updateApplicationMeansResponse> => {
+  const res = await fetch(getUpdateApplicationMeansUrl(id), {
+    ...options,
+    method: "PUT",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(updateMeansDataRequestBody),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: updateApplicationMeansResponse["data"] = body
+    ? JSON.parse(body)
+    : undefined;
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as updateApplicationMeansResponse;
 };

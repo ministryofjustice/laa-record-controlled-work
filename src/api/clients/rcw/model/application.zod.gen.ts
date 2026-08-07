@@ -9,8 +9,8 @@ import { z as zod } from "zod";
 export const Application = zod.object({
   id: zod.uuid(),
   individualLegalAidNumber: zod.uuid(),
-  providerFirmId: zod.uuid(),
-  providerOfficeId: zod.uuid(),
+  providerFirmCode: zod.string(),
+  providerOfficeCode: zod.string(),
   meansAssessmentId: zod.uuid().optional(),
   clientDetails: zod.object({
     id: zod.uuid().optional(),
@@ -37,7 +37,7 @@ export const Application = zod.object({
     createdAt: zod.iso.datetime({ offset: true }).optional(),
     modifiedAt: zod.iso.datetime({ offset: true }).optional(),
   }),
-  applicationStatus: zod.enum(["DRAFT", "COMPLETE"]).optional(),
+  applicationState: zod.enum(["DRAFT", "COMPLETED"]),
   declaration: zod
     .object({
       id: zod.uuid().optional(),

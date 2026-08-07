@@ -11,7 +11,7 @@ import type { RequestHandlerOptions } from "msw";
 
 import type { Application } from "../../../../../../src/api/clients/rcw/model/application.zod.gen.js";
 
-import { ApplicationStatus } from "../../../../../../src/api/clients/rcw/model/applicationStatus.zod.gen.js";
+import { ApplicationState } from "../../../../../../src/api/clients/rcw/model/applicationState.zod.gen.js";
 
 import type { Applications } from "../../../../../../src/api/clients/rcw/model/applications.zod.gen.js";
 
@@ -113,8 +113,8 @@ export const getGetApplicationResponseMock = <
   ({
     id: faker.string.uuid(),
     individualLegalAidNumber: faker.string.uuid(),
-    providerFirmId: faker.string.uuid(),
-    providerOfficeId: faker.string.uuid(),
+    providerFirmCode: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    providerOfficeCode: faker.string.alpha({ length: { min: 10, max: 20 } }),
     meansAssessmentId: faker.string.uuid(),
     clientDetails: {
       id: faker.string.uuid(),
@@ -139,8 +139,8 @@ export const getGetApplicationResponseMock = <
       createdAt: faker.date.past().toISOString().slice(0, 19) + "Z",
       modifiedAt: faker.date.past().toISOString().slice(0, 19) + "Z",
     },
-    applicationStatus: faker.helpers.arrayElement(
-      Object.values(ApplicationStatus),
+    applicationState: faker.helpers.arrayElement(
+      Object.values(ApplicationState),
     ),
     declaration: {
       id: faker.string.uuid(),
@@ -252,8 +252,30 @@ export const getGetApplicationMockHandler = (
     options,
   );
 };
+
+export const getUpdateApplicationMeansMockHandler = (
+  overrideResponse?:
+    | void
+    | ((
+        info: Parameters<Parameters<typeof http.put>[1]>[0],
+      ) => Promise<void> | void),
+  options?: RequestHandlerOptions,
+) => {
+  return http.put(
+    "*/api/v1/applications/:id/means",
+    async (info: Parameters<Parameters<typeof http.put>[1]>[0]) => {
+      if (typeof overrideResponse === "function") {
+        await overrideResponse(info);
+      }
+
+      return new HttpResponse(null, { status: 204 });
+    },
+    options,
+  );
+};
 export const getApplicationsMock = () => [
   getGetApplicationsMockHandler(),
   getCreateApplicationMockHandler(),
   getGetApplicationMockHandler(),
+  getUpdateApplicationMeansMockHandler(),
 ];
