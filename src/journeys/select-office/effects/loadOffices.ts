@@ -110,14 +110,14 @@ function mapAvailableOffices(officeList: ProviderFirmOfficeListDto): Office[] {
 
   if (!firmName) {
     logger.error("ProviderFirmOfficeListDto response data missing firm name", {
-      data: officeList,
+      firmName,
     });
     throw new MissingFirmNameError();
   }
 
   if (!officeList.offices || officeList.offices.length === EMPTY) {
     logger.error("ProviderFirmOfficeListDto response data missing offices", {
-      data: officeList,
+      offices: officeList.offices,
     });
 
     throw new NoAvailableOfficesError();
@@ -135,10 +135,8 @@ function mapAvailableOffices(officeList: ProviderFirmOfficeListDto): Office[] {
 
     if (!office.firmOfficeCode || addressParts.length === EMPTY) {
       logger.error(
-        "ProviderFirmOfficeListDto response data missing firm office code",
-        {
-          data: office,
-        },
+        "ProviderFirmOfficeListDto response data missing firm office code or address",
+        { office },
       );
       throw new InvalidOfficeError();
     }
