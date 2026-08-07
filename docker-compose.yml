@@ -9,7 +9,6 @@ include:
 
 services:
   nginx:
-    container_name: nginx-reverse-proxy  
     image: nginxinc/nginx-unprivileged:${NGINX_IMAGE_TAG:-alpine}
     container_name: rcw-nginx
     ports:
@@ -47,18 +46,19 @@ services:
       - .env # load from .env first
     environment: # set overrides
       - NODE_ENV=docker
-      - API_MODE=api
+      - NODE_EXTRA_CA_CERTS=/etc/mock-oauth2-server.crt.pem
+      # APIs
+      - RCW_API_MODE=api
       - RCW_API_BASE_URL=http://rcw-api:8081
+      - PDA_API_MODE=msw
+      - PDA_MSW_OFFICE_COUNT=${PDA_MSW_OFFICE_COUNT:-3}
+      # Session cache
       - REDIS_ENABLED=true
       - REDIS_URL=redis://redis-rcw:6379
       - REDIS_AUTH_TOKEN=${REDIS_AUTH_TOKEN:-redis_password}
-      - ENTRA_REDIRECT_URI=http://localhost:8080/auth/code/callback
-      - NODE_EXTRA_CA_CERTS=/etc/mock-oauth2-server.crt.pem
-      # Signs in via the mock-oauth2-server container by default, matching rcw-api and
-      # info-and-advice-api's own defaults - see docker-compose.entra.yml to sign in via real
-      # Entra ID instead. MSAL rejects non-https authorities, so the mock server terminates
-      # TLS with a self-signed cert (see docker/certs) covering host.docker.internal.
+      # OAuth/OIDC settings
       - ENTRA_AUTHORITY_BASE_URL=https://host.docker.internal:9090/
+      - ENTRA_REDIRECT_URI=http://localhost:8080/auth/code/callback
       - ENTRA_TENANT_ID=default
       - ENTRA_CLIENT_ID=rcw
       - ENTRA_CLIENT_SECRET=not-used-by-mock-oauth2-server
