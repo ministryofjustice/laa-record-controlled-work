@@ -42,6 +42,6 @@ export const selectedOfficeMultiple = GovUKBody({
 });
 
 export const createCaseButton = GovUKLinkButton({
-  href: "/cases/new/",
+  href: "/cases/new/provider-declaration",
   text: t("pages.yourCases.createCaseButton"),
 });

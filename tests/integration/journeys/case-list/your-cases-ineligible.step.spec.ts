@@ -62,6 +62,9 @@ describe("Your Cases Ineligible step", () => {
 
     it("renders a link button", () => {
       expect(recordButton.properties.text).to.equal("Record a new case");
+      expect(recordButton.properties.href).to.equal(
+        "/cases/new/provider-declaration",
+      );
     });
 
     it("renders a selected office block", () => {

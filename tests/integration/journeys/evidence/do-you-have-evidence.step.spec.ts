@@ -11,7 +11,7 @@ describe("Do you have evidence step", () => {
   const client = createForgeTestClient(
     "Evidence",
     "/cases/evidence",
-    doYouHaveEvidence("testJourney"),
+    [doYouHaveEvidence("testJourney")],
   );
 
   describe("GET /cases/evidence/have-evidence", () => {

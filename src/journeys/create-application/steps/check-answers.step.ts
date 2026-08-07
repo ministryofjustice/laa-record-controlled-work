@@ -1,6 +1,8 @@
 import {
   Answer,
   Condition,
+  Data,
+  Format,
   match,
   redirect,
   step,
@@ -14,8 +16,8 @@ import {
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
 import { CreateApplicationEffects } from "#/journeys/create-application/create-application.effects.js";
-import { DEFAULT_CASE_REFERENCE_NUMBER } from "#/journeys/edit-application/steps/task-list/task-list.step.js";
 import { submitButton } from "#/journeys/evidence/common.blocks.js";
+import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import { t } from "#/lib/i18n.js";
 
 const ecfLabel = match(Answer("ecf"))
@@ -276,7 +278,10 @@ export const checkAnswersStep = (
           effects: [CreateApplicationEffects.createApplication(journeyCode)],
           next: [
             redirect({
-              goto: `/cases/${DEFAULT_CASE_REFERENCE_NUMBER}/task-list`,
+              goto: Format(
+                "/cases/%1/task-list",
+                Data(CONTEXT_DATA_KEYS.applicationID),
+              ),
             }),
           ],
         },
