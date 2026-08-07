@@ -4,15 +4,14 @@ import sinon from "sinon";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import { InvalidSessionError } from "#/journeys/journey.errors.js";
 import { autoSelectSingleOffice } from "#/journeys/select-office/effects/autoSelectSingleOffice.js";
-import type { SelectOfficeContext } from "#/journeys/select-office/select-office.types.js";
-import type { OfficeData } from "#/dto/office/office.dto.js";
+import type { Office, SelectOfficeContext } from "#/journeys/select-office/select-office.types.js";
 
-const mockOffice: OfficeData = {
+const mockOffice: Office = {
   address: "1 High Street, Leeds, LS1 1AA",
   code: "LEEDS-01",
 };
 
-const mockOffices: OfficeData[] = [
+const mockOffices: Office[] = [
   mockOffice,
   { address: "2 King Street, Manchester, M1 1BB", code: "MCR-01" },
 ];
@@ -28,7 +27,7 @@ describe("autoSelectSingleOffice", () => {
     session = {};
     getData = sinon
       .stub()
-      .withArgs(CONTEXT_DATA_KEYS.officeList)
+      .withArgs(CONTEXT_DATA_KEYS.availableOffices)
       .returns([mockOffice]);
     getSession = sinon.stub().returns(session);
     setData = sinon.stub();
@@ -61,7 +60,7 @@ describe("autoSelectSingleOffice", () => {
 
   describe("when there are multiple offices", () => {
     it("does not set selectedOffice on the session or context", () => {
-      getData.withArgs(CONTEXT_DATA_KEYS.officeList).returns(mockOffices);
+      getData.withArgs(CONTEXT_DATA_KEYS.availableOffices).returns(mockOffices);
 
       autoSelectSingleOffice()(context);
 

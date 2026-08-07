@@ -3,11 +3,10 @@ import sinon from "sinon";
 
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import { setSelectedOffice } from "#/journeys/select-office/effects/setSelectedOffice.js";
-import type { SelectOfficeContext } from "#/journeys/select-office/select-office.types.js";
-import type { OfficeData } from "#/dto/office/office.dto.js";
+import type { Office, SelectOfficeContext } from "#/journeys/select-office/select-office.types.js";
 import { InvalidSessionError, InvalidSelectedOfficeError } from "#/journeys/journey.errors.js";
 
-const mockOffices: OfficeData[] = [
+const mockOffices: Office[] = [
   { address: "1 High Street, Leeds, LS1 1AA", code: "LEEDS-01" },
   { address: "2 King Street, Manchester, M1 1BB", code: "MCR-01"},
 ];
@@ -23,7 +22,10 @@ describe("setSelectedOffice", () => {
   beforeEach(() => {
     session = {};
     getAnswer = sinon.stub().withArgs("selectOffice").returns("LEEDS-01");
-    getData = sinon.stub().withArgs(CONTEXT_DATA_KEYS.officeList).returns(mockOffices);
+    getData = sinon
+      .stub()
+      .withArgs(CONTEXT_DATA_KEYS.availableOffices)
+      .returns(mockOffices);
     getSession = sinon.stub().returns(session);
     setData = sinon.stub();
 

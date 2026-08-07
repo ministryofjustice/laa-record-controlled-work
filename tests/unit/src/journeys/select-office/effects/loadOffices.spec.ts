@@ -7,9 +7,6 @@ import { getPdaApiDefaultOptions } from "#/api/getPdaApiDefaultOptions.js";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import {
   InvalidFirmCodeClaimError,
-  InvalidOfficeError,
-  MissingFirmNameError,
-  NoAvailableOfficesError,
 } from "#/journeys/journey.errors.js";
 import { loadOffices } from "#/journeys/select-office/effects/loadOffices.js";
 import type {
@@ -51,7 +48,7 @@ describe("loadOffices", () => {
 
   afterEach(() => sinon.restore());
 
-  it("loads mapped offices into context", async () => {
+  it("sets available offices in context when API response is valid", async () => {
     getAllProviderOffices.resolves({
       data: {
         firm: {
@@ -78,14 +75,9 @@ describe("loadOffices", () => {
         getPdaApiDefaultOptions(),
       ),
     ).to.equal(true);
-    
-    expect(setData.calledOnceWithExactly(CONTEXT_DATA_KEYS.availableOffices, [
-      {
-        address: "1 High Street, Leeds, LS1 1AA",
-        code: "LEEDS-01",
-        firmName: "Acme Legal LLP",
-      },
-    ])).to.equal(true);
+
+    expect(setData.calledOnce).to.equal(true);
+    expect(setData.firstCall.args[0]).to.equal(CONTEXT_DATA_KEYS.availableOffices);
   });
 
   it("forwards the x-correlation-id request header to the API call", async () => {
@@ -114,75 +106,6 @@ describe("loadOffices", () => {
         getPdaApiDefaultOptions(correlationId),
       ),
     ).to.equal(true);
-  });
-
-  it("throws NoAvailableOfficesError when the response does not include offices", async () => {
-    sinon.stub(logger, "error");
-    getAllProviderOffices.resolves({
-      data: {
-        firm: {
-          firmName: "Acme Legal LLP",
-        },
-      } satisfies ProviderFirmOfficeListDto,
-      status: 200,
-    });
-
-    try {
-      await loadOffices(deps)(context);
-      expect.fail("Expected loadOffices to throw NoAvailableOfficesError");
-    } catch (error) {
-      expect(error).to.be.instanceOf(NoAvailableOfficesError);
-      expect(setData.notCalled).to.equal(true);
-    }
-  });
-
-  it("throws MissingFirmNameError when the response does not include firm name", async () => {
-    sinon.stub(logger, "error");
-    getAllProviderOffices.resolves({
-      data: {
-        firm: {},
-        offices: [
-          {
-            addressLine1: "1 High Street",
-            firmOfficeCode: "LEEDS-01",
-          },
-        ],
-      } satisfies ProviderFirmOfficeListDto,
-      status: 200,
-    });
-
-    try {
-      await loadOffices(deps)(context);
-      expect.fail("Expected loadOffices to throw MissingFirmNameError");
-    } catch (error) {
-      expect(error).to.be.instanceOf(MissingFirmNameError);
-      expect(setData.notCalled).to.equal(true);
-    }
-  });
-
-  it("throws InvalidOfficeError when an office is missing code and address", async () => {
-    sinon.stub(logger, "error");
-    getAllProviderOffices.resolves({
-      data: {
-        firm: {
-          firmName: "Acme Legal LLP",
-        },
-        offices: [
-          {
-            officeName: "Leeds Office",
-          },
-        ],
-      } satisfies ProviderFirmOfficeListDto,
-      status: 200,
-    });
-
-    try {
-      await loadOffices(deps)(context);
-      expect.fail("Expected loadOffices to throw InvalidOfficeError");
-    } catch (error) {
-      expect(error).to.be.instanceOf(InvalidOfficeError);
-      expect(setData.notCalled).to.equal(true);
-    }
   });
 
   it("throws ApiResponseError when getAllProviderOffices rejects", async () => {

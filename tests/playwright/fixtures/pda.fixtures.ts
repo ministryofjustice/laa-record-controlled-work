@@ -1,6 +1,6 @@
 import { faker } from "@faker-js/faker";
+import { mapAvailableOffices } from "#/journeys/select-office/mappers/mapAvailableOffices.js";
 import { getGetAllProviderOfficesResponseMock } from "../../mocks/api/pda/msw/provider-firms-endpoints/provider-firms-endpoints.msw.gen.js";
-import { Office } from "#/dto/office/office.dto.js";
 
 // keeps the faker data consistent across test runs, so that the same mock data is used for each test run and msw handlers
 faker.seed(12345);
@@ -14,7 +14,5 @@ export function getProviderOfficesResponse(limitNumberOfOffices: number) {
 }
 
 export function getMappedOffices(limitNumberOfOffices: number) {
-  return Office.fromPdaOfficeList(
-    getProviderOfficesResponse(limitNumberOfOffices),
-  );
+  return mapAvailableOffices(getProviderOfficesResponse(limitNumberOfOffices));
 }

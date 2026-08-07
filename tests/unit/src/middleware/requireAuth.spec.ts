@@ -1,8 +1,8 @@
+import { Office } from "#/journeys/select-office/select-office.types.js";
 import { requireAuth } from "#/middleware/requireAuth.js";
 import { expect } from "chai";
 import type { Request, Response } from "express";
 import sinon from "sinon";
-import type { OfficeData } from "#/dto/office/office.dto.js";
 
 describe("requireAuth", () => {
   afterEach(() => sinon.restore());
@@ -72,7 +72,7 @@ function createMocks(
   options: {
     originalUrl?: string;
     isAuthenticated?: boolean;
-    selectedOffice?: OfficeData;
+    selectedOffice?: Office;
   } = {},
 ) {
   const session = {
