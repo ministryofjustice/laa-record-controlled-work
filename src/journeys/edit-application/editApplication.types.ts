@@ -17,6 +17,8 @@ export type EditApplicationContext = EffectFunctionContext<
 export interface EditApplicationData extends Record<string, unknown> {
   [CONTEXT_DATA_KEYS.application]: Application;
   [CONTEXT_DATA_KEYS.clientDetailsStatus]: Status;
+  [CONTEXT_DATA_KEYS.declarationStatus]: Status;
+  [CONTEXT_DATA_KEYS.evidenceStatus]: Status;
 }
 
 export interface EditApplicationEffectsDeps {
