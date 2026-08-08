@@ -12,8 +12,8 @@ import { taskListStep } from "#/journeys/edit-application/steps/task-list/task-l
 
 type RenderedTaskListItem = {
   title: { text: string };
-  href?: string;
-  status: { text?: string; tag?: { text?: string } };
+  href?: string | null;
+  status: { text?: string; tag?: { text?: string } | null };
 };
 
 describe("Task list step", () => {
@@ -75,6 +75,7 @@ describe("Task list step", () => {
 
         expect(declarationItem.href).to.equal("client-declaration-TODO");
         expect(declarationItem.status.text).to.equal("Completed");
+        expect(declarationItem.status.tag).to.equal(null);
       });
 
       it("renders declaration status as Incomplete when declaration values are empty", async () => {
@@ -92,6 +93,7 @@ describe("Task list step", () => {
 
         expect(declarationItem.href).to.equal("client-declaration-TODO");
         expect(declarationItem.status.tag?.text).to.equal("Incomplete");
+        expect(declarationItem.status.text).to.equal("");
       });
     });
 

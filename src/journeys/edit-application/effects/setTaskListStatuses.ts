@@ -49,8 +49,8 @@ export const setTaskListStatuses =
   (context: EditApplicationContext): void => {
     const application = context.getData(CONTEXT_DATA_KEYS.application);
     const clientDetailsStatus = statusFor(getClientDetailsValues(application));
-    const evidenceStatus = statusFor(getEvidenceValues(application));
     const declarationStatus = statusFor(getDeclarationValues(application));
+    const evidenceStatus = statusFor(getEvidenceValues(application));
 
     context.setData(CONTEXT_DATA_KEYS.clientDetailsStatus, clientDetailsStatus);
     context.setData(CONTEXT_DATA_KEYS.evidenceStatus, evidenceStatus);

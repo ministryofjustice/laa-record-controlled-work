@@ -14,6 +14,7 @@ export enum Status {
 export interface TaskListItem {
   href?: ResolvableString;
   status: TaskListStatus;
+  text?: ResolvableString;
   title: {
     classes?: ResolvableString;
     html?: ResolvableString;

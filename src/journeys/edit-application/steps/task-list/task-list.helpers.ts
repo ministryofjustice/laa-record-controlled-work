@@ -22,7 +22,7 @@ export function taskItem(
   status: ChainableRef,
 ): TaskListItem {
   const href = match(status)
-    .branch(Condition.Equals(Status.CANNOT_START), "")
+    .branch(Condition.Equals(Status.CANNOT_START), null)
     .otherwise(urlPath);
 
   const classes = match(status)
@@ -37,7 +37,7 @@ export function taskItem(
       classes: "govuk-tag--blue",
       text: t("journeys.createApplication.taskList.status.incomplete"),
     })
-    .otherwise({});
+    .otherwise(null);
 
   const text = match(status)
     .branch(
