@@ -3,6 +3,7 @@ import { application } from "../../fixtures/rcw.fixtures.js";
 
 test("Edit Application - Task List step", async ({ withSelectedOffice: page }) => {
   const applicationId = application.id;
+   const clientName = application.clientDetails.firstName + " " + application.clientDetails.lastName;
  // ==========================================================================
   // Task list page
   // ==========================================================================
@@ -13,7 +14,7 @@ test("Edit Application - Task List step", async ({ withSelectedOffice: page }) =
   // Check for the Heading
   await expect(
     page.getByRole("heading", {
-      name: /Joe Blogs/,
+      name: clientName,
       level: 1,
     }),
   ).toBeVisible();
