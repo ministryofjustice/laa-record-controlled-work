@@ -3,7 +3,12 @@ import type {
   ResolvableString,
 } from "@ministryofjustice/hmpps-forge/core/components";
 
-import { Format, Params } from "@ministryofjustice/hmpps-forge/core/authoring";
+import {
+  Data,
+  Format,
+  Literal,
+  Params,
+} from "@ministryofjustice/hmpps-forge/core/authoring";
 import {
   GovUKBody,
   GovUKButton,
@@ -11,10 +16,12 @@ import {
   GovUKTaskList,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
-import type { TaskListData } from "#/journeys/edit-application/steps/task-list/task-list.step.js";
-
 import { taskItem } from "#/journeys/edit-application/steps/task-list/task-list.helpers.js";
-import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
+import {
+  CONTEXT_DATA_KEYS,
+  PARAMS_KEYS,
+} from "#/journeys/journey.constants.js";
+import { Status } from "#/journeys/journey.types.js";
 import { H2 } from "#/lib/constants/headings.js";
 import { t } from "#/lib/i18n.js";
 
@@ -34,35 +41,33 @@ export function caseReferenceNumber(
  * @param text - The text content for the heading.
  * @returns A heading block definition.
  */
-export function heading(text: string): ReturnType<typeof GovUKHeading> {
+export function heading(
+  text: ResolvableString,
+): ReturnType<typeof GovUKHeading> {
   return GovUKHeading({ text });
 }
+
 /**
  * Builds the task list page blocks for the create application journey.
- * @param taskListData - The data used to populate the task list items.
  * @returns Array of block definitions for the task list page.
  */
-export function taskList(taskListData: TaskListData): BlockDefinition[] {
+export function taskList(): BlockDefinition[] {
   return [
-    GovUKHeading({
-      classes: "govuk-label--m",
-      level: H2,
-      text: t("journeys.createApplication.taskList.clientDetails.title"),
-    }),
+    sectionHeading(
+      t("journeys.createApplication.taskList.clientDetails.title"),
+    ),
     GovUKTaskList({
       items: [
         taskItem(
           t("journeys.createApplication.taskList.clientDetails.taskItem.label"),
           "/cases/new/check-answers",
-          taskListData.clientDetails.status,
+          Data(CONTEXT_DATA_KEYS.clientDetailsStatus),
         ),
       ],
     }),
-    GovUKHeading({
-      classes: "govuk-label--m",
-      level: H2,
-      text: t("journeys.createApplication.taskList.meansAssessment.title"),
-    }),
+    sectionHeading(
+      t("journeys.createApplication.taskList.meansAssessment.title"),
+    ),
     GovUKTaskList({
       items: [
         taskItem(
@@ -70,17 +75,13 @@ export function taskList(taskListData: TaskListData): BlockDefinition[] {
             "journeys.createApplication.taskList.meansAssessment.taskItem.label",
           ),
           Format("/cases/%1/eligibility/", Params(PARAMS_KEYS.applicationID)),
-          taskListData.meansAssessment.status,
+          Literal(Status.INCOMPLETE),
         ),
       ],
     }),
-    GovUKHeading({
-      classes: "govuk-label--m",
-      level: H2,
-      text: t(
-        "journeys.createApplication.taskList.EvidenceAndDeclaration.title",
-      ),
-    }),
+    sectionHeading(
+      t("journeys.createApplication.taskList.EvidenceAndDeclaration.title"),
+    ),
     GovUKTaskList({
       items: [
         taskItem(
@@ -88,18 +89,33 @@ export function taskList(taskListData: TaskListData): BlockDefinition[] {
             "journeys.createApplication.taskList.EvidenceAndDeclaration.taskItem.evidence.label",
           ),
           "/cases/evidence/have-evidence",
-          taskListData.evidence.status,
+          Literal(Status.INCOMPLETE),
         ),
         taskItem(
           t(
             "journeys.createApplication.taskList.EvidenceAndDeclaration.taskItem.declaration.label",
           ),
           "client-declaration-TODO",
-          taskListData.declaration.status,
+          Literal(Status.INCOMPLETE),
         ),
       ],
     }),
   ];
+}
+
+/**
+ * Builds a section heading for each task list group.
+ * @param text - The text content for the section heading.
+ * @returns A section heading block definition.
+ */
+function sectionHeading(
+  text: ResolvableString,
+): ReturnType<typeof GovUKHeading> {
+  return GovUKHeading({
+    classes: "govuk-label--m",
+    level: H2,
+    text,
+  });
 }
 
 export const saveAndReturnButton: GovUKButton = GovUKButton({

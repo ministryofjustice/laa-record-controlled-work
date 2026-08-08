@@ -3,6 +3,7 @@ import { EffectRegistry } from "@ministryofjustice/hmpps-forge/core/authoring";
 import type { EditApplicationEffectsDeps } from "#/journeys/edit-application/editApplication.types.js";
 
 import { loadApplication } from "#/journeys/edit-application/effects/loadApplication.js";
+import { setTaskListStatuses } from "#/journeys/edit-application/effects/setTaskListStatuses.js";
 import {
   clearAllDraftAnswers,
   clearFieldAnswers,
@@ -20,4 +21,6 @@ export const editApplicationEffects = {
   loadApplication: editApplicationEffectsRegistry.register(loadApplication),
   loadDraftAnswers: editApplicationEffectsRegistry.register(loadDraftAnswers),
   saveDraftAnswers: editApplicationEffectsRegistry.register(saveDraftAnswers),
+  setTaskListStatuses:
+    editApplicationEffectsRegistry.register(setTaskListStatuses),
 };

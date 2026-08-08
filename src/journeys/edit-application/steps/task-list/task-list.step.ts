@@ -2,11 +2,14 @@ import type { ResolvableString } from "@ministryofjustice/hmpps-forge/core/compo
 
 import {
   access,
-  Params,
+  Data,
+  Format,
   redirect,
   step,
   submit,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
+
+import type { Status } from "#/journeys/journey.types.js";
 
 import { editApplicationEffects } from "#/journeys/edit-application/editApplication.effects.js";
 import {
@@ -15,8 +18,7 @@ import {
   saveAndReturnButton,
   taskList,
 } from "#/journeys/edit-application/steps/task-list/task-list.blocks.js";
-import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
-import { Status } from "#/journeys/journey.types.js";
+import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 
 export interface TaskListData {
   caseReferenceNumber: ResolvableString;
@@ -25,36 +27,29 @@ export interface TaskListData {
   evidence: { status: Status };
   meansAssessment: { status: Status };
 }
+const clientName = Format(
+  "%1 %2",
+  Data(CONTEXT_DATA_KEYS.application).path("clientDetails.firstName"),
+  Data(CONTEXT_DATA_KEYS.application).path("clientDetails.lastName"),
+);
 
-// TODO: Hardcoded for now, will be dynamic in future
-const TASK_LIST_DATA: TaskListData = {
-  caseReferenceNumber: Params(PARAMS_KEYS.applicationID),
-  clientDetails: {
-    clientName: "Joe Blogs",
-    status: Status.Completed,
-  },
-  declaration: {
-    status: Status.CannotStart,
-  },
-  evidence: {
-    status: Status.Incomplete,
-  },
-  meansAssessment: {
-    status: Status.Incomplete,
-  },
-};
+// TODO temporarily using id until we have a proper reference number in data model
+const referenceNumber = Data(CONTEXT_DATA_KEYS.application).path("id");
 
 export const taskListStep = (): ReturnType<typeof step> =>
   step({
     blocks: [
-      heading(TASK_LIST_DATA.clientDetails.clientName),
-      caseReferenceNumber(TASK_LIST_DATA.caseReferenceNumber),
-      ...taskList(TASK_LIST_DATA),
+      heading(clientName),
+      caseReferenceNumber(referenceNumber),
+      ...taskList(),
       saveAndReturnButton,
     ],
     onAccess: [
       access({
-        effects: [editApplicationEffects.loadApplication()],
+        effects: [
+          editApplicationEffects.loadApplication(),
+          editApplicationEffects.setTaskListStatuses(),
+        ],
       }),
     ],
     onSubmission: [

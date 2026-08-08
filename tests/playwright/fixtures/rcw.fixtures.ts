@@ -11,7 +11,7 @@ export const applications = [...getGetApplicationsResponseMock()].sort(
 export const createApplicationResponse = getCreateApplicationResponseMock();
 
 export const application = getGetApplicationResponseMock({
-  applicationStatus: "DRAFT",
+  applicationState: "DRAFT",
   declaration: {
     clientDeclarationStatus: "DRAFT",
     declarationConfirmation: false,
