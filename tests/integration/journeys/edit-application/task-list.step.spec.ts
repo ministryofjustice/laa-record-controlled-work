@@ -18,10 +18,9 @@ type RenderedTaskListItem = {
 
 describe("Task list step", () => {
   const uuid = "123e4567-e89b-12d3-a456-426614174000";
+  const meansAssessmentId = "123e4567-e89b-12d3-a456-426614174111";
   const mockData = getGetApplicationResponseMock();
-  const getApplicationStub = sinon
-    .stub()
-    .resolves({ status: 200, data: mockData });
+  const getApplicationStub = sinon.stub();
   const client = createForgeTestClientForEditApplication(
     "Edit case",
     "/cases/:applicationID/",
@@ -29,6 +28,12 @@ describe("Task list step", () => {
     { getApplication: getApplicationStub },
   );
   const session = {};
+
+  beforeEach(() => {
+    getApplicationStub.resetHistory();
+    getApplicationStub.resetBehavior();
+    getApplicationStub.resolves({ status: 200, data: mockData });
+  });
 
   describe("GET /cases/123e4567-e89b-12d3-a456-426614174000/task-list", () => {
     let renderResult: TestRenderResult;
@@ -41,6 +46,7 @@ describe("Task list step", () => {
       lists[2].properties.items as RenderedTaskListItem[];
 
     before(async () => {
+      getApplicationStub.resolves({ status: 200, data: mockData });
       const result = await client.get(`/cases/${uuid}/task-list`, {
         session,
       });
@@ -67,9 +73,33 @@ describe("Task list step", () => {
       expect(taskLists.length).to.equal(3);
     });
 
-    describe("declaration status from mocked application data", () => {
-      it("renders declaration status as Completed when declaration contains values", () => {
-        const lists = renderResult.getBlocksByVariant("govukTaskList");
+    describe("declaration status rendering", () => {
+      it("renders declaration as Completed when declaration data is present", async () => {
+        getApplicationStub.resolves({
+          status: 200,
+          data: getGetApplicationResponseMock({
+            meansAssessmentId,
+            evidence: {
+              evidenceStatus: "DRAFT",
+              payeIncomeEvidence: true,
+              otherIncomeEvidence: true,
+              housingCostsEvidence: true,
+              capitalEvidence: true,
+            },
+            declaration: {
+              clientDeclarationStatus: "DRAFT",
+              declarationConfirmation: true,
+            },
+          }),
+        });
+
+        const result = await client.get(`/cases/${uuid}/task-list`, {
+          session: {},
+        });
+
+        expect(result.type).to.equal("render");
+        const declarationRender = result as TestRenderResult;
+        const lists = declarationRender.getBlocksByVariant("govukTaskList");
         const evidenceAndDeclarationItems = getEvidenceAndDeclarationItems(lists);
         const declarationItem = evidenceAndDeclarationItems[1];
 
@@ -78,22 +108,63 @@ describe("Task list step", () => {
         expect(declarationItem.status.tag).to.equal(null);
       });
 
-      it("renders declaration status as Incomplete when declaration values are empty", async () => {
-        mockData.declaration = {};
+      it("renders declaration as Incomplete when declaration data is empty", async () => {
+        getApplicationStub.resolves({
+          status: 200,
+          data: getGetApplicationResponseMock({
+            meansAssessmentId,
+            evidence: {
+              evidenceStatus: "DRAFT",
+              payeIncomeEvidence: true,
+              otherIncomeEvidence: true,
+              housingCostsEvidence: true,
+              capitalEvidence: true,
+            },
+            declaration: {},
+          }),
+        });
 
         const result = await client.get(`/cases/${uuid}/task-list`, {
           session: {},
         });
 
         expect(result.type).to.equal("render");
-        const statusRender = result as TestRenderResult;
-        const lists = statusRender.getBlocksByVariant("govukTaskList");
+        const declarationRender = result as TestRenderResult;
+        const lists = declarationRender.getBlocksByVariant("govukTaskList");
         const evidenceAndDeclarationItems = getEvidenceAndDeclarationItems(lists);
         const declarationItem = evidenceAndDeclarationItems[1];
 
         expect(declarationItem.href).to.equal("client-declaration-TODO");
         expect(declarationItem.status.tag?.text).to.equal("Incomplete");
         expect(declarationItem.status.text).to.equal("");
+      });
+
+      it("renders declaration as Cannot start yet when evidence is not complete", async () => {
+        getApplicationStub.resolves({
+          status: 200,
+          data: getGetApplicationResponseMock({
+            meansAssessmentId,
+            evidence: {},
+            declaration: {
+              clientDeclarationStatus: "DRAFT",
+              declarationConfirmation: true,
+            },
+          }),
+        });
+
+        const result = await client.get(`/cases/${uuid}/task-list`, {
+          session: {},
+        });
+
+        expect(result.type).to.equal("render");
+        const declarationRender = result as TestRenderResult;
+        const lists = declarationRender.getBlocksByVariant("govukTaskList");
+        const evidenceAndDeclarationItems = getEvidenceAndDeclarationItems(lists);
+        const declarationItem = evidenceAndDeclarationItems[1];
+
+        expect(declarationItem.href).to.equal(null);
+        expect(declarationItem.status.text).to.equal("Cannot start yet");
+        expect(declarationItem.status.tag).to.equal(null);
       });
     });
 
