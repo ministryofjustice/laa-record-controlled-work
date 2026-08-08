@@ -68,7 +68,7 @@ describe("NI number step", () => {
 
     it("shows a validation error if the NI number is invalid", async () => {
       const result = await client.post("/cases/new/ni-number", {
-        body: { hasNINumber: "yes", niNumber: "ZZ123456C" },
+        body: { hasNINumber: "yes", niNumber: "ZZ123456C" }, // gitleaks:allow - fake NI number used to test invalid format validation
       });
       expect(result.type).to.equal("render");
       const renderResult = result as TestRenderResult;
@@ -82,7 +82,7 @@ describe("NI number step", () => {
 
     it("redirects to the home address step when a valid NI number is given", async () => {
       const result = await client.post("/cases/new/ni-number", {
-        body: { hasNINumber: "yes", niNumber: "JN123456A" },
+        body: { hasNINumber: "yes", niNumber: "JN123456A" }, // gitleaks:allow - fake NI number used to test valid format acceptance
       });
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;

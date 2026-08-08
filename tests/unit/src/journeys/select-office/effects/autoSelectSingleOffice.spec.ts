@@ -25,7 +25,10 @@ describe("autoSelectSingleOffice", () => {
 
   beforeEach(() => {
     session = {};
-    getData = sinon.stub().withArgs(CONTEXT_DATA_KEYS.officeList).returns([mockOffice]);
+    getData = sinon
+      .stub()
+      .withArgs(CONTEXT_DATA_KEYS.availableOffices)
+      .returns([mockOffice]);
     getSession = sinon.stub().returns(session);
     setData = sinon.stub();
 
@@ -57,7 +60,7 @@ describe("autoSelectSingleOffice", () => {
 
   describe("when there are multiple offices", () => {
     it("does not set selectedOffice on the session or context", () => {
-      getData.withArgs(CONTEXT_DATA_KEYS.officeList).returns(mockOffices);
+      getData.withArgs(CONTEXT_DATA_KEYS.availableOffices).returns(mockOffices);
 
       autoSelectSingleOffice()(context);
 

@@ -6,6 +6,11 @@
  */
 
 import { getGetAllProviderOfficesMockHandler } from "../../../mocks/api/pda/msw/provider-firms-endpoints/provider-firms-endpoints.msw.gen.js";
-import { providerOffices } from "../../fixtures/pda.fixtures.js";
+import { getProviderOfficesResponse } from "../../fixtures/pda.fixtures.js";
+import config from "#/config.js";
 
-export const pdaApiHandlers = [getGetAllProviderOfficesMockHandler(providerOffices)];
+export const pdaApiHandlers = [
+	getGetAllProviderOfficesMockHandler(
+		getProviderOfficesResponse(config.api.pda.mswOfficeCount),
+	),
+];

@@ -59,7 +59,7 @@ describe("LoadYourCaseList", () => {
       const client = createForgeTestClientForCaseList({
         getApplications: stub,
       });
-      return await client.get("/cases");
+      return await client.get("/cases", { session });
     }
 
     it("throws ApiResponseError when the API rejects", async () => {

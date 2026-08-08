@@ -47,7 +47,7 @@ describe("loadApplication", () => {
     // rather than enum strings, so the enum fields must be explicitly overridden.
     const mockApplication = getGetApplicationResponseMock({
       id: applicationId,
-      applicationStatus: "DRAFT",
+      applicationState: "DRAFT",
       declaration: {
         clientDeclarationStatus: "DRAFT",
         declarationConfirmation: false,

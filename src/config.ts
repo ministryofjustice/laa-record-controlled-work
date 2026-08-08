@@ -13,6 +13,7 @@ import type {
 
 import { HOUR, MINUTE, SECOND } from "#/lib/constants/time.js";
 import { optional, required } from "#/lib/env.js";
+import { resolveApiMode } from "#/lib/resolveApiMode.js";
 
 const DEFAULT_AUTH_RATE_LIMIT_MAX = 20;
 const DEFAULT_RATE_LIMIT_MAX = 100;
@@ -21,8 +22,9 @@ const REDIS_MAX_RETRY_ATTEMPTS = 10;
 const DEFAULT_REDIS_PORT = 6379;
 const DEFAULT_REDIS_HOST = "localhost";
 const DEFAULT_RCW_API_BASE_URL = "http://localhost:8081";
-const DEFAULT_PDA_API_BASE_URL = "http://localhost:8081";
-const DEFAULT_API_MODE = "msw";
+const DEFAULT_PDA_API_BASE_URL =
+  "https://laa-provider-details-api-uat.apps.live.cloud-platform.service.justice.gov.uk";
+const DEFAULT_PDA_MSW_OFFICE_COUNT = 3;
 const ENTRA_APPLICATIONS_READ_SCOPE =
   "https://devlexternal.onmicrosoft.com/laa-record-controlled-work-api-uat/Applications.Read";
 
@@ -36,13 +38,16 @@ const useHttps = ["production", "staging", "uat"].includes(required.NODE_ENV);
 
 export default {
   api: {
-    mode: optional.API_MODE ?? DEFAULT_API_MODE,
     pda: {
       baseUrl: optional.PDA_API_BASE_URL ?? DEFAULT_PDA_API_BASE_URL,
       key: required.PDA_API_KEY,
+      mode: resolveApiMode(optional.PDA_API_MODE, optional.API_MODE),
+      mswOfficeCount:
+        optional.PDA_MSW_OFFICE_COUNT ?? DEFAULT_PDA_MSW_OFFICE_COUNT,
     },
     rcw: {
       baseUrl: optional.RCW_API_BASE_URL ?? DEFAULT_RCW_API_BASE_URL,
+      mode: resolveApiMode(optional.RCW_API_MODE, optional.API_MODE),
     },
     useMockAccessToken: required.NODE_ENV === "test",
   } satisfies ApiConfig,

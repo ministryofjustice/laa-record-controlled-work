@@ -32,7 +32,7 @@ describe("Check answers step", () => {
         lastName: "Doe",
         dateOfBirth: "1990-01-01",
         hasNINumber: "yes",
-        niNumber: "AB123456C",
+        niNumber: "AB123456C", // gitleaks:allow - fake NI number used to tests
         haveAHomeAddress: "yes",
         addressLine1: "123 Test Street",
         townOrCity: "Testville",

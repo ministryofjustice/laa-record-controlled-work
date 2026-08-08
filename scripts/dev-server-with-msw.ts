@@ -15,7 +15,7 @@ import { handlers } from "../tests/playwright/factories/handlers/index.js";
 const SUCCESS_EXIT_CODE = 0;
 const ERROR_EXIT_CODE = 1;
 
-const useMsw = config.api.mode === "msw";
+const useMsw = config.api.rcw.mode === "msw" || config.api.pda.mode === "msw";
 
 if (useMsw) {
   const mswServer = setupServer(...handlers);

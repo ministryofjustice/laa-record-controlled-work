@@ -253,7 +253,7 @@ export class EntraService {
       authCodeRequest: {
         code: "",
         codeVerifier: verifier,
-        redirectUri: authRequestDefaults.redirectUri,
+        redirectUri: config.entra.redirectUri,
         scopes: authRequestDefaults.scopes,
       } satisfies AuthorizationCodeRequest,
 
@@ -261,7 +261,7 @@ export class EntraService {
         codeChallenge: challenge,
         codeChallengeMethod: challengeMethod,
         prompt: authRequestDefaults.prompt,
-        redirectUri: authRequestDefaults.redirectUri,
+        redirectUri: config.entra.redirectUri,
         responseMode: authRequestDefaults.responseMode,
         scopes: authRequestDefaults.scopes,
         state: authState,

@@ -48,9 +48,6 @@ lint: knip
 lint-fix: knip
 	yarn lint:fix
 
-integration:
-	yarn integration
-
 integration-watch:
 	yarn integration:watch
 
@@ -69,18 +66,18 @@ coverage:
 unit-watch:
 	yarn unit:watch
 
-# Run unit tests.
+# Run tests from a specified directory and optional file.
 #
-# Usage:
-#   make unit                        - run all unit tests
-#   make unit file=either            - run a specific test by filename (with or without .spec.ts)
-#   make unit file=services/auth     - When multiple files share the same name
-
-unit: 
+# Internal helper target - use via `unit` or `integration` targets.
+#
+# Parameters:
+#   directory - path to tests directory (e.g., tests/unit)
+#   file      - optional test file name or path (with or without .spec.ts)
+run-tests:
 ifdef file
-	@MATCHES=$$(find tests/unit \( -path "*/$(file)" -o -path "*/$(file).spec.ts" \) 2>/dev/null); \
+	@MATCHES=$$(find $(directory) \( -path "*/$(file)" -o -path "*/$(file).spec.ts" \) 2>/dev/null); \
 	if [ -z "$$MATCHES" ]; then \
-		echo "Error: No test file found matching '$(file)' in tests/unit/"; \
+		echo "Error: No test file found matching '$(file)' in $(directory)/"; \
 		exit 1; \
 	fi; \
 	COUNT=$$(echo "$$MATCHES" | wc -l | tr -d ' '); \
@@ -91,6 +88,33 @@ ifdef file
 	fi; \
 	$(MOCHA) "$$MATCHES"
 else
+	$(error file parameter required)
+endif
+
+# Run unit tests.
+#
+# Usage:
+#   make unit                        - run all unit tests
+#   make unit file=either            - run a specific test by filename (with or without .spec.ts)
+#   make unit file=services/auth     - When multiple files share the same name
+
+unit:
+ifdef file
+	@$(MAKE) run-tests directory=tests/unit file=$(file)
+else
 	yarn unit
 endif
 
+# Run integration tests.
+#
+# Usage:
+#   make integration                 - run all integration tests
+#   make integration file=auth       - run a specific test by filename (with or without .spec.ts)
+#   make integration file=journeys/create-application - When multiple files share the same name
+
+integration:
+ifdef file
+	@$(MAKE) run-tests directory=tests/integration file=$(file)
+else
+	yarn integration
+endif

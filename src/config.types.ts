@@ -1,13 +1,17 @@
 import type { SessionOptions } from "express-session";
 
+import type { ApiMode } from "#/lib/resolveApiMode.js";
+
 export interface ApiConfig {
-  mode: string;
   pda: {
     baseUrl: string;
     key: string;
+    mode: ApiMode;
+    mswOfficeCount: number;
   };
   rcw: {
     baseUrl: string;
+    mode: ApiMode;
   };
   useMockAccessToken: boolean;
 }

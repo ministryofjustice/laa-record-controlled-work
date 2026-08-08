@@ -134,6 +134,7 @@ export function createForgeTestClientForEditApplication(
   const mockData = getGetApplicationResponseMock({
     id: uuid,
     applicationStatus: "DRAFT",
+    applicationState: "DRAFT",
     declaration: {
       clientDeclarationStatus: "DRAFT",
       declarationConfirmation: false,

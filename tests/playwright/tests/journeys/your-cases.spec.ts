@@ -1,13 +1,8 @@
 import { test, expect } from "../../fixtures/index.js";
 import { applications } from "../../fixtures/rcw.fixtures.js";
-// import { getMappedOffices } from "../../fixtures/pda.fixtures.js";
+import { getMappedOffices } from "../../fixtures/pda.fixtures.js";
 
-// TODO readd for msw mocking in next pr
-// const [selectedOffice] = getMappedOffices(1);
-const selectedOffice = {
-  address: "1 High Street, Leeds, LS1 1AA",
-  code: "LEEDS-01",
-};
+const [selectedOffice] = getMappedOffices(1);
 
 test("Your Cases step", async ({ withSelectedOffice: page }) => {
   // Navigate to the Your Cases page
