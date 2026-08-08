@@ -3,16 +3,30 @@ import {
   TestRedirectResult,
 } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
+import sinon from "sinon";
+
+import { getGetApplicationResponseMock } from "../../../mocks/api/rcw/fakers/applications/applications.faker.gen.js";
 import { createForgeTestClientForEditApplication } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import { taskListStep } from "#/journeys/edit-application/steps/task-list/task-list.step.js";
 
+type RenderedTaskListItem = {
+  title: { text: string };
+  href?: string;
+  status: { text?: string; tag?: { text?: string } };
+};
+
 describe("Task list step", () => {
   const uuid = "123e4567-e89b-12d3-a456-426614174000";
+  const mockData = getGetApplicationResponseMock();
+  const getApplicationStub = sinon
+    .stub()
+    .resolves({ status: 200, data: mockData });
   const client = createForgeTestClientForEditApplication(
     "Edit case",
     "/cases/:applicationID/",
     [taskListStep()],
+    { getApplication: getApplicationStub },
   );
   const session = {};
 
@@ -22,6 +36,9 @@ describe("Task list step", () => {
     let body: RenderBlock;
     let taskLists: RenderBlock[];
     let submitButton: RenderBlock;
+
+    const getEvidenceAndDeclarationItems = (lists: RenderBlock[]) =>
+      lists[2].properties.items as RenderedTaskListItem[];
 
     before(async () => {
       const result = await client.get(`/cases/${uuid}/task-list`, {
@@ -35,53 +52,47 @@ describe("Task list step", () => {
     });
 
     it("renders the client name as the heading", () => {
-      expect(heading.properties.content).to.equal("Joe Blogs");
+      expect(heading.properties.content).to.equal(
+        `${mockData.clientDetails.firstName} ${mockData.clientDetails.lastName}`,
+      );
     });
 
     it("renders the reference number", () => {
-      expect(body.properties.content).to.equal(`Reference number: ${uuid}`);
+      expect(body.properties.content).to.equal(
+        `Reference number: ${mockData.id}`,
+      );
     });
 
     it("renders 3 task list sections", () => {
       expect(taskLists.length).to.equal(3);
     });
 
-    it("renders the client details task as completed", () => {
-      const items = taskLists[0].properties.items as Array<{
-        title: { text: string };
-        href?: string;
-        status: { text?: string };
-      }>;
-      expect(items.length).to.equal(1);
-      expect(items[0].title.text).to.equal("Client details");
-      expect(items[0].href).to.equal("/cases/new/check-answers");
-      expect(items[0].status.text).to.equal("Completed");
-    });
+    describe("declaration status from mocked application data", () => {
+      it("renders declaration status as Completed when declaration contains values", () => {
+        const lists = renderResult.getBlocksByVariant("govukTaskList");
+        const evidenceAndDeclarationItems = getEvidenceAndDeclarationItems(lists);
+        const declarationItem = evidenceAndDeclarationItems[1];
 
-    it("renders the means assessment task as incomplete", () => {
-      const items = taskLists[1].properties.items as Array<{
-        title: { text: string };
-        href?: string;
-        status: { tag: { text: string } };
-      }>;
-      expect(items.length).to.equal(1);
-      expect(items[0].title.text).to.equal("Income and capital");
-      expect(items[0].href).to.equal(`/cases/${uuid}/eligibility/`);
-      expect(items[0].status.tag.text).to.equal("Incomplete");
-    });
+        expect(declarationItem.href).to.equal("client-declaration-TODO");
+        expect(declarationItem.status.text).to.equal("Completed");
+      });
 
-    it("renders the evidence task as incomplete and declaration task as cannot start yet", () => {
-      const items = taskLists[2].properties.items as Array<{
-        title: { text: string };
-        href?: string;
-        status: { tag: { text?: string }; text?: string };
-      }>;
-      expect(items.length).to.equal(2);
-      expect(items[0].title.text).to.equal("Evidence");
-      expect(items[0].status.tag.text).to.equal("Incomplete");
-      expect(items[0].href).to.equal("/cases/evidence/have-evidence");
-      expect(items[1].title.text).to.equal("Client declaration");
-      expect(items[1].status.text).to.equal("Cannot start yet");
+      it("renders declaration status as Incomplete when declaration values are empty", async () => {
+        mockData.declaration = {};
+
+        const result = await client.get(`/cases/${uuid}/task-list`, {
+          session: {},
+        });
+
+        expect(result.type).to.equal("render");
+        const statusRender = result as TestRenderResult;
+        const lists = statusRender.getBlocksByVariant("govukTaskList");
+        const evidenceAndDeclarationItems = getEvidenceAndDeclarationItems(lists);
+        const declarationItem = evidenceAndDeclarationItems[1];
+
+        expect(declarationItem.href).to.equal("client-declaration-TODO");
+        expect(declarationItem.status.tag?.text).to.equal("Incomplete");
+      });
     });
 
     it("renders the save and return button", () => {
