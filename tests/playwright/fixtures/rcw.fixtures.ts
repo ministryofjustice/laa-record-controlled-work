@@ -10,25 +10,4 @@ export const applications = [...getGetApplicationsResponseMock()].sort(
 
 export const createApplicationResponse = getCreateApplicationResponseMock();
 
-export const application = getGetApplicationResponseMock({
-  applicationState: "DRAFT",
-  declaration: {
-    clientDeclarationStatus: "DRAFT",
-    declarationConfirmation: false,
-    createdAt: new Date().toISOString().slice(0, 19) + "Z",
-    createdBy: "test",
-    modifiedAt: new Date().toISOString().slice(0, 19) + "Z",
-    modifiedBy: "test",
-  },
-  evidence: {
-    evidenceStatus: "DRAFT",
-    payeIncomeEvidence: false,
-    otherIncomeEvidence: false,
-    housingCostsEvidence: false,
-    capitalEvidence: false,
-    createdAt: new Date().toISOString().slice(0, 19) + "Z",
-    createdBy: "test",
-    modifiedAt: new Date().toISOString().slice(0, 19) + "Z",
-    modifiedBy: "test",
-  },
-});
+export const application = getGetApplicationResponseMock();
