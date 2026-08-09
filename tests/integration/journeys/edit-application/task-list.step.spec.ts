@@ -8,7 +8,6 @@ import sinon from "sinon";
 import { getGetApplicationResponseMock } from "../../../mocks/api/rcw/fakers/applications/applications.faker.gen.js";
 import { createForgeTestClientForEditApplication } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
-import { taskListStep } from "#/journeys/edit-application/steps/task-list/task-list.step.js";
 
 type RenderedTaskListItem = {
   title: { text: string };
@@ -20,13 +19,13 @@ describe("Task list step", () => {
   const uuid = "123e4567-e89b-12d3-a456-426614174000";
   const meansAssessmentId = "123e4567-e89b-12d3-a456-426614174111";
   const mockData = getGetApplicationResponseMock();
-  const getApplicationStub = sinon.stub();
-  const client = createForgeTestClientForEditApplication(
-    "Edit case",
-    "/cases/:applicationID/",
-    [taskListStep()],
-    { getApplication: getApplicationStub },
-  );
+  const getApplicationStub = sinon
+    .stub()
+    .resolves({ status: 200, data: mockData });
+
+  const client = createForgeTestClientForEditApplication({
+    getApplication: getApplicationStub,
+  });
   const session = {};
 
   beforeEach(() => {
@@ -58,9 +57,8 @@ describe("Task list step", () => {
     });
 
     it("renders the client name as the heading", () => {
-      expect(heading.properties.content).to.equal(
-        `${mockData.clientDetails.firstName} ${mockData.clientDetails.lastName}`,
-      );
+      const clientName = `${mockData.clientDetails.firstName} ${mockData.clientDetails.lastName}`;
+      expect(heading.properties.content).to.equal(clientName);
     });
 
     it("renders the reference number", () => {

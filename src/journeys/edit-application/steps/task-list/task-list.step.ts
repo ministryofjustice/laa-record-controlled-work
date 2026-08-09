@@ -22,19 +22,20 @@ import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 
 export interface TaskListData {
   caseReferenceNumber: ResolvableString;
-  clientDetails: { clientName: string; status: Status };
+  clientDetails: { clientName: ResolvableString; status: Status };
   declaration: { status: Status };
   evidence: { status: Status };
   meansAssessment: { status: Status };
 }
+
+// TODO temporarily using id until we have a proper reference number in data model
+const referenceNumber = Data(CONTEXT_DATA_KEYS.application).path("id");
+
 const clientName = Format(
   "%1 %2",
   Data(CONTEXT_DATA_KEYS.application).path("clientDetails.firstName"),
   Data(CONTEXT_DATA_KEYS.application).path("clientDetails.lastName"),
 );
-
-// TODO temporarily using id until we have a proper reference number in data model
-const referenceNumber = Data(CONTEXT_DATA_KEYS.application).path("id");
 
 export const taskListStep = (): ReturnType<typeof step> =>
   step({
