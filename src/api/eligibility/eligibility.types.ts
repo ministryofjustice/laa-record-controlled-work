@@ -1,8 +1,15 @@
 import { z } from "zod";
 
-export const SaveRequestBody = z.object({
+export const PutEligibilityRequestBody = z.object({
   eligibility_assessment: z.looseObject({}),
-  resource_id: z.uuid(),
 });
 
-export type SaveRequestBody = z.infer<typeof SaveRequestBody>;
+export type PutEligibilityRequestBody = z.infer<
+  typeof PutEligibilityRequestBody
+>;
+
+export const ApplicationIdParam = z.object({
+  applicationId: z.uuid(),
+});
+
+export type ApplicationIdParam = z.infer<typeof ApplicationIdParam>;

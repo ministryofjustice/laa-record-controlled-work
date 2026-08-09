@@ -1,11 +1,14 @@
-import type { Request, Response, Router } from "express";
+import type { Router } from "express";
 
 import express from "express";
 
 import type { SaveApplicationMeansDeps } from "#/api/eligibility/eligibility.service.js";
 
 import { updateApplicationMeans } from "#/api/clients/rcw/schema/applications/applications.gen.js";
-import { createSaveHandler } from "#/api/eligibility/eligibility.handlers.js";
+import {
+  createGetEligibilityHandler,
+  createPutEligibilityHandler,
+} from "#/api/eligibility/eligibility.handlers.js";
 
 /**
  * Builds the eligibility router, accepting injected RCW API client deps for testing.
@@ -15,13 +18,11 @@ import { createSaveHandler } from "#/api/eligibility/eligibility.handlers.js";
 export function createEligibilityRouter(
   deps: SaveApplicationMeansDeps = { updateApplicationMeans },
 ): Router {
-  const router = express.Router();
+  const router = express.Router({ mergeParams: true });
 
-  router.get("/load", (_req: Request, res: Response): void => {
-    res.json({ return_url: "http://localhost:8080" });
-  });
+  router.get("/", createGetEligibilityHandler());
 
-  router.post("/save", createSaveHandler(deps));
+  router.put("/", createPutEligibilityHandler(deps));
 
   return router;
 }

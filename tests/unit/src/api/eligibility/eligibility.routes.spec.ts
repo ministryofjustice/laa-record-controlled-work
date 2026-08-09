@@ -18,32 +18,49 @@ import eligibilityRouter, {
 } from "#/api/eligibility/eligibility.routes.js";
 import { createMockApp } from "../../../utils.js";
 
-describe("eligibilityRouter", () => {
+const MOUNT_PATH = "/api/applications/:applicationId/eligibility";
+const resourceId = "123e4567-e89b-12d3-a456-426614174000";
+
+function eligibilityPath(applicationId: string): string {
+  return `/api/applications/${applicationId}/eligibility`;
+}
+
+describe("GET /api/applications/:applicationId/eligibility", () => {
   afterEach(() => {
     sinon.restore();
   });
 
-  it("returns 200 for GET /api/private/load", async () => {
+  it("returns 200 for a valid applicationId", async () => {
     const app = createMockApp({
-      mountPath: "/api/private",
+      mountPath: MOUNT_PATH,
       router: eligibilityRouter,
       useCsrf: false,
     });
 
-    const response = await request(app).get("/api/private/load");
+    const response = await request(app).get(eligibilityPath(resourceId));
 
     expect(response.status).to.equal(OK);
   });
+
+  it("returns 400 when applicationId is not a valid UUID", async () => {
+    const app = createMockApp({
+      mountPath: MOUNT_PATH,
+      router: eligibilityRouter,
+      useCsrf: false,
+    });
+
+    const response = await request(app).get(eligibilityPath("not-a-uuid"));
+
+    expect(response.status).to.equal(BAD_REQUEST);
+  });
 });
 
-describe("POST /api/private/save", () => {
-  const resourceId = "123e4567-e89b-12d3-a456-426614174000";
-
+describe("PUT /api/applications/:applicationId/eligibility", () => {
   let updateApplicationMeansStub: sinon.SinonStub;
 
   function buildApp(): Application {
     return createMockApp({
-      mountPath: "/api/private",
+      mountPath: MOUNT_PATH,
       router: createEligibilityRouter({
         updateApplicationMeans: updateApplicationMeansStub,
       }),
@@ -62,17 +79,17 @@ describe("POST /api/private/save", () => {
 
   it("returns 400 when the request body fails validation", async () => {
     const response = await request(buildApp())
-      .post("/api/private/save")
-      .send({ eligibility_assessment: {} });
+      .put(eligibilityPath(resourceId))
+      .send({});
 
     expect(response.status).to.equal(BAD_REQUEST);
     expect(updateApplicationMeansStub.called).to.equal(false);
   });
 
-  it("returns 400 when resource_id is not a valid UUID", async () => {
+  it("returns 400 when applicationId is not a valid UUID", async () => {
     const response = await request(buildApp())
-      .post("/api/private/save")
-      .send({ eligibility_assessment: {}, resource_id: "not-a-uuid" });
+      .put(eligibilityPath("not-a-uuid"))
+      .send({ eligibility_assessment: {} });
 
     expect(response.status).to.equal(BAD_REQUEST);
     expect(updateApplicationMeansStub.called).to.equal(false);
@@ -80,8 +97,8 @@ describe("POST /api/private/save", () => {
 
   it("returns 400 when eligibility_assessment is missing", async () => {
     const response = await request(buildApp())
-      .post("/api/private/save")
-      .send({ resource_id: resourceId });
+      .put(eligibilityPath(resourceId))
+      .send({});
 
     expect(response.status).to.equal(BAD_REQUEST);
     expect(updateApplicationMeansStub.called).to.equal(false);
@@ -89,8 +106,8 @@ describe("POST /api/private/save", () => {
 
   it("returns 400 when eligibility_assessment is a string", async () => {
     const response = await request(buildApp())
-      .post("/api/private/save")
-      .send({ eligibility_assessment: "not-an-object", resource_id: resourceId });
+      .put(eligibilityPath(resourceId))
+      .send({ eligibility_assessment: "not-an-object" });
 
     expect(response.status).to.equal(BAD_REQUEST);
     expect(updateApplicationMeansStub.called).to.equal(false);
@@ -98,8 +115,8 @@ describe("POST /api/private/save", () => {
 
   it("returns 400 when eligibility_assessment is an array", async () => {
     const response = await request(buildApp())
-      .post("/api/private/save")
-      .send({ eligibility_assessment: [], resource_id: resourceId });
+      .put(eligibilityPath(resourceId))
+      .send({ eligibility_assessment: [] });
 
     expect(response.status).to.equal(BAD_REQUEST);
     expect(updateApplicationMeansStub.called).to.equal(false);
@@ -107,17 +124,8 @@ describe("POST /api/private/save", () => {
 
   it("returns 400 when eligibility_assessment is null", async () => {
     const response = await request(buildApp())
-      .post("/api/private/save")
-      .send({ eligibility_assessment: null, resource_id: resourceId });
-
-    expect(response.status).to.equal(BAD_REQUEST);
-    expect(updateApplicationMeansStub.called).to.equal(false);
-  });
-
-  it("returns 400 for an empty request body", async () => {
-    const response = await request(buildApp())
-      .post("/api/private/save")
-      .send({});
+      .put(eligibilityPath(resourceId))
+      .send({ eligibility_assessment: null });
 
     expect(response.status).to.equal(BAD_REQUEST);
     expect(updateApplicationMeansStub.called).to.equal(false);
@@ -125,7 +133,7 @@ describe("POST /api/private/save", () => {
 
   it("returns 400 for a malformed JSON body", async () => {
     const response = await request(buildApp())
-      .post("/api/private/save")
+      .put(eligibilityPath(resourceId))
       .set("Content-Type", "application/json")
       .send("{not valid json");
 
@@ -137,13 +145,12 @@ describe("POST /api/private/save", () => {
     updateApplicationMeansStub.resolves({ data: undefined, status: 204 });
 
     const response = await request(buildApp())
-      .post("/api/private/save")
+      .put(eligibilityPath(resourceId))
       .send({
         eligibility_assessment: {
           api_response: { indication: true },
           level_of_help: "controlled_legal_representation",
         },
-        resource_id: resourceId,
       });
 
     expect(response.status).to.equal(OK);
@@ -159,8 +166,8 @@ describe("POST /api/private/save", () => {
     sinon.stub(config.api, "useMockAccessToken").value(false);
 
     const response = await request(buildApp())
-      .post("/api/private/save")
-      .send({ eligibility_assessment: {}, resource_id: resourceId });
+      .put(eligibilityPath(resourceId))
+      .send({ eligibility_assessment: {} });
 
     expect(response.status).to.equal(UNAUTHORIZED);
     expect(updateApplicationMeansStub.called).to.equal(false);
@@ -171,8 +178,8 @@ describe("POST /api/private/save", () => {
     sinon.stub(logger, "error");
 
     const response = await request(buildApp())
-      .post("/api/private/save")
-      .send({ eligibility_assessment: {}, resource_id: resourceId });
+      .put(eligibilityPath(resourceId))
+      .send({ eligibility_assessment: {} });
 
     expect(response.status).to.equal(INTERNAL_SERVER_ERROR);
   });

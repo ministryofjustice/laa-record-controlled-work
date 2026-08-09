@@ -3,45 +3,68 @@ import type { NextFunction, Request, Response } from "express";
 import type { SaveApplicationMeansDeps } from "#/api/eligibility/eligibility.service.js";
 
 import { saveApplicationMeans } from "#/api/eligibility/eligibility.service.js";
-import { SaveRequestBody } from "#/api/eligibility/eligibility.types.js";
+import {
+  ApplicationIdParam,
+  PutEligibilityRequestBody,
+} from "#/api/eligibility/eligibility.types.js";
 import { NotAuthenticatedError } from "#/auth/auth.errors.js";
-import { HTTP_STATUS } from "#/lib/constants/http.js";
+import { BAD_REQUEST, OK, UNAUTHORIZED } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
 
-export const createSaveHandler =
-  (deps: SaveApplicationMeansDeps) =>
-  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    const parsed = SaveRequestBody.safeParse(req.body);
+export const createGetEligibilityHandler =
+  () =>
+  (req: Request, res: Response): void => {
+    const parsedParams = ApplicationIdParam.safeParse(req.params);
 
-    if (!parsed.success) {
-      logger.warn("Save request body failed validation", {
-        error: parsed.error,
+    if (!parsedParams.success) {
+      logger.warn("Invalid application ID for eligibility assessment GET", {
+        error: parsedParams.error,
       });
-      res.status(HTTP_STATUS.BAD_REQUEST).end();
+      res.status(BAD_REQUEST).end();
       return;
     }
 
-    const {
-      eligibility_assessment: eligibilityAssessment,
-      resource_id: resourceId,
-    } = parsed.data;
+    res.json({ return_url: "http://localhost:8080" });
+  };
 
+export const createPutEligibilityHandler =
+  (deps: SaveApplicationMeansDeps) =>
+  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    const parsedParams = ApplicationIdParam.safeParse(req.params);
+    if (!parsedParams.success) {
+      logger.warn("Invalid application ID for eligibility assessment PUT", {
+        error: parsedParams.error,
+      });
+      res.status(BAD_REQUEST).end();
+      return;
+    }
+
+    const parsedBody = PutEligibilityRequestBody.safeParse(req.body);
+    if (!parsedBody.success) {
+      logger.warn("PUT Eligibility request body failed validation", {
+        error: parsedBody.error,
+      });
+      res.status(BAD_REQUEST).end();
+      return;
+    }
+
+    const { eligibility_assessment: eligibilityAssessment } = parsedBody.data;
+    const { applicationId } = parsedParams.data;
     const result = await saveApplicationMeans(deps, {
+      applicationId,
       eligibilityAssessment,
       homeAccountId: req.session.msal?.homeAccountId,
-      applicationId: resourceId,
       sessionId: req.sessionID,
     });
 
     if (result.error) {
       if (result.error instanceof NotAuthenticatedError) {
-        res.status(HTTP_STATUS.UNAUTHORIZED).end();
+        res.status(UNAUTHORIZED).end();
         return;
       }
-
       next(result.error);
       return;
     }
 
-    res.status(HTTP_STATUS.OK).end();
+    res.status(OK).end();
   };
