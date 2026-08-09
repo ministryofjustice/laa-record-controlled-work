@@ -5,11 +5,11 @@ import sinon from "sinon";
 import { NotAuthenticatedError } from "#/auth/auth.errors.js";
 import config from "#/config.js";
 import { logger } from "#/logger.js";
-import { SaveApplicationMeansError } from "#/eligibility/eligibility.errors.js";
+import { SaveApplicationMeansError } from "#/api/eligibility/eligibility.errors.js";
 import {
   type SaveApplicationMeansDeps,
   saveApplicationMeans,
-} from "#/eligibility/eligibility.service.js";
+} from "#/api/eligibility/eligibility.service.js";
 
 describe("saveApplicationMeans", () => {
   const resourceId = "123e4567-e89b-12d3-a456-426614174000";

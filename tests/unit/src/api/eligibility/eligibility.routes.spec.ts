@@ -15,7 +15,7 @@ import {
 import { logger } from "#/logger.js";
 import eligibilityRouter, {
   createEligibilityRouter,
-} from "#/eligibility/eligibility.routes.js";
+} from "#/api/eligibility/eligibility.routes.js";
 
 describe("eligibilityRouter", () => {
   afterEach(() => {
