@@ -3,8 +3,8 @@ import type { NextFunction, Request, Response } from "express";
 import type { SaveApplicationMeansDeps } from "#/api/eligibility/eligibility.service.js";
 
 import { saveApplicationMeans } from "#/api/eligibility/eligibility.service.js";
-import { NotAuthenticatedError } from "#/auth/auth.errors.js";
 import { SaveRequestBody } from "#/api/eligibility/eligibility.types.js";
+import { NotAuthenticatedError } from "#/auth/auth.errors.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
 
@@ -26,27 +26,22 @@ export const createSaveHandler =
       resource_id: resourceId,
     } = parsed.data;
 
-    try {
-      const result = await saveApplicationMeans(deps, {
-        eligibilityAssessment,
-        homeAccountId: req.session.msal?.homeAccountId,
-        resourceId,
-        sessionId: req.sessionID,
-      });
+    const result = await saveApplicationMeans(deps, {
+      eligibilityAssessment,
+      homeAccountId: req.session.msal?.homeAccountId,
+      resourceId,
+      sessionId: req.sessionID,
+    });
 
-      if (result.error) {
-        if (result.error instanceof NotAuthenticatedError) {
-          res.status(HTTP_STATUS.UNAUTHORIZED).end();
-          return;
-        }
-
-        next(result.error);
+    if (result.error) {
+      if (result.error instanceof NotAuthenticatedError) {
+        res.status(HTTP_STATUS.UNAUTHORIZED).end();
         return;
       }
 
-      res.status(HTTP_STATUS.OK).end();
-    } catch (error) {
-      logger.error("Unexpected error saving application means data", error);
-      next(error);
+      next(result.error);
+      return;
     }
+
+    res.status(HTTP_STATUS.OK).end();
   };

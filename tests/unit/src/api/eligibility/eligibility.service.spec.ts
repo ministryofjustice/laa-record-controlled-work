@@ -79,6 +79,34 @@ describe("saveApplicationMeans", () => {
     expect(result.error).to.be.instanceOf(SaveApplicationMeansError);
   });
 
+  it("returns a SaveApplicationMeansError failure when the RCW API returns 404", async () => {
+    updateApplicationMeansStub.resolves({ data: {}, status: 404 });
+    sinon.stub(logger, "error");
+
+    const result = await saveApplicationMeans(deps, {
+      eligibilityAssessment: {},
+      homeAccountId: "home-account-id",
+      resourceId,
+      sessionId: "session-id",
+    });
+
+    expect(result.error).to.be.instanceOf(SaveApplicationMeansError);
+  });
+
+  it("returns a SaveApplicationMeansError failure when the RCW API returns 409", async () => {
+    updateApplicationMeansStub.resolves({ data: {}, status: 409 });
+    sinon.stub(logger, "error");
+
+    const result = await saveApplicationMeans(deps, {
+      eligibilityAssessment: {},
+      homeAccountId: "home-account-id",
+      resourceId,
+      sessionId: "session-id",
+    });
+
+    expect(result.error).to.be.instanceOf(SaveApplicationMeansError);
+  });
+
   it("returns a SaveApplicationMeansError failure when the RCW API call rejects", async () => {
     const cause = new Error("network error");
     updateApplicationMeansStub.rejects(cause);
@@ -93,5 +121,59 @@ describe("saveApplicationMeans", () => {
 
     expect(result.error).to.be.instanceOf(SaveApplicationMeansError);
     expect((result.error as SaveApplicationMeansError).cause).to.equal(cause);
+  });
+
+  it("defaults result to {} and forwards the full assessment as data when api_response is missing", async () => {
+    updateApplicationMeansStub.resolves({ data: undefined, status: 204 });
+
+    await saveApplicationMeans(deps, {
+      eligibilityAssessment: { level_of_help: "controlled_legal_representation" },
+      homeAccountId: "home-account-id",
+      resourceId,
+      sessionId: "session-id",
+    });
+
+    expect(
+      updateApplicationMeansStub.calledOnceWith(resourceId, {
+        data: { level_of_help: "controlled_legal_representation" },
+        result: {},
+      }),
+    ).to.equal(true);
+  });
+
+  it("defaults result to {} when api_response is not an object", async () => {
+    updateApplicationMeansStub.resolves({ data: undefined, status: 204 });
+
+    await saveApplicationMeans(deps, {
+      eligibilityAssessment: { api_response: "not-an-object" },
+      homeAccountId: "home-account-id",
+      resourceId,
+      sessionId: "session-id",
+    });
+
+    expect(
+      updateApplicationMeansStub.calledOnceWith(resourceId, {
+        data: {},
+        result: {},
+      }),
+    ).to.equal(true);
+  });
+
+  it("defaults both data and result to {} when eligibility_assessment is empty", async () => {
+    updateApplicationMeansStub.resolves({ data: undefined, status: 204 });
+
+    await saveApplicationMeans(deps, {
+      eligibilityAssessment: {},
+      homeAccountId: "home-account-id",
+      resourceId,
+      sessionId: "session-id",
+    });
+
+    expect(
+      updateApplicationMeansStub.calledOnceWith(resourceId, {
+        data: {},
+        result: {},
+      }),
+    ).to.equal(true);
   });
 });
