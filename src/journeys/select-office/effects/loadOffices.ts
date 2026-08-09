@@ -3,9 +3,12 @@ import type {
   SelectOfficeEffectsDeps,
 } from "#/journeys/select-office/select-office.types.js";
 
-import { ApiResponseError, ApiValidationError } from "#/api/api.errors.js";
+import {
+  ApiResponseError,
+  ApiValidationError,
+} from "#/api/clients/api.errors.js";
+import { getPdaApiDefaultOptions } from "#/api/clients/getPdaApiDefaultOptions.js";
 import { ProviderFirmOfficeListDto } from "#/api/clients/pda/model/providerFirmOfficeListDto.zod.gen.js";
-import { getPdaApiDefaultOptions } from "#/api/getPdaApiDefaultOptions.js";
 import { ID_TOKEN_CLAIMS_KEYS } from "#/auth/auth.constants.js";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import {

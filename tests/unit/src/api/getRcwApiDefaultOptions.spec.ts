@@ -5,7 +5,7 @@ import sinon from "sinon";
 import {
   type RcwApiAuthParams,
   getRcwApiDefaultOptions,
-} from "#/api/getRcwApiDefaultOptions.js";
+} from "#/api/clients/getRcwApiDefaultOptions.js";
 import { NotAuthenticatedError } from "#/auth/auth.errors.js";
 import { EntraService } from "#/auth/entra.service.js";
 import config from "#/config.js";

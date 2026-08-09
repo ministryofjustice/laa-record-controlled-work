@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { ApplicationDto } from "#/dto/application/application.dto.js";
+import { ApplicationDto } from "#/api/dto/application/application.dto.js";
 
 const answers = {
   ecf: "no",
