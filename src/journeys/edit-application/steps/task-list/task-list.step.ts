@@ -16,9 +16,7 @@ import {
   saveAndReturnButton,
   taskList,
 } from "#/journeys/edit-application/steps/task-list/task-list.blocks.js";
-import {
-  CONTEXT_DATA_KEYS,
-} from "#/journeys/journey.constants.js";
+import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import { Status } from "#/journeys/journey.types.js";
 
 export interface TaskListData {
