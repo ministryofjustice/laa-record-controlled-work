@@ -1,24 +1,31 @@
 import type { ResolvableString } from "@ministryofjustice/hmpps-forge/core/components";
 
 import {
-  Params,
+  access,
+  Data,
+  Format,
   redirect,
   step,
   submit,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
+import { editApplicationEffects } from "#/journeys/edit-application/editApplication.effects.js";
 import {
   caseReferenceNumber,
   heading,
   saveAndReturnButton,
   taskList,
 } from "#/journeys/edit-application/steps/task-list/task-list.blocks.js";
-import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
+import {
+  APPLICATION_DATA_KEYS,
+  CLIENT_DETAILS_DATA_KEYS,
+  CONTEXT_DATA_KEYS,
+} from "#/journeys/journey.constants.js";
 import { Status } from "#/journeys/journey.types.js";
 
 export interface TaskListData {
   caseReferenceNumber: ResolvableString;
-  clientDetails: { clientName: string; status: Status };
+  clientDetails: { clientName: ResolvableString; status: Status };
   declaration: { status: Status };
   evidence: { status: Status };
   meansAssessment: { status: Status };
@@ -26,7 +33,9 @@ export interface TaskListData {
 
 // TODO: Hardcoded for now, will be dynamic in future
 const TASK_LIST_DATA: TaskListData = {
-  caseReferenceNumber: Params(PARAMS_KEYS.applicationID),
+  caseReferenceNumber: Data(CONTEXT_DATA_KEYS.application).path(
+    APPLICATION_DATA_KEYS.id,
+  ),
   clientDetails: {
     clientName: "Joe Blogs",
     status: Status.Completed,
@@ -42,13 +51,27 @@ const TASK_LIST_DATA: TaskListData = {
   },
 };
 
+const clientName = Format(
+  "%1 %2",
+  Data(CONTEXT_DATA_KEYS.application).path(CLIENT_DETAILS_DATA_KEYS.firstName),
+  Data(CONTEXT_DATA_KEYS.application).path(CLIENT_DETAILS_DATA_KEYS.lastName),
+);
+
 export const taskListStep = (): ReturnType<typeof step> =>
   step({
     blocks: [
-      heading(TASK_LIST_DATA.clientDetails.clientName),
-      caseReferenceNumber(TASK_LIST_DATA.caseReferenceNumber),
+      heading(clientName),
+      // TODO caseReferenceNumber to use application ID from context data, until case reference number is generated in backend
+      caseReferenceNumber(
+        Data(CONTEXT_DATA_KEYS.application).path(APPLICATION_DATA_KEYS.id),
+      ),
       ...taskList(TASK_LIST_DATA),
       saveAndReturnButton,
+    ],
+    onAccess: [
+      access({
+        effects: [editApplicationEffects.loadApplication()],
+      }),
     ],
     onSubmission: [
       submit({

@@ -8,15 +8,9 @@ import { faker } from "@faker-js/faker";
 
 import type { Application } from "../../../../../../src/api/clients/rcw/model/application.zod.gen.js";
 
-import { ApplicationState } from "../../../../../../src/api/clients/rcw/model/applicationState.zod.gen.js";
-
 import type { Applications } from "../../../../../../src/api/clients/rcw/model/applications.zod.gen.js";
 
-import { ClientDeclarationStatus } from "../../../../../../src/api/clients/rcw/model/clientDeclarationStatus.zod.gen.js";
-
 import type { CreateApplicationResponseBody } from "../../../../../../src/api/clients/rcw/model/createApplicationResponseBody.zod.gen.js";
-
-import { EvidenceStatus } from "../../../../../../src/api/clients/rcw/model/evidenceStatus.zod.gen.js";
 
 export type KeysWithNull<O> = {
   [K in keyof O]-?: null extends O[K] ? K : never;
@@ -136,14 +130,13 @@ export const getGetApplicationResponseMock = <
       createdAt: faker.date.past().toISOString().slice(0, 19) + "Z",
       modifiedAt: faker.date.past().toISOString().slice(0, 19) + "Z",
     },
-    applicationState: faker.helpers.arrayElement(
-      Object.values(ApplicationState),
-    ),
+    applicationState: faker.helpers.arrayElement([
+      "DRAFT",
+      "COMPLETED",
+    ] as const),
     declaration: {
       id: faker.string.uuid(),
-      clientDeclarationStatus: faker.helpers.arrayElement(
-        Object.values(ClientDeclarationStatus),
-      ),
+      clientDeclarationStatus: faker.helpers.arrayElement(["DRAFT"] as const),
       declarationConfirmation: faker.datatype.boolean(),
       createdAt: faker.date.past().toISOString().slice(0, 19) + "Z",
       createdBy: faker.string.alpha({ length: { min: 10, max: 20 } }),
@@ -152,7 +145,7 @@ export const getGetApplicationResponseMock = <
     },
     evidence: {
       id: faker.string.uuid(),
-      evidenceStatus: faker.helpers.arrayElement(Object.values(EvidenceStatus)),
+      evidenceStatus: faker.helpers.arrayElement(["DRAFT"] as const),
       payeIncomeEvidence: faker.datatype.boolean(),
       otherIncomeEvidence: faker.datatype.boolean(),
       housingCostsEvidence: faker.datatype.boolean(),

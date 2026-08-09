@@ -1,4 +1,4 @@
-import { getPdaApiDefaultOptions } from "#/api/getPdaApiDefaultOptions.js";
+import { getPdaApiDefaultOptions } from "#/api/clients/getPdaApiDefaultOptions.js";
 import config from "#/config.js";
 import { expect } from "chai";
 

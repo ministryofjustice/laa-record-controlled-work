@@ -20,3 +20,5 @@ applyTo: "**/*.njk, src/journeys/**, src/scss/**, src/browser/**"
 
 - Multi-step flows in `src/journeys/` using `@ministryofjustice/hmpps-forge`.
 - Each journey owns its steps and effects in a self-contained subdirectory.
+- Structure and patterns are defined in `docs/forge.md` — follow it for any journey code you touch.
+- Refactor to match `docs/forge.md` incrementally: when editing a journey file, bring only that file (and any file you're directly changing) in line with the doc. Do not proactively refactor unrelated, untouched files in the same journey.

@@ -16,6 +16,7 @@ import type { CreateRedisStore, GetRedisClient } from "#/lib/redis.js";
 import { getAllProviderOffices } from "#/api/clients/pda/schema/provider-firms-endpoints/provider-firms-endpoints.gen.js";
 import {
   createApplication,
+  getApplication,
   getApplications,
 } from "#/api/clients/rcw/schema/applications/applications.gen.js";
 import eligibilityRouter from "#/api/eligibility/eligibility.routes.js";
@@ -23,7 +24,7 @@ import authRouter from "#/auth/auth.routes.js";
 import config from "#/config.js";
 import { autocomplete } from "#/journeys/components/autocomplete/autocomplete.component.js";
 import createApplicationJourney from "#/journeys/create-application/create-application.index.js";
-import editApplication from "#/journeys/edit-application/edit-application.index.js";
+import { editApplicationPackage } from "#/journeys/edit-application/editApplication.package.js";
 import evidence from "#/journeys/evidence/evidence.index.js";
 import { selectOfficePackage } from "#/journeys/select-office/select-office.journey.js";
 import { yourCasesPackage } from "#/journeys/your-cases/your-cases.journey.js";
@@ -109,7 +110,7 @@ const createApp = async (
     .registerGlobalFunctions(nunjucksFunctions)
     .registerPackage(yourCasesPackage, { getApplications })
     .registerPackage(selectOfficePackage, { getAllProviderOffices })
-    .registerPackage(editApplication)
+    .registerPackage(editApplicationPackage, { getApplication })
     .registerPackage(createApplicationJourney, { createApplication })
     .registerPackage(evidence);
 
