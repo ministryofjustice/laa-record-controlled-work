@@ -1,3 +1,5 @@
+import { Applications } from "#/api/clients/rcw/model/applications.zod.gen.js";
+
 export const UK_EXCLUSIVE_ADDRESS_FIELD = {
   county: "county",
   postcode: "postcode",
@@ -36,3 +38,5 @@ export const CONTEXT_DATA_KEYS = {
 export const PARAMS_KEYS = {
   applicationID: "applicationID",
 };
+
+export const APPLICATION_DATA_KEYS = Applications.element.keyof().enum;
