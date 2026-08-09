@@ -1,5 +1,5 @@
-import express from "express";
-import session from "express-session";
+import type { Application } from "express";
+
 import request from "supertest";
 
 import { expect } from "chai";
@@ -16,6 +16,7 @@ import { logger } from "#/logger.js";
 import eligibilityRouter, {
   createEligibilityRouter,
 } from "#/api/eligibility/eligibility.routes.js";
+import { createMockApp } from "../../../utils.js";
 
 describe("eligibilityRouter", () => {
   afterEach(() => {
@@ -23,8 +24,11 @@ describe("eligibilityRouter", () => {
   });
 
   it("returns 200 for GET /api/private/load", async () => {
-    const app = express();
-    app.use("/api/private", eligibilityRouter);
+    const app = createMockApp({
+      mountPath: "/api/private",
+      router: eligibilityRouter,
+      useCsrf: false,
+    });
 
     const response = await request(app).get("/api/private/load");
 
@@ -37,29 +41,14 @@ describe("POST /api/private/save", () => {
 
   let updateApplicationMeansStub: sinon.SinonStub;
 
-  function buildApp(): express.Express {
-    const app = express();
-    app.use(express.json());
-    app.use(
-      session({ resave: false, saveUninitialized: true, secret: "test" }),
-    );
-    app.use(
-      "/api/private",
-      createEligibilityRouter({
+  function buildApp(): Application {
+    return createMockApp({
+      mountPath: "/api/private",
+      router: createEligibilityRouter({
         updateApplicationMeans: updateApplicationMeansStub,
       }),
-    );
-    app.use(
-      (
-        _err: Error,
-        _req: express.Request,
-        res: express.Response,
-        _next: express.NextFunction,
-      ) => {
-        res.status(INTERNAL_SERVER_ERROR).end();
-      },
-    );
-    return app;
+      useCsrf: false,
+    });
   }
 
   beforeEach(() => {
@@ -75,6 +64,70 @@ describe("POST /api/private/save", () => {
     const response = await request(buildApp())
       .post("/api/private/save")
       .send({ eligibility_assessment: {} });
+
+    expect(response.status).to.equal(BAD_REQUEST);
+    expect(updateApplicationMeansStub.called).to.equal(false);
+  });
+
+  it("returns 400 when resource_id is not a valid UUID", async () => {
+    const response = await request(buildApp())
+      .post("/api/private/save")
+      .send({ eligibility_assessment: {}, resource_id: "not-a-uuid" });
+
+    expect(response.status).to.equal(BAD_REQUEST);
+    expect(updateApplicationMeansStub.called).to.equal(false);
+  });
+
+  it("returns 400 when eligibility_assessment is missing", async () => {
+    const response = await request(buildApp())
+      .post("/api/private/save")
+      .send({ resource_id: resourceId });
+
+    expect(response.status).to.equal(BAD_REQUEST);
+    expect(updateApplicationMeansStub.called).to.equal(false);
+  });
+
+  it("returns 400 when eligibility_assessment is a string", async () => {
+    const response = await request(buildApp())
+      .post("/api/private/save")
+      .send({ eligibility_assessment: "not-an-object", resource_id: resourceId });
+
+    expect(response.status).to.equal(BAD_REQUEST);
+    expect(updateApplicationMeansStub.called).to.equal(false);
+  });
+
+  it("returns 400 when eligibility_assessment is an array", async () => {
+    const response = await request(buildApp())
+      .post("/api/private/save")
+      .send({ eligibility_assessment: [], resource_id: resourceId });
+
+    expect(response.status).to.equal(BAD_REQUEST);
+    expect(updateApplicationMeansStub.called).to.equal(false);
+  });
+
+  it("returns 400 when eligibility_assessment is null", async () => {
+    const response = await request(buildApp())
+      .post("/api/private/save")
+      .send({ eligibility_assessment: null, resource_id: resourceId });
+
+    expect(response.status).to.equal(BAD_REQUEST);
+    expect(updateApplicationMeansStub.called).to.equal(false);
+  });
+
+  it("returns 400 for an empty request body", async () => {
+    const response = await request(buildApp())
+      .post("/api/private/save")
+      .send({});
+
+    expect(response.status).to.equal(BAD_REQUEST);
+    expect(updateApplicationMeansStub.called).to.equal(false);
+  });
+
+  it("returns 400 for a malformed JSON body", async () => {
+    const response = await request(buildApp())
+      .post("/api/private/save")
+      .set("Content-Type", "application/json")
+      .send("{not valid json");
 
     expect(response.status).to.equal(BAD_REQUEST);
     expect(updateApplicationMeansStub.called).to.equal(false);
