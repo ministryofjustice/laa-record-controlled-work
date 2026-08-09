@@ -127,7 +127,7 @@ const createApp = async (
     session(await createSession(config, getRedisClient, createRedisStore)),
   );
 
-  app.use("/api/private", requireAuth, eligibilityRouter);
+  app.use("/api/eligibility", requireAuth, eligibilityRouter);
 
   setupCsrf(app);
 
