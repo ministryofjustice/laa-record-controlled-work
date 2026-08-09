@@ -2,6 +2,8 @@ import type { ResolvableString } from "@ministryofjustice/hmpps-forge/core/compo
 
 import {
   access,
+  Data,
+  Format,
   Params,
   redirect,
   step,
@@ -15,12 +17,15 @@ import {
   saveAndReturnButton,
   taskList,
 } from "#/journeys/edit-application/steps/task-list/task-list.blocks.js";
-import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
+import {
+  CONTEXT_DATA_KEYS,
+  PARAMS_KEYS,
+} from "#/journeys/journey.constants.js";
 import { Status } from "#/journeys/journey.types.js";
 
 export interface TaskListData {
   caseReferenceNumber: ResolvableString;
-  clientDetails: { clientName: string; status: Status };
+  clientDetails: { clientName: ResolvableString; status: Status };
   declaration: { status: Status };
   evidence: { status: Status };
   meansAssessment: { status: Status };
@@ -44,10 +49,16 @@ const TASK_LIST_DATA: TaskListData = {
   },
 };
 
+const clientName = Format(
+  "%1 %2",
+  Data(CONTEXT_DATA_KEYS.application).path("clientDetails.firstName"),
+  Data(CONTEXT_DATA_KEYS.application).path("clientDetails.lastName"),
+);
+
 export const taskListStep = (): ReturnType<typeof step> =>
   step({
     blocks: [
-      heading(TASK_LIST_DATA.clientDetails.clientName),
+      heading(clientName),
       caseReferenceNumber(TASK_LIST_DATA.caseReferenceNumber),
       ...taskList(TASK_LIST_DATA),
       saveAndReturnButton,
