@@ -10,8 +10,6 @@ import type { Application } from "../../../../../../src/api/clients/rcw/model/ap
 
 import type { Applications } from "../../../../../../src/api/clients/rcw/model/applications.zod.gen.js";
 
-import type { CreateApplicationResponseBody } from "../../../../../../src/api/clients/rcw/model/createApplicationResponseBody.zod.gen.js";
-
 export type KeysWithNull<O> = {
   [K in keyof O]-?: null extends O[K] ? K : never;
 }[keyof O];
@@ -25,12 +23,6 @@ export type MockWithNullableOverrides<
 };
 
 export type ApplicationsMock = Applications;
-
-export type CreateApplicationResponseBodyMock = {
-  [
-    K in keyof Required<NonNullable<CreateApplicationResponseBody>>
-  ]: NonNullable<Required<NonNullable<CreateApplicationResponseBody>>[K]>;
-};
 
 export type ApplicationMock = {
   [K in keyof Required<NonNullable<Application>>]: NonNullable<
@@ -48,53 +40,6 @@ export const getGetApplicationsResponseMock = (): ApplicationsMock =>
     applicationRefNumber: faker.string.alpha({ length: { min: 10, max: 20 } }),
     modifiedAt: faker.date.past().toISOString().slice(0, 19) + "Z",
   }));
-
-export const getCreateApplicationResponseMock = <
-  O extends Partial<Extract<CreateApplicationResponseBody, object>> = {},
->(
-  overrideResponse?: O,
-): MockWithNullableOverrides<
-  CreateApplicationResponseBody,
-  O,
-  CreateApplicationResponseBodyMock
-> =>
-  ({
-    id: faker.string.uuid(),
-    ecfFlag: faker.datatype.boolean(),
-    legalAidBefore: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    legalAidLast6Months: faker.datatype.boolean(),
-    reasonForReapplication: faker.string.alpha({
-      length: { min: 10, max: 20 },
-    }),
-    clientDetails: {
-      id: faker.string.uuid(),
-      firstName: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      lastName: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      dateOfBirth: faker.date.past().toISOString().slice(0, 10),
-      niNumber: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      hasFixedAddress: faker.datatype.boolean(),
-      address: {
-        id: faker.string.uuid(),
-        addressLine1: faker.string.alpha({ length: { min: 10, max: 20 } }),
-        addressLine2: faker.string.alpha({ length: { min: 10, max: 20 } }),
-        addressLine3: faker.string.alpha({ length: { min: 10, max: 20 } }),
-        addressLine4: faker.string.alpha({ length: { min: 10, max: 20 } }),
-        townOrCity: faker.string.alpha({ length: { min: 10, max: 20 } }),
-        postCode: faker.string.alpha({ length: { min: 10, max: 20 } }),
-        county: faker.string.alpha({ length: { min: 10, max: 20 } }),
-        country: faker.string.alpha({ length: { min: 10, max: 20 } }),
-        createdAt: faker.date.past().toISOString().slice(0, 19) + "Z",
-        modifiedAt: faker.date.past().toISOString().slice(0, 19) + "Z",
-      },
-      createdAt: faker.date.past().toISOString().slice(0, 19) + "Z",
-      modifiedAt: faker.date.past().toISOString().slice(0, 19) + "Z",
-    },
-    ...overrideResponse,
-  }) as MockWithNullableOverrides<
-    CreateApplicationResponseBody,
-    O,
-    CreateApplicationResponseBodyMock
-  >;
 
 export const getGetApplicationResponseMock = <
   O extends Partial<Extract<Application, object>> = {},

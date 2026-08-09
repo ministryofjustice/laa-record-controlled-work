@@ -11,17 +11,13 @@ import type { Application } from "../../../../../../src/api/clients/rcw/model/ap
 
 import type { Applications } from "../../../../../../src/api/clients/rcw/model/applications.zod.gen.js";
 
-import type { CreateApplicationResponseBody } from "../../../../../../src/api/clients/rcw/model/createApplicationResponseBody.zod.gen.js";
-
 import {
-  getCreateApplicationResponseMock,
   getGetApplicationResponseMock,
   getGetApplicationsResponseMock,
 } from "../../fakers/applications/applications.faker.gen.js";
 
 export {
   getGetApplicationsResponseMock,
-  getCreateApplicationResponseMock,
   getGetApplicationResponseMock,
 } from "../../fakers/applications/applications.faker.gen.js";
 
@@ -38,12 +34,6 @@ export type MockWithNullableOverrides<
 };
 
 export type ApplicationsMock = Applications;
-
-export type CreateApplicationResponseBodyMock = {
-  [
-    K in keyof Required<NonNullable<CreateApplicationResponseBody>>
-  ]: NonNullable<Required<NonNullable<CreateApplicationResponseBody>>[K]>;
-};
 
 export type ApplicationMock = {
   [K in keyof Required<NonNullable<Application>>]: NonNullable<
@@ -77,24 +67,20 @@ export const getGetApplicationsMockHandler = (
 
 export const getCreateApplicationMockHandler = (
   overrideResponse?:
-    | CreateApplicationResponseBody
+    | void
     | ((
         info: Parameters<Parameters<typeof http.post>[1]>[0],
-      ) =>
-        Promise<CreateApplicationResponseBody> | CreateApplicationResponseBody),
+      ) => Promise<void> | void),
   options?: RequestHandlerOptions,
 ) => {
   return http.post(
     "*/api/v1/applications",
     async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
-      return HttpResponse.json(
-        overrideResponse !== undefined
-          ? typeof overrideResponse === "function"
-            ? await overrideResponse(info)
-            : overrideResponse
-          : getCreateApplicationResponseMock(),
-        { status: 201 },
-      );
+      if (typeof overrideResponse === "function") {
+        await overrideResponse(info);
+      }
+
+      return new HttpResponse(null, { status: 201 });
     },
     options,
   );

@@ -11,6 +11,8 @@ export const CreateApplicationRequestBody = zod.object({
   legalAidBefore: zod.string(),
   legalAidLast6Months: zod.boolean().optional(),
   reasonForReapplication: zod.string().optional(),
+  providerOfficeCode: zod.string(),
+  scopingQuestions: zod.record(zod.string(), zod.unknown()),
   clientDetails: zod.object({
     id: zod.uuid().optional(),
     firstName: zod.string(),

@@ -12,8 +12,6 @@ import type { Applications } from "../../model/applications.zod.gen.js";
 
 import type { CreateApplicationRequestBody } from "../../model/createApplicationRequestBody.zod.gen.js";
 
-import type { CreateApplicationResponseBody } from "../../model/createApplicationResponseBody.zod.gen.js";
-
 import type { GetApplicationsParams } from "../../model/getApplicationsParams.zod.gen.js";
 
 import type { UpdateMeansDataRequestBody } from "../../model/updateMeansDataRequestBody.zod.gen.js";
@@ -97,7 +95,7 @@ export const getApplications = async (
 };
 
 export type createApplicationResponse201 = {
-  data: CreateApplicationResponseBody;
+  data: void;
   status: 201;
 };
 
@@ -162,7 +160,9 @@ export const createApplication = async (
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: createApplicationResponse["data"] = body ? JSON.parse(body) : {};
+  const data: createApplicationResponse["data"] = body
+    ? JSON.parse(body)
+    : undefined;
   return {
     data,
     status: res.status,
