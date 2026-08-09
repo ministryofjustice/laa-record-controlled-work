@@ -5,7 +5,7 @@ import express from "express";
 import type { SaveApplicationMeansDeps } from "#/api/eligibility/eligibility.service.js";
 
 import { updateApplicationMeans } from "#/api/clients/rcw/schema/applications/applications.gen.js";
-import { createSaveHandler } from "#/eligibility/eligibility.handlers.js";
+import { createSaveHandler } from "#/api/eligibility/eligibility.handlers.js";
 
 /**
  * Builds the eligibility router, accepting injected RCW API client deps for testing.

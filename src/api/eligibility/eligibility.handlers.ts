@@ -4,7 +4,7 @@ import type { SaveApplicationMeansDeps } from "#/api/eligibility/eligibility.ser
 
 import { saveApplicationMeans } from "#/api/eligibility/eligibility.service.js";
 import { NotAuthenticatedError } from "#/auth/auth.errors.js";
-import { SaveRequestBody } from "#/eligibility/eligibility.types.js";
+import { SaveRequestBody } from "#/api/eligibility/eligibility.types.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
 

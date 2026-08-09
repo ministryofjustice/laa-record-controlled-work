@@ -3,7 +3,7 @@ import type { updateApplicationMeans } from "#/api/clients/rcw/schema/applicatio
 import { getRcwApiDefaultOptions } from "#/api/getRcwApiDefaultOptions.js";
 import { getAuthDebugHeaders } from "#/auth/auth.debug.js";
 import { NotAuthenticatedError } from "#/auth/auth.errors.js";
-import { SaveApplicationMeansError } from "#/eligibility/eligibility.errors.js";
+import { SaveApplicationMeansError } from "#/api/eligibility/eligibility.errors.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { type Either, failure, success } from "#/lib/either.js";
 import { logger } from "#/logger.js";
