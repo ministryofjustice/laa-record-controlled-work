@@ -18,6 +18,3 @@ rcw:
 
 ccq:
   replicaCount: 2
-
-  env:
-    HOST_SERVICE_URL: https://laa-record-controlled-work-staging.cloud-platform.service.justice.gov.uk
