@@ -2,6 +2,7 @@ import type { EffectFunctionContext } from "@ministryofjustice/hmpps-forge/core"
 import type { Session, SessionData } from "express-session";
 
 import type { CreateApplicationRequestBody } from "#/api/clients/rcw/model/createApplicationRequestBody.zod.gen.js";
+import type { createApplicationResponse } from "#/api/clients/rcw/schema/applications/applications.gen.js";
 import type { CreateApplicationEffectsDeps } from "#/journeys/create-application/create-application.types.js";
 
 import {
@@ -42,7 +43,7 @@ export const createApplication =
     context: EffectFunctionContext,
     journeyCode: string,
   ): Promise<void> => {
-    let response;
+    let response: createApplicationResponse;
 
     try {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Session shape is constrained by app session typing.

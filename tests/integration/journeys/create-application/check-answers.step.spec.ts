@@ -13,7 +13,11 @@ describe("Check answers step", () => {
   const uuid = "123e4567-e89b-12d3-a456-426614174000";
   const createApplicationStub = sinon
     .stub()
-    .resolves({ status: 201, data: getCreateApplicationResponseMock({ id: uuid }) });
+    .resolves({
+      status: 201,
+      data: getCreateApplicationResponseMock({ id: uuid }),
+      headers: new Headers(),
+    });
 
   const client = createForgeTestClient(
     "Record new case",

@@ -3,7 +3,10 @@ import { expect } from "chai";
 import { describe, it } from "mocha";
 import sinon from "sinon";
 
-import { ApiResponseError, ApiValidationError } from "#/api/clients/api.errors.js";
+import {
+  ApiResponseError,
+  ApiValidationError,
+} from "#/api/clients/api.errors.js";
 import config from "#/config.js";
 import { createApplication } from "#/journeys/create-application/effects/createApplication.js";
 import type { CreateApplicationEffectsDeps } from "#/journeys/create-application/create-application.types.js";
@@ -63,6 +66,7 @@ describe("CreateApplicationEffect", () => {
     createApplicationStub.resolves({
       data: getCreateApplicationResponseMock({ id: applicationId }),
       status: 201,
+      headers: new Headers(),
     });
 
     await createApplication(deps)(context, journeyCode);
@@ -77,7 +81,11 @@ describe("CreateApplicationEffect", () => {
   });
 
   it("returns an ApiResponseError when createApplication responds with non-201", async () => {
-    createApplicationStub.resolves({ status: 500, data: {} });
+    createApplicationStub.resolves({
+      status: 500,
+      data: {},
+      headers: new Headers(),
+    });
     sinon.stub(logger, "error");
 
     try {
@@ -98,6 +106,20 @@ describe("CreateApplicationEffect", () => {
       expect(error).to.be.instanceOf(ApiResponseError);
       const apiError = error as ApiResponseError;
       expect(apiError.cause).to.equal(cause);
+    }
+  });
+
+  it("returns an ApiValidationError when createApplication returns no application id", async () => {
+    createApplicationStub.resolves({
+      headers: new Headers(),
+      status: 201,
+    });
+    sinon.stub(logger, "error");
+
+    try {
+      await createApplication(deps)(context, journeyCode);
+    } catch (error) {
+      expect(error).to.be.instanceOf(ApiValidationError);
     }
   });
 
