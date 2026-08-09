@@ -6,7 +6,7 @@ import {
   TestRenderResult,
   TestResult,
 } from "@ministryofjustice/hmpps-forge/core/testing";
-import { ApiResponseError, ApiValidationError } from "#/api/api.errors.js";
+import { ApiResponseError, ApiValidationError } from "#/api/clients/api.errors.js";
 import { logger } from "#/logger.js";
 import { getGetApplicationsResponseMock } from "../../../../mocks/api/rcw/fakers/applications/applications.faker.gen.js";
 
