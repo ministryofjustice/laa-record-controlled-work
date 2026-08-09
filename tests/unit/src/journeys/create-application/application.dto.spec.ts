@@ -22,6 +22,7 @@ const answers = {
 
 describe("fromAnswers method", () => {
   it("should map answers to API request format", () => {
+    const providerOfficeCode = "22439e72-68d3-4770-b435-c352d883d21e";
     const expected = {
       ecfFlag: false,
       clientDetails: {
@@ -43,10 +44,17 @@ describe("fromAnswers method", () => {
       },
       legalAidBefore: "yesSameMatter",
       legalAidLast6Months: true,
+      providerOfficeCode,
       reasonForReapplication: "here is a reason",
+      scopingQuestions: {
+        legalAidBefore: "yesSameMatter",
+      },
     };
 
-    const result = ApplicationDto.fromAnswers(answers).toRcwApi();
+    const result = ApplicationDto.fromAnswers(
+      answers,
+      providerOfficeCode,
+    ).toRcwApi();
     expect(result).to.deep.equal(expected);
   });
 });

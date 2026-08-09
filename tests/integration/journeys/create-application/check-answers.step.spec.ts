@@ -44,6 +44,10 @@ describe("Check answers step", () => {
         country: "United Kingdom",
       },
     },
+    selectedOffice: {
+      address: "123 Test Street, Testville, TE5 7ST",
+      code: "22439e72-68d3-4770-b435-c352d883d21e",
+    },
   };
 
   describe("GET /cases/new/check-answers", () => {

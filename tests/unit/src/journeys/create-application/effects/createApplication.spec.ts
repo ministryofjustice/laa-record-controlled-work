@@ -50,6 +50,10 @@ describe("CreateApplicationEffect", () => {
           townOrCity: "Manchester",
         },
       },
+      selectedOffice: {
+        address: "123 Test Street, Manchester, A12 3BC",
+        code: "22439e72-68d3-4770-b435-c352d883d21e",
+      },
     });
 
     context = {
@@ -120,6 +124,40 @@ describe("CreateApplicationEffect", () => {
       await createApplication(deps)(context, journeyCode);
     } catch (error) {
       expect(error).to.be.instanceOf(ApiValidationError);
+    }
+  });
+
+  it("returns an ApiResponseError with ApiValidationError cause when selected office is missing", async () => {
+    getSession.returns({
+      journeyDrafts: {
+        [journeyCode]: {
+          addressLine1: "123 Test Street",
+          country: "United Kingdom",
+          dateOfBirth: "1990-01-01",
+          ecf: "no",
+          firstName: "Jane",
+          hasNINumber: "yes",
+          haveAHomeAddress: "yes",
+          lastName: "Bloggs",
+          legalAidBefore: "yesSameMatter",
+          legalAidLast6Months: "yes",
+          niNumber: "QQ123456C", // gitleaks:allow - fake NI number used in test fixture
+          postcode: "A12 3BC",
+          reasonForYes: "here is a reason",
+          townOrCity: "Manchester",
+        },
+      },
+    });
+
+    sinon.stub(logger, "error");
+
+    try {
+      await createApplication(deps)(context, journeyCode);
+    } catch (error) {
+      expect(error).to.be.instanceOf(ApiResponseError);
+      const apiError = error as ApiResponseError;
+      expect(apiError.cause).to.be.instanceOf(ApiValidationError);
+      expect(createApplicationStub.called).to.equal(false);
     }
   });
 

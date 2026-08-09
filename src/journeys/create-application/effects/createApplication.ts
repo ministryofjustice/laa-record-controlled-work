@@ -22,6 +22,7 @@ import { logger } from "#/logger.js";
 const buildApplicationData = (
   journeyAnswers: Record<string, unknown>,
   journeyCode: string,
+  providerOfficeCode: string | undefined,
 ): CreateApplicationRequestBody => {
   const answersFormatted = Answers.safeParse(journeyAnswers);
 
@@ -33,7 +34,17 @@ const buildApplicationData = (
     throw ApiValidationError.from(answersFormatted.error);
   }
 
-  const applicationDto = ApplicationDto.fromAnswers(answersFormatted.data);
+  if (!providerOfficeCode) {
+    logger.error(
+      `Journey session for ${journeyCode} is missing selected office code`,
+    );
+    throw new ApiValidationError();
+  }
+
+  const applicationDto = ApplicationDto.fromAnswers(
+    answersFormatted.data,
+    providerOfficeCode,
+  );
   return applicationDto.toRcwApi();
 };
 
@@ -60,7 +71,11 @@ export const createApplication =
         return;
       }
 
-      const dataForApi = buildApplicationData(journeyAnswers, journeyCode);
+      const dataForApi = buildApplicationData(
+        journeyAnswers,
+        journeyCode,
+        session.selectedOffice?.code,
+      );
 
       const opts = await getRcwApiDefaultOptions({
         homeAccountId: session.msal?.homeAccountId,

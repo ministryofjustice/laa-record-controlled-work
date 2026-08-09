@@ -19,7 +19,9 @@ interface Application {
   legalAidLast6Months?: boolean;
   niNumber?: string;
   postcode?: string;
+  providerOfficeCode: string;
   reasonForReapplication?: string;
+  scopingQuestions: Record<string, unknown>;
   townOrCity?: string;
 }
 
@@ -43,7 +45,9 @@ export class ApplicationDto {
   public legalAidLast6Months?: boolean;
   public niNumber?: string;
   public postcode?: string;
+  public providerOfficeCode = "";
   public reasonForReapplication?: string;
+  public scopingQuestions: Record<string, unknown> = {};
   public townOrCity?: string;
 
   /**
@@ -57,9 +61,13 @@ export class ApplicationDto {
   /**
    * Creates an ApplicationDto instance from the provided answers.
    * @param answers - The answers from which to create the ApplicationDto instance.
+   * @param providerOfficeCode - The provider office code to be included in the ApplicationDto instance.
    * @returns ApplicationDto instance.
    */
-  public static fromAnswers(answers: AnswersOutput): ApplicationDto {
+  public static fromAnswers(
+    answers: AnswersOutput,
+    providerOfficeCode: string,
+  ): ApplicationDto {
     return new ApplicationDto({
       addressLine1: answers[ADDRESS_FIELD.addressLine1],
       addressLine2: answers[ADDRESS_FIELD.addressLine2],
@@ -76,7 +84,11 @@ export class ApplicationDto {
       legalAidLast6Months: answers.legalAidLast6Months === "yes",
       niNumber: answers.niNumber,
       postcode: answers[ADDRESS_FIELD.postcode],
+      providerOfficeCode,
       reasonForReapplication: answers.reasonForYes,
+      scopingQuestions: {
+        legalAidBefore: answers.legalAidBefore,
+      },
       townOrCity: answers[ADDRESS_FIELD.townOrCity],
     });
   }
@@ -107,7 +119,9 @@ export class ApplicationDto {
       ecfFlag: this.ecfFlag,
       legalAidBefore: this.legalAidBefore,
       legalAidLast6Months: this.legalAidLast6Months,
+      providerOfficeCode: this.providerOfficeCode,
       reasonForReapplication: this.reasonForReapplication,
+      scopingQuestions: this.scopingQuestions,
     };
   }
 }
