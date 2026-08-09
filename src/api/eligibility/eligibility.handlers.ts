@@ -1,9 +1,9 @@
 import type { NextFunction, Request, Response } from "express";
 
-import type { SaveApplicationMeansDeps } from "#/eligibility/eligibility.service.js";
+import type { SaveApplicationMeansDeps } from "#/api/eligibility/eligibility.service.js";
 
+import { saveApplicationMeans } from "#/api/eligibility/eligibility.service.js";
 import { NotAuthenticatedError } from "#/auth/auth.errors.js";
-import { saveApplicationMeans } from "#/eligibility/eligibility.service.js";
 import { SaveRequestBody } from "#/eligibility/eligibility.types.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
