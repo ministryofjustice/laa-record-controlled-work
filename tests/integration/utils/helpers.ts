@@ -28,6 +28,7 @@ import { editApplicationEffectsRegistry } from "#/journeys/edit-application/edit
 import type { EditApplicationEffectsDeps } from "#/journeys/edit-application/editApplication.types.js";
 import sinon from "sinon";
 import { getCreateApplicationResponseMock, getGetApplicationResponseMock } from "../../mocks/api/rcw/fakers/applications/applications.faker.gen.js";
+import { taskListStep } from "#/journeys/edit-application/steps/task-list/task-list.step.js";
 
 /**
 
@@ -125,46 +126,19 @@ export function createForgeTestClientForCaseList(
  * @returns {ForgeTestClient} A configured test client.
  */
 export function createForgeTestClientForEditApplication(
-  title: string,
-  path: string,
-  steps: StepDefinition[],
   mockDeps?: EditApplicationEffectsDeps,
 ): ForgeTestClient {
-  const uuid = "123e4567-e89b-12d3-a456-426614174000";
-  const mockData = getGetApplicationResponseMock({
-    id: uuid,
-    applicationStatus: "DRAFT",
-    applicationState: "DRAFT",
-    declaration: {
-      clientDeclarationStatus: "DRAFT",
-      declarationConfirmation: false,
-      createdAt: new Date().toISOString().slice(0, 19) + "Z",
-      createdBy: "test",
-      modifiedAt: new Date().toISOString().slice(0, 19) + "Z",
-      modifiedBy: "test",
-    },
-    evidence: {
-      evidenceStatus: "DRAFT",
-      payeIncomeEvidence: false,
-      otherIncomeEvidence: false,
-      housingCostsEvidence: false,
-      capitalEvidence: false,
-      createdAt: new Date().toISOString().slice(0, 19) + "Z",
-      createdBy: "test",
-      modifiedAt: new Date().toISOString().slice(0, 19) + "Z",
-      modifiedBy: "test",
-    },
-  });
+  const mockData = getGetApplicationResponseMock();
   const getApplicationStub = sinon
     .stub()
     .resolves({ status: 200, data: mockData });
 
   const testJourney = journey({
     code: "testJourney",
-    path: path,
+    path: "/cases/:applicationID/",
     reachability: { disableReachabilityChecks: true },
-    steps,
-    title: title,
+    steps: [taskListStep()],
+    title: "Edit case",
     view: { template: "partials/form-step" },
   });
 

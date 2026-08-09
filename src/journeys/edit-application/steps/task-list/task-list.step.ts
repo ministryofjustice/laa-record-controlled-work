@@ -4,7 +4,6 @@ import {
   access,
   Data,
   Format,
-  Params,
   redirect,
   step,
   submit,
@@ -19,7 +18,6 @@ import {
 } from "#/journeys/edit-application/steps/task-list/task-list.blocks.js";
 import {
   CONTEXT_DATA_KEYS,
-  PARAMS_KEYS,
 } from "#/journeys/journey.constants.js";
 import { Status } from "#/journeys/journey.types.js";
 
@@ -33,7 +31,7 @@ export interface TaskListData {
 
 // TODO: Hardcoded for now, will be dynamic in future
 const TASK_LIST_DATA: TaskListData = {
-  caseReferenceNumber: Params(PARAMS_KEYS.applicationID),
+  caseReferenceNumber: Data(CONTEXT_DATA_KEYS.application).path("id"),
   clientDetails: {
     clientName: "Joe Blogs",
     status: Status.Completed,
@@ -59,7 +57,8 @@ export const taskListStep = (): ReturnType<typeof step> =>
   step({
     blocks: [
       heading(clientName),
-      caseReferenceNumber(TASK_LIST_DATA.caseReferenceNumber),
+      // TODO caseReferenceNumber to use application ID from context data, until case reference number is generated in backend
+      caseReferenceNumber(Data(CONTEXT_DATA_KEYS.application).path("id")),
       ...taskList(TASK_LIST_DATA),
       saveAndReturnButton,
     ],
