@@ -34,7 +34,9 @@ export function caseReferenceNumber(
  * @param text - The text content for the heading.
  * @returns A heading block definition.
  */
-export function heading(text: ResolvableString): ReturnType<typeof GovUKHeading> {
+export function heading(
+  text: ResolvableString,
+): ReturnType<typeof GovUKHeading> {
   return GovUKHeading({ text });
 }
 /**
