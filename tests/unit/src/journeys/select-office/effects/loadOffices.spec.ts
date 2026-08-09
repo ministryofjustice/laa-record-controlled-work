@@ -2,8 +2,8 @@ import { expect } from "chai";
 import sinon from "sinon";
 
 import type { ProviderFirmOfficeListDto } from "#/api/clients/pda/model/providerFirmOfficeListDto.zod.gen.js";
-import { ApiResponseError, ApiValidationError } from "#/api/api.errors.js";
-import { getPdaApiDefaultOptions } from "#/api/getPdaApiDefaultOptions.js";
+import { ApiResponseError, ApiValidationError } from "#/api/clients/api.errors.js";
+import { getPdaApiDefaultOptions } from "#/api/clients/getPdaApiDefaultOptions.js";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import {
   InvalidFirmCodeClaimError,
