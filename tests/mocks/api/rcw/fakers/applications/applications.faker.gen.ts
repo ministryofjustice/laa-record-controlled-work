@@ -155,6 +155,7 @@ export const getGetApplicationResponseMock = <
       modifiedAt: faker.date.past().toISOString().slice(0, 19) + "Z",
       modifiedBy: faker.string.alpha({ length: { min: 10, max: 20 } }),
     },
+    eligibility: { data: {}, result: {} },
     reasonForReapplication: faker.string.alpha({
       length: { min: 10, max: 20 },
     }),

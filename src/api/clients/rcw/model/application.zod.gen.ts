@@ -63,6 +63,12 @@ export const Application = zod.object({
       modifiedBy: zod.string().optional(),
     })
     .optional(),
+  eligibility: zod
+    .object({
+      data: zod.looseObject({}).optional(),
+      result: zod.looseObject({}).optional(),
+    })
+    .optional(),
   reasonForReapplication: zod.string().optional(),
   meansAssessmentRequired: zod.boolean().optional(),
   typeOfNonMeans: zod.boolean().optional(),
