@@ -69,12 +69,9 @@ server {
 
   # Never expose internal-only RCW eligibility API routes via ingress;
   # only the CCQ pod may call these directly (see rcw.networkpolicy.yaml).
-  location = /api/eligibility {
-    return 404;
-  }
 
-  location ^~ /api/eligibility/ {
-    return 404;
+  location ~ ^/api/applications/[^/]+/eligibility/?$ {
+    return 403;
   }
 
   location / {
