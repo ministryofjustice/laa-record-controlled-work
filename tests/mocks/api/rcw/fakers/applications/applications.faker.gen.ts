@@ -10,6 +10,8 @@ import type { Application } from "../../../../../../src/api/clients/rcw/model/ap
 
 import type { Applications } from "../../../../../../src/api/clients/rcw/model/applications.zod.gen.js";
 
+import type { CreateApplicationResponseBody } from "../../../../../../src/api/clients/rcw/model/createApplicationResponseBody.zod.gen.js";
+
 export type KeysWithNull<O> = {
   [K in keyof O]-?: null extends O[K] ? K : never;
 }[keyof O];
@@ -23,6 +25,12 @@ export type MockWithNullableOverrides<
 };
 
 export type ApplicationsMock = Applications;
+
+export type CreateApplicationResponseBodyMock = {
+  [
+    K in keyof Required<NonNullable<CreateApplicationResponseBody>>
+  ]: NonNullable<Required<NonNullable<CreateApplicationResponseBody>>[K]>;
+};
 
 export type ApplicationMock = {
   [K in keyof Required<NonNullable<Application>>]: NonNullable<
@@ -40,6 +48,24 @@ export const getGetApplicationsResponseMock = (): ApplicationsMock =>
     applicationRefNumber: faker.string.alpha({ length: { min: 10, max: 20 } }),
     modifiedAt: faker.date.past().toISOString().slice(0, 19) + "Z",
   }));
+
+export const getCreateApplicationResponseMock = <
+  O extends Partial<Extract<CreateApplicationResponseBody, object>> = {},
+>(
+  overrideResponse?: O,
+): MockWithNullableOverrides<
+  CreateApplicationResponseBody,
+  O,
+  CreateApplicationResponseBodyMock
+> =>
+  ({
+    id: faker.string.uuid(),
+    ...overrideResponse,
+  }) as MockWithNullableOverrides<
+    CreateApplicationResponseBody,
+    O,
+    CreateApplicationResponseBodyMock
+  >;
 
 export const getGetApplicationResponseMock = <
   O extends Partial<Extract<Application, object>> = {},
