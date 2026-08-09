@@ -13,9 +13,9 @@ export interface SaveApplicationMeansDeps {
 }
 
 export interface SaveApplicationMeansParams {
+  applicationId: string;
   eligibilityAssessment: Record<string, unknown>;
   homeAccountId: string | undefined;
-  resourceId: string;
   sessionId: string | undefined;
 }
 
@@ -29,19 +29,20 @@ export async function saveApplicationMeans(
   deps: SaveApplicationMeansDeps,
   params: SaveApplicationMeansParams,
 ): Promise<Either<NotAuthenticatedError | SaveApplicationMeansError, void>> {
-  const { data, result } = splitEligibilityAssessment(
-    params.eligibilityAssessment,
-  );
+  const { applicationId, eligibilityAssessment, homeAccountId, sessionId } =
+    params;
+
+  const { data, result } = splitEligibilityAssessment(eligibilityAssessment);
 
   let response;
   try {
     const opts = await getRcwApiDefaultOptions({
-      homeAccountId: params.homeAccountId,
-      sessionId: params.sessionId,
+      homeAccountId,
+      sessionId,
     });
 
     response = await deps.updateApplicationMeans(
-      params.resourceId,
+      applicationId,
       { data, result },
       opts,
     );

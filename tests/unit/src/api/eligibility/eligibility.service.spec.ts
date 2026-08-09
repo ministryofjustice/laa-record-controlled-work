@@ -12,7 +12,7 @@ import {
 } from "#/api/eligibility/eligibility.service.js";
 
 describe("saveApplicationMeans", () => {
-  const resourceId = "123e4567-e89b-12d3-a456-426614174000";
+  const applicationId = "123e4567-e89b-12d3-a456-426614174000";
 
   let deps: SaveApplicationMeansDeps;
   let updateApplicationMeansStub: sinon.SinonStub;
@@ -38,13 +38,13 @@ describe("saveApplicationMeans", () => {
         level_of_help: "controlled_legal_representation",
       },
       homeAccountId: "home-account-id",
-      resourceId,
+      applicationId,
       sessionId: "session-id",
     });
 
     expect(result.error).to.equal(undefined);
     expect(
-      updateApplicationMeansStub.calledOnceWith(resourceId, {
+      updateApplicationMeansStub.calledOnceWith(applicationId, {
         data: { level_of_help: "controlled_legal_representation" },
         result: { indication: true },
       }),
@@ -57,7 +57,7 @@ describe("saveApplicationMeans", () => {
     const result = await saveApplicationMeans(deps, {
       eligibilityAssessment: {},
       homeAccountId: undefined,
-      resourceId,
+      applicationId,
       sessionId: undefined,
     });
 
@@ -72,7 +72,7 @@ describe("saveApplicationMeans", () => {
     const result = await saveApplicationMeans(deps, {
       eligibilityAssessment: {},
       homeAccountId: "home-account-id",
-      resourceId,
+      applicationId,
       sessionId: "session-id",
     });
 
@@ -86,7 +86,7 @@ describe("saveApplicationMeans", () => {
     const result = await saveApplicationMeans(deps, {
       eligibilityAssessment: {},
       homeAccountId: "home-account-id",
-      resourceId,
+      applicationId,
       sessionId: "session-id",
     });
 
@@ -100,7 +100,7 @@ describe("saveApplicationMeans", () => {
     const result = await saveApplicationMeans(deps, {
       eligibilityAssessment: {},
       homeAccountId: "home-account-id",
-      resourceId,
+      applicationId,
       sessionId: "session-id",
     });
 
@@ -115,7 +115,7 @@ describe("saveApplicationMeans", () => {
     const result = await saveApplicationMeans(deps, {
       eligibilityAssessment: {},
       homeAccountId: "home-account-id",
-      resourceId,
+      applicationId,
       sessionId: "session-id",
     });
 
@@ -129,12 +129,12 @@ describe("saveApplicationMeans", () => {
     await saveApplicationMeans(deps, {
       eligibilityAssessment: { level_of_help: "controlled_legal_representation" },
       homeAccountId: "home-account-id",
-      resourceId,
+      applicationId,
       sessionId: "session-id",
     });
 
     expect(
-      updateApplicationMeansStub.calledOnceWith(resourceId, {
+      updateApplicationMeansStub.calledOnceWith(applicationId, {
         data: { level_of_help: "controlled_legal_representation" },
         result: {},
       }),
@@ -147,12 +147,12 @@ describe("saveApplicationMeans", () => {
     await saveApplicationMeans(deps, {
       eligibilityAssessment: { api_response: "not-an-object" },
       homeAccountId: "home-account-id",
-      resourceId,
+      applicationId,
       sessionId: "session-id",
     });
 
     expect(
-      updateApplicationMeansStub.calledOnceWith(resourceId, {
+      updateApplicationMeansStub.calledOnceWith(applicationId, {
         data: {},
         result: {},
       }),
@@ -165,12 +165,12 @@ describe("saveApplicationMeans", () => {
     await saveApplicationMeans(deps, {
       eligibilityAssessment: {},
       homeAccountId: "home-account-id",
-      resourceId,
+      applicationId,
       sessionId: "session-id",
     });
 
     expect(
-      updateApplicationMeansStub.calledOnceWith(resourceId, {
+      updateApplicationMeansStub.calledOnceWith(applicationId, {
         data: {},
         result: {},
       }),

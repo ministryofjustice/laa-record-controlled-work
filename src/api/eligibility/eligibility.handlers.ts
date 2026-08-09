@@ -29,7 +29,7 @@ export const createSaveHandler =
     const result = await saveApplicationMeans(deps, {
       eligibilityAssessment,
       homeAccountId: req.session.msal?.homeAccountId,
-      resourceId,
+      applicationId: resourceId,
       sessionId: req.sessionID,
     });
 
