@@ -3,22 +3,23 @@ import {
   TestRedirectResult,
 } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
-import { createForgeTestClient } from "../../utils/helpers.js";
+import { createForgeTestClientForEditApplication } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
-import { taskListStep } from "#/journeys/edit-application/steps/task-list/task-list.step.js";
+import sinon from "sinon";
+import { getGetApplicationResponseMock } from "../../../mocks/api/rcw/fakers/applications/applications.faker.gen.js";
 
 describe("Task list step", () => {
   const uuid = "123e4567-e89b-12d3-a456-426614174000";
-  const client = createForgeTestClient(
-    "Edit case",
-    "/cases/:applicationID/",
-    [taskListStep()],
-  );
-  const session = {
-    journeyDrafts: {
-      testJourney: {},
-    },
-  };
+
+  const mockData = getGetApplicationResponseMock();
+  const getApplicationStub = sinon
+    .stub()
+    .resolves({ status: 200, data: mockData });
+
+  const client = createForgeTestClientForEditApplication({
+    getApplication: getApplicationStub,
+  });
+  const session = {};
 
   describe("GET /cases/123e4567-e89b-12d3-a456-426614174000/task-list", () => {
     let renderResult: TestRenderResult;
@@ -39,11 +40,14 @@ describe("Task list step", () => {
     });
 
     it("renders the client name as the heading", () => {
-      expect(heading.properties.content).to.equal("Joe Blogs");
+      const clientName = `${mockData.clientDetails.firstName} ${mockData.clientDetails.lastName}`;
+      expect(heading.properties.content).to.equal(clientName);
     });
 
     it("renders the reference number", () => {
-      expect(body.properties.content).to.equal(`Reference number: ${uuid}`);
+      expect(body.properties.content).to.equal(
+        `Reference number: ${mockData.id}`,
+      );
     });
 
     it("renders 3 task list sections", () => {
