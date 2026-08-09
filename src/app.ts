@@ -18,9 +18,9 @@ import {
   createApplication,
   getApplications,
 } from "#/api/clients/rcw/schema/applications/applications.gen.js";
+import eligibilityRouter from "#/api/eligibility/eligibility.routes.js";
 import authRouter from "#/auth/auth.routes.js";
 import config from "#/config.js";
-import eligibilityRouter from "#/api/eligibility/eligibility.routes.js";
 import { autocomplete } from "#/journeys/components/autocomplete/autocomplete.component.js";
 import createApplicationJourney from "#/journeys/create-application/create-application.index.js";
 import editApplication from "#/journeys/edit-application/edit-application.index.js";
