@@ -26,6 +26,7 @@ import { autocomplete } from "#/journeys/components/autocomplete/autocomplete.co
 import createApplicationJourney from "#/journeys/create-application/create-application.index.js";
 import { editApplicationPackage } from "#/journeys/edit-application/editApplication.package.js";
 import evidence from "#/journeys/evidence/evidence.index.js";
+import declaration from "#/journeys/declaration/declaration.index.js";
 import { selectOfficePackage } from "#/journeys/select-office/select-office.journey.js";
 import { yourCasesPackage } from "#/journeys/your-cases/your-cases.journey.js";
 import * as redis from "#/lib/redis.js";
@@ -112,7 +113,8 @@ const createApp = async (
     .registerPackage(selectOfficePackage, { getAllProviderOffices })
     .registerPackage(editApplicationPackage, { getApplication })
     .registerPackage(createApplicationJourney, { createApplication })
-    .registerPackage(evidence);
+    .registerPackage(evidence)
+    .registerPackage(declaration);
 
   // Set up rate limiting
   setupRateLimit(app, config);
