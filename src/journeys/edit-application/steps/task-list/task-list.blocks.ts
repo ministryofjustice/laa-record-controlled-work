@@ -89,14 +89,14 @@ export function taskList(): BlockDefinition[] {
             "journeys.createApplication.taskList.EvidenceAndDeclaration.taskItem.evidence.label",
           ),
           "/cases/evidence/have-evidence",
-          Data("evidenceStatus"),
+          Data(CONTEXT_DATA_KEYS.evidenceStatus),
         ),
         taskItem(
           t(
             "journeys.createApplication.taskList.EvidenceAndDeclaration.taskItem.declaration.label",
           ),
           "client-declaration-TODO",
-          Data("declarationStatus"),
+          Data(CONTEXT_DATA_KEYS.declarationStatus),
         ),
       ],
     }),

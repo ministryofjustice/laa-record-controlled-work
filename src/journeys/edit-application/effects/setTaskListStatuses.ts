@@ -12,7 +12,13 @@ const statusFor = (values: unknown[]): Status =>
     ? Status.COMPLETED
     : Status.INCOMPLETE;
 
-const isCompleted = (status: Status): boolean => status === Status.COMPLETED;
+const determineStepStatus = (
+  prerequisiteStatus: Status,
+  values: unknown[],
+): Status =>
+  prerequisiteStatus === Status.COMPLETED
+    ? statusFor(values)
+    : Status.CANNOT_START;
 
 const getClientDetailsValues = ({ clientDetails }: Application): unknown[] => {
   const { address } = clientDetails;
@@ -53,17 +59,19 @@ export const setTaskListStatuses =
     const clientDetailsStatus = statusFor(getClientDetailsValues(application));
 
     // TODO meansassessmentStatus is based on is means assessmentId is present this will change when we have model ready
-    const meansAssessment: Status = isCompleted(clientDetailsStatus)
-      ? statusFor([application.meansAssessmentId])
-      : Status.CANNOT_START;
+    const meansAssessment = determineStepStatus(clientDetailsStatus, [
+      application.meansAssessmentId,
+    ]);
 
-    const evidenceStatus = isCompleted(meansAssessment)
-      ? statusFor(getEvidenceValues(application))
-      : Status.CANNOT_START;
+    const evidenceStatus = determineStepStatus(
+      meansAssessment,
+      getEvidenceValues(application),
+    );
 
-    const declarationStatus = isCompleted(evidenceStatus)
-      ? statusFor(getDeclarationValues(application))
-      : Status.CANNOT_START;
+    const declarationStatus = determineStepStatus(
+      evidenceStatus,
+      getDeclarationValues(application),
+    );
 
     context.setData(CONTEXT_DATA_KEYS.clientDetailsStatus, clientDetailsStatus);
     context.setData(CONTEXT_DATA_KEYS.evidenceStatus, evidenceStatus);
