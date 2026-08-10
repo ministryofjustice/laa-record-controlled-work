@@ -5833,7 +5833,7 @@ __metadata:
     sinon: "npm:^22.1.0"
     supertest: "npm:^7.2.2"
     testcontainers: "npm:^12.0.4"
-    tsx: "npm:^4.23.4"
+    tsx: "npm:^4.23.5"
     typescript: "npm:^6.0.3"
     undici: "npm:^8.9.0"
     zod: "npm:^4.4.3"
@@ -8618,9 +8618,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tsx@npm:^4.23.4":
-  version: 4.23.4
-  resolution: "tsx@npm:4.23.4"
+"tsx@npm:^4.23.5":
+  version: 4.23.5
+  resolution: "tsx@npm:4.23.5"
   dependencies:
     esbuild: "npm:~0.28.0"
     fsevents: "npm:~2.3.3"
@@ -8629,7 +8629,7 @@ __metadata:
       optional: true
   bin:
     tsx: dist/cli.mjs
-  checksum: 10c0/eee7b64c3e39ef6e4adf0d6a8018ce0d0410c93bd24bf68ccb90d0c89d07a5f760f0cf5e762c951ba87968944903c192e947558384d0181ba841dc6a3f8956df
+  checksum: 10c0/caed1b05eac5fbbb6f8a1ca8b22ae157b74caaba14cc781b023f8baaaa990fa8dfa60a4252eabda1a68c4dcaade3411013998fa001580a2de4ac1f0d78c80c92
   languageName: node
   linkType: hard
 
