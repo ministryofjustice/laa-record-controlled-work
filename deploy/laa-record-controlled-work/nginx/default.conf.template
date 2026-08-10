@@ -67,13 +67,11 @@ server {
     access_log  off;
   }
 
-  # Never expose internal-only RCW private API routes via ingress.
-  location = /api/private {
-    return 404;
-  }
+  # Never expose internal-only RCW eligibility API routes via ingress;
+  # only the CCQ pod may call these directly (see rcw.networkpolicy.yaml).
 
-  location ^~ /api/private/ {
-    return 404;
+  location ~ ^/api/applications/[^/]+/eligibility/?$ {
+    return 403;
   }
 
   location / {

@@ -19,6 +19,7 @@ import {
   getApplication,
   getApplications,
 } from "#/api/clients/rcw/schema/applications/applications.gen.js";
+import eligibilityRouter from "#/api/eligibility/eligibility.routes.js";
 import authRouter from "#/auth/auth.routes.js";
 import config from "#/config.js";
 import { autocomplete } from "#/journeys/components/autocomplete/autocomplete.component.js";
@@ -43,7 +44,6 @@ import { setupRequestLogging } from "#/middleware/setupRequestLogging.js";
 import { standardMiddleware } from "#/middleware/standardMiddleware.js";
 import healthRouter from "#/routes/health.js";
 import indexRouter from "#/routes/index.js";
-import privateApiRouter from "#/routes/privateApi.js";
 import testRouter from "#/routes/test.js";
 
 const TRUST_FIRST_PROXY = 1;
@@ -128,7 +128,11 @@ const createApp = async (
     session(await createSession(config, getRedisClient, createRedisStore)),
   );
 
-  app.use("/api/private", requireAuth, privateApiRouter);
+  app.use(
+    "/api/applications/:applicationId/eligibility",
+    requireAuth,
+    eligibilityRouter,
+  );
 
   setupCsrf(app);
 

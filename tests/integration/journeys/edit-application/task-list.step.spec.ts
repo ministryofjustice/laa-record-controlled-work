@@ -98,7 +98,8 @@ describe("Task list step", () => {
         expect(result.type).to.equal("render");
         const declarationRender = result as TestRenderResult;
         const lists = declarationRender.getBlocksByVariant("govukTaskList");
-        const evidenceAndDeclarationItems = getEvidenceAndDeclarationItems(lists);
+        const evidenceAndDeclarationItems =
+          getEvidenceAndDeclarationItems(lists);
         const declarationItem = evidenceAndDeclarationItems[1];
 
         expect(declarationItem.href).to.equal("client-declaration-TODO");
@@ -129,7 +130,8 @@ describe("Task list step", () => {
         expect(result.type).to.equal("render");
         const declarationRender = result as TestRenderResult;
         const lists = declarationRender.getBlocksByVariant("govukTaskList");
-        const evidenceAndDeclarationItems = getEvidenceAndDeclarationItems(lists);
+        const evidenceAndDeclarationItems =
+          getEvidenceAndDeclarationItems(lists);
         const declarationItem = evidenceAndDeclarationItems[1];
 
         expect(declarationItem.href).to.equal("client-declaration-TODO");
@@ -157,7 +159,8 @@ describe("Task list step", () => {
         expect(result.type).to.equal("render");
         const declarationRender = result as TestRenderResult;
         const lists = declarationRender.getBlocksByVariant("govukTaskList");
-        const evidenceAndDeclarationItems = getEvidenceAndDeclarationItems(lists);
+        const evidenceAndDeclarationItems =
+          getEvidenceAndDeclarationItems(lists);
         const declarationItem = evidenceAndDeclarationItems[1];
 
         expect(declarationItem.href).to.equal(null);
@@ -182,4 +185,3 @@ describe("Task list step", () => {
     });
   });
 });
-

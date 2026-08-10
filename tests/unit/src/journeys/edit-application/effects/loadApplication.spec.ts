@@ -1,7 +1,6 @@
 import { expect } from "chai";
 import sinon from "sinon";
 
-import { ApiResponseError, ApiValidationError } from "#/api/api.errors.js";
 import config from "#/config.js";
 import { loadApplication } from "#/journeys/edit-application/effects/loadApplication.js";
 import type {
@@ -11,6 +10,10 @@ import type {
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import { logger } from "#/logger.js";
 import { getGetApplicationResponseMock } from "../../../../../mocks/api/rcw/fakers/applications/applications.faker.gen.js";
+import {
+  ApiResponseError,
+  ApiValidationError,
+} from "#/api/clients/api.errors.js";
 
 describe("loadApplication", () => {
   const applicationId = "123e4567-e89b-12d3-a456-426614174000";
@@ -74,11 +77,17 @@ describe("loadApplication", () => {
     await loadApplication(deps)(context);
 
     expect(getApplicationStub.calledOnceWith(applicationId)).to.equal(true);
-    expect(setData.calledOnceWith(CONTEXT_DATA_KEYS.application, mockApplication)).to.equal(true);
+    expect(
+      setData.calledOnceWith(CONTEXT_DATA_KEYS.application, mockApplication),
+    ).to.equal(true);
   });
 
   it("throws ApiResponseError when getApplication responds with non-200", async () => {
-    getApplicationStub.resolves({ status: 500, data: {}, headers: new Headers() });
+    getApplicationStub.resolves({
+      status: 500,
+      data: {},
+      headers: new Headers(),
+    });
     sinon.stub(logger, "error");
 
     try {
@@ -116,7 +125,11 @@ describe("loadApplication", () => {
   });
 
   it("throws ApiValidationError when response data fails schema validation", async () => {
-    getApplicationStub.resolves({ status: 200, data: { invalid: true }, headers: new Headers() });
+    getApplicationStub.resolves({
+      status: 200,
+      data: { invalid: true },
+      headers: new Headers(),
+    });
     sinon.stub(logger, "error");
 
     try {

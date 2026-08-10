@@ -3,7 +3,7 @@ import { expect } from "chai";
 import { describe, it } from "mocha";
 import sinon from "sinon";
 
-import { ApiResponseError, ApiValidationError } from "#/api/api.errors.js";
+import { ApiResponseError, ApiValidationError } from "#/api/clients/api.errors.js";
 import config from "#/config.js";
 import { createApplication } from "#/journeys/create-application/effects/createApplication.js";
 import type { CreateApplicationEffectsDeps } from "#/journeys/create-application/create-application.types.js";

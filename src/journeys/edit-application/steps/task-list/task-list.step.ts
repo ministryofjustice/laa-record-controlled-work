@@ -18,7 +18,11 @@ import {
   saveAndReturnButton,
   taskList,
 } from "#/journeys/edit-application/steps/task-list/task-list.blocks.js";
-import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
+import {
+  APPLICATION_DATA_KEYS,
+  CLIENT_DETAILS_DATA_KEYS,
+  CONTEXT_DATA_KEYS,
+} from "#/journeys/journey.constants.js";
 
 export interface TaskListData {
   caseReferenceNumber: ResolvableString;
@@ -29,12 +33,14 @@ export interface TaskListData {
 }
 
 // TODO temporarily using id until we have a proper reference number in data model
-const referenceNumber = Data(CONTEXT_DATA_KEYS.application).path("id");
+const referenceNumber = Data(CONTEXT_DATA_KEYS.application).path(
+  APPLICATION_DATA_KEYS.id,
+);
 
 const clientName = Format(
   "%1 %2",
-  Data(CONTEXT_DATA_KEYS.application).path("clientDetails.firstName"),
-  Data(CONTEXT_DATA_KEYS.application).path("clientDetails.lastName"),
+  Data(CONTEXT_DATA_KEYS.application).path(CLIENT_DETAILS_DATA_KEYS.firstName),
+  Data(CONTEXT_DATA_KEYS.application).path(CLIENT_DETAILS_DATA_KEYS.lastName),
 );
 
 export const taskListStep = (): ReturnType<typeof step> =>
