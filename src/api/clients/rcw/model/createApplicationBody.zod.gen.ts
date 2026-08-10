@@ -6,6 +6,14 @@
  */
 import { z as zod } from "zod";
 
+export const createApplicationBodyClientDetailsNiNumberMin = 9;
+export const createApplicationBodyClientDetailsNiNumberMax = 9;
+
+export const createApplicationBodyClientDetailsNiNumberRegExp = new RegExp(
+  "[A-CEGHJ-NOPR-TW-Z]{2}[0-9]{6}[ABCDs]{1}",
+);
+export const createApplicationBodyClientDetailsAddressCountryMax = 2;
+
 export const CreateApplicationBody = zod.object({
   ecfFlag: zod.boolean(),
   legalAidBefore: zod.string(),
@@ -18,7 +26,12 @@ export const CreateApplicationBody = zod.object({
     firstName: zod.string(),
     lastName: zod.string(),
     dateOfBirth: zod.iso.date(),
-    niNumber: zod.string().optional(),
+    niNumber: zod
+      .string()
+      .min(createApplicationBodyClientDetailsNiNumberMin)
+      .max(createApplicationBodyClientDetailsNiNumberMax)
+      .regex(createApplicationBodyClientDetailsNiNumberRegExp)
+      .optional(),
     hasFixedAddress: zod.boolean(),
     address: zod
       .object({
@@ -30,7 +43,9 @@ export const CreateApplicationBody = zod.object({
         townOrCity: zod.string().optional(),
         postCode: zod.string().optional(),
         county: zod.string().optional(),
-        country: zod.string(),
+        country: zod
+          .string()
+          .max(createApplicationBodyClientDetailsAddressCountryMax),
         createdAt: zod.iso.datetime({ offset: true }).optional(),
         modifiedAt: zod.iso.datetime({ offset: true }).optional(),
       })

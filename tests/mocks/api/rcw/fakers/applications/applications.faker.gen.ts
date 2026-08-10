@@ -83,7 +83,9 @@ export const getGetApplicationResponseMock = <
       firstName: faker.string.alpha({ length: { min: 10, max: 20 } }),
       lastName: faker.string.alpha({ length: { min: 10, max: 20 } }),
       dateOfBirth: faker.date.past().toISOString().slice(0, 10),
-      niNumber: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      niNumber: faker.helpers.fromRegExp(
+        "[A-CEGHJ-NOPR-TW-Z]{2}[0-9]{6}[ABCDs]{1}",
+      ),
       hasFixedAddress: faker.datatype.boolean(),
       address: {
         id: faker.string.uuid(),
@@ -94,7 +96,7 @@ export const getGetApplicationResponseMock = <
         townOrCity: faker.string.alpha({ length: { min: 10, max: 20 } }),
         postCode: faker.string.alpha({ length: { min: 10, max: 20 } }),
         county: faker.string.alpha({ length: { min: 10, max: 20 } }),
-        country: faker.string.alpha({ length: { min: 10, max: 20 } }),
+        country: faker.string.alpha({ length: { min: 2, max: 2 } }),
         createdAt: faker.date.past().toISOString().slice(0, 19) + "Z",
         modifiedAt: faker.date.past().toISOString().slice(0, 19) + "Z",
       },
@@ -126,6 +128,7 @@ export const getGetApplicationResponseMock = <
       modifiedAt: faker.date.past().toISOString().slice(0, 19) + "Z",
       modifiedBy: faker.string.alpha({ length: { min: 10, max: 20 } }),
     },
+    eligibility: { data: {}, result: {} },
     reasonForReapplication: faker.string.alpha({
       length: { min: 10, max: 20 },
     }),

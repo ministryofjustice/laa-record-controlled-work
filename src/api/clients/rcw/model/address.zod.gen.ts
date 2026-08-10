@@ -6,6 +6,8 @@
  */
 import { z as zod } from "zod";
 
+export const addressCountryMax = 2;
+
 export const Address = zod.object({
   id: zod.uuid().optional(),
   addressLine1: zod.string(),
@@ -15,7 +17,7 @@ export const Address = zod.object({
   townOrCity: zod.string().optional(),
   postCode: zod.string().optional(),
   county: zod.string().optional(),
-  country: zod.string(),
+  country: zod.string().max(addressCountryMax),
   createdAt: zod.iso.datetime({ offset: true }).optional(),
   modifiedAt: zod.iso.datetime({ offset: true }).optional(),
 });
