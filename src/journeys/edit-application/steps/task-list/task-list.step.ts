@@ -9,6 +9,8 @@ import {
   submit,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
+import type { Status } from "#/journeys/journey.types.js";
+
 import { editApplicationEffects } from "#/journeys/edit-application/editApplication.effects.js";
 import {
   caseReferenceNumber,
@@ -21,7 +23,6 @@ import {
   CLIENT_DETAILS_DATA_KEYS,
   CONTEXT_DATA_KEYS,
 } from "#/journeys/journey.constants.js";
-import { Status } from "#/journeys/journey.types.js";
 
 export interface TaskListData {
   caseReferenceNumber: ResolvableString;
@@ -31,25 +32,10 @@ export interface TaskListData {
   meansAssessment: { status: Status };
 }
 
-// TODO: Hardcoded for now, will be dynamic in future
-const TASK_LIST_DATA: TaskListData = {
-  caseReferenceNumber: Data(CONTEXT_DATA_KEYS.application).path(
-    APPLICATION_DATA_KEYS.id,
-  ),
-  clientDetails: {
-    clientName: "Joe Blogs",
-    status: Status.Completed,
-  },
-  declaration: {
-    status: Status.CannotStart,
-  },
-  evidence: {
-    status: Status.Incomplete,
-  },
-  meansAssessment: {
-    status: Status.Incomplete,
-  },
-};
+// TODO temporarily using id until we have a proper reference number in data model
+const referenceNumber = Data(CONTEXT_DATA_KEYS.application).path(
+  APPLICATION_DATA_KEYS.id,
+);
 
 const clientName = Format(
   "%1 %2",
@@ -61,16 +47,16 @@ export const taskListStep = (): ReturnType<typeof step> =>
   step({
     blocks: [
       heading(clientName),
-      // TODO caseReferenceNumber to use application ID from context data, until case reference number is generated in backend
-      caseReferenceNumber(
-        Data(CONTEXT_DATA_KEYS.application).path(APPLICATION_DATA_KEYS.id),
-      ),
-      ...taskList(TASK_LIST_DATA),
+      caseReferenceNumber(referenceNumber),
+      ...taskList(),
       saveAndReturnButton,
     ],
     onAccess: [
       access({
-        effects: [editApplicationEffects.loadApplication()],
+        effects: [
+          editApplicationEffects.loadApplication(),
+          editApplicationEffects.setTaskListStatuses(),
+        ],
       }),
     ],
     onSubmission: [
