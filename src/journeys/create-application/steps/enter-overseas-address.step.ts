@@ -22,11 +22,10 @@ import {
   ADDRESS_FIELD,
   UK_EXCLUSIVE_ADDRESS_FIELDS,
 } from "#/journeys/journey.constants.js";
-import countries from "#/lib/constants/FCDOGeographicalNamesIndexSeptember2025.json" with { type: "json" };
+import { COUNTRY_NAMES } from "#/lib/countries.js";
 import { t } from "#/lib/i18n.js";
 
 const MINIMUM_AUTOCOMPLETE_CHARACTERS = 2;
-const COUNTRY_NAMES = countries.map((country) => country.name);
 
 export const enterOverseasAddressStep = (
   journeyCode: string,

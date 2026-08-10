@@ -2,6 +2,7 @@ import type { CreateApplicationRequestBody } from "#/api/clients/rcw/model/creat
 import type { AnswersOutput } from "#/journeys/create-application/data/answers.zod.js";
 
 import { ADDRESS_FIELD } from "#/journeys/journey.constants.js";
+import { mapCountryNameToIsoCode } from "#/lib/countries.js";
 
 interface Application {
   addressLine1: string;
@@ -73,10 +74,10 @@ export class ApplicationDto {
       addressLine2: answers[ADDRESS_FIELD.addressLine2],
       addressLine3: answers[ADDRESS_FIELD.addressLine3],
       addressLine4: answers[ADDRESS_FIELD.addressLine4],
-      country: answers[ADDRESS_FIELD.country],
+      country: mapCountryNameToIsoCode(answers[ADDRESS_FIELD.country]),
       county: answers[ADDRESS_FIELD.county],
       dateOfBirth: answers.dateOfBirth,
-      ecfFlag: answers.ecf === "true",
+      ecfFlag: answers.ecf === "yes",
       firstName: answers.firstName,
       hasFixedAddress: answers.haveAHomeAddress === "yes",
       lastName: answers.lastName,
@@ -87,7 +88,7 @@ export class ApplicationDto {
       providerOfficeCode,
       reasonForReapplication: answers.reasonForYes,
       scopingQuestions: {
-        legalAidBefore: answers.legalAidBefore,
+        priorLegalAid: answers.legalAidBefore,
       },
       townOrCity: answers[ADDRESS_FIELD.townOrCity],
     });

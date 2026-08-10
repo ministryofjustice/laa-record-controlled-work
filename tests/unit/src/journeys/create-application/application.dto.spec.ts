@@ -2,7 +2,7 @@ import { expect } from "chai";
 import { ApplicationDto } from "#/api/dto/application/application.dto.js";
 
 const answers = {
-  ecf: "no",
+  ecf: "yes",
   legalAidBefore: "yesSameMatter",
   legalAidLast6Months: "yes",
   reasonForYes: "here is a reason",
@@ -24,7 +24,7 @@ describe("fromAnswers method", () => {
   it("should map answers to API request format", () => {
     const providerOfficeCode = "22439e72-68d3-4770-b435-c352d883d21e";
     const expected = {
-      ecfFlag: false,
+      ecfFlag: true,
       clientDetails: {
         firstName: "Jane",
         lastName: "Bloggs",
@@ -39,7 +39,7 @@ describe("fromAnswers method", () => {
           townOrCity: "Manchester",
           county: "Greater Manchester",
           postCode: "A12 3BC",
-          country: "United Kingdom",
+          country: "GB",
         },
       },
       legalAidBefore: "yesSameMatter",
@@ -47,7 +47,7 @@ describe("fromAnswers method", () => {
       providerOfficeCode,
       reasonForReapplication: "here is a reason",
       scopingQuestions: {
-        legalAidBefore: "yesSameMatter",
+        priorLegalAid: "yesSameMatter",
       },
     };
 
