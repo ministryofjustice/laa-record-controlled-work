@@ -24,7 +24,6 @@ describe("fromAnswers method", () => {
   it("should map answers to API request format", () => {
     const providerOfficeCode = "22439e72-68d3-4770-b435-c352d883d21e";
     const expected = {
-      ecfFlag: true,
       clientDetails: {
         firstName: "Jane",
         lastName: "Bloggs",

@@ -12,7 +12,6 @@ interface Application {
   country: string;
   county?: string;
   dateOfBirth: string;
-  ecfFlag: boolean;
   firstName: string;
   hasFixedAddress: boolean;
   lastName: string;
@@ -38,7 +37,6 @@ export class ApplicationDto {
   public country = "";
   public county?: string;
   public dateOfBirth = "";
-  public ecfFlag = false;
   public firstName = "";
   public hasFixedAddress = false;
   public lastName = "";
@@ -77,7 +75,6 @@ export class ApplicationDto {
       country: mapCountryNameToIsoCode(answers[ADDRESS_FIELD.country]),
       county: answers[ADDRESS_FIELD.county],
       dateOfBirth: answers.dateOfBirth,
-      ecfFlag: answers.ecf === "yes",
       firstName: answers.firstName,
       hasFixedAddress: answers.haveAHomeAddress === "yes",
       lastName: answers.lastName,
@@ -117,7 +114,6 @@ export class ApplicationDto {
         lastName: this.lastName,
         niNumber: this.niNumber,
       },
-      ecfFlag: this.ecfFlag,
       legalAidBefore: this.legalAidBefore,
       legalAidLast6Months: this.legalAidLast6Months,
       providerOfficeCode: this.providerOfficeCode,
