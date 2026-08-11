@@ -83,6 +83,9 @@ services:
           path: ./scripts
           target: /app/scripts
         - action: sync
+          path: ./tests/playwright
+          target: /app/tests/playwright
+        - action: sync
           path: ./tests/mocks
           target: /app/tests/mocks
         - action: rebuild
