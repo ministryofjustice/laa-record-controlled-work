@@ -15,7 +15,7 @@ export const DeclarationJourney = journey({
   path: "/cases/new/declaration",
   reachability: { disableReachabilityChecks: false },
   steps: [
-    clientConfirmationStep(journeyCode),
+    clientConfirmationStep(),
   ],
   title: "Declaration",
   view: { template: "partials/form-step" },

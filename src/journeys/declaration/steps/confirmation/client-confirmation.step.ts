@@ -16,7 +16,6 @@ import {
 } from "#/journeys/declaration/steps/confirmation/client-confirmation.blocks.js";
 
 export const clientConfirmationStep = (
-  journeyCode: string,
 ): ReturnType<typeof step> =>
   step({
     blocks: [
@@ -51,5 +50,5 @@ export const clientConfirmationStep = (
     ],
     path: "/client-declaration",
     reachability: { entryWhen: true },
-    title: t("journeys.declaration.clientConfirmation.title"),
+    title: t("journeys.declaration.title"),
   });
