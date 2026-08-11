@@ -4111,7 +4111,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-perfectionist@npm:^5.10.0":
+"eslint-plugin-perfectionist@npm:^5.10.1":
   version: 5.10.1
   resolution: "eslint-plugin-perfectionist@npm:5.10.1"
   dependencies:
@@ -5807,7 +5807,7 @@ __metadata:
     eslint-config-prettier: "npm:^10.1.8"
     eslint-plugin-jsdoc: "npm:^63.3.3"
     eslint-plugin-jsonc: "npm:^3.4.1"
-    eslint-plugin-perfectionist: "npm:^5.10.0"
+    eslint-plugin-perfectionist: "npm:^5.10.1"
     eslint-plugin-prettier: "npm:^5.5.6"
     express: "npm:^5.2.1"
     express-rate-limit: "npm:^8.6.2"
