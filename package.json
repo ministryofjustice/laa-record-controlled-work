@@ -37,6 +37,8 @@
     "test:integration:watch": "./node_modules/.bin/mocha --watch --recursive 'tests/integration/**/*.spec.ts'",
     "test:ui": "yarn playwright test --config=tests/ui/playwright.config.ts",
     "test:ui:open": "yarn playwright test --config=tests/ui/playwright.config.ts --ui",
+    "test:e2e": "yarn playwright test --config=tests/e2e/playwright.config.ts",
+    "test:e2e:open": "yarn playwright test --config=tests/e2e/playwright.config.ts --ui",
     "test": "yarn test:unit && yarn test:integration && yarn test:ui"
   },
   "engines": {
