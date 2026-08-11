@@ -18,8 +18,10 @@ services:
       - ./deploy/laa-record-controlled-work/nginx/proxy.conf:/etc/nginx/proxy.conf:ro
       - ./deploy/laa-record-controlled-work/nginx/maps.conf:/etc/nginx/maps.conf:ro
     depends_on:
-      - rcw
-      - ccq-embedded
+      rcw:
+        condition: service_healthy
+      ccq-embedded:
+        condition: service_healthy
     environment:
       NGINX_UPSTREAM_RCW: rcw:3000
       NGINX_UPSTREAM_CCQ: ccq-embedded:3000
@@ -34,6 +36,8 @@ services:
       - 3000
     depends_on:
       redis-rcw:
+        condition: service_healthy
+      rcw-api:
         condition: service_healthy
       mock-oauth2-server:
         condition: service_started
@@ -65,6 +69,12 @@ services:
       # secrets injected by 1Password CLI via .env
       # op run --env-file=.env -- docker compose up -d
       - PDA_API_KEY
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/health || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 30s
     develop:
       watch:
         - action: sync
