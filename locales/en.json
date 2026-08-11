@@ -354,7 +354,7 @@
         "declarationText": "agrees that:",
         "declarationList": [
           "they've instructed me, the provider, to act on their behalf",
-          "<a class='govuk-link' href='#'>LAA privacy policy (opens in a new window or tab)</a>",
+          "they've read the <a class='govuk-link' href='#'>LAA privacy policy (opens in a new window or tab)</a>",
           "the information they've given is complete and correct",
           "they'll report any changes to their financial situation immediately"
         ],
