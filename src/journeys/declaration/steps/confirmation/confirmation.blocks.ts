@@ -32,19 +32,19 @@ function textListHtml(key: string, classes: string): string {
   return `<ul class="${classes}">${listItems}</ul>`;
 }
 
-export const declarationHeading = (): HtmlBlock =>
+export const confirmHeading = (): HtmlBlock =>
   GovUKHeading({
     level: H1,
     text: t("journeys.declaration.confirm.title"),
   });
 
-export const declarationBody = (): HtmlBlock =>
+export const confirmBody = (): HtmlBlock =>
   GovUKBody({
     classes: "govuk-body",
     text: `Joe Bloggs ${t("journeys.declaration.confirm.declarationText")}<br>${textListHtml("journeys.declaration.confirm.declarationList", "govuk-list govuk-list--bullet govuk-!-margin-bottom-6")}`,
   });
 
-export const declarationWarning = (): HtmlBlock =>
+export const confirmWarning = (): HtmlBlock =>
   GovUKWarningText({
     html: `${t(
       "journeys.declaration.confirm.warningText",
@@ -52,7 +52,7 @@ export const declarationWarning = (): HtmlBlock =>
     iconFallbackText: "Warning",
   });
 
-export const declarationButtonGroup = (): HtmlBlock =>
+export const confirmButtonGroup = (): HtmlBlock =>
   GovUKButtonGroup({
     buttons: [
       GovUKButton({

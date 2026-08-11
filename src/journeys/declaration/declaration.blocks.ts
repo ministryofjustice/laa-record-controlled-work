@@ -24,11 +24,13 @@ export const buttonGroup = GovUKButtonGroup({
     GovUKButton({
       buttonType: "submit",
       text: t("common.continue"),
+      value: "continue",
     }),
     GovUKButton({
       buttonType: "submit",
       classes: "govuk-button--secondary",
       text: t("common.saveAndReturn"),
+      value: "return",
     }),
   ],
 });

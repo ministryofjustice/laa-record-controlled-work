@@ -13,10 +13,10 @@ import {
   caption,
 } from "#/journeys/declaration/declaration.blocks.js";
 import {
-  declarationBody,
-  declarationButtonGroup,
-  declarationHeading,
-  declarationWarning,
+  confirmBody,
+  confirmButtonGroup,
+  confirmHeading,
+  confirmWarning,
 } from "#/journeys/declaration/steps/confirmation/confirmation.blocks.js";
 import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
 import { t } from "#/lib/i18n.js";
@@ -28,10 +28,10 @@ export const confirmStep = (): ReturnType<typeof step> =>
         Format("/cases/%1/task-list/", Params(PARAMS_KEYS.applicationID)),
       ),
       caption,
-      declarationHeading(),
-      declarationBody(),
-      declarationWarning(),
-      declarationButtonGroup(),
+      confirmHeading(),
+      confirmBody(),
+      confirmWarning(),
+      confirmButtonGroup(),
     ],
     onSubmission: [
       submit({
