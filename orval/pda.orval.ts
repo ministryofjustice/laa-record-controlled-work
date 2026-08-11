@@ -49,6 +49,7 @@ export function createPdaConfig(): Options {
       afterAllFilesWrite: [
         "tsx orval/convertOptionalToNullish.ts",
         "tsx orval/fixDoubleGenImports.ts",
+        "tsx orval/fixSchemaAliasExtensions.ts",
       ],
     },
     input: {

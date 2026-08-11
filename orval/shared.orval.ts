@@ -51,6 +51,7 @@ export function sharedOutputConfig(
     },
     schemaFileExtension: ".zod.gen.ts",
     schemas: {
+      importPath: `#/api/clients/${client}/model`,
       path: `./src/api/clients/${client}/model`,
       type: "zod",
     },
