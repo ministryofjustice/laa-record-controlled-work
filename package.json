@@ -30,14 +30,14 @@
     "knip": "knip --config knip.json --reporter compact",
     "knip:fix": "yarn knip --fix --fix-type dependencies && echo '\nUnused dependencies removed. Updating lockfile ...' && yarn",
     "knip:trace": "yarn knip --trace-dependency",
-    "unit": "./node_modules/.bin/mocha --recursive 'tests/unit/**/*.spec.ts'",
-    "unit:watch": "./node_modules/.bin/mocha --watch --recursive 'tests/unit/**/*.spec.ts'",
-    "unit:coverage": "c8 yarn unit --check-coverage",
-    "integration": "yarn build && ./node_modules/.bin/mocha --recursive 'tests/integration/**/*.spec.ts'",
-    "integration:watch": "./node_modules/.bin/mocha --watch --recursive 'tests/integration/**/*.spec.ts'",
-    "e2e": "yarn playwright test --config=tests/playwright/playwright.config.ts",
-    "e2e:ui": "yarn playwright test --config=tests/playwright/playwright.config.ts --ui",
-    "test": "yarn unit && yarn integration && yarn e2e"
+    "test:unit": "./node_modules/.bin/mocha --recursive 'tests/unit/**/*.spec.ts'",
+    "test:unit:watch": "./node_modules/.bin/mocha --watch --recursive 'tests/unit/**/*.spec.ts'",
+    "test:unit:coverage": "c8 yarn test:unit --check-coverage",
+    "test:integration": "yarn build && ./node_modules/.bin/mocha --recursive 'tests/integration/**/*.spec.ts'",
+    "test:integration:watch": "./node_modules/.bin/mocha --watch --recursive 'tests/integration/**/*.spec.ts'",
+    "test:ui": "yarn playwright test --config=tests/ui/playwright.config.ts",
+    "test:ui:open": "yarn playwright test --config=tests/ui/playwright.config.ts --ui",
+    "test": "yarn test:unit && yarn test:integration && yarn test:ui"
   },
   "engines": {
     "node": "26.6.0"
