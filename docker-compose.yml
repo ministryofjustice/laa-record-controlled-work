@@ -71,6 +71,9 @@ services:
           path: ./src
           target: /app/src
         - action: sync
+          path: ./orval/mocks
+          target: /app/orval/mocks
+        - action: sync
           path: ./esbuild
           target: /app/esbuild
         - action: sync
@@ -80,8 +83,8 @@ services:
           path: ./tsconfig.json
           target: /app/tsconfig.json
         - action: sync
-          path: ./scripts
-          target: /app/scripts
+          path: ./msw
+          target: /app/msw
         - action: sync
           path: ./tests/playwright
           target: /app/tests/playwright

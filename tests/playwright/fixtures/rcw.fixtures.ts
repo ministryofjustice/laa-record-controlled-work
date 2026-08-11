@@ -3,7 +3,7 @@ import {
   getCreateApplicationResponseMock,
   getGetApplicationsResponseMock,
   getGetApplicationResponseMock,
-} from "#/api/mocks/rcw/fakers/applications/applications.faker.gen.js";
+} from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
 
 // keeps the faker data consistent across test runs, so that the same mock data is used for each test run and msw handlers
 faker.seed(12345);

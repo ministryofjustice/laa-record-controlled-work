@@ -20,5 +20,5 @@
   "env": {
     "NODE_ENV": "development"
   },
-  "exec": "npx tsx scripts/dev-server-with-msw.ts"
+  "exec": "npx tsx msw/dev-server-with-msw.ts"
 }

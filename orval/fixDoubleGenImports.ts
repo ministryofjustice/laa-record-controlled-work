@@ -2,7 +2,7 @@ import { globSync, readFileSync, writeFileSync } from "node:fs";
 
 // Orval duplicates ".gen" in cross-file faker import paths when fileExtension
 // is multi-part (".gen.ts"); collapse ".gen.gen." back to ".gen.".
-const files = globSync("src/api/mocks/**/*.gen.ts");
+const files = globSync("orval/mocks/**/*.gen.ts");
 
 for (const file of files) {
   const content = readFileSync(file, "utf-8");

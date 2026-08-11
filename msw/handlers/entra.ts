@@ -1,15 +1,5 @@
-/**
- * Entra Handlers for MSW
- *
- * These handlers intercept outgoing HTTP requests that the Express application makes
- * to Entra (Microsoft Identity Platform) and serve mock responses.
- *
- * The token endpoint handler is the only one needed — MSAL has login.microsoftonline.com
- * hardcoded so it never calls the OIDC discovery or instance discovery endpoints.
- */
-
 import { http, HttpResponse } from "msw";
-import { ENTRA_TEST_CONFIG } from "../../playwright.config.js";
+import { ENTRA_TEST_CONFIG } from "../../tests/playwright/playwright.config.js";
 
 const { ENTRA_TENANT_ID, ENTRA_CLIENT_ID, ENTRA_AUTHORITY_BASE_URL } =
   ENTRA_TEST_CONFIG;
@@ -40,10 +30,8 @@ function createMockIdToken(): string {
 }
 
 export const entraHandlers = [
-  // Token endpoint — called by MSAL's acquireTokenByCode when exchanging the auth code.
-  // MSAL has login.microsoftonline.com hardcoded in both its instance discovery metadata
-  // and endpoint metadata, so no network calls are made for authority resolution —
-  // this is the only Entra endpoint MSAL actually hits during the code exchange.
+  // Token endpoint — MSAL has login.microsoftonline.com hardcoded, so this is the
+  // only Entra endpoint it actually hits during the auth code exchange.
   http.post(`${AUTHORITY_BASE}/oauth2/v2.0/token`, () => {
     const now = Math.floor(Date.now() / 1000);
     return HttpResponse.json({

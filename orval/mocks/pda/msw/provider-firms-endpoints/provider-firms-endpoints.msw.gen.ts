@@ -7,7 +7,7 @@
 import { HttpResponse, http } from "msw";
 import type { RequestHandlerOptions } from "msw";
 
-import type { ProviderFirmOfficeListDto } from "../../../../../../src/api/clients/pda/model/providerFirmOfficeListDto.zod.gen.js";
+import type { ProviderFirmOfficeListDto } from "../../../../../src/api/clients/pda/model/providerFirmOfficeListDto.zod.gen.js";
 
 import { getGetAllProviderOfficesResponseMock } from "../../fakers/provider-firms-endpoints/provider-firms-endpoints.faker.gen.js";
 

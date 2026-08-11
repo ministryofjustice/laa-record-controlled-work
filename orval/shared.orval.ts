@@ -28,9 +28,9 @@ export function sharedOutputConfig(
     indexFiles: false,
     mock: {
       generators: [
-        { path: `./src/api/mocks/${client}/msw`, type: "msw" },
+        { path: `./orval/mocks/${client}/msw`, type: "msw" },
         {
-          path: `./src/api/mocks/${client}/fakers`,
+          path: `./orval/mocks/${client}/fakers`,
           type: "faker",
         },
       ],

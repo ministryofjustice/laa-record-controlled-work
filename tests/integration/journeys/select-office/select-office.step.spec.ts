@@ -6,7 +6,7 @@ import { expect } from "chai";
 import { faker } from "@faker-js/faker";
 import sinon from "sinon";
 
-import { getGetAllProviderOfficesResponseMock } from "#/api/mocks/pda/fakers/provider-firms-endpoints/provider-firms-endpoints.faker.gen.js";
+import { getGetAllProviderOfficesResponseMock } from "#orval/mocks/pda/fakers/provider-firms-endpoints/provider-firms-endpoints.faker.gen.js";
 import { createForgeTestClientForSelectOffice } from "../../utils/helpers.js";
 
 faker.seed(12345);

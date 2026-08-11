@@ -7,11 +7,11 @@
 import { HttpResponse, http } from "msw";
 import type { RequestHandlerOptions } from "msw";
 
-import type { Application } from "../../../../../../src/api/clients/rcw/model/application.zod.gen.js";
+import type { Application } from "../../../../../src/api/clients/rcw/model/application.zod.gen.js";
 
-import type { Applications } from "../../../../../../src/api/clients/rcw/model/applications.zod.gen.js";
+import type { Applications } from "../../../../../src/api/clients/rcw/model/applications.zod.gen.js";
 
-import type { CreateApplicationResponseBody } from "../../../../../../src/api/clients/rcw/model/createApplicationResponseBody.zod.gen.js";
+import type { CreateApplicationResponseBody } from "../../../../../src/api/clients/rcw/model/createApplicationResponseBody.zod.gen.js";
 
 import {
   getCreateApplicationResponseMock,
