@@ -9,7 +9,7 @@ import type {
 } from "#/journeys/edit-application/editApplication.types.js";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import { logger } from "#/logger.js";
-import { getGetApplicationResponseMock } from "../../../../../mocks/api/rcw/fakers/applications/applications.faker.gen.js";
+import { getGetApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
 import {
   ApiResponseError,
   ApiValidationError,

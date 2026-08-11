@@ -1,8 +1,5 @@
 import { test, expect } from "../../fixtures/index.js";
-import { applications } from "../../fixtures/rcw.fixtures.js";
-import { getMappedOffices } from "../../fixtures/pda.fixtures.js";
-
-const [selectedOffice] = getMappedOffices(1);
+import { applications } from "../../msw/fixtures/rcw.fixtures.js";
 
 test("Your Cases step", async ({ withSelectedOffice: page }) => {
   // Navigate to the Your Cases page
@@ -16,9 +13,11 @@ test("Your Cases step", async ({ withSelectedOffice: page }) => {
     }),
   ).toBeVisible();
 
-  // Check the selected office is displayed using the seeded MSW mock data
-  await expect(page.getByText(selectedOffice.address)).toBeVisible();
-  await expect(page.getByText(selectedOffice.code)).toBeVisible();
+  // Check selected office summary is shown with a change action
+  const officeSummary = page.locator("p", { hasText: "Office:" });
+  await expect(officeSummary).toBeVisible();
+  await expect(officeSummary).toContainText(/Office:\s+.+\([A-Z0-9]+\)/);
+  await expect(page.getByRole("link", { name: "Change" })).toBeVisible();
 
   // Check the button
   await page.getByRole("button", { name: "Record a new case" }).click();

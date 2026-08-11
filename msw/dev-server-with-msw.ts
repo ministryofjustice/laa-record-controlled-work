@@ -10,7 +10,7 @@ import { setupServer } from "msw/node";
 
 import config from "#/config.js";
 
-import { handlers } from "../tests/playwright/factories/handlers/index.js";
+import { handlers } from "./handlers/index.js";
 
 const SUCCESS_EXIT_CODE = 0;
 const ERROR_EXIT_CODE = 1;

@@ -1,11 +1,12 @@
 import { faker } from "@faker-js/faker";
+
 import {
   getCreateApplicationResponseMock,
-  getGetApplicationsResponseMock,
   getGetApplicationResponseMock,
-} from "../../mocks/api/rcw/fakers/applications/applications.faker.gen.js";
+  getGetApplicationsResponseMock,
+} from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
 
-// keeps the faker data consistent across test runs, so that the same mock data is used for each test run and msw handlers
+// eslint-disable-next-line @typescript-eslint/no-magic-numbers -- deterministic test fixtures
 faker.seed(12345);
 
 export const applications = [...getGetApplicationsResponseMock()].sort((a, b) =>

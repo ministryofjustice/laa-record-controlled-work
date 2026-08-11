@@ -1,5 +1,5 @@
 import { test, expect } from "../../fixtures/index.js";
-import { createApplicationResponse } from "../../fixtures/rcw.fixtures.js";
+import { createApplicationResponse } from "../../msw/fixtures/rcw.fixtures.js";
 
 test("create application flow", async ({ withSelectedOffice: page }) => {
   const applicationId = createApplicationResponse.id;

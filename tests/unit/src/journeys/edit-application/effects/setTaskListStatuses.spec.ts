@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import sinon from "sinon";
 
-import { getGetApplicationResponseMock } from "../../../../../mocks/api/rcw/fakers/applications/applications.faker.gen.js";
+import { getGetApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
 import { setTaskListStatuses } from "#/journeys/edit-application/effects/setTaskListStatuses.js";
 import type { EditApplicationContext } from "#/journeys/edit-application/editApplication.types.js";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";

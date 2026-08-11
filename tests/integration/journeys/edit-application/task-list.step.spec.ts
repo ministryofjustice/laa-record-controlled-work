@@ -5,7 +5,7 @@ import {
 import { expect } from "chai";
 import sinon from "sinon";
 
-import { getGetApplicationResponseMock } from "../../../mocks/api/rcw/fakers/applications/applications.faker.gen.js";
+import { getGetApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
 import { createForgeTestClientForEditApplication } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 

@@ -28,9 +28,9 @@ export function sharedOutputConfig(
     indexFiles: false,
     mock: {
       generators: [
-        { path: `./tests/mocks/api/${client}/msw`, type: "msw" },
+        { path: `./orval/mocks/${client}/msw`, type: "msw" },
         {
-          path: `./tests/mocks/api/${client}/fakers`,
+          path: `./orval/mocks/${client}/fakers`,
           type: "faker",
         },
       ],
@@ -51,6 +51,7 @@ export function sharedOutputConfig(
     },
     schemaFileExtension: ".zod.gen.ts",
     schemas: {
+      importPath: `#/api/clients/${client}/model`,
       path: `./src/api/clients/${client}/model`,
       type: "zod",
     },
