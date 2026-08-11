@@ -9,7 +9,7 @@ import {
 	getCreateApplicationMockHandler,
 	getGetApplicationMockHandler,
 	getGetApplicationsMockHandler,
-} from "../../../mocks/api/rcw/msw/applications/applications.msw.gen.js";
+} from "#/api/mocks/rcw/msw/applications/applications.msw.gen.js";
 import {
 	application,
 	applications,

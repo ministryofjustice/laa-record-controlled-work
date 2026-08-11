@@ -83,8 +83,8 @@ services:
           path: ./scripts
           target: /app/scripts
         - action: sync
-          path: ./tests/mocks
-          target: /app/tests/mocks
+          path: ./tests/playwright
+          target: /app/tests/playwright
         - action: rebuild
           path: package.json
         - action: rebuild

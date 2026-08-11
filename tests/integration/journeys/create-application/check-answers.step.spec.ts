@@ -7,7 +7,7 @@ import { createForgeTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import { checkAnswersStep } from "#/journeys/create-application/steps/check-answers.step.js";
 import sinon from "sinon";
-import { getCreateApplicationResponseMock } from "../../../mocks/api/rcw/fakers/applications/applications.faker.gen.js";
+import { getCreateApplicationResponseMock } from "#/api/mocks/rcw/fakers/applications/applications.faker.gen.js";
 
 describe("Check answers step", () => {
   const uuid = "123e4567-e89b-12d3-a456-426614174000";

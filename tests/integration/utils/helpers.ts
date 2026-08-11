@@ -27,8 +27,8 @@ import type { CreateApplicationEffectsDeps } from "#/journeys/create-application
 import { editApplicationEffectsRegistry } from "#/journeys/edit-application/editApplication.effects.js";
 import type { EditApplicationEffectsDeps } from "#/journeys/edit-application/editApplication.types.js";
 import sinon from "sinon";
-import { getGetApplicationResponseMock } from "../../mocks/api/rcw/fakers/applications/applications.faker.gen.js";
-import { getCreateApplicationResponseMock } from "../../mocks/api/rcw/fakers/applications/applications.faker.gen.js";
+import { getGetApplicationResponseMock } from "#/api/mocks/rcw/fakers/applications/applications.faker.gen.js";
+import { getCreateApplicationResponseMock } from "#/api/mocks/rcw/fakers/applications/applications.faker.gen.js";
 import { taskListStep } from "#/journeys/edit-application/steps/task-list/task-list.step.js";
 
 /**

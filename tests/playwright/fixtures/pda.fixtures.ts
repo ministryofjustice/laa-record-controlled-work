@@ -1,6 +1,6 @@
 import { faker } from "@faker-js/faker";
 import { mapAvailableOffices } from "#/journeys/select-office/mappers/mapAvailableOffices.js";
-import { getGetAllProviderOfficesResponseMock } from "../../mocks/api/pda/msw/provider-firms-endpoints/provider-firms-endpoints.msw.gen.js";
+import { getGetAllProviderOfficesResponseMock } from "#/api/mocks/pda/msw/provider-firms-endpoints/provider-firms-endpoints.msw.gen.js";
 
 // keeps the faker data consistent across test runs, so that the same mock data is used for each test run and msw handlers
 faker.seed(12345);

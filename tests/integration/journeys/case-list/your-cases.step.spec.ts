@@ -6,7 +6,7 @@ import { expect } from "chai";
 import { createForgeTestClientForCaseList } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import sinon from "sinon";
-import { getGetApplicationsResponseMock } from "../../../mocks/api/rcw/fakers/applications/applications.faker.gen.js";
+import { getGetApplicationsResponseMock } from "#/api/mocks/rcw/fakers/applications/applications.faker.gen.js";
 
 const session = {
   selectedOffice: {
