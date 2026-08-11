@@ -1,3 +1,5 @@
+import type { HtmlBlock } from "@ministryofjustice/hmpps-forge/core/components";
+
 import {
   GovUKBody,
   GovUKButton,
@@ -10,9 +12,10 @@ import { H1 } from "#/lib/constants/headings.js";
 import { i18next, t } from "#/lib/i18n.js";
 
 /**
- *
- * @param key
- * @param classes
+ * Generates an HTML unordered list from a translation key that returns an array of strings.
+ * @param key - The key in the translation file
+ * @param classes - The classes to apply to the unordered list
+ * @returns An HTML string representing the unordered list
  */
 function textListHtml(key: string, classes: string): string {
   const items = i18next.t(key, { returnObjects: true });
@@ -29,19 +32,19 @@ function textListHtml(key: string, classes: string): string {
   return `<ul class="${classes}">${listItems}</ul>`;
 }
 
-export const declarationHeading = () =>
+export const declarationHeading = (): HtmlBlock =>
   GovUKHeading({
     level: H1,
     text: t("journeys.declaration.confirm.title"),
   });
 
-export const declarationBody = () =>
+export const declarationBody = (): HtmlBlock =>
   GovUKBody({
     classes: "govuk-body",
     text: `Joe Bloggs ${t("journeys.declaration.confirm.declarationText")}<br>${textListHtml("journeys.declaration.confirm.declarationList", "govuk-list govuk-list--bullet govuk-!-margin-bottom-6")}`,
   });
 
-export const declarationWarning = () =>
+export const declarationWarning = (): HtmlBlock =>
   GovUKWarningText({
     html: `${t(
       "journeys.declaration.confirm.warningText",
@@ -49,7 +52,7 @@ export const declarationWarning = () =>
     iconFallbackText: "Warning",
   });
 
-export const declarationButtonGroup = () =>
+export const declarationButtonGroup = (): HtmlBlock =>
   GovUKButtonGroup({
     buttons: [
       GovUKButton({
