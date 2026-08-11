@@ -358,6 +358,19 @@
       }
     },
     "declaration": {
+      "sign": {
+        "title": "Sign the declaration",
+        "statement": [
+          "Download a copy of the details you entered for your client and get them to sign the declaration.",
+          "You must save a copy along with any evidence provided by your client. Your client’s file may be audited and assessed by the LAA at a later date."
+        ],
+        "download": "Download declaration as a PDF",
+        "confirmHeading": "Confirmation of signed declaration",
+        "confirmLabel": "I confirm that I have a signed declaration from my client",
+        "dateLabel": "Date of signature",
+        "dateHint": "This is your case start date and the date you can bill from",
+        "continueButton": "Continue"
+      },
       "caption": "Client declaration",
       "confirm": {
         "title": "Confirm the following",

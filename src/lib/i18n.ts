@@ -111,6 +111,19 @@ export const t = (key: string, options?: Record<string, unknown>): string => {
   return i18next.t(key, options);
 };
 
+// TODO Refactor the tt function to include the mapping.
+export const tt = (key: string): string[] => {
+  const items = i18next.t(key, { returnObjects: true });
+
+  if (!Array.isArray(items)) {
+    logger.warn("Translation key is not an array");
+    return [key];
+  }
+
+  // @ts-expect-error Don't care about this.
+  return items;
+};
+
 /**
  * Nunjucks global function for templates
  * Usage in templates: {{ t("common.back") }} or {{ t("pages.caseDetails.tabs.clientDetails") }}
