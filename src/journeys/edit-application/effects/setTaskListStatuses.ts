@@ -69,7 +69,7 @@ export const setTaskListStatuses =
     );
 
     const declarationStatus = determineStepStatus(
-      Status.COMPLETED,
+      evidenceStatus,
       getDeclarationValues(application),
     );
 
