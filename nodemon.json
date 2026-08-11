@@ -1,5 +1,10 @@
 {
-  "watch": ["src/**/*.ts", "locales/**/*.json"],
+  "watch": [
+    "src/**/*.ts",
+    "locales/**/*.json",
+    "msw/**/*.ts",
+    "orval/mocks/**/*.ts"
+  ],
   "ext": "ts,js,json",
   "ignore": [
     "public/assets/**/*",
