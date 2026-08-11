@@ -2,6 +2,7 @@ import type { CreateApplicationRequestBody } from "#/api/clients/rcw/model/creat
 import type { AnswersOutput } from "#/journeys/create-application/data/answers.zod.js";
 
 import { ADDRESS_FIELD } from "#/journeys/journey.constants.js";
+import { mapCountryNameToIsoCode } from "#/lib/countries.js";
 
 interface Application {
   addressLine1: string;
@@ -11,7 +12,6 @@ interface Application {
   country: string;
   county?: string;
   dateOfBirth: string;
-  ecfFlag: boolean;
   firstName: string;
   hasFixedAddress: boolean;
   lastName: string;
@@ -19,7 +19,9 @@ interface Application {
   legalAidLast6Months?: boolean;
   niNumber?: string;
   postcode?: string;
+  providerOfficeCode: string;
   reasonForReapplication?: string;
+  scopingQuestions: Record<string, unknown>;
   townOrCity?: string;
 }
 
@@ -35,7 +37,6 @@ export class ApplicationDto {
   public country = "";
   public county?: string;
   public dateOfBirth = "";
-  public ecfFlag = false;
   public firstName = "";
   public hasFixedAddress = false;
   public lastName = "";
@@ -43,7 +44,9 @@ export class ApplicationDto {
   public legalAidLast6Months?: boolean;
   public niNumber?: string;
   public postcode?: string;
+  public providerOfficeCode = "";
   public reasonForReapplication?: string;
+  public scopingQuestions: Record<string, unknown> = {};
   public townOrCity?: string;
 
   /**
@@ -57,18 +60,21 @@ export class ApplicationDto {
   /**
    * Creates an ApplicationDto instance from the provided answers.
    * @param answers - The answers from which to create the ApplicationDto instance.
+   * @param providerOfficeCode - The provider office code to be included in the ApplicationDto instance.
    * @returns ApplicationDto instance.
    */
-  public static fromAnswers(answers: AnswersOutput): ApplicationDto {
+  public static fromAnswers(
+    answers: AnswersOutput,
+    providerOfficeCode: string,
+  ): ApplicationDto {
     return new ApplicationDto({
       addressLine1: answers[ADDRESS_FIELD.addressLine1],
       addressLine2: answers[ADDRESS_FIELD.addressLine2],
       addressLine3: answers[ADDRESS_FIELD.addressLine3],
       addressLine4: answers[ADDRESS_FIELD.addressLine4],
-      country: answers[ADDRESS_FIELD.country],
+      country: mapCountryNameToIsoCode(answers[ADDRESS_FIELD.country]),
       county: answers[ADDRESS_FIELD.county],
       dateOfBirth: answers.dateOfBirth,
-      ecfFlag: answers.ecf === "true",
       firstName: answers.firstName,
       hasFixedAddress: answers.haveAHomeAddress === "yes",
       lastName: answers.lastName,
@@ -76,7 +82,11 @@ export class ApplicationDto {
       legalAidLast6Months: answers.legalAidLast6Months === "yes",
       niNumber: answers.niNumber,
       postcode: answers[ADDRESS_FIELD.postcode],
+      providerOfficeCode,
       reasonForReapplication: answers.reasonForYes,
+      scopingQuestions: {
+        priorLegalAid: answers.legalAidBefore,
+      },
       townOrCity: answers[ADDRESS_FIELD.townOrCity],
     });
   }
@@ -104,10 +114,11 @@ export class ApplicationDto {
         lastName: this.lastName,
         niNumber: this.niNumber,
       },
-      ecfFlag: this.ecfFlag,
       legalAidBefore: this.legalAidBefore,
       legalAidLast6Months: this.legalAidLast6Months,
+      providerOfficeCode: this.providerOfficeCode,
       reasonForReapplication: this.reasonForReapplication,
+      scopingQuestions: this.scopingQuestions,
     };
   }
 }

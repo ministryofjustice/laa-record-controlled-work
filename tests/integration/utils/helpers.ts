@@ -27,7 +27,8 @@ import type { CreateApplicationEffectsDeps } from "#/journeys/create-application
 import { editApplicationEffectsRegistry } from "#/journeys/edit-application/editApplication.effects.js";
 import type { EditApplicationEffectsDeps } from "#/journeys/edit-application/editApplication.types.js";
 import sinon from "sinon";
-import { getCreateApplicationResponseMock, getGetApplicationResponseMock } from "../../mocks/api/rcw/fakers/applications/applications.faker.gen.js";
+import { getGetApplicationResponseMock } from "../../mocks/api/rcw/fakers/applications/applications.faker.gen.js";
+import { getCreateApplicationResponseMock } from "../../mocks/api/rcw/fakers/applications/applications.faker.gen.js";
 import { taskListStep } from "#/journeys/edit-application/steps/task-list/task-list.step.js";
 
 /**
@@ -45,10 +46,10 @@ export function createForgeTestClient(
   mockDeps?: CreateApplicationEffectsDeps,
 ): ForgeTestClient {
   const uuid = "123e4567-e89b-12d3-a456-426614174000";
-  const mockData = getCreateApplicationResponseMock({id: uuid});
+  const mockData = getCreateApplicationResponseMock({ id: uuid });
   const createApplicationStub = sinon
     .stub()
-    .resolves({ status: 201, data: mockData });
+    .resolves({ status: 201, data: mockData, headers: new Headers() });
 
   const testJourney = journey({
     code: "testJourney",
@@ -74,10 +75,12 @@ export function createForgeTestClient(
     .registerGlobalComponents([autocomplete])
     .registerGlobalFunctions(nunjucksFunctions)
     .registerGlobalFunctions(JourneyEffectsImplementations)
-    .registerPackage(testPackage, mockDeps ?? { createApplication: createApplicationStub })
+    .registerPackage(
+      testPackage,
+      mockDeps ?? { createApplication: createApplicationStub },
+    )
     .createClient();
 }
-
 
 /**
  * Creates a test client for the select office journey.
@@ -152,6 +155,9 @@ export function createForgeTestClientForEditApplication(
     .registerGlobalComponents([autocomplete])
     .registerGlobalFunctions(nunjucksFunctions)
     .registerGlobalFunctions(JourneyEffectsImplementations)
-    .registerPackage(testPackage, mockDeps ?? { getApplication: getApplicationStub })
+    .registerPackage(
+      testPackage,
+      mockDeps ?? { getApplication: getApplicationStub },
+    )
     .createClient();
 }

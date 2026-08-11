@@ -6,12 +6,25 @@
  */
 import { z as zod } from "zod";
 
+export const clientDetailsNiNumberMin = 9;
+export const clientDetailsNiNumberMax = 9;
+
+export const clientDetailsNiNumberRegExp = new RegExp(
+  "[A-CEGHJ-NOPR-TW-Z]{2}[0-9]{6}[ABCDs]{1}",
+);
+export const clientDetailsAddressCountryMax = 2;
+
 export const ClientDetails = zod.object({
   id: zod.uuid().optional(),
   firstName: zod.string(),
   lastName: zod.string(),
   dateOfBirth: zod.iso.date(),
-  niNumber: zod.string().optional(),
+  niNumber: zod
+    .string()
+    .min(clientDetailsNiNumberMin)
+    .max(clientDetailsNiNumberMax)
+    .regex(clientDetailsNiNumberRegExp)
+    .optional(),
   hasFixedAddress: zod.boolean(),
   address: zod
     .object({
@@ -23,7 +36,7 @@ export const ClientDetails = zod.object({
       townOrCity: zod.string().optional(),
       postCode: zod.string().optional(),
       county: zod.string().optional(),
-      country: zod.string(),
+      country: zod.string().max(clientDetailsAddressCountryMax),
       createdAt: zod.iso.datetime({ offset: true }).optional(),
       modifiedAt: zod.iso.datetime({ offset: true }).optional(),
     })
