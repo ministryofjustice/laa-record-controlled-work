@@ -1,4 +1,3 @@
-import { Data, Format } from "@ministryofjustice/hmpps-forge/core/authoring";
 import {
   GovUKBody,
   GovUKButton,
@@ -7,10 +6,6 @@ import {
   GovUKWarningText,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
-import {
-  CLIENT_DETAILS_DATA_KEYS,
-  CONTEXT_DATA_KEYS,
-} from "#/journeys/journey.constants.js";
 import { H1 } from "#/lib/constants/headings.js";
 import { i18next, t } from "#/lib/i18n.js";
 
@@ -33,12 +28,6 @@ function textListHtml(key: string, classes: string): string {
 
   return `<ul class="${classes}">${listItems}</ul>`;
 }
-
-// const clientName = Format(
-//   "%1 %2",
-//   Data(CONTEXT_DATA_KEYS.application).path(CLIENT_DETAILS_DATA_KEYS.firstName),
-//   Data(CONTEXT_DATA_KEYS.application).path(CLIENT_DETAILS_DATA_KEYS.lastName),
-// );
 
 export const declarationHeading = () =>
   GovUKHeading({
