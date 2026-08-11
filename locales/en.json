@@ -349,8 +349,8 @@
     },
     "declaration": {
       "caption": "Client declaration",
-      "title": "Confirm the following",
-      "clientConfirmation": {
+      "confirm": {
+        "title": "Confirm the following",
         "declarationText": "agrees that:",
         "declarationList": [
           "they've instructed me, the provider, to act on their behalf",
@@ -363,9 +363,9 @@
           "be prosecuted",
           "need to pay a financial penalty",
           "have their legal aid stopped and have to pay back the costs"
-        ]
-      },
-      "confirmButton": "Confirm and continue"
+        ],
+        "confirmButton": "Confirm and continue"
+      }
     }
   }
 }

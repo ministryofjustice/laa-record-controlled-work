@@ -1,5 +1,5 @@
 import { access, journey } from "@ministryofjustice/hmpps-forge/core/authoring";
-import { clientConfirmationStep } from "#/journeys/declaration/steps/confirmation/client-confirmation.step.js";
+import { confirmStep } from "#/journeys/declaration/steps/confirmation/confirmation.step.js";
 
 import { JourneyEffects } from "#/journeys/effects.js";
 
@@ -15,7 +15,7 @@ export const DeclarationJourney = journey({
   path: "/cases/new/declaration",
   reachability: { disableReachabilityChecks: false },
   steps: [
-    clientConfirmationStep(),
+    confirmStep(),
   ],
   title: "Declaration",
   view: { template: "partials/form-step" },

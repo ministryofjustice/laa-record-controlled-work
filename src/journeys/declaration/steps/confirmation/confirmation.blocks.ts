@@ -33,21 +33,21 @@ function textListHtml(key: string, classes: string): string {
 
 export const declarationHeading = () =>
   GovUKHeading({
-    text: t("journeys.declaration.title"),
+    text: t("journeys.declaration.confirm.title"),
     level: H1,
   });
 
 export const declarationBody = () =>
   GovUKBody({
     classes: "govuk-body",
-    text: `Joe Bloggs ${t("journeys.declaration.clientConfirmation.declarationText")}<br>${textListHtml("journeys.declaration.clientConfirmation.declarationList", "govuk-list govuk-list--bullet govuk-!-margin-bottom-6")}`,
+    text: `Joe Bloggs ${t("journeys.declaration.confirm.declarationText")}<br>${textListHtml("journeys.declaration.confirm.declarationList", "govuk-list govuk-list--bullet govuk-!-margin-bottom-6")}`,
   });
 
 export const declarationWarning = () =>
   GovUKWarningText({
     html: `${t(
-      "journeys.declaration.clientConfirmation.warningText",
-    )} <br>${textListHtml("journeys.declaration.clientConfirmation.warningList", "govuk-list govuk-list--bullet govuk-!-margin-bottom-6 govuk-!-font-weight-bold")}`,
+      "journeys.declaration.confirm.warningText",
+    )} <br>${textListHtml("journeys.declaration.confirm.warningList", "govuk-list govuk-list--bullet govuk-!-margin-bottom-6 govuk-!-font-weight-bold")}`,
     iconFallbackText: "Warning",
   });
 
@@ -55,7 +55,7 @@ export const declarationButtonGroup = () =>
   GovUKButtonGroup({
   buttons: [
     GovUKButton({
-      text: t("journeys.declaration.confirmButton"),
+      text: t("journeys.declaration.confirm.confirmButton"),
       buttonType: "submit",
       value: "continue",
     }),

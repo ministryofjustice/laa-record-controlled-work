@@ -4,7 +4,7 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
 
-import { clientConfirmationStep } from "#/journeys/declaration/steps/confirmation/client-confirmation.step.js";
+import { confirmStep } from "#/journeys/declaration/steps/confirmation/confirmation.step.js";
 import { createForgeTestClient } from "../../utils/helpers.js";
 import { TemplateWrapper } from "@ministryofjustice/hmpps-forge/core/components";
 
@@ -12,15 +12,15 @@ describe("Declaration step", () => {
   const client = createForgeTestClient(
     "Declaration",
     "/cases/new/declaration/",
-    [clientConfirmationStep()],
+    [confirmStep()],
   );
 
-  describe("GET /cases/new/declaration/client-declaration", () => {
+  describe("GET /cases/new/declaration/confirm", () => {
     let renderResult: TestRenderResult;
 
     before(async () => {
       const result = await client.get(
-        "/cases/new/declaration/client-declaration",
+        "/cases/new/declaration/confirm",
       );
       expect(result.type).to.equal("render");
       renderResult = result as TestRenderResult;
@@ -69,10 +69,10 @@ describe("Declaration step", () => {
     });
   });
 
-  describe("POST /cases/new/declaration/client-declaration", () => {
+  describe("POST /cases/new/declaration/confirm", () => {
     it("redirects to the application summary step when continue is clicked", async () => {
       const result = await client.post(
-        "/cases/new/declaration/client-declaration",
+        "/cases/new/declaration/confirm",
         {
           body: {
             action: "continue",
@@ -83,13 +83,13 @@ describe("Declaration step", () => {
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
       expect(redirectResult.url).to.equal(
-        "/cases/new/declaration/client-declaration-application-summary",
+        "/cases/new/declaration/sign",
       );
     });
 
     it("redirects to the task list step when return is clicked", async () => {
       const result = await client.post(
-        "/cases/new/declaration/client-declaration",
+        "/cases/new/declaration/confirm",
         {
           body: {
             action: "return",

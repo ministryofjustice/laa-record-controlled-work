@@ -7,15 +7,15 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
 import { t } from "#/lib/i18n.js";
-import { backLink, caption } from "#/journeys/declaration/common.blocks.js";
+import { backLink, caption } from "#/journeys/declaration/declaration.blocks.js";
 import {
   declarationBody,
   declarationButtonGroup,
   declarationHeading,
   declarationWarning,
-} from "#/journeys/declaration/steps/confirmation/client-confirmation.blocks.js";
+} from "#/journeys/declaration/steps/confirmation/confirmation.blocks.js";
 
-export const clientConfirmationStep = (
+export const confirmStep = (
 ): ReturnType<typeof step> =>
   step({
     blocks: [
@@ -32,7 +32,7 @@ export const clientConfirmationStep = (
         onValid: {
           next: [
             redirect({
-              goto: "client-declaration-application-summary",
+              goto: "sign",
             }),
           ],
         },
@@ -48,7 +48,7 @@ export const clientConfirmationStep = (
         },
       }),
     ],
-    path: "/client-declaration",
+    path: "/confirm",
     reachability: { entryWhen: true },
-    title: t("journeys.declaration.title"),
+    title: t("journeys.declaration.confirm.title"),
   });
