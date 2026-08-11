@@ -1,10 +1,11 @@
 import { http, HttpResponse } from "msw";
 
-import { entraHandlers } from "./entra.js";
-import { pdaApiHandlers } from "./pda.js";
+import { entraHandlers } from "#msw/handlers/entra.js";
+import { pdaApiHandlers } from "#msw/handlers/pda.js";
+
 import { rcwHandlers } from "./rcw.js";
 
-const debugHandler = http.all("*", () => {});
+const debugHandler = http.all("*", () => undefined);
 
 export const handlers = [
   debugHandler,
@@ -14,9 +15,9 @@ export const handlers = [
 
   http.get("/health", () =>
     HttpResponse.json({
+      msw: "active",
       status: "ok",
       timestamp: new Date().toISOString(),
-      msw: "active",
     }),
   ),
 ];

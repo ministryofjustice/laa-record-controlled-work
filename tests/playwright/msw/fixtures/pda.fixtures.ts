@@ -1,20 +1,13 @@
-import { faker } from "@faker-js/faker";
+import type { Office } from "#/journeys/select-office/select-office.types.js";
 
 import { mapAvailableOffices } from "#/journeys/select-office/mappers/mapAvailableOffices.js";
-import { getGetAllProviderOfficesResponseMock } from "#orval/mocks/pda/msw/provider-firms-endpoints/provider-firms-endpoints.msw.gen.js";
+import { getProviderOfficesResponse } from "#msw/fixtures/pda.js";
 
-// Keep generated fixture data deterministic across test runs.
-faker.seed(12345);
-
-export function getProviderOfficesResponse(limitNumberOfOffices: number) {
-  const providerOfficesResponse = getGetAllProviderOfficesResponseMock();
-
-  return {
-    ...providerOfficesResponse,
-    offices: providerOfficesResponse.offices.slice(0, limitNumberOfOffices),
-  };
-}
-
-export function getMappedOffices(limitNumberOfOffices: number) {
+/**
+ * Maps mock office response data to journey office options.
+ * @param limitNumberOfOffices Number of offices to include from fixtures.
+ * @returns Office options used in journey tests.
+ */
+export function getMappedOffices(limitNumberOfOffices: number): Office[] {
   return mapAvailableOffices(getProviderOfficesResponse(limitNumberOfOffices));
 }

@@ -8,8 +8,33 @@ const TEST_PORT = "3001";
 const SUCCESS_EXIT_CODE = 0;
 const ERROR_EXIT_CODE = 1;
 
+const ignoredUnhandledPaths = new Set(["/favicon.ico", "/robots.txt"]);
+
+const shouldIgnoreUnhandledRequest = (req: Request): boolean => {
+  const { pathname, protocol } = new URL(req.url);
+
+  if (ignoredUnhandledPaths.has(pathname)) {
+    return true;
+  }
+
+  return protocol === "data:" || protocol === "blob:";
+};
+
 mswServer.listen({
-  onUnhandledRequest: (req: Request, print: { warning: () => void }): void => {
+  onUnhandledRequest: (
+    req: Request,
+    print: { error: () => void; warning: () => void },
+  ): void => {
+    if (shouldIgnoreUnhandledRequest(req)) {
+      return;
+    }
+
+    const { pathname } = new URL(req.url);
+    if (pathname.startsWith("/api/") || pathname.includes("/oauth2/")) {
+      print.error();
+      return;
+    }
+
     print.warning();
   },
 });

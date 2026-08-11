@@ -85,9 +85,6 @@ services:
         - action: sync
           path: ./msw
           target: /app/msw
-        - action: sync
-          path: ./tests/playwright
-          target: /app/tests/playwright
         - action: rebuild
           path: package.json
         - action: rebuild

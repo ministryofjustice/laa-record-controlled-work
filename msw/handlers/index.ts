@@ -3,11 +3,11 @@ import { http, HttpResponse } from "msw";
 import config from "#/config.js";
 
 import { entraHandlers } from "./entra.js";
-import { rcwHandlers } from "./rcw.js";
 import { pdaApiHandlers } from "./pda.js";
+import { rcwHandlers } from "./rcw.js";
 
 // Logs all intercepted requests; returns undefined to pass through to actual handlers
-const debugHandler = http.all("*", ({ request }) => {});
+const debugHandler = http.all("*", () => undefined);
 
 export const handlers = [
   debugHandler,
@@ -17,9 +17,9 @@ export const handlers = [
 
   http.get("/health", () =>
     HttpResponse.json({
+      msw: "active",
       status: "ok",
       timestamp: new Date().toISOString(),
-      msw: "active",
     }),
   ),
 ];
