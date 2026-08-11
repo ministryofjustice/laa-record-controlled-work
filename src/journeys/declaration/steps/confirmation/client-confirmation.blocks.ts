@@ -2,6 +2,8 @@ import {
   GovUKBody,
   GovUKHeading,
   GovUKWarningText,
+  GovUKButton,
+  GovUKButtonGroup,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 import { i18next, t } from "#/lib/i18n.js";
 import { H1 } from "#/lib/constants/headings.js";
@@ -40,3 +42,20 @@ export const declarationWarning = () =>
     )} <br>${textListHtml("journeys.declaration.clientConfirmation.warningList", "govuk-list govuk-list--bullet govuk-!-margin-bottom-6 govuk-!-font-weight-bold")}`,
     iconFallbackText: "Warning",
   });
+
+export const declarationButtonGroup = () =>
+  GovUKButtonGroup({
+  buttons: [
+    GovUKButton({
+      text: t("journeys.declaration.confirmButton"),
+      buttonType: "submit",
+      value: "continue",
+    }),
+    GovUKButton({
+      text: t("common.saveAndReturn"),
+      classes: "govuk-button--secondary",
+      buttonType: "submit",
+      value: "return",
+    }),
+  ],
+});

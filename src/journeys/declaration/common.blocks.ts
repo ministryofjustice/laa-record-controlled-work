@@ -19,7 +19,7 @@ export const caption = HtmlBlock({
 export const buttonGroup = GovUKButtonGroup({
   buttons: [
     GovUKButton({
-      text: t("journeys.declaration.confirmButton"),
+      text: t("common.continue"),
       buttonType: "submit",
     }),
     GovUKButton({

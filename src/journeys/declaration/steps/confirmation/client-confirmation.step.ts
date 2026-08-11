@@ -1,13 +1,19 @@
 import {
+  Condition,
+  Post,
   redirect,
   step,
   submit,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
-import { JourneyEffects } from "#/journeys/effects.js";
 import { t } from "#/lib/i18n.js";
-import { backLink, caption, buttonGroup } from "#/journeys/declaration/common.blocks.js";
-import { declarationBody, declarationHeading, declarationWarning } from "#/journeys/declaration/steps/confirmation/client-confirmation.blocks.js";
+import { backLink, caption } from "#/journeys/declaration/common.blocks.js";
+import {
+  declarationBody,
+  declarationButtonGroup,
+  declarationHeading,
+  declarationWarning,
+} from "#/journeys/declaration/steps/confirmation/client-confirmation.blocks.js";
 
 export const clientConfirmationStep = (
   journeyCode: string,
@@ -19,17 +25,28 @@ export const clientConfirmationStep = (
       declarationHeading(),
       declarationBody(),
       declarationWarning(),
-      buttonGroup,
+      declarationButtonGroup(),
     ],
     onSubmission: [
       submit({
+        when: Post("action").match(Condition.Equals("continue")),
         onValid: {
-          effects: [JourneyEffects.SaveDraftAnswers(journeyCode)],
           next: [
-            redirect({ goto: "client-declaration-application-summary" }),
+            redirect({
+              goto: "client-declaration-application-summary",
+            }),
           ],
         },
-        validate: true,
+      }),
+      submit({
+        when: Post("action").match(Condition.Equals("return")),
+        onValid: {
+          next: [
+            redirect({
+              goto: "/cases/new/task-list",
+            }),
+          ],
+        },
       }),
     ],
     path: "/client-declaration",
