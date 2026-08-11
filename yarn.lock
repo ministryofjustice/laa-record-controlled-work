@@ -559,146 +559,146 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@j178/prek-android-arm64@npm:0.4.11":
-  version: 0.4.11
-  resolution: "@j178/prek-android-arm64@npm:0.4.11"
+"@j178/prek-android-arm64@npm:0.4.12":
+  version: 0.4.12
+  resolution: "@j178/prek-android-arm64@npm:0.4.12"
   conditions: os=android & cpu=arm64
   languageName: node
   linkType: hard
 
-"@j178/prek-darwin-arm64@npm:0.4.11":
-  version: 0.4.11
-  resolution: "@j178/prek-darwin-arm64@npm:0.4.11"
+"@j178/prek-darwin-arm64@npm:0.4.12":
+  version: 0.4.12
+  resolution: "@j178/prek-darwin-arm64@npm:0.4.12"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
-"@j178/prek-darwin-x64@npm:0.4.11":
-  version: 0.4.11
-  resolution: "@j178/prek-darwin-x64@npm:0.4.11"
+"@j178/prek-darwin-x64@npm:0.4.12":
+  version: 0.4.12
+  resolution: "@j178/prek-darwin-x64@npm:0.4.12"
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
-"@j178/prek-linux-arm-gnueabihf@npm:0.4.11":
-  version: 0.4.11
-  resolution: "@j178/prek-linux-arm-gnueabihf@npm:0.4.11"
+"@j178/prek-linux-arm-gnueabihf@npm:0.4.12":
+  version: 0.4.12
+  resolution: "@j178/prek-linux-arm-gnueabihf@npm:0.4.12"
   conditions: os=linux & cpu=arm & libc=glibc
   languageName: node
   linkType: hard
 
-"@j178/prek-linux-arm-musleabihf@npm:0.4.11":
-  version: 0.4.11
-  resolution: "@j178/prek-linux-arm-musleabihf@npm:0.4.11"
+"@j178/prek-linux-arm-musleabihf@npm:0.4.12":
+  version: 0.4.12
+  resolution: "@j178/prek-linux-arm-musleabihf@npm:0.4.12"
   conditions: os=linux & cpu=arm & libc=musl
   languageName: node
   linkType: hard
 
-"@j178/prek-linux-arm64-gnu@npm:0.4.11":
-  version: 0.4.11
-  resolution: "@j178/prek-linux-arm64-gnu@npm:0.4.11"
+"@j178/prek-linux-arm64-gnu@npm:0.4.12":
+  version: 0.4.12
+  resolution: "@j178/prek-linux-arm64-gnu@npm:0.4.12"
   conditions: os=linux & cpu=arm64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@j178/prek-linux-arm64-musl@npm:0.4.11":
-  version: 0.4.11
-  resolution: "@j178/prek-linux-arm64-musl@npm:0.4.11"
+"@j178/prek-linux-arm64-musl@npm:0.4.12":
+  version: 0.4.12
+  resolution: "@j178/prek-linux-arm64-musl@npm:0.4.12"
   conditions: os=linux & cpu=arm64 & libc=musl
   languageName: node
   linkType: hard
 
-"@j178/prek-linux-armv7-musleabihf@npm:0.4.11":
-  version: 0.4.11
-  resolution: "@j178/prek-linux-armv7-musleabihf@npm:0.4.11"
+"@j178/prek-linux-armv7-musleabihf@npm:0.4.12":
+  version: 0.4.12
+  resolution: "@j178/prek-linux-armv7-musleabihf@npm:0.4.12"
   conditions: os=linux & cpu=arm & libc=musl
   languageName: node
   linkType: hard
 
-"@j178/prek-linux-ia32-gnu@npm:0.4.11":
-  version: 0.4.11
-  resolution: "@j178/prek-linux-ia32-gnu@npm:0.4.11"
+"@j178/prek-linux-ia32-gnu@npm:0.4.12":
+  version: 0.4.12
+  resolution: "@j178/prek-linux-ia32-gnu@npm:0.4.12"
   conditions: os=linux & cpu=ia32 & libc=glibc
   languageName: node
   linkType: hard
 
-"@j178/prek-linux-ia32-musl@npm:0.4.11":
-  version: 0.4.11
-  resolution: "@j178/prek-linux-ia32-musl@npm:0.4.11"
+"@j178/prek-linux-ia32-musl@npm:0.4.12":
+  version: 0.4.12
+  resolution: "@j178/prek-linux-ia32-musl@npm:0.4.12"
   conditions: os=linux & cpu=ia32 & libc=musl
   languageName: node
   linkType: hard
 
-"@j178/prek-linux-riscv64-gnu@npm:0.4.11":
-  version: 0.4.11
-  resolution: "@j178/prek-linux-riscv64-gnu@npm:0.4.11"
+"@j178/prek-linux-riscv64-gnu@npm:0.4.12":
+  version: 0.4.12
+  resolution: "@j178/prek-linux-riscv64-gnu@npm:0.4.12"
   conditions: os=linux & cpu=riscv64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@j178/prek-linux-s390x-gnu@npm:0.4.11":
-  version: 0.4.11
-  resolution: "@j178/prek-linux-s390x-gnu@npm:0.4.11"
+"@j178/prek-linux-s390x-gnu@npm:0.4.12":
+  version: 0.4.12
+  resolution: "@j178/prek-linux-s390x-gnu@npm:0.4.12"
   conditions: os=linux & cpu=s390x & libc=glibc
   languageName: node
   linkType: hard
 
-"@j178/prek-linux-x64-gnu@npm:0.4.11":
-  version: 0.4.11
-  resolution: "@j178/prek-linux-x64-gnu@npm:0.4.11"
+"@j178/prek-linux-x64-gnu@npm:0.4.12":
+  version: 0.4.12
+  resolution: "@j178/prek-linux-x64-gnu@npm:0.4.12"
   conditions: os=linux & cpu=x64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@j178/prek-linux-x64-musl@npm:0.4.11":
-  version: 0.4.11
-  resolution: "@j178/prek-linux-x64-musl@npm:0.4.11"
+"@j178/prek-linux-x64-musl@npm:0.4.12":
+  version: 0.4.12
+  resolution: "@j178/prek-linux-x64-musl@npm:0.4.12"
   conditions: os=linux & cpu=x64 & libc=musl
   languageName: node
   linkType: hard
 
-"@j178/prek-win32-arm64-msvc@npm:0.4.11":
-  version: 0.4.11
-  resolution: "@j178/prek-win32-arm64-msvc@npm:0.4.11"
+"@j178/prek-win32-arm64-msvc@npm:0.4.12":
+  version: 0.4.12
+  resolution: "@j178/prek-win32-arm64-msvc@npm:0.4.12"
   conditions: os=win32 & cpu=arm64
   languageName: node
   linkType: hard
 
-"@j178/prek-win32-ia32-msvc@npm:0.4.11":
-  version: 0.4.11
-  resolution: "@j178/prek-win32-ia32-msvc@npm:0.4.11"
+"@j178/prek-win32-ia32-msvc@npm:0.4.12":
+  version: 0.4.12
+  resolution: "@j178/prek-win32-ia32-msvc@npm:0.4.12"
   conditions: os=win32 & cpu=ia32
   languageName: node
   linkType: hard
 
-"@j178/prek-win32-x64-msvc@npm:0.4.11":
-  version: 0.4.11
-  resolution: "@j178/prek-win32-x64-msvc@npm:0.4.11"
+"@j178/prek-win32-x64-msvc@npm:0.4.12":
+  version: 0.4.12
+  resolution: "@j178/prek-win32-x64-msvc@npm:0.4.12"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
 
-"@j178/prek@npm:^0.4.11":
-  version: 0.4.11
-  resolution: "@j178/prek@npm:0.4.11"
+"@j178/prek@npm:^0.4.12":
+  version: 0.4.12
+  resolution: "@j178/prek@npm:0.4.12"
   dependencies:
-    "@j178/prek-android-arm64": "npm:0.4.11"
-    "@j178/prek-darwin-arm64": "npm:0.4.11"
-    "@j178/prek-darwin-x64": "npm:0.4.11"
-    "@j178/prek-linux-arm-gnueabihf": "npm:0.4.11"
-    "@j178/prek-linux-arm-musleabihf": "npm:0.4.11"
-    "@j178/prek-linux-arm64-gnu": "npm:0.4.11"
-    "@j178/prek-linux-arm64-musl": "npm:0.4.11"
-    "@j178/prek-linux-armv7-musleabihf": "npm:0.4.11"
-    "@j178/prek-linux-ia32-gnu": "npm:0.4.11"
-    "@j178/prek-linux-ia32-musl": "npm:0.4.11"
-    "@j178/prek-linux-riscv64-gnu": "npm:0.4.11"
-    "@j178/prek-linux-s390x-gnu": "npm:0.4.11"
-    "@j178/prek-linux-x64-gnu": "npm:0.4.11"
-    "@j178/prek-linux-x64-musl": "npm:0.4.11"
-    "@j178/prek-win32-arm64-msvc": "npm:0.4.11"
-    "@j178/prek-win32-ia32-msvc": "npm:0.4.11"
-    "@j178/prek-win32-x64-msvc": "npm:0.4.11"
+    "@j178/prek-android-arm64": "npm:0.4.12"
+    "@j178/prek-darwin-arm64": "npm:0.4.12"
+    "@j178/prek-darwin-x64": "npm:0.4.12"
+    "@j178/prek-linux-arm-gnueabihf": "npm:0.4.12"
+    "@j178/prek-linux-arm-musleabihf": "npm:0.4.12"
+    "@j178/prek-linux-arm64-gnu": "npm:0.4.12"
+    "@j178/prek-linux-arm64-musl": "npm:0.4.12"
+    "@j178/prek-linux-armv7-musleabihf": "npm:0.4.12"
+    "@j178/prek-linux-ia32-gnu": "npm:0.4.12"
+    "@j178/prek-linux-ia32-musl": "npm:0.4.12"
+    "@j178/prek-linux-riscv64-gnu": "npm:0.4.12"
+    "@j178/prek-linux-s390x-gnu": "npm:0.4.12"
+    "@j178/prek-linux-x64-gnu": "npm:0.4.12"
+    "@j178/prek-linux-x64-musl": "npm:0.4.12"
+    "@j178/prek-win32-arm64-msvc": "npm:0.4.12"
+    "@j178/prek-win32-ia32-msvc": "npm:0.4.12"
+    "@j178/prek-win32-x64-msvc": "npm:0.4.12"
   dependenciesMeta:
     "@j178/prek-android-arm64":
       optional: true
@@ -736,7 +736,7 @@ __metadata:
       optional: true
   bin:
     prek: bin/prek.js
-  checksum: 10c0/bb433db3fe0cc630f6f326e9d0ed1f669c05c5ff937e45a486b8fcb5d527bda2765b5d1630440830c5d95eae302c3c08801e311d67cfbdd87b4968f7fe6d3d76
+  checksum: 10c0/9d6b460907c4fc99136987bed78cb8b08cb610734bc93bbd5897451bdb6a77c129a37aa98578258b3c1f13bdda1b804d83cfdfa717400b3405e74570ca7d472a
   languageName: node
   linkType: hard
 
@@ -5769,7 +5769,7 @@ __metadata:
     "@axe-core/playwright": "npm:^4.12.1"
     "@azure/msal-node": "npm:^5.4.3"
     "@faker-js/faker": "npm:^10.5.0"
-    "@j178/prek": "npm:^0.4.11"
+    "@j178/prek": "npm:^0.4.12"
     "@ministryofjustice/frontend": "npm:9.0.0"
     "@ministryofjustice/hmpps-forge": "npm:^0.3.4"
     "@playwright/test": "npm:^1.62.1"
