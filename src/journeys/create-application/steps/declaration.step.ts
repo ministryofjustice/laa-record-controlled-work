@@ -21,14 +21,14 @@ export const declarationStep = (journeyCode: string): ReturnType<typeof step> =>
       }),
       GovUKHeading({
         level: H1,
-        text: t("journeys.declaration.title"),
+        text: t("journeys.createApplication.declaration.title"),
       }),
       GovUKBody({
         classes: "govuk-body",
         text: 'By continuing, you agree that:<br><ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-6"><li>your client has instructed you, the provider, to act on their behalf</li><li>your client has read the <a target="_blank" href="/privacy-policy">LAA privacy policy (opens in a new window or tab)</a></li><li>you\'ll give complete and correct information</li></ul>',
       }),
       GovUKButton({
-        text: t("journeys.declaration.continue"),
+        text: t("journeys.createApplication.declaration.continue"),
       }),
     ],
     onSubmission: [
@@ -41,5 +41,5 @@ export const declarationStep = (journeyCode: string): ReturnType<typeof step> =>
     ],
     path: "/provider-declaration",
     reachability: { entryWhen: true },
-    title: t("journeys.declaration.title"),
+    title: t("journeys.createApplication.declaration.title"),
   });
