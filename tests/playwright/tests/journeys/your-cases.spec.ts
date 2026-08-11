@@ -1,6 +1,6 @@
 import { test, expect } from "../../fixtures/index.js";
-import { applications } from "../../fixtures/rcw.fixtures.js";
-import { getMappedOffices } from "../../fixtures/pda.fixtures.js";
+import { getMappedOffices } from "../../msw/fixtures/pda.fixtures.js";
+import { applications } from "../../msw/fixtures/rcw.fixtures.js";
 
 const [selectedOffice] = getMappedOffices(1);
 

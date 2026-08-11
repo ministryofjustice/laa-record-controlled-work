@@ -8,7 +8,7 @@ import {
   application,
   applications,
   createApplicationResponse,
-} from "../fixtures/rcw.js";
+} from "../fixtures/rcw.fixtures.js";
 
 export const rcwHandlers = [
   getGetApplicationsMockHandler(applications),

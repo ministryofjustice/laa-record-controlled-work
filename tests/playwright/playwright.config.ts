@@ -46,8 +46,8 @@ export default defineConfig({
   webServer: {
     command:
       process.env.CI === "true"
-        ? "yarn tsx msw/test-server-with-msw.ts"
-        : "yarn build && yarn tsx msw/test-server-with-msw.ts",
+        ? "yarn tsx tests/playwright/msw/test-server-with-msw.ts"
+        : "yarn build && yarn tsx tests/playwright/msw/test-server-with-msw.ts",
     url: "http://127.0.0.1:3001/health",
     reuseExistingServer: process.env.CI !== "true",
     stdout: "pipe",

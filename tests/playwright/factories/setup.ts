@@ -6,7 +6,7 @@
  */
 
 import { setupServer } from 'msw/node';
-import { handlers } from '#msw/handlers/index.js';
+import { handlers } from '../msw/handlers/index.js';
 
 /**
  * MSW server instance for Node.js environment
