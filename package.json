@@ -113,7 +113,7 @@
     "testcontainers": "^12.0.4",
     "tsx": "^4.23.5",
     "typescript": "^6.0.3",
-    "undici": "^8.9.0"
+    "undici": "^8.10.0"
   },
   "packageManager": "yarn@4.18.0",
   "resolutions": {
@@ -121,7 +121,7 @@
     "serialize-javascript": "7.0.7",
     "js-yaml": "4.3.1",
     "ws": "8.21.1",
-    "undici": "8.9.0",
+    "undici": "^8.10.0",
     "tar": "^7.5.21"
   }
 }
