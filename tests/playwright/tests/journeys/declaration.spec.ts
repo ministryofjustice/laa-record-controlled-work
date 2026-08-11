@@ -27,7 +27,7 @@ test("Client Declaration - Client Declaration step", async ({ page }) => {
   ).toBeVisible();
 
   await page.getByRole("button", { name: "Save and return" }).click();
-  await expect(page).toHaveURL("/cases/new/task-list");
+  await expect(page).toHaveURL("/cases/new/task-list/");
 
   await page.goto("/cases/new/declaration/confirm");
 

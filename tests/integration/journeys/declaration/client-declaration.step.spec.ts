@@ -13,7 +13,7 @@ describe("Declaration step", () => {
 
   const client = createForgeTestClient(
     "Declaration",
-    `/cases/${uuid}/declaration/`,
+    "/cases/:applicationID/declaration/",
     [confirmStep()],
   );
 
@@ -34,7 +34,7 @@ describe("Declaration step", () => {
 
     it("renders a backlink to the start page", () => {
       const [backLink] = renderResult.getBlocksByVariant("govukBackLink");
-      expect(backLink.properties.href).to.equal(`/cases/${uuid}/task-list`);
+      expect(backLink.properties.href).to.equal(`/cases/${uuid}/task-list/`);
     });
 
     it("renders declaration body copy including the privacy policy link", () => {
@@ -101,7 +101,7 @@ describe("Declaration step", () => {
 
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
-      expect(redirectResult.url).to.equal(`/cases/${uuid}/task-list`);
+      expect(redirectResult.url).to.equal(`/cases/${uuid}/task-list/`);
     });
   });
 });

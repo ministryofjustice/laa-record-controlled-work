@@ -1,4 +1,7 @@
-import { HtmlBlock, ResolvableString } from "@ministryofjustice/hmpps-forge/core/components";
+import {
+  HtmlBlock,
+  type ResolvableString,
+} from "@ministryofjustice/hmpps-forge/core/components";
 import {
   GovUKBackLink,
   GovUKButton,
