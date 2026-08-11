@@ -12,7 +12,7 @@ export const DeclarationJourney = journey({
       effects: [JourneyEffects.LoadDraftAnswers(journeyCode)],
     }),
   ],
-  path: "/cases/new/declaration",
+  path: "/cases/:applicationID/declaration",
   reachability: { disableReachabilityChecks: false },
   steps: [confirmStep()],
   title: "Declaration",

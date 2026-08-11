@@ -1,5 +1,7 @@
 import {
   Condition,
+  Format,
+  Params,
   Post,
   redirect,
   step,
@@ -17,11 +19,12 @@ import {
   declarationWarning,
 } from "#/journeys/declaration/steps/confirmation/confirmation.blocks.js";
 import { t } from "#/lib/i18n.js";
+import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
 
 export const confirmStep = (): ReturnType<typeof step> =>
   step({
     blocks: [
-      backLink("/cases/new/task-list"),
+      backLink(Format("/cases/%1/task-list/", Params(PARAMS_KEYS.applicationID))),
       caption,
       declarationHeading(),
       declarationBody(),
@@ -43,7 +46,7 @@ export const confirmStep = (): ReturnType<typeof step> =>
         onValid: {
           next: [
             redirect({
-              goto: "/cases/new/task-list",
+              goto: Format("/cases/%1/task-list/", Params(PARAMS_KEYS.applicationID)),
             }),
           ],
         },
@@ -54,3 +57,4 @@ export const confirmStep = (): ReturnType<typeof step> =>
     reachability: { entryWhen: true },
     title: t("journeys.declaration.confirm.title"),
   });
+

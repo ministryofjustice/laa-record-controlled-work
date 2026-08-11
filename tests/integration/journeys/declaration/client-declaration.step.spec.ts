@@ -9,18 +9,20 @@ import { createForgeTestClient } from "../../utils/helpers.js";
 import { TemplateWrapper } from "@ministryofjustice/hmpps-forge/core/components";
 
 describe("Declaration step", () => {
+  const uuid = "123e4567-e89b-12d3-a456-426614174000";
+
   const client = createForgeTestClient(
     "Declaration",
-    "/cases/new/declaration/",
+    `/cases/${uuid}/declaration/`,
     [confirmStep()],
   );
 
-  describe("GET /cases/new/declaration/confirm", () => {
+  describe(`GET /cases/${uuid}/declaration/confirm`, () => {
     let renderResult: TestRenderResult;
 
     before(async () => {
       const result = await client.get(
-        "/cases/new/declaration/confirm",
+        `/cases/${uuid}/declaration/confirm`,
       );
       expect(result.type).to.equal("render");
       renderResult = result as TestRenderResult;
@@ -32,7 +34,7 @@ describe("Declaration step", () => {
 
     it("renders a backlink to the start page", () => {
       const [backLink] = renderResult.getBlocksByVariant("govukBackLink");
-      expect(backLink.properties.href).to.equal("/cases/new/task-list");
+      expect(backLink.properties.href).to.equal(`/cases/${uuid}/task-list`);
     });
 
     it("renders declaration body copy including the privacy policy link", () => {
@@ -69,10 +71,10 @@ describe("Declaration step", () => {
     });
   });
 
-  describe("POST /cases/new/declaration/confirm", () => {
+  describe(`POST /cases/${uuid}/declaration/confirm`, () => {
     it("redirects to the application summary step when continue is clicked", async () => {
       const result = await client.post(
-        "/cases/new/declaration/confirm",
+        `/cases/${uuid}/declaration/confirm`,
         {
           body: {
             action: "continue",
@@ -83,13 +85,13 @@ describe("Declaration step", () => {
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
       expect(redirectResult.url).to.equal(
-        "/cases/new/declaration/sign",
+        `/cases/${uuid}/declaration/sign`,
       );
     });
 
     it("redirects to the task list step when return is clicked", async () => {
       const result = await client.post(
-        "/cases/new/declaration/confirm",
+        `/cases/${uuid}/declaration/confirm`,
         {
           body: {
             action: "return",
@@ -99,7 +101,7 @@ describe("Declaration step", () => {
 
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
-      expect(redirectResult.url).to.equal("/cases/new/task-list");
+      expect(redirectResult.url).to.equal(`/cases/${uuid}/task-list`);
     });
   });
 });
