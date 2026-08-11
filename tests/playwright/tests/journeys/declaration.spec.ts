@@ -1,11 +1,14 @@
 import { test, expect } from "../../fixtures/index.js";
+import { application } from "../../fixtures/rcw.fixtures.js";
 
-test("Client Declaration - Client Declaration step", async ({ page }) => {
+test("Client Declaration - Client Declaration step", async ({ withSelectedOffice: page }) => {
+    const applicationId = application.id;
+  
   // ==========================================================================
   // Client Declaration page
   // ==========================================================================
 
-  await page.goto("/cases/new/declaration/confirm");
+  await page.goto(`/cases/${applicationId}/declaration/confirm`);
 
   await expect(
     page.getByRole("heading", {
@@ -27,10 +30,10 @@ test("Client Declaration - Client Declaration step", async ({ page }) => {
   ).toBeVisible();
 
   await page.getByRole("button", { name: "Save and return" }).click();
-  await expect(page).toHaveURL("/cases/new/task-list/");
+  await expect(page).toHaveURL(`/cases/${applicationId}/task-list/`);
 
-  await page.goto("/cases/new/declaration/confirm");
+  await page.goto(`/cases/${applicationId}/declaration/confirm`);
 
   await page.getByRole("button", { name: "Confirm and continue" }).click();
-  await expect(page).toHaveURL("/cases/new/declaration/sign");
+  await expect(page).toHaveURL(`/cases/${applicationId}/declaration/sign`);
 });
