@@ -1,4 +1,4 @@
-import { test } from "../../fixtures/index.js";
+import { test } from "../../playwright.harness.js";
 
 test.fixme(
   "@e2e means incomplete blocks evidence and declaration tasks",

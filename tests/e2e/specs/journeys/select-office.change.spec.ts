@@ -1,4 +1,4 @@
-import { test } from "../../fixtures/index.js";
+import { test } from "../../playwright.harness.js";
 
 test.fixme(
   "@e2e multi-office user can change office and return to case list",
