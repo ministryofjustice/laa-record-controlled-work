@@ -9,7 +9,10 @@ const RCW_API_SHA = readFileSync(".rcw-api-version", "utf-8").trim();
  */
 export const rcwConfig = {
   hooks: {
-    afterAllFilesWrite: "tsx orval/fixDoubleGenImports.ts",
+    afterAllFilesWrite: [
+      "tsx orval/fixDoubleGenImports.ts",
+      "tsx orval/fixSchemaAliasExtensions.ts",
+    ],
   },
   input: {
     filters: {

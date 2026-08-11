@@ -12,7 +12,7 @@ import { createApplication } from "#/journeys/create-application/effects/createA
 import type { CreateApplicationEffectsDeps } from "#/journeys/create-application/create-application.types.js";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import { logger } from "#/logger.js";
-import { getCreateApplicationResponseMock } from "../../../../../mocks/api/rcw/fakers/applications/applications.faker.gen.js";
+import { getCreateApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
 
 describe("CreateApplicationEffect", () => {
   const journeyCode = "testJourney";

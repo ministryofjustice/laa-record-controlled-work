@@ -6,7 +6,7 @@
  */
 import { faker } from "@faker-js/faker";
 
-import type { ProviderFirmOfficeListDto } from "../../../../../../src/api/clients/pda/model/providerFirmOfficeListDto.zod.gen.js";
+import type { ProviderFirmOfficeListDto } from "../../../../../src/api/clients/pda/model/providerFirmOfficeListDto.zod.gen.js";
 
 export type KeysWithNull<O> = {
   [K in keyof O]-?: null extends O[K] ? K : never;

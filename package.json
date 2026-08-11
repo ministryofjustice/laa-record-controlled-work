@@ -8,6 +8,8 @@
   "main": "public/app.js",
   "type": "module",
   "imports": {
+    "#orval/*": "./orval/*",
+    "#msw/*": "./msw/*",
     "#/*": "./src/*"
   },
   "scripts": {
@@ -16,12 +18,12 @@
     "gitleaks:install": "sh ./scripts/install-gitleaks.sh",
     "prek:patch-hook-path": "sh ./scripts/patch-precommit-hook-path.sh",
     "prek:install": "yarn gitleaks:install && prek install && yarn prek:patch-hook-path",
-    "dev": "op run --env-file=.env -- npx tsx scripts/dev-server-with-msw.ts",
+    "dev": "op run --env-file=.env -- npx tsx msw/dev-server-with-msw.ts",
     "dev:watch": "op run --env-file=.env -- yarn watch",
     "dev:docker": "./docker/compose/up mock-issuer",
     "dev:docker:entra": "./docker/compose/up entra",
-    "watch": "yarn build && concurrently \"tsc --watch\" \"node public/esbuild/esbuild.js --watch\" \"nodemon --exec 'npx tsx scripts/dev-server-with-msw.ts'\"",
-    "build": "yarn clean && tsc && node public/esbuild/esbuild.js",
+    "watch": "yarn build && concurrently \"tsc --watch\" \"node public/esbuild/esbuild.js --watch\" \"nodemon --exec 'npx tsx msw/dev-server-with-msw.ts'\"",
+    "build": "yarn clean && tsc -p tsconfig.build.json && node public/esbuild/esbuild.js",
     "clean": "rimraf public",
     "lint": "yarn eslint .",
     "lint:fix": "yarn eslint . --fix",
