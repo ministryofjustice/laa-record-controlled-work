@@ -1,7 +1,7 @@
 MOCHA := ./node_modules/.bin/mocha
-PLAYWRIGHT := yarn playwright test --config=tests/playwright/playwright.config.ts
+PLAYWRIGHT := yarn playwright test --config=tests/ui/playwright.config.ts
 
-.PHONY: unit integration e2e run-tests
+.PHONY: unit integration ui run-tests
 
 # Run tests from a specified directory and optional file.
 #
@@ -40,7 +40,7 @@ unit:
 ifdef file
 	@$(MAKE) run-tests directory=tests/unit file=$(file) runner=$(MOCHA)
 else
-	yarn unit
+	yarn test:unit
 endif
 
 # Run integration tests.
@@ -54,19 +54,19 @@ integration:
 ifdef file
 	@$(MAKE) run-tests directory=tests/integration file=$(file) runner=$(MOCHA)
 else
-	yarn integration
+	yarn test:integration
 endif
 
-# Run e2e tests.
+# Run UI tests (single-service browser tests with MSW mocks).
 #
 # Usage:
-#   make e2e                                          - run all e2e tests
-#   make e2e file=create-application                  - run a specific test by filename (with or without .spec.ts)
-#   make e2e file=journeys/create-application         - When multiple files share the same name
+#   make ui                                           - run all UI tests
+#   make ui file=create-application                   - run a specific test by filename (with or without .spec.ts)
+#   make ui file=journeys/create-application          - When multiple files share the same name
 
-e2e:
+ui:
 ifdef file
-	@$(MAKE) run-tests directory=tests/playwright file=$(file) "runner=$(PLAYWRIGHT)"
+	@$(MAKE) run-tests directory=tests/ui file=$(file) "runner=$(PLAYWRIGHT)"
 else
-	yarn e2e
+	yarn test:ui
 endif

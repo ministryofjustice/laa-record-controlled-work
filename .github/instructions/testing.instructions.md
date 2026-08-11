@@ -5,7 +5,7 @@ applyTo: "tests/**"
 ## Frameworks
 
 - **Unit**: Mocha + TSX; assertions via Chai (`expect`); HTTP testing via Supertest; stubs/spies via Sinon
-- **E2E**: Playwright (`tests/playwright/`)
+- **UI**: Playwright (`tests/ui/`)
 - **Integration**: Mocha (`tests/integration/`)
 
 ## Conventions
