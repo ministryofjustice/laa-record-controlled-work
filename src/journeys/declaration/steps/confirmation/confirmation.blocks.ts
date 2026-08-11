@@ -1,15 +1,24 @@
+import { Data, Format } from "@ministryofjustice/hmpps-forge/core/authoring";
 import {
   GovUKBody,
-  GovUKHeading,
-  GovUKWarningText,
   GovUKButton,
   GovUKButtonGroup,
+  GovUKHeading,
+  GovUKWarningText,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
-import { i18next, t } from "#/lib/i18n.js";
-import { H1 } from "#/lib/constants/headings.js";
-import { Data, Format } from "@ministryofjustice/hmpps-forge/core/authoring";
-import { CONTEXT_DATA_KEYS, CLIENT_DETAILS_DATA_KEYS } from "#/journeys/journey.constants.js";
 
+import {
+  CLIENT_DETAILS_DATA_KEYS,
+  CONTEXT_DATA_KEYS,
+} from "#/journeys/journey.constants.js";
+import { H1 } from "#/lib/constants/headings.js";
+import { i18next, t } from "#/lib/i18n.js";
+
+/**
+ *
+ * @param key
+ * @param classes
+ */
 function textListHtml(key: string, classes: string): string {
   const items = i18next.t(key, { returnObjects: true });
 
@@ -33,8 +42,8 @@ function textListHtml(key: string, classes: string): string {
 
 export const declarationHeading = () =>
   GovUKHeading({
-    text: t("journeys.declaration.confirm.title"),
     level: H1,
+    text: t("journeys.declaration.confirm.title"),
   });
 
 export const declarationBody = () =>
@@ -53,17 +62,17 @@ export const declarationWarning = () =>
 
 export const declarationButtonGroup = () =>
   GovUKButtonGroup({
-  buttons: [
-    GovUKButton({
-      text: t("journeys.declaration.confirm.confirmButton"),
-      buttonType: "submit",
-      value: "continue",
-    }),
-    GovUKButton({
-      text: t("common.saveAndReturn"),
-      classes: "govuk-button--secondary",
-      buttonType: "submit",
-      value: "return",
-    }),
-  ],
-});
+    buttons: [
+      GovUKButton({
+        buttonType: "submit",
+        text: t("journeys.declaration.confirm.confirmButton"),
+        value: "continue",
+      }),
+      GovUKButton({
+        buttonType: "submit",
+        classes: "govuk-button--secondary",
+        text: t("common.saveAndReturn"),
+        value: "return",
+      }),
+    ],
+  });

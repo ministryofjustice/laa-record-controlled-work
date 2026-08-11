@@ -6,17 +6,19 @@ import {
   submit,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
-import { t } from "#/lib/i18n.js";
-import { backLink, caption } from "#/journeys/declaration/declaration.blocks.js";
+import {
+  backLink,
+  caption,
+} from "#/journeys/declaration/declaration.blocks.js";
 import {
   declarationBody,
   declarationButtonGroup,
   declarationHeading,
   declarationWarning,
 } from "#/journeys/declaration/steps/confirmation/confirmation.blocks.js";
+import { t } from "#/lib/i18n.js";
 
-export const confirmStep = (
-): ReturnType<typeof step> =>
+export const confirmStep = (): ReturnType<typeof step> =>
   step({
     blocks: [
       backLink("/cases/new/task-list"),
@@ -28,7 +30,6 @@ export const confirmStep = (
     ],
     onSubmission: [
       submit({
-        when: Post("action").match(Condition.Equals("continue")),
         onValid: {
           next: [
             redirect({
@@ -36,9 +37,9 @@ export const confirmStep = (
             }),
           ],
         },
+        when: Post("action").match(Condition.Equals("continue")),
       }),
       submit({
-        when: Post("action").match(Condition.Equals("return")),
         onValid: {
           next: [
             redirect({
@@ -46,6 +47,7 @@ export const confirmStep = (
             }),
           ],
         },
+        when: Post("action").match(Condition.Equals("return")),
       }),
     ],
     path: "/confirm",
