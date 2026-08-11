@@ -26,7 +26,6 @@ export const E2E_CONFIG = {
 export default defineConfig({
   forbidOnly: Boolean(process.env.CI ?? false),
   fullyParallel: false,
-  globalSetup: "./setup.ts",
   grep: /@e2e/,
   projects: [
     {
