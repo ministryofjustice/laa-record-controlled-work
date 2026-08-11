@@ -7,6 +7,8 @@ import {
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 import { i18next, t } from "#/lib/i18n.js";
 import { H1 } from "#/lib/constants/headings.js";
+import { Data, Format } from "@ministryofjustice/hmpps-forge/core/authoring";
+import { CONTEXT_DATA_KEYS, CLIENT_DETAILS_DATA_KEYS } from "#/journeys/journey.constants.js";
 
 function textListHtml(key: string, classes: string): string {
   const items = i18next.t(key, { returnObjects: true });
@@ -22,6 +24,12 @@ function textListHtml(key: string, classes: string): string {
 
   return `<ul class="${classes}">${listItems}</ul>`;
 }
+
+// const clientName = Format(
+//   "%1 %2",
+//   Data(CONTEXT_DATA_KEYS.application).path(CLIENT_DETAILS_DATA_KEYS.firstName),
+//   Data(CONTEXT_DATA_KEYS.application).path(CLIENT_DETAILS_DATA_KEYS.lastName),
+// );
 
 export const declarationHeading = () =>
   GovUKHeading({
