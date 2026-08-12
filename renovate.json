@@ -19,6 +19,12 @@
       "groupName": "playwright"
     },
     {
+      "description": "Group Node.js packages together to reduce PR noise",
+      "matchdepNames": ["node"],
+      "matchManagers": ["npm", "nvm", "mise", "dockerfile", "docker-compose"],
+      "groupName": "Node.js"
+    },
+    {
       "description": "Automerge patch and minor updates to reduce noise",
       "matchUpdateTypes": ["patch", "minor"],
       "minimumReleaseAge": "7 days",
