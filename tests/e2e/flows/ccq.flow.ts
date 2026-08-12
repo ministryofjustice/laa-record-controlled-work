@@ -2,7 +2,7 @@ import type { Page } from "@playwright/test";
 
 import { expect } from "@playwright/test";
 
-import { isTaskListPath } from "./task-list.flow.js";
+import { isTaskListPath } from "#tests/e2e/flows/task-list.flow.js";
 
 const FLOW_TIMEOUT_MS = 30000;
 const MAX_STEPS = 20;

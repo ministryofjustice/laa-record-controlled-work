@@ -17,7 +17,8 @@
     "paths": {
       "#orval/*": ["./orval/*"],
       "#msw/*": ["./msw/*"],
-      "#/*": ["./src/*"]
+      "#/*": ["./src/*"],
+      "#tests/*": ["./tests/*"]
     }
   },
   "include": [

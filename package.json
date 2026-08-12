@@ -10,7 +10,8 @@
   "imports": {
     "#orval/*": "./orval/*",
     "#msw/*": "./msw/*",
-    "#/*": "./src/*"
+    "#/*": "./src/*",
+    "#tests/*": "./tests/*"
   },
   "scripts": {
     "postinstall": "[ -n \"${CI:-}\" ] || [ -n \"${DOCKER:-}\" ] || yarn prek:install",

@@ -2,8 +2,8 @@ import type { Page } from "@playwright/test";
 
 import { expect } from "@playwright/test";
 
-import { pagePathname } from "./auth.flow.js";
-import { CASE_LIST_URL_PATTERN } from "./case-list.flow.js";
+import { pagePathname } from "#tests/e2e/flows/auth.flow.js";
+import { CASE_LIST_URL_PATTERN } from "#tests/e2e/flows/case-list.flow.js";
 
 export const selectOfficeByCode = async (
   page: Page,

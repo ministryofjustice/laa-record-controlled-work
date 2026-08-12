@@ -5,7 +5,7 @@ import { expect } from "@playwright/test";
 import {
   extractApplicationIdFromTaskListPath,
   isTaskListPath,
-} from "./task-list.flow.js";
+} from "#tests/e2e/flows/task-list.flow.js";
 
 export const CASE_LIST_URL_PATTERN = new RegExp("/cases$");
 

@@ -10,8 +10,8 @@ import {
   type Actor,
   type ActorFixtures,
   createActor,
-} from "./fixtures/actor.fixture.js";
-import { AUTH_MODE, signInWithMockOAuth } from "./flows/auth.flow.js";
+} from "#tests/e2e/fixtures/actor.fixture.js";
+import { AUTH_MODE, signInWithMockOAuth } from "#tests/e2e/flows/auth.flow.js";
 
 interface HarnessFixtures extends ActorFixtures {}
 

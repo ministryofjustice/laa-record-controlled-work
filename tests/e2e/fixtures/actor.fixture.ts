@@ -1,24 +1,24 @@
 import type { Page } from "@playwright/test";
 
-import { assertTaskStatus } from "../assertions/task-list.assert.js";
-import { signIn } from "../flows/auth.flow.js";
+import { assertTaskStatus } from "#tests/e2e/assertions/task-list.assert.js";
+import { signIn } from "#tests/e2e/flows/auth.flow.js";
 import {
   assertInProgressCaseVisible,
   gotoCase,
   gotoCaseList,
   openDraftCaseFromCaseList,
-} from "../flows/case-list.flow.js";
-import { completeCcqShortestEligiblePath } from "../flows/ccq.flow.js";
+} from "#tests/e2e/flows/case-list.flow.js";
+import { completeCcqShortestEligiblePath } from "#tests/e2e/flows/ccq.flow.js";
 import {
   completeCreateCaseShortestPath,
   startNewCase,
-} from "../flows/create-case.flow.js";
+} from "#tests/e2e/flows/create-case.flow.js";
 import {
   completeEvidenceNoPath,
   completeEvidenceYesPath,
-} from "../flows/evidence.flow.js";
-import { selectOfficeByCode } from "../flows/office.flow.js";
-import { openMeansAssessmentFromTaskList } from "../flows/task-list.flow.js";
+} from "#tests/e2e/flows/evidence.flow.js";
+import { selectOfficeByCode } from "#tests/e2e/flows/office.flow.js";
+import { openMeansAssessmentFromTaskList } from "#tests/e2e/flows/task-list.flow.js";
 
 export interface Actor {
   assertInProgressCaseVisible: (clientName: string) => Promise<void>;

@@ -4,14 +4,14 @@ import {
   createBrowserContext,
   expect,
   test,
-} from "../../playwright.harness.js";
+} from "#tests/e2e/playwright.harness.js";
 import {
   signInWithMultiOffice,
   signInWithSingleOffice,
-} from "../../flows/auth.flow.js";
-import { CASE_LIST_URL_PATTERN } from "../../flows/case-list.flow.js";
-import { completeCreateCaseShortestPath } from "../../flows/create-case.flow.js";
-import { selectOfficeByCode } from "../../flows/office.flow.js";
+} from "#tests/e2e/flows/auth.flow.js";
+import { CASE_LIST_URL_PATTERN } from "#tests/e2e/flows/case-list.flow.js";
+import { completeCreateCaseShortestPath } from "#tests/e2e/flows/create-case.flow.js";
+import { selectOfficeByCode } from "#tests/e2e/flows/office.flow.js";
 
 const SELECT_OFFICE_URL_PATTERN = new RegExp("/select-office/?$");
 const LANDING_URL_PATTERN = new RegExp("/$");

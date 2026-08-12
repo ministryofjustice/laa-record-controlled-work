@@ -5,7 +5,7 @@ import { expect } from "@playwright/test";
 import {
   extractApplicationIdFromTaskListPath,
   taskListUrlPattern,
-} from "./task-list.flow.js";
+} from "#tests/e2e/flows/task-list.flow.js";
 
 const clickContinue = async (page: Page): Promise<void> => {
   await page.getByRole("button", { name: "Continue" }).click();

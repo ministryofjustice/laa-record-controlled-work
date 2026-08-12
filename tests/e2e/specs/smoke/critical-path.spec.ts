@@ -6,9 +6,9 @@ import {
   type Actor,
   expect,
   test,
-} from "../../playwright.harness.js";
-import { CASE_LIST_URL_PATTERN } from "../../flows/case-list.flow.js";
-import { taskListUrlPattern } from "../../flows/task-list.flow.js";
+} from "#tests/e2e/playwright.harness.js";
+import { CASE_LIST_URL_PATTERN } from "#tests/e2e/flows/case-list.flow.js";
+import { taskListUrlPattern } from "#tests/e2e/flows/task-list.flow.js";
 
 const ROOT_OR_ENTRY_URL_PATTERN = new RegExp("/$|/(select-office|cases)$");
 
