@@ -86,7 +86,7 @@ describe("Select Office step", () => {
       }
     });
 
-      it("redirects straight to /cases when only one office is returned", async () => {
+      it("redirects straight to / when only one office is returned", async () => {
         const singleOfficeResponse = getGetAllProviderOfficesResponseMock({
           offices: [mockOffices[0]],
         });
@@ -96,7 +96,7 @@ describe("Select Office step", () => {
         });
         const result = await client.get("/select-office/", { session });
         expect(result.type).to.equal("redirect");
-        expect((result as TestRedirectResult).url).to.equal("/cases");
+        expect((result as TestRedirectResult).url).to.equal("/");
       });
   });
 
@@ -115,14 +115,14 @@ describe("Select Office step", () => {
       ).to.equal("Select the office you're recording cases from");
     });
 
-    it("redirects to /cases after a valid office is selected", async () => {
+    it("redirects to / after a valid office is selected", async () => {
       const result = await client.post("/select-office/", {
         session,
         body: { selectOffice: mockOffices[0].firmOfficeCode },
       });
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
-      expect(redirectResult.url).to.equal("/cases");
+      expect(redirectResult.url).to.equal("/");
     });
   });
 });

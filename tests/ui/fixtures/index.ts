@@ -81,7 +81,7 @@ export const test = base.extend<TestFixtures>({
     await page.goto("/select-office/");
     await page.getByRole("radio").first().check();
     await page.getByRole("button", { name: "Continue" }).click();
-    await expect(page).toHaveURL("/cases");
+    await expect(page).toHaveURL("/");
     await use(page);
   },
 });
