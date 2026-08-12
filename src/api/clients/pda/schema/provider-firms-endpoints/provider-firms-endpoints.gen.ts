@@ -4,9 +4,9 @@
  * Provider Details API r1
  * OpenAPI spec version: 0.27.2
  */
-import config from "#/config.js";
+import type { ProviderFirmOfficeListDto } from "#/api/clients/pda/model/providerFirmOfficeListDto.zod.gen.js";
 
-import type { ProviderFirmOfficeListDto } from "../../model/providerFirmOfficeListDto.zod.gen.js";
+import config from "#/config.js";
 
 export type getAllProviderOfficesResponse200 = {
   data: ProviderFirmOfficeListDto;

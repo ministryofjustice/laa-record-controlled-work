@@ -4,10 +4,10 @@
  * Provider Details API r1
  * OpenAPI spec version: 0.27.2
  */
+import type { ProviderFirmOfficeListDto } from "#/api/clients/pda/model/providerFirmOfficeListDto.zod.gen.js";
+
 import { HttpResponse, http } from "msw";
 import type { RequestHandlerOptions } from "msw";
-
-import type { ProviderFirmOfficeListDto } from "../../../../../src/api/clients/pda/model/providerFirmOfficeListDto.zod.gen.js";
 
 import { getGetAllProviderOfficesResponseMock } from "../../fakers/provider-firms-endpoints/provider-firms-endpoints.faker.gen.js";
 

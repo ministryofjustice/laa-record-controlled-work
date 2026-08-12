@@ -15,10 +15,6 @@ export const rcwConfig = {
     ],
   },
   input: {
-    filters: {
-      mode: "exclude" as const,
-      tags: ["items"],
-    },
     target: `https://raw.githubusercontent.com/ministryofjustice/laa-record-controlled-work-api/${RCW_API_SHA}/record-controlled-work-api/open-api-specification.yml`,
   },
   output: sharedOutputConfig("rcw", "config.api.rcw.baseUrl"),
