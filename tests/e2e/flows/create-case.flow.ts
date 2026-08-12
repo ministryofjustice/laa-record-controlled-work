@@ -2,7 +2,10 @@ import type { Page } from "@playwright/test";
 
 import { expect } from "@playwright/test";
 
-const APPLICATION_ID_CAPTURE_GROUP_INDEX = 1;
+import {
+  extractApplicationIdFromTaskListPath,
+  taskListUrlPattern,
+} from "./task-list.flow.js";
 
 const clickContinue = async (page: Page): Promise<void> => {
   await page.getByRole("button", { name: "Continue" }).click();
@@ -43,15 +46,15 @@ export const completeCreateCaseShortestPath = async (
   await clickContinue(page);
 
   await page.getByRole("button", { name: "Save and continue" }).click();
-  await expect(page).toHaveURL(/\/cases\/[^/]+\/task-list\/?$/);
+  await expect(page).toHaveURL(taskListUrlPattern());
 
-  const match = /\/cases\/([^/]+)\/task-list\/?$/.exec(
+  const applicationId = extractApplicationIdFromTaskListPath(
     new URL(page.url()).pathname,
   );
 
-  if (match === null) {
+  if (applicationId === undefined) {
     throw new Error("Failed to extract application ID from task-list URL");
   }
 
-  return match[APPLICATION_ID_CAPTURE_GROUP_INDEX];
+  return applicationId;
 };

@@ -3,10 +3,17 @@ import type { Page } from "@playwright/test";
 import { expect } from "@playwright/test";
 
 import { pagePathname } from "./auth.flow.js";
+import { CASE_LIST_URL_PATTERN } from "./case-list.flow.js";
 
-export const ensureOfficeSelected = async (page: Page): Promise<void> => {
+export const selectOfficeByCode = async (
+  page: Page,
+  code: string,
+): Promise<void> => {
   if (pagePathname(page.url()).startsWith("/select-office")) {
-    await page.getByRole("radio").first().check();
+    await page
+      .locator(".govuk-radios__item", { hasText: code })
+      .getByRole("radio")
+      .check();
     await page.getByRole("button", { name: "Continue" }).click();
   }
 
@@ -14,5 +21,13 @@ export const ensureOfficeSelected = async (page: Page): Promise<void> => {
     await page.goto("/cases");
   }
 
-  await expect(page).toHaveURL(/\/cases\/?$/);
+  if (pagePathname(page.url()).startsWith("/select-office")) {
+    await page
+      .locator(".govuk-radios__item", { hasText: code })
+      .getByRole("radio")
+      .check();
+    await page.getByRole("button", { name: "Continue" }).click();
+  }
+
+  await expect(page).toHaveURL(CASE_LIST_URL_PATTERN);
 };

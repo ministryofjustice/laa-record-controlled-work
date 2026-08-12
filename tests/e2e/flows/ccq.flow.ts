@@ -2,9 +2,14 @@ import type { Page } from "@playwright/test";
 
 import { expect } from "@playwright/test";
 
+import { isTaskListPath } from "./task-list.flow.js";
+
 const FLOW_TIMEOUT_MS = 30000;
 const MAX_STEPS = 20;
 const STEP_INCREMENT = 1;
+const LEADING_SLASH_TRIM_INDEX = 1;
+const STEP_START_INDEX = 0;
+const TRAILING_SLASH_TRIM_INDEX = -1;
 
 const waitForPathChange = async (
   page: Page,
@@ -22,20 +27,14 @@ export const completeCcqShortestEligiblePath = async (
   page: Page,
   applicationId: string,
 ): Promise<void> => {
-  const eligibilityRoot = `/cases/${applicationId}/eligibility/`;
-
-  await page.goto(eligibilityRoot);
+  const eligibilityRoot = `/cases/${applicationId}/eligibility`;
 
   // This journey is intentionally stepwise and depends on each page transition.
   /* eslint-disable no-await-in-loop -- Each step depends on prior page navigation completion. */
   for (let index = 0; index < MAX_STEPS; index += STEP_INCREMENT) {
     const { pathname } = new URL(page.url());
 
-    if (pathname === `/cases/${applicationId}/task-list`) {
-      return;
-    }
-
-    if (pathname === `/cases/${applicationId}/task-list/`) {
+    if (isTaskListPath(pathname, applicationId)) {
       return;
     }
 
@@ -46,7 +45,15 @@ export const completeCcqShortestEligiblePath = async (
     }
 
     const previousPath = pathname;
-    const step = pathname.slice(eligibilityRoot.length).replace(/\/$/, "");
+    let step = pathname.slice(eligibilityRoot.length);
+
+    if (step.startsWith("/")) {
+      step = step.slice(LEADING_SLASH_TRIM_INDEX);
+    }
+
+    if (step.endsWith("/")) {
+      step = step.slice(STEP_START_INDEX, TRAILING_SLASH_TRIM_INDEX);
+    }
 
     switch (step) {
       case "": {

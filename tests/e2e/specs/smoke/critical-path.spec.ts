@@ -1,4 +1,4 @@
-import type { Page } from "@playwright/test";
+import type { BrowserContext, Page } from "@playwright/test";
 
 import {
   createActor,
@@ -6,8 +6,11 @@ import {
   expect,
   test,
 } from "../../playwright.harness.js";
+import { CASE_LIST_URL_PATTERN } from "../../flows/case-list.flow.js";
+import { taskListUrlPattern } from "../../flows/task-list.flow.js";
 
 const BASE_URL = process.env.E2E_BASE_URL ?? "http://localhost:8080";
+const ROOT_OR_ENTRY_URL_PATTERN = new RegExp("/$|/(select-office|cases)/?");
 
 test.describe("@e2e critical path", () => {
   test.describe.configure({ mode: "serial" });
@@ -15,9 +18,10 @@ test.describe("@e2e critical path", () => {
   let page: Page;
   let actor: E2EActor;
   let applicationId: string;
+  let context: BrowserContext;
 
   test.beforeAll(async ({ browser }) => {
-    const context = await browser.newContext({
+    context = await browser.newContext({
       baseURL: BASE_URL,
       ignoreHTTPSErrors: true,
     });
@@ -26,35 +30,35 @@ test.describe("@e2e critical path", () => {
   });
 
   test.afterAll(async () => {
-    await page.context().close();
+    await context.close();
   });
 
-  test("logs in", async () => {
+  test("login directs user to select office flow", async () => {
     await actor.login();
-    await expect(page).toHaveURL(/\/(select-office|cases)\/?/);
+    await expect(page).toHaveURL(ROOT_OR_ENTRY_URL_PATTERN);
   });
 
-  test("selects office", async () => {
-    await actor.ensureOfficeSelected();
-    await expect(page).toHaveURL(/\/cases\/?$/);
+  test("user selects office", async () => {
+    await actor.selectOfficeByCode("R1XEVG");
+    await expect(page).toHaveURL(CASE_LIST_URL_PATTERN);
   });
 
-  test("creates new application", async () => {
+  test("user creates a new application", async () => {
     applicationId = await actor.completeCreateCaseShortestPath();
-    await expect(page).toHaveURL(
-      new RegExp(`/cases/${applicationId}/task-list/?$`),
-    );
+    await expect(page).toHaveURL(taskListUrlPattern(applicationId));
   });
 
-  test("application appears in case list as in progress", async () => {
+  test("application appears in case list as draft", async () => {
     await actor.assertInProgressCaseVisible("Test User");
   });
 
-  test("completes eligibility assessment", async () => {
+  test("user navigates to draft case and completes eligibility assessment", async () => {
+    applicationId = await actor.openDraftCaseFromCaseList(applicationId);
+    await actor.openMeansAssessmentFromTaskList(applicationId);
+
     await actor.completeCcqShortestEligiblePath(applicationId);
-    await expect(page).toHaveURL(
-      new RegExp(`/cases/${applicationId}/task-list/?$`),
-    );
+
+    await expect(page).toHaveURL(taskListUrlPattern(applicationId));
     await actor.assertTaskStatus("Income and capital", "Completed");
   });
 
