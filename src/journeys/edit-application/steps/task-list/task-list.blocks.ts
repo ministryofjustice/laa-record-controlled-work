@@ -6,7 +6,6 @@ import type {
 import {
   Data,
   Format,
-  Literal,
   Params,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 import {
@@ -21,7 +20,6 @@ import {
   CONTEXT_DATA_KEYS,
   PARAMS_KEYS,
 } from "#/journeys/journey.constants.js";
-import { Status } from "#/journeys/journey.types.js";
 import { H2 } from "#/lib/constants/headings.js";
 import { t } from "#/lib/i18n.js";
 
@@ -75,7 +73,7 @@ export function taskList(): BlockDefinition[] {
             "journeys.createApplication.taskList.meansAssessment.taskItem.label",
           ),
           Format("/cases/%1/eligibility/", Params(PARAMS_KEYS.applicationID)),
-          Literal(Status.INCOMPLETE),
+          Data(CONTEXT_DATA_KEYS.meansAssessment),
         ),
       ],
     }),
