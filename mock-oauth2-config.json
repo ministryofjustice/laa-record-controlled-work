@@ -17,11 +17,34 @@
       "requestMappings": [
         {
           "requestParam": "grant_type",
+          "match": "authorization_code",
+          "claims": {
+            "LAA_ACCOUNTS": ["R1XEVG", "VGHVEY", "3TVRNM"],
+            "FIRM_CODE": "123456"
+          }
+        },
+        {
+          "requestParam": "grant_type",
+          "match": "refresh_token",
+          "claims": {
+            "LAA_ACCOUNTS": ["R1XEVG", "VGHVEY", "3TVRNM"],
+            "FIRM_CODE": "123456"
+          }
+        }
+      ]
+    },
+    {
+      "issuerId": "default",
+      "tokenExpiry": 3600,
+      "requestMappings": [
+        {
+          "requestParam": "grant_type",
           "match": "urn:ietf:params:oauth:grant-type:jwt-bearer",
           "claims": {
             "aud": "default",
             "scp": "DataStore.Access",
-            "FIRM_CODE": "123456"
+            "FIRM_CODE": "123456",
+            "LAA_ACCOUNTS": ["R1XEVG", "VGHVEY", "3TVRNM"]
           }
         }
       ]

@@ -4,6 +4,8 @@ import type { ProviderFirmOfficeListDto } from "#/api/clients/pda/model/provider
 
 import { getGetAllProviderOfficesResponseMock } from "#orval/mocks/pda/msw/provider-firms-endpoints/provider-firms-endpoints.msw.gen.js";
 
+// if you change this, make sure you update the office codes in LAA_ACCOUNTS in
+// mock-oauth2-config.json and mock-oauth2-login.html
 // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- actually magic
 faker.seed(12345);
 
