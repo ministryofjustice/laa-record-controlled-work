@@ -20,8 +20,9 @@
     },
     {
       "description": "Group Node.js packages together to reduce PR noise",
-      "matchdepNames": ["node"],
-      "matchManagers": ["npm", "nvm", "mise", "dockerfile", "docker-compose"],
+      "matchDepNames": ["node"],
+      "matchManagers": ["npm", "nvm", "mise", "dockerfile"],
+      "minimumGroupSize": 4,
       "groupName": "Node.js"
     },
     {
