@@ -44,6 +44,7 @@ jobs:
         env:
           DOCKER_BUILDKIT: "1"
           COMPOSE_DOCKER_CLI_BUILD: "1"
+          COMPOSE_BAKE: "true"
           GITHUB_TOKEN: ${{ github.token }}
           PDA_API_KEY: ci-placeholder
 
