@@ -44,9 +44,8 @@ export const createAuthLimiter = (config: Config): RequestHandler =>
     ? (_req, _res, next) => {
         next();
       }
-    :
-  rateLimit({
-    max: toNumber(config.app.rateLimit.authMax),
-    message: "Too many attempts, please try again later.",
-    windowMs: toNumber(config.app.rateLimit.windowMs),
-  });
+    : rateLimit({
+        max: toNumber(config.app.rateLimit.authMax),
+        message: "Too many attempts, please try again later.",
+        windowMs: toNumber(config.app.rateLimit.windowMs),
+      });
