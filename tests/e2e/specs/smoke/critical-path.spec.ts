@@ -10,7 +10,7 @@ import { CASE_LIST_URL_PATTERN } from "../../flows/case-list.flow.js";
 import { taskListUrlPattern } from "../../flows/task-list.flow.js";
 
 const BASE_URL = process.env.E2E_BASE_URL ?? "http://localhost:8080";
-const ROOT_OR_ENTRY_URL_PATTERN = new RegExp("/$|/(select-office|cases)/?");
+const ROOT_OR_ENTRY_URL_PATTERN = new RegExp("/$|/(select-office|cases)$");
 
 test.describe("@e2e critical path", () => {
   test.describe.configure({ mode: "serial" });

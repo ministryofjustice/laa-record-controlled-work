@@ -7,10 +7,10 @@ import {
   isTaskListPath,
 } from "./task-list.flow.js";
 
-export const CASE_LIST_URL_PATTERN = new RegExp("/cases/?$");
+export const CASE_LIST_URL_PATTERN = new RegExp("/cases$");
 
 export const isCaseListPath = (pathname: string): boolean =>
-  pathname === "/cases" || pathname === "/cases/";
+  pathname === "/cases";
 
 export const gotoCaseList = async (page: Page): Promise<void> => {
   await page.goto("/cases");
@@ -48,9 +48,7 @@ export const openDraftCaseFromCaseList = async (
   await page.getByRole("link", { name: "In progress" }).click();
 
   const draftCaseLink = page
-    .locator(
-      `a[href='/cases/${applicationId}/task-list/'], a[href='/cases/${applicationId}/task-list']`,
-    )
+    .locator(`a[href='/cases/${applicationId}/task-list']`)
     .first();
 
   await expect(draftCaseLink).toBeVisible();

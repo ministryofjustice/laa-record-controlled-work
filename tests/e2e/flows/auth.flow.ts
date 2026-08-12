@@ -5,12 +5,7 @@ import { expect } from "@playwright/test";
 const MOCK_OAUTH_SIGNIN_PATH = "https://localhost:9090/default/authorize";
 const MOCK_USERNAME = process.env.E2E_MOCK_USERNAME ?? "test.user@example.com";
 const SIGN_IN_TIMEOUT_MS = 30000;
-const RCW_ENTRY_PATHS = new Set([
-  "/cases",
-  "/cases/",
-  "/select-office",
-  "/select-office/",
-]);
+const RCW_ENTRY_PATHS = new Set(["/cases", "/select-office"]);
 
 export const pagePathname = (urlString: string): string =>
   new URL(urlString).pathname;
