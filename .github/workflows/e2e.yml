@@ -10,7 +10,7 @@ on:
 
 jobs:
   e2e:
-    name: Tests
+    name: End-to-end
     timeout-minutes: 30
     runs-on: ubuntu-latest
     permissions:
