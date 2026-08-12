@@ -1,33 +1,39 @@
-import type { BrowserContext } from "@playwright/test";
+import type {
+  Browser,
+  BrowserContext,
+  BrowserContextOptions,
+} from "@playwright/test";
 
 import { test as base, expect } from "@playwright/test";
 
 import {
+  type Actor,
   type ActorFixtures,
   createActor,
-  type E2EActor,
 } from "./fixtures/actor.fixture.js";
-import { signInWithMockOAuth } from "./flows/auth.flow.js";
-
-const AUTH_MODE = (process.env.E2E_AUTH_MODE ?? "mock").toLowerCase();
+import { AUTH_MODE, signInWithMockOAuth } from "./flows/auth.flow.js";
 
 interface HarnessFixtures extends ActorFixtures {}
 
 interface HarnessWorkerFixtures {
-  authStorageState: Awaited<ReturnType<BrowserContext["storageState"]>>;
+  authStorageState?: BrowserContextOptions["storageState"];
 }
 
 const BASE_URL = process.env.E2E_BASE_URL ?? "http://localhost:8080";
-
-const assertMockAuthMode = (): void => {
-  if (AUTH_MODE !== "mock") {
-    throw new Error(
-      "Unsupported E2E_AUTH_MODE " +
-        `'${AUTH_MODE}' in playwright harness. ` +
-        "Only 'mock' is implemented for Phase 2.",
-    );
-  }
+const AUTH_STORAGE_STATE_PATH = process.env.E2E_AUTH_STORAGE_STATE_PATH;
+const CONTEXT_OPTIONS: BrowserContextOptions = {
+  baseURL: BASE_URL,
+  ignoreHTTPSErrors: true,
 };
+
+export const createBrowserContext = async (
+  browser: Browser,
+  options: BrowserContextOptions = {},
+): Promise<BrowserContext> =>
+  await browser.newContext({
+    ...CONTEXT_OPTIONS,
+    ...options,
+  });
 
 export const test = base.extend<HarnessFixtures, HarnessWorkerFixtures>({
   actor: async ({ page }, use): Promise<void> => {
@@ -36,12 +42,17 @@ export const test = base.extend<HarnessFixtures, HarnessWorkerFixtures>({
 
   authStorageState: [
     async ({ browser }, use): Promise<void> => {
-      assertMockAuthMode();
+      if (AUTH_STORAGE_STATE_PATH !== undefined) {
+        await use(AUTH_STORAGE_STATE_PATH);
+        return;
+      }
 
-      const authContext = await browser.newContext({
-        baseURL: BASE_URL,
-        ignoreHTTPSErrors: true,
-      });
+      if (AUTH_MODE !== "mock") {
+        await use(undefined);
+        return;
+      }
+
+      const authContext = await createBrowserContext(browser);
       const authPage = await authContext.newPage();
 
       await signInWithMockOAuth(authPage);
@@ -55,11 +66,10 @@ export const test = base.extend<HarnessFixtures, HarnessWorkerFixtures>({
   ],
 
   context: async ({ authStorageState, browser }, use): Promise<void> => {
-    const context = await browser.newContext({
-      baseURL: BASE_URL,
-      ignoreHTTPSErrors: true,
-      storageState: authStorageState,
-    });
+    const context = await createBrowserContext(
+      browser,
+      authStorageState === undefined ? {} : { storageState: authStorageState },
+    );
 
     await use(context);
     await context.close();
@@ -72,5 +82,5 @@ export const test = base.extend<HarnessFixtures, HarnessWorkerFixtures>({
   },
 });
 
-export type { E2EActor };
+export type { Actor };
 export { createActor, expect };

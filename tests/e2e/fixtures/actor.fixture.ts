@@ -1,7 +1,7 @@
 import type { Page } from "@playwright/test";
 
 import { assertTaskStatus } from "../assertions/task-list.assert.js";
-import { signInWithMockOAuth } from "../flows/auth.flow.js";
+import { signIn } from "../flows/auth.flow.js";
 import {
   assertInProgressCaseVisible,
   gotoCase,
@@ -20,7 +20,7 @@ import {
 import { selectOfficeByCode } from "../flows/office.flow.js";
 import { openMeansAssessmentFromTaskList } from "../flows/task-list.flow.js";
 
-export interface E2EActor {
+export interface Actor {
   assertInProgressCaseVisible: (clientName: string) => Promise<void>;
   assertTaskStatus: (taskName: string, expectedStatus: string) => Promise<void>;
   completeCcqShortestEligiblePath: (applicationId: string) => Promise<void>;
@@ -37,10 +37,10 @@ export interface E2EActor {
 }
 
 interface ActorFixtures {
-  actor: E2EActor;
+  actor: Actor;
 }
 
-export const createActor = (page: Page): E2EActor => ({
+export const createActor = (page: Page): Actor => ({
   assertInProgressCaseVisible: async (clientName: string) => {
     await assertInProgressCaseVisible(page, clientName);
   },
@@ -65,7 +65,7 @@ export const createActor = (page: Page): E2EActor => ({
     await gotoCaseList(page);
   },
   login: async () => {
-    await signInWithMockOAuth(page);
+    await signIn(page);
   },
   openDraftCaseFromCaseList: async (applicationId: string) => {
     return await openDraftCaseFromCaseList(page, applicationId);

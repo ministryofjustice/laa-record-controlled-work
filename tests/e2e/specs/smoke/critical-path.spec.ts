@@ -1,30 +1,27 @@
 import type { BrowserContext, Page } from "@playwright/test";
 
 import {
+  createBrowserContext,
   createActor,
-  type E2EActor,
+  type Actor,
   expect,
   test,
 } from "../../playwright.harness.js";
 import { CASE_LIST_URL_PATTERN } from "../../flows/case-list.flow.js";
 import { taskListUrlPattern } from "../../flows/task-list.flow.js";
 
-const BASE_URL = process.env.E2E_BASE_URL ?? "http://localhost:8080";
 const ROOT_OR_ENTRY_URL_PATTERN = new RegExp("/$|/(select-office|cases)$");
 
 test.describe("@e2e critical path", () => {
   test.describe.configure({ mode: "serial" });
 
   let page: Page;
-  let actor: E2EActor;
+  let actor: Actor;
   let applicationId: string;
   let context: BrowserContext;
 
   test.beforeAll(async ({ browser }) => {
-    context = await browser.newContext({
-      baseURL: BASE_URL,
-      ignoreHTTPSErrors: true,
-    });
+    context = await createBrowserContext(browser);
     page = await context.newPage();
     actor = createActor(page);
   });

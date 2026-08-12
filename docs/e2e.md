@@ -58,12 +58,34 @@ Environment variables:
 | `E2E_BASE_URL` | `http://localhost:8080` | Base URL for the app under test |
 | `E2E_AUTH_MODE` | `mock` | `mock` (mock-oauth2-server) or `entra` (real Entra, not yet implemented) |
 | `E2E_MOCK_USERNAME` | `test.user@example.com` | Username submitted on the mock sign-in form |
+| `E2E_AUTH_STORAGE_STATE_PATH` | unset | Optional Playwright storage-state file path for pre-authenticated non-mock runs |
 
 ## Authentication
 
 In `mock` mode the harness authenticates once per Playwright worker (not per test) by navigating to `/auth/signin`, submitting the mock sign-in form, and storing the resulting session cookies as `storageState`. Each test context is then created with that pre-authenticated storage state, so tests start already signed in.
 
 The mock sign-in form is served by the mock OAuth2 server container at `https://localhost:9090`.
+
+### Auth mode abstraction
+
+Specs should call the mode-aware helpers in `tests/e2e/flows/auth.flow.ts`:
+
+- `signIn(page)`
+- `signInWithSingleOffice(page, officeCode)`
+- `signInWithMultiOffice(page, officeCodes)`
+
+These route to mock OAuth implementations when `E2E_AUTH_MODE=mock`.
+For non-mock modes, `signInWithSingleOffice` and `signInWithMultiOffice`
+are currently explicit stubs and will be implemented later.
+
+### Non-mock/deployed preparation
+
+The Playwright harness can now run without mock pre-authentication:
+
+- When `E2E_AUTH_STORAGE_STATE_PATH` is set, that storage state is used for all contexts.
+- When `E2E_AUTH_MODE` is non-mock and no storage state path is set, contexts are created unauthenticated.
+
+This keeps spec call-sites stable now, while allowing deployed auth to be implemented in-place later.
 
 ## MSW and the UI test suite
 
