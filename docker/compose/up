@@ -143,6 +143,9 @@ ENV_FILES+=(--env-file=.env)
 $ENTRA_MODE && ENV_FILES+=(--env-file=.env.entra)
 
 COMPOSE_FILES=(-f docker-compose.yml -f docker-compose.override.yml)
+if $CI_MODE; then
+  COMPOSE_FILES+=(-f docker-compose.ci.yml)
+fi
 $ENTRA_MODE && COMPOSE_FILES+=(-f docker-compose.entra.yml)
 
 if $CI_MODE; then
