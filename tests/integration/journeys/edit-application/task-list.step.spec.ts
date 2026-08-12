@@ -102,7 +102,7 @@ describe("Task list step", () => {
           getEvidenceAndDeclarationItems(lists);
         const declarationItem = evidenceAndDeclarationItems[1];
 
-        expect(declarationItem.href).to.equal("client-declaration-TODO");
+        expect(declarationItem.href).to.equal(`/cases/${uuid}/declaration/`);
         expect(declarationItem.status.text).to.equal("Completed");
         expect(declarationItem.status.tag).to.equal(null);
       });
@@ -134,7 +134,7 @@ describe("Task list step", () => {
           getEvidenceAndDeclarationItems(lists);
         const declarationItem = evidenceAndDeclarationItems[1];
 
-        expect(declarationItem.href).to.equal("client-declaration-TODO");
+        expect(declarationItem.href).to.equal(`/cases/${uuid}/declaration/`);
         expect(declarationItem.status.tag?.text).to.equal("Incomplete");
         expect(declarationItem.status.text).to.equal("");
       });
