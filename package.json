@@ -40,7 +40,7 @@
     "test": "yarn unit && yarn integration && yarn e2e"
   },
   "engines": {
-    "node": "26.6.0"
+    "node": "26.7.0"
   },
   "dependencies": {
     "@azure/msal-node": "^5.5.0",
