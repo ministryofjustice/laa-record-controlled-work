@@ -170,4 +170,49 @@ describe("loadOffices", () => {
       expect(getAllProviderOffices.notCalled).to.equal(true);
     }
   });
+
+  it("filters available offices to those in the LAA_ACCOUNTS claim", async () => {
+    getSession.returns({
+      account: {
+        idTokenClaims: {
+          FIRM_CODE,
+          LAA_ACCOUNTS: ["OFFICE-01"],
+        },
+      },
+    });
+    getAllProviderOffices.resolves({
+      data: {
+        firm: { firmName: "Acme Legal LLP" },
+        offices: [
+          { addressLine1: "1 High Street", city: "Leeds", postCode: "LS1 1AA", firmOfficeCode: "OFFICE-01" },
+          { addressLine1: "2 Low Street", city: "York", postCode: "YO1 1BB", firmOfficeCode: "OFFICE-02" },
+        ],
+      },
+      status: 200,
+    });
+
+    await loadOffices(deps)(context);
+
+    const [, offices] = setData.firstCall.args as [string, { code: string }[]];
+    expect(offices).to.have.length(1);
+    expect(offices[0].code).to.equal("OFFICE-01");
+  });
+
+  it("returns all offices when LAA_ACCOUNTS claim is absent", async () => {
+    getAllProviderOffices.resolves({
+      data: {
+        firm: { firmName: "Acme Legal LLP" },
+        offices: [
+          { addressLine1: "1 High Street", city: "Leeds", postCode: "LS1 1AA", firmOfficeCode: "OFFICE-01" },
+          { addressLine1: "2 Low Street", city: "York", postCode: "YO1 1BB", firmOfficeCode: "OFFICE-02" },
+        ],
+      },
+      status: 200,
+    });
+
+    await loadOffices(deps)(context);
+
+    const [, offices] = setData.firstCall.args as [string, { code: string }[]];
+    expect(offices).to.have.length(2);
+  });
 });

@@ -61,8 +61,12 @@ export const loadOffices =
       throw ApiValidationError.from(result.error);
     }
     const mappedOffices = mapAvailableOffices(result.data);
+    const laaAccounts = context.getSession()?.account?.idTokenClaims?.[ID_TOKEN_CLAIMS_KEYS.laaAccounts];
+    const availableOffices = Array.isArray(laaAccounts)
+      ? mappedOffices.filter((o) => (laaAccounts as string[]).includes(o.code))
+      : mappedOffices;
 
-    context.setData(CONTEXT_DATA_KEYS.availableOffices, mappedOffices);
+    context.setData(CONTEXT_DATA_KEYS.availableOffices, availableOffices);
   };
 
 /**
