@@ -99,7 +99,9 @@ export const completeCcqShortestEligiblePath = async (
       }
 
       case "client-assets": {
-        await page.getByLabel("Total money in bank account").first().fill("0");
+        await page
+          .getByRole("textbox", { name: "Total money in bank account" })
+          .fill("0");
 
         await page
           .locator(
@@ -114,6 +116,11 @@ export const completeCcqShortestEligiblePath = async (
           .check();
 
         await page.getByRole("button", { name: "Save and continue" }).click();
+        break;
+      }
+
+      case "complete": {
+        await page.goto(`/cases/${applicationId}/task-list`);
         break;
       }
 
