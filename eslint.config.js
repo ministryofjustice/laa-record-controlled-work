@@ -15,10 +15,14 @@ export default [
   // Global language options
   {
     name: "project/globals",
+    files: ["**/*.js", "**/*.ts", "**/*.tsx"],
     languageOptions: {
       ecmaVersion: "latest",
       globals: { ...globals.browser, ...globals.node },
       sourceType: "module",
+    },
+    rules: {
+      "prefer-regex-literals": "off",
     },
   },
   // Declaration files: relax strict TypeScript rules
