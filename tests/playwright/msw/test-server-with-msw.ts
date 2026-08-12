@@ -45,7 +45,7 @@ process.env.NODE_ENV = "test";
 process.env.PORT = TEST_PORT;
 process.env.SESSION_SECRET ??= "test-secret-key";
 process.env.SERVICE_NAME ??= "Test Express Template";
-process.env.RATE_LIMIT_MAX ??= "1000";
+process.env.RATE_LIMIT_MAX ??= "10000";
 
 const appModulePath = "../../../public/app.js";
 
