@@ -18,6 +18,8 @@ export default {
     "eslint.config.js", // Parsing error: not found by the project service
     "eslint/**", // ESLint config split files
     "coverage",
+    "playwright-report/**", // Generated Playwright HTML report assets
+    "test-results/**", // Generated Playwright run artifacts
     "tests/**/*.spec.ts", // Unit test specs (if any remain in tests/)
     "tests/ui/**/*.spec.ts",
     "tests/ui/fixtures/*",
