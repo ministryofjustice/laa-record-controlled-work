@@ -790,15 +790,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ministryofjustice/hmpps-forge@npm:^0.3.5":
-  version: 0.3.5
-  resolution: "@ministryofjustice/hmpps-forge@npm:0.3.5"
+"@ministryofjustice/hmpps-forge@npm:^0.3.6":
+  version: 0.3.6
+  resolution: "@ministryofjustice/hmpps-forge@npm:0.3.6"
   dependencies:
     express: "npm:^4.21.0 || ^5.0.0"
     nunjucks: "npm:^3.2.4"
     ws: "npm:^8.18.0"
     zod: "npm:^4.1.5"
-  checksum: 10c0/099f4bff58ad0b84e6a8216808b37aeaa4bcebec6e3a6b361a66bd7bf1b8ed85874f10d0f93805f1a7f7f3c75404a5977fcce5364aa7658e424e78f3006db44c
+  checksum: 10c0/a3e8f2a87331949be162a42d0785d77e6b50d81841384cf9625831198281ef672d076bf6ca4b4889cb1e896a937eca9e6f5fd7901bc2d5947f06b4257019d610
   languageName: node
   linkType: hard
 
@@ -5771,7 +5771,7 @@ __metadata:
     "@faker-js/faker": "npm:^10.5.0"
     "@j178/prek": "npm:^0.4.12"
     "@ministryofjustice/frontend": "npm:9.0.0"
-    "@ministryofjustice/hmpps-forge": "npm:^0.3.5"
+    "@ministryofjustice/hmpps-forge": "npm:^0.3.6"
     "@playwright/test": "npm:^1.62.1"
     "@types/chai": "npm:^5.2.3"
     "@types/chai-as-promised": "npm:^8.0.2"
