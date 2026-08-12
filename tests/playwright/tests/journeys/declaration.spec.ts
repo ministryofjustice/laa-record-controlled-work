@@ -1,5 +1,5 @@
 import { test, expect } from "../../fixtures/index.js";
-import { application } from "../../fixtures/rcw.fixtures.js";
+import { application } from "../../msw/fixtures/rcw.fixtures.js";
 
 test("Client Declaration - Client Declaration step", async ({ withSelectedOffice: page }) => {
     const applicationId = application.id;
