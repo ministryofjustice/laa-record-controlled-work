@@ -56,6 +56,7 @@ services:
       - RCW_API_MODE=api
       - RCW_API_BASE_URL=http://rcw-api:8081
       - PDA_API_MODE=msw
+      - PDA_API_KEY=${PDA_API_KEY:-default}
       - PDA_MSW_OFFICE_COUNT=${PDA_MSW_OFFICE_COUNT:-3}
       # Session cache
       - REDIS_ENABLED=true
@@ -67,9 +68,6 @@ services:
       - ENTRA_TENANT_ID=default
       - ENTRA_CLIENT_ID=rcw
       - ENTRA_CLIENT_SECRET=not-used-by-mock-oauth2-server
-      # secrets injected by 1Password CLI via .env
-      # op run --env-file=.env -- docker compose up -d
-      - PDA_API_KEY
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:3000/health || exit 1"]
       interval: 5s
