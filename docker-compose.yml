@@ -50,6 +50,7 @@ services:
       - .env # load from .env first
     environment: # set overrides
       - NODE_ENV=docker
+      - RATE_LIMIT_ENABLED=false
       - NODE_EXTRA_CA_CERTS=/etc/mock-oauth2-server.crt.pem
       # APIs
       - RCW_API_MODE=api

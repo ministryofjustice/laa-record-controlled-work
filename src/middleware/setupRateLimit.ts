@@ -20,6 +20,10 @@ const toNumber = (value: number | string): number =>
  * @param {Config} config - The configuration object containing rate limiting settings.
  */
 export const setupRateLimit = (app: Application, config: Config): void => {
+  if (!config.app.rateLimit.enabled) {
+    return;
+  }
+
   app.use(
     rateLimit({
       max: config.app.rateLimit.max,
@@ -36,6 +40,11 @@ export const setupRateLimit = (app: Application, config: Config): void => {
  * @returns {RequestHandler} An Express rate limiting middleware instance.
  */
 export const createAuthLimiter = (config: Config): RequestHandler =>
+  !config.app.rateLimit.enabled
+    ? (_req, _res, next) => {
+        next();
+      }
+    :
   rateLimit({
     max: toNumber(config.app.rateLimit.authMax),
     message: "Too many attempts, please try again later.",

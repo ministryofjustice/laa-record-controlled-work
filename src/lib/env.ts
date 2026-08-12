@@ -14,6 +14,11 @@ const optionalEnvSchema = z.object({
   PDA_API_MODE: z.enum(["msw", "api"]).optional(),
   PDA_MSW_OFFICE_COUNT: z.coerce.number().optional(),
   PORT: z.coerce.number().optional(),
+  RATE_LIMIT_ENABLED: z
+    .string()
+    .transform((value) => value.toLowerCase())
+    .pipe(z.enum(["true", "false"]))
+    .optional(),
   RATE_LIMIT_MAX: z.coerce.number().optional(),
   RATE_WINDOW_MS: z.coerce.number().optional(),
   RATELIMIT_HEADERS_ENABLED: z.string().optional(),
