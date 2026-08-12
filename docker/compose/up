@@ -86,7 +86,11 @@ clone_if_missing() {
   require_confirm "Run 'git clone $url $dir'?"
   # Remove a partial clone if this is interrupted, so re-running this script retries cleanly.
   trap 'rm -rf "$dir"' INT TERM
-  git clone "$url" "$dir"
+  if $CI_MODE; then
+    git clone --depth 1 --single-branch "$url" "$dir"
+  else
+    git clone "$url" "$dir"
+  fi
   trap - INT TERM
 }
 
@@ -117,7 +121,7 @@ if $ENTRA_MODE; then
 fi
 
 # docker-compose.embedded.yml sets pull_policy: never - build the image locally if missing.
-if ! docker image inspect laa-check-client-qualifies:latest >/dev/null 2>&1; then
+if ! $CI_MODE && ! docker image inspect laa-check-client-qualifies:latest >/dev/null 2>&1; then
   echo "laa-check-client-qualifies:latest image is missing."
   require_confirm "Run 'make -C $CCQ_DIR build'?"
   make -C "$CCQ_DIR" build
@@ -149,10 +153,12 @@ fi
 $ENTRA_MODE && COMPOSE_FILES+=(-f docker-compose.entra.yml)
 
 if $CI_MODE; then
-  # CI mode: run in background and exit once healthy
+  # CI mode: build first (parallel where possible), then start and wait for health.
   echo "==> Starting docker compose stack (CI mode, $($ENTRA_MODE && echo 'entra' || echo 'mock-issuer')):"
-  printf '        docker compose %s %s up -d --wait --build\n' "${COMPOSE_FILES[*]}" "${ENV_FILES[*]}"
-  exec docker compose "${COMPOSE_FILES[@]}" "${ENV_FILES[@]}" up -d --wait --build
+  printf '        docker compose %s %s build --parallel\n' "${COMPOSE_FILES[*]}" "${ENV_FILES[*]}"
+  docker compose "${COMPOSE_FILES[@]}" "${ENV_FILES[@]}" build --parallel
+  printf '        docker compose %s %s up -d --wait --no-build\n' "${COMPOSE_FILES[*]}" "${ENV_FILES[*]}"
+  exec docker compose "${COMPOSE_FILES[@]}" "${ENV_FILES[@]}" up -d --wait --no-build
 else
   echo "==> Starting docker compose stack (interactive mode, $($ENTRA_MODE && echo 'entra' || echo 'mock-issuer')):"
   echo "      op run"
