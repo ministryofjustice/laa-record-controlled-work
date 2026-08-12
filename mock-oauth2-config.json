@@ -19,6 +19,8 @@
           "requestParam": "grant_type",
           "match": "authorization_code",
           "claims": {
+            "aud": "default",
+            "scp": "Applications.Read Applications.Write",
             "LAA_ACCOUNTS": ["R1XEVG", "VGHVEY", "3TVRNM"],
             "FIRM_CODE": "123456"
           }
@@ -27,6 +29,8 @@
           "requestParam": "grant_type",
           "match": "refresh_token",
           "claims": {
+            "aud": "default",
+            "scp": "Applications.Read Applications.Write",
             "LAA_ACCOUNTS": ["R1XEVG", "VGHVEY", "3TVRNM"],
             "FIRM_CODE": "123456"
           }
@@ -42,9 +46,7 @@
           "match": "urn:ietf:params:oauth:grant-type:jwt-bearer",
           "claims": {
             "aud": "default",
-            "scp": "DataStore.Access",
-            "FIRM_CODE": "123456",
-            "LAA_ACCOUNTS": ["R1XEVG", "VGHVEY", "3TVRNM"]
+            "scp": "DataStore.Access"
           }
         }
       ]
