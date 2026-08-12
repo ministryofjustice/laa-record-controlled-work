@@ -14,6 +14,7 @@ import { completeCreateCaseShortestPath } from "../../flows/create-case.flow.js"
 import { selectOfficeByCode } from "../../flows/office.flow.js";
 
 const SELECT_OFFICE_URL_PATTERN = new RegExp("/select-office/?$");
+const LANDING_URL_PATTERN = new RegExp("/$");
 const OFFICE_ONE_CODE = "R1XEVG";
 const OFFICE_TWO_CODE = "VGHVEY";
 
@@ -23,7 +24,7 @@ const gotoInProgressCases = async (page: Page): Promise<void> => {
   await expect(page).toHaveURL(CASE_LIST_URL_PATTERN);
 };
 
-test.describe("single office user", () => {
+test.describe("@e2e single office user", () => {
   test.describe.configure({ mode: "serial" });
 
   let context: BrowserContext;
@@ -39,15 +40,15 @@ test.describe("single office user", () => {
   });
 
   test(
-    "@e2e is redirected to landing page on sign in",
+    "is redirected to landing page on sign in",
     async () => {
       await signInWithSingleOffice(page, OFFICE_ONE_CODE);
-      await expect(page).toHaveURL(CASE_LIST_URL_PATTERN);
+      await expect(page).toHaveURL(LANDING_URL_PATTERN);
     },
   );
 });
 
-test.describe("multi office user", () => {
+test.describe("@e2e multi office user", () => {
   test.describe.configure({ mode: "serial" });
 
   let context: BrowserContext;
@@ -63,7 +64,7 @@ test.describe("multi office user", () => {
   });
 
   test(
-    "@e2e is redirected to landing page on sign in",
+    "is redirected to landing page on sign in",
     async () => {
       await signInWithMultiOffice(page, [OFFICE_ONE_CODE, OFFICE_TWO_CODE]);
       await expect(page).toHaveURL(SELECT_OFFICE_URL_PATTERN);
@@ -71,7 +72,7 @@ test.describe("multi office user", () => {
   );
 
   test(
-    "@e2e can change office and is redirected to the landing page",
+    "can change office and is redirected to the landing page",
     async () => {
       await signInWithMultiOffice(page, [OFFICE_ONE_CODE, OFFICE_TWO_CODE]);
       await selectOfficeByCode(page, OFFICE_ONE_CODE);
@@ -88,7 +89,7 @@ test.describe("multi office user", () => {
   );
 
   test(
-    "@e2e can only see cases for the selected office after changing offices",
+    "can only see cases for the selected office after changing offices",
     async () => {
       await signInWithMultiOffice(page, [OFFICE_ONE_CODE, OFFICE_TWO_CODE]);
       await selectOfficeByCode(page, OFFICE_ONE_CODE);
