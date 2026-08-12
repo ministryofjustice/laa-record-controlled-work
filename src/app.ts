@@ -24,6 +24,7 @@ import authRouter from "#/auth/auth.routes.js";
 import config from "#/config.js";
 import { autocomplete } from "#/journeys/components/autocomplete/autocomplete.component.js";
 import createApplicationJourney from "#/journeys/create-application/create-application.index.js";
+import declaration from "#/journeys/declaration/declaration.index.js";
 import { editApplicationPackage } from "#/journeys/edit-application/editApplication.package.js";
 import evidence from "#/journeys/evidence/evidence.index.js";
 import { selectOfficePackage } from "#/journeys/select-office/select-office.journey.js";
@@ -112,7 +113,8 @@ const createApp = async (
     .registerPackage(selectOfficePackage, { getAllProviderOffices })
     .registerPackage(editApplicationPackage, { getApplication })
     .registerPackage(createApplicationJourney, { createApplication })
-    .registerPackage(evidence);
+    .registerPackage(evidence)
+    .registerPackage(declaration);
 
   // Set up rate limiting
   setupRateLimit(app, config);

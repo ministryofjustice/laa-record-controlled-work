@@ -95,7 +95,7 @@ export function taskList(): BlockDefinition[] {
           t(
             "journeys.createApplication.taskList.EvidenceAndDeclaration.taskItem.declaration.label",
           ),
-          "client-declaration-TODO",
+          Format("/cases/%1/declaration/", Params(PARAMS_KEYS.applicationID)),
           Data(CONTEXT_DATA_KEYS.declarationStatus),
         ),
       ],
