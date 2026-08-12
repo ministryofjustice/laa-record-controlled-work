@@ -4,9 +4,9 @@
  * Provider Details API r1
  * OpenAPI spec version: 0.27.2
  */
-import { faker } from "@faker-js/faker";
+import type { ProviderFirmOfficeListDto } from "#/api/clients/pda/model/providerFirmOfficeListDto.zod.gen.js";
 
-import type { ProviderFirmOfficeListDto } from "../../../../../src/api/clients/pda/model/providerFirmOfficeListDto.zod.gen.js";
+import { faker } from "@faker-js/faker";
 
 export type KeysWithNull<O> = {
   [K in keyof O]-?: null extends O[K] ? K : never;
