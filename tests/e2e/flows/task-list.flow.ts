@@ -2,7 +2,7 @@ import type { Page } from "@playwright/test";
 
 import { expect } from "@playwright/test";
 
-const APPLICATION_ID_CAPTURE_GROUP_INDEX = 1;
+const APPLICATION_ID_CAPTURE_GROUP_INDEX = 2;
 const CASES_SEGMENT_INDEX = 1;
 const TASK_LIST_SEGMENT_INDEX = 3;
 const EXPECTED_TASK_LIST_PATH_SEGMENT_COUNT = 4;

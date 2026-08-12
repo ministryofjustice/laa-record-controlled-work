@@ -9,7 +9,7 @@ test("Edit Application - Task List step", async ({ withSelectedOffice: page }) =
   // ==========================================================================
 
   // Navigate to the task-list page using the application ID from fixtures
-  await page.goto(`/cases/${applicationId}/task-list/`);
+  await page.goto(`/cases/${applicationId}/task-list`);
 
   // Check for the Heading
   await expect(

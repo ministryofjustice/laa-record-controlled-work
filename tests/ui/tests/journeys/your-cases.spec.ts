@@ -70,7 +70,7 @@ test("Your Cases step", async ({ withSelectedOffice: page }) => {
 
     await expect(row.getByRole("link", { name: app.name })).toHaveAttribute(
       "href",
-      `/cases/${app.applicationRefNumber}/task-list/`,
+      `/cases/${app.applicationRefNumber}/task-list`,
     );
     await expect(row.getByRole("cell").nth(1)).toHaveText(
       app.applicationRefNumber,

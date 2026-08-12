@@ -48,7 +48,7 @@ export const casesTable = (cases: ChainableRef): GovUKTable =>
       Iterator.Map([
         {
           html: Format(
-            '<a class="govuk-link" href="/cases/%1/task-list/">%2</a>',
+            '<a class="govuk-link" href="/cases/%1/task-list">%2</a>',
             Item().path(APPLICATIONS_DATA_KEYS.id),
             Item().path(APPLICATIONS_DATA_KEYS.name),
           ),

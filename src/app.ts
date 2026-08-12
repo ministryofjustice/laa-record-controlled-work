@@ -169,7 +169,7 @@ const createApp = async (
       return;
     }
 
-    res.redirect(`/cases/${id}/task-list/`);
+    res.redirect(`/cases/${id}/task-list`);
   });
 
   app.use("/", forgeRouter);

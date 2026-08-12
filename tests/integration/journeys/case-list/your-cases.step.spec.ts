@@ -148,7 +148,7 @@ describe("Your Cases step", () => {
         const { name, applicationRefNumber, modifiedAt } = mockData[i];
         expect(row[0].html).to.include(name);
         expect(row[0].html).to.include(
-          `/cases/${applicationRefNumber}/task-list/`,
+          `/cases/${applicationRefNumber}/task-list`,
         );
         expect(row[1].text).to.equal(applicationRefNumber);
         expect(row[2].text).to.equal(
