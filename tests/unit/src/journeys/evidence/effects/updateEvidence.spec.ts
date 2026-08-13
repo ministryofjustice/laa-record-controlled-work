@@ -51,7 +51,7 @@ describe("updateEvidence", () => {
       msal: { homeAccountId: "home-account-id" },
     });
 
-    context = { getSession } as unknown as EffectFunctionContext;
+    context = { getSession, setData: sinon.stub() } as unknown as EffectFunctionContext;
   });
 
   afterEach(() => sinon.restore());
