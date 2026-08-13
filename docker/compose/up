@@ -169,7 +169,13 @@ if $CI_MODE; then
     docker compose "${COMPOSE_FILES[@]}" "${ENV_FILES[@]}" build --parallel
   fi
   printf '        docker compose %s %s up -d --wait --no-build\n' "${COMPOSE_FILES[*]}" "${ENV_FILES[*]}"
-  exec docker compose "${COMPOSE_FILES[@]}" "${ENV_FILES[@]}" up -d --wait --no-build
+  if ! docker compose "${COMPOSE_FILES[@]}" "${ENV_FILES[@]}" up -d --wait --no-build; then
+    echo "==> Docker compose failed; service state:"
+    docker compose "${COMPOSE_FILES[@]}" "${ENV_FILES[@]}" ps --all || true
+    echo "==> Docker compose logs:"
+    docker compose "${COMPOSE_FILES[@]}" "${ENV_FILES[@]}" logs --no-color || true
+    exit 1
+  fi
 else
   echo "==> Starting docker compose stack (interactive mode, $($ENTRA_MODE && echo 'entra' || echo 'mock-issuer')):"
   echo "      op run"
