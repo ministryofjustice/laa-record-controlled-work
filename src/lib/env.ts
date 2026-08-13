@@ -82,4 +82,4 @@ if (error) {
   process.exit(1);
 }
 
-export const { optional, required, useHttps } = data;
+export const { optional, required } = data;
