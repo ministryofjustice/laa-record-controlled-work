@@ -64,7 +64,7 @@ export const taskListStep = (): ReturnType<typeof step> =>
         onAlways: {
           next: [
             redirect({
-              goto: "/case-list",
+              goto: "/cases",
             }),
           ],
         },
