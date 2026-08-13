@@ -30,6 +30,12 @@ const optionalEnvSchema = z.object({
   SERVICE_NAME: z.string().optional(),
   SERVICE_PHASE: z.string().optional(),
   SERVICE_URL: z.url().optional(),
+  USE_HTTPS: z
+    .string()
+    .transform((value) => value.toLowerCase())
+    .pipe(z.enum(["true", "false"]))
+    .transform((value) => value === "true")
+    .optional(),
 });
 
 const injected = z.string().refine((val) => !val.startsWith("op://"), {
@@ -60,6 +66,10 @@ const { data, error } = z
     optional: optionalEnvSchema,
     required: requiredEnvSchema,
   })
+  .transform(({ optional, required }) => ({
+    optional,
+    required,
+  }))
   .safeParse({
     optional: process.env,
     required: process.env,
@@ -72,4 +82,4 @@ if (error) {
   process.exit(1);
 }
 
-export const { optional, required } = data;
+export const { optional, required, useHttps } = data;

@@ -43,7 +43,6 @@ export interface AppConfig {
     phase: string | undefined;
     url: string | undefined;
   };
-  useHttps: boolean;
 }
 export interface Config {
   api: ApiConfig;
