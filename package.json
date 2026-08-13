@@ -48,7 +48,7 @@
   "dependencies": {
     "@azure/msal-node": "^5.5.0",
     "@ministryofjustice/frontend": "9.0.0",
-    "@ministryofjustice/hmpps-forge": "^0.3.5",
+    "@ministryofjustice/hmpps-forge": "^0.3.6",
     "accessible-autocomplete": "^3.0.1",
     "body-parser": "^2.3.0",
     "compression": "^1.8.1",
@@ -116,7 +116,7 @@
     "sinon": "^22.1.0",
     "supertest": "^7.2.2",
     "testcontainers": "^12.1.0",
-    "tsx": "^4.23.5",
+    "tsx": "^4.23.8",
     "typescript": "^6.0.3",
     "undici": "^8.10.0"
   },
