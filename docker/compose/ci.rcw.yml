@@ -3,6 +3,8 @@ services:
   rcw:
     image: ${RCW_IMAGE:?RCW_IMAGE must name the loaded RCW runner image}
     pull_policy: never
+    environment:
+      NODE_ENV: production
     build: !reset null
     command: !reset null
     develop: !reset null
