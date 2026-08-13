@@ -130,9 +130,7 @@ const saveAndReturnButton: GovUKButton = GovUKButton({
 
 const submitButton: GovUKButton = GovUKButton({
   classes: when(
-    Data(CONTEXT_DATA_KEYS.applicationStatus).match(
-      Condition.Equals(Status.COMPLETED),
-    ),
+    Data(CONTEXT_DATA_KEYS.readyForSubmission).match(Condition.Equals(true)),
   )
     .then("")
     .else("govuk-!-display-none"),

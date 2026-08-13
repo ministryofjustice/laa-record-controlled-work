@@ -1,21 +1,20 @@
-import type { ResolvableString } from "@ministryofjustice/hmpps-forge/core/components";
-
 import {
   access,
+  Condition,
   Data,
   Format,
+  Post,
   redirect,
   step,
   submit,
+  type SubmitHook,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
-
-import type { Status } from "#/journeys/journey.types.js";
 
 import { editApplicationEffects } from "#/journeys/edit-application/editApplication.effects.js";
 import {
+  buttonGroup,
   caseReferenceNumber,
   heading,
-  saveAndReturnButton,
   taskList,
 } from "#/journeys/edit-application/steps/task-list/task-list.blocks.js";
 import {
@@ -23,14 +22,6 @@ import {
   CLIENT_DETAILS_DATA_KEYS,
   CONTEXT_DATA_KEYS,
 } from "#/journeys/journey.constants.js";
-
-export interface TaskListData {
-  caseReferenceNumber: ResolvableString;
-  clientDetails: { clientName: ResolvableString; status: Status };
-  declaration: { status: Status };
-  evidence: { status: Status };
-  meansAssessment: { status: Status };
-}
 
 // TODO temporarily using id until we have a proper reference number in data model
 const referenceNumber = Data(CONTEXT_DATA_KEYS.application).path(
@@ -49,7 +40,7 @@ export const taskListStep = (): ReturnType<typeof step> =>
       heading(clientName),
       caseReferenceNumber(referenceNumber),
       ...taskList(),
-      saveAndReturnButton,
+      buttonGroup(),
     ],
     onAccess: [
       access({
@@ -59,21 +50,35 @@ export const taskListStep = (): ReturnType<typeof step> =>
         ],
       }),
     ],
-    onSubmission: [
-      submit({
-        onAlways: {
-          next: [
-            redirect({
-              goto: "/case-list",
-            }),
-          ],
-        },
-        validate: false,
-      }),
-    ],
+    onSubmission: [saveAndReturn(), submitApplication()],
     path: "/task-list",
     reachability: {
       entryWhen: true,
     },
     title: "Task List",
+  });
+
+const saveAndReturn = (): SubmitHook =>
+  submit({
+    onAlways: {
+      next: [
+        redirect({
+          goto: "/case-list",
+        }),
+      ],
+    },
+    when: Post("action").match(Condition.Equals("return")),
+  });
+
+// TODO: no submission page completed yet
+const submitApplication = (): SubmitHook =>
+  submit({
+    onAlways: {
+      next: [
+        redirect({
+          goto: "/submittedPage-TODO",
+        }),
+      ],
+    },
+    when: Post("action").match(Condition.Equals("submit")),
   });

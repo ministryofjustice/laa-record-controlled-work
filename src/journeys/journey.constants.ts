@@ -38,6 +38,7 @@ export const CONTEXT_DATA_KEYS = {
   declarationStatus: "declarationStatus",
   evidenceStatus: "evidenceStatus",
   meansAssessment: "meansAssessment",
+  readyForSubmission: "readyForSubmission",
   selectedOffice: "selectedOffice",
   singleOffice: "singleOffice",
 } as const;
