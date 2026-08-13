@@ -1,17 +1,21 @@
 import type {
   BlockDefinition,
+  HtmlBlock,
   ResolvableString,
 } from "@ministryofjustice/hmpps-forge/core/components";
 
 import {
+  Condition,
   Data,
   Format,
   Literal,
   Params,
+  when,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 import {
   GovUKBody,
   GovUKButton,
+  GovUKButtonGroup,
   GovUKHeading,
   GovUKTaskList,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
@@ -118,7 +122,25 @@ function sectionHeading(
   });
 }
 
-export const saveAndReturnButton: GovUKButton = GovUKButton({
+const saveAndReturnButton: GovUKButton = GovUKButton({
   classes: "govuk-button--secondary",
   text: t("common.saveAndReturn"),
+  value: "return",
 });
+
+const submitButton: GovUKButton = GovUKButton({
+  classes: when(
+    Data(CONTEXT_DATA_KEYS.applicationStatus).match(
+      Condition.Equals(Status.COMPLETED),
+    ),
+  )
+    .then("")
+    .else("govuk-!-display-none"),
+  text: t("journeys.tasklist.submitButton.label"),
+  value: "submit",
+});
+
+export const buttonGroup = (): HtmlBlock =>
+  GovUKButtonGroup({
+    buttons: [submitButton, saveAndReturnButton],
+  });
