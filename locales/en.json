@@ -233,6 +233,9 @@
           "cannotStart": "Cannot start yet",
           "incomplete": "Incomplete",
           "completed": "Completed"
+        },
+        "submitButton": {
+          "label": "Record Controlled Work"
         }
       }
     },
