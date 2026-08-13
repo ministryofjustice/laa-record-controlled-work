@@ -7,6 +7,10 @@ on:
         description: "Commit SHA to check out"
         type: string
         default: ''
+      use-prebuilt-rcw:
+        description: "Run the exported RCW runner image"
+        type: boolean
+        default: false
 
 jobs:
   e2e:
@@ -47,7 +51,30 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ github.token }}
 
+      - name: Download RCW runner image
+        if: inputs.use-prebuilt-rcw
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: rcw-runner-image
+          path: rcw-runner-image
+
+      - name: Load RCW runner image
+        if: inputs.use-prebuilt-rcw
+        run: docker load --input rcw-runner-image/rcw-runner-image.tar
+
+      - name: Start docker-compose stack with prebuilt RCW
+        if: inputs.use-prebuilt-rcw
+        run: docker/compose/up --ci --prebuilt-rcw
+        env:
+          DOCKER_BUILDKIT: "1"
+          COMPOSE_DOCKER_CLI_BUILD: "1"
+          COMPOSE_BAKE: "true"
+          GITHUB_TOKEN: ${{ github.token }}
+          PDA_API_KEY: ci-placeholder
+          RCW_IMAGE: rcw-runner:${{ inputs.sha || github.sha }}
+
       - name: Start docker-compose stack
+        if: ${{ !inputs.use-prebuilt-rcw }}
         run: docker/compose/up --ci
         env:
           DOCKER_BUILDKIT: "1"
