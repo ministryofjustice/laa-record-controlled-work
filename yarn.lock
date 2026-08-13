@@ -5824,7 +5824,7 @@ __metadata:
     sinon: "npm:^22.1.0"
     supertest: "npm:^7.2.2"
     testcontainers: "npm:^12.1.0"
-    tsx: "npm:^4.23.8"
+    tsx: "npm:^4.23.9"
     typescript: "npm:^6.0.3"
     undici: "npm:^8.10.0"
     zod: "npm:^4.4.3"
@@ -8609,7 +8609,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tsx@npm:^4.23.8":
+"tsx@npm:^4.23.9":
   version: 4.23.9
   resolution: "tsx@npm:4.23.9"
   dependencies:

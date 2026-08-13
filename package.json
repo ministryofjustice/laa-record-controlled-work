@@ -116,7 +116,7 @@
     "sinon": "^22.1.0",
     "supertest": "^7.2.2",
     "testcontainers": "^12.1.0",
-    "tsx": "^4.23.8",
+    "tsx": "^4.23.9",
     "typescript": "^6.0.3",
     "undici": "^8.10.0"
   },
