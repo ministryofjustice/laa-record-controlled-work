@@ -198,7 +198,7 @@ describe("loadOffices", () => {
     expect(offices[0].code).to.equal("OFFICE-01");
   });
 
-  it("returns all offices when LAA_ACCOUNTS claim is absent", async () => {
+  it("returns no offices when LAA_ACCOUNTS claim is absent", async () => {
     getAllProviderOffices.resolves({
       data: {
         firm: { firmName: "Acme Legal LLP" },
@@ -213,6 +213,6 @@ describe("loadOffices", () => {
     await loadOffices(deps)(context);
 
     const [, offices] = setData.firstCall.args as [string, { code: string }[]];
-    expect(offices).to.have.length(2);
+    expect(offices).to.have.length(0);
   });
 });

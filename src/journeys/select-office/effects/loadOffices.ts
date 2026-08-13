@@ -69,10 +69,10 @@ export const loadOffices =
       ? laaAccounts.filter(
           (account): account is string => typeof account === "string",
         )
-      : undefined;
-    const availableOffices = laaAccountCodes
-      ? mappedOffices.filter((o) => laaAccountCodes.includes(o.code))
-      : mappedOffices;
+      : [];
+    const availableOffices = mappedOffices.filter((o) =>
+      laaAccountCodes.includes(o.code),
+    );
 
     context.setData(CONTEXT_DATA_KEYS.availableOffices, availableOffices);
   };
