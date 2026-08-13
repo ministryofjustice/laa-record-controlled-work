@@ -1,9 +1,9 @@
 include docker-images.env
+include scripts/makeFiles/docker.mk
+include scripts/makeFiles/tests.mk
 export
 
-MOCHA    := ./node_modules/.bin/mocha
-
-.PHONY: install prek-install dev watch docker-up docker-up-entra docker-down build pda-spec api-generate knip lint lint-fix integration integration-watch e2e e2e-ui test-all coverage unit unit-watch
+.PHONY: install prek-install dev watch docker-up docker-up-entra docker-down build pda-spec api-generate knip lint lint-fix integration integration-watch e2e e2e-ui test-all coverage unit unit-watch db-applications db-scoping-questions run-tests
 
 # 	op run --env-file=.env uses 1Password to load environment variables securely
 # 	you can --no-masking flag means that varaibles is not masked in the output which can be used for debugging
@@ -48,14 +48,8 @@ lint: knip
 lint-fix: knip
 	yarn lint:fix
 
-integration:
-	yarn integration
-
 integration-watch:
 	yarn integration:watch
-
-e2e:
-	yarn e2e
 
 e2e-ui:
 	yarn e2e:ui
@@ -68,29 +62,3 @@ coverage:
 
 unit-watch:
 	yarn unit:watch
-
-# Run unit tests.
-#
-# Usage:
-#   make unit                        - run all unit tests
-#   make unit file=either            - run a specific test by filename (with or without .spec.ts)
-#   make unit file=services/auth     - When multiple files share the same name
-
-unit: 
-ifdef file
-	@MATCHES=$$(find tests/unit \( -path "*/$(file)" -o -path "*/$(file).spec.ts" \) 2>/dev/null); \
-	if [ -z "$$MATCHES" ]; then \
-		echo "Error: No test file found matching '$(file)' in tests/unit/"; \
-		exit 1; \
-	fi; \
-	COUNT=$$(echo "$$MATCHES" | wc -l | tr -d ' '); \
-	if [ "$$COUNT" -gt 1 ]; then \
-		echo "Error: Multiple files found for '$(file)', be more specific by including parent directory"; \
-		echo "$$MATCHES"; \
-		exit 1; \
-	fi; \
-	$(MOCHA) "$$MATCHES"
-else
-	yarn unit
-endif
-

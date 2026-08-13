@@ -10,8 +10,8 @@ import { checkAnswersStep } from "#/journeys/evidence/steps/check-answers/check-
 describe("Check answers step", () => {
   const client = createForgeTestClient(
     "Evidence",
-    "/cases/evidence/",
-    checkAnswersStep(),
+    "/cases/evidence",
+    [checkAnswersStep()],
   );
   const session = {
     journeyDrafts: {

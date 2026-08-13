@@ -4,13 +4,17 @@ import { OK } from "#/lib/constants/http.js";
 
 const router: Router = Router();
 
+const FIRM_CODE = 12345;
+
 router.get("/signin", (req, res, next) => {
   req.session.isAuthenticated = true;
   req.session.account = {
     environment: "login.microsoftonline.com",
     homeAccountId: "test-uid.test-tenant-id",
     idToken: "test-id-token",
-    idTokenClaims: {},
+    idTokenClaims: {
+      FIRM_CODE,
+    },
     localAccountId: "test-uid",
     name: "Test User",
     tenantId: "test-tenant-id",

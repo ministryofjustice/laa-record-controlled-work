@@ -13,7 +13,10 @@ import {
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 import { MOJSubNavigation } from "@ministryofjustice/hmpps-forge/moj-components";
 
-import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
+import {
+  APPLICATIONS_DATA_KEYS,
+  CONTEXT_DATA_KEYS,
+} from "#/journeys/journey.constants.js";
 import { t } from "#/lib/i18n.js";
 
 export const subNavigation = MOJSubNavigation({
@@ -46,14 +49,14 @@ export const casesTable = (cases: ChainableRef): GovUKTable =>
         {
           html: Format(
             '<a class="govuk-link" href="/cases/%1/task-list/">%2</a>',
-            Item().path("applicationRefNumber"),
-            Item().path("name"),
+            Item().path(APPLICATIONS_DATA_KEYS.applicationRefNumber),
+            Item().path(APPLICATIONS_DATA_KEYS.name),
           ),
         },
-        { text: Item().path("applicationRefNumber") },
+        { text: Item().path(APPLICATIONS_DATA_KEYS.applicationRefNumber) },
         {
           text: Item()
-            .path("modifiedAt")
+            .path(APPLICATIONS_DATA_KEYS.modifiedAt)
             .pipe(
               Transformer.String.FormatDate({
                 day: "numeric",

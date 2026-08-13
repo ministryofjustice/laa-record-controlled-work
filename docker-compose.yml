@@ -46,18 +46,19 @@ services:
       - .env # load from .env first
     environment: # set overrides
       - NODE_ENV=docker
-      - API_MODE=api
+      - NODE_EXTRA_CA_CERTS=/etc/mock-oauth2-server.crt.pem
+      # APIs
+      - RCW_API_MODE=api
       - RCW_API_BASE_URL=http://rcw-api:8081
+      - PDA_API_MODE=msw
+      - PDA_MSW_OFFICE_COUNT=${PDA_MSW_OFFICE_COUNT:-3}
+      # Session cache
       - REDIS_ENABLED=true
       - REDIS_URL=redis://redis-rcw:6379
       - REDIS_AUTH_TOKEN=${REDIS_AUTH_TOKEN:-redis_password}
-      - ENTRA_REDIRECT_URI=http://localhost:8080/auth/code/callback
-      - NODE_EXTRA_CA_CERTS=/etc/mock-oauth2-server.crt.pem
-      # Signs in via the mock-oauth2-server container by default, matching rcw-api and
-      # info-and-advice-api's own defaults - see docker-compose.entra.yml to sign in via real
-      # Entra ID instead. MSAL rejects non-https authorities, so the mock server terminates
-      # TLS with a self-signed cert (see docker/certs) covering host.docker.internal.
+      # OAuth/OIDC settings
       - ENTRA_AUTHORITY_BASE_URL=https://host.docker.internal:9090/
+      - ENTRA_REDIRECT_URI=http://localhost:8080/auth/code/callback
       - ENTRA_TENANT_ID=default
       - ENTRA_CLIENT_ID=rcw
       - ENTRA_CLIENT_SECRET=not-used-by-mock-oauth2-server
@@ -70,6 +71,9 @@ services:
           path: ./src
           target: /app/src
         - action: sync
+          path: ./orval/mocks
+          target: /app/orval/mocks
+        - action: sync
           path: ./esbuild
           target: /app/esbuild
         - action: sync
@@ -79,11 +83,8 @@ services:
           path: ./tsconfig.json
           target: /app/tsconfig.json
         - action: sync
-          path: ./scripts
-          target: /app/scripts
-        - action: sync
-          path: ./tests/mocks
-          target: /app/tests/mocks
+          path: ./msw
+          target: /app/msw
         - action: rebuild
           path: package.json
         - action: rebuild
@@ -91,7 +92,7 @@ services:
 
   redis-rcw:
     container_name: rcw-session-redis
-    image: "redis:8.8-alpine@sha256:8096655e437712b07503796fb64d81359256cfcff0ab29d95a7da72863786efb"
+    image: "redis:8.10-alpine@sha256:978f0e01593e65eed801f2402944efcd936d43b5027e4908a7897baf88ed6241"
     ports:
       - 6379:6379
     command: >

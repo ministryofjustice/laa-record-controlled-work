@@ -1,5 +1,10 @@
 {
-  "watch": ["src/**/*.ts", "locales/**/*.json"],
+  "watch": [
+    "src/**/*.ts",
+    "locales/**/*.json",
+    "msw/**/*.ts",
+    "orval/mocks/**/*.ts"
+  ],
   "ext": "ts,js,json",
   "ignore": [
     "public/assets/**/*",
@@ -20,5 +25,5 @@
   "env": {
     "NODE_ENV": "development"
   },
-  "exec": "npx tsx scripts/dev-server-with-msw.ts"
+  "exec": "npx tsx msw/dev-server-with-msw.ts"
 }

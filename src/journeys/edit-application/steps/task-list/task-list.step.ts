@@ -1,52 +1,63 @@
+import type { ResolvableString } from "@ministryofjustice/hmpps-forge/core/components";
+
 import {
+  access,
+  Data,
+  Format,
   redirect,
   step,
   submit,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
+import type { Status } from "#/journeys/journey.types.js";
+
+import { editApplicationEffects } from "#/journeys/edit-application/editApplication.effects.js";
 import {
   caseReferenceNumber,
   heading,
   saveAndReturnButton,
   taskList,
 } from "#/journeys/edit-application/steps/task-list/task-list.blocks.js";
-import { Status } from "#/journeys/journey.types.js";
+import {
+  APPLICATION_DATA_KEYS,
+  CLIENT_DETAILS_DATA_KEYS,
+  CONTEXT_DATA_KEYS,
+} from "#/journeys/journey.constants.js";
 
 export interface TaskListData {
-  caseReferenceNumber: string;
-  clientDetails: { clientName: string; status: Status };
+  caseReferenceNumber: ResolvableString;
+  clientDetails: { clientName: ResolvableString; status: Status };
   declaration: { status: Status };
   evidence: { status: Status };
   meansAssessment: { status: Status };
 }
 
-export const DEFAULT_CASE_REFERENCE_NUMBER = "CW-123456";
+// TODO temporarily using id until we have a proper reference number in data model
+const referenceNumber = Data(CONTEXT_DATA_KEYS.application).path(
+  APPLICATION_DATA_KEYS.id,
+);
 
-// TODO: Hardcoded for now, will be dynamic in future
-const TASK_LIST_DATA: TaskListData = {
-  caseReferenceNumber: DEFAULT_CASE_REFERENCE_NUMBER,
-  clientDetails: {
-    clientName: "Joe Blogs",
-    status: Status.Completed,
-  },
-  declaration: {
-    status: Status.CannotStart,
-  },
-  evidence: {
-    status: Status.Incomplete,
-  },
-  meansAssessment: {
-    status: Status.Incomplete,
-  },
-};
+const clientName = Format(
+  "%1 %2",
+  Data(CONTEXT_DATA_KEYS.application).path(CLIENT_DETAILS_DATA_KEYS.firstName),
+  Data(CONTEXT_DATA_KEYS.application).path(CLIENT_DETAILS_DATA_KEYS.lastName),
+);
 
 export const taskListStep = (): ReturnType<typeof step> =>
   step({
     blocks: [
-      heading(TASK_LIST_DATA.clientDetails.clientName),
-      caseReferenceNumber(TASK_LIST_DATA.caseReferenceNumber),
-      ...taskList(TASK_LIST_DATA),
+      heading(clientName),
+      caseReferenceNumber(referenceNumber),
+      ...taskList(),
       saveAndReturnButton,
+    ],
+    onAccess: [
+      access({
+        effects: [
+          editApplicationEffects.loadApplication(),
+          editApplicationEffects.setTaskListStatuses(),
+        ],
+      }),
     ],
     onSubmission: [
       submit({

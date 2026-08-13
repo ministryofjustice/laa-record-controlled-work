@@ -1,8 +1,8 @@
 import { expect } from "chai";
-import { ApplicationDto } from "#/dto/application/application.dto.js";
+import { ApplicationDto } from "#/api/dto/application/application.dto.js";
 
 const answers = {
-  ecf: "no",
+  ecf: "yes",
   legalAidBefore: "yesSameMatter",
   legalAidLast6Months: "yes",
   reasonForYes: "here is a reason",
@@ -22,8 +22,8 @@ const answers = {
 
 describe("fromAnswers method", () => {
   it("should map answers to API request format", () => {
+    const providerOfficeCode = "22439e72-68d3-4770-b435-c352d883d21e";
     const expected = {
-      ecfFlag: false,
       clientDetails: {
         firstName: "Jane",
         lastName: "Bloggs",
@@ -38,15 +38,22 @@ describe("fromAnswers method", () => {
           townOrCity: "Manchester",
           county: "Greater Manchester",
           postCode: "A12 3BC",
-          country: "United Kingdom",
+          country: "GB",
         },
       },
       legalAidBefore: "yesSameMatter",
       legalAidLast6Months: true,
+      providerOfficeCode,
       reasonForReapplication: "here is a reason",
+      scopingQuestions: {
+        priorLegalAid: "yesSameMatter",
+      },
     };
 
-    const result = ApplicationDto.fromAnswers(answers).toRcwApi();
+    const result = ApplicationDto.fromAnswers(
+      answers,
+      providerOfficeCode,
+    ).toRcwApi();
     expect(result).to.deep.equal(expected);
   });
 });

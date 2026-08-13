@@ -3,7 +3,7 @@ import { expect } from "chai";
 import { createForgeTestClientForCaseList } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import sinon from "sinon";
-import { getGetApplicationsResponseMock } from "../../../mocks/api/rcw/fakers/applications/applications.faker.gen.js";
+import { getGetApplicationsResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
 
 const session = {
   selectedOffice: {
@@ -62,6 +62,9 @@ describe("Your Cases Ineligible step", () => {
 
     it("renders a link button", () => {
       expect(recordButton.properties.text).to.equal("Record a new case");
+      expect(recordButton.properties.href).to.equal(
+        "/cases/new/provider-declaration",
+      );
     });
 
     it("renders a selected office block", () => {

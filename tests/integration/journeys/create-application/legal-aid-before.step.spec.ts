@@ -11,7 +11,7 @@ describe("Legal aid before step", () => {
   const client = createForgeTestClient(
     "Record new case",
     "/cases/new/",
-    legalAidBeforeStep("testJourney"),
+    [legalAidBeforeStep("testJourney")],
   );
 
   describe("GET /cases/new/legal-aid-before", () => {

@@ -6,12 +6,24 @@ import { expect } from "chai";
 import { createForgeTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import { checkAnswersStep } from "#/journeys/create-application/steps/check-answers.step.js";
+import sinon from "sinon";
+import { getCreateApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
 
 describe("Check answers step", () => {
+  const uuid = "123e4567-e89b-12d3-a456-426614174000";
+  const createApplicationStub = sinon
+    .stub()
+    .resolves({
+      status: 201,
+      data: getCreateApplicationResponseMock({ id: uuid }),
+      headers: new Headers(),
+    });
+
   const client = createForgeTestClient(
     "Record new case",
     "/cases/new/",
-    checkAnswersStep("testJourney"),
+    [checkAnswersStep("testJourney")],
+    { createApplication: createApplicationStub },
   );
   const session = {
     journeyDrafts: {
@@ -24,13 +36,17 @@ describe("Check answers step", () => {
         lastName: "Doe",
         dateOfBirth: "1990-01-01",
         hasNINumber: "yes",
-        niNumber: "AB123456C",
+        niNumber: "AB123456C", // gitleaks:allow - fake NI number used to tests
         haveAHomeAddress: "yes",
         addressLine1: "123 Test Street",
         townOrCity: "Testville",
         postcode: "TE5 7ST",
         country: "United Kingdom",
       },
+    },
+    selectedOffice: {
+      address: "123 Test Street, Testville, TE5 7ST",
+      code: "22439e72-68d3-4770-b435-c352d883d21e",
     },
   };
 
@@ -114,7 +130,7 @@ describe("Check answers step", () => {
       });
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
-      expect(redirectResult.url).to.equal("/cases/CW-123456/task-list");
+      expect(redirectResult.url).to.equal(`/cases/${uuid}/task-list`);
     });
   });
 });

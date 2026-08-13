@@ -12,8 +12,10 @@ describe("Declaration step", () => {
   const client = createForgeTestClient(
     "Record new case",
     "/cases/new/",
-    declarationStep("testJourney"),
-    ecfStep("testJourney"),
+    [
+      declarationStep("testJourney"),
+      ecfStep("testJourney"),
+    ],
   );
 
   describe("GET /cases/new/provider-declaration", () => {

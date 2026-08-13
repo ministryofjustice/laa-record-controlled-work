@@ -2,21 +2,27 @@ import type { EffectFunctionContext } from "@ministryofjustice/hmpps-forge/core"
 import type { Session, SessionData } from "express-session";
 
 import type { CreateApplicationRequestBody } from "#/api/clients/rcw/model/createApplicationRequestBody.zod.gen.js";
+import type { createApplicationResponse } from "#/api/clients/rcw/schema/applications/applications.gen.js";
 import type { CreateApplicationEffectsDeps } from "#/journeys/create-application/create-application.types.js";
 
-import { ApiResponseError, ApiValidationError } from "#/api/api.errors.js";
+import {
+  ApiResponseError,
+  ApiValidationError,
+} from "#/api/clients/api.errors.js";
+import { getRcwApiDefaultOptions } from "#/api/clients/getRcwApiDefaultOptions.js";
 import { CreateApplicationResponseBody } from "#/api/clients/rcw/model/createApplicationResponseBody.zod.gen.js";
-import { getRcwApiDefaultOptions } from "#/api/getRcwApiDefaultOptions.js";
+import { ApplicationDto } from "#/api/dto/application/application.dto.js";
 import { getAuthDebugHeaders } from "#/auth/auth.debug.js";
-import { ApplicationDto } from "#/dto/application/application.dto.js";
 import { Answers } from "#/journeys/create-application/data/answers.zod.js";
 import { isJourneySession } from "#/journeys/effects.js";
+import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
 
 const buildApplicationData = (
   journeyAnswers: Record<string, unknown>,
   journeyCode: string,
+  providerOfficeCode: string | undefined,
 ): CreateApplicationRequestBody => {
   const answersFormatted = Answers.safeParse(journeyAnswers);
 
@@ -28,7 +34,17 @@ const buildApplicationData = (
     throw ApiValidationError.from(answersFormatted.error);
   }
 
-  const applicationDto = ApplicationDto.fromAnswers(answersFormatted.data);
+  if (!providerOfficeCode) {
+    logger.error(
+      `Journey session for ${journeyCode} is missing selected office code`,
+    );
+    throw new ApiValidationError();
+  }
+
+  const applicationDto = ApplicationDto.fromAnswers(
+    answersFormatted.data,
+    providerOfficeCode,
+  );
   return applicationDto.toRcwApi();
 };
 
@@ -38,7 +54,7 @@ export const createApplication =
     context: EffectFunctionContext,
     journeyCode: string,
   ): Promise<void> => {
-    let response;
+    let response: createApplicationResponse;
 
     try {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Session shape is constrained by app session typing.
@@ -55,7 +71,11 @@ export const createApplication =
         return;
       }
 
-      const dataForApi = buildApplicationData(journeyAnswers, journeyCode);
+      const dataForApi = buildApplicationData(
+        journeyAnswers,
+        journeyCode,
+        session.selectedOffice?.code,
+      );
 
       const opts = await getRcwApiDefaultOptions({
         homeAccountId: session.msal?.homeAccountId,
@@ -98,4 +118,6 @@ export const createApplication =
       );
       throw ApiValidationError.from(result.error);
     }
+
+    context.setData(CONTEXT_DATA_KEYS.applicationID, result.data.id);
   };

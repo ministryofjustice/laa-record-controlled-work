@@ -1,4 +1,4 @@
-import { ConfidentialClientApplication, ProtocolMode } from "@azure/msal-node";
+import { ProtocolMode } from "@azure/msal-node";
 
 import config from "#/config.js";
 
@@ -37,6 +37,3 @@ export const authRequestDefaults = {
   responseMode: "query",
   scopes,
 } as const;
-
-export const msalClient: ConfidentialClientApplication =
-  new ConfidentialClientApplication(msalConfig);

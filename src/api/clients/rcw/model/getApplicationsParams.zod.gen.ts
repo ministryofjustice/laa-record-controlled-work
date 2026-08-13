@@ -11,8 +11,8 @@ export const getApplicationsParamsSizeDefault = 25;
 export const GetApplicationsParams = zod.object({
   page: zod.int().default(getApplicationsParamsPageDefault),
   size: zod.int().default(getApplicationsParamsSizeDefault),
-  officeId: zod.uuid().optional(),
-  status: zod.enum(["DRAFT", "COMPLETE"]).optional(),
+  officeId: zod.string().optional(),
+  status: zod.enum(["DRAFT", "COMPLETED"]).optional(),
 });
 
 export type GetApplicationsParams = zod.input<typeof GetApplicationsParams>;

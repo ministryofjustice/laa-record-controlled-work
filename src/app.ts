@@ -11,19 +11,25 @@ import compression from "compression";
 import express from "express";
 import session from "express-session";
 
+import type { CreateRedisStore, GetRedisClient } from "#/lib/redis.js";
+
 import { getAllProviderOffices } from "#/api/clients/pda/schema/provider-firms-endpoints/provider-firms-endpoints.gen.js";
 import {
   createApplication,
+  getApplication,
   getApplications,
 } from "#/api/clients/rcw/schema/applications/applications.gen.js";
+import eligibilityRouter from "#/api/eligibility/eligibility.routes.js";
 import authRouter from "#/auth/auth.routes.js";
 import config from "#/config.js";
 import { autocomplete } from "#/journeys/components/autocomplete/autocomplete.component.js";
 import createApplicationJourney from "#/journeys/create-application/create-application.index.js";
-import editApplication from "#/journeys/edit-application/edit-application.index.js";
+import declaration from "#/journeys/declaration/declaration.index.js";
+import { editApplicationPackage } from "#/journeys/edit-application/editApplication.package.js";
 import evidence from "#/journeys/evidence/evidence.index.js";
 import { selectOfficePackage } from "#/journeys/select-office/select-office.journey.js";
 import { yourCasesPackage } from "#/journeys/your-cases/your-cases.journey.js";
+import * as redis from "#/lib/redis.js";
 import { createSession } from "#/lib/session.js";
 import { requireAuth } from "#/middleware/requireAuth.js";
 import { setupConfig } from "#/middleware/setupConfigs.js";
@@ -39,20 +45,30 @@ import { setupRequestLogging } from "#/middleware/setupRequestLogging.js";
 import { standardMiddleware } from "#/middleware/standardMiddleware.js";
 import healthRouter from "#/routes/health.js";
 import indexRouter from "#/routes/index.js";
-import privateApiRouter from "#/routes/privateApi.js";
 import testRouter from "#/routes/test.js";
 
 const TRUST_FIRST_PROXY = 1;
-const ENABLE_PLAYWRIGHT_TEST_SIGNIN =
-  process.env.PLAYWRIGHT_TEST_SIGNIN === "true";
+
+interface Dependencies {
+  createRedisStore?: CreateRedisStore;
+  getRedisClient?: GetRedisClient;
+}
 
 /**
  * Creates and configures an Express application.
  * Server startup is handled separately in src/server.ts.
  *
+ * @param dependencies injected dependencies
  * @returns {Promise<import('express').Application>} The configured Express application
  */
-const createApp = async (): Promise<express.Application> => {
+const createApp = async (
+  dependencies: Dependencies = {},
+): Promise<express.Application> => {
+  const {
+    createRedisStore = redis.createRedisStore,
+    getRedisClient = redis.getRedisClient,
+  } = dependencies;
+
   const app = express();
 
   app.use("/", healthRouter);
@@ -95,9 +111,10 @@ const createApp = async (): Promise<express.Application> => {
     .registerGlobalFunctions(nunjucksFunctions)
     .registerPackage(yourCasesPackage, { getApplications })
     .registerPackage(selectOfficePackage, { getAllProviderOffices })
-    .registerPackage(editApplication)
+    .registerPackage(editApplicationPackage, { getApplication })
     .registerPackage(createApplicationJourney, { createApplication })
-    .registerPackage(evidence);
+    .registerPackage(evidence)
+    .registerPackage(declaration);
 
   // Set up rate limiting
   setupRateLimit(app, config);
@@ -109,14 +126,23 @@ const createApp = async (): Promise<express.Application> => {
   setupRequestLogging(app);
 
   // Setup express-session using redis
-  app.use(session(await createSession(config)));
+  app.use(
+    session(await createSession(config, getRedisClient, createRedisStore)),
+  );
 
-  app.use("/api/private", requireAuth, privateApiRouter);
+  app.use(
+    "/api/applications/:applicationId/eligibility",
+    requireAuth,
+    eligibilityRouter,
+  );
 
   setupCsrf(app);
 
   // Playwright-only route: sets an authenticated session without going through Entra.
-  if (ENABLE_PLAYWRIGHT_TEST_SIGNIN && process.env.NODE_ENV === "test") {
+  if (
+    process.env.PLAYWRIGHT_TEST_SIGNIN === "true" &&
+    process.env.NODE_ENV === "test"
+  ) {
     app.use("/test", testRouter);
   }
 

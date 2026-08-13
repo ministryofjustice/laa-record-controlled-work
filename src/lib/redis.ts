@@ -8,6 +8,9 @@ import { logger } from "#/logger.js";
 
 import { SECOND } from "./constants/time.js";
 
+export type CreateRedisStore = (client: RedisClientType) => Promise<RedisStore>;
+export type GetRedisClient = () => RedisClientType;
+
 // Module-level reference to the active Redis client
 let activeRedisClient: null | RedisClientType = null;
 

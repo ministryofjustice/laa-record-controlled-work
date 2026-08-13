@@ -6,9 +6,9 @@ import {
   TestRenderResult,
   TestResult,
 } from "@ministryofjustice/hmpps-forge/core/testing";
-import { ApiResponseError, ApiValidationError } from "#/api/api.errors.js";
+import { ApiResponseError, ApiValidationError } from "#/api/clients/api.errors.js";
 import { logger } from "#/logger.js";
-import { getGetApplicationsResponseMock } from "../../../../mocks/api/rcw/fakers/applications/applications.faker.gen.js";
+import { getGetApplicationsResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
 
 const mockData = getGetApplicationsResponseMock();
 const session = {
@@ -59,7 +59,7 @@ describe("LoadYourCaseList", () => {
       const client = createForgeTestClientForCaseList({
         getApplications: stub,
       });
-      return await client.get("/cases");
+      return await client.get("/cases", { session });
     }
 
     it("throws ApiResponseError when the API rejects", async () => {
