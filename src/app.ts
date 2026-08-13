@@ -25,7 +25,7 @@ import authRouter from "#/auth/auth.routes.js";
 import config from "#/config.js";
 import { autocomplete } from "#/journeys/components/autocomplete/autocomplete.component.js";
 import createApplicationJourney from "#/journeys/create-application/create-application.index.js";
-import declaration from "#/journeys/declaration/declaration.index.js";
+import declaration from "#/journeys/declaration/declaration.package.js";
 import { editApplicationPackage } from "#/journeys/edit-application/editApplication.package.js";
 import { evidencePackage } from "#/journeys/evidence/evidence.package.js";
 import { selectOfficePackage } from "#/journeys/select-office/select-office.journey.js";

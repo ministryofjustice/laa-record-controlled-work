@@ -1,4 +1,4 @@
-import type { HtmlBlock } from "@ministryofjustice/hmpps-forge/core/components";
+import type { BlockDefinition } from "@ministryofjustice/hmpps-forge/core/components";
 
 import {
   GovUKBody,
@@ -32,19 +32,19 @@ function textListHtml(key: string, classes: string): string {
   return `<ul class="${classes}">${listItems}</ul>`;
 }
 
-export const confirmHeading = (): HtmlBlock =>
+export const confirmHeading = (): BlockDefinition =>
   GovUKHeading({
     level: H1,
     text: t("journeys.declaration.confirm.title"),
   });
 
-export const confirmBody = (): HtmlBlock =>
+export const confirmBody = (): BlockDefinition =>
   GovUKBody({
     classes: "govuk-body",
     text: `Joe Bloggs ${t("journeys.declaration.confirm.declarationText")}<br>${textListHtml("journeys.declaration.confirm.declarationList", "govuk-list govuk-list--bullet govuk-!-margin-bottom-6")}`,
   });
 
-export const confirmWarning = (): HtmlBlock =>
+export const confirmWarning = (): BlockDefinition =>
   GovUKWarningText({
     html: `${t(
       "journeys.declaration.confirm.warningText",
@@ -52,7 +52,7 @@ export const confirmWarning = (): HtmlBlock =>
     iconFallbackText: "Warning",
   });
 
-export const confirmButtonGroup = (): HtmlBlock =>
+export const confirmButtonGroup = (): BlockDefinition =>
   GovUKButtonGroup({
     buttons: [
       GovUKButton({

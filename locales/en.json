@@ -369,7 +369,15 @@
         "confirmLabel": "I confirm that I have a signed declaration from my client",
         "dateLabel": "Date of signature",
         "dateHint": "This is your case start date and the date you can bill from",
-        "continueButton": "Continue"
+        "continueButton": "Continue",
+        "error": {
+          "confirmRequired": "You must confirm you have a signed declaration to continue",
+          "dateRequired": "You must confirm the date of signature to continue",
+          "dateInvalid": "Date of signature must be a real date",
+          "dateMissingDay": "Date of signature must include a day",
+          "dateMissingMonth": "Date of signature must include a month",
+          "dateMissingYear": "Date of signature must include a year"
+        }
       },
       "caption": "Client declaration",
       "confirm": {

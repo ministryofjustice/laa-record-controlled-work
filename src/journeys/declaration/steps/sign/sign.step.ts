@@ -1,8 +1,17 @@
-import { step } from "@ministryofjustice/hmpps-forge/core/authoring";
+import {
+  Condition,
+  Format,
+  Params,
+  Post,
+  redirect,
+  step,
+  submit,
+} from "@ministryofjustice/hmpps-forge/core/authoring";
 
 import { t } from "#/lib/i18n.js";
 
-import { backLink, caption } from "../../common.blocks.js";
+import { backLink, caption } from "../../declaration.blocks.js";
+import { declarationEffects } from "../../declaration.effects.js";
 import {
   confirmHeading,
   confirmSignedCheckbox,
@@ -16,9 +25,10 @@ import {
 export const signStep = (): ReturnType<typeof step> => {
   return step({
     blocks: [
-      backLink("/cases/new/declaration/confirm"),
+      backLink(Format("/cases/%1/declaration/confirm", Params("id"))),
       caption,
       heading(),
+      // TODO Refactor statement to not require spreading?
       ...statement(),
       downloadButton(),
       confirmHeading(),
@@ -26,7 +36,37 @@ export const signStep = (): ReturnType<typeof step> => {
       confirmSignedDate(),
       continueReturnButtons(),
     ],
-    onSubmission: [],
+    onSubmission: [
+      submit({
+        onValid: {
+          effects: [declarationEffects.submitSignedDeclaration()],
+          next: [
+            redirect({
+              goto: Format(
+                // TODO Update this URI to be correct.
+                "/cases/%1/declaration/done",
+                Params("applicationId"),
+              ),
+            }),
+          ],
+        },
+        validate: true,
+        when: Post("action").match(Condition.Equals("continue")),
+      }),
+      submit({
+        onValid: {
+          next: [
+            redirect({
+              goto: Format(
+                "/cases/%1/declaration/confirm",
+                Params("applicationId"),
+              ),
+            }),
+          ],
+        },
+        when: Post("action").match(Condition.Equals("return")),
+      }),
+    ],
     path: "/sign",
     title: t("journeys.declaration.title"),
   });

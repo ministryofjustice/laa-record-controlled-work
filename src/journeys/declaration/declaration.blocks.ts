@@ -2,11 +2,7 @@ import {
   HtmlBlock,
   type ResolvableString,
 } from "@ministryofjustice/hmpps-forge/core/components";
-import {
-  GovUKBackLink,
-  GovUKButton,
-  GovUKButtonGroup,
-} from "@ministryofjustice/hmpps-forge/govuk-components";
+import { GovUKBackLink } from "@ministryofjustice/hmpps-forge/govuk-components";
 
 import { t } from "#/lib/i18n.js";
 
@@ -17,20 +13,4 @@ export const backLink = (url: ResolvableString): GovUKBackLink =>
 
 export const caption = HtmlBlock({
   content: `<span class="govuk-caption-l">${t("journeys.declaration.caption")}</span>`,
-});
-
-export const buttonGroup = GovUKButtonGroup({
-  buttons: [
-    GovUKButton({
-      buttonType: "submit",
-      text: t("common.continue"),
-      value: "continue",
-    }),
-    GovUKButton({
-      buttonType: "submit",
-      classes: "govuk-button--secondary",
-      text: t("common.saveAndReturn"),
-      value: "return",
-    }),
-  ],
 });
