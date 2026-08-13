@@ -1,5 +1,6 @@
 # CI-only compose overrides.
-# Enables BuildKit GitHub Actions cache across workflows/branches for all local-build services.
+# RCW is still built from the pull request; dependency services are pulled pre-built
+# from GHCR instead of being built locally, to cut e2e workflow time.
 services:
   rcw:
     build:
@@ -9,29 +10,30 @@ services:
         - type=gha,scope=rcw-e2e-rcw,mode=max
 
   rcw-api:
-    build:
-      cache_from:
-        - type=gha,scope=rcw-e2e-rcw-api
-      cache_to:
-        - type=gha,scope=rcw-e2e-rcw-api,mode=max
+    image: ghcr.io/ministryofjustice/laa-record-controlled-work-api:latest
+    pull_policy: always
+    build: !reset null
 
   info-and-advice-api:
-    build:
-      cache_from:
-        - type=gha,scope=rcw-e2e-datastore
-      cache_to:
-        - type=gha,scope=rcw-e2e-datastore,mode=max
+    image: ghcr.io/ministryofjustice/laa-info-and-advice-datastore:latest
+    pull_policy: always
+    build: !reset null
 
+  # Only exists to build CCQ's image locally; not needed when ccq-embedded is pulled from GHCR.
   ccq-image-prebuild:
-    build:
-      cache_from:
-        - type=gha,scope=rcw-e2e-ccq
-      cache_to:
-        - type=gha,scope=rcw-e2e-ccq,mode=max
+    profiles:
+      - disabled
+
+  ccq-embedded:
+    image: ghcr.io/ministryofjustice/laa-check-client-qualifies:latest
+    pull_policy: always
+    depends_on: !override
+      redis:
+        condition: service_healthy
+      cfe:
+        condition: service_started
 
   cfe:
-    build:
-      cache_from:
-        - type=gha,scope=rcw-e2e-cfe
-      cache_to:
-        - type=gha,scope=rcw-e2e-cfe,mode=max
+    image: ghcr.io/ministryofjustice/laa-rcw-cfe-civil:latest
+    pull_policy: always
+    build: !reset null
