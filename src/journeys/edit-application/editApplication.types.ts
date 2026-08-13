@@ -1,7 +1,10 @@
 import type { EffectFunctionContext } from "@ministryofjustice/hmpps-forge/core";
 
 import type { Application } from "#/api/clients/rcw/model/application.zod.gen.js";
-import type { getApplication } from "#/api/clients/rcw/schema/applications/applications.gen.js";
+import type {
+  getApplication,
+  updateApplicationStatus,
+} from "#/api/clients/rcw/schema/applications/applications.gen.js";
 import type { JourneySession } from "#/journeys/context.type.js";
 import type { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import type { Status } from "#/journeys/journey.types.js";
@@ -23,4 +26,5 @@ export interface EditApplicationData extends Record<string, unknown> {
 
 export interface EditApplicationEffectsDeps {
   getApplication: typeof getApplication;
+  updateApplicationStatus: typeof updateApplicationStatus;
 }
