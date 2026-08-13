@@ -1,9 +1,9 @@
 import type { Page } from "@playwright/test";
 
+import { assertInProgressCaseVisible } from "#tests/e2e/assertions/case-list.assert.js";
 import { assertTaskStatus } from "#tests/e2e/assertions/task-list.assert.js";
 import { signIn } from "#tests/e2e/flows/auth.flow.js";
 import {
-  assertInProgressCaseVisible,
   gotoCase,
   gotoCaseList,
   openDraftCaseFromCaseList,

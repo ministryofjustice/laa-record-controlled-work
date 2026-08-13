@@ -29,17 +29,6 @@ export const gotoCase = async (
     .toBe(true);
 };
 
-export const assertInProgressCaseVisible = async (
-  page: Page,
-  clientName: string,
-): Promise<void> => {
-  await gotoCaseList(page);
-  await page.getByRole("link", { name: "In progress" }).click();
-  await expect(
-    page.getByRole("cell", { name: clientName }).first(),
-  ).toBeVisible();
-};
-
 export const openDraftCaseFromCaseList = async (
   page: Page,
   applicationId: string,

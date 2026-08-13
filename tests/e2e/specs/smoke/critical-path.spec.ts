@@ -46,6 +46,7 @@ test.describe("@e2e critical path", () => {
   });
 
   test("application appears in case list as draft", async () => {
+    await actor.gotoCaseList();
     await actor.assertInProgressCaseVisible("Test User");
   });
 
