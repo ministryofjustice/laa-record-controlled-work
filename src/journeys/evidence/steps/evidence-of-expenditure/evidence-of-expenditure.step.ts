@@ -6,7 +6,7 @@ import {
   submit,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
-import { JourneyEffects } from "#/journeys/effects.js";
+import { EvidenceEffects } from "#/journeys/evidence/evidence.effects.js";
 import {
   backLink,
   caption,
@@ -42,7 +42,7 @@ export const evidenceOfExpenditure = (
     onSubmission: [
       submit({
         onValid: {
-          effects: [JourneyEffects.SaveDraftAnswers(journeyCode)],
+          effects: [EvidenceEffects.saveDraftAnswers(journeyCode)],
           next: [
             redirect({
               goto: "check-answers",

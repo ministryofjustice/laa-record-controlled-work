@@ -1,6 +1,6 @@
 import { access, journey } from "@ministryofjustice/hmpps-forge/core/authoring";
 
-import { JourneyEffects } from "#/journeys/effects.js";
+import { EvidenceEffects } from "#/journeys/evidence/evidence.effects.js";
 import { checkAnswersStep } from "#/journeys/evidence/steps/check-answers/check-answers.step.js";
 import { doYouHaveEvidence } from "#/journeys/evidence/steps/do-you-have-evidence/do-you-have-evidence.step.js";
 import { evidenceOfCapital } from "#/journeys/evidence/steps/evidence-of-capital/evidence-of-capital.step.js";
@@ -14,7 +14,7 @@ export const EvidenceJourney = journey({
   code: "evidence",
   onAccess: [
     access({
-      effects: [JourneyEffects.LoadDraftAnswers(journeyCode)],
+      effects: [EvidenceEffects.loadDraftAnswers(journeyCode)],
     }),
   ],
   path: "/cases/evidence",

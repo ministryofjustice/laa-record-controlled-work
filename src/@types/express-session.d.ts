@@ -18,6 +18,7 @@ declare module "express-session" {
     authCodeUrlRequest?: AuthorizationUrlRequest;
     authState?: string;
     isAuthenticated?: boolean;
+    currentApplicationId?: string;
     journeyDrafts?: Record<string, Record<string, unknown>>;
     journeySubmitted?: Record<string, boolean>;
     msal?: SessionMsalReference;

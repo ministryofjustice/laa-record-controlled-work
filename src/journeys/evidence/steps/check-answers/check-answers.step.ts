@@ -5,6 +5,7 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
 import { submitButton } from "#/journeys/evidence/common.blocks.js";
+import { EvidenceEffects } from "#/journeys/evidence/evidence.effects.js";
 import {
   heading,
   summaryList,
@@ -18,6 +19,7 @@ export const checkAnswersStep = (): ReturnType<typeof step> =>
     onSubmission: [
       submit({
         onAlways: {
+          effects: [EvidenceEffects.updateEvidence("evidence")],
           next: [
             redirect({
               goto: "/task-list", // TODO: Update to go to specific task list for case
