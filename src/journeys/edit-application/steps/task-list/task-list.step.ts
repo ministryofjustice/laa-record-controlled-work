@@ -63,7 +63,7 @@ const saveAndReturn = (): SubmitHook =>
     onAlways: {
       next: [
         redirect({
-          goto: "/case-list",
+          goto: "/cases",
         }),
       ],
     },
@@ -74,6 +74,7 @@ const saveAndReturn = (): SubmitHook =>
 const submitApplication = (): SubmitHook =>
   submit({
     onAlways: {
+      effects: [editApplicationEffects.submitApplication()],
       next: [
         redirect({
           goto: "/submittedPage-TODO",

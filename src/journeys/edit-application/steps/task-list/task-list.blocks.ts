@@ -55,47 +55,43 @@ export function heading(
  */
 export function taskList(): BlockDefinition[] {
   return [
-    sectionHeading(
-      t("journeys.createApplication.taskList.clientDetails.title"),
-    ),
+    sectionHeading(t("journeys.editApplication.taskList.clientDetails.title")),
     GovUKTaskList({
       items: [
         taskItem(
-          t("journeys.createApplication.taskList.clientDetails.taskItem.label"),
+          t("journeys.editApplication.taskList.clientDetails.taskItem.label"),
           "/cases/new/check-answers",
           Data(CONTEXT_DATA_KEYS.clientDetailsStatus),
         ),
       ],
     }),
     sectionHeading(
-      t("journeys.createApplication.taskList.meansAssessment.title"),
+      t("journeys.editApplication.taskList.meansAssessment.title"),
     ),
     GovUKTaskList({
       items: [
         taskItem(
-          t(
-            "journeys.createApplication.taskList.meansAssessment.taskItem.label",
-          ),
+          t("journeys.editApplication.taskList.meansAssessment.taskItem.label"),
           Format("/cases/%1/eligibility/", Params(PARAMS_KEYS.applicationID)),
           Data(CONTEXT_DATA_KEYS.meansAssessment),
         ),
       ],
     }),
     sectionHeading(
-      t("journeys.createApplication.taskList.EvidenceAndDeclaration.title"),
+      t("journeys.editApplication.taskList.EvidenceAndDeclaration.title"),
     ),
     GovUKTaskList({
       items: [
         taskItem(
           t(
-            "journeys.createApplication.taskList.EvidenceAndDeclaration.taskItem.evidence.label",
+            "journeys.editApplication.taskList.EvidenceAndDeclaration.taskItem.evidence.label",
           ),
           "/cases/evidence/have-evidence",
           Data(CONTEXT_DATA_KEYS.evidenceStatus),
         ),
         taskItem(
           t(
-            "journeys.createApplication.taskList.EvidenceAndDeclaration.taskItem.declaration.label",
+            "journeys.editApplication.taskList.EvidenceAndDeclaration.taskItem.declaration.label",
           ),
           Format("/cases/%1/declaration/", Params(PARAMS_KEYS.applicationID)),
           Data(CONTEXT_DATA_KEYS.declarationStatus),
@@ -132,7 +128,7 @@ const submitButton: GovUKButton = GovUKButton({
   )
     .then("")
     .else("govuk-!-display-none"),
-  text: t("journeys.tasklist.submitButton.label"),
+  text: t("journeys.editApplication.taskList.submitButton.label"),
   value: "submit",
 });
 
