@@ -68,6 +68,10 @@ export default {
     port: optional.PORT ?? DEFAULT_PORT,
     rateLimit: {
       authMax: optional.AUTH_RATE_LIMIT_MAX ?? DEFAULT_AUTH_RATE_LIMIT_MAX,
+      enabled:
+        optional.RATE_LIMIT_ENABLED !== undefined
+          ? optional.RATE_LIMIT_ENABLED === "true"
+          : required.NODE_ENV !== "docker",
       headersEnabled: optional.RATELIMIT_HEADERS_ENABLED,
       max: optional.RATE_LIMIT_MAX ?? DEFAULT_RATE_LIMIT_MAX,
       storageUri: optional.RATELIMIT_STORAGE_URI,

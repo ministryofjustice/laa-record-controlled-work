@@ -7,6 +7,8 @@ node_modules
 .DS_Store
 coverage
 .nyc_output
+playwright-report/
+test-results/
 tests/
 
 # RCW specific directories
@@ -14,6 +16,11 @@ docs/
 deploy/
 infrastructure/
 public/
+docker/
+docker-compose*.yml
+mock-oauth2-config.json
+mock-oauth2-login.html
+README.md
 
 # Local-only mock IdP TLS material - not needed in the built image
 docker/certs/

@@ -15,7 +15,7 @@ export const selectOfficeStep = step({
     submit({
       onValid: {
         effects: [selectOfficeEffects.setSelectedOffice()],
-        next: [redirect({ goto: "/cases" })],
+        next: [redirect({ goto: "/" })],
       },
       validate: true,
     }),

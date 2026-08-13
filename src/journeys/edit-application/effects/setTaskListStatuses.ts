@@ -58,9 +58,8 @@ export const setTaskListStatuses =
     const application = context.getData(CONTEXT_DATA_KEYS.application);
     const clientDetailsStatus = statusFor(getClientDetailsValues(application));
 
-    // TODO meansassessmentStatus is based on is means assessmentId is present this will change when we have model ready
     const meansAssessment = determineStepStatus(clientDetailsStatus, [
-      application.meansAssessmentId,
+      application.eligibility?.result,
     ]);
 
     const evidenceStatus = determineStepStatus(

@@ -312,7 +312,7 @@ In RCW we build our single question per page form flows in Forge. To ensure good
 
 1. Create the step in `src/journeys/<journeyGroup>/<journey>/steps/<step>/myStep.ts`
 2. Add the step to the relevant Journey file in `src/journeys/<journeyGroup>/<journey>/myJourney.journey.ts`
-3. Add the step to the e2e test located in `tests/playwright/tests/journeys/<journey>`. These should cover:
+3. Add the step to the UI test located in `tests/ui/tests/journeys/<journey>`. These should cover:
    - The happy path journey renders each step in the correct order
    - Data can be entered as expected in each step
    - The check answers step contains all of the correct information given the journey completed
