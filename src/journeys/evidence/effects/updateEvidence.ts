@@ -11,6 +11,7 @@ import {
 import { getRcwApiDefaultOptions } from "#/api/clients/getRcwApiDefaultOptions.js";
 import { getAuthDebugHeaders } from "#/auth/auth.debug.js";
 import { isJourneySession } from "#/journeys/effects.js";
+import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
 
@@ -82,6 +83,7 @@ export const updateEvidence =
         );
         throw new Error("applicationId is required to update evidence");
       }
+      context.setData(CONTEXT_DATA_KEYS.applicationID, applicationId);
 
       const journeyAnswers = session.journeyDrafts?.[journeyCode];
       if (!journeyAnswers) {

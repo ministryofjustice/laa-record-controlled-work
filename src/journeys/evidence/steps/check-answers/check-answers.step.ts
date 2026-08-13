@@ -1,4 +1,6 @@
 import {
+  Data,
+  Format,
   redirect,
   step,
   submit,
@@ -10,6 +12,7 @@ import {
   heading,
   summaryList,
 } from "#/journeys/evidence/steps/check-answers/check-answers.blocks.js";
+import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import { t } from "#/lib/i18n.js";
 
 export const checkAnswersStep = (): ReturnType<typeof step> =>
@@ -22,7 +25,10 @@ export const checkAnswersStep = (): ReturnType<typeof step> =>
           effects: [EvidenceEffects.updateEvidence("evidence")],
           next: [
             redirect({
-              goto: "/task-list", // TODO: Update to go to specific task list for case
+              goto: Format(
+                "/cases/%1/task-list",
+                Data(CONTEXT_DATA_KEYS.applicationID),
+              ),
             }),
           ],
         },
