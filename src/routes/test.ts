@@ -5,6 +5,7 @@ import { OK } from "#/lib/constants/http.js";
 const router: Router = Router();
 
 const FIRM_CODE = 12345;
+const LAA_ACCOUNTS = ["R1XEVG", "VGHVEY", "3TVRNM"];
 
 router.get("/signin", (req, res, next) => {
   req.session.isAuthenticated = true;
@@ -14,6 +15,7 @@ router.get("/signin", (req, res, next) => {
     idToken: "test-id-token",
     idTokenClaims: {
       FIRM_CODE,
+      LAA_ACCOUNTS,
     },
     localAccountId: "test-uid",
     name: "Test User",

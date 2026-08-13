@@ -13,11 +13,15 @@ faker.seed(12345);
 
 const mockResponse = getGetAllProviderOfficesResponseMock();
 const mockOffices = mockResponse.offices!;
+const laaAccounts = mockOffices
+  .map((office) => office.firmOfficeCode)
+  .filter((officeCode): officeCode is string => typeof officeCode === "string");
 
 const session = {
   account: {
     idTokenClaims: {
       FIRM_CODE: 12345,
+      LAA_ACCOUNTS: laaAccounts,
     },
   },
 };
