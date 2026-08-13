@@ -34,7 +34,9 @@ const SESSION_AGE_MAX = 12 * HOUR;
 const DEFAULT_RATE_WINDOW = 15 * MINUTE;
 /* eslint-enable @typescript-eslint/no-magic-numbers */
 
-const useHttps = ["production", "staging", "uat"].includes(required.NODE_ENV);
+const DEPLOYED_ENVIRONMENTS = ["production", "staging", "uat"];
+const useHttps =
+  optional.USE_HTTPS ?? DEPLOYED_ENVIRONMENTS.includes(required.NODE_ENV);
 
 export default {
   api: {
@@ -82,7 +84,6 @@ export default {
       phase: optional.SERVICE_PHASE,
       url: optional.SERVICE_URL,
     },
-    useHttps,
   } satisfies AppConfig,
 
   csrf: {

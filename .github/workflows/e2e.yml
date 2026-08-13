@@ -16,6 +16,7 @@ jobs:
     permissions:
       actions: write
       contents: read
+      packages: read
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -38,6 +39,13 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@21162887f0d6e25b4e8eafb0cf44cf9bf7f6acd3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
 
       - name: Start docker-compose stack
         run: docker/compose/up --ci

@@ -34,19 +34,33 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - name: Docker Build & Push with Cache
+    - name: Docker Build, Push and Export with Cache
       id: build_and_push
       run: |
+        image_uri=${{ inputs.image_registry }}/${{ inputs.image_repo }}:${{ inputs.image_tag }}
+        runner_image=rcw-runner:${{ inputs.image_tag }}
+
         docker buildx build \
-          --push \
+          --load \
           --cache-from=type=local,src=/tmp/.buildx-cache \
           --cache-to=type=local,dest=/tmp/.buildx-cache-new \
-          -t ${{ inputs.image_registry }}/${{ inputs.image_repo }}:${{ inputs.image_tag }} \
+          -t "$image_uri" \
           -f ${{ inputs.dockerfile_path }} .
+
+        docker push "$image_uri"
+        docker tag "$image_uri" "$runner_image"
+        docker save "$runner_image" -o rcw-runner-image.tar
 
         rm -rf /tmp/.buildx-cache
         mv /tmp/.buildx-cache-new /tmp/.buildx-cache
       shell: bash
+
+    - name: Upload runner image
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+      with:
+        name: rcw-runner-image
+        path: rcw-runner-image.tar
+        retention-days: 1
 
     - name: Output
       id: output

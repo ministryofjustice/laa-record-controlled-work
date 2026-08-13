@@ -133,6 +133,7 @@ jobs:
 
   e2e:
     name: Tests
+    needs: setup
     uses: ./.github/workflows/e2e.yml
     with:
       sha: ${{ github.event.pull_request.head.sha || github.sha }}
