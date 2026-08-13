@@ -18,8 +18,10 @@ services:
       - ./deploy/laa-record-controlled-work/nginx/proxy.conf:/etc/nginx/proxy.conf:ro
       - ./deploy/laa-record-controlled-work/nginx/maps.conf:/etc/nginx/maps.conf:ro
     depends_on:
-      - rcw
-      - ccq-embedded
+      rcw:
+        condition: service_healthy
+      ccq-embedded:
+        condition: service_healthy
     environment:
       NGINX_UPSTREAM_RCW: rcw:3000
       NGINX_UPSTREAM_CCQ: ccq-embedded:3000
@@ -35,6 +37,8 @@ services:
     depends_on:
       redis-rcw:
         condition: service_healthy
+      rcw-api:
+        condition: service_healthy
       mock-oauth2-server:
         condition: service_started
     extra_hosts:
@@ -46,11 +50,13 @@ services:
       - .env # load from .env first
     environment: # set overrides
       - NODE_ENV=docker
+      - RATE_LIMIT_ENABLED=false
       - NODE_EXTRA_CA_CERTS=/etc/mock-oauth2-server.crt.pem
       # APIs
       - RCW_API_MODE=api
       - RCW_API_BASE_URL=http://rcw-api:8081
       - PDA_API_MODE=msw
+      - PDA_API_KEY=${PDA_API_KEY:-default}
       - PDA_MSW_OFFICE_COUNT=${PDA_MSW_OFFICE_COUNT:-3}
       # Session cache
       - REDIS_ENABLED=true
@@ -62,9 +68,12 @@ services:
       - ENTRA_TENANT_ID=default
       - ENTRA_CLIENT_ID=rcw
       - ENTRA_CLIENT_SECRET=not-used-by-mock-oauth2-server
-      # secrets injected by 1Password CLI via .env
-      # op run --env-file=.env -- docker compose up -d
-      - PDA_API_KEY
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/health || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 30s
     develop:
       watch:
         - action: sync

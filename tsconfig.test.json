@@ -8,7 +8,7 @@
   },
   "include": [
     "tests/**/*.spec.ts", // Unit tests (if any remain in tests/)
-    "tests/playwright/**/*.ts", // E2E tests, fixtures, pages, utils in Playwright structure
+    "tests/ui/**/*.ts",
     "msw/**/*.ts", // MSW handlers and test/dev server modules
     "routes/**/*.ts",
     "src/**/*.ts",

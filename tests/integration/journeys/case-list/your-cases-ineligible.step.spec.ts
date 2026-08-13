@@ -108,9 +108,9 @@ describe("Your Cases Ineligible step", () => {
       expect(rows).to.have.length(mockData.length);
 
       for (const [i, row] of rows.entries()) {
-        const { name, applicationRefNumber, modifiedAt } = mockData[i];
+        const { id, name, applicationRefNumber, modifiedAt } = mockData[i];
         expect(row[0].html).to.include(name);
-        expect(row[0].html).to.include(`/cases/${applicationRefNumber}`);
+        expect(row[0].html).to.include(`/cases/${id}`);
         expect(row[1].text).to.equal(applicationRefNumber);
         expect(row[2].text).to.equal(
           dateFormatter.format(new Date(modifiedAt)),

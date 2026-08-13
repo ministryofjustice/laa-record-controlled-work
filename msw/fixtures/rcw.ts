@@ -15,4 +15,6 @@ export const applications = [...getGetApplicationsResponseMock()].sort((a, b) =>
 
 export const createApplicationResponse = getCreateApplicationResponseMock();
 
-export const application = getGetApplicationResponseMock();
+export const application = getGetApplicationResponseMock({
+  eligibility: { data: {} },
+});
