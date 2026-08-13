@@ -8,6 +8,7 @@ import { z as zod } from "zod";
 
 export const UpdateApplicationStatusRequestBody = zod.object({
   applicationState: zod.enum(["DRAFT", "COMPLETED"]),
+  eTag: zod.int().describe("ETag value for optimistic concurrency control"),
 });
 
 export type UpdateApplicationStatusRequestBody = zod.input<

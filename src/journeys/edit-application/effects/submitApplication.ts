@@ -10,6 +10,9 @@ import { getAuthDebugHeaders } from "#/auth/auth.debug.js";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
+// TODO: etag not currently being returned from rcw api, so hardcoding for now.
+// Once rcw api is updated to return etag, this can be removed and the etag can be retrieved from the application data in context.
+const eTag = 1;
 
 export const submitApplication =
   (deps: EditApplicationEffectsDeps) =>
@@ -18,15 +21,15 @@ export const submitApplication =
 
     try {
       const session = context.getSession();
-      const applicationID = context.getData(CONTEXT_DATA_KEYS.application).id;
+      const { id } = context.getData(CONTEXT_DATA_KEYS.application);
       const opts = await getRcwApiDefaultOptions({
         homeAccountId: session?.msal?.homeAccountId,
         sessionId: session?.id,
       });
 
       response = await deps.updateApplicationStatus(
-        applicationID,
-        { applicationState: ApplicationState.enum.COMPLETED },
+        id,
+        { applicationState: ApplicationState.enum.COMPLETED, eTag },
         opts,
       );
     } catch (error) {
