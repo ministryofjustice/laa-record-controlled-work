@@ -82,6 +82,43 @@ describe("loadApplication", () => {
     ).to.equal(true);
   });
 
+  it("stores the application id as currentApplicationId in the session", async () => {
+    const mockApplication = getGetApplicationResponseMock({
+      id: applicationId,
+      applicationState: "DRAFT",
+      declaration: {
+        clientDeclarationStatus: "DRAFT",
+        declarationConfirmation: false,
+        createdAt: "2026-01-01T00:00:00Z",
+        createdBy: "test",
+        modifiedAt: "2026-01-01T00:00:00Z",
+        modifiedBy: "test",
+      },
+      evidence: {
+        evidenceStatus: "DRAFT",
+        payeIncomeEvidence: false,
+        otherIncomeEvidence: false,
+        housingCostsEvidence: false,
+        capitalEvidence: false,
+        createdAt: "2026-01-01T00:00:00Z",
+        createdBy: "test",
+        modifiedAt: "2026-01-01T00:00:00Z",
+        modifiedBy: "test",
+      },
+    });
+
+    const session = {
+      id: "session-id",
+      msal: { homeAccountId: "home-account-id" },
+    };
+    getSession.returns(session);
+    getApplicationStub.resolves({ status: 200, data: mockApplication });
+
+    await loadApplication(deps)(context);
+
+    expect((session as Record<string, unknown>).currentApplicationId).to.equal(applicationId);
+  });
+
   it("throws ApiResponseError when getApplication responds with non-200", async () => {
     getApplicationStub.resolves({
       status: 500,
