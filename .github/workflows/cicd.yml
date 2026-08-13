@@ -133,11 +133,10 @@ jobs:
 
   e2e:
     name: Tests
-    needs: build-image
+    needs: setup
     uses: ./.github/workflows/e2e.yml
     with:
       sha: ${{ github.event.pull_request.head.sha || github.sha }}
-      no-build: true
 
   build-image:
     name: Build Docker Image
