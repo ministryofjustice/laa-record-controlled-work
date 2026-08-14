@@ -6,7 +6,7 @@ import sinon from "sinon";
 import { ApiResponseError } from "#/api/clients/api.errors.js";
 import config from "#/config.js";
 import { updateEvidence } from "#/journeys/evidence/effects/updateEvidence.js";
-import type { EvidenceEffectsDeps } from "#/journeys/evidence/evidence.types.js";
+import type { EvidenceContext, EvidenceEffectsDeps } from "#/journeys/evidence/evidence.types.js";
 import { logger } from "#/logger.js";
 
 describe("updateEvidence", () => {
@@ -35,23 +35,24 @@ describe("updateEvidence", () => {
     moreDetailsForNoEvidence: "Client was advised over the phone",
   };
 
-  let context: EffectFunctionContext;
+  let context: EvidenceContext;
   let updateApplicationEvidenceStub: sinon.SinonStub;
   let deps: EvidenceEffectsDeps;
   let getSession: sinon.SinonStub;
+  let getRequestParam: sinon.SinonStub;
 
   beforeEach(() => {
     sinon.stub(config.api, "useMockAccessToken").value(true);
     updateApplicationEvidenceStub = sinon.stub();
     deps = { updateApplicationEvidence: updateApplicationEvidenceStub };
     getSession = sinon.stub().returns({
-      currentApplicationId: applicationId,
       id: "session-id",
       journeyDrafts: { [journeyCode]: incomeAnswers },
       msal: { homeAccountId: "home-account-id" },
     });
+    getRequestParam = sinon.stub().returns(applicationId);
 
-    context = { getSession, setData: sinon.stub() } as unknown as EffectFunctionContext;
+    context = { getSession, getRequestParam, setData: sinon.stub() } as unknown as EvidenceContext;
   });
 
   afterEach(() => sinon.restore());
@@ -88,7 +89,6 @@ describe("updateEvidence", () => {
   describe("when doYouHaveEvidence is no", () => {
     beforeEach(() => {
       getSession.returns({
-        currentApplicationId: applicationId,
         id: "session-id",
         journeyDrafts: { [journeyCode]: exemptionAnswers },
         msal: { homeAccountId: "home-account-id" },
@@ -122,11 +122,7 @@ describe("updateEvidence", () => {
   });
 
   it("throws ApiResponseError when currentApplicationId is missing from session", async () => {
-    getSession.returns({
-      id: "session-id",
-      journeyDrafts: { [journeyCode]: incomeAnswers },
-      msal: { homeAccountId: "home-account-id" },
-    });
+    getRequestParam.returns(undefined);
     sinon.stub(logger, "error");
 
     try {
@@ -139,7 +135,6 @@ describe("updateEvidence", () => {
 
   it("throws ApiResponseError when doYouHaveEvidence has an unexpected value", async () => {
     getSession.returns({
-      currentApplicationId: applicationId,
       id: "session-id",
       journeyDrafts: { [journeyCode]: { doYouHaveEvidence: "maybe" } },
       msal: { homeAccountId: "home-account-id" },

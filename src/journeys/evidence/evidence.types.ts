@@ -2,7 +2,6 @@ import type { EffectFunctionContext } from "@ministryofjustice/hmpps-forge/core"
 
 import type { updateApplicationEvidence } from "#/api/clients/rcw/schema/applications/applications.gen.js";
 import type { JourneySession } from "#/journeys/context.type.js";
-import type { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 
 export interface EvidenceAnswers extends Record<string, unknown> {
   asylumSupportEvidence?: string[];
@@ -28,9 +27,7 @@ export type EvidenceContext = EffectFunctionContext<
   JourneySession
 >;
 
-export interface EvidenceData extends Record<string, unknown> {
-  [CONTEXT_DATA_KEYS.applicationID]: string;
-}
+export interface EvidenceData extends Record<string, unknown> {}
 
 export interface EvidenceEffectsDeps {
   updateApplicationEvidence: typeof updateApplicationEvidence;

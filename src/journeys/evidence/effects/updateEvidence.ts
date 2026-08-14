@@ -9,10 +9,7 @@ import {
   isEvidenceAnswers,
 } from "#/journeys/evidence/evidence.types.js";
 import { mapEvidenceToEvidenceRequest } from "#/journeys/evidence/mappers/mapEvidenceToEvidenceRequest.js";
-import {
-  CONTEXT_DATA_KEYS,
-  PARAMS_KEYS,
-} from "#/journeys/journey.constants.js";
+import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
 import {
   InvalidEvidenceError,
   InvalidSessionError,
@@ -38,8 +35,6 @@ export const updateEvidence =
         logger.error("applicationID parameter is missing");
         throw new Error("applicationID parameter is required");
       }
-
-      context.setData(CONTEXT_DATA_KEYS.applicationID, applicationId);
 
       const journeyAnswers = session.journeyDrafts?.[journeyCode];
       if (!journeyAnswers) {
