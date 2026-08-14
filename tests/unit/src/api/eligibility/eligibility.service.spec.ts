@@ -7,17 +7,15 @@ import config from "#/config.js";
 import type { Success } from "#/lib/either.js";
 import { logger } from "#/logger.js";
 import {
-  LoadEligibilityAssessmentError,
-  SaveEligibilityAssessmentError,
-} from "#/api/eligibility/eligibility.errors.js";
-import {
   type EligibilityAssessment,
   type LoadEligibilityAssessmentDeps,
   type SaveEligibilityAssessmentDeps,
   loadEligibilityAssessment,
   saveEligibilityAssessment,
 } from "#/api/eligibility/eligibility.service.js";
-import { getGetApplicationResponseMock } from "../../../../mocks/api/rcw/fakers/applications/applications.faker.gen.js";
+import { getGetApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
+import { LoadEligibilityAssessmentError, SaveEligibilityAssessmentError } from "#/api/eligibility/eligibility.errors.js";
+
 
 describe("saveEligibilityAssessment", () => {
   const applicationId = "123e4567-e89b-12d3-a456-426614174000";

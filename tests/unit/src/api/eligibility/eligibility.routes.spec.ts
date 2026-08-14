@@ -14,8 +14,9 @@ import {
 } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
 import { createEligibilityRouter } from "#/api/eligibility/eligibility.routes.js";
-import { getGetApplicationResponseMock } from "../../../../mocks/api/rcw/fakers/applications/applications.faker.gen.js";
+
 import { createMockApp } from "../../../utils.js";
+import { getGetApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
 
 const MOUNT_PATH = "/api/applications/:applicationId/eligibility";
 const resourceId = "123e4567-e89b-12d3-a456-426614174000";
