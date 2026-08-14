@@ -125,9 +125,7 @@ function eligibilityResult(): HtmlBlock {
       `<div class="eligibility-result-box">
         <h2 class="govuk-heading-s">%1</h2>
         <p class="govuk-body">%2</p>
-        <p class="govuk-!-margin-bottom-0">
-          <a class="govuk-link" href="/cases/%3/eligibility/">%4</a>
-        </p>
+        <p class="govuk-!-margin-bottom-0"><a class="govuk-link" href="/cases/%3/eligibility/">%4</a></p>
       </div>`,
       t("journeys.createApplication.taskList.eligibilityResult.title"),
       eligibleContent,
