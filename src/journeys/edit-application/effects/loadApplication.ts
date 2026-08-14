@@ -10,7 +10,6 @@ import {
 import { getRcwApiDefaultOptions } from "#/api/clients/getRcwApiDefaultOptions.js";
 import { Application } from "#/api/clients/rcw/model/application.zod.gen.js";
 import { getAuthDebugHeaders } from "#/auth/auth.debug.js";
-import { isJourneySession } from "#/journeys/effects.js";
 import {
   CONTEXT_DATA_KEYS,
   PARAMS_KEYS,
@@ -72,9 +71,4 @@ export const loadApplication =
 
     const application: Application = result.data;
     context.setData(CONTEXT_DATA_KEYS.application, application);
-
-    const session = context.getSession();
-    if (isJourneySession(session) && application.id) {
-      session.currentApplicationId = application.id;
-    }
   };
