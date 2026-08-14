@@ -18,7 +18,7 @@ import {
   yourCasesEffectsRegistry,
 } from "#/journeys/your-cases/your-cases.effects.js";
 
-const yourCasesJourney = journey({
+export const yourCasesJourney = journey({
   code: "cases",
   onAccess: [
     access({

@@ -1,11 +1,13 @@
 import { expect } from "chai";
 import { describe, it } from "mocha";
 import sinon from "sinon";
-import { createForgeTestClientForCaseList } from "../../../../integration/utils/helpers.js";
-import {
-  TestRenderResult,
-  TestResult,
-} from "@ministryofjustice/hmpps-forge/core/testing";
+import { createTestClient } from "../../../../integration/utils/helpers.js";
+import { type ForgeTestClient, TestRenderResult, TestResult } from "@ministryofjustice/hmpps-forge/core/testing";
+import { yourCasesEffectsRegistry } from "#/journeys/your-cases/your-cases.effects.js";
+import { yourCasesJourney } from "#/journeys/your-cases/your-cases.journey.js";
+import { yourCasesStep } from "#/journeys/your-cases/steps/your-cases/your-cases.step.js";
+import { yourCasesRecordedStep } from "#/journeys/your-cases/steps/your-cases-recorded/your-cases-recorded.step.js";
+import { yourCasesIneligibleStep } from "#/journeys/your-cases/steps/your-cases-ineligible/your-cases-ineligible.step.js";
 import { ApiResponseError, ApiValidationError } from "#/api/clients/api.errors.js";
 import { logger } from "#/logger.js";
 import { getGetApplicationsResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
@@ -20,7 +22,7 @@ const session = {
 
 describe("LoadYourCaseList", () => {
   describe("when getApplications succeeds", () => {
-    let client: ReturnType<typeof createForgeTestClientForCaseList>;
+    let client: ForgeTestClient;
     let getApplicationsStub: sinon.SinonStub;
 
     before(() => {
@@ -28,8 +30,13 @@ describe("LoadYourCaseList", () => {
         .stub()
         .resolves({ status: 200, data: mockData });
 
-      client = createForgeTestClientForCaseList({
-        getApplications: getApplicationsStub,
+      client = createTestClient({
+        accessHooks: yourCasesJourney.onAccess,
+        journeyCode: "cases",
+        mockDeps: { getApplications: getApplicationsStub },
+        path: "/",
+        steps: [yourCasesStep, yourCasesRecordedStep, yourCasesIneligibleStep],
+        testEffects: yourCasesEffectsRegistry,
       });
     });
 
@@ -85,8 +92,13 @@ describe("LoadYourCaseList", () => {
     async function getErrorFromYourCases(
       stub: sinon.SinonStub,
     ): Promise<TestResult> {
-      const client = createForgeTestClientForCaseList({
-        getApplications: stub,
+      const client = createTestClient({
+        accessHooks: yourCasesJourney.onAccess,
+        journeyCode: "cases",
+        mockDeps: { getApplications: stub },
+        path: "/",
+        steps: [yourCasesStep, yourCasesRecordedStep, yourCasesIneligibleStep],
+        testEffects: yourCasesEffectsRegistry,
       });
       return await client.get("/cases", { session });
     }

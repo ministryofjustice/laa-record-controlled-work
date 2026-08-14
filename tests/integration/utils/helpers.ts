@@ -95,24 +95,6 @@ export function createForgeTestClient(
 }
 
 /**
- * Creates a test client for a single-step journey under /cases.
- * @param {Record<string, FunctionEvaluator>} mockYourCasesEffectsDeps - mock implementations for the journey's effect functions
- * @param {...any} steps - Step definitions to include in the test journey.
- * @returns {ForgeTestClient} A configured test client.
- */
-export function createForgeTestClientForCaseList(
-  mockYourCasesEffectsDeps: YourCasesEffectsDeps,
-): ForgeTestClient {
-  return new ForgeTestHarness()
-    .registerGlobalComponents(govukComponents)
-    .registerGlobalComponents(mojComponents)
-    .registerGlobalFunctions(nunjucksFunctions)
-    .registerPackage(yourCasesPackage, mockYourCasesEffectsDeps)
-    .registerGlobalFunctions(JourneyEffectsImplementations)
-    .createClient();
-}
-
-/**
  * Creates a test client for edit-application journey.
  * @param {EditApplicationEffectsDeps} mockDeps - mock implementations for the journey's effect functions
  * @returns {ForgeTestClient} A configured test client.

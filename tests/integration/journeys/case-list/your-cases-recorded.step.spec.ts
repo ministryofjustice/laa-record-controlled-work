@@ -1,6 +1,12 @@
 import { TestRenderResult } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
-import { createForgeTestClientForCaseList } from "../../utils/helpers.js";
+import { type ForgeTestClient } from "@ministryofjustice/hmpps-forge/core/testing";
+import { createTestClient } from "../../utils/helpers.js";
+import { yourCasesEffectsRegistry } from "#/journeys/your-cases/your-cases.effects.js";
+import { yourCasesJourney } from "#/journeys/your-cases/your-cases.journey.js";
+import { yourCasesStep } from "#/journeys/your-cases/steps/your-cases/your-cases.step.js";
+import { yourCasesRecordedStep } from "#/journeys/your-cases/steps/your-cases-recorded/your-cases-recorded.step.js";
+import { yourCasesIneligibleStep } from "#/journeys/your-cases/steps/your-cases-ineligible/your-cases-ineligible.step.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import sinon from "sinon";
 import { getGetApplicationsResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
@@ -15,15 +21,20 @@ const session = {
 
 describe("Your Cases recorded step", () => {
   let getApplicationsStub: sinon.SinonStub;
-  let client: ReturnType<typeof createForgeTestClientForCaseList>;
+  let client: ForgeTestClient;
   const mockData = getGetApplicationsResponseMock();
 
   before(() => {
     getApplicationsStub = sinon
       .stub()
       .resolves({ status: 200, data: mockData });
-    client = createForgeTestClientForCaseList({
-      getApplications: getApplicationsStub,
+    client = createTestClient({
+      accessHooks: yourCasesJourney.onAccess,
+      journeyCode: "cases",
+      mockDeps: { getApplications: getApplicationsStub },
+      path: "/",
+      steps: [yourCasesStep, yourCasesRecordedStep, yourCasesIneligibleStep],
+      testEffects: yourCasesEffectsRegistry,
     });
   });
 
