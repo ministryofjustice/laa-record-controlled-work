@@ -62,7 +62,13 @@ test.describe("@e2e critical path", () => {
 
   test.fixme("completes evidence section", async () => {});
   test.fixme("completes declaration", async () => {});
-  test.fixme("submits application", async () => {});
+
+  test.fixme("submits application", async () => {
+    // TODO started scaffolding this test, it requires other journeys to be complete first
+    await actor.submitApplication(applicationId);
+    await expect(page).toHaveURL(/\/submittedPage-TODO/);
+  });
+
   test.fixme("checks recorded cases", async () => {});
   test.fixme("exports case", async () => {});
 });

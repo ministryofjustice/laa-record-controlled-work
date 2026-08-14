@@ -18,7 +18,10 @@ import {
   completeEvidenceYesPath,
 } from "#tests/e2e/flows/evidence.flow.js";
 import { selectOfficeByCode } from "#tests/e2e/flows/office.flow.js";
-import { openMeansAssessmentFromTaskList } from "#tests/e2e/flows/task-list.flow.js";
+import {
+  openMeansAssessmentFromTaskList,
+  submitApplication,
+} from "#tests/e2e/flows/task-list.flow.js";
 
 export interface Actor {
   assertInProgressCaseVisible: (clientName: string) => Promise<void>;
@@ -34,6 +37,7 @@ export interface Actor {
   openMeansAssessmentFromTaskList: (applicationId: string) => Promise<void>;
   selectOfficeByCode: (code: string) => Promise<void>;
   startNewCase: () => Promise<void>;
+  submitApplication: (applicationId: string) => Promise<void>;
 }
 
 interface ActorFixtures {
@@ -78,6 +82,9 @@ export const createActor = (page: Page): Actor => ({
   },
   startNewCase: async () => {
     await startNewCase(page);
+  },
+  submitApplication: async (applicationId: string) => {
+    await submitApplication(page, applicationId);
   },
 });
 

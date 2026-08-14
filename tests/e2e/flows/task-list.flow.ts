@@ -42,3 +42,12 @@ export const openMeansAssessmentFromTaskList = async (
     new RegExp(`/cases/${applicationId}/eligibility(?:/.*)?(?:$|\\?)`),
   );
 };
+
+export const submitApplication = async (
+  page: Page,
+  _applicationId: string,
+): Promise<void> => {
+  await page.getByRole("button", { name: "Record Controlled Work" }).click();
+  // TODO: Update this to the correct URL once the submission journey is implemented
+  await expect(page).toHaveURL(/\/submittedPage-TODO/);
+};
