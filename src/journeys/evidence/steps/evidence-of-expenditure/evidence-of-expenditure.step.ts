@@ -6,12 +6,12 @@ import {
   submit,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
-import { EvidenceEffects } from "#/journeys/evidence/evidence.effects.js";
 import {
   backLink,
   caption,
   continueButton,
 } from "#/journeys/evidence/common.blocks.js";
+import { EvidenceEffects } from "#/journeys/evidence/evidence.effects.js";
 import {
   childCareEvidenceGroup,
   description,

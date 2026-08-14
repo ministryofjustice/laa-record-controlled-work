@@ -1,6 +1,6 @@
 import {
-  Data,
   Format,
+  Params,
   redirect,
   step,
   submit,
@@ -12,7 +12,7 @@ import {
   heading,
   summaryList,
 } from "#/journeys/evidence/steps/check-answers/check-answers.blocks.js";
-import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
+import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
 import { t } from "#/lib/i18n.js";
 
 export const checkAnswersStep = (): ReturnType<typeof step> =>
@@ -27,7 +27,7 @@ export const checkAnswersStep = (): ReturnType<typeof step> =>
             redirect({
               goto: Format(
                 "/cases/%1/task-list",
-                Data(CONTEXT_DATA_KEYS.applicationID),
+                Params(PARAMS_KEYS.applicationID),
               ),
             }),
           ],

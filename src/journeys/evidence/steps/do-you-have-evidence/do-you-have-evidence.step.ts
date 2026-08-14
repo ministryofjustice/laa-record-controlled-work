@@ -7,12 +7,12 @@ import {
   submit,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
-import { EvidenceEffects } from "#/journeys/evidence/evidence.effects.js";
 import {
   backLink,
   caption,
   continueButton,
 } from "#/journeys/evidence/common.blocks.js";
+import { EvidenceEffects } from "#/journeys/evidence/evidence.effects.js";
 import { doYouHaveEvidenceRadioInput } from "#/journeys/evidence/steps/do-you-have-evidence/do-you-have-evidence.blocks.js";
 import { t } from "#/lib/i18n.js";
 
