@@ -53,7 +53,7 @@ test("Edit Application - Task List step - Record Controlled Work button", async 
   const allStatuses = page.locator(".govuk-task-list__status");
   await expect(allStatuses).toHaveText(["Completed", "Completed", "Completed", "Completed"]);
 
-  const submitButton = page.getByRole("button", { name: "Record Controlled Work" });
+  const submitButton = page.getByRole("button", { name: "Record controlled work" });
 
   await expect(submitButton).toBeVisible();
 
