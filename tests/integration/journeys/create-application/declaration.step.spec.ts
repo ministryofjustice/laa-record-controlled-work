@@ -10,20 +10,20 @@ import {
 
 import { declarationStep } from "#/journeys/create-application/steps/declaration.step.js";
 import { ecfStep } from "#/journeys/create-application/steps/ecf.step.js";
-import { createTestClient } from "../../utils/helpers.js";
+import { createForgeTestClient } from "../../utils/helpers.js";
 import { createApplicationJourney } from "#/journeys/create-application/create-application.journey.js";
 
 describe("Declaration step", () => {
-  const client = createTestClient({
-    accessHooks: createApplicationJourney.onAccess,
-    journeyCode: "createApplication",
-    path: "/cases/new/",
-    steps: [
-      declarationStep("createApplication"),
-      ecfStep("createApplication"),
-    ],
-    testEffects: createApplicationEffectsRegistry,
-  });
+  const client = createForgeTestClient(
+    createApplicationJourney,
+    createApplicationEffectsRegistry,
+    {
+      steps: [
+        declarationStep("createApplication"),
+        ecfStep("createApplication"),
+      ],
+    },
+  );
 
   describe("GET /cases/new/provider-declaration", () => {
     let renderResult: TestRenderResult;

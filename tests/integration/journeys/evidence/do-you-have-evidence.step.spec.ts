@@ -4,7 +4,7 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
 import { doYouHaveEvidence } from "#/journeys/evidence/steps/do-you-have-evidence/do-you-have-evidence.step.js";
-import { createTestClient } from "../../utils/helpers.js";
+import { createForgeTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import { evidenceEffects } from "#/journeys/evidence/evidence.effects.js";
 import { evidencePackage } from "#/journeys/evidence/evidence.package.js";
@@ -13,13 +13,11 @@ import { evidenceJourney } from "#/journeys/evidence/evidence.journey.js";
 
 describe("Do you have evidence step", () => {
   const applicationId = "123e4567-e89b-12d3-a456-426614174000";
-  const client = createTestClient({
-    accessHooks: evidenceJourney.onAccess,
-    journeyCode: "evidence",
-    path: "/cases/:applicationID/evidence",
-    steps: [doYouHaveEvidence("evidence")],
-    testEffects: evidencePackage.functions,
-  });
+  const client = createForgeTestClient(
+    evidenceJourney,
+    evidencePackage.functions,
+    { steps: [doYouHaveEvidence("evidence")] },
+  );
 
   describe("GET /cases/evidence/have-evidence", () => {
     let renderResult: TestRenderResult;

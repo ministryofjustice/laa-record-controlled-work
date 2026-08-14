@@ -8,10 +8,9 @@ import sinon from "sinon";
 
 import { getGetAllProviderOfficesResponseMock } from "#orval/mocks/pda/fakers/provider-firms-endpoints/provider-firms-endpoints.faker.gen.js";
 import { type ForgeTestClient } from "@ministryofjustice/hmpps-forge/core/testing";
-import { createTestClient } from "../../utils/helpers.js";
+import { createForgeTestClient } from "../../utils/helpers.js";
 import { selectOfficeEffectsRegistry } from "#/journeys/select-office/select-office.effects.js";
 import { selectOfficeJourney } from "#/journeys/select-office/select-office.journey.js";
-import { selectOfficeStep } from "#/journeys/select-office/steps/select-office.step.js";
 
 faker.seed(12345);
 
@@ -39,14 +38,11 @@ describe("Select Office step", () => {
       .stub()
       .resolves({ status: 200, data: mockResponse });
 
-    client = createTestClient({
-      accessHooks: selectOfficeJourney.onAccess,
-      journeyCode: "selectOffice",
-      mockDeps: { getAllProviderOffices: getAllProviderOfficesStub },
-      path: "/select-office",
-      steps: [selectOfficeStep],
-      testEffects: selectOfficeEffectsRegistry,
-    });
+    client = createForgeTestClient(
+      selectOfficeJourney,
+      selectOfficeEffectsRegistry,
+      { dependencies: { getAllProviderOffices: getAllProviderOfficesStub } },
+    );
   });
 
   after(() => {

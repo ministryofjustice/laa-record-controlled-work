@@ -7,7 +7,7 @@ import {
   CreateApplicationEffects,
   createApplicationEffectsRegistry,
 } from "#/journeys/create-application/create-application.effects.js";
-import { createTestClient } from "../../utils/helpers.js";
+import { createForgeTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import { checkAnswersStep } from "#/journeys/create-application/steps/check-answers.step.js";
 import sinon from "sinon";
@@ -24,14 +24,15 @@ describe("Check answers step", () => {
       headers: new Headers(),
     });
 
-  const client = createTestClient({
-    accessHooks: createApplicationJourney.onAccess,
-    journeyCode: "createApplication",
-    mockDeps: { createApplication: createApplicationStub },
-    path: "/cases/new/",
-    steps: [checkAnswersStep("createApplication")],
-    testEffects: createApplicationEffectsRegistry,
-  });
+  const client = createForgeTestClient(
+    createApplicationJourney,
+    createApplicationEffectsRegistry,
+    {
+      dependencies: { createApplication: createApplicationStub },
+      steps: [checkAnswersStep("createApplication")],
+    },
+  );
+  
   const session = {
     journeyDrafts: {
       createApplication: {

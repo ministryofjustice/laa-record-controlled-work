@@ -8,18 +8,16 @@ import {
   createApplicationEffectsRegistry,
 } from "#/journeys/create-application/create-application.effects.js";
 import { legalAidBeforeStep } from "#/journeys/create-application/steps/legal-aid-before.step.js";
-import { createTestClient } from "../../utils/helpers.js";
+import { createForgeTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import { createApplicationJourney } from "#/journeys/create-application/create-application.journey.js";
 
 describe("Legal aid before step", () => {
-  const client = createTestClient({
-    accessHooks: createApplicationJourney.onAccess,
-    journeyCode: "createApplication",
-    path: "/cases/new/",
-    steps: [legalAidBeforeStep("createApplication")],
-    testEffects: createApplicationEffectsRegistry,
-  });
+  const client = createForgeTestClient(
+    createApplicationJourney,
+    createApplicationEffectsRegistry,
+    { steps: [legalAidBeforeStep("createApplication")] },
+  );
 
   describe("GET /cases/new/legal-aid-before", () => {
     let renderResult: TestRenderResult;

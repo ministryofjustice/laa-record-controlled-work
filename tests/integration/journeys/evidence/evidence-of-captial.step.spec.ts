@@ -5,7 +5,7 @@ import {
   TestRenderResult,
 } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
-import { createTestClient } from "../../utils/helpers.js";
+import { createForgeTestClient } from "../../utils/helpers.js";
 import { evidenceEffects } from "#/journeys/evidence/evidence.effects.js";
 import { evidencePackage } from "#/journeys/evidence/evidence.package.js";
 import { createApplicationJourney } from "#/journeys/create-application/create-application.journey.js";
@@ -13,13 +13,11 @@ import { evidenceJourney } from "#/journeys/evidence/evidence.journey.js";
 
 describe("Evidence of capital step", () => {
   const applicationId = "123e4567-e89b-12d3-a456-426614174000";
-  const client = createTestClient({
-    accessHooks: evidenceJourney.onAccess,
-    journeyCode: "evidence",
-    path: "/cases/:applicationID/evidence",
-    steps: [evidenceOfCapital("evidence")],
-    testEffects: evidencePackage.functions,
-  });
+  const client = createForgeTestClient(
+    evidenceJourney,
+    evidencePackage.functions,
+    { steps: [evidenceOfCapital("evidence")] },
+  );
 
   describe("GET /cases/evidence/evidence-of-capital", () => {
     let renderResult: TestRenderResult;

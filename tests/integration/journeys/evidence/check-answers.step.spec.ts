@@ -4,7 +4,7 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
 import sinon from "sinon";
-import { createTestClient } from "../../utils/helpers.js";
+import { createForgeTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import { evidencePackage } from "#/journeys/evidence/evidence.package.js";
 import { checkAnswersStep } from "#/journeys/evidence/steps/check-answers/check-answers.step.js";
@@ -18,16 +18,14 @@ describe("Check answers step", () => {
     status: 204,
   });
 
-  const client = createTestClient({
-    steps: [checkAnswersStep()],
-    accessHooks: evidenceJourney.onAccess,
-    journeyCode: "evidence",
-    path: "/cases/:applicationID/evidence",
-    testEffects: evidencePackage.functions,
-    mockDeps: {
-      updateApplicationEvidence: updateApplicationEvidenceStub,
+  const client = createForgeTestClient(
+    evidenceJourney,
+    evidencePackage.functions,
+    {
+      dependencies: { updateApplicationEvidence: updateApplicationEvidenceStub },
+      steps: [checkAnswersStep()],
     },
-  });
+  );
 
   const session = {
     journeyDrafts: {

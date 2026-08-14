@@ -4,7 +4,7 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
 import { reasonForNoEvidence } from "#/journeys/evidence/steps/reason-for-no-evidence/reason-for-no-evidence.step.js";
-import { createTestClient } from "../../utils/helpers.js";
+import { createForgeTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import { evidenceEffects } from "#/journeys/evidence/evidence.effects.js";
 import { evidencePackage } from "#/journeys/evidence/evidence.package.js";
@@ -13,13 +13,11 @@ import { evidenceJourney } from "#/journeys/evidence/evidence.journey.js";
 
 describe("Reason for no evidence step", () => {
   const applicationId = "123e4567-e89b-12d3-a456-426614174000";
-  const client = createTestClient({
-    accessHooks: evidenceJourney.onAccess,
-    journeyCode: "evidence",
-    path: "/cases/:applicationID/evidence",
-    steps: [reasonForNoEvidence("evidence")],
-    testEffects: evidencePackage.functions,
-  });
+  const client = createForgeTestClient(
+    evidenceJourney,
+    evidencePackage.functions,
+    { steps: [reasonForNoEvidence("evidence")] },
+  );
 
   describe("GET /cases/evidence/reason-for-no-evidence", () => {
     let renderResult: TestRenderResult;

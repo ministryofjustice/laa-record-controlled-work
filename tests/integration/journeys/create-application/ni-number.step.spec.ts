@@ -8,18 +8,16 @@ import {
   createApplicationEffectsRegistry,
 } from "#/journeys/create-application/create-application.effects.js";
 import { niNumberStep } from "#/journeys/create-application/steps/ni-number.step.js";
-import { createTestClient } from "../../utils/helpers.js";
+import { createForgeTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import { createApplicationJourney } from "#/journeys/create-application/create-application.journey.js";
 
 describe("NI number step", () => {
-  const client = createTestClient({
-    accessHooks: createApplicationJourney.onAccess,
-    journeyCode: "createApplication",
-    path: "/cases/new/",
-    steps: [niNumberStep("createApplication")],
-    testEffects: createApplicationEffectsRegistry,
-  });
+  const client = createForgeTestClient(
+    createApplicationJourney,
+    createApplicationEffectsRegistry,
+    { steps: [niNumberStep("createApplication")] },
+  );
 
   describe("GET /cases/new/ni-number", () => {
     let renderResult: TestRenderResult;

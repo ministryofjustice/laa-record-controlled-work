@@ -8,18 +8,16 @@ import {
   createApplicationEffectsRegistry,
 } from "#/journeys/create-application/create-application.effects.js";
 import { clientDetailsStep } from "#/journeys/create-application/steps/client-details.step.js";
-import { createTestClient } from "../../utils/helpers.js";
+import { createForgeTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import { createApplicationJourney } from "#/journeys/create-application/create-application.journey.js";
 
 describe("Client details step", () => {
-  const client = createTestClient({
-    accessHooks: createApplicationJourney.onAccess,
-    journeyCode: "createApplication",
-    path: "/cases/new/",
-    steps: [clientDetailsStep("createApplication")],
-    testEffects: createApplicationEffectsRegistry,
-  });
+  const client = createForgeTestClient(
+    createApplicationJourney,
+    createApplicationEffectsRegistry,
+    { steps: [clientDetailsStep("createApplication")] },
+  );
 
   describe("GET /cases/new/client-details", () => {
     let renderResult: TestRenderResult;

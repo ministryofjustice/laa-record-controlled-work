@@ -9,21 +9,21 @@ import {
 } from "#/journeys/create-application/create-application.effects.js";
 import { ineligibleStep } from "#/journeys/create-application/steps/ecf-dropout.step.js";
 import { ecfStep } from "#/journeys/create-application/steps/ecf.step.js";
-import { createTestClient } from "../../utils/helpers.js";
+import { createForgeTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import { createApplicationJourney } from "#/journeys/create-application/create-application.journey.js";
 
 describe("ECF step", () => {
-  const client = createTestClient({
-    accessHooks: createApplicationJourney.onAccess,
-    journeyCode: "createApplication",
-    path: "/cases/new/",
-    steps: [
-      ecfStep("createApplication"),
-      ineligibleStep("createApplication"),
-    ],
-    testEffects: createApplicationEffectsRegistry,
-  });
+  const client = createForgeTestClient(
+    createApplicationJourney,
+    createApplicationEffectsRegistry,
+    {
+      steps: [
+        ecfStep("createApplication"),
+        ineligibleStep("createApplication"),
+      ],
+    },
+  );
 
   describe("GET /cases/new/ecf", () => {
     let renderResult: TestRenderResult;

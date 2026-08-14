@@ -5,6 +5,8 @@ import { ecfStep } from "#/journeys/create-application/steps/ecf.step.js";
 import { TestRenderResult } from "@ministryofjustice/hmpps-forge/core/testing";
 import { JourneyEffects } from "#/journeys/effects.js";
 import { access, step } from "@ministryofjustice/hmpps-forge/core/authoring";
+import { createApplicationJourney } from "#/journeys/create-application/create-application.journey.js";
+import { createApplicationEffectsRegistry } from "#/journeys/create-application/create-application.effects.js";
 
 const clearDraftStep = step({
   blocks: [],
@@ -35,15 +37,19 @@ const clearAnswerStep = step({
   title: "Clear Answers",
 });
 
-const client = createForgeTestClient(
-  "Record new case",
-  "/cases/new/",
-  [
-    ecfStep("testJourney"),
-    clearDraftStep,
-    clearAnswerStep,
-  ],
-);
+  const client = createForgeTestClient(
+    createApplicationJourney,
+    createApplicationEffectsRegistry,
+    {
+      accessHooks: [access({ effects: [JourneyEffects.LoadDraftAnswers("testJourney")] })],
+      steps: [
+        ecfStep("testJourney"),
+        clearDraftStep,
+        clearAnswerStep,
+      ],
+    },
+  );
+
 let session: Record<string, unknown> = {};
 
 beforeEach(() => {
