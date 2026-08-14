@@ -1,7 +1,10 @@
 import { test, expect } from "../../fixtures/index.js";
+import { application } from "../../msw/fixtures/rcw.fixtures.js";
 
-test("evidence flow", async ({ page }) => {
-  await page.goto("/cases/evidence/have-evidence");
+test("evidence flow", async ({ withSelectedOffice: page }) => {
+  const applicationId = application.id;
+
+  await page.goto(`/cases/${applicationId}/evidence/have-evidence`);
 
   // Check for the question
   await expect(
@@ -16,7 +19,7 @@ test("evidence flow", async ({ page }) => {
   await page.getByRole("button", { name: "Continue" }).click();
 
   // Verify redirection to the evidence of income page
-  await expect(page).toHaveURL("/cases/evidence/evidence-of-income");
+  await expect(page).toHaveURL(`/cases/${applicationId}/evidence/evidence-of-income`);
 
   // Check for the question on the evidence of income page
   await expect(
@@ -32,7 +35,7 @@ test("evidence flow", async ({ page }) => {
   await page.getByRole("button", { name: "Continue" }).click();
 
   // Verify redirection to the evidence of expenditure page
-  await expect(page).toHaveURL("/cases/evidence/evidence-of-expenditure");
+  await expect(page).toHaveURL(`/cases/${applicationId}/evidence/evidence-of-expenditure`);
 
   // Check for the question on the evidence of expenditure page
   await expect(
@@ -48,7 +51,7 @@ test("evidence flow", async ({ page }) => {
   await page.getByRole("button", { name: "Continue" }).click();
 
   // Verify redirection to the evidence of capital page
-  await expect(page).toHaveURL("/cases/evidence/evidence-of-capital");
+  await expect(page).toHaveURL(`/cases/${applicationId}/evidence/evidence-of-capital`);
 
   // Check for the question on the evidence of capital page
   await expect(
@@ -64,17 +67,17 @@ test("evidence flow", async ({ page }) => {
   await page.getByRole("button", { name: "Continue" }).click();
   
   // Verify redirection to the check your answers page
-  await expect(page).toHaveURL("/cases/evidence/check-answers");
+  await expect(page).toHaveURL(`/cases/${applicationId}/evidence/check-answers`);
 
-  // Navigate back to the has evidence page
-  await page.goto("/cases/evidence/have-evidence");
+  // Navigate back to the have evidence page
+  await page.goto(`/cases/${applicationId}/evidence/have-evidence`);
 
   // Select "No" and submit
   await page.getByRole("radio", { name: "No" }).check();
   await page.getByRole("button", { name: "Continue" }).click();
 
   // Verify redirection to the reason for no evidence page
-  await expect(page).toHaveURL("/cases/evidence/reason-for-no-evidence");
+  await expect(page).toHaveURL(`/cases/${applicationId}/evidence/reason-for-no-evidence`);
 
   // check for questions on reason for no evidence page
   await expect(
@@ -96,7 +99,7 @@ test("evidence flow", async ({ page }) => {
   await page.getByRole("button", { name: "Continue" }).click();
 
   // Verify redirection to the check your answers page
-  await expect(page).toHaveURL("/cases/evidence/check-answers"); 
+  await expect(page).toHaveURL(`/cases/${applicationId}/evidence/check-answers`); 
 
   await expect(
     page.getByRole("heading", {
@@ -123,5 +126,5 @@ test("evidence flow", async ({ page }) => {
   await page.getByRole("button", { name: "Save and continue" }).click();
 
   // Verify redirection to the task list page
-  await expect(page).toHaveURL("/task-list");
+  await expect(page).toHaveURL(`/cases/${applicationId}/task-list`);
 });
