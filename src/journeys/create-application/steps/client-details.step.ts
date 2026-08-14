@@ -82,12 +82,6 @@ export const clientDetailsStep = (
           text: t("journeys.createApplication.clientDetails.dateOfBirth.hint"),
         },
         validWhen: [
-          validation({
-            condition: Self().match(Condition.Date.IsAfter("1900-01-01")),
-            message: t(
-              "journeys.createApplication.clientDetails.dateOfBirth.validation.ageLimit",
-            ),
-          }),
           ...GovUKValidations.DateInputFull({
             empty: {
               message: t(
@@ -120,6 +114,12 @@ export const clientDetailsStep = (
               ),
               submissionOnly: true,
             },
+          }),
+          validation({
+            condition: Self().match(Condition.Date.IsAfter("1900-01-01")),
+            message: t(
+              "journeys.createApplication.clientDetails.dateOfBirth.validation.ageLimit",
+            ),
           }),
         ],
       }),
