@@ -78,7 +78,6 @@ describe("loadApplication", () => {
     ).to.equal(true);
   });
 
-
   it("throws ApiResponseError when getApplication responds with non-200", async () => {
     getApplicationStub.resolves({
       status: 500,
