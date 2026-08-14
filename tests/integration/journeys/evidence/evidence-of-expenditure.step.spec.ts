@@ -4,13 +4,13 @@ import {
   TestRenderResult,
 } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
-import { createForgeTestClient } from "../../utils/helpers.js";
+import { createForgeTestClientForEvidence } from "../../utils/helpers.js";
 import { evidenceOfExpenditure } from "#/journeys/evidence/steps/evidence-of-expenditure/evidence-of-expenditure.step.js";
 
 describe("Evidence of expenditure step", () => {
-  const client = createForgeTestClient(
+  const applicationId = "123e4567-e89b-12d3-a456-426614174000";
+  const client = createForgeTestClientForEvidence(
     "Evidence",
-    "/cases/evidence",
     [evidenceOfExpenditure("testJourney")],
   );
 
@@ -20,7 +20,7 @@ describe("Evidence of expenditure step", () => {
 
     before(async () => {
       const result = await client.get(
-        "/cases/evidence/evidence-of-expenditure",
+        `/cases/${applicationId}/evidence/evidence-of-expenditure`,
       );
       expect(result.type).to.equal("render");
       renderResult = result as TestRenderResult;
@@ -59,7 +59,7 @@ describe("Evidence of expenditure step", () => {
   describe("POST /cases/evidence/evidence-of-expenditure", () => {
     it("should redirect to evidence of expenditure and capital step if at least one option is selected", async () => {
       const result = await client.post(
-        "/cases/evidence/evidence-of-expenditure",
+        `/cases/${applicationId}/evidence/evidence-of-expenditure`,
         {
           body: {
             employedEvidence: ["wageSlips", "taxCalculationSheet"],
@@ -69,7 +69,7 @@ describe("Evidence of expenditure step", () => {
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
       expect(redirectResult.url).to.equal(
-        "/cases/evidence/evidence-of-capital",
+        `/cases/${applicationId}/evidence/evidence-of-capital`,
       );
     });
   });

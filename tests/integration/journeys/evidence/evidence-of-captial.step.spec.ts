@@ -5,12 +5,12 @@ import {
   TestRenderResult,
 } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
-import { createForgeTestClient } from "../../utils/helpers.js";
+import { createForgeTestClientForEvidence } from "../../utils/helpers.js";
 
 describe("Evidence of capital step", () => {
-  const client = createForgeTestClient(
+  const applicationId = "123e4567-e89b-12d3-a456-426614174000";
+  const client = createForgeTestClientForEvidence(
     "Evidence",
-    "/cases/evidence",
     [evidenceOfCapital("testJourney")],
   );
 
@@ -19,7 +19,7 @@ describe("Evidence of capital step", () => {
     let checkboxInputs: RenderBlock[];
 
     before(async () => {
-      const result = await client.get("/cases/evidence/evidence-of-capital");
+      const result = await client.get(`/cases/${applicationId}/evidence/evidence-of-capital`);
       expect(result.type).to.equal("render");
       renderResult = result as TestRenderResult;
       checkboxInputs = renderResult.getBlocksByVariant("govukCheckboxInput");
@@ -50,7 +50,7 @@ describe("Evidence of capital step", () => {
 
   describe("POST /cases/evidence/evidence-of-capital", () => {
     it("should show validation error if no option is selected", async () => {
-      const result = await client.post("/cases/evidence/evidence-of-capital", {
+      const result = await client.post("/cases/123e4567-e89b-12d3-a456-426614174000/evidence/evidence-of-capital", {
         body: {},
       });
       expect(result.type).to.equal("render");
@@ -59,7 +59,7 @@ describe("Evidence of capital step", () => {
     });
 
     it("should redirect to check answers step", async () => {
-      const result = await client.post("/cases/evidence/evidence-of-capital", {
+      const result = await client.post("/cases/123e4567-e89b-12d3-a456-426614174000/evidence/evidence-of-capital", {
         body: {
           capitalEvidence: ["bankStatement"],
         },
@@ -67,7 +67,7 @@ describe("Evidence of capital step", () => {
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
       expect(redirectResult.url).to.equal(
-        "/cases/evidence/check-answers",
+        `/cases/${applicationId}/evidence/check-answers`,
       );
     });
   });
