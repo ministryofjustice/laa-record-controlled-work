@@ -47,7 +47,7 @@ export const submitApplication = async (
   page: Page,
   _applicationId: string,
 ): Promise<void> => {
-  await page.getByRole("button", { name: "Record Controlled Work" }).click();
+  await page.getByRole("button", { name: "Record controlled work" }).click();
   // TODO: Update this to the correct URL once the submission journey is implemented
   await expect(page).toHaveURL(/\/submittedPage-TODO/);
 };
