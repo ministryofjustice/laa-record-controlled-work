@@ -1,8 +1,14 @@
 import type { NextFunction, Request, Response } from "express";
 
-import type { SaveApplicationMeansDeps } from "#/api/eligibility/eligibility.service.js";
+import type {
+  LoadEligibilityAssessmentDeps,
+  SaveEligibilityAssessmentDeps,
+} from "#/api/eligibility/eligibility.service.js";
 
-import { saveApplicationMeans } from "#/api/eligibility/eligibility.service.js";
+import {
+  loadEligibilityAssessment,
+  saveEligibilityAssessment,
+} from "#/api/eligibility/eligibility.service.js";
 import {
   ApplicationIdParam,
   PutEligibilityRequestBody,
@@ -12,8 +18,8 @@ import { BAD_REQUEST, OK, UNAUTHORIZED } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
 
 export const createGetEligibilityHandler =
-  () =>
-  (req: Request, res: Response): void => {
+  (deps: LoadEligibilityAssessmentDeps) =>
+  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const parsedParams = ApplicationIdParam.safeParse(req.params);
 
     if (!parsedParams.success) {
@@ -24,11 +30,27 @@ export const createGetEligibilityHandler =
       return;
     }
 
-    res.json({ return_url: "http://localhost:8080" });
+    const { applicationId } = parsedParams.data;
+    const result = await loadEligibilityAssessment(deps, {
+      applicationId,
+      homeAccountId: req.session.msal?.homeAccountId,
+      sessionId: req.sessionID,
+    });
+
+    if (result.error) {
+      if (result.error instanceof NotAuthenticatedError) {
+        res.status(UNAUTHORIZED).end();
+        return;
+      }
+      next(result.error);
+      return;
+    }
+
+    res.json({ ...(result.value ?? {}) });
   };
 
 export const createPutEligibilityHandler =
-  (deps: SaveApplicationMeansDeps) =>
+  (deps: SaveEligibilityAssessmentDeps) =>
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const parsedParams = ApplicationIdParam.safeParse(req.params);
     if (!parsedParams.success) {
@@ -50,7 +72,7 @@ export const createPutEligibilityHandler =
 
     const { eligibility_assessment: eligibilityAssessment } = parsedBody.data;
     const { applicationId } = parsedParams.data;
-    const result = await saveApplicationMeans(deps, {
+    const result = await saveEligibilityAssessment(deps, {
       applicationId,
       eligibilityAssessment,
       homeAccountId: req.session.msal?.homeAccountId,

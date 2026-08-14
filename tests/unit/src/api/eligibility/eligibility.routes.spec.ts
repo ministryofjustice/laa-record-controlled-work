@@ -13,10 +13,10 @@ import {
   UNAUTHORIZED,
 } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
-import eligibilityRouter, {
-  createEligibilityRouter,
-} from "#/api/eligibility/eligibility.routes.js";
+import { createEligibilityRouter } from "#/api/eligibility/eligibility.routes.js";
+
 import { createMockApp } from "../../../utils.js";
+import { getGetApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
 
 const MOUNT_PATH = "/api/applications/:applicationId/eligibility";
 const resourceId = "123e4567-e89b-12d3-a456-426614174000";
@@ -26,32 +26,114 @@ function eligibilityPath(applicationId: string): string {
 }
 
 describe("GET /api/applications/:applicationId/eligibility", () => {
+  let getApplicationStub: sinon.SinonStub;
+
+  function buildApp(): Application {
+    return createMockApp({
+      mountPath: MOUNT_PATH,
+      router: createEligibilityRouter({
+        getApplication: getApplicationStub,
+        updateApplicationMeans: sinon.stub(),
+      }),
+      useCsrf: false,
+    });
+  }
+
+  beforeEach(() => {
+    sinon.stub(config.api, "useMockAccessToken").value(true);
+    getApplicationStub = sinon.stub();
+  });
+
   afterEach(() => {
     sinon.restore();
   });
 
-  it("returns 200 for a valid applicationId", async () => {
-    const app = createMockApp({
-      mountPath: MOUNT_PATH,
-      router: eligibilityRouter,
-      useCsrf: false,
-    });
-
-    const response = await request(app).get(eligibilityPath(resourceId));
-
-    expect(response.status).to.equal(OK);
-  });
-
   it("returns 400 when applicationId is not a valid UUID", async () => {
-    const app = createMockApp({
-      mountPath: MOUNT_PATH,
-      router: eligibilityRouter,
-      useCsrf: false,
-    });
-
-    const response = await request(app).get(eligibilityPath("not-a-uuid"));
+    const response = await request(buildApp()).get(
+      eligibilityPath("not-a-uuid"),
+    );
 
     expect(response.status).to.equal(BAD_REQUEST);
+    expect(getApplicationStub.called).to.equal(false);
+  });
+
+  it("returns an empty body when the application has no eligibility assessment", async () => {
+    getApplicationStub.resolves({
+      data: getGetApplicationResponseMock({
+        id: resourceId,
+        eligibility: undefined,
+      }),
+      status: 200,
+    });
+
+    const response = await request(buildApp()).get(
+      eligibilityPath(resourceId),
+    );
+
+    expect(response.status).to.equal(OK);
+    expect(response.body).to.deep.equal({});
+  });
+
+  it("returns data/result when a completed assessment is present", async () => {
+    getApplicationStub.resolves({
+      data: getGetApplicationResponseMock({
+        id: resourceId,
+        eligibility: {
+          data: { level_of_help: "controlled_legal_representation" },
+          result: { indication: true },
+        },
+      }),
+      status: 200,
+    });
+
+    const response = await request(buildApp()).get(
+      eligibilityPath(resourceId),
+    );
+
+    expect(response.status).to.equal(OK);
+    expect(response.body).to.deep.equal({
+      data: { level_of_help: "controlled_legal_representation" },
+      result: { indication: true },
+    });
+  });
+
+  it("returns an empty body when the eligibility assessment is malformed or partial", async () => {
+    getApplicationStub.resolves({
+      data: getGetApplicationResponseMock({
+        id: resourceId,
+        eligibility: { data: { level_of_help: "cw" }, result: undefined },
+      }),
+      status: 200,
+    });
+
+    const response = await request(buildApp()).get(
+      eligibilityPath(resourceId),
+    );
+
+    expect(response.status).to.equal(OK);
+    expect(response.body).to.deep.equal({});
+  });
+
+  it("returns 401 when the session cannot be authenticated", async () => {
+    sinon.stub(config.api, "useMockAccessToken").value(false);
+
+    const response = await request(buildApp()).get(
+      eligibilityPath(resourceId),
+    );
+
+    expect(response.status).to.equal(UNAUTHORIZED);
+    expect(getApplicationStub.called).to.equal(false);
+  });
+
+  it("surfaces a 5xx when the RCW API call fails", async () => {
+    getApplicationStub.resolves({ data: undefined, status: 500 });
+    sinon.stub(logger, "error");
+
+    const response = await request(buildApp()).get(
+      eligibilityPath(resourceId),
+    );
+
+    expect(response.status).to.equal(INTERNAL_SERVER_ERROR);
   });
 });
 
@@ -62,6 +144,7 @@ describe("PUT /api/applications/:applicationId/eligibility", () => {
     return createMockApp({
       mountPath: MOUNT_PATH,
       router: createEligibilityRouter({
+        getApplication: sinon.stub(),
         updateApplicationMeans: updateApplicationMeansStub,
       }),
       useCsrf: false,
