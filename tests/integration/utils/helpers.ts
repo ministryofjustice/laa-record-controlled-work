@@ -165,99 +165,16 @@ export function createForgeTestClientForEditApplication(
     .createClient();
 }
 
-  // /**
-  //  * Creates a test client for evidence journey tests.
-  //  * @param {string} title - The title of the journey.
-  //  * @param {...any} steps - Step definitions to include in the test journey.
-  //  * @param {EvidenceEffectsDeps} mockDeps - mock implementations for the journey's effect functions
-  //  * @returns {ForgeTestClient} A configured test client.
-  //  */
-  // export function createForgeTestClientForEvidence(
-  //   title: string,
-  //   steps: StepDefinition[],
-  //   mockDeps?: EvidenceEffectsDeps,
-  // ): ForgeTestClient {
-  //   const updateApplicationEvidenceStub = sinon
-  //     .stub()
-  //     .resolves({ status: 204 });
-
-  //   const testJourney = journey({
-  //     code: "testJourney",
-  //     path: "/cases/:applicationID/evidence",
-  //     onAccess: [
-  //       access({
-  //         effects: [JourneyEffects.LoadDraftAnswers("testJourney")],
-  //       }),
-  //     ],
-  //     reachability: { disableReachabilityChecks: true },
-  //     steps: steps,
-  //     title: title,
-  //     view: { template: "partials/form-step" },
-  //   });
-
-  //   const testPackage = createTestPackage({
-  //     functions: [evidenceEffectsRegistry],
-  //     journey: testJourney,
-  //   });
-
-  //   return createTestClient(
-  //     testPackage,
-  //     mockDeps ?? { updateApplicationEvidence: updateApplicationEvidenceStub },
-  //   );
-  // }
-
-  // /**
-  //  * Creates a generic test client for any Forge package.
-  //  * @param forgePackage The Forge package to register.
-  //  * @param mockDeps Optional dependency object matching the package deps type.
-  //  * @returns {ForgeTestClient} A configured test client.
-  //  */
-  // export function createTestClient<TDeps>(
-  //   forgePackage: ForgePackageRegistration<TDeps>,
-  //   mockDeps?: TDeps,
-  // ): ForgeTestClient {
-  //   return new ForgeTestHarness()
-  //     .registerGlobalComponents(govukComponents)
-  //     .registerGlobalComponents(mojComponents)
-  //     .registerGlobalComponents([autocomplete])
-  //     .registerGlobalFunctions(nunjucksFunctions)
-  //     .registerGlobalFunctions(JourneyEffectsImplementations)
-  //     .registerPackage(forgePackage, mockDeps)
-  //     .createClient();
-  // }
-
-  // /**
-  //  * Creates a generic test client for any Forge package.
-  //  * @param forgePackage The Forge package to register.
-  //  * @param mockDeps Optional dependency object matching the package deps type.
-  //  * @returns {ForgeTestClient} A configured test client.
-  //  */
-  // export function createTestClient2<TDeps>(
-  //   testJourney: JourneyDefinition,
-  //   testEffects: ForgePackageRegistration<TDeps>["functions"],
-  //   mockDeps?: TDeps,
-  // ): ForgeTestClient {
-  //   const testPackage = createTestPackage({
-  //     functions: testEffects,
-  //     journey: testJourney,
-  //   });
-  //   return new ForgeTestHarness()
-  //     .registerGlobalComponents(govukComponents)
-  //     .registerGlobalComponents(mojComponents)
-  //     .registerGlobalComponents([autocomplete])
-  //     .registerGlobalFunctions(nunjucksFunctions)
-  //     .registerGlobalFunctions(JourneyEffectsImplementations)
-  //     .registerPackage(testPackage, mockDeps)
-  //     .createClient();
-  // }
-
 /**
- * Creates a generic test client for any Forge package.
- * @param forgePackage The Forge package to register.
- * @param mockDeps Optional dependency object matching the package deps type.
+ * Creates a generic integration test client for a test journey and function registry.
+ * @param options The test client configuration.
+ * @param options.steps Step definitions to mount in the test journey.
+ * @param options.path Base path for the test journey.
+ * @param options.effects Access effects to run when the journey is entered.
+ * @param options.testEffects Journey function registry or registries to register for the test package.
+ * @param options.mockDeps Optional dependency object matching the test effects deps type.
  * @returns {ForgeTestClient} A configured test client.
  */
-
 export function createTestClient<TDeps>(
   options: {
     steps: StepDefinition[];

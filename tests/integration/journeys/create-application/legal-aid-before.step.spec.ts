@@ -3,16 +3,21 @@ import {
   TestRedirectResult,
 } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
+import {
+  CreateApplicationEffects,
+  createApplicationEffectsRegistry,
+} from "#/journeys/create-application/create-application.effects.js";
 import { legalAidBeforeStep } from "#/journeys/create-application/steps/legal-aid-before.step.js";
-import { createForgeTestClient } from "../../utils/helpers.js";
+import { createTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 
 describe("Legal aid before step", () => {
-  const client = createForgeTestClient(
-    "Record new case",
-    "/cases/new/",
-    [legalAidBeforeStep("testJourney")],
-  );
+  const client = createTestClient({
+    effects: [CreateApplicationEffects.loadDraftAnswers("testJourney")],
+    path: "/cases/new/",
+    steps: [legalAidBeforeStep("testJourney")],
+    testEffects: createApplicationEffectsRegistry,
+  });
 
   describe("GET /cases/new/legal-aid-before", () => {
     let renderResult: TestRenderResult;

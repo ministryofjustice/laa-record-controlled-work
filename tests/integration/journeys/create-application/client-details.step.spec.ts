@@ -3,14 +3,21 @@ import {
   TestRedirectResult,
 } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
+import {
+  CreateApplicationEffects,
+  createApplicationEffectsRegistry,
+} from "#/journeys/create-application/create-application.effects.js";
 import { clientDetailsStep } from "#/journeys/create-application/steps/client-details.step.js";
-import { createForgeTestClient } from "../../utils/helpers.js";
+import { createTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 
 describe("Client details step", () => {
-  const client = createForgeTestClient("Record new case", "/cases/new/", [
-    clientDetailsStep("testJourney"),
-  ]);
+  const client = createTestClient({
+    effects: [CreateApplicationEffects.loadDraftAnswers("testJourney")],
+    path: "/cases/new/",
+    steps: [clientDetailsStep("testJourney")],
+    testEffects: createApplicationEffectsRegistry,
+  });
 
   describe("GET /cases/new/client-details", () => {
     let renderResult: TestRenderResult;

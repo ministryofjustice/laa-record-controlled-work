@@ -3,20 +3,25 @@ import {
   TestRenderResult,
 } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
+import {
+  CreateApplicationEffects,
+  createApplicationEffectsRegistry,
+} from "#/journeys/create-application/create-application.effects.js";
 
 import { declarationStep } from "#/journeys/create-application/steps/declaration.step.js";
 import { ecfStep } from "#/journeys/create-application/steps/ecf.step.js";
-import { createForgeTestClient } from "../../utils/helpers.js";
+import { createTestClient } from "../../utils/helpers.js";
 
 describe("Declaration step", () => {
-  const client = createForgeTestClient(
-    "Record new case",
-    "/cases/new/",
-    [
+  const client = createTestClient({
+    effects: [CreateApplicationEffects.loadDraftAnswers("testJourney")],
+    path: "/cases/new/",
+    steps: [
       declarationStep("testJourney"),
       ecfStep("testJourney"),
     ],
-  );
+    testEffects: createApplicationEffectsRegistry,
+  });
 
   describe("GET /cases/new/provider-declaration", () => {
     let renderResult: TestRenderResult;

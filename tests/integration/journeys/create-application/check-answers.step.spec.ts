@@ -3,7 +3,11 @@ import {
   TestRedirectResult,
 } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
-import { createForgeTestClient } from "../../utils/helpers.js";
+import {
+  CreateApplicationEffects,
+  createApplicationEffectsRegistry,
+} from "#/journeys/create-application/create-application.effects.js";
+import { createTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import { checkAnswersStep } from "#/journeys/create-application/steps/check-answers.step.js";
 import sinon from "sinon";
@@ -19,12 +23,13 @@ describe("Check answers step", () => {
       headers: new Headers(),
     });
 
-  const client = createForgeTestClient(
-    "Record new case",
-    "/cases/new/",
-    [checkAnswersStep("testJourney")],
-    { createApplication: createApplicationStub },
-  );
+  const client = createTestClient({
+    effects: [CreateApplicationEffects.loadDraftAnswers("testJourney")],
+    mockDeps: { createApplication: createApplicationStub },
+    path: "/cases/new/",
+    steps: [checkAnswersStep("testJourney")],
+    testEffects: createApplicationEffectsRegistry,
+  });
   const session = {
     journeyDrafts: {
       testJourney: {

@@ -3,16 +3,21 @@ import {
   TestRedirectResult,
 } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
+import {
+  CreateApplicationEffects,
+  createApplicationEffectsRegistry,
+} from "#/journeys/create-application/create-application.effects.js";
 import { haveAHomeAddressStep } from "#/journeys/create-application/steps/have-a-home-address.step.js";
-import { createForgeTestClient } from "../../utils/helpers.js";
+import { createTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 
 describe("Have A Home Address Step", () => {
-  const client = createForgeTestClient(
-    "Record new case",
-    "/cases/new/",
-    [haveAHomeAddressStep("testJourney")],
-  );
+  const client = createTestClient({
+    effects: [CreateApplicationEffects.loadDraftAnswers("testJourney")],
+    path: "/cases/new/",
+    steps: [haveAHomeAddressStep("testJourney")],
+    testEffects: createApplicationEffectsRegistry,
+  });
 
   describe("GET /cases/new/have-a-home-address", () => {
     let renderResult: TestRenderResult;
