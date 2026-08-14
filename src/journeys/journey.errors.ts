@@ -1,6 +1,14 @@
 /* eslint-disable jsdoc/require-jsdoc -- not needed */
 import { DomainError } from "#/lib/errors/domainError.js";
 
+export class InvalidEvidenceError extends DomainError {
+  public readonly name = "InvalidEvidenceError";
+
+  constructor(cause?: unknown) {
+    super("Invalid Evidence Answers", cause);
+  }
+}
+
 export class InvalidFirmCodeClaimError extends DomainError {
   public readonly name = "InvalidFirmCodeClaimError";
 
@@ -24,7 +32,6 @@ export class InvalidSelectedOfficeError extends DomainError {
     super("Missing or invalid Selected Office", cause);
   }
 }
-
 export class InvalidSessionError extends DomainError {
   public readonly name = "InvalidSessionError";
 
@@ -32,6 +39,7 @@ export class InvalidSessionError extends DomainError {
     super("Missing or invalid session data", cause);
   }
 }
+
 export class MissingFirmNameError extends DomainError {
   public readonly name = "MissingFirmNameError";
 
