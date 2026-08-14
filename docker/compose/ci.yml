@@ -1,0 +1,39 @@
+# CI-only compose overrides.
+# RCW is still built from the pull request; dependency services are pulled pre-built
+# from GHCR instead of being built locally, to cut e2e workflow time.
+services:
+  rcw:
+    build:
+      cache_from:
+        - type=gha,scope=rcw-e2e-rcw
+      cache_to:
+        - type=gha,scope=rcw-e2e-rcw,mode=max
+
+  rcw-api:
+    image: ghcr.io/ministryofjustice/laa-record-controlled-work-api:latest
+    pull_policy: always
+    build: !reset null
+
+  info-and-advice-api:
+    image: ghcr.io/ministryofjustice/laa-info-and-advice-datastore:latest
+    pull_policy: always
+    build: !reset null
+
+  # Only exists to build CCQ's image locally; not needed when ccq-embedded is pulled from GHCR.
+  ccq-image-prebuild:
+    profiles:
+      - disabled
+
+  ccq-embedded:
+    image: ghcr.io/ministryofjustice/laa-check-client-qualifies:latest
+    pull_policy: always
+    depends_on: !override
+      redis:
+        condition: service_healthy
+      cfe:
+        condition: service_started
+
+  cfe:
+    image: ghcr.io/ministryofjustice/laa-rcw-cfe-civil:latest
+    pull_policy: always
+    build: !reset null

@@ -4,19 +4,19 @@
  * Record Controlled Work API
  * OpenAPI spec version: 1.0.0
  */
+import type { Application } from "#/api/clients/rcw/model/application.zod.gen.js";
+
+import type { Applications } from "#/api/clients/rcw/model/applications.zod.gen.js";
+
+import type { CreateApplicationRequestBody } from "#/api/clients/rcw/model/createApplicationRequestBody.zod.gen.js";
+
+import type { CreateApplicationResponseBody } from "#/api/clients/rcw/model/createApplicationResponseBody.zod.gen.js";
+
+import type { GetApplicationsParams } from "#/api/clients/rcw/model/getApplicationsParams.zod.gen.js";
+
+import type { UpdateMeansDataRequestBody } from "#/api/clients/rcw/model/updateMeansDataRequestBody.zod.gen.js";
+
 import config from "#/config.js";
-
-import type { Application } from "../../model/application.zod.gen.js";
-
-import type { Applications } from "../../model/applications.zod.gen.js";
-
-import type { CreateApplicationRequestBody } from "../../model/createApplicationRequestBody.zod.gen.js";
-
-import type { CreateApplicationResponseBody } from "../../model/createApplicationResponseBody.zod.gen.js";
-
-import type { GetApplicationsParams } from "../../model/getApplicationsParams.zod.gen.js";
-
-import type { UpdateMeansDataRequestBody } from "../../model/updateMeansDataRequestBody.zod.gen.js";
 
 export type getApplicationsResponse200 = {
   data: Applications;

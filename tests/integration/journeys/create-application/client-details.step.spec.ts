@@ -8,11 +8,9 @@ import { createForgeTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 
 describe("Client details step", () => {
-  const client = createForgeTestClient(
-    "Record new case",
-    "/cases/new/",
-    [clientDetailsStep("testJourney")],
-  );
+  const client = createForgeTestClient("Record new case", "/cases/new/", [
+    clientDetailsStep("testJourney"),
+  ]);
 
   describe("GET /cases/new/client-details", () => {
     let renderResult: TestRenderResult;
@@ -165,6 +163,16 @@ describe("Client details step", () => {
           dateOfBirth: { year: "3000", month: "12", day: "31" },
         },
         expectedMessage: "Date of birth must be in the past",
+        fieldCode: "dateOfBirth",
+      },
+      {
+        description: "date is too far in the past",
+        body: {
+          firstName: "John",
+          lastName: "Doe",
+          dateOfBirth: { year: "1800", month: "12", day: "31" },
+        },
+        expectedMessage: "Date of birth must be after 1 January 1900",
         fieldCode: "dateOfBirth",
       },
     ];

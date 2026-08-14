@@ -23,10 +23,10 @@ forge/
 │        ├─ <journey>.package.ts
 │        ├─ <journey>.types.ts
 │        └─ <journey>.effects.ts
-├─ AnswerKeyEnum.ts
-├─ DataKeyEnum.ts
-├─ JourneyCodeEnum.ts
-└─ StepCodeEnum.ts
+├─ AnswerKey.enum.ts
+├─ DataKey.enum.ts
+├─ JourneyCode.enum.ts
+└─ StepCode.enum.ts
 ```
 
 This directory structure uses the following concepts:
@@ -57,7 +57,7 @@ This directory structure uses the following concepts:
 Definitive list of Forge Answer keys, across all Journeys.
 
 ```ts
-export enum AnswerKeyEnum {
+export enum AnswerKey {
   ANSWER_KEY = "answerKey",
 }
 ```
@@ -67,7 +67,7 @@ export enum AnswerKeyEnum {
 Definitive list of Forge Data keys, across all Journeys.
 
 ```ts
-export enum DataKeyEnum {
+export enum DataKey {
   DATA_KEY = "dataKey"
 }
 ```
@@ -77,7 +77,7 @@ export enum DataKeyEnum {
 Definitive list of Forge Journey codes.
 
 ```ts
-export enum JourneyCodeEnum {
+export enum JourneyCode {
   JOURNEY_NAME = "journeyCode"
 }
 ```
@@ -87,7 +87,7 @@ export enum JourneyCodeEnum {
 Definitive list of Forge Step codes, across all Journeys.
 
 ```ts
-export enum StepCodeEnum {
+export enum StepCode {
   STEP_NAME = "stepCode"
 }
 ```
@@ -105,13 +105,13 @@ export interface interface MyJourneyDeps {
 }
 
 export interface MyJourneyData extends Record<string, unknown> {
-  [DataKeyEnum.DATA_KEY]: MyType;
-  [DataKeyEnum.DATA_KEY2]: MyOtherType[];
+  [DataKey.DATA_KEY]: MyType;
+  [DataKey.DATA_KEY2]: MyOtherType[];
 }
 
 export interface MyJourneyAnswers extends Record<string, unknown> {
-  [AnswerKeyEnum.ANSWER_KEY]: string;
-  [AnswerKeyEnum.ANSWER_KEY2]: MyType;
+  [AnswerKey.ANSWER_KEY]: string;
+  [AnswerKey.ANSWER_KEY2]: MyType;
 }
 
 export type MyJourneyContext = EffectFunctionContext<
@@ -138,14 +138,14 @@ export const myJourneyPackage = createForgePackage<MyJourneyDeps>({
 
 ### Example of a good journey file
 
-- Uses JourneyCodeEnum values rather than magic strings.
+- Uses JourneyCode values rather than magic strings.
 - Avoids bloat by importing steps.
 
 ```ts
 import { journey } from "@ministryofjustice/hmpps-forge/core/authoring";
 
 export const myJourney = journey({
-  code: JourneyCodeEnum.MY_JOURNEY,
+  code: JourneyCode.MY_JOURNEY,
   onAccess: [
     access({
       effects: [journeyEffects.myEffect()],
@@ -229,7 +229,7 @@ export const label = GovUKBody({
 });
 
 export const myQuestionRadioInput = GovUKRadioInput({
-  code: JourneyCodeEnum.MY_JOURNEY,
+  code: JourneyCode.MY_JOURNEY,
   fieldset: {
     legend: {
       classes: "govuk-fieldset__legend--l",
@@ -278,7 +278,7 @@ export const legalAidBeforeLabel = (): ResolvableString => {
   );
   const no = t("common.no");
 
-  return match(Answer(AnswersEnum.LEGAL_AID_BEFORE))
+  return match(Answer(AnswersKey.LEGAL_AID_BEFORE))
     .branch(Condition.Equals("yesSameMatter"), same)
     .branch(Condition.Equals("yesDifferentMatter"), different)
     .otherwise(no);
@@ -312,7 +312,7 @@ In RCW we build our single question per page form flows in Forge. To ensure good
 
 1. Create the step in `src/journeys/<journeyGroup>/<journey>/steps/<step>/myStep.ts`
 2. Add the step to the relevant Journey file in `src/journeys/<journeyGroup>/<journey>/myJourney.journey.ts`
-3. Add the step to the e2e test located in `tests/playwright/tests/journeys/<journey>`. These should cover:
+3. Add the step to the UI test located in `tests/ui/tests/journeys/<journey>`. These should cover:
    - The happy path journey renders each step in the correct order
    - Data can be entered as expected in each step
    - The check answers step contains all of the correct information given the journey completed

@@ -7,29 +7,37 @@
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-      background: #f4f5f7;
+      background:
+        radial-gradient(circle at top, rgba(14, 165, 233, 0.08), transparent 30%),
+        linear-gradient(180deg, #0f172a 0%, #020617 100%);
+      color: #e5e7eb;
       display: flex;
       justify-content: center;
+      min-height: 100vh;
+      margin: 0;
       padding-top: 4rem;
     }
 
     form {
-      background: #fff;
-      border: 1px solid #d9dbe0;
-      border-radius: 8px;
+      background: rgba(2, 6, 23, 0.96);
+      border: 1px solid #475569;
+      border-radius: 12px;
       padding: 2rem;
       width: 75vw;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(10px);
     }
 
     h4 {
       margin: 0 0 1.5rem;
+      color: #f8fafc;
     }
 
     label {
       display: block;
       font-size: 0.85rem;
       font-weight: 600;
+      color: #cbd5e1;
       margin-bottom: 0.25rem;
     }
 
@@ -44,8 +52,10 @@
       font-family: inherit;
       font-size: 0.9rem;
       padding: 0.5rem;
-      border: 1px solid #c2c4cc;
-      border-radius: 4px;
+      color: #e2e8f0;
+      background: #111827;
+      border: 1px solid #64748b;
+      border-radius: 6px;
     }
 
     textarea {
@@ -53,18 +63,33 @@
       resize: vertical;
     }
 
+    input:focus,
+    textarea:focus {
+      outline: 2px solid #60a5fa;
+      outline-offset: 1px;
+      border-color: #60a5fa;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: #94a3b8;
+    }
+
     button {
-      background: #1a56db;
-      color: #fff;
-      border: none;
-      border-radius: 4px;
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      color: #eff6ff;
+      border: 1px solid #1d4ed8;
+      border-radius: 6px;
       padding: 0.6rem 1.2rem;
       font-size: 0.9rem;
+      font-weight: 600;
       cursor: pointer;
+      box-shadow: 0 1px 4px rgba(2, 6, 23, 0.22);
     }
 
     button:hover {
-      background: #1544ad;
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      box-shadow: 0 2px 6px rgba(2, 6, 23, 0.28);
     }
   </style>
 </head>
@@ -78,12 +103,14 @@
     </div>
     <div class="field">
       <label for="claims">Claims (optional JSON) &mdash; edit to override the defaults below</label>
+      <!-- keep LAA_ACCOUNTS aligned with ./msw/fixtures/pda.ts seeded output -->
+      <!-- as well as ./mock-oauth2-config.json -->
       <textarea id="claims" name="claims" rows="16">{
   "aud": "default",
   "scp": "Applications.Read Applications.Write",
   "FIRM_CODE": 123456,
   "FIRM_NAME": "Test Legal Aid Firm Ltd",
-  "LAA_ACCOUNTS": ["AB12CD", "XY34ZT"],
+  "LAA_ACCOUNTS": ["R1XEVG", "VGHVEY", "3TVRNM"],
   "USER_EMAIL": "test.user@example.com",
   "USER_NAME": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
   "APP_ROLES": "Record Controlled Work User",

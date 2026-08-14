@@ -75,7 +75,7 @@ jobs:
             ./deploy/laa-record-controlled-work/values.yaml >> $GITHUB_ENV
 
       - name: Run Playwright tests
-        run: yarn playwright test --config=tests/playwright/playwright.config.ts --grep-invert @accessibility
+        run: yarn playwright test --config=tests/ui/playwright.config.ts --grep-invert @accessibility
         env:
           CI: true
           PLAYWRIGHT_TRACING: "on"
@@ -138,7 +138,7 @@ jobs:
             ./deploy/laa-record-controlled-work/values.yaml >> $GITHUB_ENV
 
       - name: Run Accessibility Tests
-        run: yarn playwright test --config=tests/playwright/playwright.config.ts --grep @accessibility
+        run: yarn playwright test --config=tests/ui/playwright.config.ts --grep @accessibility
         env:
           CI: true
           NODE_ENV: "test"

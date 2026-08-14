@@ -33,6 +33,10 @@ export const CONTEXT_DATA_KEYS = {
   applicationID: "applicationID",
   availableOffices: "availableOffices",
   caseList: "caseList",
+  clientDetailsStatus: "clientDetailsStatus",
+  declarationStatus: "declarationStatus",
+  evidenceStatus: "evidenceStatus",
+  meansAssessment: "meansAssessment",
   selectedOffice: "selectedOffice",
   singleOffice: "singleOffice",
 } as const;

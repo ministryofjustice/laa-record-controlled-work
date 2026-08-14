@@ -55,7 +55,7 @@ if [[ "$SKIP_TESTS" == "true" ]]; then
     touch tested-routes.txt
 else
     echo -e "${YELLOW}📝 Running Playwright tests with debug logging...${NC}"
-    if DEBUG=pw:api yarn playwright test --config=tests/playwright/playwright.config.ts --reporter=line > playwright-debug.log 2>&1; then
+    if DEBUG=pw:api yarn playwright test --config=tests/ui/playwright.config.ts --reporter=line > playwright-debug.log 2>&1; then
         echo -e "${GREEN}✓ Tests completed${NC}"
     else
         echo -e "${RED}✗ Playwright tests failed${NC}"

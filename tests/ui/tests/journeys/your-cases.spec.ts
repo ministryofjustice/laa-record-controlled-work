@@ -1,0 +1,80 @@
+import { test, expect } from "../../fixtures/index.js";
+import { applications } from "../../msw/fixtures/rcw.fixtures.js";
+
+test("Your Cases step", async ({ withSelectedOffice: page }) => {
+  // Navigate to the Your Cases page
+  await page.goto("/cases");
+
+  // Check the title of the page
+  await expect(
+    page.getByRole("heading", {
+      name: /Your cases/,
+      level: 1,
+    }),
+  ).toBeVisible();
+
+  // Check selected office summary is shown with a change action
+  const officeSummary = page.locator("p", { hasText: "Office:" });
+  await expect(officeSummary).toBeVisible();
+  await expect(officeSummary).toContainText(/Office:\s+.+\([A-Z0-9]+\)/);
+  await expect(page.getByRole("link", { name: "Change" })).toBeVisible();
+
+  // Check the button
+  await page.getByRole("button", { name: "Record a new case" }).click();
+
+  // Verify redirection to the provider declaration page
+  await expect(page).toHaveURL("/cases/new/provider-declaration");
+
+  // Navigate back to the your cases page
+  await page.goto("/cases");
+
+  // Check the sub navigation
+  const inProgressLink = page.getByRole("link", { name: "In progress" });
+  const recordedLink = page.getByRole("link", { name: "Recorded" });
+  const ineligibleLink = page.getByRole("link", { name: "Ineligible" });
+
+  // Check in progress link navigates to correct page and links have correct aria-current attribute
+  await inProgressLink.click();
+  await expect(page).toHaveURL("/cases");
+  await expect(inProgressLink).toHaveAttribute("aria-current", "page");
+  await expect(recordedLink).not.toHaveAttribute("aria-current", "page");
+  await expect(ineligibleLink).not.toHaveAttribute("aria-current", "page");
+
+  // Check recorded link navigates to the correct page
+  await recordedLink.click();
+  await expect(page).toHaveURL("/cases/recorded");
+
+  // Check ineligible link navigates to the correct page
+  await ineligibleLink.click();
+  await expect(page).toHaveURL("/cases/ineligible");
+
+  // Navigate back to the Your Cases page
+  await page.goto("/cases");
+
+  // Check the table renders mock data correctly
+  const table = page.getByRole("table");
+  const rows = table
+    .getByRole("row")
+    .filter({ hasNot: page.getByRole("columnheader") }); // Exclude the header row
+
+  await expect(rows).toHaveCount(applications.length);
+
+  for (const [i, app] of applications.entries()) {
+    const row = rows.nth(i);
+    const formattedDate = new Intl.DateTimeFormat("en-GB", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+      timeZone: "Europe/London",
+    }).format(new Date(app.modifiedAt));
+
+    await expect(row.getByRole("link", { name: app.name })).toHaveAttribute(
+      "href",
+      `/cases/${app.id}/task-list`,
+    );
+    await expect(row.getByRole("cell").nth(1)).toHaveText(
+      app.applicationRefNumber,
+    );
+    await expect(row.getByRole("cell").nth(2)).toHaveText(formattedDate);
+  }
+});

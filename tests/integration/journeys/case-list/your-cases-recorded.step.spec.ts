@@ -3,7 +3,7 @@ import { expect } from "chai";
 import { createForgeTestClientForCaseList } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import sinon from "sinon";
-import { getGetApplicationsResponseMock } from "../../../mocks/api/rcw/fakers/applications/applications.faker.gen.js";
+import { getGetApplicationsResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
 
 const session = {
   selectedOffice: {
@@ -107,9 +107,9 @@ describe("Your Cases recorded step", () => {
       expect(rows).to.have.length(mockData.length);
 
       for (const [i, row] of rows.entries()) {
-        const { name, applicationRefNumber, modifiedAt } = mockData[i];
+        const { id, name, applicationRefNumber, modifiedAt } = mockData[i];
         expect(row[0].html).to.include(name);
-        expect(row[0].html).to.include(`/cases/${applicationRefNumber}`);
+        expect(row[0].html).to.include(`/cases/${id}`);
         expect(row[1].text).to.equal(applicationRefNumber);
         expect(row[2].text).to.equal(
           dateFormatter.format(new Date(modifiedAt)),

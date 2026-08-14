@@ -3,8 +3,10 @@
   "entry": [
     "src/**/*.ts",
     "esbuild/**/*.ts",
+    "msw/**/*.ts",
     "scripts/**/*.ts",
     "tests/**/*.ts",
+    "orval/mocks/**/*.ts",
     "eslint.config.js",
     "src/browser/frontendPackagesEntry.ts",
     "src/scss/main.scss"
@@ -12,8 +14,10 @@
   "project": [
     "src/**/*.ts",
     "esbuild/**/*.ts",
+    "msw/**/*.ts",
     "scripts/**/*.ts",
     "tests/**/*.ts",
+    "orval/mocks/**/*.ts",
     "eslint/**/*.js",
     "*.js",
     "*.ts"

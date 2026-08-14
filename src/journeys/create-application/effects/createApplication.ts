@@ -2,6 +2,7 @@ import type { EffectFunctionContext } from "@ministryofjustice/hmpps-forge/core"
 import type { Session, SessionData } from "express-session";
 
 import type { CreateApplicationRequestBody } from "#/api/clients/rcw/model/createApplicationRequestBody.zod.gen.js";
+import type { createApplicationResponse } from "#/api/clients/rcw/schema/applications/applications.gen.js";
 import type { CreateApplicationEffectsDeps } from "#/journeys/create-application/create-application.types.js";
 
 import {
@@ -21,6 +22,7 @@ import { logger } from "#/logger.js";
 const buildApplicationData = (
   journeyAnswers: Record<string, unknown>,
   journeyCode: string,
+  providerOfficeCode: string | undefined,
 ): CreateApplicationRequestBody => {
   const answersFormatted = Answers.safeParse(journeyAnswers);
 
@@ -32,7 +34,17 @@ const buildApplicationData = (
     throw ApiValidationError.from(answersFormatted.error);
   }
 
-  const applicationDto = ApplicationDto.fromAnswers(answersFormatted.data);
+  if (!providerOfficeCode) {
+    logger.error(
+      `Journey session for ${journeyCode} is missing selected office code`,
+    );
+    throw new ApiValidationError();
+  }
+
+  const applicationDto = ApplicationDto.fromAnswers(
+    answersFormatted.data,
+    providerOfficeCode,
+  );
   return applicationDto.toRcwApi();
 };
 
@@ -42,7 +54,7 @@ export const createApplication =
     context: EffectFunctionContext,
     journeyCode: string,
   ): Promise<void> => {
-    let response;
+    let response: createApplicationResponse;
 
     try {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Session shape is constrained by app session typing.
@@ -59,7 +71,11 @@ export const createApplication =
         return;
       }
 
-      const dataForApi = buildApplicationData(journeyAnswers, journeyCode);
+      const dataForApi = buildApplicationData(
+        journeyAnswers,
+        journeyCode,
+        session.selectedOffice?.code,
+      );
 
       const opts = await getRcwApiDefaultOptions({
         homeAccountId: session.msal?.homeAccountId,

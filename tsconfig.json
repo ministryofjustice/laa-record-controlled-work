@@ -15,11 +15,14 @@
     "strict": true, // Enable all strict type-checking options
     "forceConsistentCasingInFileNames": true, // Disallow inconsistently-cased references to the same file
     "paths": {
-      "#/*": ["./src/*"]
+      "#orval/*": ["./orval/*"],
+      "#msw/*": ["./msw/*"],
+      "#/*": ["./src/*"],
+      "#tests/*": ["./tests/*"]
     }
   },
   "include": [
-    "scripts/**/*.ts",
+    "msw/**/*.ts",
     "src/**/*.ts",
     "tests/**/*.ts",
     "esbuild/**/*.ts",

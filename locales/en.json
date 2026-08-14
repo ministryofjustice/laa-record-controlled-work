@@ -112,7 +112,8 @@
             "missingDay": "Date of birth must include a day",
             "missingMonth": "Date of birth must include a month",
             "missingYear": "Date of birth must include a year",
-            "mustBePast": "Date of birth must be in the past"
+            "mustBePast": "Date of birth must be in the past",
+            "ageLimit": "Date of birth must be after 1 January 1900"
           }
         }
       },
@@ -345,6 +346,26 @@
         "changeLink": {
           "change": "Change"
         }
+      }
+    },
+    "declaration": {
+      "caption": "Client declaration",
+      "confirm": {
+        "title": "Confirm the following",
+        "declarationText": "agrees that:",
+        "declarationList": [
+          "they've instructed me, the provider, to act on their behalf",
+          "they've read the <a class='govuk-link' href='#'>LAA privacy policy (opens in a new window or tab)</a>",
+          "the information they've given is complete and correct",
+          "they'll report any changes to their financial situation immediately"
+        ],
+        "warningText": "If they give wrong or incomplete information, do not report changes or are found to have committed benefit fraud, they may:",
+        "warningList": [
+          "be prosecuted",
+          "need to pay a financial penalty",
+          "have their legal aid stopped and have to pay back the costs"
+        ],
+        "confirmButton": "Confirm and continue"
       }
     }
   }

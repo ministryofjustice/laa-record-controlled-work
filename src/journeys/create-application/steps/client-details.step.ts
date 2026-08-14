@@ -115,6 +115,12 @@ export const clientDetailsStep = (
               submissionOnly: true,
             },
           }),
+          validation({
+            condition: Self().match(Condition.Date.IsAfter("1900-01-01")),
+            message: t(
+              "journeys.createApplication.clientDetails.dateOfBirth.validation.ageLimit",
+            ),
+          }),
         ],
       }),
       GovUKButton({ text: t("common.continue") }),

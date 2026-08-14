@@ -8,7 +8,7 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/testing";
 import { ApiResponseError, ApiValidationError } from "#/api/clients/api.errors.js";
 import { logger } from "#/logger.js";
-import { getGetApplicationsResponseMock } from "../../../../mocks/api/rcw/fakers/applications/applications.faker.gen.js";
+import { getGetApplicationsResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
 
 const mockData = getGetApplicationsResponseMock();
 const session = {
@@ -38,6 +38,11 @@ describe("LoadYourCaseList", () => {
     it("calls getApplications", async () => {
       await client.get("/cases", { session });
       expect(getApplicationsStub.calledOnce).to.be.true;
+    });
+
+    it("calls getApplications with the selected office code as officeId", async () => {
+      await client.get("/cases", { session });
+      expect(getApplicationsStub.calledWith(sinon.match({ officeId: "LEEDS-01" }))).to.be.true;
     });
 
     it("sets caseList in context", async () => {

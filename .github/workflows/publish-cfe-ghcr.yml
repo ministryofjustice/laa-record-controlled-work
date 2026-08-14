@@ -1,0 +1,65 @@
+name: Publish CFE cache image
+#
+#  CFE Civil isn't published as a container image upstream, so this builds and
+#  caches one from its own Dockerfile for use as an E2E dependency. Skips the
+#  build entirely if the latest cfe-civil commit on main is already published.
+#
+on:
+  schedule:
+    - cron: "0 2 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  IMAGE: ghcr.io/ministryofjustice/laa-rcw-cfe-civil
+
+jobs:
+  publish:
+    name: Publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout cfe-civil
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          repository: ministryofjustice/cfe-civil
+          path: cfe-civil
+          fetch-depth: 1
+
+      - name: Login to GHCR
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+
+      - name: Check if commit is already published
+        id: check
+        working-directory: cfe-civil
+        run: |
+          sha=$(git rev-parse HEAD)
+          echo "sha=${sha}" >> "$GITHUB_OUTPUT"
+
+          if docker manifest inspect "${IMAGE}:sha-${sha}" > /dev/null 2>&1; then
+            echo "${IMAGE}:sha-${sha} already published - skipping build." >> "$GITHUB_STEP_SUMMARY"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Set up Docker Buildx
+        if: steps.check.outputs.skip != 'true'
+        uses: docker/setup-buildx-action@21162887f0d6e25b4e8eafb0cf44cf9bf7f6acd3
+
+      - name: Build and push
+        if: steps.check.outputs.skip != 'true'
+        working-directory: cfe-civil
+        run: |
+          docker buildx build \
+            --platform linux/amd64 \
+            --push \
+            --tag "${IMAGE}:latest" \
+            --tag "${IMAGE}:sha-${{ steps.check.outputs.sha }}" \
+            .

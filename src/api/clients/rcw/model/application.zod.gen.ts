@@ -6,6 +6,14 @@
  */
 import { z as zod } from "zod";
 
+export const applicationClientDetailsNiNumberMin = 9;
+export const applicationClientDetailsNiNumberMax = 9;
+
+export const applicationClientDetailsNiNumberRegExp = new RegExp(
+  "[A-CEGHJ-NOPR-TW-Z]{2}[0-9]{6}[ABCDs]{1}",
+);
+export const applicationClientDetailsAddressCountryMax = 2;
+
 export const Application = zod.object({
   id: zod.uuid(),
   individualLegalAidNumber: zod.uuid(),
@@ -17,7 +25,12 @@ export const Application = zod.object({
     firstName: zod.string(),
     lastName: zod.string(),
     dateOfBirth: zod.iso.date(),
-    niNumber: zod.string().optional(),
+    niNumber: zod
+      .string()
+      .min(applicationClientDetailsNiNumberMin)
+      .max(applicationClientDetailsNiNumberMax)
+      .regex(applicationClientDetailsNiNumberRegExp)
+      .optional(),
     hasFixedAddress: zod.boolean(),
     address: zod
       .object({
@@ -29,7 +42,7 @@ export const Application = zod.object({
         townOrCity: zod.string().optional(),
         postCode: zod.string().optional(),
         county: zod.string().optional(),
-        country: zod.string(),
+        country: zod.string().max(applicationClientDetailsAddressCountryMax),
         createdAt: zod.iso.datetime({ offset: true }).optional(),
         modifiedAt: zod.iso.datetime({ offset: true }).optional(),
       })
@@ -72,8 +85,8 @@ export const Application = zod.object({
   reasonForReapplication: zod.string().optional(),
   meansAssessmentRequired: zod.boolean().optional(),
   typeOfNonMeans: zod.boolean().optional(),
-  ecfFlag: zod.boolean(),
   contribution: zod.string().optional(),
+  scopingQuestions: zod.looseObject({}).optional(),
   applicationType: zod.string(),
   createdAt: zod.iso.datetime({ offset: true }),
   createdBy: zod.string(),

@@ -7,13 +7,17 @@ import { createForgeTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import { checkAnswersStep } from "#/journeys/create-application/steps/check-answers.step.js";
 import sinon from "sinon";
-import { getCreateApplicationResponseMock } from "../../../mocks/api/rcw/fakers/applications/applications.faker.gen.js";
+import { getCreateApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
 
 describe("Check answers step", () => {
   const uuid = "123e4567-e89b-12d3-a456-426614174000";
   const createApplicationStub = sinon
     .stub()
-    .resolves({ status: 201, data: getCreateApplicationResponseMock({ id: uuid }) });
+    .resolves({
+      status: 201,
+      data: getCreateApplicationResponseMock({ id: uuid }),
+      headers: new Headers(),
+    });
 
   const client = createForgeTestClient(
     "Record new case",
@@ -39,6 +43,10 @@ describe("Check answers step", () => {
         postcode: "TE5 7ST",
         country: "United Kingdom",
       },
+    },
+    selectedOffice: {
+      address: "123 Test Street, Testville, TE5 7ST",
+      code: "22439e72-68d3-4770-b435-c352d883d21e",
     },
   };
 

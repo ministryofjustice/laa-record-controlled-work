@@ -10,7 +10,10 @@ import {
 import { getRcwApiDefaultOptions } from "#/api/clients/getRcwApiDefaultOptions.js";
 import { Application } from "#/api/clients/rcw/model/application.zod.gen.js";
 import { getAuthDebugHeaders } from "#/auth/auth.debug.js";
-import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
+import {
+  CONTEXT_DATA_KEYS,
+  PARAMS_KEYS,
+} from "#/journeys/journey.constants.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
 
@@ -21,7 +24,7 @@ export const loadApplication =
 
     try {
       const session = context.getSession();
-      const applicationID = context.getRequestParam("applicationID");
+      const applicationID = context.getRequestParam(PARAMS_KEYS.applicationID);
 
       if (!applicationID) {
         logger.error("applicationID parameter is missing");
