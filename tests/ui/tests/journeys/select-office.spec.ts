@@ -16,11 +16,14 @@ test("select office flow", async ({ page }) => {
   await radios.first().check();
   await page.getByRole("button", { name: "Continue" }).click();
 
-  // Verify redirection to Your Cases after selecting an office
-  await expect(page).toHaveURL("/cases");
+  // Verify redirection to the landing page after selecting an office
+  await expect(page).toHaveURL("/");
 
-  // Verify the selected office is displayed on Your Cases
+  // Verify the landing page is shown
   await expect(
-    page.getByRole("heading", { name: /Your cases/, level: 1 }),
+    page.getByRole("heading", { name: "Landing Page", level: 1 }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Temporary Record New Case"),
   ).toBeVisible();
 });

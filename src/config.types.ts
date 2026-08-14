@@ -32,6 +32,7 @@ export interface AppConfig {
   port: number;
   rateLimit: {
     authMax: number | string;
+    enabled: boolean;
     headersEnabled: string | undefined;
     max: number;
     storageUri: string | undefined;
@@ -42,7 +43,6 @@ export interface AppConfig {
     phase: string | undefined;
     url: string | undefined;
   };
-  useHttps: boolean;
 }
 export interface Config {
   api: ApiConfig;

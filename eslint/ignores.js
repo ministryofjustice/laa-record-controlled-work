@@ -18,13 +18,15 @@ export default {
     "eslint.config.js", // Parsing error: not found by the project service
     "eslint/**", // ESLint config split files
     "coverage",
+    "playwright-report/**", // Generated Playwright HTML report assets
+    "test-results/**", // Generated Playwright run artifacts
     "tests/**/*.spec.ts", // Unit test specs (if any remain in tests/)
-    "tests/playwright/**/*.spec.ts", // E2E test specs in new Playwright structure
-    "tests/playwright/fixtures/*", // Test fixtures
-    "tests/playwright/factories/*", // Test factories and mock handlers
-    "tests/playwright/pages/*", // Page object models
-    "tests/playwright/utils/*", // Test utilities and helpers
-    "tests/playwright/playwright.config.ts", // Playwright configuration file
+    "tests/ui/**/*.spec.ts",
+    "tests/ui/fixtures/*",
+    "tests/ui/factories/*",
+    "tests/ui/pages/*",
+    "tests/ui/utils/*",
+    "tests/ui/playwright.config.ts",
     "tests/helpers/*", // Test helper utilities (if any remain)
     "tests/integration/utils/*", // Integration test utilities and helpers
     "docs/source/javascripts/application.js", // Parsing error: not found by the project service

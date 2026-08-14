@@ -49,16 +49,16 @@ lint-fix: knip
 	yarn lint:fix
 
 integration-watch:
-	yarn integration:watch
+	yarn test:integration:watch
 
-e2e-ui:
-	yarn e2e:ui
+ui-open:
+	yarn test:ui:open
 
 test: 
 	yarn test
 
 coverage:
-	yarn unit:coverage
+	yarn test:unit:coverage
 
 unit-watch:
-	yarn unit:watch
+	yarn test:unit:watch

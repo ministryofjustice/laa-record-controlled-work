@@ -17,7 +17,7 @@ type RenderedTaskListItem = {
 
 describe("Task list step", () => {
   const uuid = "123e4567-e89b-12d3-a456-426614174000";
-  const meansAssessmentId = "123e4567-e89b-12d3-a456-426614174111";
+  const eligibilityResult = { result: { qualified: true } };
   const mockData = getGetApplicationResponseMock();
   const getApplicationStub = sinon
     .stub()
@@ -76,7 +76,7 @@ describe("Task list step", () => {
         getApplicationStub.resolves({
           status: 200,
           data: getGetApplicationResponseMock({
-            meansAssessmentId,
+            eligibility: eligibilityResult,
             evidence: {
               evidenceStatus: "DRAFT",
               payeIncomeEvidence: true,
@@ -111,7 +111,7 @@ describe("Task list step", () => {
         getApplicationStub.resolves({
           status: 200,
           data: getGetApplicationResponseMock({
-            meansAssessmentId,
+            eligibility: eligibilityResult,
             evidence: {
               evidenceStatus: "DRAFT",
               payeIncomeEvidence: true,
@@ -143,7 +143,7 @@ describe("Task list step", () => {
         getApplicationStub.resolves({
           status: 200,
           data: getGetApplicationResponseMock({
-            meansAssessmentId,
+            eligibility: eligibilityResult,
             evidence: {},
             declaration: {
               clientDeclarationStatus: "DRAFT",

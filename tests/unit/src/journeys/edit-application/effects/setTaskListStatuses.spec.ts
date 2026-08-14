@@ -43,7 +43,7 @@ describe("setTaskListStatuses", () => {
           country: "",
         },
       },
-      meansAssessmentId: undefined,
+      eligibility: undefined,
       evidence: {},
       declaration: {},
     });
@@ -60,7 +60,7 @@ describe("setTaskListStatuses", () => {
 
   it("sets means assessment to Incomplete when client details are complete but means assessment has not started", () => {
     const application = getGetApplicationResponseMock({
-      meansAssessmentId: undefined,
+      eligibility: undefined,
       evidence: {},
       declaration: {},
     });
@@ -77,7 +77,7 @@ describe("setTaskListStatuses", () => {
 
   it("sets declaration to Incomplete when means and evidence are complete but declaration is empty", () => {
     const application = getGetApplicationResponseMock({
-      meansAssessmentId: "means-id",
+      eligibility: { result: { qualified: true } },
       evidence: {
         evidenceStatus: "DRAFT",
         payeIncomeEvidence: true,
@@ -97,7 +97,7 @@ describe("setTaskListStatuses", () => {
 
   it("sets all statuses to Completed when all task list data is present", () => {
     const application = getGetApplicationResponseMock({
-      meansAssessmentId: "means-id",
+      eligibility: { result: { qualified: true } },
       evidence: {
         evidenceStatus: "DRAFT",
         payeIncomeEvidence: true,

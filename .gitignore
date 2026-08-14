@@ -24,7 +24,7 @@ public/
 /test-results/
 /playwright-report/
 /blob-report/
-/tests/playwright/.cache/
+/tests/ui/.cache/
 
 # Code coverage
 coverage/

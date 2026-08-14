@@ -131,6 +131,13 @@ jobs:
     with:
       sha: ${{ github.event.pull_request.head.sha || github.sha }}
 
+  e2e:
+    name: Tests
+    needs: setup
+    uses: ./.github/workflows/e2e.yml
+    with:
+      sha: ${{ github.event.pull_request.head.sha || github.sha }}
+
   build-image:
     name: Build Docker Image
     runs-on: ubuntu-latest
@@ -183,6 +190,7 @@ jobs:
       - snyk-infra
       - mocha-tests
       - playwright
+      - e2e
       - build-image
     steps:
       - name: Checkout code
@@ -220,6 +228,7 @@ jobs:
       - build-image
       - mocha-tests
       - playwright
+      - e2e
       - snyk-infra
     secrets: inherit
 

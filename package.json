@@ -10,7 +10,8 @@
   "imports": {
     "#orval/*": "./orval/*",
     "#msw/*": "./msw/*",
-    "#/*": "./src/*"
+    "#/*": "./src/*",
+    "#tests/*": "./tests/*"
   },
   "scripts": {
     "postinstall": "[ -n \"${CI:-}\" ] || [ -n \"${DOCKER:-}\" ] || yarn prek:install",
@@ -20,8 +21,8 @@
     "prek:install": "yarn gitleaks:install && prek install && yarn prek:patch-hook-path",
     "dev": "op run --env-file=.env -- npx tsx msw/dev-server-with-msw.ts",
     "dev:watch": "op run --env-file=.env -- yarn watch",
-    "dev:docker": "./docker/compose/up mock-issuer",
-    "dev:docker:entra": "./docker/compose/up entra",
+    "dev:docker": "./docker/compose/up",
+    "dev:docker:entra": "./docker/compose/up --entra",
     "watch": "yarn build && concurrently \"tsc --watch\" \"node public/esbuild/esbuild.js --watch\" \"nodemon --exec 'npx tsx msw/dev-server-with-msw.ts'\"",
     "build": "yarn clean && tsc -p tsconfig.build.json && node public/esbuild/esbuild.js",
     "clean": "rimraf public",
@@ -30,14 +31,16 @@
     "knip": "knip --config knip.json --reporter compact",
     "knip:fix": "yarn knip --fix --fix-type dependencies && echo '\nUnused dependencies removed. Updating lockfile ...' && yarn",
     "knip:trace": "yarn knip --trace-dependency",
-    "unit": "./node_modules/.bin/mocha --recursive 'tests/unit/**/*.spec.ts'",
-    "unit:watch": "./node_modules/.bin/mocha --watch --recursive 'tests/unit/**/*.spec.ts'",
-    "unit:coverage": "c8 yarn unit --check-coverage",
-    "integration": "yarn build && ./node_modules/.bin/mocha --recursive 'tests/integration/**/*.spec.ts'",
-    "integration:watch": "./node_modules/.bin/mocha --watch --recursive 'tests/integration/**/*.spec.ts'",
-    "e2e": "yarn playwright test --config=tests/playwright/playwright.config.ts",
-    "e2e:ui": "yarn playwright test --config=tests/playwright/playwright.config.ts --ui",
-    "test": "yarn unit && yarn integration && yarn e2e"
+    "test:unit": "./node_modules/.bin/mocha --recursive 'tests/unit/**/*.spec.ts'",
+    "test:unit:watch": "./node_modules/.bin/mocha --watch --recursive 'tests/unit/**/*.spec.ts'",
+    "test:unit:coverage": "c8 yarn test:unit --check-coverage",
+    "test:integration": "yarn build && ./node_modules/.bin/mocha --recursive 'tests/integration/**/*.spec.ts'",
+    "test:integration:watch": "./node_modules/.bin/mocha --watch --recursive 'tests/integration/**/*.spec.ts'",
+    "test:ui": "yarn playwright test --config=tests/ui/playwright.config.ts",
+    "test:ui:open": "yarn playwright test --config=tests/ui/playwright.config.ts --ui",
+    "test:e2e": "yarn playwright test --config=tests/e2e/playwright.config.ts",
+    "test:e2e:open": "yarn playwright test --config=tests/e2e/playwright.config.ts --ui",
+    "test": "yarn test:unit && yarn test:integration && yarn test:ui"
   },
   "engines": {
     "node": "26.7.0"
@@ -85,7 +88,7 @@
     "@types/sinon": "^22.0.0",
     "@types/supertest": "^7.2.1",
     "@typescript-eslint/parser": "^8.66.0",
-    "c8": "^11.0.0",
+    "c8": "^12.0.0",
     "chai": "^6.2.2",
     "chai-as-promised": "^8.0.2",
     "concurrently": "^10.0.4",
@@ -101,7 +104,7 @@
     "eslint-plugin-perfectionist": "^5.10.1",
     "eslint-plugin-prettier": "^5.5.6",
     "globals": "^17.9.0",
-    "knip": "^6.31.0",
+    "knip": "^6.32.0",
     "mocha": "^11.8.0",
     "msw": "^2.15.0",
     "nodemon": "^3.1.14",
@@ -113,7 +116,7 @@
     "sinon": "^22.1.0",
     "supertest": "^7.2.2",
     "testcontainers": "^12.1.0",
-    "tsx": "^4.23.8",
+    "tsx": "^4.23.9",
     "typescript": "^6.0.3",
     "undici": "^8.10.0"
   },

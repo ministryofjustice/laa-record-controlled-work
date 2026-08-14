@@ -40,6 +40,11 @@ describe("LoadYourCaseList", () => {
       expect(getApplicationsStub.calledOnce).to.be.true;
     });
 
+    it("calls getApplications with the selected office code as officeId", async () => {
+      await client.get("/cases", { session });
+      expect(getApplicationsStub.calledWith(sinon.match({ officeId: "LEEDS-01" }))).to.be.true;
+    });
+
     it("sets caseList in context", async () => {
       const result = await client.get("/cases", { session });
       expect(result.type).to.equal("render");

@@ -5,22 +5,41 @@
 #
 # Every step that touches the filesystem, network or Docker is confirmed interactively
 # first - answer "n" or Ctrl-C out at any prompt, and re-running this script later will
-# pick up from whatever's still missing.
+# pick up from whatever's still missing. Use --ci to skip all confirmations (for CI).
 #
-# Usage: docker/compose/up [mock-issuer|entra]
+# Usage: docker/compose/up [--entra] [--ci] [--no-build]
+#   --entra  Load .env.entra overrides (Entra auth mode; default: mock-issuer)
+#   --ci     CI mode: skip confirmations, skip 1Password, auto-add /etc/hosts, exit after stack ready
+#   --no-build  Use a loaded RCW runner image (requires --ci)
 set -euo pipefail
 
-MODE="${1:-mock-issuer}"
-case "$MODE" in
-  mock-issuer | entra) ;;
-  *)
-    echo "Usage: $0 [mock-issuer|entra]" >&2
-    exit 1
-    ;;
-esac
+ENTRA_MODE=false
+CI_MODE=false
+NO_BUILD=false
+
+# Parse named arguments
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --entra) ENTRA_MODE=true; shift ;;
+    --ci) CI_MODE=true; shift ;;
+    --no-build) NO_BUILD=true; shift ;;
+    *)
+      echo "Usage: $0 [--entra] [--ci] [--no-build]" >&2
+      exit 1
+      ;;
+  esac
+done
+
+if $NO_BUILD && ! $CI_MODE; then
+  echo "error: --no-build requires --ci" >&2
+  exit 1
+fi
 
 confirm() {
   local prompt="$1" reply
+  if $CI_MODE; then
+    return 0  # Skip confirmation in CI mode
+  fi
   if [[ ! -t 0 ]]; then
     echo "error: no interactive terminal available to confirm: $prompt" >&2
     return 1
@@ -41,12 +60,22 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 PARENT_DIR="$(dirname "$REPO_ROOT")"
 cd "$REPO_ROOT"
 
-for cmd in git docker op; do
-  command -v "$cmd" >/dev/null 2>&1 || {
-    echo "error: $cmd is required but not installed" >&2
-    exit 1
-  }
-done
+# In CI mode, only require git and docker (skip op requirement)
+if $CI_MODE; then
+  for cmd in git docker; do
+    command -v "$cmd" >/dev/null 2>&1 || {
+      echo "error: $cmd is required but not installed" >&2
+      exit 1
+    }
+  done
+else
+  for cmd in git docker op; do
+    command -v "$cmd" >/dev/null 2>&1 || {
+      echo "error: $cmd is required but not installed" >&2
+      exit 1
+    }
+  done
+fi
 
 # Derive sibling clone URLs from this repo's own remote, so ssh/https and the org stay
 # consistent with whatever the developer already uses.
@@ -56,6 +85,7 @@ ORG_URL="${ORG_URL%/*}"
 API_DIR="$PARENT_DIR/laa-record-controlled-work-api"
 DATASTORE_DIR="$PARENT_DIR/laa-info-and-advice-datastore"
 CCQ_DIR="$PARENT_DIR/laa-check-client-qualifies"
+CFE_DIR="$PARENT_DIR/cfe-civil"
 
 clone_if_missing() {
   local dir="$1" name="$2" url="$ORG_URL/$2.git"
@@ -64,13 +94,18 @@ clone_if_missing() {
   require_confirm "Run 'git clone $url $dir'?"
   # Remove a partial clone if this is interrupted, so re-running this script retries cleanly.
   trap 'rm -rf "$dir"' INT TERM
-  git clone "$url" "$dir"
+  if $CI_MODE; then
+    git clone --depth 1 --single-branch "$url" "$dir"
+  else
+    git clone "$url" "$dir"
+  fi
   trap - INT TERM
 }
 
 clone_if_missing "$API_DIR" laa-record-controlled-work-api
 clone_if_missing "$DATASTORE_DIR" laa-info-and-advice-datastore
 clone_if_missing "$CCQ_DIR" laa-check-client-qualifies
+clone_if_missing "$CFE_DIR" cfe-civil
 
 ensure_env_file() {
   local dir="$1" file="$2" example="$3"
@@ -87,14 +122,14 @@ ensure_env_file "$API_DIR" .env .env.example
 ensure_env_file "$DATASTORE_DIR" .env .env.example
 ensure_env_file "$CCQ_DIR" .env .env.sample
 
-if [[ "$MODE" == "entra" ]]; then
+if $ENTRA_MODE; then
   ensure_env_file "$REPO_ROOT" .env.entra .env.entra.example
   ensure_env_file "$API_DIR" .env.entra .env.entra.example
   ensure_env_file "$DATASTORE_DIR" .env.entra .env.entra.example
 fi
 
 # docker-compose.embedded.yml sets pull_policy: never - build the image locally if missing.
-if ! docker image inspect laa-check-client-qualifies:latest >/dev/null 2>&1; then
+if ! $CI_MODE && ! docker image inspect laa-check-client-qualifies:latest >/dev/null 2>&1; then
   echo "laa-check-client-qualifies:latest image is missing."
   require_confirm "Run 'make -C $CCQ_DIR build'?"
   make -C "$CCQ_DIR" build
@@ -103,22 +138,48 @@ fi
 # MSAL requires an https authority even for the mock IdP (see docker/certs) - Docker Desktop
 # on Mac doesn't add this automatically, but the browser needs it to reach the login page.
 if ! grep -qE '(^|[[:space:]])host\.docker\.internal([[:space:]]|$)' /etc/hosts 2>/dev/null; then
-  echo "warning: host.docker.internal not found in /etc/hosts - add it so the mock OAuth2 login page loads in your browser:" >&2
-  echo "  echo '127.0.0.1 host.docker.internal' | sudo tee -a /etc/hosts" >&2
+  if $CI_MODE; then
+    echo "Adding host.docker.internal to /etc/hosts..."
+    echo '127.0.0.1 host.docker.internal' | sudo tee -a /etc/hosts >/dev/null
+  else
+    echo "warning: host.docker.internal not found in /etc/hosts - add it so the mock OAuth2 login page loads in your browser:" >&2
+    echo "  echo '127.0.0.1 host.docker.internal' | sudo tee -a /etc/hosts" >&2
+  fi
 fi
 
 ENV_FILES=(--env-file="$API_DIR/.env")
-[[ "$MODE" == "entra" ]] && ENV_FILES+=(--env-file="$API_DIR/.env.entra")
+$ENTRA_MODE && ENV_FILES+=(--env-file="$API_DIR/.env.entra")
 ENV_FILES+=(--env-file="$DATASTORE_DIR/.env")
-[[ "$MODE" == "entra" ]] && ENV_FILES+=(--env-file="$DATASTORE_DIR/.env.entra")
+$ENTRA_MODE && ENV_FILES+=(--env-file="$DATASTORE_DIR/.env.entra")
 ENV_FILES+=(--env-file=.env)
-[[ "$MODE" == "entra" ]] && ENV_FILES+=(--env-file=.env.entra)
+$ENTRA_MODE && ENV_FILES+=(--env-file=.env.entra)
 
 COMPOSE_FILES=(-f docker-compose.yml -f docker-compose.override.yml)
-[[ "$MODE" == "entra" ]] && COMPOSE_FILES+=(-f docker-compose.entra.yml)
+if $CI_MODE; then
+  COMPOSE_FILES+=(-f docker/compose/ci.yml)
+fi
+$NO_BUILD && COMPOSE_FILES+=(-f docker/compose/ci.rcw.yml)
+$ENTRA_MODE && COMPOSE_FILES+=(-f docker-compose.entra.yml)
 
-echo "==> Starting docker compose stack (mode: $MODE):"
-echo "      op run"
-printf '        %s\n' "${ENV_FILES[@]}"
-echo "        -- docker compose ${COMPOSE_FILES[*]} up --watch --build"
-exec op run "${ENV_FILES[@]}" -- docker compose "${COMPOSE_FILES[@]}" up --watch --build
+if $CI_MODE; then
+  # CI mode: build first (parallel where possible), then start and wait for health.
+  echo "==> Starting docker compose stack (CI mode, $($ENTRA_MODE && echo 'entra' || echo 'mock-issuer')):"
+  if ! $NO_BUILD; then
+    printf '        docker compose %s %s build --parallel\n' "${COMPOSE_FILES[*]}" "${ENV_FILES[*]}"
+    docker compose "${COMPOSE_FILES[@]}" "${ENV_FILES[@]}" build --parallel
+  fi
+  printf '        docker compose %s %s up -d --wait --no-build\n' "${COMPOSE_FILES[*]}" "${ENV_FILES[*]}"
+  if ! docker compose "${COMPOSE_FILES[@]}" "${ENV_FILES[@]}" up -d --wait --no-build; then
+    echo "==> Docker compose failed; service state:"
+    docker compose "${COMPOSE_FILES[@]}" "${ENV_FILES[@]}" ps --all || true
+    echo "==> Docker compose logs:"
+    docker compose "${COMPOSE_FILES[@]}" "${ENV_FILES[@]}" logs --no-color || true
+    exit 1
+  fi
+else
+  echo "==> Starting docker compose stack (interactive mode, $($ENTRA_MODE && echo 'entra' || echo 'mock-issuer')):"
+  echo "      op run"
+  printf '        %s\n' "${ENV_FILES[@]}"
+  echo "        -- docker compose ${COMPOSE_FILES[*]} up --watch --build"
+  exec op run "${ENV_FILES[@]}" -- docker compose "${COMPOSE_FILES[@]}" up --watch --build
+fi

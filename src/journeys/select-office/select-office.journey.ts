@@ -29,7 +29,7 @@ export const selectOfficeJourney = journey({
       effects: [selectOfficeEffects.autoSelectSingleOffice()],
       next: [
         redirect({
-          goto: "/cases",
+          goto: "/",
           when: Data(CONTEXT_DATA_KEYS.availableOffices)
             .pipe(Transformer.Array.Length())
             .match(Condition.Equals(SINGLE_OFFICE)),

@@ -46,14 +46,14 @@ export default defineConfig({
   webServer: {
     command:
       process.env.CI === "true"
-        ? "yarn tsx tests/playwright/msw/test-server-with-msw.ts"
-        : "yarn build && yarn tsx tests/playwright/msw/test-server-with-msw.ts",
+        ? "yarn tsx tests/ui/msw/test-server-with-msw.ts"
+        : "yarn build && yarn tsx tests/ui/msw/test-server-with-msw.ts",
     url: "http://127.0.0.1:3001/health",
     reuseExistingServer: process.env.CI !== "true",
     stdout: "pipe",
     stderr: "pipe",
     timeout: 60000,
-    cwd: "../..", // Run from project root since config is now in tests/playwright/ subdirectory
+    cwd: "../..", // run from project root
     env: {
       NODE_ENV: "test",
       PORT: "3001",

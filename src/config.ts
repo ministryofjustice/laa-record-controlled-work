@@ -34,7 +34,9 @@ const SESSION_AGE_MAX = 12 * HOUR;
 const DEFAULT_RATE_WINDOW = 15 * MINUTE;
 /* eslint-enable @typescript-eslint/no-magic-numbers */
 
-const useHttps = ["production", "staging", "uat"].includes(required.NODE_ENV);
+const DEPLOYED_ENVIRONMENTS = ["production", "staging", "uat"];
+const useHttps =
+  optional.USE_HTTPS ?? DEPLOYED_ENVIRONMENTS.includes(required.NODE_ENV);
 
 export default {
   api: {
@@ -68,6 +70,10 @@ export default {
     port: optional.PORT ?? DEFAULT_PORT,
     rateLimit: {
       authMax: optional.AUTH_RATE_LIMIT_MAX ?? DEFAULT_AUTH_RATE_LIMIT_MAX,
+      enabled:
+        optional.RATE_LIMIT_ENABLED !== undefined
+          ? optional.RATE_LIMIT_ENABLED === "true"
+          : required.NODE_ENV !== "docker",
       headersEnabled: optional.RATELIMIT_HEADERS_ENABLED,
       max: optional.RATE_LIMIT_MAX ?? DEFAULT_RATE_LIMIT_MAX,
       storageUri: optional.RATELIMIT_STORAGE_URI,
@@ -78,7 +84,6 @@ export default {
       phase: optional.SERVICE_PHASE,
       url: optional.SERVICE_URL,
     },
-    useHttps,
   } satisfies AppConfig,
 
   csrf: {

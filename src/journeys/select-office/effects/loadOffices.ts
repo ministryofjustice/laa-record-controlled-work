@@ -61,8 +61,20 @@ export const loadOffices =
       throw ApiValidationError.from(result.error);
     }
     const mappedOffices = mapAvailableOffices(result.data);
+    const laaAccounts =
+      context.getSession()?.account?.idTokenClaims?.[
+        ID_TOKEN_CLAIMS_KEYS.laaAccounts
+      ];
+    const laaAccountCodes = Array.isArray(laaAccounts)
+      ? laaAccounts.filter(
+          (account): account is string => typeof account === "string",
+        )
+      : [];
+    const availableOffices = mappedOffices.filter((o) =>
+      laaAccountCodes.includes(o.code),
+    );
 
-    context.setData(CONTEXT_DATA_KEYS.availableOffices, mappedOffices);
+    context.setData(CONTEXT_DATA_KEYS.availableOffices, availableOffices);
   };
 
 /**
