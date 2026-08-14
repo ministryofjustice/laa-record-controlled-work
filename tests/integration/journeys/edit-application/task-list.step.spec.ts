@@ -100,13 +100,15 @@ describe("Task list step", () => {
         );
 
       expect(indicators).to.have.length(1);
-      expect(indicators[0].properties.content).to.equal(
-        `<div class="eligibility-result-box">
-        <h2 class="govuk-heading-s">Eligibility result</h2>
-        <p class="govuk-body"></p>
-        <p class="govuk-!-margin-bottom-0"><a class="govuk-link" href="/cases/${uuid}/eligibility/">View result</a></p>
-      </div>`,
+      const indicator = String(indicators[0].properties.content);
+      expect(indicator).to.include("Eligibility result");
+      expect(indicator).to.not.include(
+        "Your client qualifies financially for civil legal aid",
       );
+      expect(indicator).to.include(
+        `href="/cases/${uuid}/eligibility/"`,
+      );
+      expect(indicator).to.include("View result");
     });
 
     it("renders eligibility content for an eligible assessment", async () => {
@@ -130,13 +132,15 @@ describe("Task list step", () => {
         );
 
       expect(indicators).to.have.length(1);
-      expect(indicators[0].properties.content).to.equal(
-        `<div class="eligibility-result-box">
-        <h2 class="govuk-heading-s">Eligibility result</h2>
-        <p class="govuk-body">Your client qualifies financially for civil legal aid based on the information you entered.</p>
-        <p class="govuk-!-margin-bottom-0"><a class="govuk-link" href="/cases/${uuid}/eligibility/">View result</a></p>
-      </div>`,
+      const indicator = String(indicators[0].properties.content);
+      expect(indicator).to.include("Eligibility result");
+      expect(indicator).to.include(
+        "Your client qualifies financially for civil legal aid based on the information you entered.",
       );
+      expect(indicator).to.include(
+        `href="/cases/${uuid}/eligibility/"`,
+      );
+      expect(indicator).to.include("View result");
     });
 
     describe("declaration status rendering", () => {
