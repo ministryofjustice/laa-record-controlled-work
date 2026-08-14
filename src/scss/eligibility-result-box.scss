@@ -1,0 +1,14 @@
+.eligibility-result-box {
+  padding: 25px;
+  margin-bottom: 25px;
+  background-color: #f3f2f1;
+
+  & * {
+    margin: 0 0 10px 0;
+  }
+
+  a {
+    font-size: 19px;
+    margin: 0;
+  }
+}

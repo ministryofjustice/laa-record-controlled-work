@@ -219,6 +219,11 @@
             "label": "Income and capital"
           }
         },
+        "eligibilityResult": {
+          "title": "Eligibility result",
+          "eligible": "Your client qualifies financially for civil legal aid based on the information you entered.",
+          "viewResult": "View result"
+        },
         "EvidenceAndDeclaration": {
           "title": "Evidence and declarations",
           "taskItem": {
