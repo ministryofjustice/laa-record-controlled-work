@@ -204,39 +204,6 @@
           "niNumber": "National Insurance number",
           "address": "Address"
         }
-      },
-      "taskList": {
-        "clientDetails": {
-          "title": "About your client",
-          "taskItem": {
-            "label": "Client details"
-          }
-        },
-        "meansAssessment": {
-          "title": "Means assessment",
-          "taskItem": {
-            "label": "Income and capital"
-          }
-        },
-        "EvidenceAndDeclaration": {
-          "title": "Evidence and declarations",
-          "taskItem": {
-            "evidence": {
-              "label": "Evidence"
-            },
-            "declaration": {
-              "label": "Client declaration"
-            }
-          }
-        },
-        "status": {
-          "cannotStart": "Cannot start yet",
-          "incomplete": "Incomplete",
-          "completed": "Completed"
-        },
-        "submitButton": {
-          "label": "Record Controlled Work"
-        }
       }
     },
     "evidence": {
