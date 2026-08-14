@@ -1,5 +1,7 @@
 import {
   Condition,
+  Format,
+  Params,
   Query,
   redirect,
   step,
@@ -17,6 +19,7 @@ import {
   heading,
   label,
 } from "#/journeys/evidence/steps/evidence-of-capital/evidence-of-capital.blocks.js";
+import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
 import { t } from "#/lib/i18n.js";
 
 export const evidenceOfCapital = (
@@ -24,7 +27,12 @@ export const evidenceOfCapital = (
 ): ReturnType<typeof step> =>
   step({
     blocks: [
-      backLink("/cases/evidence/evidence-of-expenditure"),
+      backLink(
+        Format(
+          "/cases/%1/evidence/evidence-of-expenditure",
+          Params(PARAMS_KEYS.applicationID),
+        ),
+      ),
       caption,
       heading,
       label,

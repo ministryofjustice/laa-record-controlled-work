@@ -1,7 +1,9 @@
 import {
   Answer,
   Condition,
+  Format,
   or,
+  Params,
   Query,
   redirect,
   step,
@@ -26,6 +28,7 @@ import {
   stateBenefitsEvidenceGroup,
   taxCreditsEvidenceGroup,
 } from "#/journeys/evidence/steps/evidence-of-income/evidence-of-income.blocks.js";
+import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
 import { t } from "#/lib/i18n.js";
 
 export const evidenceOfIncome = (
@@ -33,7 +36,12 @@ export const evidenceOfIncome = (
 ): ReturnType<typeof step> =>
   step({
     blocks: [
-      backLink("/cases/evidence/have-evidence"),
+      backLink(
+        Format(
+          "/cases/%1/evidence/have-evidence",
+          Params(PARAMS_KEYS.applicationID),
+        ),
+      ),
       caption,
       heading,
       description,

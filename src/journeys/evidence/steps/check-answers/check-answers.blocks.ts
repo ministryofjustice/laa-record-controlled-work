@@ -1,7 +1,9 @@
 import {
   Answer,
   Condition,
+  Format,
   match,
+  Params,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 import { NunjucksGenerators } from "@ministryofjustice/hmpps-forge/express-nunjucks";
 import {
@@ -9,6 +11,7 @@ import {
   GovUKSummaryList,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
+import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
 import { t } from "#/lib/i18n.js";
 
 const doYouHaveEvidenceLabel = match(Answer("doYouHaveEvidence"))
@@ -271,7 +274,10 @@ export const summaryList = GovUKSummaryList({
       actions: {
         items: [
           {
-            href: "/cases/evidence/have-evidence?returnTo=check-answers",
+            href: Format(
+              "/cases/%1/evidence/have-evidence?returnTo=check-answers",
+              Params(PARAMS_KEYS.applicationID),
+            ),
             text: t("journeys.evidence.checkAnswers.changeLink.change"),
             visuallyHiddenText: t(
               "journeys.evidence.checkAnswers.answerLabels.doYouHaveEvidence",
@@ -290,7 +296,10 @@ export const summaryList = GovUKSummaryList({
       actions: {
         items: [
           {
-            href: "/cases/evidence/reason-for-no-evidence?returnTo=check-answers",
+            href: Format(
+              "/cases/%1/evidence/reason-for-no-evidence?returnTo=check-answers",
+              Params(PARAMS_KEYS.applicationID),
+            ),
             text: t("journeys.evidence.checkAnswers.changeLink.change"),
             visuallyHiddenText: t(
               "journeys.evidence.checkAnswers.answerLabels.reasonForNoEvidence",
@@ -310,7 +319,10 @@ export const summaryList = GovUKSummaryList({
       actions: {
         items: [
           {
-            href: "/cases/evidence/evidence-of-income?returnTo=check-answers",
+            href: Format(
+              "/cases/%1/evidence/evidence-of-income?returnTo=check-answers",
+              Params(PARAMS_KEYS.applicationID),
+            ),
             text: t("journeys.evidence.checkAnswers.changeLink.change"),
             visuallyHiddenText: t(
               "journeys.evidence.checkAnswers.answerLabels.evidenceOfIncome",
@@ -328,7 +340,10 @@ export const summaryList = GovUKSummaryList({
       actions: {
         items: [
           {
-            href: "/cases/evidence/evidence-of-expenditure?returnTo=check-answers",
+            href: Format(
+              "/cases/%1/evidence/evidence-of-expenditure?returnTo=check-answers",
+              Params(PARAMS_KEYS.applicationID),
+            ),
             text: t("journeys.evidence.checkAnswers.changeLink.change"),
             visuallyHiddenText: t(
               "journeys.evidence.checkAnswers.answerLabels.evidenceOfExpenditure",
@@ -348,7 +363,10 @@ export const summaryList = GovUKSummaryList({
       actions: {
         items: [
           {
-            href: "/cases/evidence/evidence-of-capital?returnTo=check-answers",
+            href: Format(
+              "/cases/%1/evidence/evidence-of-capital?returnTo=check-answers",
+              Params(PARAMS_KEYS.applicationID),
+            ),
             text: t("journeys.evidence.checkAnswers.changeLink.change"),
             visuallyHiddenText: t(
               "journeys.evidence.checkAnswers.answerLabels.evidenceOfCapital",
