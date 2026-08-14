@@ -8,11 +8,14 @@ import { createTestClient } from "../../utils/helpers.js";
 import { evidenceOfExpenditure } from "#/journeys/evidence/steps/evidence-of-expenditure/evidence-of-expenditure.step.js";
 import { evidenceEffects } from "#/journeys/evidence/evidence.effects.js";
 import { evidencePackage } from "#/journeys/evidence/evidence.package.js";
+import { createApplicationJourney } from "#/journeys/create-application/create-application.journey.js";
+import { evidenceJourney } from "#/journeys/evidence/evidence.journey.js";
 
 describe("Evidence of expenditure step", () => {
   const applicationId = "123e4567-e89b-12d3-a456-426614174000";
   const client = createTestClient({
-    effects: [evidenceEffects.loadDraftAnswers("evidence")],
+    accessHooks: evidenceJourney.onAccess,
+    journeyCode: "evidence",
     path: "/cases/:applicationID/evidence",
     steps: [evidenceOfExpenditure("evidence")],
     testEffects: evidencePackage.functions,

@@ -10,12 +10,15 @@ import {
 import { createForgeTestClient } from "../../utils/helpers.js";
 import { createTestClient } from "../../utils/helpers.js";
 import { enterOverseasAddressStep } from "#/journeys/create-application/steps/enter-overseas-address.step.js";
+import { createApplicationJourney } from "#/journeys/create-application/create-application.journey.js";
+import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 
 describe("Enter overseas address step", () => {
   const client = createTestClient({
-    effects: [CreateApplicationEffects.loadDraftAnswers("testJourney")],
+    accessHooks: createApplicationJourney.onAccess,
+    journeyCode: "createApplication",
     path: "/cases/new/",
-    steps: [enterOverseasAddressStep("testJourney")],
+    steps: [enterOverseasAddressStep("createApplication")],
     testEffects: createApplicationEffectsRegistry,
   });
 

@@ -10,12 +10,14 @@ import {
 import { clientDetailsStep } from "#/journeys/create-application/steps/client-details.step.js";
 import { createTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
+import { createApplicationJourney } from "#/journeys/create-application/create-application.journey.js";
 
 describe("Client details step", () => {
   const client = createTestClient({
-    effects: [CreateApplicationEffects.loadDraftAnswers("testJourney")],
+    accessHooks: createApplicationJourney.onAccess,
+    journeyCode: "createApplication",
     path: "/cases/new/",
-    steps: [clientDetailsStep("testJourney")],
+    steps: [clientDetailsStep("createApplication")],
     testEffects: createApplicationEffectsRegistry,
   });
 

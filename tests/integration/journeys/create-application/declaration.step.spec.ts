@@ -11,14 +11,16 @@ import {
 import { declarationStep } from "#/journeys/create-application/steps/declaration.step.js";
 import { ecfStep } from "#/journeys/create-application/steps/ecf.step.js";
 import { createTestClient } from "../../utils/helpers.js";
+import { createApplicationJourney } from "#/journeys/create-application/create-application.journey.js";
 
 describe("Declaration step", () => {
   const client = createTestClient({
-    effects: [CreateApplicationEffects.loadDraftAnswers("testJourney")],
+    accessHooks: createApplicationJourney.onAccess,
+    journeyCode: "createApplication",
     path: "/cases/new/",
     steps: [
-      declarationStep("testJourney"),
-      ecfStep("testJourney"),
+      declarationStep("createApplication"),
+      ecfStep("createApplication"),
     ],
     testEffects: createApplicationEffectsRegistry,
   });

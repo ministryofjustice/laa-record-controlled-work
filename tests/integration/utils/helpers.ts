@@ -3,8 +3,15 @@ import {
   journey,
   type StepDefinition,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
-import type { EffectFunctionExpr, JourneyDefinition } from "@ministryofjustice/hmpps-forge/core/authoring";
-import type { ForgePackageFunctions, ForgePackageRegistration } from "@ministryofjustice/hmpps-forge/core";
+import type {
+  AccessHook,
+  EffectFunctionExpr,
+  JourneyDefinition,
+} from "@ministryofjustice/hmpps-forge/core/authoring";
+import type {
+  ForgePackageFunctions,
+  ForgePackageRegistration,
+} from "@ministryofjustice/hmpps-forge/core";
 import {
   createTestPackage,
   type ForgeTestClient,
@@ -170,7 +177,8 @@ export function createForgeTestClientForEditApplication(
  * @param options The test client configuration.
  * @param options.steps Step definitions to mount in the test journey.
  * @param options.path Base path for the test journey.
- * @param options.effects Access effects to run when the journey is entered.
+ * @param options.journeyCode Journey code for the generated test journey.
+ * @param options.accessHooks Explicit access hooks to mount on the journey. Use this when the journey needs redirects or multiple access phases.
  * @param options.testEffects Journey function registry or registries to register for the test package.
  * @param options.mockDeps Optional dependency object matching the test effects deps type.
  * @returns {ForgeTestClient} A configured test client.
@@ -179,25 +187,27 @@ export function createTestClient<TDeps>(
   options: {
     steps: StepDefinition[];
     path: string;
-    effects?: EffectFunctionExpr<any>[];
+    journeyCode: string;
+    accessHooks?: AccessHook[];
     testEffects: ForgePackageRegistration<TDeps>["functions"];
     mockDeps?: TDeps;
   },
 ): ForgeTestClient {
-  const { effects, mockDeps, path, steps, testEffects } = options;
+  const {
+    accessHooks,
+    journeyCode,
+    mockDeps,
+    path,
+    steps,
+    testEffects,
+  } = options;
+
+
 
   const testJourney = journey({
-    code: "testJourney",
+    code: journeyCode,
     path: path,
-    ...(effects === undefined
-      ? {}
-      : {
-          onAccess: [
-            access({
-              effects,
-            }),
-          ],
-        }),
+    ...(accessHooks && { onAccess: accessHooks }),
     reachability: { disableReachabilityChecks: true },
     steps: steps,
     title: "Test Journey",

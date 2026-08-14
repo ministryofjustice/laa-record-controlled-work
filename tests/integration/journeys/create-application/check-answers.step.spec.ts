@@ -12,6 +12,7 @@ import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import { checkAnswersStep } from "#/journeys/create-application/steps/check-answers.step.js";
 import sinon from "sinon";
 import { getCreateApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
+import { createApplicationJourney } from "#/journeys/create-application/create-application.journey.js";
 
 describe("Check answers step", () => {
   const uuid = "123e4567-e89b-12d3-a456-426614174000";
@@ -24,15 +25,16 @@ describe("Check answers step", () => {
     });
 
   const client = createTestClient({
-    effects: [CreateApplicationEffects.loadDraftAnswers("testJourney")],
+    accessHooks: createApplicationJourney.onAccess,
+    journeyCode: "createApplication",
     mockDeps: { createApplication: createApplicationStub },
     path: "/cases/new/",
-    steps: [checkAnswersStep("testJourney")],
+    steps: [checkAnswersStep("createApplication")],
     testEffects: createApplicationEffectsRegistry,
   });
   const session = {
     journeyDrafts: {
-      testJourney: {
+      createApplication: {
         ecf: "no",
         legalAidBefore: "yesSameMatter",
         legalAidLast6Months: "yes",

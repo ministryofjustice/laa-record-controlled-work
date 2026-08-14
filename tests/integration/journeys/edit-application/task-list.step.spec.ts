@@ -30,6 +30,7 @@ describe("Task list step", () => {
     .resolves({ status: 200, data: mockData });
 
   const client = createTestClient({
+    journeyCode: "editApplication",
     mockDeps: { getApplication: getApplicationStub },
     path: "/cases/:applicationID/",
     steps: [taskListStep()],

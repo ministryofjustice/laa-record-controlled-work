@@ -9,6 +9,8 @@ import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import { evidencePackage } from "#/journeys/evidence/evidence.package.js";
 import { checkAnswersStep } from "#/journeys/evidence/steps/check-answers/check-answers.step.js";
 import { evidenceEffects } from "#/journeys/evidence/evidence.effects.js";
+import { createApplicationJourney } from "#/journeys/create-application/create-application.journey.js";
+import { evidenceJourney } from "#/journeys/evidence/evidence.journey.js";
 
 describe("Check answers step", () => {
   const applicationId = "123e4567-e89b-12d3-a456-426614174000";
@@ -18,8 +20,9 @@ describe("Check answers step", () => {
 
   const client = createTestClient({
     steps: [checkAnswersStep()],
+    accessHooks: evidenceJourney.onAccess,
+    journeyCode: "evidence",
     path: "/cases/:applicationID/evidence",
-    effects: [evidenceEffects.loadDraftAnswers("evidence")],
     testEffects: evidencePackage.functions,
     mockDeps: {
       updateApplicationEvidence: updateApplicationEvidenceStub,

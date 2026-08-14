@@ -10,12 +10,14 @@ import {
 import { haveAHomeAddressStep } from "#/journeys/create-application/steps/have-a-home-address.step.js";
 import { createTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
+import { createApplicationJourney } from "#/journeys/create-application/create-application.journey.js";
 
 describe("Have A Home Address Step", () => {
   const client = createTestClient({
-    effects: [CreateApplicationEffects.loadDraftAnswers("testJourney")],
+    accessHooks: createApplicationJourney.onAccess,
+    journeyCode: "createApplication",
     path: "/cases/new/",
-    steps: [haveAHomeAddressStep("testJourney")],
+    steps: [haveAHomeAddressStep("createApplication")],
     testEffects: createApplicationEffectsRegistry,
   });
 

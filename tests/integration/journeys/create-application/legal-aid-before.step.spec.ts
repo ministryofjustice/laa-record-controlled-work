@@ -10,12 +10,14 @@ import {
 import { legalAidBeforeStep } from "#/journeys/create-application/steps/legal-aid-before.step.js";
 import { createTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
+import { createApplicationJourney } from "#/journeys/create-application/create-application.journey.js";
 
 describe("Legal aid before step", () => {
   const client = createTestClient({
-    effects: [CreateApplicationEffects.loadDraftAnswers("testJourney")],
+    accessHooks: createApplicationJourney.onAccess,
+    journeyCode: "createApplication",
     path: "/cases/new/",
-    steps: [legalAidBeforeStep("testJourney")],
+    steps: [legalAidBeforeStep("createApplication")],
     testEffects: createApplicationEffectsRegistry,
   });
 

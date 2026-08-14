@@ -10,13 +10,15 @@ import {
 import { createForgeTestClient } from "../../utils/helpers.js";
 import { createTestClient } from "../../utils/helpers.js";
 import { enterAddressManuallyStep } from "#/journeys/create-application/steps/enter-address-manually.step.js";
+import { createApplicationJourney } from "#/journeys/create-application/create-application.journey.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 
 describe("Enter address manually step", () => {
   const client = createTestClient({
-    effects: [CreateApplicationEffects.loadDraftAnswers("testJourney")],
+    accessHooks: createApplicationJourney.onAccess,
+    journeyCode: "createApplication",
     path: "/cases/new/",
-    steps: [enterAddressManuallyStep("testJourney")],
+    steps: [enterAddressManuallyStep("createApplication")],
     testEffects: createApplicationEffectsRegistry,
   });
 
