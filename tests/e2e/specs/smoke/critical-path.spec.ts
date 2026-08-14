@@ -60,6 +60,13 @@ test.describe("@e2e critical path", () => {
     await actor.assertTaskStatus("Income and capital", "Completed");
   });
 
+  test("user views the completed eligibility assessment result", async () => {
+    await actor.assertEligibilityResultVisible();
+
+    await actor.viewCompletedEligibilityAssessment(applicationId);
+    await actor.returnToTaskListFromEligibilityResult(applicationId);
+  });
+
   test.fixme("completes evidence section", async () => {});
   test.fixme("completes declaration", async () => {});
   test.fixme("submits application", async () => {});

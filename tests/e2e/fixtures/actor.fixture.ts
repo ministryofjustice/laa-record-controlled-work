@@ -1,7 +1,10 @@
 import type { Page } from "@playwright/test";
 
 import { assertInProgressCaseVisible } from "#tests/e2e/assertions/case-list.assert.js";
-import { assertTaskStatus } from "#tests/e2e/assertions/task-list.assert.js";
+import {
+  assertEligibilityResultVisible,
+  assertTaskStatus,
+} from "#tests/e2e/assertions/task-list.assert.js";
 import { signIn } from "#tests/e2e/flows/auth.flow.js";
 import {
   gotoCase,
@@ -18,9 +21,14 @@ import {
   completeEvidenceYesPath,
 } from "#tests/e2e/flows/evidence.flow.js";
 import { selectOfficeByCode } from "#tests/e2e/flows/office.flow.js";
-import { openMeansAssessmentFromTaskList } from "#tests/e2e/flows/task-list.flow.js";
+import {
+  openMeansAssessmentFromTaskList,
+  returnToTaskListFromEligibilityResult,
+  viewCompletedEligibilityAssessment,
+} from "#tests/e2e/flows/task-list.flow.js";
 
 export interface Actor {
+  assertEligibilityResultVisible: () => Promise<void>;
   assertInProgressCaseVisible: (clientName: string) => Promise<void>;
   assertTaskStatus: (taskName: string, expectedStatus: string) => Promise<void>;
   completeCcqShortestEligiblePath: (applicationId: string) => Promise<void>;
@@ -32,8 +40,12 @@ export interface Actor {
   login: () => Promise<void>;
   openDraftCaseFromCaseList: (applicationId: string) => Promise<string>;
   openMeansAssessmentFromTaskList: (applicationId: string) => Promise<void>;
+  returnToTaskListFromEligibilityResult: (
+    applicationId: string,
+  ) => Promise<void>;
   selectOfficeByCode: (code: string) => Promise<void>;
   startNewCase: () => Promise<void>;
+  viewCompletedEligibilityAssessment: (applicationId: string) => Promise<void>;
 }
 
 interface ActorFixtures {
@@ -41,6 +53,9 @@ interface ActorFixtures {
 }
 
 export const createActor = (page: Page): Actor => ({
+  assertEligibilityResultVisible: async () => {
+    await assertEligibilityResultVisible(page);
+  },
   assertInProgressCaseVisible: async (clientName: string) => {
     await assertInProgressCaseVisible(page, clientName);
   },
@@ -73,11 +88,17 @@ export const createActor = (page: Page): Actor => ({
   openMeansAssessmentFromTaskList: async (applicationId: string) => {
     await openMeansAssessmentFromTaskList(page, applicationId);
   },
+  returnToTaskListFromEligibilityResult: async (applicationId: string) => {
+    await returnToTaskListFromEligibilityResult(page, applicationId);
+  },
   selectOfficeByCode: async (code: string) => {
     await selectOfficeByCode(page, code);
   },
   startNewCase: async () => {
     await startNewCase(page);
+  },
+  viewCompletedEligibilityAssessment: async (applicationId: string) => {
+    await viewCompletedEligibilityAssessment(page, applicationId);
   },
 });
 

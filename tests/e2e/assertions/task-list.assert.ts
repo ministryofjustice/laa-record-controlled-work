@@ -13,3 +13,9 @@ export const assertTaskStatus = async (
 
   await expect(taskRow).toContainText(expectedStatus);
 };
+
+export const assertEligibilityResultVisible = async (
+  page: Page,
+): Promise<void> => {
+  await expect(page.locator(".eligibility-result-box")).toBeVisible();
+};

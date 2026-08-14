@@ -152,6 +152,7 @@ export function createForgeTestClientForEditApplication(
 
   return new ForgeTestHarness()
     .registerGlobalComponents(govukComponents)
+    .registerGlobalComponents(mojComponents)
     .registerGlobalComponents([autocomplete])
     .registerGlobalFunctions(nunjucksFunctions)
     .registerGlobalFunctions(JourneyEffectsImplementations)

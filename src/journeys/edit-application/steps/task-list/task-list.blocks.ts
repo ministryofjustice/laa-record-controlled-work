@@ -1,13 +1,15 @@
-import type {
-  BlockDefinition,
-  ResolvableString,
-} from "@ministryofjustice/hmpps-forge/core/components";
-
 import {
+  Condition,
   Data,
   Format,
+  match,
   Params,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
+import {
+  type BlockDefinition,
+  HtmlBlock,
+  type ResolvableString,
+} from "@ministryofjustice/hmpps-forge/core/components";
 import {
   GovUKBody,
   GovUKButton,
@@ -77,6 +79,7 @@ export function taskList(): BlockDefinition[] {
         ),
       ],
     }),
+    eligibilityResult(),
     sectionHeading(
       t("journeys.createApplication.taskList.EvidenceAndDeclaration.title"),
     ),
@@ -99,6 +102,37 @@ export function taskList(): BlockDefinition[] {
       ],
     }),
   ];
+}
+
+/**
+ * Builds the eligibility result indicator.
+ * @returns The eligibility result HTML block.
+ */
+function eligibilityResult(): HtmlBlock {
+  const eligibleContent = match(
+    Data(CONTEXT_DATA_KEYS.application).path(
+      "eligibility.result.result_summary.overall_result.result",
+    ),
+  )
+    .branch(
+      Condition.Equals("eligible"),
+      t("journeys.createApplication.taskList.eligibilityResult.eligible"),
+    )
+    .otherwise("");
+
+  return HtmlBlock({
+    content: Format(
+      `<div class="eligibility-result-box">
+        <h2 class="govuk-heading-s">%1</h2>
+        <p class="govuk-body">%2</p>
+        <p class="govuk-!-margin-bottom-0"><a class="govuk-link" href="/cases/%3/eligibility/">%4</a></p>
+      </div>`,
+      t("journeys.createApplication.taskList.eligibilityResult.title"),
+      eligibleContent,
+      Params(PARAMS_KEYS.applicationID),
+      t("journeys.createApplication.taskList.eligibilityResult.viewResult"),
+    ),
+  });
 }
 
 /**
