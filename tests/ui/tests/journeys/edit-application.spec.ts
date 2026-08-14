@@ -1,9 +1,9 @@
 import { test, expect } from "../../fixtures/index.js";
-import { application } from "../../msw/fixtures/rcw.fixtures.js";
+import { incompleteApplication, completeApplication } from "../../msw/fixtures/rcw.fixtures.js";
 
 test("Edit Application - Task List step", async ({ withSelectedOffice: page }) => {
-  const applicationId = application.id;
-   const clientName = application.clientDetails.firstName + " " + application.clientDetails.lastName;
+  const applicationId = incompleteApplication.id;
+   const clientName = incompleteApplication.clientDetails.firstName + " " + incompleteApplication.clientDetails.lastName;
  // ==========================================================================
   // Task list page
   // ==========================================================================
@@ -38,6 +38,26 @@ test("Edit Application - Task List step", async ({ withSelectedOffice: page }) =
   await page.getByRole("button", { name: "Save and return later" }).click();
 
   // Verify redirection to the case list page
-  await expect(page).toHaveURL("/case-list"); 
+  await expect(page).toHaveURL("/cases"); 
 
+});
+
+test("Edit Application - Task List step - Record Controlled Work button", async ({ withSelectedOffice: page }) => {
+  const applicationId = completeApplication.id;
+
+  await page.goto(`/cases/${applicationId}/task-list`);
+
+  const taskListSections = page.locator(".govuk-task-list");
+  await expect(taskListSections).toHaveCount(3);
+
+  const allStatuses = page.locator(".govuk-task-list__status");
+  await expect(allStatuses).toHaveText(["Completed", "Completed", "Completed", "Completed"]);
+
+  const submitButton = page.getByRole("button", { name: "Record Controlled Work" });
+
+  await expect(submitButton).toBeVisible();
+
+  await submitButton.click();
+
+  await expect(page).toHaveURL("/submittedPage-TODO");
 });
