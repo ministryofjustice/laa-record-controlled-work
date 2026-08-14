@@ -5,14 +5,18 @@ import {
   TestRenderResult,
 } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
-import { createForgeTestClientForEvidence } from "../../utils/helpers.js";
+import { createTestClient } from "../../utils/helpers.js";
+import { evidenceEffects } from "#/journeys/evidence/evidence.effects.js";
+import { evidencePackage } from "#/journeys/evidence/evidence.package.js";
 
 describe("Evidence of income step", () => {
   const applicationId = "123e4567-e89b-12d3-a456-426614174000";
-  const client = createForgeTestClientForEvidence(
-    "Evidence",
-    [evidenceOfIncome("testJourney")],
-  );
+  const client = createTestClient({
+    effects: [evidenceEffects.loadDraftAnswers("evidence")],
+    path: "/cases/:applicationID/evidence",
+    steps: [evidenceOfIncome("evidence")],
+    testEffects: evidencePackage.functions,
+  });
 
   describe("GET /cases/evidence/evidence-of-income", () => {
     let renderResult: TestRenderResult;

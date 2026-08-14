@@ -4,15 +4,19 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
 import { doYouHaveEvidence } from "#/journeys/evidence/steps/do-you-have-evidence/do-you-have-evidence.step.js";
-import { createForgeTestClientForEvidence } from "../../utils/helpers.js";
+import { createTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
+import { evidenceEffects } from "#/journeys/evidence/evidence.effects.js";
+import { evidencePackage } from "#/journeys/evidence/evidence.package.js";
 
 describe("Do you have evidence step", () => {
   const applicationId = "123e4567-e89b-12d3-a456-426614174000";
-  const client = createForgeTestClientForEvidence(
-    "Evidence",
-    [doYouHaveEvidence("testJourney")],
-  );
+  const client = createTestClient({
+    effects: [evidenceEffects.loadDraftAnswers("evidence")],
+    path: "/cases/:applicationID/evidence",
+    steps: [doYouHaveEvidence("evidence")],
+    testEffects: evidencePackage.functions,
+  });
 
   describe("GET /cases/evidence/have-evidence", () => {
     let renderResult: TestRenderResult;
