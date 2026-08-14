@@ -1,88 +1,44 @@
-import type { EffectFunctionContext } from "@ministryofjustice/hmpps-forge/core";
-import type { Session, SessionData } from "express-session";
-
 import type { UpdateEvidenceRequestBody } from "#/api/clients/rcw/model/updateEvidenceRequestBody.zod.gen.js";
-import type { EvidenceEffectsDeps } from "#/journeys/evidence/evidence.types.js";
 
-import {
-  ApiResponseError,
-  ApiValidationError,
-} from "#/api/clients/api.errors.js";
+import { ApiResponseError } from "#/api/clients/api.errors.js";
 import { getRcwApiDefaultOptions } from "#/api/clients/getRcwApiDefaultOptions.js";
 import { getAuthDebugHeaders } from "#/auth/auth.debug.js";
-import { isJourneySession } from "#/journeys/effects.js";
-import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
+import {
+  type EvidenceContext,
+  type EvidenceEffectsDeps,
+  isEvidenceAnswers,
+} from "#/journeys/evidence/evidence.types.js";
+import { mapEvidenceToEvidenceRequest } from "#/journeys/evidence/mappers/mapEvidenceToEvidenceRequest.js";
+import {
+  CONTEXT_DATA_KEYS,
+  PARAMS_KEYS,
+} from "#/journeys/journey.constants.js";
+import {
+  InvalidEvidenceError,
+  InvalidSessionError,
+} from "#/journeys/journey.errors.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
 
-const buildEvidenceData = (
-  answers: Record<string, unknown>,
-  journeyCode: string,
-): UpdateEvidenceRequestBody => {
-  if (answers.doYouHaveEvidence === "no") {
-    return {
-      evidenceExemptionCode:
-        typeof answers.reasonForNoEvidence === "string"
-          ? answers.reasonForNoEvidence
-          : undefined,
-      evidenceExemptionReason:
-        typeof answers.moreDetailsForNoEvidence === "string"
-          ? answers.moreDetailsForNoEvidence
-          : undefined,
-    };
-  }
-
-  if (answers.doYouHaveEvidence === "yes") {
-    return {
-      incomeEvidenceChecklist: {
-        employedEvidence: answers.employedEvidence,
-        selfEmployedEvidence: answers.selfEmployedEvidence,
-        benefitsInKindEvidence: answers.benefitsInKindEvidence,
-        otherEvidence: answers.otherEvidence,
-        stateBenefitsEvidence: answers.stateBenefitsEvidence,
-        asylumSupportEvidence: answers.asylumSupportEvidence,
-        taxCreditsEvidence: answers.taxCreditsEvidence,
-      },
-      expenditureCapitalEvidenceChecklist: {
-        incomeEvidence: answers.incomeEvidence,
-        housingCostsEvidence: answers.housingCostsEvidence,
-        childCareEvidence: answers.childCareEvidence,
-        maintenanceEvidence: answers.maintenanceEvidence,
-        capitalEvidence: answers.capitalEvidence,
-      },
-    };
-  }
-
-  logger.warn(
-    `Journey ${journeyCode} has unexpected doYouHaveEvidence value: ${String(answers.doYouHaveEvidence)}`,
-  );
-  throw new ApiValidationError();
-};
-
 export const updateEvidence =
   (deps: EvidenceEffectsDeps) =>
-  async (
-    context: EffectFunctionContext,
-    journeyCode: string,
-  ): Promise<void> => {
+  async (context: EvidenceContext, journeyCode: string): Promise<void> => {
     let response;
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Session shape is constrained by app session typing.
-      const session = context.getSession() as
-        (Partial<SessionData> & Session) | undefined;
+      const session = context.getSession();
 
-      if (!isJourneySession(session)) {
-        return;
+      if (!session) {
+        throw new InvalidSessionError();
       }
 
-      const applicationId = session.currentApplicationId;
+      const applicationId = context.getRequestParam(PARAMS_KEYS.applicationID);
+
       if (!applicationId) {
-        logger.error(
-          `No currentApplicationId in session for journey ${journeyCode}`,
-        );
-        throw new Error("applicationId is required to update evidence");
+        logger.error("applicationID parameter is missing");
+        throw new Error("applicationID parameter is required");
       }
+
       context.setData(CONTEXT_DATA_KEYS.applicationID, applicationId);
 
       const journeyAnswers = session.journeyDrafts?.[journeyCode];
@@ -90,7 +46,13 @@ export const updateEvidence =
         return;
       }
 
-      const dataForApi = buildEvidenceData(journeyAnswers, journeyCode);
+      if (!isEvidenceAnswers(journeyAnswers)) {
+        logger.warn(`Journey ${journeyCode} has invalid evidence answers`);
+        throw new InvalidEvidenceError();
+      }
+
+      const updateEvidenceReq: UpdateEvidenceRequestBody =
+        mapEvidenceToEvidenceRequest(journeyAnswers);
 
       const opts = await getRcwApiDefaultOptions({
         homeAccountId: session.msal?.homeAccountId,
@@ -99,7 +61,7 @@ export const updateEvidence =
 
       response = await deps.updateApplicationEvidence(
         applicationId,
-        dataForApi,
+        updateEvidenceReq,
         opts,
       );
     } catch (error) {
