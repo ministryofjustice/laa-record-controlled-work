@@ -179,7 +179,7 @@ export function createTestClient<TDeps>(
   options: {
     steps: StepDefinition[];
     path: string;
-    effects: EffectFunctionExpr<any>[];
+    effects?: EffectFunctionExpr<any>[];
     testEffects: ForgePackageRegistration<TDeps>["functions"];
     mockDeps?: TDeps;
   },
@@ -189,11 +189,15 @@ export function createTestClient<TDeps>(
   const testJourney = journey({
     code: "testJourney",
     path: path,
-    onAccess: [
-      access({
-        effects: effects,
-      }),
-    ],
+    ...(effects === undefined
+      ? {}
+      : {
+          onAccess: [
+            access({
+              effects,
+            }),
+          ],
+        }),
     reachability: { disableReachabilityChecks: true },
     steps: steps,
     title: "Test Journey",

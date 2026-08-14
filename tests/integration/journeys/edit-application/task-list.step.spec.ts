@@ -6,8 +6,10 @@ import { expect } from "chai";
 import sinon from "sinon";
 
 import { getGetApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
-import { createForgeTestClientForEditApplication } from "../../utils/helpers.js";
+import { createTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
+import { editApplicationEffectsRegistry } from "#/journeys/edit-application/editApplication.effects.js";
+import { taskListStep } from "#/journeys/edit-application/steps/task-list/task-list.step.js";
 
 type RenderedTaskListItem = {
   title: { text: string };
@@ -27,8 +29,11 @@ describe("Task list step", () => {
     .stub()
     .resolves({ status: 200, data: mockData });
 
-  const client = createForgeTestClientForEditApplication({
-    getApplication: getApplicationStub,
+  const client = createTestClient({
+    mockDeps: { getApplication: getApplicationStub },
+    path: "/cases/:applicationID/",
+    steps: [taskListStep()],
+    testEffects: editApplicationEffectsRegistry,
   });
   const session = {};
 
