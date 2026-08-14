@@ -95,26 +95,6 @@ export function createForgeTestClient(
 }
 
 /**
- * Creates a test client for the select office journey.
- * @param {SelectOfficeEffectsDeps} mockDeps - mock implementations for the journey's effect functions
- * @returns {ForgeTestClient} A configured test client.
- */
-export function createForgeTestClientForSelectOffice(
-  mockDeps: SelectOfficeEffectsDeps,
-): ForgeTestClient {
-  const testPackage = createTestPackage({
-    functions: selectOfficeEffectsRegistry,
-    journey: selectOfficeJourney,
-  });
-
-  return new ForgeTestHarness()
-    .registerGlobalComponents(govukComponents)
-    .registerGlobalFunctions(nunjucksFunctions)
-    .registerPackage(testPackage, mockDeps)
-    .createClient();
-}
-
-/**
  * Creates a test client for a single-step journey under /cases.
  * @param {Record<string, FunctionEvaluator>} mockYourCasesEffectsDeps - mock implementations for the journey's effect functions
  * @param {...any} steps - Step definitions to include in the test journey.
