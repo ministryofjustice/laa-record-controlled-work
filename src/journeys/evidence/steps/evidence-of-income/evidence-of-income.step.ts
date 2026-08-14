@@ -14,7 +14,7 @@ import {
   caption,
   continueButton,
 } from "#/journeys/evidence/common.blocks.js";
-import { EvidenceEffects } from "#/journeys/evidence/evidence.effects.js";
+import { evidenceEffects } from "#/journeys/evidence/evidence.effects.js";
 import {
   asylumSupportEvidenceGroup,
   benefitsInKindEvidenceGroup,
@@ -49,7 +49,7 @@ export const evidenceOfIncome = (
     onSubmission: [
       submit({
         onValid: {
-          effects: [EvidenceEffects.saveDraftAnswers(journeyCode)],
+          effects: [evidenceEffects.saveDraftAnswers(journeyCode)],
           next: [
             redirect({
               goto: "check-answers",

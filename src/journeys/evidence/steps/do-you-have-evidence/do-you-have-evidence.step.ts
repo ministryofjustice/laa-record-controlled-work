@@ -12,7 +12,7 @@ import {
   caption,
   continueButton,
 } from "#/journeys/evidence/common.blocks.js";
-import { EvidenceEffects } from "#/journeys/evidence/evidence.effects.js";
+import { evidenceEffects } from "#/journeys/evidence/evidence.effects.js";
 import { doYouHaveEvidenceRadioInput } from "#/journeys/evidence/steps/do-you-have-evidence/do-you-have-evidence.blocks.js";
 import { t } from "#/lib/i18n.js";
 
@@ -29,7 +29,7 @@ export const doYouHaveEvidence = (
     onSubmission: [
       submit({
         onValid: {
-          effects: [EvidenceEffects.saveDraftAnswers(journeyCode)],
+          effects: [evidenceEffects.saveDraftAnswers(journeyCode)],
           next: [
             redirect({
               goto: "check-answers",

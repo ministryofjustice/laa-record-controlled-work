@@ -13,7 +13,7 @@ import { updateEvidence } from "#/journeys/evidence/effects/updateEvidence.js";
 export const evidenceEffectsRegistry =
   new EffectRegistry<EvidenceEffectsDeps>();
 
-export const EvidenceEffects = {
+export const evidenceEffects = {
   clearAllDraftAnswers: evidenceEffectsRegistry.register(clearAllDraftAnswers),
   clearFieldAnswers: evidenceEffectsRegistry.register(clearFieldAnswers),
   loadDraftAnswers: evidenceEffectsRegistry.register(loadDraftAnswers),

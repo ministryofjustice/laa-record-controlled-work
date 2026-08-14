@@ -11,7 +11,7 @@ import {
   caption,
   continueButton,
 } from "#/journeys/evidence/common.blocks.js";
-import { EvidenceEffects } from "#/journeys/evidence/evidence.effects.js";
+import { evidenceEffects } from "#/journeys/evidence/evidence.effects.js";
 import {
   moreDetailsForNoEvidence,
   reasonForNoEvidenceRadioInput,
@@ -32,7 +32,7 @@ export const reasonForNoEvidence = (
     onSubmission: [
       submit({
         onValid: {
-          effects: [EvidenceEffects.saveDraftAnswers(journeyCode)],
+          effects: [evidenceEffects.saveDraftAnswers(journeyCode)],
           next: [
             redirect({
               goto: "check-answers",
