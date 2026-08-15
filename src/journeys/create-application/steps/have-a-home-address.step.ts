@@ -78,7 +78,7 @@ export const haveAHomeAddressStep = (
               when: Answer("haveAHomeAddress").match(Condition.Equals("yes")),
             }),
             redirect({
-              goto: "need-means-assessment",
+              goto: "check-answers",
               when: Answer("haveAHomeAddress").match(Condition.Equals("no")),
             }),
           ],
