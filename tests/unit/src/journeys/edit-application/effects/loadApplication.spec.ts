@@ -46,13 +46,10 @@ describe("loadApplication", () => {
   afterEach(() => sinon.restore());
 
   it("sets application in context from getApplication response", async () => {
-    // The generated faker uses Object.values() on Zod v4 schemas, which returns methods
-    // rather than enum strings, so the enum fields must be explicitly overridden.
     const mockApplication = getGetApplicationResponseMock({
       id: applicationId,
       applicationState: "DRAFT",
       declaration: {
-        clientDeclarationStatus: "DRAFT",
         declarationConfirmation: false,
         createdAt: "2026-01-01T00:00:00Z",
         createdBy: "test",
@@ -60,7 +57,6 @@ describe("loadApplication", () => {
         modifiedBy: "test",
       },
       evidence: {
-        evidenceStatus: "DRAFT",
         payeIncomeEvidence: false,
         otherIncomeEvidence: false,
         housingCostsEvidence: false,
