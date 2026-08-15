@@ -8824,9 +8824,9 @@ __metadata:
   linkType: hard
 
 "unbash@npm:^4.0.4":
-  version: 4.0.7
-  resolution: "unbash@npm:4.0.7"
-  checksum: 10c0/b8cd6f6d8afd93a0451455a180647f5ae976fdcc0ce5551b25528997673271da932e800f8149c133ddc89518c574877ebe1f693af7e93b1ae53c61a9ae4f24d1
+  version: 4.0.8
+  resolution: "unbash@npm:4.0.8"
+  checksum: 10c0/3ddb67928e491a12777481725b8219af07b88b86ac06747360b52ac04fabce0dd8898d4ec00364f4800365172ddc86c9bcaeb7d924e172cfc9c28817b89ee690
   languageName: node
   linkType: hard
 
