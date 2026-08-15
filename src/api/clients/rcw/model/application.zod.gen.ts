@@ -16,6 +16,7 @@ export const applicationClientDetailsAddressCountryMax = 2;
 
 export const Application = zod.object({
   id: zod.uuid(),
+  applicationRefNumber: zod.string().optional(),
   individualLegalAidNumber: zod.uuid(),
   providerFirmCode: zod.string(),
   providerOfficeCode: zod.string(),

@@ -14,6 +14,10 @@ import type { CreateApplicationResponseBody } from "#/api/clients/rcw/model/crea
 
 import type { GetApplicationsParams } from "#/api/clients/rcw/model/getApplicationsParams.zod.gen.js";
 
+import type { UpdateApplicationStatusRequestBody } from "#/api/clients/rcw/model/updateApplicationStatusRequestBody.zod.gen.js";
+
+import type { UpdateEvidenceRequestBody } from "#/api/clients/rcw/model/updateEvidenceRequestBody.zod.gen.js";
+
 import type { UpdateMeansDataRequestBody } from "#/api/clients/rcw/model/updateMeansDataRequestBody.zod.gen.js";
 
 import config from "#/config.js";
@@ -236,6 +240,91 @@ export const getApplication = async (
   } as getApplicationResponse;
 };
 
+export type updateApplicationEvidenceResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type updateApplicationEvidenceResponse400 = {
+  data: void;
+  status: 400;
+};
+
+export type updateApplicationEvidenceResponse401 = {
+  data: void;
+  status: 401;
+};
+
+export type updateApplicationEvidenceResponse403 = {
+  data: void;
+  status: 403;
+};
+
+export type updateApplicationEvidenceResponse404 = {
+  data: void;
+  status: 404;
+};
+
+export type updateApplicationEvidenceResponse409 = {
+  data: void;
+  status: 409;
+};
+
+export type updateApplicationEvidenceResponse500 = {
+  data: void;
+  status: 500;
+};
+
+export type updateApplicationEvidenceResponseSuccess =
+  updateApplicationEvidenceResponse204 & {
+    headers: Headers;
+  };
+export type updateApplicationEvidenceResponseError = (
+  | updateApplicationEvidenceResponse400
+  | updateApplicationEvidenceResponse401
+  | updateApplicationEvidenceResponse403
+  | updateApplicationEvidenceResponse404
+  | updateApplicationEvidenceResponse409
+  | updateApplicationEvidenceResponse500
+) & {
+  headers: Headers;
+};
+
+export type updateApplicationEvidenceResponse =
+  | updateApplicationEvidenceResponseSuccess
+  | updateApplicationEvidenceResponseError;
+
+export const getUpdateApplicationEvidenceUrl = (id: string) => {
+  return `${config.api.rcw.baseUrl}/api/v1/applications/${id}/evidence`;
+};
+
+/**
+ * @summary Update the evidence data for an application
+ */
+export const updateApplicationEvidence = async (
+  id: string,
+  updateEvidenceRequestBody: UpdateEvidenceRequestBody,
+  options?: RequestInit,
+): Promise<updateApplicationEvidenceResponse> => {
+  const res = await fetch(getUpdateApplicationEvidenceUrl(id), {
+    ...options,
+    method: "PUT",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(updateEvidenceRequestBody),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: updateApplicationEvidenceResponse["data"] = body
+    ? JSON.parse(body)
+    : undefined;
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as updateApplicationEvidenceResponse;
+};
+
 export type updateApplicationMeansResponse204 = {
   data: void;
   status: 204;
@@ -318,4 +407,88 @@ export const updateApplicationMeans = async (
     status: res.status,
     headers: res.headers,
   } as updateApplicationMeansResponse;
+};
+
+export type updateApplicationStatusResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type updateApplicationStatusResponse400 = {
+  data: void;
+  status: 400;
+};
+
+export type updateApplicationStatusResponse401 = {
+  data: void;
+  status: 401;
+};
+
+export type updateApplicationStatusResponse403 = {
+  data: void;
+  status: 403;
+};
+
+export type updateApplicationStatusResponse404 = {
+  data: void;
+  status: 404;
+};
+
+export type updateApplicationStatusResponse409 = {
+  data: void;
+  status: 409;
+};
+
+export type updateApplicationStatusResponse500 = {
+  data: void;
+  status: 500;
+};
+
+export type updateApplicationStatusResponseSuccess =
+  updateApplicationStatusResponse204 & {
+    headers: Headers;
+  };
+export type updateApplicationStatusResponseError = (
+  | updateApplicationStatusResponse400
+  | updateApplicationStatusResponse401
+  | updateApplicationStatusResponse403
+  | updateApplicationStatusResponse404
+  | updateApplicationStatusResponse409
+  | updateApplicationStatusResponse500
+) & {
+  headers: Headers;
+};
+
+export type updateApplicationStatusResponse =
+  updateApplicationStatusResponseSuccess | updateApplicationStatusResponseError;
+
+export const getUpdateApplicationStatusUrl = (id: string) => {
+  return `${config.api.rcw.baseUrl}/api/v1/applications/${id}/status`;
+};
+
+/**
+ * @summary Update the application status
+ */
+export const updateApplicationStatus = async (
+  id: string,
+  updateApplicationStatusRequestBody: UpdateApplicationStatusRequestBody,
+  options?: RequestInit,
+): Promise<updateApplicationStatusResponse> => {
+  const res = await fetch(getUpdateApplicationStatusUrl(id), {
+    ...options,
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(updateApplicationStatusRequestBody),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: updateApplicationStatusResponse["data"] = body
+    ? JSON.parse(body)
+    : undefined;
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as updateApplicationStatusResponse;
 };

@@ -19,6 +19,7 @@ import {
 
 import { taskItem } from "#/journeys/edit-application/steps/task-list/task-list.helpers.js";
 import {
+  APPLICATION_DATA_KEYS,
   CONTEXT_DATA_KEYS,
   PARAMS_KEYS,
 } from "#/journeys/journey.constants.js";
@@ -111,7 +112,7 @@ export function taskList(): BlockDefinition[] {
 function eligibilityResult(): HtmlBlock {
   const eligibleContent = match(
     Data(CONTEXT_DATA_KEYS.application).path(
-      "eligibility.result.result_summary.overall_result.result",
+      APPLICATION_DATA_KEYS.eligibilityOverallResult,
     ),
   )
     .branch(
@@ -132,6 +133,9 @@ function eligibilityResult(): HtmlBlock {
       Params(PARAMS_KEYS.applicationID),
       t("journeys.createApplication.taskList.eligibilityResult.viewResult"),
     ),
+    visibleWhen: Data(CONTEXT_DATA_KEYS.application)
+      .path(APPLICATION_DATA_KEYS.eligibilityOverallResult)
+      .match(Condition.IsRequired()),
   });
 }
 

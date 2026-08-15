@@ -74,6 +74,7 @@ export const getGetApplicationResponseMock = <
 ): MockWithNullableOverrides<Application, O, ApplicationMock> =>
   ({
     id: faker.string.uuid(),
+    applicationRefNumber: faker.string.alpha({ length: { min: 10, max: 20 } }),
     individualLegalAidNumber: faker.string.uuid(),
     providerFirmCode: faker.string.alpha({ length: { min: 10, max: 20 } }),
     providerOfficeCode: faker.string.alpha({ length: { min: 10, max: 20 } }),
