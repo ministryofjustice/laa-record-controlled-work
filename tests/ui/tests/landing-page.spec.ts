@@ -16,15 +16,13 @@ test("landing page should display Landing page title", async ({ page }) => {
   ).toBeVisible();
 });
 
-test("landing page record new case button links to provider declaration", async ({
+test("landing page record new case button navigates to provider declaration", async ({
   page,
 }) => {
   await page.goto("/");
 
-  const button = page.getByRole("link", { name: "Record a new case" });
+  const button = page.getByRole("button", { name: "Record a new case" });
   await expect(button).toBeVisible();
-  await expect(button).toHaveAttribute(
-    "href",
-    "/cases/new/provider-declaration",
-  );
+  await button.click();
+  await expect(page).toHaveURL("/cases/new/provider-declaration");
 });
