@@ -32,9 +32,8 @@ export interface TaskListData {
   meansAssessment: { status: Status };
 }
 
-// TODO temporarily using id until we have a proper reference number in data model
 const referenceNumber = Data(CONTEXT_DATA_KEYS.application).path(
-  APPLICATION_DATA_KEYS.id,
+  APPLICATION_DATA_KEYS.applicationRefNumber,
 );
 
 const clientName = Format(
@@ -64,7 +63,7 @@ export const taskListStep = (): ReturnType<typeof step> =>
         onAlways: {
           next: [
             redirect({
-              goto: "/case-list",
+              goto: "/cases",
             }),
           ],
         },
