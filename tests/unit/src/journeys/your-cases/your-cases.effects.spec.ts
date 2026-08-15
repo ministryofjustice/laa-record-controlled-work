@@ -33,6 +33,8 @@ describe("LoadYourCaseList", () => {
       });
     });
 
+    beforeEach(() => getApplicationsStub.resetHistory());
+
     after(() => sinon.restore());
 
     it("calls getApplications", async () => {
@@ -40,9 +42,31 @@ describe("LoadYourCaseList", () => {
       expect(getApplicationsStub.calledOnce).to.be.true;
     });
 
-    it("calls getApplications with the selected office code as officeId", async () => {
+    it("loads draft applications for the selected office on the in-progress route", async () => {
       await client.get("/cases", { session });
-      expect(getApplicationsStub.calledWith(sinon.match({ officeId: "LEEDS-01" }))).to.be.true;
+      expect(
+        getApplicationsStub.calledWith(
+          sinon.match({ officeId: "LEEDS-01", status: "DRAFT" }),
+        ),
+      ).to.be.true;
+    });
+
+    it("loads completed applications for the selected office on the recorded route", async () => {
+      await client.get("/cases/recorded", { session });
+      expect(
+        getApplicationsStub.calledWith(
+          sinon.match({ officeId: "LEEDS-01", status: "COMPLETED" }),
+        ),
+      ).to.be.true;
+    });
+
+    it("loads completed applications for the selected office on the ineligible route", async () => {
+      await client.get("/cases/ineligible", { session });
+      expect(
+        getApplicationsStub.calledWith(
+          sinon.match({ officeId: "LEEDS-01", status: "COMPLETED" }),
+        ),
+      ).to.be.true;
     });
 
     it("sets caseList in context", async () => {
