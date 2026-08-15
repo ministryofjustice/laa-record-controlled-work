@@ -31,7 +31,7 @@ export const yourCasesRecordedStep = step({
   ],
   onAccess: [
     access({
-      effects: [yourCasesEffects.loadYourCaseList()],
+      effects: [yourCasesEffects.loadYourCaseList("COMPLETED")],
     }),
   ],
   path: "/cases/recorded",

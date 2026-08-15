@@ -31,7 +31,7 @@ export const yourCasesStep = step({
   ],
   onAccess: [
     access({
-      effects: [yourCasesEffects.loadYourCaseList()],
+      effects: [yourCasesEffects.loadYourCaseList("DRAFT")],
     }),
   ],
   path: "/cases",
