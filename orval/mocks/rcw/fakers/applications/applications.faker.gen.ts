@@ -110,7 +110,6 @@ export const getGetApplicationResponseMock = <
     ] as const),
     declaration: {
       id: faker.string.uuid(),
-      clientDeclarationStatus: faker.helpers.arrayElement(["DRAFT"] as const),
       declarationConfirmation: faker.datatype.boolean(),
       createdAt: faker.date.past().toISOString().slice(0, 19) + "Z",
       createdBy: faker.string.alpha({ length: { min: 10, max: 20 } }),
@@ -119,7 +118,6 @@ export const getGetApplicationResponseMock = <
     },
     evidence: {
       id: faker.string.uuid(),
-      evidenceStatus: faker.helpers.arrayElement(["DRAFT"] as const),
       payeIncomeEvidence: faker.datatype.boolean(),
       otherIncomeEvidence: faker.datatype.boolean(),
       housingCostsEvidence: faker.datatype.boolean(),
