@@ -20,7 +20,7 @@ test("Edit Application - Task List step", async ({ withSelectedOffice: page }) =
   ).toBeVisible();
   
     // Check the reference number is displayed
-  await expect(page.getByText(`Reference number: ${applicationId}`)).toBeVisible();
+  await expect(page.getByText(`Reference number: ${application.applicationRefNumber}`)).toBeVisible();
 
   // Check that the task list sections are displayed
   const taskListSections = page.locator(".govuk-task-list");
@@ -38,6 +38,6 @@ test("Edit Application - Task List step", async ({ withSelectedOffice: page }) =
   await page.getByRole("button", { name: "Save and return later" }).click();
 
   // Verify redirection to the case list page
-  await expect(page).toHaveURL("/case-list"); 
+  await expect(page).toHaveURL("/cases"); 
 
 });

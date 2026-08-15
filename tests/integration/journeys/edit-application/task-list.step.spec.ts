@@ -67,7 +67,7 @@ describe("Task list step", () => {
 
     it("renders the reference number", () => {
       expect(body.properties.content).to.equal(
-        `Reference number: ${mockData.id}`,
+        `Reference number: ${mockData.applicationRefNumber}`,
       );
     });
 
@@ -109,6 +109,29 @@ describe("Task list step", () => {
         `href="/cases/${uuid}/eligibility/"`,
       );
       expect(indicator).to.include("View result");
+    });
+
+    it("does not render an eligibility result indicator when no result is available", async () => {
+      getApplicationStub.resolves({
+        status: 200,
+        data: getGetApplicationResponseMock({
+          eligibility: { result: {} },
+        }),
+      });
+
+      const result = await client.get(`/cases/${uuid}/task-list`, {
+        session: {},
+      });
+
+      expect(result.type).to.equal("render");
+      const eligibilityResultRender = result as TestRenderResult;
+      const indicators = eligibilityResultRender
+        .getBlocksByVariant("html")
+        .filter((block) =>
+          String(block.properties.content).includes("Eligibility result"),
+        );
+
+      expect(indicators).to.have.length(0);
     });
 
     it("renders eligibility content for an eligible assessment", async () => {
@@ -247,13 +270,13 @@ describe("Task list step", () => {
   });
 
   describe("POST /cases/123e4567-e89b-12d3-a456-426614174000/task-list", () => {
-    it("redirects to the case list", async () => {
+    it("redirects to the cases list", async () => {
       const result = await client.post(`/cases/${uuid}/task-list`, {
         session,
       });
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
-      expect(redirectResult.url).to.equal("/case-list");
+      expect(redirectResult.url).to.equal("/cases");
     });
   });
 });
