@@ -111,7 +111,7 @@ rcw:
   # Override per environment by setting the key again in the relevant 
   # values/<env>.yaml file.
   env:
-    SERVICE_NAME: "LAA Record Controlled Work"
+    SERVICE_NAME: "Record Controlled Work"
     SERVICE_PHASE: "Beta"
     DEPARTMENT_NAME: "Legal Aid Agency"
     DEPARTMENT_URL: "https://www.gov.uk/government/organisations/legal-aid-agency"

@@ -60,7 +60,7 @@ export default {
       phone: optional.CONTACT_PHONE,
     },
     department: {
-      name: optional.DEPARTMENT_NAME,
+      name: optional.DEPARTMENT_NAME ?? "Legal Aid Agency",
       url: optional.DEPARTMENT_URL,
     },
     environment: required.NODE_ENV,
@@ -80,7 +80,7 @@ export default {
       windowMs: optional.RATE_WINDOW_MS ?? DEFAULT_RATE_WINDOW,
     },
     service: {
-      name: optional.SERVICE_NAME ?? "LAA Record Controlled Work",
+      name: optional.SERVICE_NAME ?? "Record Controlled Work",
       phase: optional.SERVICE_PHASE,
       url: optional.SERVICE_URL,
     },

@@ -22,7 +22,7 @@ export interface AppConfig {
     phone: string | undefined;
   };
   department: {
-    name: string | undefined;
+    name: string;
     url: string | undefined;
   };
   environment: string;
