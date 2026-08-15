@@ -15,3 +15,16 @@ test("landing page should display Landing page title", async ({ page }) => {
     page.getByRole("heading", { name: "Landing Page", level: 1 }),
   ).toBeVisible();
 });
+
+test("landing page record new case button links to provider declaration", async ({
+  page,
+}) => {
+  await page.goto("/");
+
+  const button = page.getByRole("link", { name: "Record a new case" });
+  await expect(button).toBeVisible();
+  await expect(button).toHaveAttribute(
+    "href",
+    "/cases/new/provider-declaration",
+  );
+});
