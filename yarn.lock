@@ -5651,13 +5651,13 @@ __metadata:
   linkType: hard
 
 "jsonc-eslint-parser@npm:^3.1.0":
-  version: 3.2.0
-  resolution: "jsonc-eslint-parser@npm:3.2.0"
+  version: 3.3.0
+  resolution: "jsonc-eslint-parser@npm:3.3.0"
   dependencies:
     acorn: "npm:^8.5.0"
     eslint-visitor-keys: "npm:^5.0.0"
     verkit: "npm:^0.3.2"
-  checksum: 10c0/37a75f749188f8ae2d80241c9c755d7381efc9b3ad4d2ea9e560b19d4ad3f5038169ca1964f591a7c6266a534f8b7f4077206d0ceaec75ea3ecf4e9090d9d971
+  checksum: 10c0/705c3ddd3deb7e586ce45a26398a815c18a21a13b0d3d21ceb2493d31f7c814ea260594f42eaa72e2c2588ed35999a6dc8406a03b9e4ece60294bba7b5d68db0
   languageName: node
   linkType: hard
 
