@@ -16,13 +16,7 @@ import { createApplicationJourney } from "#/journeys/create-application/create-a
 describe("Declaration step", () => {
   const client = createForgeTestClient(
     createApplicationJourney,
-    createApplicationEffectsRegistry,
-    {
-      steps: [
-        declarationStep("createApplication"),
-        ecfStep("createApplication"),
-      ],
-    },
+    createApplicationEffectsRegistry
   );
 
   describe("GET /cases/new/provider-declaration", () => {

@@ -23,7 +23,6 @@ describe("Check answers step", () => {
     evidencePackage.functions,
     {
       dependencies: { updateApplicationEvidence: updateApplicationEvidenceStub },
-      steps: [checkAnswersStep()],
     },
   );
 

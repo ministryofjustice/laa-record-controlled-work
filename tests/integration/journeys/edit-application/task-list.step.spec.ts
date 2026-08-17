@@ -35,7 +35,6 @@ describe("Task list step", () => {
     editApplicationEffectsRegistry,
     {
       dependencies: { getApplication: getApplicationStub },
-      steps: [taskListStep()],
     },
   );
   const session = {};

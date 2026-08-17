@@ -16,7 +16,6 @@ describe("Enter address manually step", () => {
   const client = createForgeTestClient(
     createApplicationJourney,
     createApplicationEffectsRegistry,
-    { steps: [enterAddressManuallyStep("createApplication")] },
   );
 
   describe("GET /cases/new/enter-address-manually", () => {

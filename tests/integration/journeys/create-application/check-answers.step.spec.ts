@@ -29,7 +29,6 @@ describe("Check answers step", () => {
     createApplicationEffectsRegistry,
     {
       dependencies: { createApplication: createApplicationStub },
-      steps: [checkAnswersStep("createApplication")],
     },
   );
   

@@ -16,7 +16,6 @@ describe("Enter overseas address step", () => {
   const client = createForgeTestClient(
     createApplicationJourney,
     createApplicationEffectsRegistry,
-    { steps: [enterOverseasAddressStep("createApplication")] },
   );
 
   describe("GET /cases/new/enter-overseas-address", () => {

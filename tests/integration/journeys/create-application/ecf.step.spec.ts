@@ -16,13 +16,7 @@ import { createApplicationJourney } from "#/journeys/create-application/create-a
 describe("ECF step", () => {
   const client = createForgeTestClient(
     createApplicationJourney,
-    createApplicationEffectsRegistry,
-    {
-      steps: [
-        ecfStep("createApplication"),
-        ineligibleStep("createApplication"),
-      ],
-    },
+    createApplicationEffectsRegistry
   );
 
   describe("GET /cases/new/ecf", () => {

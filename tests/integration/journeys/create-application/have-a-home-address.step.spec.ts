@@ -16,7 +16,6 @@ describe("Have A Home Address Step", () => {
   const client = createForgeTestClient(
     createApplicationJourney,
     createApplicationEffectsRegistry,
-    { steps: [haveAHomeAddressStep("createApplication")] },
   );
 
   describe("GET /cases/new/have-a-home-address", () => {

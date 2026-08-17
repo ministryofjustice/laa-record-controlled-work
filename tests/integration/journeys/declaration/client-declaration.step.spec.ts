@@ -16,7 +16,6 @@ describe("Declaration step", () => {
     const client = createForgeTestClient(
       DeclarationJourney,
       JourneyEffectsImplementations,
-      { steps: [confirmStep()] },
     );
 
   describe(`GET /cases/${uuid}/declaration/confirm`, () => {

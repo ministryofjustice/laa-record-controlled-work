@@ -28,25 +28,16 @@ export function createForgeTestClient<TDeps>(
   sourceJourney: JourneyDefinition,
   effectsRegistry: ForgePackageRegistration<TDeps>["functions"],
   overrides?: {
-    accessHooks?: AccessHook[];
     dependencies?: TDeps;
-    steps?: StepDefinition[];
   },
 ): ForgeTestClient {
-  const onAccess = overrides?.accessHooks ?? sourceJourney.onAccess;
-  const testJourney = journey({
-    code: sourceJourney.code,
-    path: sourceJourney.path,
-    ...(onAccess && { onAccess }),
-    reachability: { disableReachabilityChecks: true },
-    steps: overrides?.steps ?? sourceJourney.steps,
-    title: sourceJourney.title,
-    view: sourceJourney.view,
-  });
+
+
+  sourceJourney.reachability = { disableReachabilityChecks: true };
 
   const testPackage = createTestPackage({
     functions: effectsRegistry,
-    journey: testJourney,
+    journey: sourceJourney,
   });
   return new ForgeTestHarness()
     .registerGlobalComponents(govukComponents)

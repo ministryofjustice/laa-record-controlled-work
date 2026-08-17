@@ -15,9 +15,7 @@ import { createApplicationJourney } from "#/journeys/create-application/create-a
 describe("Client details step", () => {
   const client = createForgeTestClient(
     createApplicationJourney,
-    createApplicationEffectsRegistry,
-    { steps: [clientDetailsStep("createApplication")] },
-  );
+    createApplicationEffectsRegistry  );
 
   describe("GET /cases/new/client-details", () => {
     let renderResult: TestRenderResult;

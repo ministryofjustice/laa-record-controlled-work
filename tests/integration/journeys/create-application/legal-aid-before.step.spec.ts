@@ -16,7 +16,6 @@ describe("Legal aid before step", () => {
   const client = createForgeTestClient(
     createApplicationJourney,
     createApplicationEffectsRegistry,
-    { steps: [legalAidBeforeStep("createApplication")] },
   );
 
   describe("GET /cases/new/legal-aid-before", () => {
