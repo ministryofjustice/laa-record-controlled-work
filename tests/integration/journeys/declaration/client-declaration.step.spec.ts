@@ -4,7 +4,6 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
 
-import { confirmStep } from "#/journeys/declaration/steps/confirmation/confirmation.step.js";
 import { createForgeTestClient } from "../../utils/helpers.js";
 import { TemplateWrapper } from "@ministryofjustice/hmpps-forge/core/components";
 import { DeclarationJourney } from "#/journeys/declaration/declaration.journey.js";

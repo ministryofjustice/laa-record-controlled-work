@@ -37,6 +37,7 @@ export const statement = (): HtmlBlock[] => {
 export const downloadButton = (): GovUKButton => {
   return GovUKButton({
     text: t("journeys.declaration.sign.download"),
+    value: "download-pdf",
   });
 };
 

@@ -25,7 +25,9 @@ import {
 export const signStep = (): ReturnType<typeof step> => {
   return step({
     blocks: [
-      backLink(Format("/cases/%1/declaration/confirm", Params("id"))),
+      backLink(
+        Format("/cases/%1/declaration/confirm", Params("applicationId")),
+      ),
       caption,
       heading(),
       // TODO Refactor statement to not require spreading?
@@ -44,7 +46,7 @@ export const signStep = (): ReturnType<typeof step> => {
             redirect({
               goto: Format(
                 // TODO Update this URI to be correct.
-                "/cases/%1/declaration/done",
+                "/cases/%1/declaration/ufn",
                 Params("applicationId"),
               ),
             }),
@@ -68,6 +70,6 @@ export const signStep = (): ReturnType<typeof step> => {
       }),
     ],
     path: "/sign",
-    title: t("journeys.declaration.title"),
+    title: t("journeys.declaration.sign.title"),
   });
 };
