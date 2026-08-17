@@ -56,6 +56,7 @@ export const Application = zod.object({
     .object({
       id: zod.uuid().optional(),
       declarationConfirmation: zod.boolean().optional(),
+      dateSigned: zod.iso.date().optional(),
       createdAt: zod.iso.datetime({ offset: true }).optional(),
       createdBy: zod.string().optional(),
       modifiedAt: zod.iso.datetime({ offset: true }).optional(),

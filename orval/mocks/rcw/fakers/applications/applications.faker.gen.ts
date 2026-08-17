@@ -4,11 +4,11 @@
  * Record Controlled Work API
  * OpenAPI spec version: 1.0.0
  */
-import type { Application } from "#/api/clients/rcw/model/application.zod.gen.js";
+import type { Application } from "#/api/clients/rcw/model/application.zod";
 
-import type { Applications } from "#/api/clients/rcw/model/applications.zod.gen.js";
+import type { Applications } from "#/api/clients/rcw/model/applications.zod";
 
-import type { CreateApplicationResponseBody } from "#/api/clients/rcw/model/createApplicationResponseBody.zod.gen.js";
+import type { CreateApplicationResponseBody } from "#/api/clients/rcw/model/createApplicationResponseBody.zod";
 
 import { faker } from "@faker-js/faker";
 
@@ -111,6 +111,7 @@ export const getGetApplicationResponseMock = <
     declaration: {
       id: faker.string.uuid(),
       declarationConfirmation: faker.datatype.boolean(),
+      dateSigned: faker.date.past().toISOString().slice(0, 10),
       createdAt: faker.date.past().toISOString().slice(0, 19) + "Z",
       createdBy: faker.string.alpha({ length: { min: 10, max: 20 } }),
       modifiedAt: faker.date.past().toISOString().slice(0, 19) + "Z",

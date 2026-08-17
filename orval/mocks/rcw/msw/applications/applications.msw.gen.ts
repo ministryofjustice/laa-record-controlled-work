@@ -4,11 +4,11 @@
  * Record Controlled Work API
  * OpenAPI spec version: 1.0.0
  */
-import type { Application } from "#/api/clients/rcw/model/application.zod.gen.js";
+import type { Application } from "#/api/clients/rcw/model/application.zod";
 
-import type { Applications } from "#/api/clients/rcw/model/applications.zod.gen.js";
+import type { Applications } from "#/api/clients/rcw/model/applications.zod";
 
-import type { CreateApplicationResponseBody } from "#/api/clients/rcw/model/createApplicationResponseBody.zod.gen.js";
+import type { CreateApplicationResponseBody } from "#/api/clients/rcw/model/createApplicationResponseBody.zod";
 
 import { HttpResponse, http } from "msw";
 import type { RequestHandlerOptions } from "msw";
@@ -17,13 +17,13 @@ import {
   getCreateApplicationResponseMock,
   getGetApplicationResponseMock,
   getGetApplicationsResponseMock,
-} from "../../fakers/applications/applications.faker.gen.js";
+} from "../../fakers/applications/applications.faker.gen.gen.js";
 
 export {
   getGetApplicationsResponseMock,
   getCreateApplicationResponseMock,
   getGetApplicationResponseMock,
-} from "../../fakers/applications/applications.faker.gen.js";
+} from "../../fakers/applications/applications.faker.gen.gen.js";
 
 export type KeysWithNull<O> = {
   [K in keyof O]-?: null extends O[K] ? K : never;
@@ -166,6 +166,27 @@ export const getUpdateApplicationMeansMockHandler = (
   );
 };
 
+export const getUpdateApplicationDeclarationMockHandler = (
+  overrideResponse?:
+    | void
+    | ((
+        info: Parameters<Parameters<typeof http.put>[1]>[0],
+      ) => Promise<void> | void),
+  options?: RequestHandlerOptions,
+) => {
+  return http.put(
+    "*/api/v1/applications/:id/declaration",
+    async (info: Parameters<Parameters<typeof http.put>[1]>[0]) => {
+      if (typeof overrideResponse === "function") {
+        await overrideResponse(info);
+      }
+
+      return new HttpResponse(null, { status: 204 });
+    },
+    options,
+  );
+};
+
 export const getUpdateApplicationStatusMockHandler = (
   overrideResponse?:
     | void
@@ -192,5 +213,6 @@ export const getApplicationsMock = () => [
   getGetApplicationMockHandler(),
   getUpdateApplicationEvidenceMockHandler(),
   getUpdateApplicationMeansMockHandler(),
+  getUpdateApplicationDeclarationMockHandler(),
   getUpdateApplicationStatusMockHandler(),
 ];

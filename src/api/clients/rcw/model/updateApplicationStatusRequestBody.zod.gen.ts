@@ -4,7 +4,7 @@
  * Record Controlled Work API
  * OpenAPI spec version: 1.0.0
  */
-import * as zod from "zod";
+import { z as zod } from "zod";
 
 export const UpdateApplicationStatusRequestBody = zod.object({
   applicationState: zod.enum(["DRAFT", "COMPLETED"]),

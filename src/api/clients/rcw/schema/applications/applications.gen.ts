@@ -4,33 +4,35 @@
  * Record Controlled Work API
  * OpenAPI spec version: 1.0.0
  */
-import type { Application } from "#/api/clients/rcw/model/application.zod.gen.js";
+import type { Application } from "#/api/clients/rcw/model/application.zod";
 
-import type { Applications } from "#/api/clients/rcw/model/applications.zod.gen.js";
+import type { Applications } from "#/api/clients/rcw/model/applications.zod";
 
-import type { BadRequestResponse } from "#/api/clients/rcw/model/badRequestResponse.zod.gen.js";
+import type { BadRequestResponse } from "#/api/clients/rcw/model/badRequestResponse.zod";
 
-import type { ConflictResponse } from "#/api/clients/rcw/model/conflictResponse.zod.gen.js";
+import type { ConflictResponse } from "#/api/clients/rcw/model/conflictResponse.zod";
 
-import type { CreateApplicationRequestBody } from "#/api/clients/rcw/model/createApplicationRequestBody.zod.gen.js";
+import type { CreateApplicationRequestBody } from "#/api/clients/rcw/model/createApplicationRequestBody.zod";
 
-import type { CreateApplicationResponseBody } from "#/api/clients/rcw/model/createApplicationResponseBody.zod.gen.js";
+import type { CreateApplicationResponseBody } from "#/api/clients/rcw/model/createApplicationResponseBody.zod";
 
-import type { ForbiddenResponse } from "#/api/clients/rcw/model/forbiddenResponse.zod.gen.js";
+import type { ForbiddenResponse } from "#/api/clients/rcw/model/forbiddenResponse.zod";
 
-import type { GetApplicationsParams } from "#/api/clients/rcw/model/getApplicationsParams.zod.gen.js";
+import type { GetApplicationsParams } from "#/api/clients/rcw/model/getApplicationsParams.zod";
 
-import type { InternalServerErrorResponse } from "#/api/clients/rcw/model/internalServerErrorResponse.zod.gen.js";
+import type { InternalServerErrorResponse } from "#/api/clients/rcw/model/internalServerErrorResponse.zod";
 
-import type { NotFoundResponse } from "#/api/clients/rcw/model/notFoundResponse.zod.gen.js";
+import type { NotFoundResponse } from "#/api/clients/rcw/model/notFoundResponse.zod";
 
-import type { UnauthorizedResponse } from "#/api/clients/rcw/model/unauthorizedResponse.zod.gen.js";
+import type { UnauthorizedResponse } from "#/api/clients/rcw/model/unauthorizedResponse.zod";
 
-import type { UpdateApplicationStatusRequestBody } from "#/api/clients/rcw/model/updateApplicationStatusRequestBody.zod.gen.js";
+import type { UpdateApplicationStatusRequestBody } from "#/api/clients/rcw/model/updateApplicationStatusRequestBody.zod";
 
-import type { UpdateEvidenceRequestBody } from "#/api/clients/rcw/model/updateEvidenceRequestBody.zod.gen.js";
+import type { UpdateDeclarationRequestBody } from "#/api/clients/rcw/model/updateDeclarationRequestBody.zod";
 
-import type { UpdateMeansDataRequestBody } from "#/api/clients/rcw/model/updateMeansDataRequestBody.zod.gen.js";
+import type { UpdateEvidenceRequestBody } from "#/api/clients/rcw/model/updateEvidenceRequestBody.zod";
+
+import type { UpdateMeansDataRequestBody } from "#/api/clients/rcw/model/updateMeansDataRequestBody.zod";
 
 import config from "#/config.js";
 
@@ -419,6 +421,91 @@ export const updateApplicationMeans = async (
     status: res.status,
     headers: res.headers,
   } as updateApplicationMeansResponse;
+};
+
+export type updateApplicationDeclarationResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type updateApplicationDeclarationResponse400 = {
+  data: void;
+  status: 400;
+};
+
+export type updateApplicationDeclarationResponse401 = {
+  data: void;
+  status: 401;
+};
+
+export type updateApplicationDeclarationResponse403 = {
+  data: void;
+  status: 403;
+};
+
+export type updateApplicationDeclarationResponse404 = {
+  data: void;
+  status: 404;
+};
+
+export type updateApplicationDeclarationResponse409 = {
+  data: void;
+  status: 409;
+};
+
+export type updateApplicationDeclarationResponse500 = {
+  data: void;
+  status: 500;
+};
+
+export type updateApplicationDeclarationResponseSuccess =
+  updateApplicationDeclarationResponse204 & {
+    headers: Headers;
+  };
+export type updateApplicationDeclarationResponseError = (
+  | updateApplicationDeclarationResponse400
+  | updateApplicationDeclarationResponse401
+  | updateApplicationDeclarationResponse403
+  | updateApplicationDeclarationResponse404
+  | updateApplicationDeclarationResponse409
+  | updateApplicationDeclarationResponse500
+) & {
+  headers: Headers;
+};
+
+export type updateApplicationDeclarationResponse =
+  | updateApplicationDeclarationResponseSuccess
+  | updateApplicationDeclarationResponseError;
+
+export const getUpdateApplicationDeclarationUrl = (id: string) => {
+  return `${config.api.rcw.baseUrl}/api/v1/applications/${id}/declaration`;
+};
+
+/**
+ * @summary Update the signed declaration for an application
+ */
+export const updateApplicationDeclaration = async (
+  id: string,
+  updateDeclarationRequestBody: UpdateDeclarationRequestBody,
+  options?: RequestInit,
+): Promise<updateApplicationDeclarationResponse> => {
+  const res = await fetch(getUpdateApplicationDeclarationUrl(id), {
+    ...options,
+    method: "PUT",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(updateDeclarationRequestBody),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: updateApplicationDeclarationResponse["data"] = body
+    ? JSON.parse(body)
+    : undefined;
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as updateApplicationDeclarationResponse;
 };
 
 export type updateApplicationStatusResponse204 = {
