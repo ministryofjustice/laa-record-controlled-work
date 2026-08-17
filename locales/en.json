@@ -69,6 +69,11 @@
           "required": "Please select an option"
         }
       },
+      "ecfDropout": {
+        "title": "You are ineligible",
+        "heading": "You cannot use this service for this type of case",
+        "button": "Return to case list"
+      },
       "legalAidBefore": {
         "title": "Has your client accessed legal aid before?",
         "radioButton": {
