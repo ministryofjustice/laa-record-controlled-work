@@ -4,7 +4,7 @@
  * Record Controlled Work API
  * OpenAPI spec version: 1.0.0
  */
-import { z as zod } from "zod";
+import * as zod from "zod";
 
 export const applicationClientDetailsNiNumberMin = 9;
 export const applicationClientDetailsNiNumberMax = 9;
