@@ -8,11 +8,9 @@ import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import { enterAddressManuallyStep } from "#/journeys/create-application/steps/enter-address-manually.step.js";
 
 describe("Enter address manually step", () => {
-  const client = createForgeTestClient(
-    "Record new case",
-    "/cases/new/",
-    [enterAddressManuallyStep("testJourney")],
-  );
+  const client = createForgeTestClient("Record new case", "/cases/new/", [
+    enterAddressManuallyStep("testJourney"),
+  ]);
 
   describe("GET /cases/new/enter-address-manually", () => {
     let renderResult: TestRenderResult;
@@ -26,20 +24,31 @@ describe("Enter address manually step", () => {
       const result = await client.get("/cases/new/enter-address-manually");
       expect(result.type).to.equal("render");
       renderResult = result as TestRenderResult;
-      [addressLine1Input, addressLine2Input, townOrCityInput, countyInput, postcodeInput] =
-        renderResult.getBlocksByVariant("govukTextInput");
+      [
+        addressLine1Input,
+        addressLine2Input,
+        townOrCityInput,
+        countyInput,
+        postcodeInput,
+      ] = renderResult.getBlocksByVariant("govukTextInput");
     });
 
     it("has the correct title", () => {
-      expect(renderResult.context.step.title).to.equal("Enter your client's home address");
+      expect(renderResult.context.step.title).to.equal(
+        "Enter your client's home address",
+      );
     });
 
     it("renders a link to the overseas address page", () => {
       const linkBlock = renderResult
         .getBlocksByVariant("html")
-        .find((b) => (b.properties.content as string).includes("/enter-overseas-address"));
+        .find((b) =>
+          (b.properties.content as string).includes("/enter-overseas-address"),
+        );
       expect(linkBlock).to.exist;
-      expect(linkBlock!.properties.content as string).to.contain("The address is not in the UK");
+      expect(linkBlock!.properties.content as string).to.contain(
+        "The address is not in the UK",
+      );
     });
 
     it("renders an address line 1 input", () => {
@@ -96,7 +105,8 @@ describe("Enter address manually step", () => {
       {
         description: "address line 1 is missing",
         body: { ...validBody, addressLine1: "" },
-        expectedMessage: "Enter address line 1, typically the building and street",
+        expectedMessage:
+          "Enter address line 1, typically the building and street",
         fieldCode: "addressLine1",
       },
       {
@@ -107,13 +117,24 @@ describe("Enter address manually step", () => {
       },
       {
         description: "postcode is missing",
-        body: { ...validBody,postcode: "" },
+        body: { ...validBody, postcode: "" },
         expectedMessage: "Enter postcode",
+        fieldCode: "postcode",
+      },
+      {
+        description: "postcode is invalid",
+        body: { ...validBody, postcode: "INVALID" },
+        expectedMessage: "Enter a valid postcode, for example SW1A 1AA",
         fieldCode: "postcode",
       },
     ];
 
-    for (const { description, body, expectedMessage, fieldCode } of validationErrorTests) {
+    for (const {
+      description,
+      body,
+      expectedMessage,
+      fieldCode,
+    } of validationErrorTests) {
       it(`should show validation error when ${description}`, async () => {
         const result = await client.post("/cases/new/enter-address-manually", {
           body,
@@ -129,4 +150,3 @@ describe("Enter address manually step", () => {
     }
   });
 });
-
