@@ -1,4 +1,9 @@
 import {
+  Condition,
+  Self,
+  validation,
+} from "@ministryofjustice/hmpps-forge/core/authoring";
+import {
   HtmlBlock,
   type ResolvableString,
 } from "@ministryofjustice/hmpps-forge/core/components";
@@ -6,6 +11,7 @@ import {
   GovUKBackLink,
   GovUKButton,
   GovUKHeading,
+  GovUKRadioInput,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
 import { H1 } from "#/lib/constants/headings.js";
@@ -36,9 +42,10 @@ export function heading(text: string): HtmlBlock {
   });
 }
 
-export const caption = HtmlBlock({
-  content: `<span class="govuk-caption-l">${t("journeys.evidence.caption")}</span>`,
-});
+export const caption = (text: string): HtmlBlock =>
+  HtmlBlock({
+    content: `<span class="govuk-caption-l">${text}</span>`,
+  });
 
 /**
  * Creates a GovUK-styled continue button with localized text.
@@ -62,3 +69,36 @@ export const submitButton = GovUKButton({
 export function button(text: string): GovUKButton {
   return GovUKButton({ text });
 }
+
+export const yesOrNoRadioInput = (
+  code: string,
+  question: string,
+  validationErrorMessage: string,
+  isPageHeading = true,
+): GovUKRadioInput =>
+  GovUKRadioInput({
+    code,
+    fieldset: {
+      legend: {
+        classes: "govuk-fieldset__legend--l",
+        isPageHeading,
+        text: question,
+      },
+    },
+    items: [
+      {
+        text: t("common.yes"),
+        value: "yes",
+      },
+      {
+        text: t("common.no"),
+        value: "no",
+      },
+    ],
+    validWhen: [
+      validation({
+        condition: Self().match(Condition.IsRequired()),
+        message: validationErrorMessage,
+      }),
+    ],
+  });

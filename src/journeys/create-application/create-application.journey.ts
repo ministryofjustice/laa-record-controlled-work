@@ -12,7 +12,7 @@ import { JourneyPath } from "#/journeys/JourneyPath.enum.js";
 
 import { checkAnswersStep } from "./steps/check-answers.step.js";
 import { ineligibleStep } from "./steps/ecf-dropout.step.js";
-import { ecfStep } from "./steps/ecf.step.js";
+import { ecfStep } from "./steps/ecf/ecf.step.js";
 import { legalAidBeforeStep } from "./steps/legal-aid-before.step.js";
 import { niNumberStep } from "./steps/ni-number.step.js";
 

@@ -38,7 +38,7 @@ export const evidenceOfIncome = (
           Params(PARAMS_KEYS.applicationID),
         ),
       ),
-      caption,
+      caption(t("journeys.evidence.caption")),
       heading,
       description,
       employedEvidenceGroup,

@@ -28,7 +28,7 @@ export const reasonForNoEvidence = (
           Params(PARAMS_KEYS.applicationID),
         ),
       ),
-      caption,
+      caption(t("journeys.evidence.caption")),
       reasonForNoEvidenceRadioInput,
       moreDetailsForNoEvidence,
       continueButton(),
