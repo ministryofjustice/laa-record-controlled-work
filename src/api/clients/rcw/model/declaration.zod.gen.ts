@@ -8,7 +8,6 @@ import * as zod from "zod";
 
 export const Declaration = zod.object({
   id: zod.uuid().optional(),
-  clientDeclarationStatus: zod.enum(["DRAFT"]).optional(),
   declarationConfirmation: zod.boolean().optional(),
   createdAt: zod.iso.datetime({ offset: true }).optional(),
   createdBy: zod.string().optional(),

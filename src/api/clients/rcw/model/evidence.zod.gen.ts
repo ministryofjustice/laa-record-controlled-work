@@ -8,7 +8,6 @@ import * as zod from "zod";
 
 export const Evidence = zod.object({
   id: zod.uuid().optional(),
-  evidenceStatus: zod.enum(["DRAFT"]).optional(),
   payeIncomeEvidence: zod.boolean().optional(),
   otherIncomeEvidence: zod.boolean().optional(),
   housingCostsEvidence: zod.boolean().optional(),

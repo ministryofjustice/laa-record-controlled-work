@@ -173,14 +173,12 @@ describe("Task list step", () => {
           data: getGetApplicationResponseMock({
             eligibility: eligibilityResult,
             evidence: {
-              evidenceStatus: "DRAFT",
               payeIncomeEvidence: true,
               otherIncomeEvidence: true,
               housingCostsEvidence: true,
               capitalEvidence: true,
             },
             declaration: {
-              clientDeclarationStatus: "DRAFT",
               declarationConfirmation: true,
             },
           }),
@@ -208,7 +206,6 @@ describe("Task list step", () => {
           data: getGetApplicationResponseMock({
             eligibility: eligibilityResult,
             evidence: {
-              evidenceStatus: "DRAFT",
               payeIncomeEvidence: true,
               otherIncomeEvidence: true,
               housingCostsEvidence: true,
@@ -241,7 +238,6 @@ describe("Task list step", () => {
             eligibility: eligibilityResult,
             evidence: {},
             declaration: {
-              clientDeclarationStatus: "DRAFT",
               declarationConfirmation: true,
             },
           }),
