@@ -6,8 +6,8 @@ import { getGetAllProviderOfficesResponseMock } from "#orval/mocks/pda/msw/provi
 
 const FIRST_OFFICE_INDEX = 0;
 
-// if you change this, make sure you update the office codes in LAA_ACCOUNTS in
-// mock-oauth2-config.json and mock-oauth2-login.html
+// officeCodes (forwarded from the signed-in user's LAA_ACCOUNTS claim, see
+// msw/handlers/pda.ts) overrides these seeded codes, so no manual sync needed.
 // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- actually magic
 faker.seed(12345);
 

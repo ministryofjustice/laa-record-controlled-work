@@ -103,8 +103,7 @@
     </div>
     <div class="field">
       <label for="claims">Claims (optional JSON) &mdash; edit to override the defaults below</label>
-      <!-- keep LAA_ACCOUNTS aligned with ./msw/fixtures/pda.ts seeded output -->
-      <!-- as well as ./mock-oauth2-config.json -->
+      <!-- LAA_ACCOUNTS here is forwarded to the MSW PDA mock -->
       <textarea id="claims" name="claims" rows="16">{
   "aud": "default",
   "scp": "Applications.Read Applications.Write",
