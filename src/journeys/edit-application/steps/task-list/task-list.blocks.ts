@@ -115,7 +115,7 @@ function eligibilityResult(): HtmlBlock {
   )
     .branch(
       Condition.Equals("eligible"),
-      t("journeys.createApplication.taskList.eligibilityResult.eligible"),
+      t("journeys.editApplication.taskList.eligibilityResult.eligible"),
     )
     .otherwise("");
 
@@ -126,10 +126,10 @@ function eligibilityResult(): HtmlBlock {
         <p class="govuk-body">%2</p>
         <p class="govuk-!-margin-bottom-0"><a class="govuk-link" href="/cases/%3/eligibility/">%4</a></p>
       </div>`,
-      t("journeys.createApplication.taskList.eligibilityResult.title"),
+      t("journeys.editApplication.taskList.eligibilityResult.title"),
       eligibleContent,
       Params(PARAMS_KEYS.applicationID),
-      t("journeys.createApplication.taskList.eligibilityResult.viewResult"),
+      t("journeys.editApplication.taskList.eligibilityResult.viewResult"),
     ),
     visibleWhen: Data(CONTEXT_DATA_KEYS.application)
       .path(APPLICATION_DATA_KEYS.eligibilityOverallResult)
