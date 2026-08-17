@@ -20,7 +20,7 @@ test("Edit Application - Task List step", async ({ withSelectedOffice: page }) =
   ).toBeVisible();
   
     // Check the reference number is displayed
-  await expect(page.getByText(`Reference number: ${application.applicationRefNumber}`)).toBeVisible();
+  await expect(page.getByText(`Reference number: ${incompleteApplication.applicationRefNumber}`)).toBeVisible();
 
   // Check that the task list sections are displayed
   const taskListSections = page.locator(".govuk-task-list");
