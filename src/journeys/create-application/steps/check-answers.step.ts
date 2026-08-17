@@ -11,8 +11,8 @@ import {
   heading,
   summaryList,
 } from "#/journeys/create-application/steps/check-answers.blocks.js";
-import { submitButton } from "#/journeys/evidence/common.blocks.js";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
+import { submitButton } from "#/journeys/shared.blocks.js";
 import { t } from "#/lib/i18n.js";
 
 export const checkAnswersStep = (

@@ -11,11 +11,6 @@ import {
   validation,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
-import {
-  backLink,
-  caption,
-  continueButton,
-} from "#/journeys/evidence/common.blocks.js";
 import { evidenceEffects } from "#/journeys/evidence/evidence.effects.js";
 import {
   asylumSupportEvidenceGroup,
@@ -29,6 +24,7 @@ import {
   taxCreditsEvidenceGroup,
 } from "#/journeys/evidence/steps/evidence-of-income/evidence-of-income.blocks.js";
 import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
+import { backLink, caption, continueButton } from "#/journeys/shared.blocks.js";
 import { t } from "#/lib/i18n.js";
 
 export const evidenceOfIncome = (
@@ -52,7 +48,7 @@ export const evidenceOfIncome = (
       stateBenefitsEvidenceGroup,
       asylumSupportEvidenceGroup,
       taxCreditsEvidenceGroup,
-      continueButton,
+      continueButton(),
     ],
     onSubmission: [
       submit({
