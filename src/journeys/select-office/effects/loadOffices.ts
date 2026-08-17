@@ -10,6 +10,7 @@ import {
 import { getPdaApiDefaultOptions } from "#/api/clients/getPdaApiDefaultOptions.js";
 import { ProviderFirmOfficeListDto } from "#/api/clients/pda/model/providerFirmOfficeListDto.zod.gen.js";
 import { ID_TOKEN_CLAIMS_KEYS } from "#/auth/auth.constants.js";
+import config from "#/config.js";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import {
   InvalidFirmCodeClaimError,
@@ -17,18 +18,31 @@ import {
 } from "#/journeys/journey.errors.js";
 import { mapAvailableOffices } from "#/journeys/select-office/mappers/mapAvailableOffices.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
+import { PDA_MSW_LAA_ACCOUNTS_HEADER } from "#/lib/constants/pda.js";
 import { logger } from "#/logger.js";
 
 export const loadOffices =
   (deps: SelectOfficeEffectsDeps) => async (context: SelectOfficeContext) => {
     let response;
     const firmCode = getFirmCodeFromSession(context);
+    const laaAccounts =
+      context.getSession()?.account?.idTokenClaims?.[
+        ID_TOKEN_CLAIMS_KEYS.laaAccounts
+      ];
+    const laaAccountCodes = parseOfficeCodesClaim(laaAccounts);
     const correlationId = context
       .getRequestHeader("x-correlation-id")
       ?.toString();
 
     try {
-      const opts = getPdaApiDefaultOptions(correlationId);
+      const opts = getPdaApiDefaultOptions(
+        correlationId,
+        config.api.pda.mode === "msw"
+          ? {
+              [PDA_MSW_LAA_ACCOUNTS_HEADER]: JSON.stringify(laaAccountCodes),
+            }
+          : undefined,
+      );
       response = await deps.getAllProviderOffices(firmCode, opts);
     } catch (error) {
       logger.error("Error fetching offices", error, {
@@ -61,15 +75,6 @@ export const loadOffices =
       throw ApiValidationError.from(result.error);
     }
     const mappedOffices = mapAvailableOffices(result.data);
-    const laaAccounts =
-      context.getSession()?.account?.idTokenClaims?.[
-        ID_TOKEN_CLAIMS_KEYS.laaAccounts
-      ];
-    const laaAccountCodes = Array.isArray(laaAccounts)
-      ? laaAccounts.filter(
-          (account): account is string => typeof account === "string",
-        )
-      : [];
     const availableOffices = mappedOffices.filter((o) =>
       laaAccountCodes.includes(o.code),
     );
@@ -107,4 +112,32 @@ function getFirmCodeFromSession(context: SelectOfficeContext): number {
   }
 
   return firmCode;
+}
+
+/**
+ * Reads office codes from array and serialized-array Entra claims.
+ * @param claim LAA_ACCOUNTS claim from the authenticated account.
+ * @returns Valid office-code strings from the claim.
+ */
+function parseOfficeCodesClaim(claim: unknown): string[] {
+  if (Array.isArray(claim)) {
+    return claim.filter(
+      (account): account is string => typeof account === "string",
+    );
+  }
+
+  if (typeof claim !== "string") {
+    return [];
+  }
+
+  try {
+    const parsedClaim: unknown = JSON.parse(claim);
+    return Array.isArray(parsedClaim)
+      ? parsedClaim.filter(
+          (account): account is string => typeof account === "string",
+        )
+      : [];
+  } catch {
+    return [];
+  }
 }
