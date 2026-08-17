@@ -112,7 +112,8 @@
             "missingDay": "Date of birth must include a day",
             "missingMonth": "Date of birth must include a month",
             "missingYear": "Date of birth must include a year",
-            "mustBePast": "Date of birth must be in the past"
+            "mustBePast": "Date of birth must be in the past",
+            "ageLimit": "Date of birth must be after 1 January 1900"
           }
         }
       },
@@ -158,7 +159,8 @@
         "postcode": {
           "label": "Postcode",
           "validation": {
-            "required": "Enter postcode"
+            "required": "Enter postcode",
+            "invalid": "Enter a valid postcode, for example SW1A 1AA"
           }
         },
         "nonUkAddress": "The address is not in the UK"

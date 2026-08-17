@@ -81,7 +81,7 @@ describe("Have A Home Address Step", () => {
       );
     });
 
-    it("should redirect to Need means assessment step if no", async () => {
+    it("should redirect to Check answers step if no", async () => {
       const result = await client.post(
         "/cases/new/have-a-home-address",
         {
@@ -93,7 +93,7 @@ describe("Have A Home Address Step", () => {
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
       expect(redirectResult.url).to.equal(
-        "/cases/new/need-means-assessment",
+        "/cases/new/check-answers",
       );
     });
   });

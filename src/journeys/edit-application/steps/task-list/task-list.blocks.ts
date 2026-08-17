@@ -1,16 +1,16 @@
-import type {
-  BlockDefinition,
-  HtmlBlock,
-  ResolvableString,
-} from "@ministryofjustice/hmpps-forge/core/components";
-
 import {
   Condition,
   Data,
   Format,
+  match,
   Params,
   when,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
+import {
+  type BlockDefinition,
+  HtmlBlock,
+  type ResolvableString,
+} from "@ministryofjustice/hmpps-forge/core/components";
 import {
   GovUKBody,
   GovUKButton,
@@ -21,6 +21,7 @@ import {
 
 import { taskItem } from "#/journeys/edit-application/steps/task-list/task-list.helpers.js";
 import {
+  APPLICATION_DATA_KEYS,
   CONTEXT_DATA_KEYS,
   PARAMS_KEYS,
 } from "#/journeys/journey.constants.js";
@@ -77,6 +78,7 @@ export function taskList(): BlockDefinition[] {
         ),
       ],
     }),
+    eligibilityResult(),
     sectionHeading(
       t("journeys.editApplication.taskList.EvidenceAndDeclaration.title"),
     ),
@@ -99,6 +101,40 @@ export function taskList(): BlockDefinition[] {
       ],
     }),
   ];
+}
+
+/**
+ * Builds the eligibility result indicator.
+ * @returns The eligibility result HTML block.
+ */
+function eligibilityResult(): HtmlBlock {
+  const eligibleContent = match(
+    Data(CONTEXT_DATA_KEYS.application).path(
+      APPLICATION_DATA_KEYS.eligibilityOverallResult,
+    ),
+  )
+    .branch(
+      Condition.Equals("eligible"),
+      t("journeys.createApplication.taskList.eligibilityResult.eligible"),
+    )
+    .otherwise("");
+
+  return HtmlBlock({
+    content: Format(
+      `<div class="eligibility-result-box">
+        <h2 class="govuk-heading-s">%1</h2>
+        <p class="govuk-body">%2</p>
+        <p class="govuk-!-margin-bottom-0"><a class="govuk-link" href="/cases/%3/eligibility/">%4</a></p>
+      </div>`,
+      t("journeys.createApplication.taskList.eligibilityResult.title"),
+      eligibleContent,
+      Params(PARAMS_KEYS.applicationID),
+      t("journeys.createApplication.taskList.eligibilityResult.viewResult"),
+    ),
+    visibleWhen: Data(CONTEXT_DATA_KEYS.application)
+      .path(APPLICATION_DATA_KEYS.eligibilityOverallResult)
+      .match(Condition.IsRequired()),
+  });
 }
 
 /**

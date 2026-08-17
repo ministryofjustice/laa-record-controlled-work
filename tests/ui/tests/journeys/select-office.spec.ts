@@ -24,6 +24,6 @@ test("select office flow", async ({ page }) => {
     page.getByRole("heading", { name: "Landing Page", level: 1 }),
   ).toBeVisible();
   await expect(
-    page.getByText("Temporary Record New Case"),
+    page.getByRole("button", { name: "Record a new case" }),
   ).toBeVisible();
 });

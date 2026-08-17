@@ -17,7 +17,11 @@ type RenderedTaskListItem = {
 
 describe("Task list step", () => {
   const uuid = "123e4567-e89b-12d3-a456-426614174000";
-  const eligibilityResult = { result: { qualified: true } };
+  const eligibilityResult = {
+    result: {
+      result_summary: { overall_result: { result: "eligible" } },
+    },
+  };
   const mockData = getGetApplicationResponseMock();
   const getApplicationStub = sinon
     .stub()
@@ -64,12 +68,103 @@ describe("Task list step", () => {
 
     it("renders the reference number", () => {
       expect(body.properties.content).to.equal(
-        `Reference number: ${mockData.id}`,
+        `Reference number: ${mockData.applicationRefNumber}`,
       );
     });
 
     it("renders 3 task list sections", () => {
       expect(taskLists.length).to.equal(3);
+    });
+
+    it("renders an eligibility result indicator without content for an ineligible assessment", async () => {
+      getApplicationStub.resolves({
+        status: 200,
+        data: getGetApplicationResponseMock({
+          eligibility: {
+            result: {
+              result_summary: { overall_result: { result: "ineligible" } },
+            },
+          },
+        }),
+      });
+
+      const result = await client.get(`/cases/${uuid}/task-list`, {
+        session: {},
+      });
+
+      expect(result.type).to.equal("render");
+      const eligibilityResultRender = result as TestRenderResult;
+      const indicators = eligibilityResultRender
+        .getBlocksByVariant("html")
+        .filter((block) =>
+          String(block.properties.content).includes("Eligibility result"),
+        );
+
+      expect(indicators).to.have.length(1);
+      const indicator = String(indicators[0].properties.content);
+      expect(indicator).to.include("Eligibility result");
+      expect(indicator).to.not.include(
+        "Your client qualifies financially for civil legal aid",
+      );
+      expect(indicator).to.include(
+        `href="/cases/${uuid}/eligibility/"`,
+      );
+      expect(indicator).to.include("View result");
+    });
+
+    it("does not render an eligibility result indicator when no result is available", async () => {
+      getApplicationStub.resolves({
+        status: 200,
+        data: getGetApplicationResponseMock({
+          eligibility: { result: {} },
+        }),
+      });
+
+      const result = await client.get(`/cases/${uuid}/task-list`, {
+        session: {},
+      });
+
+      expect(result.type).to.equal("render");
+      const eligibilityResultRender = result as TestRenderResult;
+      const indicators = eligibilityResultRender
+        .getBlocksByVariant("html")
+        .filter((block) =>
+          String(block.properties.content).includes("Eligibility result"),
+        );
+
+      expect(indicators).to.have.length(0);
+    });
+
+    it("renders eligibility content for an eligible assessment", async () => {
+      getApplicationStub.resolves({
+        status: 200,
+        data: getGetApplicationResponseMock({
+          eligibility: eligibilityResult,
+        }),
+      });
+
+      const result = await client.get(`/cases/${uuid}/task-list`, {
+        session: {},
+      });
+
+      expect(result.type).to.equal("render");
+      const eligibilityResultRender = result as TestRenderResult;
+      const indicators = eligibilityResultRender
+        .getBlocksByVariant("html")
+        .filter((block) =>
+          String(block.properties.content).includes("Eligibility result"),
+        );
+
+      expect(indicators).to.have.length(1);
+      const indicator = String(indicators[0].properties.content);
+      expect(indicator).to.include("Eligibility result");
+      expect(indicator).to.include(
+        "Your client qualifies financially for civil legal aid based on the information you entered.",
+      );
+      expect(indicator).to.include(
+        `href="/cases/${uuid}/eligibility/"`,
+      );
+      expect(indicator).to.include("View result");
     });
 
     describe("declaration status rendering", () => {
@@ -79,14 +174,12 @@ describe("Task list step", () => {
           data: getGetApplicationResponseMock({
             eligibility: eligibilityResult,
             evidence: {
-              evidenceStatus: "DRAFT",
               payeIncomeEvidence: true,
               otherIncomeEvidence: true,
               housingCostsEvidence: true,
               capitalEvidence: true,
             },
             declaration: {
-              clientDeclarationStatus: "DRAFT",
               declarationConfirmation: true,
             },
           }),
@@ -114,7 +207,6 @@ describe("Task list step", () => {
           data: getGetApplicationResponseMock({
             eligibility: eligibilityResult,
             evidence: {
-              evidenceStatus: "DRAFT",
               payeIncomeEvidence: true,
               otherIncomeEvidence: true,
               housingCostsEvidence: true,
@@ -147,7 +239,6 @@ describe("Task list step", () => {
             eligibility: eligibilityResult,
             evidence: {},
             declaration: {
-              clientDeclarationStatus: "DRAFT",
               declarationConfirmation: true,
             },
           }),
@@ -214,7 +305,7 @@ describe("Task list step", () => {
   });
 
   describe("POST /cases/123e4567-e89b-12d3-a456-426614174000/task-list", () => {
-    it("redirects to /cases when save and return is clicked", async () => {
+    it("redirects to the cases list", async () => {
       const result = await client.post(`/cases/${uuid}/task-list`, {
         session,
         body: { action: "return" },

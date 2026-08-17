@@ -7,25 +7,33 @@
 # first - answer "n" or Ctrl-C out at any prompt, and re-running this script later will
 # pick up from whatever's still missing. Use --ci to skip all confirmations (for CI).
 #
-# Usage: docker/compose/up [--entra] [--ci]
+# Usage: docker/compose/up [--entra] [--ci] [--no-build]
 #   --entra  Load .env.entra overrides (Entra auth mode; default: mock-issuer)
 #   --ci     CI mode: skip confirmations, skip 1Password, auto-add /etc/hosts, exit after stack ready
+#   --no-build  Use a loaded RCW runner image (requires --ci)
 set -euo pipefail
 
 ENTRA_MODE=false
 CI_MODE=false
+NO_BUILD=false
 
 # Parse named arguments
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --entra) ENTRA_MODE=true; shift ;;
     --ci) CI_MODE=true; shift ;;
+    --no-build) NO_BUILD=true; shift ;;
     *)
-      echo "Usage: $0 [--entra] [--ci]" >&2
+      echo "Usage: $0 [--entra] [--ci] [--no-build]" >&2
       exit 1
       ;;
   esac
 done
+
+if $NO_BUILD && ! $CI_MODE; then
+  echo "error: --no-build requires --ci" >&2
+  exit 1
+fi
 
 confirm() {
   local prompt="$1" reply
@@ -148,17 +156,26 @@ $ENTRA_MODE && ENV_FILES+=(--env-file=.env.entra)
 
 COMPOSE_FILES=(-f docker-compose.yml -f docker-compose.override.yml)
 if $CI_MODE; then
-  COMPOSE_FILES+=(-f docker-compose.ci.yml)
+  COMPOSE_FILES+=(-f docker/compose/ci.yml)
 fi
+$NO_BUILD && COMPOSE_FILES+=(-f docker/compose/ci.rcw.yml)
 $ENTRA_MODE && COMPOSE_FILES+=(-f docker-compose.entra.yml)
 
 if $CI_MODE; then
   # CI mode: build first (parallel where possible), then start and wait for health.
   echo "==> Starting docker compose stack (CI mode, $($ENTRA_MODE && echo 'entra' || echo 'mock-issuer')):"
-  printf '        docker compose %s %s build --parallel\n' "${COMPOSE_FILES[*]}" "${ENV_FILES[*]}"
-  docker compose "${COMPOSE_FILES[@]}" "${ENV_FILES[@]}" build --parallel
+  if ! $NO_BUILD; then
+    printf '        docker compose %s %s build --parallel\n' "${COMPOSE_FILES[*]}" "${ENV_FILES[*]}"
+    docker compose "${COMPOSE_FILES[@]}" "${ENV_FILES[@]}" build --parallel
+  fi
   printf '        docker compose %s %s up -d --wait --no-build\n' "${COMPOSE_FILES[*]}" "${ENV_FILES[*]}"
-  exec docker compose "${COMPOSE_FILES[@]}" "${ENV_FILES[@]}" up -d --wait --no-build
+  if ! docker compose "${COMPOSE_FILES[@]}" "${ENV_FILES[@]}" up -d --wait --no-build; then
+    echo "==> Docker compose failed; service state:"
+    docker compose "${COMPOSE_FILES[@]}" "${ENV_FILES[@]}" ps --all || true
+    echo "==> Docker compose logs:"
+    docker compose "${COMPOSE_FILES[@]}" "${ENV_FILES[@]}" logs --no-color || true
+    exit 1
+  fi
 else
   echo "==> Starting docker compose stack (interactive mode, $($ENTRA_MODE && echo 'entra' || echo 'mock-issuer')):"
   echo "      op run"

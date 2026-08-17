@@ -106,6 +106,12 @@ export const enterAddressManuallyStep = (
               "journeys.createApplication.enterAddressManually.postcode.validation.required",
             ),
           }),
+          validation({
+            condition: Self().match(Condition.Address.IsValidPostcode()),
+            message: t(
+              "journeys.createApplication.enterAddressManually.postcode.validation.invalid",
+            ),
+          }),
         ],
       }),
       GovUKTextInput({

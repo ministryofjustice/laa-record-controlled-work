@@ -48,7 +48,11 @@ export const PARAMS_KEYS = {
 };
 
 export const APPLICATIONS_DATA_KEYS = Applications.element.keyof().enum;
-export const APPLICATION_DATA_KEYS = Application.keyof().enum;
+export const APPLICATION_DATA_KEYS = {
+  ...Application.keyof().enum,
+  eligibilityOverallResult:
+    "eligibility.result.result_summary.overall_result.result",
+} as const satisfies Record<string, string>;
 export const CLIENT_DETAILS_DATA_KEYS = {
   address: "clientDetails.address",
   addressLine1: "clientDetails.address.addressLine1",

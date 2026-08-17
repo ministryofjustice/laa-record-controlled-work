@@ -51,3 +51,21 @@ export const submitApplication = async (
   // TODO: Update this to the correct URL once the submission journey is implemented
   await expect(page).toHaveURL(/\/submittedPage-TODO/);
 };
+
+export const viewCompletedEligibilityAssessment = async (
+  page: Page,
+  applicationId: string,
+): Promise<void> => {
+  await page.getByRole("link", { name: "View result" }).click();
+  await expect(page).toHaveURL(
+    new RegExp(`/cases/${applicationId}/eligibility/check-result$`),
+  );
+};
+
+export const returnToTaskListFromEligibilityResult = async (
+  page: Page,
+  applicationId: string,
+): Promise<void> => {
+  await page.getByRole("button", { name: "Save and continue" }).click();
+  await expect(page).toHaveURL(taskListUrlPattern(applicationId));
+};

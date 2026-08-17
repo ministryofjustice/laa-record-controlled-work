@@ -34,7 +34,9 @@ const SESSION_AGE_MAX = 12 * HOUR;
 const DEFAULT_RATE_WINDOW = 15 * MINUTE;
 /* eslint-enable @typescript-eslint/no-magic-numbers */
 
-const useHttps = ["production", "staging", "uat"].includes(required.NODE_ENV);
+const DEPLOYED_ENVIRONMENTS = ["production", "staging", "uat"];
+const useHttps =
+  optional.USE_HTTPS ?? DEPLOYED_ENVIRONMENTS.includes(required.NODE_ENV);
 
 export default {
   api: {
@@ -58,7 +60,7 @@ export default {
       phone: optional.CONTACT_PHONE,
     },
     department: {
-      name: optional.DEPARTMENT_NAME,
+      name: optional.DEPARTMENT_NAME ?? "Legal Aid Agency",
       url: optional.DEPARTMENT_URL,
     },
     environment: required.NODE_ENV,
@@ -78,11 +80,10 @@ export default {
       windowMs: optional.RATE_WINDOW_MS ?? DEFAULT_RATE_WINDOW,
     },
     service: {
-      name: optional.SERVICE_NAME ?? "LAA Record Controlled Work",
+      name: optional.SERVICE_NAME ?? "Record Controlled Work",
       phase: optional.SERVICE_PHASE,
       url: optional.SERVICE_URL,
     },
-    useHttps,
   } satisfies AppConfig,
 
   csrf: {

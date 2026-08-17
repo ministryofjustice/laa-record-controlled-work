@@ -22,7 +22,7 @@ export interface AppConfig {
     phone: string | undefined;
   };
   department: {
-    name: string | undefined;
+    name: string;
     url: string | undefined;
   };
   environment: string;
@@ -43,7 +43,6 @@ export interface AppConfig {
     phase: string | undefined;
     url: string | undefined;
   };
-  useHttps: boolean;
 }
 export interface Config {
   api: ApiConfig;

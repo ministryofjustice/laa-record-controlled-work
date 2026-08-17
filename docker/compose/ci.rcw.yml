@@ -1,0 +1,11 @@
+# CI-only override for the immutable RCW runner image exported by CICD.
+services:
+  rcw:
+    image: ${RCW_IMAGE:?RCW_IMAGE must name the loaded RCW runner image}
+    pull_policy: never
+    environment:
+      NODE_ENV: production
+      USE_HTTPS: "false"
+    build: !reset null
+    command: !reset null
+    develop: !reset null

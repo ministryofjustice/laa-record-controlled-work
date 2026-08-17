@@ -9,7 +9,9 @@ test.describe('Layout header', () => {
     await expect(header).toBeVisible();
 
     // Check for MoJ branding which is typically in the header
-    await expect(page.locator('.moj-header').getByRole('link', { name: 'Legal Aid Agency' })).toBeVisible();
+    const organisationLink = page.locator('.moj-header').getByRole('link', { name: 'Legal Aid Agency' });
+    await expect(organisationLink).toBeVisible();
+    await expect(organisationLink).toHaveAttribute('href', '/');
   });
 
   test('layout should contain navigation', async ({ page }) => {
@@ -21,6 +23,12 @@ test.describe('Layout header', () => {
 
     // Check for navigation links
     await expect(page.getByRole('link', { name: 'Your cases' })).toBeVisible();
+
+    // Search link should not be shown
+    await expect(navigation.getByRole('link', { name: 'Search' })).toHaveCount(0);
+
+    // Service name link should point back to the landing page
+    await expect(navigation.getByRole('link', { name: 'Record civil controlled work' })).toHaveAttribute('href', '/');
   });
 
   test('layout should contain phase banner', async ({ page }) => {

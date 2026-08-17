@@ -79,7 +79,6 @@ describe("setTaskListStatuses", () => {
     const application = getGetApplicationResponseMock({
       eligibility: { result: { qualified: true } },
       evidence: {
-        evidenceStatus: "DRAFT",
         payeIncomeEvidence: true,
       },
       declaration: {},
@@ -99,11 +98,9 @@ describe("setTaskListStatuses", () => {
     const application = getGetApplicationResponseMock({
       eligibility: { result: { qualified: true } },
       evidence: {
-        evidenceStatus: "DRAFT",
         payeIncomeEvidence: true,
       },
       declaration: {
-        clientDeclarationStatus: "DRAFT",
         declarationConfirmation: true,
       },
     });

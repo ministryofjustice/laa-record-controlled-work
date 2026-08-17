@@ -4,8 +4,8 @@
 {% block content %}
     <h1 class="govuk-heading-xl">{{ t('pages.index.defaultHeading') }}</h1>
     {{ govukButton({
-        text: "Temporary Record New Case",
-        href: '/cases/new',
+        text: t('pages.yourCases.createCaseButton'),
+        href: '/cases/new/provider-declaration',
         isStartButton: true
     })  }}
 {% endblock %}

@@ -6,7 +6,7 @@
     <div class="moj-header__container">
       <div class="moj-header__logo">
         {% include "../icons/moj-header-crest.svg" %}
-        <a class="moj-header__link moj-header__link--organisation-name" href="{{config.app.department.url}}">{{config.app.department.name}}</a>
+        <a class="moj-header__link moj-header__link--organisation-name" href="/">{{config.app.department.name}}</a>
       </div>
       {% if isAuthenticated %}
         <div class="moj-header__content">
@@ -29,15 +29,11 @@
 {% block navigation %}
     {{ govukServiceNavigation({
   serviceName: config.app.service.name,
-  serviceUrl: "#",
+  serviceUrl: "/",
   navigation: [
     {
       href: "/cases",
       text: "Your cases"
-    },
-    {
-      href: "#",
-      text: "Search"
     }
   ]
     }) }}

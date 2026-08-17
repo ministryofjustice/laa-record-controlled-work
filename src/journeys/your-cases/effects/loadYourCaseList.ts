@@ -14,8 +14,11 @@ import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
 
+type ApplicationStatus = "COMPLETED" | "DRAFT";
+
 export const loadYourCaseList =
-  (deps: YourCasesEffectsDeps) => async (context: CaseListContext) => {
+  (deps: YourCasesEffectsDeps) =>
+  async (context: CaseListContext, status: ApplicationStatus) => {
     let response;
 
     try {
@@ -25,7 +28,7 @@ export const loadYourCaseList =
         sessionId: session?.id,
       });
       response = await deps.getApplications(
-        { officeId: session?.selectedOffice?.code },
+        { officeId: session?.selectedOffice?.code, status },
         opts,
       );
     } catch (error) {
