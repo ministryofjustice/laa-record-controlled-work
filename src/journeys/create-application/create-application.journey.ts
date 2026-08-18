@@ -13,7 +13,7 @@ import { JourneyPath } from "#/journeys/JourneyPath.enum.js";
 import { checkAnswersStep } from "./steps/check-answers.step.js";
 import { ecfStep } from "./steps/ecf/ecf.step.js";
 import { ineligibleStep } from "./steps/ecfDropout/ecfDropout.step.js";
-import { legalAidBeforeStep } from "./steps/legal-aid-before.step.js";
+import { legalAidBeforeStep } from "./steps/legalAidBefore/legalAidBefore.step.js";
 import { niNumberStep } from "./steps/ni-number.step.js";
 
 const loadDraftAnswers = access({
