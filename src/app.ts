@@ -18,8 +18,8 @@ import {
   createApplication,
   getApplication,
   getApplications,
-  updateApplicationStatus,
   updateApplicationEvidence,
+  updateApplicationStatus,
 } from "#/api/clients/rcw/schema/applications/applications.gen.js";
 import eligibilityRouter from "#/api/eligibility/eligibility.routes.js";
 import authRouter from "#/auth/auth.routes.js";
