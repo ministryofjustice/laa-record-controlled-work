@@ -3,14 +3,14 @@ import {
   TestRedirectResult,
 } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
-import { createForgeTestClient } from "../../utils/helpers.js";
+import { createForgeTestClientForEvidence } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import { checkAnswersStep } from "#/journeys/evidence/steps/check-answers/check-answers.step.js";
 
 describe("Check answers step", () => {
-  const client = createForgeTestClient(
+  const applicationId = "123e4567-e89b-12d3-a456-426614174000";
+  const client = createForgeTestClientForEvidence(
     "Evidence",
-    "/cases/evidence",
     [checkAnswersStep()],
   );
   const session = {
@@ -37,7 +37,7 @@ describe("Check answers step", () => {
     let submitButton: RenderBlock;
 
     before(async () => {
-      const result = await client.get("/cases/evidence/check-answers", {
+      const result = await client.get(`/cases/${applicationId}/evidence/check-answers`, {
         session,
       });
       expect(result.type).to.equal("render");
@@ -91,12 +91,12 @@ describe("Check answers step", () => {
 
   describe("POST /cases/evidence/check-answers", () => {
     it("redirects to the confirmation step", async () => {
-      const result = await client.post("/cases/evidence/check-answers", {
+      const result = await client.post(`/cases/${applicationId}/evidence/check-answers`, {
         session,
       });
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
-      expect(redirectResult.url).to.equal("/task-list");
+      expect(redirectResult.url).to.equal(`/cases/${applicationId}/task-list`);
     });
   });
 });

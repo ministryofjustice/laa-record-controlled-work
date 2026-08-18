@@ -1,17 +1,19 @@
 import {
   Condition,
+  Format,
+  Params,
   Query,
   redirect,
   step,
   submit,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
-import { JourneyEffects } from "#/journeys/effects.js";
 import {
   backLink,
   caption,
   continueButton,
 } from "#/journeys/evidence/common.blocks.js";
+import { evidenceEffects } from "#/journeys/evidence/evidence.effects.js";
 import {
   childCareEvidenceGroup,
   description,
@@ -21,6 +23,7 @@ import {
   label,
   maintenanceEvidenceGroup,
 } from "#/journeys/evidence/steps/evidence-of-expenditure/evidence-of-expenditure.blocks.js";
+import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
 import { t } from "#/lib/i18n.js";
 
 export const evidenceOfExpenditure = (
@@ -28,7 +31,12 @@ export const evidenceOfExpenditure = (
 ): ReturnType<typeof step> =>
   step({
     blocks: [
-      backLink("/cases/evidence/evidence-of-income"),
+      backLink(
+        Format(
+          "/cases/%1/evidence/evidence-of-income",
+          Params(PARAMS_KEYS.applicationID),
+        ),
+      ),
       caption,
       heading,
       description,
@@ -42,7 +50,7 @@ export const evidenceOfExpenditure = (
     onSubmission: [
       submit({
         onValid: {
-          effects: [JourneyEffects.SaveDraftAnswers(journeyCode)],
+          effects: [evidenceEffects.saveDraftAnswers(journeyCode)],
           next: [
             redirect({
               goto: "check-answers",

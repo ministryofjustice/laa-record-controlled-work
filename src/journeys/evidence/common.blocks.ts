@@ -1,4 +1,7 @@
-import { HtmlBlock } from "@ministryofjustice/hmpps-forge/core/components";
+import {
+  HtmlBlock,
+  type ResolvableString,
+} from "@ministryofjustice/hmpps-forge/core/components";
 import {
   GovUKBackLink,
   GovUKButton,
@@ -6,7 +9,7 @@ import {
 
 import { t } from "#/lib/i18n.js";
 
-export const backLink = (url: string): GovUKBackLink =>
+export const backLink = (url: ResolvableString): GovUKBackLink =>
   GovUKBackLink({
     href: url,
   });

@@ -26,6 +26,8 @@ import { createApplicationEffectsRegistry } from "#/journeys/create-application/
 import type { CreateApplicationEffectsDeps } from "#/journeys/create-application/create-application.types.js";
 import { editApplicationEffectsRegistry } from "#/journeys/edit-application/editApplication.effects.js";
 import type { EditApplicationEffectsDeps } from "#/journeys/edit-application/editApplication.types.js";
+import { evidenceEffectsRegistry, evidenceEffects } from "#/journeys/evidence/evidence.effects.js";
+import type { EvidenceEffectsDeps } from "#/journeys/evidence/evidence.types.js";
 import sinon from "sinon";
 import { getGetApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
 import { getCreateApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
@@ -122,9 +124,6 @@ export function createForgeTestClientForCaseList(
 
 /**
  * Creates a test client for edit-application journey.
- * @param {string} title - The title of the journey.
- * @param {string} path - The path of the journey.
- * @param {...any} steps - Step definitions to include in the test journey.
  * @param {EditApplicationEffectsDeps} mockDeps - mock implementations for the journey's effect functions
  * @returns {ForgeTestClient} A configured test client.
  */
@@ -159,6 +158,53 @@ export function createForgeTestClientForEditApplication(
     .registerPackage(
       testPackage,
       mockDeps ?? { getApplication: getApplicationStub },
+    )
+    .createClient();
+}
+
+/**
+ * Creates a test client for evidence journey tests.
+ * @param {string} title - The title of the journey.
+ * @param {...any} steps - Step definitions to include in the test journey.
+ * @param {EvidenceEffectsDeps} mockDeps - mock implementations for the journey's effect functions
+ * @returns {ForgeTestClient} A configured test client.
+ */
+export function createForgeTestClientForEvidence(
+  title: string,
+  steps: StepDefinition[],
+  mockDeps?: EvidenceEffectsDeps,
+): ForgeTestClient {
+  const updateApplicationEvidenceStub = sinon
+    .stub()
+    .resolves({ status: 204 });
+
+  const testJourney = journey({
+    code: "testJourney",
+    path: "/cases/:applicationID/evidence",
+    onAccess: [
+      access({
+        effects: [JourneyEffects.LoadDraftAnswers("testJourney")],
+      }),
+    ],
+    reachability: { disableReachabilityChecks: true },
+    steps: steps,
+    title: title,
+    view: { template: "partials/form-step" },
+  });
+
+  const testPackage = createTestPackage({
+    functions: [evidenceEffectsRegistry],
+    journey: testJourney,
+  });
+
+  return new ForgeTestHarness()
+    .registerGlobalComponents(govukComponents)
+    .registerGlobalComponents([autocomplete])
+    .registerGlobalFunctions(nunjucksFunctions)
+    .registerGlobalFunctions(JourneyEffectsImplementations)
+    .registerPackage(
+      testPackage,
+      mockDeps ?? { updateApplicationEvidence: updateApplicationEvidenceStub },
     )
     .createClient();
 }
