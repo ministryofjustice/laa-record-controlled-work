@@ -128,9 +128,53 @@ describe("Check answers step", () => {
     it("renders the submit button", () => {
       expect(submitButton.properties.text).to.equal("Save and continue");
     });
+
+    it("renders no fixed address row when client has no fixed address", async () => {
+      const result = await client.get("/cases/new/check-answers", {
+        session: {
+          ...session,
+          journeyDrafts: {
+            createApplication: {
+              ...session.journeyDrafts.createApplication,
+              haveAHomeAddress: "no",
+              addressLine1: undefined,
+              country: undefined,
+              townOrCity: undefined,
+              postcode: undefined,
+            },
+          },
+        },
+      });
+
+      expect(result.type).to.equal("render");
+      const noAddressRender = result as TestRenderResult;
+      const [noAddressSummaryList] = noAddressRender.getBlocksByVariant(
+        "govukSummaryList",
+      );
+
+      const rows = noAddressSummaryList.properties.rows as Array<{
+        actions?: {
+          items: Array<{ href: string }>;
+        };
+        key: { text: string };
+        value: { html?: string; text?: string };
+      }>;
+
+      const addressRow = rows.find((row) => row.key.text === "Address");
+
+      expect(addressRow).to.not.be.undefined;
+      expect(addressRow?.value.html).to.equal("No fixed address");
+      expect(addressRow?.actions?.items[0].href).to.equal(
+        "have-a-home-address?returnTo=check-answers",
+      );
+    });
   });
 
   describe("POST /cases/new/check-answers", () => {
+    beforeEach(() => {
+      createApplicationStub.resetHistory();
+    });
+
     it("redirects to the confirmation step", async () => {
       const result = await client.post("/cases/new/check-answers", {
         session,
@@ -138,6 +182,37 @@ describe("Check answers step", () => {
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
       expect(redirectResult.url).to.equal(`/cases/${uuid}/task-list`);
+    });
+
+    it("submits no address when client has no fixed address", async () => {
+      const result = await client.post("/cases/new/check-answers", {
+        session: {
+          ...session,
+          journeyDrafts: {
+            createApplication: {
+              ...session.journeyDrafts.createApplication,
+              haveAHomeAddress: "no",
+              addressLine1: undefined,
+              country: undefined,
+              townOrCity: undefined,
+              postcode: undefined,
+            },
+          },
+        },
+      });
+
+      expect(result.type).to.equal("redirect");
+      expect(createApplicationStub.calledOnce).to.equal(true);
+
+      const payload = createApplicationStub.firstCall.args[0] as {
+        clientDetails: {
+          address?: unknown;
+          hasFixedAddress: boolean;
+        };
+      };
+
+      expect(payload.clientDetails.hasFixedAddress).to.equal(false);
+      expect(payload.clientDetails).to.not.have.property("address");
     });
   });
 });

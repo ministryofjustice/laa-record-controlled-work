@@ -76,6 +76,16 @@ const changeAddressRedirect = match(Answer("postcode"))
   )
   .otherwise("enter-overseas-address?returnTo=check-answers");
 
+const addressChangeHref = match(Answer("haveAHomeAddress"))
+  .branch(Condition.Equals("no"), "have-a-home-address?returnTo=check-answers")
+  .otherwise(changeAddressRedirect);
+
+const addressValueDisplay = match(Answer("haveAHomeAddress"))
+  .branch(Condition.Equals("yes"), addressDisplay)
+  .otherwise(
+    t("journeys.createApplication.checkAnswers.answerValues.noFixedAddress"),
+  );
+
 export const checkAnswersStep = (
   journeyCode: string,
 ): ReturnType<typeof step> =>
@@ -249,7 +259,7 @@ export const checkAnswersStep = (
             actions: {
               items: [
                 {
-                  href: changeAddressRedirect,
+                  href: addressChangeHref,
                   text: t("common.change"),
                   visuallyHiddenText: t(
                     "journeys.createApplication.checkAnswers.answerLabels.address",
@@ -262,10 +272,7 @@ export const checkAnswersStep = (
                 "journeys.createApplication.checkAnswers.answerLabels.address",
               ),
             },
-            value: { html: addressDisplay },
-            visibleWhen: Answer("haveAHomeAddress").match(
-              Condition.Equals("yes"),
-            ),
+            value: { html: addressValueDisplay },
           },
         ],
       }),
