@@ -7,16 +7,14 @@ import {
   type SubmitHook,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
-import { AnswerValue } from "#/journeys/AnswerValue.enum.js";
+import { AnswerKey } from "#/journeys/AnswerKey.enum.js";
 import { CreateApplicationEffects } from "#/journeys/create-application/create-application.effects.js";
-import { Answerkey } from "#/journeys/create-application/data/answers.zod.js";
 import { ecfPath } from "#/journeys/create-application/steps/ecfDropout/ecfDropout.formatters.js";
 import { legalAidBeforeRadioInput } from "#/journeys/create-application/steps/legalAidBefore/legalAidBefore.blocks.js";
 import {
   legalAidBeforeCaption,
   legalAidBeforeTitle,
 } from "#/journeys/create-application/steps/legalAidBefore/legalAidBefore.formatters.js";
-import { CreateApplicationPath } from "#/journeys/JourneyPath.enum.js";
 import { backLink, caption, continueButton } from "#/journeys/shared.blocks.js";
 import {
   hasCheckAnswersInQuery,
@@ -36,7 +34,7 @@ export const legalAidBeforeStep = (
     ],
     code: StepCode.LEGAL_AID_BEFORE,
     onSubmission: [onSubmission(journeyCode)],
-    path: CreateApplicationPath.LEGAL_AID_BEFORE,
+    path: "/legal-aid-before",
     reachability: {
       entryWhen: hasCheckAnswersInQuery,
     },
@@ -58,7 +56,7 @@ const onSubmission = (journeyCode: string): SubmitHook =>
 
 const redirectWhenSameMatter = redirect({
   goto: StepCode.LEGAL_AID_LAST_6_MONTHS,
-  when: Answer(Answerkey.enum.legalAidBefore).match(
-    Condition.Equals(AnswerValue.YES_SAME_MATTER),
+  when: Answer(AnswerKey.legalAidBefore).match(
+    Condition.Equals("yesSameMatter"),
   ),
 });

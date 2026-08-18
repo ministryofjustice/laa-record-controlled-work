@@ -5,8 +5,7 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 import { GovUKRadioInput } from "@ministryofjustice/hmpps-forge/govuk-components";
 
-import { AnswerValue } from "#/journeys/AnswerValue.enum.js";
-import { Answerkey } from "#/journeys/create-application/data/answers.zod.js";
+import { AnswerKey } from "#/journeys/AnswerKey.enum.js";
 import {
   differentMatter,
   legalAidBeforeTitle,
@@ -17,7 +16,7 @@ import { t } from "#/lib/i18n.js";
 
 export const legalAidBeforeRadioInput = (): GovUKRadioInput =>
   GovUKRadioInput({
-    code: Answerkey.enum.legalAidBefore,
+    code: AnswerKey.legalAidBefore,
     fieldset: {
       legend: {
         classes: "govuk-fieldset__legend--l",
@@ -28,15 +27,15 @@ export const legalAidBeforeRadioInput = (): GovUKRadioInput =>
     items: [
       {
         text: sameMatter,
-        value: AnswerValue.YES_SAME_MATTER,
+        value: "yesSameMatter",
       },
       {
         text: differentMatter,
-        value: AnswerValue.YES_DIFFERENT_MATTER,
+        value: "yesDifferentMatter",
       },
       {
         text: t("common.no"),
-        value: AnswerValue.NO,
+        value: "no",
       },
     ],
     validWhen: [
