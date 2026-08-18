@@ -45,3 +45,4 @@ export const Answers = zod
 
 export type Answers = zod.input<typeof Answers>;
 export type AnswersOutput = zod.output<typeof Answers>;
+export const Answerkey = Answers.keyof();
