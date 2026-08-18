@@ -7,7 +7,7 @@ import {
   type SubmitHook,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
-import { AnswerValue } from "#/journeys/AnswerValue.enum.js";
+import { AnswerKey } from "#/journeys/AnswerKey.enum.js";
 import { CreateApplicationEffects } from "#/journeys/create-application/create-application.effects.js";
 import {
   declarationPath,
@@ -15,7 +15,6 @@ import {
   ecfQuestion,
   ecfRequiredValidationMessage,
 } from "#/journeys/create-application/steps/ecf/ecf.formatters.js";
-import { CreateApplicationPath } from "#/journeys/JourneyPath.enum.js";
 import {
   backLink,
   caption,
@@ -31,14 +30,15 @@ export const ecfStep = (journeyCode: string): ReturnType<typeof step> =>
       backLink(declarationPath),
       caption(ecfCaptionTitle),
       yesOrNoRadioInput(
-        StepCode.ECF,
+        AnswerKey.ECF,
         ecfQuestion,
         ecfRequiredValidationMessage,
       ),
       continueButton(),
     ],
+    code: StepCode.ECF,
     onSubmission: [onSubmission(journeyCode)],
-    path: CreateApplicationPath.ECF,
+    path: "/ecf",
     reachability: { entryWhen: true },
     title: ecfQuestion,
   });
@@ -58,7 +58,7 @@ const onSubmission = (journeyCode: string): SubmitHook =>
 
 const redirectToECFDropout = redirect({
   goto: StepCode.ECF_DROPOUT,
-  when: Answer(StepCode.ECF).match(Condition.Equals(AnswerValue.YES)),
+  when: Answer(AnswerKey.ECF).match(Condition.Equals("yes")),
 });
 
 const redirectToLegalAidBefore = redirect({ goto: StepCode.LEGAL_AID_BEFORE });
