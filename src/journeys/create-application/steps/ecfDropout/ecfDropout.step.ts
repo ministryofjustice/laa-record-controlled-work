@@ -16,7 +16,6 @@ import {
   ecfPath,
   returnToCaseList,
 } from "#/journeys/create-application/steps/ecfDropout/ecfDropout.formatters.js";
-import { CreateApplicationPath } from "#/journeys/JourneyPath.enum.js";
 import { backLink, button, heading } from "#/journeys/shared.blocks.js";
 
 export const ineligibleStep = (journeyCode: string): ReturnType<typeof step> =>
@@ -29,7 +28,7 @@ export const ineligibleStep = (journeyCode: string): ReturnType<typeof step> =>
       button(returnToCaseList),
     ],
     onSubmission: [onSubmission(journeyCode)],
-    path: CreateApplicationPath.ECF_DROPOUT,
+    path: "/ecf-dropout",
     title: ecfDropoutTitle,
   });
 
@@ -37,7 +36,7 @@ const onSubmission = (journeyCode: string): SubmitHook =>
   submit({
     onValid: {
       effects: [CreateApplicationEffects.clearAllDraftAnswers(journeyCode)],
-      next: [redirect({ goto: CreateApplicationPath.ROOT })],
+      next: [redirect({ goto: "/" })],
     },
     validate: true,
   });

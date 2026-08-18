@@ -1,11 +1,7 @@
-import {
-  CreateApplicationPath,
-  JourneyPath,
-} from "#/journeys/JourneyPath.enum.js";
+import { JourneyPath } from "#/journeys/JourneyPath.enum.js";
 import { t } from "#/lib/i18n.js";
 
-export const ecfPath =
-  JourneyPath.CREATE_APPLICATION + CreateApplicationPath.ECF;
+export const ecfPath = `${JourneyPath.CREATE_APPLICATION}/ecf`;
 
 export const ecfDropoutHeading = t(
   "journeys.createApplication.ecfDropout.heading",
