@@ -1,14 +1,18 @@
 import {
+  Format,
+  Params,
   redirect,
   step,
   submit,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
 import { submitButton } from "#/journeys/evidence/common.blocks.js";
+import { evidenceEffects } from "#/journeys/evidence/evidence.effects.js";
 import {
   heading,
   summaryList,
 } from "#/journeys/evidence/steps/check-answers/check-answers.blocks.js";
+import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
 import { t } from "#/lib/i18n.js";
 
 export const checkAnswersStep = (): ReturnType<typeof step> =>
@@ -18,9 +22,13 @@ export const checkAnswersStep = (): ReturnType<typeof step> =>
     onSubmission: [
       submit({
         onAlways: {
+          effects: [evidenceEffects.updateEvidence("evidence")],
           next: [
             redirect({
-              goto: "/task-list", // TODO: Update to go to specific task list for case
+              goto: Format(
+                "/cases/%1/task-list",
+                Params(PARAMS_KEYS.applicationID),
+              ),
             }),
           ],
         },

@@ -1,11 +1,10 @@
 import { expect } from "chai";
 import { describe, it } from "mocha";
 import sinon from "sinon";
-import { createForgeTestClientForCaseList } from "../../../../integration/utils/helpers.js";
-import {
-  TestRenderResult,
-  TestResult,
-} from "@ministryofjustice/hmpps-forge/core/testing";
+import { createForgeTestClient } from "../../../../integration/utils/helpers.js";
+import { type ForgeTestClient, TestRenderResult, TestResult } from "@ministryofjustice/hmpps-forge/core/testing";
+import { yourCasesEffectsRegistry } from "#/journeys/your-cases/your-cases.effects.js";
+import { yourCasesJourney } from "#/journeys/your-cases/your-cases.journey.js";
 import { ApiResponseError, ApiValidationError } from "#/api/clients/api.errors.js";
 import { logger } from "#/logger.js";
 import { getGetApplicationsResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
@@ -20,7 +19,7 @@ const session = {
 
 describe("LoadYourCaseList", () => {
   describe("when getApplications succeeds", () => {
-    let client: ReturnType<typeof createForgeTestClientForCaseList>;
+    let client: ForgeTestClient;
     let getApplicationsStub: sinon.SinonStub;
 
     before(() => {
@@ -28,9 +27,11 @@ describe("LoadYourCaseList", () => {
         .stub()
         .resolves({ status: 200, data: mockData });
 
-      client = createForgeTestClientForCaseList({
-        getApplications: getApplicationsStub,
-      });
+      client = createForgeTestClient(
+        yourCasesJourney,
+        yourCasesEffectsRegistry,
+        { dependencies: { getApplications: getApplicationsStub } },
+      );
     });
 
     beforeEach(() => getApplicationsStub.resetHistory());
@@ -85,9 +86,11 @@ describe("LoadYourCaseList", () => {
     async function getErrorFromYourCases(
       stub: sinon.SinonStub,
     ): Promise<TestResult> {
-      const client = createForgeTestClientForCaseList({
-        getApplications: stub,
-      });
+      const client = createForgeTestClient(
+        yourCasesJourney,
+        yourCasesEffectsRegistry,
+        { dependencies: { getApplications: stub } },
+      );
       return await client.get("/cases", { session });
     }
 

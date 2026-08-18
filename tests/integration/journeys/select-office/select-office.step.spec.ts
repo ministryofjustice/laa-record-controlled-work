@@ -7,7 +7,10 @@ import { faker } from "@faker-js/faker";
 import sinon from "sinon";
 
 import { getGetAllProviderOfficesResponseMock } from "#orval/mocks/pda/fakers/provider-firms-endpoints/provider-firms-endpoints.faker.gen.js";
-import { createForgeTestClientForSelectOffice } from "../../utils/helpers.js";
+import { type ForgeTestClient } from "@ministryofjustice/hmpps-forge/core/testing";
+import { createForgeTestClient } from "../../utils/helpers.js";
+import { selectOfficeEffectsRegistry } from "#/journeys/select-office/select-office.effects.js";
+import { selectOfficeJourney } from "#/journeys/select-office/select-office.journey.js";
 
 faker.seed(12345);
 
@@ -28,16 +31,18 @@ const session = {
 
 describe("Select Office step", () => {
   let getAllProviderOfficesStub: sinon.SinonStub;
-  let client: ReturnType<typeof createForgeTestClientForSelectOffice>;
+  let client: ForgeTestClient;
 
   before(() => {
     getAllProviderOfficesStub = sinon
       .stub()
       .resolves({ status: 200, data: mockResponse });
 
-    client = createForgeTestClientForSelectOffice({
-      getAllProviderOffices: getAllProviderOfficesStub,
-    });
+    client = createForgeTestClient(
+      selectOfficeJourney,
+      selectOfficeEffectsRegistry,
+      { dependencies: { getAllProviderOffices: getAllProviderOfficesStub } },
+    );
   });
 
   after(() => {

@@ -19,6 +19,7 @@ import {
   getApplication,
   getApplications,
   updateApplicationStatus,
+  updateApplicationEvidence,
 } from "#/api/clients/rcw/schema/applications/applications.gen.js";
 import eligibilityRouter from "#/api/eligibility/eligibility.routes.js";
 import authRouter from "#/auth/auth.routes.js";
@@ -27,7 +28,7 @@ import { autocomplete } from "#/journeys/components/autocomplete/autocomplete.co
 import createApplicationJourney from "#/journeys/create-application/create-application.index.js";
 import declaration from "#/journeys/declaration/declaration.index.js";
 import { editApplicationPackage } from "#/journeys/edit-application/editApplication.package.js";
-import evidence from "#/journeys/evidence/evidence.index.js";
+import { evidencePackage } from "#/journeys/evidence/evidence.package.js";
 import { selectOfficePackage } from "#/journeys/select-office/select-office.journey.js";
 import { yourCasesPackage } from "#/journeys/your-cases/your-cases.journey.js";
 import * as redis from "#/lib/redis.js";
@@ -117,9 +118,8 @@ const createApp = async (
       updateApplicationStatus,
     })
     .registerPackage(createApplicationJourney, { createApplication })
-    .registerPackage(evidence)
-    .registerPackage(declaration);
-
+    .registerPackage(declaration)
+    .registerPackage(evidencePackage, { updateApplicationEvidence });
   // Set up rate limiting
   setupRateLimit(app, config);
 

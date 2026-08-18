@@ -6,12 +6,16 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
 import { createForgeTestClient } from "../../utils/helpers.js";
+import { evidenceEffects } from "#/journeys/evidence/evidence.effects.js";
+import { evidencePackage } from "#/journeys/evidence/evidence.package.js";
+import { createApplicationJourney } from "#/journeys/create-application/create-application.journey.js";
+import { evidenceJourney } from "#/journeys/evidence/evidence.journey.js";
 
 describe("Evidence of income step", () => {
+  const applicationId = "123e4567-e89b-12d3-a456-426614174000";
   const client = createForgeTestClient(
-    "Evidence",
-    "/cases/evidence",
-    [evidenceOfIncome("testJourney")],
+    evidenceJourney,
+    evidencePackage.functions,
   );
 
   describe("GET /cases/evidence/evidence-of-income", () => {
@@ -19,7 +23,7 @@ describe("Evidence of income step", () => {
     let checkboxInputs: RenderBlock[];
 
     before(async () => {
-      const result = await client.get("/cases/evidence/evidence-of-income");
+      const result = await client.get(`/cases/${applicationId}/evidence/evidence-of-income`);
       expect(result.type).to.equal("render");
       renderResult = result as TestRenderResult;
       checkboxInputs = renderResult.getBlocksByVariant("govukCheckboxInput");
@@ -74,14 +78,14 @@ describe("Evidence of income step", () => {
 
   describe("POST /cases/evidence/evidence-of-income", () => {
     it("should show validation error if no option is selected", async () => {
-      const result = await client.post("/cases/evidence/evidence-of-income");
+      const result = await client.post(`/cases/${applicationId}/evidence/evidence-of-income`);
       expect(result.type).to.equal("render");
       const renderResult = result as TestRenderResult;
       expect(renderResult.context.showValidationFailures).to.equal(true);
     });
 
     it("should redirect to evidence of expenditure and capital step if at least one option is selected", async () => {
-      const result = await client.post("/cases/evidence/evidence-of-income", {
+      const result = await client.post(`/cases/${applicationId}/evidence/evidence-of-income`, {
         body: {
           employedEvidence: ["wageSlips"],
         },
@@ -89,7 +93,7 @@ describe("Evidence of income step", () => {
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
       expect(redirectResult.url).to.equal(
-        "/cases/evidence/evidence-of-expenditure",
+        `/cases/${applicationId}/evidence/evidence-of-expenditure`,
       );
     });
   });

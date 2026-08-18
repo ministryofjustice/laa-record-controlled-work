@@ -3,15 +3,19 @@ import {
   TestRedirectResult,
 } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
+import {
+  CreateApplicationEffects,
+  createApplicationEffectsRegistry,
+} from "#/journeys/create-application/create-application.effects.js";
 import { niNumberStep } from "#/journeys/create-application/steps/ni-number.step.js";
 import { createForgeTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
+import { createApplicationJourney } from "#/journeys/create-application/create-application.journey.js";
 
 describe("NI number step", () => {
   const client = createForgeTestClient(
-    "Record new case",
-    "/cases/new/",
-    [niNumberStep("testJourney")],
+    createApplicationJourney,
+    createApplicationEffectsRegistry,
   );
 
   describe("GET /cases/new/ni-number", () => {

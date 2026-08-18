@@ -6,12 +6,16 @@ import { expect } from "chai";
 import { doYouHaveEvidence } from "#/journeys/evidence/steps/do-you-have-evidence/do-you-have-evidence.step.js";
 import { createForgeTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
+import { evidenceEffects } from "#/journeys/evidence/evidence.effects.js";
+import { evidencePackage } from "#/journeys/evidence/evidence.package.js";
+import { createApplicationJourney } from "#/journeys/create-application/create-application.journey.js";
+import { evidenceJourney } from "#/journeys/evidence/evidence.journey.js";
 
 describe("Do you have evidence step", () => {
+  const applicationId = "123e4567-e89b-12d3-a456-426614174000";
   const client = createForgeTestClient(
-    "Evidence",
-    "/cases/evidence",
-    [doYouHaveEvidence("testJourney")],
+    evidenceJourney,
+    evidencePackage.functions,
   );
 
   describe("GET /cases/evidence/have-evidence", () => {
@@ -19,7 +23,7 @@ describe("Do you have evidence step", () => {
     let radioInput: RenderBlock;
 
     before(async () => {
-      const result = await client.get("/cases/evidence/have-evidence");
+      const result = await client.get(`/cases/${applicationId}/evidence/have-evidence`);
       expect(result.type).to.equal("render");
       renderResult = result as TestRenderResult;
       [radioInput] = renderResult.getBlocksByVariant("govukRadioInput");
@@ -43,7 +47,7 @@ describe("Do you have evidence step", () => {
     const fieldCode = "doYouHaveEvidence";
     
     it("should show validation error if no option is selected", async () => {
-      const result = await client.post("/cases/evidence/have-evidence");
+      const result = await client.post(`/cases/${applicationId}/evidence/have-evidence`);
       expect(result.type).to.equal("render");
       const renderResult = result as TestRenderResult;
       expect(renderResult.context.showValidationFailures).to.equal(true);
@@ -53,18 +57,18 @@ describe("Do you have evidence step", () => {
     });
 
     it("should redirect to reason for no evidence step if no is selected", async () => {
-      const result = await client.post("/cases/evidence/have-evidence", {
+      const result = await client.post(`/cases/${applicationId}/evidence/have-evidence`, {
         body: {
           doYouHaveEvidence: "no",
         },
       });
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
-      expect(redirectResult.url).to.equal("/cases/evidence/reason-for-no-evidence");
+      expect(redirectResult.url).to.equal(`/cases/${applicationId}/evidence/reason-for-no-evidence`);
     });
 
     it("should redirect to evidence of income step if yes is selected", async () => {
-      const result = await client.post("/cases/evidence/have-evidence", {
+      const result = await client.post(`/cases/${applicationId}/evidence/have-evidence`, {
         body: {
           doYouHaveEvidence: "yes",
         },
@@ -72,7 +76,7 @@ describe("Do you have evidence step", () => {
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
       expect(redirectResult.url).to.equal(
-        "/cases/evidence/evidence-of-income",
+        `/cases/${applicationId}/evidence/evidence-of-income`,
       );
     });
   });

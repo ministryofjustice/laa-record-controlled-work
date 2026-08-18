@@ -6,12 +6,16 @@ import { expect } from "chai";
 import { reasonForNoEvidence } from "#/journeys/evidence/steps/reason-for-no-evidence/reason-for-no-evidence.step.js";
 import { createForgeTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
+import { evidenceEffects } from "#/journeys/evidence/evidence.effects.js";
+import { evidencePackage } from "#/journeys/evidence/evidence.package.js";
+import { createApplicationJourney } from "#/journeys/create-application/create-application.journey.js";
+import { evidenceJourney } from "#/journeys/evidence/evidence.journey.js";
 
 describe("Reason for no evidence step", () => {
+  const applicationId = "123e4567-e89b-12d3-a456-426614174000";
   const client = createForgeTestClient(
-    "Evidence",
-    "/cases/evidence",
-    [reasonForNoEvidence("testJourney")],
+    evidenceJourney,
+    evidencePackage.functions,
   );
 
   describe("GET /cases/evidence/reason-for-no-evidence", () => {
@@ -20,7 +24,7 @@ describe("Reason for no evidence step", () => {
     let textareaInput: RenderBlock;
 
     before(async () => {
-      const result = await client.get("/cases/evidence/reason-for-no-evidence");
+      const result = await client.get(`/cases/${applicationId}/evidence/reason-for-no-evidence`);
       expect(result.type).to.equal("render");
       renderResult = result as TestRenderResult;
       [radioInput] = renderResult.getBlocksByVariant("govukRadioInput");
@@ -59,7 +63,7 @@ describe("Reason for no evidence step", () => {
 
     it("should show validation error if no option is selected", async () => {
       const result = await client.post(
-        "/cases/evidence/reason-for-no-evidence",
+        `/cases/${applicationId}/evidence/reason-for-no-evidence`,
         {
           body: {
             moreDetailsForNoEvidence: "a reason",
@@ -76,7 +80,7 @@ describe("Reason for no evidence step", () => {
 
     it("should show validation error if no reason is given", async () => {
       const result = await client.post(
-        "/cases/evidence/reason-for-no-evidence",
+        `/cases/${applicationId}/evidence/reason-for-no-evidence`,
         {
           body: {
             reasonForNoEvidence: "notPossibleBeforeStart",
@@ -93,7 +97,7 @@ describe("Reason for no evidence step", () => {
 
     it("should redirect to check answers step if not possible before start is selected", async () => {
       const result = await client.post(
-        "/cases/evidence/reason-for-no-evidence",
+        `/cases/${applicationId}/evidence/reason-for-no-evidence`,
         {
           body: {
             reasonForNoEvidence: "notPossibleBeforeStart",
@@ -103,12 +107,12 @@ describe("Reason for no evidence step", () => {
       );
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
-      expect(redirectResult.url).to.equal("/cases/evidence/check-answers");
+      expect(redirectResult.url).to.equal(`/cases/${applicationId}/evidence/check-answers`);
     });
 
     it("should redirect to check answers step if personal circumstances is selected", async () => {
       const result = await client.post(
-        "/cases/evidence/reason-for-no-evidence",
+        `/cases/${applicationId}/evidence/reason-for-no-evidence`,
         {
           body: {
             reasonForNoEvidence: "personalCircumstances",
@@ -118,12 +122,12 @@ describe("Reason for no evidence step", () => {
       );
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
-      expect(redirectResult.url).to.equal("/cases/evidence/check-answers");
+      expect(redirectResult.url).to.equal(`/cases/${applicationId}/evidence/check-answers`);
     });
 
     it("should redirect to check answers step if advice over phone is selected", async () => {
       const result = await client.post(
-        "/cases/evidence/reason-for-no-evidence",
+        `/cases/${applicationId}/evidence/reason-for-no-evidence`,
         {
           body: {
             reasonForNoEvidence: "adviceOverPhone",
@@ -133,7 +137,7 @@ describe("Reason for no evidence step", () => {
       );
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
-      expect(redirectResult.url).to.equal("/cases/evidence/check-answers");
+      expect(redirectResult.url).to.equal(`/cases/${applicationId}/evidence/check-answers`);
     });
   });
 });

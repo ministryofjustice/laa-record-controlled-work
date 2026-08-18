@@ -7,15 +7,16 @@ import { expect } from "chai";
 import { confirmStep } from "#/journeys/declaration/steps/confirmation/confirmation.step.js";
 import { createForgeTestClient } from "../../utils/helpers.js";
 import { TemplateWrapper } from "@ministryofjustice/hmpps-forge/core/components";
+import { DeclarationJourney } from "#/journeys/declaration/declaration.journey.js";
+import { JourneyEffectsImplementations } from "#/journeys/effects.js";
 
 describe("Declaration step", () => {
   const uuid = "123e4567-e89b-12d3-a456-426614174000";
 
-  const client = createForgeTestClient(
-    "Declaration",
-    "/cases/:applicationID/declaration/",
-    [confirmStep()],
-  );
+    const client = createForgeTestClient(
+      DeclarationJourney,
+      JourneyEffectsImplementations,
+    );
 
   describe(`GET /cases/${uuid}/declaration/confirm`, () => {
     let renderResult: TestRenderResult;

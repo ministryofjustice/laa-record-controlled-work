@@ -6,8 +6,11 @@ import { expect } from "chai";
 import sinon from "sinon";
 
 import { getGetApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
-import { createForgeTestClientForEditApplication } from "../../utils/helpers.js";
+import { createForgeTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
+import { editApplicationEffectsRegistry } from "#/journeys/edit-application/editApplication.effects.js";
+import { editApplicationJourney } from "#/journeys/edit-application/editApplication.journey.js";
+import { taskListStep } from "#/journeys/edit-application/steps/task-list/task-list.step.js";
 
 type RenderedTaskListItem = {
   title: { text: string };
@@ -26,11 +29,18 @@ describe("Task list step", () => {
   const getApplicationStub = sinon
     .stub()
     .resolves({ status: 200, data: mockData });
+  const updateApplicationStatusStub = sinon.stub().resolves({ status: 204 });
 
-  const client = createForgeTestClientForEditApplication({
-    getApplication: getApplicationStub,
-    updateApplicationStatus: sinon.stub().resolves({ status: 204 }),
-  });
+  const client = createForgeTestClient(
+    editApplicationJourney,
+    editApplicationEffectsRegistry,
+    {
+      dependencies: {
+        getApplication: getApplicationStub,
+        updateApplicationStatus: updateApplicationStatusStub,
+      },
+    },
+  );
   const session = {};
 
   beforeEach(() => {
@@ -106,9 +116,7 @@ describe("Task list step", () => {
       expect(indicator).to.not.include(
         "Your client qualifies financially for civil legal aid",
       );
-      expect(indicator).to.include(
-        `href="/cases/${uuid}/eligibility/"`,
-      );
+      expect(indicator).to.include(`href="/cases/${uuid}/eligibility/"`);
       expect(indicator).to.include("View result");
     });
 
@@ -161,9 +169,7 @@ describe("Task list step", () => {
       expect(indicator).to.include(
         "Your client qualifies financially for civil legal aid based on the information you entered.",
       );
-      expect(indicator).to.include(
-        `href="/cases/${uuid}/eligibility/"`,
-      );
+      expect(indicator).to.include(`href="/cases/${uuid}/eligibility/"`);
       expect(indicator).to.include("View result");
     });
 
@@ -262,10 +268,15 @@ describe("Task list step", () => {
     });
 
     it("renders the save and return button", () => {
-      const slots = buttonGroupBlock.properties.slots as Record<string, RenderBlock[]>;
+      const slots = buttonGroupBlock.properties.slots as Record<
+        string,
+        RenderBlock[]
+      >;
       const saveAndReturnBtn = slots.child1[0];
       expect(saveAndReturnBtn.properties.value).to.equal("return");
-      expect(saveAndReturnBtn.properties.text).to.equal("Save and return later");
+      expect(saveAndReturnBtn.properties.text).to.equal(
+        "Save and return later",
+      );
     });
 
     it("hides the Record Controlled Work button when readyForSubmission is false", async () => {
@@ -279,8 +290,12 @@ describe("Task list step", () => {
       });
       expect(result.type).to.equal("render");
       const incompleteRender = result as TestRenderResult;
-      const [incompleteButtonGroup] = incompleteRender.getBlocksByVariant("templateWrapper");
-      const incompleteSlots = incompleteButtonGroup.properties.slots as Record<string, RenderBlock[]>;
+      const [incompleteButtonGroup] =
+        incompleteRender.getBlocksByVariant("templateWrapper");
+      const incompleteSlots = incompleteButtonGroup.properties.slots as Record<
+        string,
+        RenderBlock[]
+      >;
       const submitBtn = incompleteSlots.child0[0];
       expect(submitBtn.properties.classes).to.equal("govuk-!-display-none");
     });
@@ -296,8 +311,12 @@ describe("Task list step", () => {
       });
       expect(result.type).to.equal("render");
       const readyRender = result as TestRenderResult;
-      const [readyButtonGroup] = readyRender.getBlocksByVariant("templateWrapper");
-      const readySlots = readyButtonGroup.properties.slots as Record<string, RenderBlock[]>;
+      const [readyButtonGroup] =
+        readyRender.getBlocksByVariant("templateWrapper");
+      const readySlots = readyButtonGroup.properties.slots as Record<
+        string,
+        RenderBlock[]
+      >;
       const submitBtn = readySlots.child0[0];
       expect(submitBtn.properties.value).to.equal("submit");
       expect(submitBtn.properties.classes).to.equal("");

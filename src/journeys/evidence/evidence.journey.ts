@@ -1,6 +1,6 @@
 import { access, journey } from "@ministryofjustice/hmpps-forge/core/authoring";
 
-import { JourneyEffects } from "#/journeys/effects.js";
+import { evidenceEffects } from "#/journeys/evidence/evidence.effects.js";
 import { checkAnswersStep } from "#/journeys/evidence/steps/check-answers/check-answers.step.js";
 import { doYouHaveEvidence } from "#/journeys/evidence/steps/do-you-have-evidence/do-you-have-evidence.step.js";
 import { evidenceOfCapital } from "#/journeys/evidence/steps/evidence-of-capital/evidence-of-capital.step.js";
@@ -10,14 +10,14 @@ import { reasonForNoEvidence } from "#/journeys/evidence/steps/reason-for-no-evi
 
 const journeyCode = "evidence";
 
-export const EvidenceJourney = journey({
-  code: "evidence",
+export const evidenceJourney = journey({
+  code: journeyCode,
   onAccess: [
     access({
-      effects: [JourneyEffects.LoadDraftAnswers(journeyCode)],
+      effects: [evidenceEffects.loadDraftAnswers(journeyCode)],
     }),
   ],
-  path: "/cases/evidence",
+  path: "/cases/:applicationID/evidence",
   reachability: { disableReachabilityChecks: false },
   steps: [
     doYouHaveEvidence(journeyCode),

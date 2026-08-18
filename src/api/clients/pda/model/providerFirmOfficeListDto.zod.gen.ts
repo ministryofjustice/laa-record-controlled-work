@@ -4,7 +4,7 @@
  * Provider Details API r1
  * OpenAPI spec version: 0.27.2
  */
-import { z as zod } from "zod";
+import * as zod from "zod";
 
 export const ProviderFirmOfficeListDto = zod.object({
   firm: zod
