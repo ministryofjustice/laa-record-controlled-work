@@ -71,7 +71,7 @@ function onSubmission(journeyCode: string): SubmitHook {
 
 const redirectToECFDropout = redirect({
   goto: StepCode.ECF_DROPOUT,
-  when: Answer(AnswerKey.ecf).match(Condition.Equals("yes")),
+  when: Answer(AnswerKey.ECF).match(Condition.Equals("yes")),
 });
 
 const redirectToLegalAidBefore = redirect({ goto: StepCode.LEGAL_AID_BEFORE });
