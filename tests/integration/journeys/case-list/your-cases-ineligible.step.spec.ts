@@ -1,6 +1,9 @@
 import { TestRenderResult } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
-import { createForgeTestClientForCaseList } from "../../utils/helpers.js";
+import { type ForgeTestClient } from "@ministryofjustice/hmpps-forge/core/testing";
+import { createForgeTestClient } from "../../utils/helpers.js";
+import { yourCasesEffectsRegistry } from "#/journeys/your-cases/your-cases.effects.js";
+import { yourCasesJourney } from "#/journeys/your-cases/your-cases.journey.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import sinon from "sinon";
 import { getGetApplicationsResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
@@ -15,16 +18,18 @@ const session = {
 
 describe("Your Cases Ineligible step", () => {
   let getApplicationsStub: sinon.SinonStub;
-  let client: ReturnType<typeof createForgeTestClientForCaseList>;
+  let client: ForgeTestClient;
   const mockData = getGetApplicationsResponseMock();
 
   before(() => {
     getApplicationsStub = sinon
       .stub()
       .resolves({ status: 200, data: mockData });
-    client = createForgeTestClientForCaseList({
-      getApplications: getApplicationsStub,
-    });
+    client = createForgeTestClient(
+      yourCasesJourney,
+      yourCasesEffectsRegistry,
+      { dependencies: { getApplications: getApplicationsStub } },
+    );
   });
 
   after(() => {

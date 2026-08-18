@@ -3,19 +3,32 @@ import {
   TestRedirectResult,
 } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
-import { createForgeTestClientForEvidence } from "../../utils/helpers.js";
+import sinon from "sinon";
+import { createForgeTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
+import { evidencePackage } from "#/journeys/evidence/evidence.package.js";
 import { checkAnswersStep } from "#/journeys/evidence/steps/check-answers/check-answers.step.js";
+import { evidenceEffects } from "#/journeys/evidence/evidence.effects.js";
+import { createApplicationJourney } from "#/journeys/create-application/create-application.journey.js";
+import { evidenceJourney } from "#/journeys/evidence/evidence.journey.js";
 
 describe("Check answers step", () => {
   const applicationId = "123e4567-e89b-12d3-a456-426614174000";
-  const client = createForgeTestClientForEvidence(
-    "Evidence",
-    [checkAnswersStep()],
+  const updateApplicationEvidenceStub = sinon.stub().resolves({
+    status: 204,
+  });
+
+  const client = createForgeTestClient(
+    evidenceJourney,
+    evidencePackage.functions,
+    {
+      dependencies: { updateApplicationEvidence: updateApplicationEvidenceStub },
+    },
   );
+
   const session = {
     journeyDrafts: {
-      testJourney: {
+      evidence: {
         doYouHaveEvidence: "yes",
         employedEvidence: ["wageSlips"],
         selfEmployedEvidence: [],
@@ -37,9 +50,12 @@ describe("Check answers step", () => {
     let submitButton: RenderBlock;
 
     before(async () => {
-      const result = await client.get(`/cases/${applicationId}/evidence/check-answers`, {
-        session,
-      });
+      const result = await client.get(
+        `/cases/${applicationId}/evidence/check-answers`,
+        {
+          session,
+        },
+      );
       expect(result.type).to.equal("render");
       renderResult = result as TestRenderResult;
       [summaryList] = renderResult.getBlocksByVariant("govukSummaryList");
@@ -65,9 +81,7 @@ describe("Check answers step", () => {
       const rows = summaryList.properties.rows as Array<{
         key: { text: string };
       }>;
-      const evidenceRow = rows.find(
-        (row) => row.key.text === "Income",
-      );
+      const evidenceRow = rows.find((row) => row.key.text === "Income");
 
       expect(evidenceRow).to.not.be.undefined;
     });
@@ -91,9 +105,12 @@ describe("Check answers step", () => {
 
   describe("POST /cases/evidence/check-answers", () => {
     it("redirects to the confirmation step", async () => {
-      const result = await client.post(`/cases/${applicationId}/evidence/check-answers`, {
-        session,
-      });
+      const result = await client.post(
+        `/cases/${applicationId}/evidence/check-answers`,
+        {
+          session,
+        },
+      );
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
       expect(redirectResult.url).to.equal(`/cases/${applicationId}/task-list`);

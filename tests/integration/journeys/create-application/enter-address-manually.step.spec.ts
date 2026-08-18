@@ -3,14 +3,20 @@ import {
   TestRedirectResult,
 } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
+import {
+  CreateApplicationEffects,
+  createApplicationEffectsRegistry,
+} from "#/journeys/create-application/create-application.effects.js";
 import { createForgeTestClient } from "../../utils/helpers.js";
-import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import { enterAddressManuallyStep } from "#/journeys/create-application/steps/enter-address-manually.step.js";
+import { createApplicationJourney } from "#/journeys/create-application/create-application.journey.js";
+import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 
 describe("Enter address manually step", () => {
-  const client = createForgeTestClient("Record new case", "/cases/new/", [
-    enterAddressManuallyStep("testJourney"),
-  ]);
+  const client = createForgeTestClient(
+    createApplicationJourney,
+    createApplicationEffectsRegistry,
+  );
 
   describe("GET /cases/new/enter-address-manually", () => {
     let renderResult: TestRenderResult;

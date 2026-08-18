@@ -3,11 +3,16 @@ import {
   TestRedirectResult,
 } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
+import {
+  CreateApplicationEffects,
+  createApplicationEffectsRegistry,
+} from "#/journeys/create-application/create-application.effects.js";
 import { createForgeTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import { checkAnswersStep } from "#/journeys/create-application/steps/check-answers.step.js";
 import sinon from "sinon";
 import { getCreateApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
+import { createApplicationJourney } from "#/journeys/create-application/create-application.journey.js";
 
 describe("Check answers step", () => {
   const uuid = "123e4567-e89b-12d3-a456-426614174000";
@@ -20,14 +25,16 @@ describe("Check answers step", () => {
     });
 
   const client = createForgeTestClient(
-    "Record new case",
-    "/cases/new/",
-    [checkAnswersStep("testJourney")],
-    { createApplication: createApplicationStub },
+    createApplicationJourney,
+    createApplicationEffectsRegistry,
+    {
+      dependencies: { createApplication: createApplicationStub },
+    },
   );
+  
   const session = {
     journeyDrafts: {
-      testJourney: {
+      createApplication: {
         ecf: "no",
         legalAidBefore: "yesSameMatter",
         legalAidLast6Months: "yes",

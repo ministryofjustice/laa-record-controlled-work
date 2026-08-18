@@ -4,14 +4,18 @@ import {
   TestRenderResult,
 } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
-import { createForgeTestClientForEvidence } from "../../utils/helpers.js";
+import { createForgeTestClient } from "../../utils/helpers.js";
 import { evidenceOfExpenditure } from "#/journeys/evidence/steps/evidence-of-expenditure/evidence-of-expenditure.step.js";
+import { evidenceEffects } from "#/journeys/evidence/evidence.effects.js";
+import { evidencePackage } from "#/journeys/evidence/evidence.package.js";
+import { createApplicationJourney } from "#/journeys/create-application/create-application.journey.js";
+import { evidenceJourney } from "#/journeys/evidence/evidence.journey.js";
 
 describe("Evidence of expenditure step", () => {
   const applicationId = "123e4567-e89b-12d3-a456-426614174000";
-  const client = createForgeTestClientForEvidence(
-    "Evidence",
-    [evidenceOfExpenditure("testJourney")],
+  const client = createForgeTestClient(
+    evidenceJourney,
+    evidencePackage.functions,
   );
 
   describe("GET /cases/evidence/evidence-of-expenditure", () => {

@@ -3,15 +3,19 @@ import {
   TestRedirectResult,
 } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
+import {
+  CreateApplicationEffects,
+  createApplicationEffectsRegistry,
+} from "#/journeys/create-application/create-application.effects.js";
 import { legalAidLast6MonthsStep } from "#/journeys/create-application/steps/legal-aid-last-6-months.step.js";
 import { createForgeTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
+import { createApplicationJourney } from "#/journeys/create-application/create-application.journey.js";
 
 describe("Legal aid before 6 months step", () => {
   const client = createForgeTestClient(
-    "Record new case",
-    "/cases/new/",
-    [legalAidLast6MonthsStep("testJourney")],
+    createApplicationJourney,
+    createApplicationEffectsRegistry,
   );
 
   describe("GET /cases/new/legal-aid-last-6-months", () => {
