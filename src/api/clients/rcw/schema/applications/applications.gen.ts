@@ -4,35 +4,35 @@
  * Record Controlled Work API
  * OpenAPI spec version: 1.0.0
  */
-import type { Application } from "#/api/clients/rcw/model/application.zod";
+import type { Application } from "#/api/clients/rcw/model/application.zod.gen.js";
 
-import type { Applications } from "#/api/clients/rcw/model/applications.zod";
+import type { Applications } from "#/api/clients/rcw/model/applications.zod.gen.js";
 
-import type { BadRequestResponse } from "#/api/clients/rcw/model/badRequestResponse.zod";
+import type { BadRequestResponse } from "#/api/clients/rcw/model/badRequestResponse.zod.gen.js";
 
-import type { ConflictResponse } from "#/api/clients/rcw/model/conflictResponse.zod";
+import type { ConflictResponse } from "#/api/clients/rcw/model/conflictResponse.zod.gen.js";
 
-import type { CreateApplicationRequestBody } from "#/api/clients/rcw/model/createApplicationRequestBody.zod";
+import type { CreateApplicationRequestBody } from "#/api/clients/rcw/model/createApplicationRequestBody.zod.gen.js";
 
-import type { CreateApplicationResponseBody } from "#/api/clients/rcw/model/createApplicationResponseBody.zod";
+import type { CreateApplicationResponseBody } from "#/api/clients/rcw/model/createApplicationResponseBody.zod.gen.js";
 
-import type { ForbiddenResponse } from "#/api/clients/rcw/model/forbiddenResponse.zod";
+import type { ForbiddenResponse } from "#/api/clients/rcw/model/forbiddenResponse.zod.gen.js";
 
-import type { GetApplicationsParams } from "#/api/clients/rcw/model/getApplicationsParams.zod";
+import type { GetApplicationsParams } from "#/api/clients/rcw/model/getApplicationsParams.zod.gen.js";
 
-import type { InternalServerErrorResponse } from "#/api/clients/rcw/model/internalServerErrorResponse.zod";
+import type { InternalServerErrorResponse } from "#/api/clients/rcw/model/internalServerErrorResponse.zod.gen.js";
 
-import type { NotFoundResponse } from "#/api/clients/rcw/model/notFoundResponse.zod";
+import type { NotFoundResponse } from "#/api/clients/rcw/model/notFoundResponse.zod.gen.js";
 
-import type { UnauthorizedResponse } from "#/api/clients/rcw/model/unauthorizedResponse.zod";
+import type { UnauthorizedResponse } from "#/api/clients/rcw/model/unauthorizedResponse.zod.gen.js";
 
-import type { UpdateApplicationStatusRequestBody } from "#/api/clients/rcw/model/updateApplicationStatusRequestBody.zod";
+import type { UpdateApplicationStatusRequestBody } from "#/api/clients/rcw/model/updateApplicationStatusRequestBody.zod.gen.js";
 
-import type { UpdateDeclarationRequestBody } from "#/api/clients/rcw/model/updateDeclarationRequestBody.zod";
+import type { UpdateDeclarationRequestBody } from "#/api/clients/rcw/model/updateDeclarationRequestBody.zod.gen.js";
 
-import type { UpdateEvidenceRequestBody } from "#/api/clients/rcw/model/updateEvidenceRequestBody.zod";
+import type { UpdateEvidenceRequestBody } from "#/api/clients/rcw/model/updateEvidenceRequestBody.zod.gen.js";
 
-import type { UpdateMeansDataRequestBody } from "#/api/clients/rcw/model/updateMeansDataRequestBody.zod";
+import type { UpdateMeansDataRequestBody } from "#/api/clients/rcw/model/updateMeansDataRequestBody.zod.gen.js";
 
 import config from "#/config.js";
 

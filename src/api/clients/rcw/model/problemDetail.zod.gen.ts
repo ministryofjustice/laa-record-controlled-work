@@ -4,7 +4,7 @@
  * Record Controlled Work API
  * OpenAPI spec version: 1.0.0
  */
-import { z as zod } from "zod";
+import * as zod from "zod";
 
 export const ProblemDetail = zod.object({
   type: zod.url().describe("URI reference identifying the problem type"),

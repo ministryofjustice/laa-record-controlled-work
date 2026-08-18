@@ -4,11 +4,11 @@
  * Record Controlled Work API
  * OpenAPI spec version: 1.0.0
  */
-import type { Application } from "#/api/clients/rcw/model/application.zod";
+import type { Application } from "#/api/clients/rcw/model/application.zod.gen.js";
 
-import type { Applications } from "#/api/clients/rcw/model/applications.zod";
+import type { Applications } from "#/api/clients/rcw/model/applications.zod.gen.js";
 
-import type { CreateApplicationResponseBody } from "#/api/clients/rcw/model/createApplicationResponseBody.zod";
+import type { CreateApplicationResponseBody } from "#/api/clients/rcw/model/createApplicationResponseBody.zod.gen.js";
 
 import { HttpResponse, http } from "msw";
 import type { RequestHandlerOptions } from "msw";
@@ -17,13 +17,13 @@ import {
   getCreateApplicationResponseMock,
   getGetApplicationResponseMock,
   getGetApplicationsResponseMock,
-} from "../../fakers/applications/applications.faker.gen.gen.js";
+} from "../../fakers/applications/applications.faker.gen.js";
 
 export {
   getGetApplicationsResponseMock,
   getCreateApplicationResponseMock,
   getGetApplicationResponseMock,
-} from "../../fakers/applications/applications.faker.gen.gen.js";
+} from "../../fakers/applications/applications.faker.gen.js";
 
 export type KeysWithNull<O> = {
   [K in keyof O]-?: null extends O[K] ? K : never;

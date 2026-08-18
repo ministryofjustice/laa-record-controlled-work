@@ -4,14 +4,14 @@
  * Provider Details API r1
  * OpenAPI spec version: 0.27.2
  */
-import type { ProviderFirmOfficeListDto } from "#/api/clients/pda/model/providerFirmOfficeListDto.zod";
+import type { ProviderFirmOfficeListDto } from "#/api/clients/pda/model/providerFirmOfficeListDto.zod.gen.js";
 
 import { HttpResponse, http } from "msw";
 import type { RequestHandlerOptions } from "msw";
 
-import { getGetAllProviderOfficesResponseMock } from "../../fakers/provider-firms-endpoints/provider-firms-endpoints.faker.gen.gen.js";
+import { getGetAllProviderOfficesResponseMock } from "../../fakers/provider-firms-endpoints/provider-firms-endpoints.faker.gen.js";
 
-export { getGetAllProviderOfficesResponseMock } from "../../fakers/provider-firms-endpoints/provider-firms-endpoints.faker.gen.gen.js";
+export { getGetAllProviderOfficesResponseMock } from "../../fakers/provider-firms-endpoints/provider-firms-endpoints.faker.gen.js";
 
 export type KeysWithNull<O> = {
   [K in keyof O]-?: null extends O[K] ? K : never;

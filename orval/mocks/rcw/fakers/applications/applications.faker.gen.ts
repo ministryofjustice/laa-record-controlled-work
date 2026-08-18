@@ -4,11 +4,11 @@
  * Record Controlled Work API
  * OpenAPI spec version: 1.0.0
  */
-import type { Application } from "#/api/clients/rcw/model/application.zod";
+import type { Application } from "#/api/clients/rcw/model/application.zod.gen.js";
 
-import type { Applications } from "#/api/clients/rcw/model/applications.zod";
+import type { Applications } from "#/api/clients/rcw/model/applications.zod.gen.js";
 
-import type { CreateApplicationResponseBody } from "#/api/clients/rcw/model/createApplicationResponseBody.zod";
+import type { CreateApplicationResponseBody } from "#/api/clients/rcw/model/createApplicationResponseBody.zod.gen.js";
 
 import { faker } from "@faker-js/faker";
 
