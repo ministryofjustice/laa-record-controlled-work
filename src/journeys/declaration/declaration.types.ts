@@ -5,7 +5,7 @@ import type { AnswerKey as A } from "#/journeys/AnswerKey.js";
 import type { JourneySession } from "#/journeys/context.type.js";
 
 export interface DeclarationAnswers extends Record<string, unknown> {
-  [A.DECLARATION_SIGNED_CONFIRM]?: string;
+  [A.DECLARATION_SIGNED_CONFIRM]?: string[];
   [A.DECLARATION_SIGNED_DATE]?: string;
 }
 

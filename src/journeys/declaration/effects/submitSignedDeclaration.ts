@@ -33,7 +33,7 @@ export const submitSignedDeclaration =
       throw new Error("Missing applicationId in request parameters");
     }
 
-    if (confirmed === undefined) {
+    if (!Array.isArray(confirmed)) {
       logger.error("Missing declaration confirmation answer");
       throw new Error("Missing declaration confirmation answer");
     }
@@ -48,7 +48,10 @@ export const submitSignedDeclaration =
     try {
       const body = {
         dateSigned: date,
-        declarationConfirmation: confirmed === "yes",
+        // The `govukCheckbox` component returns `string[]` even though we only have one checkbox, so we can expect the
+        // first value to be our confirmation.
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- Dance, magic, dance
+        declarationConfirmation: confirmed[0] === "yes",
       };
 
       const opts = await getRcwApiDefaultOptions({
