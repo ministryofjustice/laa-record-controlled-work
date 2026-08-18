@@ -8,6 +8,7 @@ import {
   type SubmitHook,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
+import { AnswerKey } from "#/journeys/AnswerKey.enum.js";
 import { CreateApplicationEffects } from "#/journeys/create-application/create-application.effects.js";
 import { ecfQuestion } from "#/journeys/create-application/steps/ecf/ecf.blocks.js";
 import { JourneyPath } from "#/journeys/JourneyPath.enum.js";
@@ -19,7 +20,6 @@ import {
 import { redirectToCheckAnswers } from "#/journeys/shared.hook.js";
 import { StepCode } from "#/journeys/StepCode.enum.js";
 import { t } from "#/lib/i18n.js";
-import { AnswerKey } from "#/journeys/AnswerKey.enum.js";
 
 const DECLARATION_PATH = `${JourneyPath.CREATE_APPLICATION}/provider-declaration`;
 const TITLE = t("journeys.createApplication.ecf.title");
