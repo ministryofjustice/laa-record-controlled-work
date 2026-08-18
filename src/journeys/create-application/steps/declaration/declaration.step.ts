@@ -9,20 +9,19 @@ import {
   agreeAndContinue,
   declaration,
 } from "#/journeys/create-application/steps/declaration/declaration.formatters.js";
-import { CreateApplicationPath } from "#/journeys/JourneyPath.enum.js";
 import { backLink, button, heading } from "#/journeys/shared.blocks.js";
 import { StepCode } from "#/journeys/StepCode.enum.js";
 
 export const declarationStep = (): ReturnType<typeof step> =>
   step({
     blocks: [
-      backLink(CreateApplicationPath.ROOT),
+      backLink("/"),
       heading(declaration),
       body(),
       button(agreeAndContinue),
     ],
     onSubmission: [onSubmission],
-    path: CreateApplicationPath.DECLARATION,
+    path: "/provider-declaration",
     reachability: { entryWhen: true },
     title: declaration,
   });
