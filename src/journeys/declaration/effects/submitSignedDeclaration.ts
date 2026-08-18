@@ -33,6 +33,16 @@ export const submitSignedDeclaration =
       throw new Error("Missing applicationId in request parameters");
     }
 
+    if (confirmed === undefined) {
+      logger.error("Missing declaration confirmation answer");
+      throw new Error("Missing declaration confirmation answer");
+    }
+
+    if (date === undefined) {
+      logger.error("Missing declaration signed date answer");
+      throw new Error("Missing declaration signed date answer");
+    }
+
     let response;
 
     try {
