@@ -7,7 +7,7 @@ import {
   type SubmitHook,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
-import { AnswerValue } from "#/journeys/AnswerValues.enum.js";
+import { AnswerValue } from "#/journeys/AnswerValue.enum.js";
 import { CreateApplicationEffects } from "#/journeys/create-application/create-application.effects.js";
 import {
   declarationPath,
