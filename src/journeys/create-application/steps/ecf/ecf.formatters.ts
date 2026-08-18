@@ -1,11 +1,7 @@
-import {
-  CreateApplicationPath,
-  JourneyPath,
-} from "#/journeys/JourneyPath.enum.js";
+import { JourneyPath } from "#/journeys/JourneyPath.enum.js";
 import { t } from "#/lib/i18n.js";
 
-export const declarationPath =
-  JourneyPath.CREATE_APPLICATION + CreateApplicationPath.DECLARATION;
+export const declarationPath = `${JourneyPath.CREATE_APPLICATION}/provider-declaration`;
 
 export const ecfCaptionTitle = t("journeys.createApplication.caption");
 
