@@ -1,4 +1,4 @@
-export enum AnswerKey {
+export enum AnswerValue {
   NO = "no",
   YES = "yes",
 }

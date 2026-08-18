@@ -7,7 +7,7 @@ import {
   type SubmitHook,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
-import { AnswerKey } from "#/journeys/AnswerKey.enum.js";
+import { AnswerValue } from "#/journeys/AnswerValues.enum.js";
 import { CreateApplicationEffects } from "#/journeys/create-application/create-application.effects.js";
 import {
   declarationPath,
@@ -58,7 +58,7 @@ const onSubmission = (journeyCode: string): SubmitHook =>
 
 const redirectToECFDropout = redirect({
   goto: StepCode.ECF_DROPOUT,
-  when: Answer(StepCode.ECF).match(Condition.Equals(AnswerKey.YES)),
+  when: Answer(StepCode.ECF).match(Condition.Equals(AnswerValue.YES)),
 });
 
 const redirectToLegalAidBefore = redirect({ goto: StepCode.LEGAL_AID_BEFORE });
