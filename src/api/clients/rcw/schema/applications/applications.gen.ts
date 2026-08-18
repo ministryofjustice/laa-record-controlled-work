@@ -429,32 +429,32 @@ export type updateApplicationDeclarationResponse204 = {
 };
 
 export type updateApplicationDeclarationResponse400 = {
-  data: void;
+  data: BadRequestResponse;
   status: 400;
 };
 
 export type updateApplicationDeclarationResponse401 = {
-  data: void;
+  data: UnauthorizedResponse;
   status: 401;
 };
 
 export type updateApplicationDeclarationResponse403 = {
-  data: void;
+  data: ForbiddenResponse;
   status: 403;
 };
 
 export type updateApplicationDeclarationResponse404 = {
-  data: void;
+  data: NotFoundResponse;
   status: 404;
 };
 
 export type updateApplicationDeclarationResponse409 = {
-  data: void;
+  data: ConflictResponse;
   status: 409;
 };
 
 export type updateApplicationDeclarationResponse500 = {
-  data: void;
+  data: InternalServerErrorResponse;
   status: 500;
 };
 
