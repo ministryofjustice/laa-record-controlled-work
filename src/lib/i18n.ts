@@ -111,12 +111,22 @@ export const t = (key: string, options?: Record<string, unknown>): string => {
   return i18next.t(key, options);
 };
 
-// TODO Refactor the tt function to include the mapping.
+/**
+ * Get set of translations for a given key, useful for things like multiple paragraphs or list items.
+ * @param {string} key Translation key with dot notation for namespaces
+ * @returns {string[]} Array of translated strings
+ */
 export const tt = (key: string): string[] => {
+  // Ensure i18next is initialised before calling translation
+  if (!i18next.isInitialized) {
+    logger.warn("i18next not initialised when translating", { key });
+    return [key]; // Return the key as fallback
+  }
+
   const items = i18next.t(key, { returnObjects: true });
 
   if (!Array.isArray(items)) {
-    logger.warn("Translation key is not an array");
+    logger.warn(`Translation for key "${key}" is not an array`);
     return [key];
   }
 

@@ -30,7 +30,6 @@ export const signStep = (): ReturnType<typeof step> => {
       ),
       caption,
       heading(),
-      // TODO Refactor statement to not require spreading?
       ...statement(),
       downloadButton(),
       confirmHeading(),
@@ -45,7 +44,6 @@ export const signStep = (): ReturnType<typeof step> => {
           next: [
             redirect({
               goto: Format(
-                // TODO Update this URI to be correct.
                 "/cases/%1/declaration/ufn",
                 Params("applicationId"),
               ),

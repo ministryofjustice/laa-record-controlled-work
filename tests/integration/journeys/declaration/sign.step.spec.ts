@@ -98,7 +98,6 @@ describe("Declaration sign step", () => {
       expect(block.properties.tag).to.equal("h2");
     });
 
-    // TODO Can this be refactored to use `getBlockWithContent`?
     it("shows the expected checkbox", () => {
       const label = "I confirm that I have a signed declaration from my client";
       const value = "yes";
