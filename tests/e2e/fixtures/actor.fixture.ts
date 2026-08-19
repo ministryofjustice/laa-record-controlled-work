@@ -67,6 +67,7 @@ export const createActor = (page: Page): Actor => ({
   },
   completeCreateCaseShortestPath: async () =>
     await completeCreateCaseShortestPath(page),
+
   completeEvidenceNoPath: async (applicationId: string) => {
     await completeEvidenceNoPath(page, applicationId);
   },
