@@ -40,10 +40,10 @@ const getClientDetailsValues = ({ clientDetails }: Application): unknown[] => {
 };
 
 const getEvidenceValues = ({ evidence }: Application): unknown[] => [
-  evidence?.payeIncomeEvidence,
-  evidence?.otherIncomeEvidence,
-  evidence?.housingCostsEvidence,
-  evidence?.capitalEvidence,
+  evidence?.evidenceExemptionCode,
+  evidence?.evidenceExemptionReason,
+  evidence?.expenditureCapitalEvidenceChecklist,
+  evidence?.incomeEvidenceChecklist,
 ];
 
 const getDeclarationValues = ({ declaration }: Application): unknown[] => [
