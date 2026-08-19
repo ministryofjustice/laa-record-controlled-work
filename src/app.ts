@@ -47,6 +47,7 @@ import { standardMiddleware } from "#/middleware/standardMiddleware.js";
 import healthRouter from "#/routes/health.js";
 import indexRouter from "#/routes/index.js";
 import testRouter from "#/routes/test.js";
+import { viewApplicationPackage } from "#/journeys/view-application/viewApplication.package.js";
 
 const TRUST_FIRST_PROXY = 1;
 
@@ -115,7 +116,8 @@ const createApp = async (
     .registerPackage(editApplicationPackage, { getApplication })
     .registerPackage(createApplicationJourney, { createApplication })
     .registerPackage(declaration)
-    .registerPackage(evidencePackage, { updateApplicationEvidence });
+    .registerPackage(evidencePackage, { updateApplicationEvidence })
+    .registerPackage(viewApplicationPackage, { getApplication });
   // Set up rate limiting
   setupRateLimit(app, config);
 
