@@ -8,13 +8,19 @@ import { expect } from "chai";
 import { declarationEffectRegistry } from "#/journeys/declaration/declaration.effects.js";
 import { DeclarationJourney } from "#/journeys/declaration/declaration.journey.js";
 import { getBlockWithContent } from "#tests/integration/utils/getBlockWithContent.helper.js";
+import sinon from "sinon";
 
 describe("Declaration sign step", () => {
   const uuid = faker.string.uuid();
 
+  const updateApplicationDeclarationMock = sinon.stub().resolves({
+    status: 204,
+  });
+
   const client = initForgeTestClient(
     DeclarationJourney,
     declarationEffectRegistry,
+    { updateApplicationDeclaration: updateApplicationDeclarationMock },
   );
 
   describe(`GET /cases/:applicationId/declaration/sign`, () => {
@@ -140,7 +146,7 @@ describe("Declaration sign step", () => {
       const result = (await client.post(`/cases/${uuid}/declaration/sign`, {
         body: {
           action: "continue",
-          declarationSignedConfirm: "yes",
+          declarationSignedConfirm: ["yes"],
           declarationSignedDate: { year: "2000", month: "2", day: "2" },
         },
       })) as TestRedirectResult;

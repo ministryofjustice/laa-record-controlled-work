@@ -18,6 +18,7 @@ import {
   createApplication,
   getApplication,
   getApplications,
+  updateApplicationDeclaration,
   updateApplicationEvidence,
 } from "#/api/clients/rcw/schema/applications/applications.gen.js";
 import eligibilityRouter from "#/api/eligibility/eligibility.routes.js";
@@ -115,7 +116,7 @@ const createApp = async (
     .registerPackage(selectOfficePackage, { getAllProviderOffices })
     .registerPackage(editApplicationPackage, { getApplication })
     .registerPackage(createApplicationJourney, { createApplication })
-    .registerPackage(declaration)
+    .registerPackage(declaration, { updateApplicationDeclaration })
     .registerPackage(evidencePackage, { updateApplicationEvidence })
     .registerPackage(viewApplicationPackage, { getApplication });
   // Set up rate limiting
