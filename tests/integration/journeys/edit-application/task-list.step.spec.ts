@@ -180,10 +180,7 @@ describe("Task list step", () => {
           data: getGetApplicationResponseMock({
             eligibility: eligibilityResult,
             evidence: {
-              payeIncomeEvidence: true,
-              otherIncomeEvidence: true,
-              housingCostsEvidence: true,
-              capitalEvidence: true,
+              evidenceExemptionCode: "something",
             },
             declaration: {
               declarationConfirmation: true,
@@ -213,10 +210,7 @@ describe("Task list step", () => {
           data: getGetApplicationResponseMock({
             eligibility: eligibilityResult,
             evidence: {
-              payeIncomeEvidence: true,
-              otherIncomeEvidence: true,
-              housingCostsEvidence: true,
-              capitalEvidence: true,
+              evidenceExemptionCode: "something",
             },
             declaration: {},
           }),

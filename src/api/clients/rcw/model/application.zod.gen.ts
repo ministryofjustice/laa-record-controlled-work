@@ -64,15 +64,10 @@ export const Application = zod.object({
     .optional(),
   evidence: zod
     .object({
-      id: zod.uuid().optional(),
-      payeIncomeEvidence: zod.boolean().optional(),
-      otherIncomeEvidence: zod.boolean().optional(),
-      housingCostsEvidence: zod.boolean().optional(),
-      capitalEvidence: zod.boolean().optional(),
-      createdAt: zod.iso.datetime({ offset: true }).optional(),
-      createdBy: zod.string().optional(),
-      modifiedAt: zod.iso.datetime({ offset: true }).optional(),
-      modifiedBy: zod.string().optional(),
+      evidenceExemptionCode: zod.string().optional(),
+      evidenceExemptionReason: zod.string().optional(),
+      incomeEvidenceChecklist: zod.looseObject({}).optional(),
+      expenditureCapitalEvidenceChecklist: zod.looseObject({}).optional(),
     })
     .optional(),
   eligibility: zod
