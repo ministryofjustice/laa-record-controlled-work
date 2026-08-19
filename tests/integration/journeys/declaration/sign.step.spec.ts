@@ -1,4 +1,4 @@
-import { initForgeTestClient } from "#tests/integration/utils/helpers.js";
+import { createForgeTestClient } from "#tests/integration/utils/helpers.js";
 import { faker } from "@faker-js/faker";
 import {
   TestRedirectResult,
@@ -17,10 +17,14 @@ describe("Declaration sign step", () => {
     status: 204,
   });
 
-  const client = initForgeTestClient(
+  const client = createForgeTestClient(
     DeclarationJourney,
     declarationEffectRegistry,
-    { updateApplicationDeclaration: updateApplicationDeclarationMock },
+    {
+      dependencies: {
+        updateApplicationDeclaration: updateApplicationDeclarationMock,
+      },
+    },
   );
 
   describe(`GET /cases/:applicationId/declaration/sign`, () => {
