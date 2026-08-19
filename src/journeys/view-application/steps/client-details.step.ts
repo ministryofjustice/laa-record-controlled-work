@@ -16,6 +16,7 @@ import {
 import {
   caseReferenceNumber,
   heading,
+  printButton,
   recordedOn,
   statusTag,
 } from "#/journeys/view-application/steps/client-details.blocks.js";
@@ -43,6 +44,7 @@ export const clientDetailsStep = (): ReturnType<typeof step> =>
       heading(clientName),
       caseReferenceNumber(referenceNumber),
       recordedOn(recordedOnDate),
+      printButton(),
     ],
     onAccess: [
       access({

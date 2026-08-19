@@ -1,6 +1,6 @@
 import { Format } from "@ministryofjustice/hmpps-forge/core/authoring";
 import { HtmlBlock, ResolvableString } from "@ministryofjustice/hmpps-forge/core/components";
-import { GovUKBody, GovUKHeading } from "@ministryofjustice/hmpps-forge/govuk-components";
+import { GovUKBody, GovUKButton, GovUKHeading } from "@ministryofjustice/hmpps-forge/govuk-components";
 
 /**
  * Builds a GovUKBody block for the case reference number.
@@ -53,3 +53,14 @@ export function statusTag(
     content: `<div class="govuk-!-margin-bottom-4"><div class="govuk-tag govuk-tag--purple">${text}</div></div>`,
   });
 }
+
+/**
+ * Builds a GovUKButton for printing the case, non functional.
+ * @returns A GovUKButton block definition for printing the case.
+ */
+export function printButton(): ReturnType<typeof GovUKButton> {
+  return GovUKButton({
+    text: "Print this case",
+    classes: "govuk-button--secondary"
+  });
+} 
