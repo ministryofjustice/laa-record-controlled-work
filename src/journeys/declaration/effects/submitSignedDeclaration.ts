@@ -9,6 +9,7 @@ import {
   UndefinedParamError,
   UndefinedSessionError,
 } from "#/journeys/errors.js";
+import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
 
@@ -25,7 +26,7 @@ import type {
 export const submitSignedDeclaration =
   (deps: DeclarationDeps) => async (context: DeclarationContext) => {
     const session = context.getSession();
-    const applicationId = context.getRequestParam("applicationId");
+    const applicationId = context.getRequestParam(PARAMS_KEYS.applicationID);
     const confirmed = context.getAnswer(A.DECLARATION_SIGNED_CONFIRM);
     const date = context.getAnswer(A.DECLARATION_SIGNED_DATE);
 

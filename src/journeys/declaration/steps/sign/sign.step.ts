@@ -8,6 +8,7 @@ import {
   submit,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
+import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
 import { t } from "#/lib/i18n.js";
 
 import { backLink, caption } from "../../declaration.blocks.js";
@@ -26,7 +27,10 @@ export const signStep = (): ReturnType<typeof step> => {
   return step({
     blocks: [
       backLink(
-        Format("/cases/%1/declaration/confirm", Params("applicationId")),
+        Format(
+          "/cases/%1/declaration/confirm",
+          Params(PARAMS_KEYS.applicationID),
+        ),
       ),
       caption,
       heading(),
@@ -45,7 +49,7 @@ export const signStep = (): ReturnType<typeof step> => {
             redirect({
               goto: Format(
                 "/cases/%1/declaration/ufn",
-                Params("applicationId"),
+                Params(PARAMS_KEYS.applicationID),
               ),
             }),
           ],
@@ -59,7 +63,7 @@ export const signStep = (): ReturnType<typeof step> => {
             redirect({
               goto: Format(
                 "/cases/%1/declaration/confirm",
-                Params("applicationId"),
+                Params(PARAMS_KEYS.applicationID),
               ),
             }),
           ],
