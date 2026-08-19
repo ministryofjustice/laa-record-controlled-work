@@ -23,7 +23,6 @@ export function recordedOn(
   return GovUKBody({ 
     text: Format("<strong>Recorded on:</strong> %1", recordedOnDate),
     size: "l",
-    classes: "govuk-!-margin-bottom-1"
   });
 }
 
