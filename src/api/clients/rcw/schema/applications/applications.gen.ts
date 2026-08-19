@@ -8,11 +8,23 @@ import type { Application } from "#/api/clients/rcw/model/application.zod.gen.js
 
 import type { Applications } from "#/api/clients/rcw/model/applications.zod.gen.js";
 
+import type { BadRequestResponse } from "#/api/clients/rcw/model/badRequestResponse.zod.gen.js";
+
+import type { ConflictResponse } from "#/api/clients/rcw/model/conflictResponse.zod.gen.js";
+
 import type { CreateApplicationRequestBody } from "#/api/clients/rcw/model/createApplicationRequestBody.zod.gen.js";
 
 import type { CreateApplicationResponseBody } from "#/api/clients/rcw/model/createApplicationResponseBody.zod.gen.js";
 
+import type { ForbiddenResponse } from "#/api/clients/rcw/model/forbiddenResponse.zod.gen.js";
+
 import type { GetApplicationsParams } from "#/api/clients/rcw/model/getApplicationsParams.zod.gen.js";
+
+import type { InternalServerErrorResponse } from "#/api/clients/rcw/model/internalServerErrorResponse.zod.gen.js";
+
+import type { NotFoundResponse } from "#/api/clients/rcw/model/notFoundResponse.zod.gen.js";
+
+import type { UnauthorizedResponse } from "#/api/clients/rcw/model/unauthorizedResponse.zod.gen.js";
 
 import type { UpdateApplicationStatusRequestBody } from "#/api/clients/rcw/model/updateApplicationStatusRequestBody.zod.gen.js";
 
@@ -28,22 +40,22 @@ export type getApplicationsResponse200 = {
 };
 
 export type getApplicationsResponse400 = {
-  data: void;
+  data: BadRequestResponse;
   status: 400;
 };
 
 export type getApplicationsResponse401 = {
-  data: void;
+  data: UnauthorizedResponse;
   status: 401;
 };
 
 export type getApplicationsResponse403 = {
-  data: void;
+  data: ForbiddenResponse;
   status: 403;
 };
 
 export type getApplicationsResponse500 = {
-  data: void;
+  data: InternalServerErrorResponse;
   status: 500;
 };
 
@@ -106,27 +118,27 @@ export type createApplicationResponse201 = {
 };
 
 export type createApplicationResponse400 = {
-  data: void;
+  data: BadRequestResponse;
   status: 400;
 };
 
 export type createApplicationResponse401 = {
-  data: void;
+  data: UnauthorizedResponse;
   status: 401;
 };
 
 export type createApplicationResponse403 = {
-  data: void;
+  data: ForbiddenResponse;
   status: 403;
 };
 
 export type createApplicationResponse404 = {
-  data: void;
+  data: NotFoundResponse;
   status: 404;
 };
 
 export type createApplicationResponse500 = {
-  data: void;
+  data: InternalServerErrorResponse;
   status: 500;
 };
 
@@ -180,22 +192,22 @@ export type getApplicationResponse200 = {
 };
 
 export type getApplicationResponse401 = {
-  data: void;
+  data: UnauthorizedResponse;
   status: 401;
 };
 
 export type getApplicationResponse403 = {
-  data: void;
+  data: ForbiddenResponse;
   status: 403;
 };
 
 export type getApplicationResponse404 = {
-  data: void;
+  data: NotFoundResponse;
   status: 404;
 };
 
 export type getApplicationResponse500 = {
-  data: void;
+  data: InternalServerErrorResponse;
   status: 500;
 };
 
@@ -246,32 +258,32 @@ export type updateApplicationEvidenceResponse204 = {
 };
 
 export type updateApplicationEvidenceResponse400 = {
-  data: void;
+  data: BadRequestResponse;
   status: 400;
 };
 
 export type updateApplicationEvidenceResponse401 = {
-  data: void;
+  data: UnauthorizedResponse;
   status: 401;
 };
 
 export type updateApplicationEvidenceResponse403 = {
-  data: void;
+  data: ForbiddenResponse;
   status: 403;
 };
 
 export type updateApplicationEvidenceResponse404 = {
-  data: void;
+  data: NotFoundResponse;
   status: 404;
 };
 
 export type updateApplicationEvidenceResponse409 = {
-  data: void;
+  data: ConflictResponse;
   status: 409;
 };
 
 export type updateApplicationEvidenceResponse500 = {
-  data: void;
+  data: InternalServerErrorResponse;
   status: 500;
 };
 
@@ -331,32 +343,32 @@ export type updateApplicationMeansResponse204 = {
 };
 
 export type updateApplicationMeansResponse400 = {
-  data: void;
+  data: BadRequestResponse;
   status: 400;
 };
 
 export type updateApplicationMeansResponse401 = {
-  data: void;
+  data: UnauthorizedResponse;
   status: 401;
 };
 
 export type updateApplicationMeansResponse403 = {
-  data: void;
+  data: ForbiddenResponse;
   status: 403;
 };
 
 export type updateApplicationMeansResponse404 = {
-  data: void;
+  data: NotFoundResponse;
   status: 404;
 };
 
 export type updateApplicationMeansResponse409 = {
-  data: void;
+  data: ConflictResponse;
   status: 409;
 };
 
 export type updateApplicationMeansResponse500 = {
-  data: void;
+  data: InternalServerErrorResponse;
   status: 500;
 };
 
@@ -415,32 +427,32 @@ export type updateApplicationStatusResponse204 = {
 };
 
 export type updateApplicationStatusResponse400 = {
-  data: void;
+  data: BadRequestResponse;
   status: 400;
 };
 
 export type updateApplicationStatusResponse401 = {
-  data: void;
+  data: UnauthorizedResponse;
   status: 401;
 };
 
 export type updateApplicationStatusResponse403 = {
-  data: void;
+  data: ForbiddenResponse;
   status: 403;
 };
 
 export type updateApplicationStatusResponse404 = {
-  data: void;
+  data: NotFoundResponse;
   status: 404;
 };
 
 export type updateApplicationStatusResponse409 = {
-  data: void;
+  data: ConflictResponse;
   status: 409;
 };
 
 export type updateApplicationStatusResponse500 = {
-  data: void;
+  data: InternalServerErrorResponse;
   status: 500;
 };
 
