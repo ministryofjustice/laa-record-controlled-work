@@ -38,13 +38,7 @@
             "LAA_ACCOUNTS": ["R1XEVG", "VGHVEY", "3TVRNM"],
             "FIRM_CODE": "123456"
           }
-        }
-      ]
-    },
-    {
-      "issuerId": "default",
-      "tokenExpiry": 3600,
-      "requestMappings": [
+        },
         {
           "requestParam": "grant_type",
           "match": "urn:ietf:params:oauth:grant-type:jwt-bearer",
