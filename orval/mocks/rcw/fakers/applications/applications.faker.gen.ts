@@ -118,14 +118,15 @@ export const getGetApplicationResponseMock = <
       modifiedBy: faker.string.alpha({ length: { min: 10, max: 20 } }),
     },
     evidence: {
-      evidenceExemptionCode: faker.string.alpha({
-        length: { min: 10, max: 20 },
-      }),
-      evidenceExemptionReason: faker.string.alpha({
-        length: { min: 10, max: 20 },
-      }),
-      incomeEvidenceChecklist: {},
-      expenditureCapitalEvidenceChecklist: {},
+      id: faker.string.uuid(),
+      payeIncomeEvidence: faker.datatype.boolean(),
+      otherIncomeEvidence: faker.datatype.boolean(),
+      housingCostsEvidence: faker.datatype.boolean(),
+      capitalEvidence: faker.datatype.boolean(),
+      createdAt: faker.date.past().toISOString().slice(0, 19) + "Z",
+      createdBy: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      modifiedAt: faker.date.past().toISOString().slice(0, 19) + "Z",
+      modifiedBy: faker.string.alpha({ length: { min: 10, max: 20 } }),
     },
     eligibility: { data: {}, result: {} },
     reasonForReapplication: faker.string.alpha({

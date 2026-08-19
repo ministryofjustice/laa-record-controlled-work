@@ -7,10 +7,15 @@
 import * as zod from "zod";
 
 export const Evidence = zod.object({
-  evidenceExemptionCode: zod.string().optional(),
-  evidenceExemptionReason: zod.string().optional(),
-  incomeEvidenceChecklist: zod.looseObject({}).optional(),
-  expenditureCapitalEvidenceChecklist: zod.looseObject({}).optional(),
+  id: zod.uuid().optional(),
+  payeIncomeEvidence: zod.boolean().optional(),
+  otherIncomeEvidence: zod.boolean().optional(),
+  housingCostsEvidence: zod.boolean().optional(),
+  capitalEvidence: zod.boolean().optional(),
+  createdAt: zod.iso.datetime({ offset: true }).optional(),
+  createdBy: zod.string().optional(),
+  modifiedAt: zod.iso.datetime({ offset: true }).optional(),
+  modifiedBy: zod.string().optional(),
 });
 
 export type Evidence = zod.input<typeof Evidence>;
