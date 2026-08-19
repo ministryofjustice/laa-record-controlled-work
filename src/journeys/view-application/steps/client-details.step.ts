@@ -28,7 +28,15 @@ const referenceNumber = Data(CONTEXT_DATA_KEYS.application).path(
 
 const recordedOnDate = Data(CONTEXT_DATA_KEYS.application)
   .path(APPLICATIONS_DATA_KEYS.modifiedAt)
-  .pipe(Transformer.String.ToDate(), Transformer.Date.Format("D MMMM YYYY"));
+  .pipe(
+    Transformer.String.FormatDate({
+      day: "numeric",
+      locale: "en-GB",
+      month: "short",
+      timeZone: "Europe/London",
+      year: "numeric",
+    }),
+  );
 
 const clientName = Format(
   "%1 %2",
