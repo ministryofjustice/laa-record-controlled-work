@@ -59,7 +59,7 @@ export const openRecordedCaseFromCaseList = async (
   applicationId: string,
 ): Promise<string> => {
   await gotoCaseList(page);
-  await page.getByRole("link", { name: "Completed" }).click();
+  await page.getByRole("link", { name: "Recorded" }).click();
 
   const recordedCaseLink = page
     .locator(`a[href='/cases/${applicationId}/view/client-details']`)
