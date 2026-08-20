@@ -62,7 +62,7 @@ export const signStep = (): ReturnType<typeof step> => {
           next: [
             redirect({
               goto: Format(
-                "/cases/%1/declaration/confirm",
+                "/cases/%1/task-list",
                 Params(PARAMS_KEYS.applicationID),
               ),
             }),

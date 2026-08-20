@@ -158,7 +158,7 @@ describe("Declaration sign step", () => {
       expect(result.url).to.equal(`/cases/${uuid}/declaration/ufn`);
     });
 
-    it("redirects to the declaration confirm step when 'save and return later' is clicked", async () => {
+    it("redirects to the task list when 'save and return later' is clicked", async () => {
       const result = (await client.post(`/cases/${uuid}/declaration/sign`, {
         body: {
           action: "return",
@@ -166,7 +166,7 @@ describe("Declaration sign step", () => {
       })) as TestRedirectResult;
 
       expect(result.type).to.equal("redirect");
-      expect(result.url).to.equal(`/cases/${uuid}/declaration/confirm`);
+      expect(result.url).to.equal(`/cases/${uuid}/task-list`);
     });
   });
 });
