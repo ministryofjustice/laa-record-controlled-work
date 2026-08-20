@@ -75,6 +75,8 @@ test.describe("@e2e critical path", () => {
   });
   test.fixme("completes declaration", async () => {});
   test.fixme("submits application", async () => {});
-  test.fixme("checks recorded cases", async () => {});
+  test.fixme("checks recorded cases", async () => {
+    await actor.openRecordedCaseFromCaseList(applicationId);
+  });
   test.fixme("exports case", async () => {});
 });

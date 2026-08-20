@@ -29,6 +29,7 @@ import declaration from "#/journeys/declaration/declaration.index.js";
 import { editApplicationPackage } from "#/journeys/edit-application/editApplication.package.js";
 import { evidencePackage } from "#/journeys/evidence/evidence.package.js";
 import { selectOfficePackage } from "#/journeys/select-office/select-office.journey.js";
+import { viewApplicationPackage } from "#/journeys/view-application/viewApplication.package.js";
 import { yourCasesPackage } from "#/journeys/your-cases/your-cases.journey.js";
 import * as redis from "#/lib/redis.js";
 import { createSession } from "#/lib/session.js";
@@ -115,7 +116,8 @@ const createApp = async (
     .registerPackage(editApplicationPackage, { getApplication })
     .registerPackage(createApplicationJourney, { createApplication })
     .registerPackage(declaration)
-    .registerPackage(evidencePackage, { updateApplicationEvidence });
+    .registerPackage(evidencePackage, { updateApplicationEvidence })
+    .registerPackage(viewApplicationPackage, { getApplication });
   // Set up rate limiting
   setupRateLimit(app, config);
 
