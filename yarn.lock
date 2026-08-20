@@ -1636,8 +1636,8 @@ __metadata:
   linkType: hard
 
 "@scalar/openapi-parser@npm:^0.28.11":
-  version: 0.28.12
-  resolution: "@scalar/openapi-parser@npm:0.28.12"
+  version: 0.28.13
+  resolution: "@scalar/openapi-parser@npm:0.28.13"
   dependencies:
     "@scalar/helpers": "npm:0.10.0"
     "@scalar/json-magic": "npm:0.12.20"
@@ -1649,7 +1649,7 @@ __metadata:
     jsonpointer: "npm:^5.0.1"
     leven: "npm:^4.0.0"
     yaml: "npm:^2.9.0"
-  checksum: 10c0/a67d4cf1c4a1a6f246d4cc52cb7b1a140fa321e937adbc6cd49d29e820965b962a41346d52990f9b14f7422c90e1ea6ef141e0a3952e434d080e4868b36c0e8f
+  checksum: 10c0/c4f52124c52c5c7fd4038a66ccb4325d1ad5409dc1e9dfbdf0c77486090fc7d445de82f4091643228d2701a13882f8c6bdfb776c35d7c28f4f9ce319e1972a12
   languageName: node
   linkType: hard
 
@@ -2391,9 +2391,9 @@ __metadata:
   linkType: hard
 
 "ansi-regex@npm:^6.2.2":
-  version: 6.2.2
-  resolution: "ansi-regex@npm:6.2.2"
-  checksum: 10c0/05d4acb1d2f59ab2cf4b794339c7b168890d44dda4bf0ce01152a8da0213aca207802f930442ce8cd22d7a92f44907664aac6508904e75e038fa944d2601b30f
+  version: 6.3.0
+  resolution: "ansi-regex@npm:6.3.0"
+  checksum: 10c0/bc047786d0531f1f22d1e22e9863e8554488a399f1ee5270b753efa6de938a788d27456f2b256770f11fdd8b1e847483bc1b55ddc2b3ffe82ec45c875292c651
   languageName: node
   linkType: hard
 
@@ -4821,12 +4821,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"get-tsconfig@npm:4.14.1, get-tsconfig@npm:^4.14.0, get-tsconfig@npm:^4.8.1":
+"get-tsconfig@npm:4.14.1":
   version: 4.14.1
   resolution: "get-tsconfig@npm:4.14.1"
   dependencies:
     resolve-pkg-maps: "npm:^1.0.0"
   checksum: 10c0/c5e5d8fd298be9bc554b8ca3708a76732c27f632cd9b902c1d41b23ad1f4b6fefbe4dbdecd2fee84994d1ebf46e8cc50dd575fcff1b7ffafcdf6e2e0809a0337
+  languageName: node
+  linkType: hard
+
+"get-tsconfig@npm:^4.14.0, get-tsconfig@npm:^4.8.1":
+  version: 4.14.2
+  resolution: "get-tsconfig@npm:4.14.2"
+  dependencies:
+    resolve-pkg-maps: "npm:^1.0.0"
+  checksum: 10c0/0b6e4fafd34adcc992258f9874a366222fac76b165a4b9c102fe25056a3f9c4dae1e365c213c040e56b0bd45fd5671343f9410d153af1aab0bbf699a54d59c1b
   languageName: node
   linkType: hard
 
