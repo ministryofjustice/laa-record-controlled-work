@@ -67,16 +67,22 @@ export class ApplicationDto {
     answers: AnswersOutput,
     providerOfficeCode: string,
   ): ApplicationDto {
+    const hasFixedAddress = answers.haveAHomeAddress === "yes";
+    const countryName = answers[ADDRESS_FIELD.country];
+
     return new ApplicationDto({
-      addressLine1: answers[ADDRESS_FIELD.addressLine1],
+      addressLine1: answers[ADDRESS_FIELD.addressLine1] ?? "",
       addressLine2: answers[ADDRESS_FIELD.addressLine2],
       addressLine3: answers[ADDRESS_FIELD.addressLine3],
       addressLine4: answers[ADDRESS_FIELD.addressLine4],
-      country: mapCountryNameToIsoCode(answers[ADDRESS_FIELD.country]),
+      country:
+        hasFixedAddress && countryName
+          ? mapCountryNameToIsoCode(countryName)
+          : "",
       county: answers[ADDRESS_FIELD.county],
       dateOfBirth: answers.dateOfBirth,
       firstName: answers.firstName,
-      hasFixedAddress: answers.haveAHomeAddress === "yes",
+      hasFixedAddress,
       lastName: answers.lastName,
       legalAidBefore: answers.legalAidBefore,
       legalAidLast6Months: answers.legalAidLast6Months === "yes",
@@ -96,24 +102,29 @@ export class ApplicationDto {
    * @returns CreateApplicationRequestBody.
    */
   public toRcwApi(): CreateApplicationRequestBody {
+    const clientDetails: CreateApplicationRequestBody["clientDetails"] = {
+      dateOfBirth: this.dateOfBirth,
+      firstName: this.firstName,
+      hasFixedAddress: this.hasFixedAddress,
+      lastName: this.lastName,
+      niNumber: this.niNumber,
+    };
+
+    if (this.hasFixedAddress) {
+      clientDetails.address = {
+        addressLine1: this.addressLine1,
+        addressLine2: this.addressLine2,
+        addressLine3: this.addressLine3,
+        addressLine4: this.addressLine4,
+        country: this.country,
+        county: this.county,
+        postCode: this.postcode,
+        townOrCity: this.townOrCity,
+      };
+    }
+
     return {
-      clientDetails: {
-        address: {
-          addressLine1: this.addressLine1,
-          addressLine2: this.addressLine2,
-          addressLine3: this.addressLine3,
-          addressLine4: this.addressLine4,
-          country: this.country,
-          county: this.county,
-          postCode: this.postcode,
-          townOrCity: this.townOrCity,
-        },
-        dateOfBirth: this.dateOfBirth,
-        firstName: this.firstName,
-        hasFixedAddress: this.hasFixedAddress,
-        lastName: this.lastName,
-        niNumber: this.niNumber,
-      },
+      clientDetails,
       legalAidBefore: this.legalAidBefore,
       legalAidLast6Months: this.legalAidLast6Months,
       providerOfficeCode: this.providerOfficeCode,
