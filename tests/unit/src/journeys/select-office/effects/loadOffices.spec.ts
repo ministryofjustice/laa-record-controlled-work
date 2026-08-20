@@ -13,6 +13,7 @@ import type {
   SelectOfficeContext,
   SelectOfficeEffectsDeps,
 } from "#/journeys/select-office/select-office.types.js";
+import { PDA_MSW_LAA_ACCOUNTS_HEADER } from "#/lib/constants/pda.js";
 import { logger } from "#/logger.js";
 
 describe("loadOffices", () => {
@@ -72,7 +73,9 @@ describe("loadOffices", () => {
     expect(
       getAllProviderOffices.calledOnceWithExactly(
         FIRM_CODE,
-        getPdaApiDefaultOptions(),
+        getPdaApiDefaultOptions(undefined, {
+          [PDA_MSW_LAA_ACCOUNTS_HEADER]: "[]",
+        }),
       ),
     ).to.equal(true);
 
@@ -103,7 +106,40 @@ describe("loadOffices", () => {
     expect(
       getAllProviderOffices.calledOnceWithExactly(
         FIRM_CODE,
-        getPdaApiDefaultOptions(correlationId),
+        getPdaApiDefaultOptions(correlationId, {
+          [PDA_MSW_LAA_ACCOUNTS_HEADER]: "[]",
+        }),
+      ),
+    ).to.equal(true);
+  });
+
+  it("forwards the LAA_ACCOUNTS claim to the PDA mock when in msw mode", async () => {
+    getSession.returns({
+      account: {
+        idTokenClaims: {
+          FIRM_CODE,
+          LAA_ACCOUNTS: ["0R128U", "0R695K"],
+        },
+      },
+    });
+    getAllProviderOffices.resolves({
+      data: {
+        firm: { firmName: "Acme Legal LLP" },
+        offices: [
+          { addressLine1: "1 High Street", firmOfficeCode: "0R128U" },
+        ],
+      } satisfies ProviderFirmOfficeListDto,
+      status: 200,
+    });
+
+    await loadOffices(deps)(context);
+
+    expect(
+      getAllProviderOffices.calledOnceWithExactly(
+        FIRM_CODE,
+        getPdaApiDefaultOptions(undefined, {
+          [PDA_MSW_LAA_ACCOUNTS_HEADER]: JSON.stringify(["0R128U", "0R695K"]),
+        }),
       ),
     ).to.equal(true);
   });
@@ -196,6 +232,35 @@ describe("loadOffices", () => {
     const [, offices] = setData.firstCall.args as [string, { code: string }[]];
     expect(offices).to.have.length(1);
     expect(offices[0].code).to.equal("OFFICE-01");
+  });
+
+  it("filters available offices using a serialized LAA_ACCOUNTS claim", async () => {
+    getSession.returns({
+      account: {
+        idTokenClaims: {
+          FIRM_CODE,
+          LAA_ACCOUNTS: '["0R128U","0R695K"]',
+        },
+      },
+    });
+    getAllProviderOffices.resolves({
+      data: {
+        firm: { firmName: "Acme Legal LLP" },
+        offices: [
+          { addressLine1: "1 High Street", firmOfficeCode: "0R128U" },
+          { addressLine1: "2 Low Street", firmOfficeCode: "0R695K" },
+        ],
+      },
+      status: 200,
+    });
+
+    await loadOffices(deps)(context);
+
+    const [, offices] = setData.firstCall.args as [string, { code: string }[]];
+    expect(offices.map(({ code }) => code)).to.deep.equal([
+      "0R128U",
+      "0R695K",
+    ]);
   });
 
   it("returns no offices when LAA_ACCOUNTS claim is absent", async () => {

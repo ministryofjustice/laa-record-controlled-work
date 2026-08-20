@@ -20,4 +20,15 @@ describe("getPdaApiDefaultOptions", () => {
       "X-Correlation-Id": correlationId,
     });
   });
+
+  it("should include extra headers when provided", () => {
+    const result = getPdaApiDefaultOptions(undefined, {
+      "X-Test-Header": "test-value",
+    });
+
+    expect(result.headers).to.deep.equal({
+      "X-Authorization": config.api.pda.key,
+      "X-Test-Header": "test-value",
+    });
+  });
 });
