@@ -166,6 +166,7 @@ ccq:
 
     CCQ_MODE: embedded
     CCQ_EMBEDDED_LAYOUT: rcw/application
+    HOST_SERVICE_ELIGIBILITY_ENDPOINT: /api/applications/%<application_id>s/eligibility
 
     HOST_SERVICE_URL: http://laa-record-controlled-work-rcw:3000
 
