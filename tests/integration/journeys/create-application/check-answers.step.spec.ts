@@ -79,10 +79,14 @@ describe("Check answers step", () => {
     it("renders a summary list", () => {
       const rows = summaryList.properties.rows as Array<{
         key: { text: string };
+        value: { text: string };
       }>;
       expect(rows.length).to.equal(9);
       expect(rows[0].key.text).to.equal("ECF");
       expect(rows[1].key.text).to.equal("Accessed legal aid before");
+      expect(rows[1].value.text).to.equal(
+        "Yes, about the same matter",
+      );
       expect(rows[2].key.text).to.equal("Did your client get legal help for this matter in the last 6 months?");
       expect(rows[3].key.text).to.equal("Reason for new application for same matter");
       expect(rows[4].key.text).to.equal("First name");

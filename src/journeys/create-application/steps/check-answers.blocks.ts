@@ -13,12 +13,12 @@ import {
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
 import {
-  addressChangeHref,
-  addressValueDisplay,
-  dateOfBirthDisplay,
-  ecfLabel,
-  legalAidBeforeLabel,
-  legalAidLast6MonthsLabel,
+  formatAddressChangeHref,
+  formatAddressValue,
+  formatDateOfBirth,
+  formatEcfLabel,
+  formatLegalAidBeforeLabel,
+  formatLegalAidLast6MonthsLabel,
 } from "#/journeys/create-application/steps/check-answers.formatters.js";
 import { t } from "#/lib/i18n.js";
 
@@ -78,19 +78,19 @@ export const summaryList = GovUKSummaryList({
     SummaryRow({
       href: "ecf?returnTo=check-answers",
       labelKey: "journeys.createApplication.checkAnswers.answerLabels.ecf",
-      value: { text: ecfLabel },
+      value: { text: formatEcfLabel() },
     }),
     SummaryRow({
       href: "legal-aid-before?returnTo=check-answers",
       labelKey:
         "journeys.createApplication.checkAnswers.answerLabels.legalAidBefore",
-      value: { text: legalAidBeforeLabel },
+      value: { text: formatLegalAidBeforeLabel() },
     }),
     SummaryRow({
       href: "legal-aid-last-6-months?returnTo=check-answers",
       labelKey:
         "journeys.createApplication.checkAnswers.answerLabels.legalAidLast6Months",
-      value: { text: legalAidLast6MonthsLabel },
+      value: { text: formatLegalAidLast6MonthsLabel() },
       visibleWhen: Answer("legalAidBefore").match(
         Condition.Equals("yesSameMatter"),
       ),
@@ -117,7 +117,7 @@ export const summaryList = GovUKSummaryList({
       href: "client-details?returnTo=check-answers",
       labelKey:
         "journeys.createApplication.checkAnswers.answerLabels.dateOfBirth",
-      value: { text: dateOfBirthDisplay },
+      value: { text: formatDateOfBirth() },
     }),
     SummaryRow({
       href: "ni-number?returnTo=check-answers",
@@ -126,9 +126,9 @@ export const summaryList = GovUKSummaryList({
       visibleWhen: Answer("hasNINumber").match(Condition.Equals("yes")),
     }),
     SummaryRow({
-      href: addressChangeHref,
+      href: formatAddressChangeHref(),
       labelKey: "journeys.createApplication.checkAnswers.answerLabels.address",
-      value: { html: addressValueDisplay },
+      value: { html: formatAddressValue() },
     }),
   ],
 });
