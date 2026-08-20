@@ -32,12 +32,12 @@ describe("View recorded client details step", () => {
     getApplicationStub.resolves({ status: 200, data: mockData });
   });
 
-  describe("GET /cases/123e4567-e89b-12d3-a456-426614174000/recorded/client-details", () => {
+  describe("GET /cases/123e4567-e89b-12d3-a456-426614174000/view/client-details", () => {
     let renderResult: TestRenderResult;
 
     before(async () => {
       getApplicationStub.resolves({ status: 200, data: mockData });
-      const result = await client.get(`/cases/${uuid}/recorded/client-details`, {
+      const result = await client.get(`/cases/${uuid}/view/client-details`, {
         session,
       });
       expect(result.type).to.equal("render");
