@@ -1,7 +1,8 @@
 MOCHA := ./node_modules/.bin/mocha
 PLAYWRIGHT := yarn playwright test --config=tests/ui/playwright.config.ts
+PLAYWRIGHT_E2E := yarn playwright test --config=tests/e2e/playwright.config.ts
 
-.PHONY: unit integration ui run-tests
+.PHONY: unit integration ui e2e run-tests
 
 # Run tests from a specified directory and optional file.
 #
@@ -69,4 +70,19 @@ ifdef file
 	@$(MAKE) run-tests directory=tests/ui file=$(file) "runner=$(PLAYWRIGHT)"
 else
 	yarn test:ui
+endif
+
+# Run E2E tests (multi-service browser tests).
+#
+# Usage:
+#   make e2e                                          - run all E2E tests
+#   make e2e file=evidence.no-evidence-reason         - run a specific test by filename (with or without .spec.ts)
+#   make e2e file=journeys/evidence.no-evidence-reason - when multiple files share the same name
+
+e2e:
+
+ifdef file
+	@$(MAKE) run-tests directory=tests/e2e/specs file=$(file) "runner=$(PLAYWRIGHT_E2E)"
+else
+	yarn test:e2e
 endif
