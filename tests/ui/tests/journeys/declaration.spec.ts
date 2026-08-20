@@ -46,7 +46,7 @@ test("Client Declaration - Sign Declaration step", async ({
   const applicationId = application.id;
 
   // ==========================================================================
-  // Client Declaration page
+  // Sign Declaration page
   // ==========================================================================
 
   await page.goto(`/cases/${applicationId}/declaration/sign`);
