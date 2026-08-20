@@ -126,6 +126,7 @@ export class ApplicationDto {
     return {
       clientDetails,
       legalAidBefore: this.legalAidBefore,
+      legalAidLast6Months: this.legalAidLast6Months,
       providerOfficeCode: this.providerOfficeCode,
       reasonForReapplication: this.reasonForReapplication,
       scopingQuestions: this.scopingQuestions,
