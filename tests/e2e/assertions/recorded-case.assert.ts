@@ -6,7 +6,5 @@ export const assertRecordedCaseVisible = async (
   page: Page,
   clientName: string,
 ): Promise<void> => {
-  await expect(
-    page.getByRole("heading", { name: clientName })
-  ).toBeVisible();
+  await expect(page.getByRole("heading", { name: clientName })).toBeVisible();
 };

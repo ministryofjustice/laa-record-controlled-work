@@ -16,4 +16,3 @@ export const gotoRecordedCase = async (
     .poll(() => isRecordedCasePath(new URL(page.url()).pathname, applicationId))
     .toBe(true);
 };
-
