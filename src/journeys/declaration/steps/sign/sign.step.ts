@@ -41,6 +41,7 @@ export const signStep = (): ReturnType<typeof step> => {
       confirmSignedDate(),
       continueReturnButtons(),
     ],
+    code: "declaration-sign",
     onSubmission: [
       submit({
         onValid: {
@@ -58,7 +59,7 @@ export const signStep = (): ReturnType<typeof step> => {
         when: Post("action").match(Condition.Equals("continue")),
       }),
       submit({
-        onValid: {
+        onAlways: {
           next: [
             redirect({
               goto: Format(

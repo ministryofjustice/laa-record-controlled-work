@@ -49,7 +49,9 @@ test("Client Declaration - Sign Declaration step", async ({
   // Sign Declaration page
   // ==========================================================================
 
-  await page.goto(`/cases/${applicationId}/declaration/sign`);
+  await page.goto(`/cases/${applicationId}/declaration/confirm`);
+  await page.getByRole("button", { name: "Confirm and continue" }).click();
+  await expect(page).toHaveURL(`/cases/${applicationId}/declaration/sign`);
 
   await expect(
     page.getByRole("heading", {
@@ -65,9 +67,7 @@ test("Client Declaration - Sign Declaration step", async ({
   ).toBeVisible();
 
   await expect(page.getByRole("textbox", { name: "Day" })).toBeVisible();
-
   await expect(page.getByRole("textbox", { name: "Month" })).toBeVisible();
-
   await expect(page.getByRole("textbox", { name: "Year" })).toBeVisible();
 
   await expect(
@@ -83,7 +83,7 @@ test("Client Declaration - Sign Declaration step", async ({
   ).toBeVisible();
 
   await page.getByRole("button", { name: "Save and return" }).click();
-  await expect(page).toHaveURL(`/cases/${applicationId}/declaration/confirm`);
+  await expect(page).toHaveURL(`/cases/${applicationId}/task-list`);
 
   await page.goto(`/cases/${applicationId}/declaration/sign`);
 
