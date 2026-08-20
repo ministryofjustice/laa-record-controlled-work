@@ -8,7 +8,6 @@ import { t } from "#/lib/i18n.js";
 
 export const backLink = (url: ResolvableString): GovUKBackLink =>
   GovUKBackLink({
-    attributes: { id: "back-link" },
     href: url,
   });
 
