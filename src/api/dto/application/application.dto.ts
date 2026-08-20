@@ -102,30 +102,30 @@ export class ApplicationDto {
    * @returns CreateApplicationRequestBody.
    */
   public toRcwApi(): CreateApplicationRequestBody {
+    const clientDetails: CreateApplicationRequestBody["clientDetails"] = {
+      dateOfBirth: this.dateOfBirth,
+      firstName: this.firstName,
+      hasFixedAddress: this.hasFixedAddress,
+      lastName: this.lastName,
+      niNumber: this.niNumber,
+    };
+
+    if (this.hasFixedAddress) {
+      clientDetails.address = {
+        addressLine1: this.addressLine1,
+        addressLine2: this.addressLine2,
+        addressLine3: this.addressLine3,
+        addressLine4: this.addressLine4,
+        country: this.country,
+        county: this.county,
+        postCode: this.postcode,
+        townOrCity: this.townOrCity,
+      };
+    }
+
     return {
-      clientDetails: {
-        ...(this.hasFixedAddress
-          ? {
-              address: {
-                addressLine1: this.addressLine1,
-                addressLine2: this.addressLine2,
-                addressLine3: this.addressLine3,
-                addressLine4: this.addressLine4,
-                country: this.country,
-                county: this.county,
-                postCode: this.postcode,
-                townOrCity: this.townOrCity,
-              },
-            }
-          : {}),
-        dateOfBirth: this.dateOfBirth,
-        firstName: this.firstName,
-        hasFixedAddress: this.hasFixedAddress,
-        lastName: this.lastName,
-        niNumber: this.niNumber,
-      },
+      clientDetails,
       legalAidBefore: this.legalAidBefore,
-      legalAidLast6Months: this.legalAidLast6Months,
       providerOfficeCode: this.providerOfficeCode,
       reasonForReapplication: this.reasonForReapplication,
       scopingQuestions: this.scopingQuestions,
