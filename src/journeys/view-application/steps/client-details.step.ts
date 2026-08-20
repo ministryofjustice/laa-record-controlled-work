@@ -5,8 +5,8 @@ import {
   step,
   Transformer,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
-import { viewApplicationEffects } from "#/journeys/view-application/viewApplication.effects.js";
 
+import { backLink } from "#/journeys/common.blocks.js";
 import {
   APPLICATION_DATA_KEYS,
   APPLICATIONS_DATA_KEYS,
@@ -20,7 +20,7 @@ import {
   recordedOn,
   statusTag,
 } from "#/journeys/view-application/steps/client-details.blocks.js";
-import { backLink } from "#/journeys/common.blocks.js";
+import { viewApplicationEffects } from "#/journeys/view-application/viewApplication.effects.js";
 
 const referenceNumber = Data(CONTEXT_DATA_KEYS.application).path(
   APPLICATION_DATA_KEYS.applicationRefNumber,

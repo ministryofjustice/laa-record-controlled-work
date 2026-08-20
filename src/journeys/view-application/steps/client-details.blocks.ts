@@ -1,6 +1,13 @@
 import { Format } from "@ministryofjustice/hmpps-forge/core/authoring";
-import { HtmlBlock, ResolvableString } from "@ministryofjustice/hmpps-forge/core/components";
-import { GovUKBody, GovUKButton, GovUKHeading } from "@ministryofjustice/hmpps-forge/govuk-components";
+import {
+  HtmlBlock,
+  type ResolvableString,
+} from "@ministryofjustice/hmpps-forge/core/components";
+import {
+  GovUKBody,
+  GovUKButton,
+  GovUKHeading,
+} from "@ministryofjustice/hmpps-forge/govuk-components";
 
 /**
  * Builds a GovUKBody block for the case reference number.
@@ -10,19 +17,10 @@ import { GovUKBody, GovUKButton, GovUKHeading } from "@ministryofjustice/hmpps-f
 export function caseReferenceNumber(
   caseRefNumber: ResolvableString,
 ): ReturnType<typeof GovUKBody> {
-  return GovUKBody({ 
+  return GovUKBody({
+    classes: "govuk-!-margin-bottom-1",
+    size: "l",
     text: Format("<strong>Reference number:</strong> %1", caseRefNumber),
-    size: "l",
-    classes: "govuk-!-margin-bottom-1"
-  });
-}
-
-export function recordedOn(
-  recordedOnDate: ResolvableString,
-): ReturnType<typeof GovUKBody> {
-  return GovUKBody({ 
-    text: Format("<strong>Recorded on:</strong> %1", recordedOnDate),
-    size: "l",
   });
 }
 
@@ -34,9 +32,34 @@ export function recordedOn(
 export function heading(
   text: ResolvableString,
 ): ReturnType<typeof GovUKHeading> {
-  return GovUKHeading({ 
-    text: text,
-    size: "xl"
+  return GovUKHeading({
+    size: "xl",
+    text,
+  });
+}
+
+/**
+ * Builds a GovUKButton for printing the case, non functional.
+ * @returns A GovUKButton block definition for printing the case.
+ */
+export function printButton(): ReturnType<typeof GovUKButton> {
+  return GovUKButton({
+    classes: "govuk-button--secondary",
+    text: "Print this case",
+  });
+}
+
+/**
+ * Builds a GovUKBody block for the recorded on date.
+ * @param recordedOnDate - The text content for the recorded on date.
+ * @returns A GovUKBody block definition for the recorded on date.
+ */
+export function recordedOn(
+  recordedOnDate: ResolvableString,
+): ReturnType<typeof GovUKBody> {
+  return GovUKBody({
+    size: "l",
+    text: Format("<strong>Recorded on:</strong> %1", recordedOnDate),
   });
 }
 
@@ -52,14 +75,3 @@ export function statusTag(
     content: `<div class="govuk-!-margin-bottom-4"><div class="govuk-tag govuk-tag--purple">${text}</div></div>`,
   });
 }
-
-/**
- * Builds a GovUKButton for printing the case, non functional.
- * @returns A GovUKButton block definition for printing the case.
- */
-export function printButton(): ReturnType<typeof GovUKButton> {
-  return GovUKButton({
-    text: "Print this case",
-    classes: "govuk-button--secondary"
-  });
-} 
