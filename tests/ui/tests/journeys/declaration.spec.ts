@@ -71,7 +71,7 @@ test("Client Declaration - Sign Declaration step", async ({
   ).toBeVisible();
 
   await page.getByRole("button", { name: "Save and return" }).click();
-  await expect(page).toHaveURL(`/cases/${applicationId}/declaration/confirm/`);
+  await expect(page).toHaveURL(`/cases/${applicationId}/declaration/confirm`);
 
   await page.goto(`/cases/${applicationId}/declaration/sign`);
 
