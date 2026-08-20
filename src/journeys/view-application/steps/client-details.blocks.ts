@@ -68,9 +68,7 @@ export function recordedOn(
  * @param text - The text content for the status tag.
  * @returns A status tag block definition.
  */
-export function statusTag(
-  text: string,
-): ReturnType<typeof HtmlBlock> {
+export function statusTag(text: string): ReturnType<typeof HtmlBlock> {
   return HtmlBlock({
     content: `<div class="govuk-!-margin-bottom-4"><div class="govuk-tag govuk-tag--purple">${text}</div></div>`,
   });
