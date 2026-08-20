@@ -59,6 +59,18 @@ test("Client Declaration - Sign Declaration step", async ({
   ).toBeVisible();
 
   await expect(
+    page.getByRole("checkbox", {
+      name: "I confirm that I have a signed declaration from my client",
+    }),
+  ).toBeVisible();
+
+  await expect(page.getByRole("textbox", { name: "Day" })).toBeVisible();
+
+  await expect(page.getByRole("textbox", { name: "Month" })).toBeVisible();
+
+  await expect(page.getByRole("textbox", { name: "Year" })).toBeVisible();
+
+  await expect(
     page.getByRole("button", {
       name: "Continue",
     }),
@@ -75,6 +87,14 @@ test("Client Declaration - Sign Declaration step", async ({
 
   await page.goto(`/cases/${applicationId}/declaration/sign`);
 
+  await page
+    .getByRole("checkbox", {
+      name: "I confirm that I have a signed declaration from my client",
+    })
+    .check();
+  await page.getByRole("textbox", { name: "Day" }).fill("1");
+  await page.getByRole("textbox", { name: "Month" }).fill("2");
+  await page.getByRole("textbox", { name: "Year" }).fill("2026");
   await page.getByRole("button", { name: "Continue" }).click();
   await expect(page).toHaveURL(`/cases/${applicationId}/declaration/ufn`);
 });

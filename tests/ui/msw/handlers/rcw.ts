@@ -2,6 +2,7 @@ import {
   getCreateApplicationMockHandler,
   getGetApplicationMockHandler,
   getGetApplicationsMockHandler,
+  getUpdateApplicationDeclarationMockHandler,
   getUpdateApplicationEvidenceMockHandler,
 } from "#orval/mocks/rcw/msw/applications/applications.msw.gen.js";
 
@@ -16,4 +17,5 @@ export const rcwHandlers = [
   getCreateApplicationMockHandler(createApplicationResponse),
   getGetApplicationMockHandler(application),
   getUpdateApplicationEvidenceMockHandler(),
+  getUpdateApplicationDeclarationMockHandler(),
 ];
