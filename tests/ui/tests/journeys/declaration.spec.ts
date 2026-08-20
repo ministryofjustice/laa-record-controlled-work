@@ -40,7 +40,7 @@ test("Client Declaration - Client Declaration step", async ({
   await expect(page).toHaveURL(`/cases/${applicationId}/declaration/sign`);
 });
 
-test("Client Declaration - Client Declaration step", async ({
+test("Client Declaration - Sign Declaration step", async ({
   withSelectedOffice: page,
 }) => {
   const applicationId = application.id;
