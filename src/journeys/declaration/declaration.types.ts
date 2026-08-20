@@ -12,7 +12,7 @@ export interface DeclarationAnswers extends Record<string, unknown> {
 export type DeclarationContext = EffectFunctionContext<
   DeclarationData,
   DeclarationAnswers,
-  JourneySession // a reusable type set in root journey.types
+  JourneySession
 >;
 
 export interface DeclarationData extends Record<string, unknown> {}
