@@ -41,7 +41,7 @@
         "before 5am every weekday",
         "every weekend"
       ],
-      "rebaseWhen": "conflicted",
+      "rebaseWhen": "behind-base-branch",
       "automerge": true,
       "automergeType": "pr",
 

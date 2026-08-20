@@ -37,6 +37,7 @@ export const CONTEXT_DATA_KEYS = {
   declarationStatus: "declarationStatus",
   evidenceStatus: "evidenceStatus",
   meansAssessment: "meansAssessment",
+  recordedOn: "recordedOn",
   selectedOffice: "selectedOffice",
   singleOffice: "singleOffice",
 } as const;
