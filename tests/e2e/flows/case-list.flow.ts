@@ -53,3 +53,28 @@ export const openDraftCaseFromCaseList = async (
 
   return openedApplicationId;
 };
+
+export const openRecordedCaseFromCaseList = async (
+  page: Page,
+  applicationId: string,
+): Promise<string> => {
+  await gotoCaseList(page);
+  await page.getByRole("link", { name: "Completed" }).click();
+
+  const recordedCaseLink = page
+    .locator(`a[href='/cases/${applicationId}/recorded/client-details']`)
+    .first();
+
+  await expect(recordedCaseLink).toBeVisible();
+  await recordedCaseLink.click();
+
+  const openedApplicationId = extractApplicationIdFromTaskListPath(
+    new URL(page.url()).pathname,
+  );
+
+  if (openedApplicationId === undefined) {
+    throw new Error("Failed to extract application ID from task-list URL");
+  }
+
+  return openedApplicationId;
+};

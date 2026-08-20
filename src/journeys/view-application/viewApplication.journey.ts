@@ -4,7 +4,7 @@ import { clientDetailsStep } from "#/journeys/view-application/steps/client-deta
 
 export const viewApplicationJourney = journey({
   code: "viewApplication",
-  path: "/recorded-case/:applicationID",
+  path: "/cases/:applicationID/recorded",
   reachability: { disableReachabilityChecks: true },
   steps: [clientDetailsStep()],
   title: "View case",
