@@ -80,7 +80,6 @@ test.describe("@e2e critical path", () => {
     await actor.submitApplication(applicationId);
     await expect(page).toHaveURL(/\/submittedPage-TODO/);
   });
-  test.fixme("submits application", async () => {});
   test.fixme("checks recorded cases", async () => {
     await actor.openRecordedCaseFromCaseList(applicationId);
   });
