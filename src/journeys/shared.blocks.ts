@@ -55,6 +55,8 @@ export const caption = (text: string): HtmlBlock =>
 export function continueButton(): GovUKButton {
   return button(t("common.continue"));
 }
+export const clientDetailsCaption = (): HtmlBlock =>
+  caption(t("journeys.createApplication.caption"));
 
 export const submitButton = GovUKButton({
   text: t("common.submit"),
