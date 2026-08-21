@@ -113,7 +113,7 @@ describe("Task list step", () => {
         "Your client qualifies financially for civil legal aid",
       );
       expect(indicator).to.include(
-        `href="/cases/${uuid}/eligibility/"`,
+        `href="/cases/${uuid}/eligibility/?destination=check-result"`,
       );
       expect(indicator).to.include("View result");
     });
@@ -168,9 +168,59 @@ describe("Task list step", () => {
         "Your client qualifies financially for civil legal aid based on the information you entered.",
       );
       expect(indicator).to.include(
-        `href="/cases/${uuid}/eligibility/"`,
+        `href="/cases/${uuid}/eligibility/?destination=check-result"`,
       );
       expect(indicator).to.include("View result");
+    });
+
+    describe("means assessment status rendering", () => {
+      it("links to the CCQ landing with a check-answers destination when completed", async () => {
+        getApplicationStub.resolves({
+          status: 200,
+          data: getGetApplicationResponseMock({
+            eligibility: eligibilityResult,
+          }),
+        });
+
+        const result = await client.get(`/cases/${uuid}/task-list`, {
+          session: {},
+        });
+
+        expect(result.type).to.equal("render");
+        const meansAssessmentRender = result as TestRenderResult;
+        const lists = meansAssessmentRender.getBlocksByVariant("govukTaskList");
+        const meansAssessmentItems = lists[1].properties
+          .items as RenderedTaskListItem[];
+        const meansAssessmentItem = meansAssessmentItems[0];
+
+        expect(meansAssessmentItem.href).to.equal(
+          `/cases/${uuid}/eligibility/?destination=check-answers`,
+        );
+        expect(meansAssessmentItem.status.text).to.equal("Completed");
+      });
+
+      it("links to the CCQ landing without a destination when incomplete", async () => {
+        getApplicationStub.resolves({
+          status: 200,
+          data: getGetApplicationResponseMock({
+            eligibility: {},
+          }),
+        });
+
+        const result = await client.get(`/cases/${uuid}/task-list`, {
+          session: {},
+        });
+
+        expect(result.type).to.equal("render");
+        const meansAssessmentRender = result as TestRenderResult;
+        const lists = meansAssessmentRender.getBlocksByVariant("govukTaskList");
+        const meansAssessmentItems = lists[1].properties
+          .items as RenderedTaskListItem[];
+        const meansAssessmentItem = meansAssessmentItems[0];
+
+        expect(meansAssessmentItem.href).to.equal(`/cases/${uuid}/eligibility/`);
+        expect(meansAssessmentItem.status.tag?.text).to.equal("Incomplete");
+      });
     });
 
     describe("declaration status rendering", () => {
