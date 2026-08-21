@@ -49,27 +49,7 @@ describe("loadApplication", () => {
   afterEach(() => sinon.restore());
 
   it("sets application in context from getApplication response", async () => {
-    const mockApplication = getGetApplicationResponseMock({
-      id: applicationId,
-      applicationState: "DRAFT",
-      declaration: {
-        declarationConfirmation: false,
-        createdAt: "2026-01-01T00:00:00Z",
-        createdBy: "test",
-        modifiedAt: "2026-01-01T00:00:00Z",
-        modifiedBy: "test",
-      },
-      evidence: {
-        payeIncomeEvidence: false,
-        otherIncomeEvidence: false,
-        housingCostsEvidence: false,
-        capitalEvidence: false,
-        createdAt: "2026-01-01T00:00:00Z",
-        createdBy: "test",
-        modifiedAt: "2026-01-01T00:00:00Z",
-        modifiedBy: "test",
-      },
-    });
+    const mockApplication = getGetApplicationResponseMock();
 
     getApplicationStub.resolves({ status: 200, data: mockApplication });
 

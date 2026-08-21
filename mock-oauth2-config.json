@@ -21,6 +21,8 @@
           "claims": {
             "aud": "default",
             "scp": "Applications.Read Applications.Write",
+            "oid": "test_user",
+            "tid": "test_tenant",
             "LAA_ACCOUNTS": ["R1XEVG", "VGHVEY", "3TVRNM"],
             "FIRM_CODE": "123456"
           }
@@ -31,20 +33,18 @@
           "claims": {
             "aud": "default",
             "scp": "Applications.Read Applications.Write",
+            "oid": "test_user",
+            "tid": "test_tenant",
             "LAA_ACCOUNTS": ["R1XEVG", "VGHVEY", "3TVRNM"],
             "FIRM_CODE": "123456"
           }
-        }
-      ]
-    },
-    {
-      "issuerId": "default",
-      "tokenExpiry": 3600,
-      "requestMappings": [
+        },
         {
           "requestParam": "grant_type",
           "match": "urn:ietf:params:oauth:grant-type:jwt-bearer",
           "claims": {
+            "oid": "test_user",
+            "tid": "test_tenant",
             "aud": "default",
             "scp": "DataStore.Access"
           }

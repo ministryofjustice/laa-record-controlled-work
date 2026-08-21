@@ -205,6 +205,9 @@
           "dateOfBirth": "Date of birth",
           "niNumber": "National Insurance number",
           "address": "Address"
+        },
+        "answerValues": {
+          "noFixedAddress": "No fixed address"
         }
       }
     },

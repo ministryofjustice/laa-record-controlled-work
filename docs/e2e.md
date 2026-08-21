@@ -100,13 +100,9 @@ The e2e suite does **not** use MSW. When the docker-compose stack is running, `R
 
 The mock OAuth2 server (`ghcr.io/navikt/mock-oauth2-server`) is configured by `mock-oauth2-config.json` in the RCW repo root. It issues JWTs whose claims include `LAA_ACCOUNTS`, a list of office codes the signed-in user is authorised for.
 
-**These codes must match the office codes returned by the MSW PDA stub.**
+**`LAA_ACCOUNTS` is authoritative over the MSW PDA stub, no manual sync required.**
 
-The PDA fixture (`msw/fixtures/pda.ts`) generates offices deterministically using a fixed faker seed (`12345`). The `LAA_ACCOUNTS` claim in `mock-oauth2-config.json` (and in
-`mock-oauth2-login.html`) is kept manually in sync with the first _N_ office codes produced by that seed (`R1XEVG`, `VGHVEY`, `3TVRNM`).
-
-If they diverge, the user will not be offered any matching offices on the select-office screen (or worse, will be offered offices they cannot access), breaking the e2e login flow. The comment
-in `msw/fixtures/pda.ts` documents this constraint.
+The PDA fixture (`msw/fixtures/pda.ts`) generates offices deterministically using a fixed faker seed (`12345`), but `loadOffices.ts` reads the signed-in user's `LAA_ACCOUNTS` claim from the session and forwards it to the MSW PDA handler via the `x-pda-msw-laa-accounts` header (see `src/lib/constants/pda.ts`). The handler (`msw/handlers/pda.ts`) overrides the faker-seeded `firmOfficeCode`s with these codes, so whatever `LAA_ACCOUNTS` the mock OAuth2 server (or real Entra) issues is what the select-office screen offers. This applies whether the mock OAuth2 server is reached via `yarn dev:docker` or `yarn dev:docker:entra`.
 
 ### Why the codes matter to the API tier
 

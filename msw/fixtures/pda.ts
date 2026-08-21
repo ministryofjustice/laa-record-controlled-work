@@ -4,24 +4,36 @@ import type { ProviderFirmOfficeListDto } from "#/api/clients/pda/model/provider
 
 import { getGetAllProviderOfficesResponseMock } from "#orval/mocks/pda/msw/provider-firms-endpoints/provider-firms-endpoints.msw.gen.js";
 
-// if you change this, make sure you update the office codes in LAA_ACCOUNTS in
-// mock-oauth2-config.json and mock-oauth2-login.html
-// eslint-disable-next-line @typescript-eslint/no-magic-numbers -- actually magic
-faker.seed(12345);
+const FIRST_OFFICE_INDEX = 0;
+const FAKER_SEED = 12345;
 
 /**
  * .
  * @param limitNumberOfOffices .
+ * @param officeCodes .
  * @returns .
  */
 export function getProviderOfficesResponse(
   limitNumberOfOffices: number,
+  officeCodes?: string[],
 ): ProviderFirmOfficeListDto {
+  faker.seed(FAKER_SEED);
+
   const providerOfficesResponse = getGetAllProviderOfficesResponseMock();
+  const offices = officeCodes
+    ? officeCodes.map((firmOfficeCode, index) => ({
+        ...providerOfficesResponse.offices[
+          index % providerOfficesResponse.offices.length
+        ],
+        firmOfficeCode,
+      }))
+    : providerOfficesResponse.offices.slice(
+        FIRST_OFFICE_INDEX,
+        limitNumberOfOffices,
+      );
 
   return {
     ...providerOfficesResponse,
-    // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- intuitive
-    offices: providerOfficesResponse.offices.slice(0, limitNumberOfOffices),
+    offices,
   };
 }

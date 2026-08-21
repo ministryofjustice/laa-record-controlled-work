@@ -10,6 +10,7 @@ import {
   gotoCase,
   gotoCaseList,
   openDraftCaseFromCaseList,
+  openRecordedCaseFromCaseList,
 } from "#tests/e2e/flows/case-list.flow.js";
 import { completeCcqShortestEligiblePath } from "#tests/e2e/flows/ccq.flow.js";
 import {
@@ -41,6 +42,7 @@ export interface Actor {
   login: () => Promise<void>;
   openDraftCaseFromCaseList: (applicationId: string) => Promise<string>;
   openMeansAssessmentFromTaskList: (applicationId: string) => Promise<void>;
+  openRecordedCaseFromCaseList: (applicationId: string) => Promise<string>;
   returnToTaskListFromEligibilityResult: (
     applicationId: string,
   ) => Promise<void>;
@@ -69,6 +71,7 @@ export const createActor = (page: Page): Actor => ({
   },
   completeCreateCaseShortestPath: async () =>
     await completeCreateCaseShortestPath(page),
+
   completeEvidenceNoPath: async (applicationId: string) => {
     await completeEvidenceNoPath(page, applicationId);
   },
@@ -89,6 +92,9 @@ export const createActor = (page: Page): Actor => ({
   },
   openMeansAssessmentFromTaskList: async (applicationId: string) => {
     await openMeansAssessmentFromTaskList(page, applicationId);
+  },
+  openRecordedCaseFromCaseList: async (applicationId: string) => {
+    return await openRecordedCaseFromCaseList(page, applicationId);
   },
   returnToTaskListFromEligibilityResult: async (applicationId: string) => {
     await returnToTaskListFromEligibilityResult(page, applicationId);

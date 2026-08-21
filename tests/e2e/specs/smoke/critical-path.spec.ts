@@ -67,7 +67,12 @@ test.describe("@e2e critical path", () => {
     await actor.returnToTaskListFromEligibilityResult(applicationId);
   });
 
-  test.fixme("completes evidence section", async () => {});
+  test("completes evidence section", async () => {
+    await actor.completeEvidenceYesPath(applicationId);
+
+    await expect(page).toHaveURL(taskListUrlPattern(applicationId));
+    await actor.assertTaskStatus("Evidence", "Completed");
+  });
   test.fixme("completes declaration", async () => {});
 
   test.fixme("submits application", async () => {
@@ -77,5 +82,9 @@ test.describe("@e2e critical path", () => {
   });
 
   test.fixme("checks recorded cases", async () => {});
+  test.fixme("submits application", async () => {});
+  test.fixme("checks recorded cases", async () => {
+    await actor.openRecordedCaseFromCaseList(applicationId);
+  });
   test.fixme("exports case", async () => {});
 });

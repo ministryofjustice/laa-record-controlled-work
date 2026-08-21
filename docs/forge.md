@@ -263,13 +263,14 @@ Only exports methods that:
 - Return strings—either plain text or HTML.
 - Format or conditionally return values.
 - Exports using the naming convention `format<SomeThing>`.
+- Name translated strings for their semantic meaning before conditional use.
 
 ```ts
 /**
  * Legal Aid Before label block.
  * @returns ResolvableString
  */
-export const legalAidBeforeLabel = (): ResolvableString => {
+export const formatLegalAidBeforeLabel = (): ResolvableString => {
   const same = t(
     "journeys.createApplication.legalAidBefore.radioButton.yesSameMatter",
   );
