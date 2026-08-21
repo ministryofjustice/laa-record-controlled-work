@@ -9,26 +9,30 @@ import {
 
 import { AnswerKey } from "#/journeys/AnswerKey.enum.js";
 import { CreateApplicationEffects } from "#/journeys/create-application/create-application.effects.js";
-import { ecfPath } from "#/journeys/create-application/steps/ecfDropout/ecfDropout.formatters.js";
 import { legalAidBeforeRadioInput } from "#/journeys/create-application/steps/legalAidBefore/legalAidBefore.blocks.js";
+import { JourneyPath } from "#/journeys/JourneyPath.enum.js";
 import {
-  legalAidBeforeCaption,
-  legalAidBeforeTitle,
-} from "#/journeys/create-application/steps/legalAidBefore/legalAidBefore.formatters.js";
-import { backLink, caption, continueButton } from "#/journeys/shared.blocks.js";
+  backLink,
+  clientDetailsCaption,
+  continueButton,
+} from "#/journeys/shared.blocks.js";
 import {
   hasCheckAnswersInQuery,
   redirectToCheckAnswers,
 } from "#/journeys/shared.hook.js";
 import { StepCode } from "#/journeys/StepCode.enum.js";
+import { t } from "#/lib/i18n.js";
+
+const ECF_PATH = `${JourneyPath.CREATE_APPLICATION}/ecf`;
+const TITLE = t("journeys.createApplication.legalAidBefore.title");
 
 export const legalAidBeforeStep = (
   journeyCode: string,
 ): ReturnType<typeof step> =>
   step({
     blocks: [
-      backLink(ecfPath),
-      caption(legalAidBeforeCaption),
+      backLink(ECF_PATH),
+      clientDetailsCaption(),
       legalAidBeforeRadioInput(),
       continueButton(),
     ],
@@ -38,7 +42,7 @@ export const legalAidBeforeStep = (
     reachability: {
       entryWhen: hasCheckAnswersInQuery,
     },
-    title: legalAidBeforeTitle,
+    title: TITLE,
   });
 
 const onSubmission = (journeyCode: string): SubmitHook =>

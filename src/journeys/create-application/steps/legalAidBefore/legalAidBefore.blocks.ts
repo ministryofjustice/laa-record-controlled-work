@@ -6,13 +6,19 @@ import {
 import { GovUKRadioInput } from "@ministryofjustice/hmpps-forge/govuk-components";
 
 import { AnswerKey } from "#/journeys/AnswerKey.enum.js";
-import {
-  differentMatter,
-  legalAidBeforeTitle,
-  legalAidBeforeValidation,
-  sameMatter,
-} from "#/journeys/create-application/steps/legalAidBefore/legalAidBefore.formatters.js";
 import { t } from "#/lib/i18n.js";
+
+const QUESTION = t("journeys.createApplication.legalAidBefore.title");
+const SAME_MATTER = t(
+  "journeys.createApplication.legalAidBefore.radioButton.yesSameMatter",
+);
+const DIFFERENT_MATTER = t(
+  "journeys.createApplication.legalAidBefore.radioButton.yesDifferentMatter",
+);
+
+const VALIDATION_MESSAGE = t(
+  "journeys.createApplication.legalAidBefore.validation.required",
+);
 
 export const legalAidBeforeRadioInput = (): GovUKRadioInput =>
   GovUKRadioInput({
@@ -21,16 +27,16 @@ export const legalAidBeforeRadioInput = (): GovUKRadioInput =>
       legend: {
         classes: "govuk-fieldset__legend--l",
         isPageHeading: true,
-        text: legalAidBeforeTitle,
+        text: QUESTION,
       },
     },
     items: [
       {
-        text: sameMatter,
+        text: SAME_MATTER,
         value: "yesSameMatter",
       },
       {
-        text: differentMatter,
+        text: DIFFERENT_MATTER,
         value: "yesDifferentMatter",
       },
       {
@@ -41,7 +47,7 @@ export const legalAidBeforeRadioInput = (): GovUKRadioInput =>
     validWhen: [
       validation({
         condition: Self().match(Condition.IsRequired()),
-        message: legalAidBeforeValidation,
+        message: VALIDATION_MESSAGE,
       }),
     ],
   });
