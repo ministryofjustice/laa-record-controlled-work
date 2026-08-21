@@ -64,7 +64,14 @@ test.describe("@e2e critical path", () => {
     await actor.assertEligibilityResultVisible();
 
     await actor.viewCompletedEligibilityAssessment(applicationId);
-    await actor.returnToTaskListFromEligibilityResult(applicationId);
+    await actor.returnToTaskList(applicationId);
+  });
+
+  test("user edits the completed eligibility assessment", async () => {
+    await actor.openMeansAssessmentFromTaskList(applicationId);
+    await actor.changeBankBalance(applicationId);
+    await actor.submitCheckAnswers(applicationId);
+    await actor.returnToTaskList(applicationId);
   });
 
   test("completes evidence section", async () => {

@@ -12,7 +12,12 @@ import {
   openDraftCaseFromCaseList,
   openRecordedCaseFromCaseList,
 } from "#tests/e2e/flows/case-list.flow.js";
-import { completeCcqShortestEligiblePath } from "#tests/e2e/flows/ccq.flow.js";
+import {
+  changeBankBalance,
+  completeCcqShortestEligiblePath,
+  returnToTaskList,
+  submitCheckAnswers,
+} from "#tests/e2e/flows/ccq.flow.js";
 import {
   completeCreateCaseShortestPath,
   startNewCase,
@@ -24,7 +29,6 @@ import {
 import { selectOfficeByCode } from "#tests/e2e/flows/office.flow.js";
 import {
   openMeansAssessmentFromTaskList,
-  returnToTaskListFromEligibilityResult,
   viewCompletedEligibilityAssessment,
 } from "#tests/e2e/flows/task-list.flow.js";
 
@@ -32,6 +36,7 @@ export interface Actor {
   assertEligibilityResultVisible: () => Promise<void>;
   assertInProgressCaseVisible: (clientName: string) => Promise<void>;
   assertTaskStatus: (taskName: string, expectedStatus: string) => Promise<void>;
+  changeBankBalance: (applicationId: string) => Promise<void>;
   completeCcqShortestEligiblePath: (applicationId: string) => Promise<void>;
   completeCreateCaseShortestPath: () => Promise<string>;
   completeEvidenceNoPath: (applicationId: string) => Promise<void>;
@@ -42,11 +47,10 @@ export interface Actor {
   openDraftCaseFromCaseList: (applicationId: string) => Promise<string>;
   openMeansAssessmentFromTaskList: (applicationId: string) => Promise<void>;
   openRecordedCaseFromCaseList: (applicationId: string) => Promise<string>;
-  returnToTaskListFromEligibilityResult: (
-    applicationId: string,
-  ) => Promise<void>;
+  returnToTaskList: (applicationId: string) => Promise<void>;
   selectOfficeByCode: (code: string) => Promise<void>;
   startNewCase: () => Promise<void>;
+  submitCheckAnswers: (applicationId: string) => Promise<void>;
   viewCompletedEligibilityAssessment: (applicationId: string) => Promise<void>;
 }
 
@@ -64,12 +68,15 @@ export const createActor = (page: Page): Actor => ({
   assertTaskStatus: async (taskName: string, expectedStatus: string) => {
     await assertTaskStatus(page, taskName, expectedStatus);
   },
+  changeBankBalance: async (applicationId: string) => {
+    await changeBankBalance(page, applicationId);
+  },
   completeCcqShortestEligiblePath: async (applicationId: string) => {
     await completeCcqShortestEligiblePath(page, applicationId);
   },
+
   completeCreateCaseShortestPath: async () =>
     await completeCreateCaseShortestPath(page),
-
   completeEvidenceNoPath: async (applicationId: string) => {
     await completeEvidenceNoPath(page, applicationId);
   },
@@ -94,14 +101,17 @@ export const createActor = (page: Page): Actor => ({
   openRecordedCaseFromCaseList: async (applicationId: string) => {
     return await openRecordedCaseFromCaseList(page, applicationId);
   },
-  returnToTaskListFromEligibilityResult: async (applicationId: string) => {
-    await returnToTaskListFromEligibilityResult(page, applicationId);
+  returnToTaskList: async (applicationId: string) => {
+    await returnToTaskList(page, applicationId);
   },
   selectOfficeByCode: async (code: string) => {
     await selectOfficeByCode(page, code);
   },
   startNewCase: async () => {
     await startNewCase(page);
+  },
+  submitCheckAnswers: async (applicationId: string) => {
+    await submitCheckAnswers(page, applicationId);
   },
   viewCompletedEligibilityAssessment: async (applicationId: string) => {
     await viewCompletedEligibilityAssessment(page, applicationId);

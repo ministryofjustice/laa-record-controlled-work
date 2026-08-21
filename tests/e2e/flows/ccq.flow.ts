@@ -2,7 +2,10 @@ import type { Page } from "@playwright/test";
 
 import { expect } from "@playwright/test";
 
-import { isTaskListPath } from "#tests/e2e/flows/task-list.flow.js";
+import {
+  isTaskListPath,
+  taskListUrlPattern,
+} from "#tests/e2e/flows/task-list.flow.js";
 
 const FLOW_TIMEOUT_MS = 30000;
 const MAX_STEPS = 20;
@@ -172,4 +175,38 @@ export const completeCcqShortestEligiblePath = async (
   /* eslint-enable no-await-in-loop */
 
   throw new Error("Eligibility journey exceeded max step count");
+};
+
+export const changeBankBalance = async (
+  page: Page,
+  applicationId: string,
+): Promise<void> => {
+  await page.locator('a[aria-label="Change Client assets"]').click();
+
+  await page
+    .getByRole("textbox", { name: "Total money in bank account" })
+    .fill("1");
+
+  await page.getByRole("button", { name: "Save and continue" }).click();
+  await expect(page).toHaveURL(
+    new RegExp(`/cases/${applicationId}/eligibility/check-answers(?:#.*)?$`),
+  );
+};
+
+export const submitCheckAnswers = async (
+  page: Page,
+  applicationId: string,
+): Promise<void> => {
+  await page.getByRole("button", { name: "Submit eligibility check" }).click();
+  await expect(page).toHaveURL(
+    new RegExp(`/cases/${applicationId}/eligibility/check-result(?:#.*)?$`),
+  );
+};
+
+export const returnToTaskList = async (
+  page: Page,
+  applicationId: string,
+): Promise<void> => {
+  await page.getByRole("button", { name: "Save and continue" }).click();
+  await expect(page).toHaveURL(taskListUrlPattern(applicationId));
 };
