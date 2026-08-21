@@ -16,5 +16,5 @@ const VALIDATION_MESSAGE = t(
  * @returns {GovUKRadioInput} A GovUK radio input component with yes/no options for the ECF question
  */
 export function ecfQuestion(): GovUKRadioInput {
-  return yesOrNoRadioInput(AnswerKey.ECF, QUESTION, VALIDATION_MESSAGE);
+  return yesOrNoRadioInput(AnswerKey.ecf, QUESTION, VALIDATION_MESSAGE);
 }
