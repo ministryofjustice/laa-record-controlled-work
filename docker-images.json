@@ -1,6 +1,6 @@
 {
   "images": [
     "docker.io/library/node:26.3.1-alpine",
-    "docker.io/nginxinc/nginx-unprivileged@sha256:59ccf0943b0b8e8d9e6ea9039a39555730f544701a655c596f7df7d096c593f5"
+    "docker.io/nginxinc/nginx-unprivileged@sha256:c3fed6436b61d2bf2201ec032c35c000871f7ed062dea5d586bc6bf4d0fdd140"
   ]
 }
