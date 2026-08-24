@@ -35,7 +35,7 @@ export const confirmStep = (): ReturnType<typeof step> =>
     ],
     onSubmission: [
       submit({
-        onValid: {
+        onAlways: {
           next: [
             redirect({
               goto: "sign",
