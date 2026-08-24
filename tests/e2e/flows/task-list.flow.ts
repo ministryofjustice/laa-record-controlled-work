@@ -52,11 +52,3 @@ export const viewCompletedEligibilityAssessment = async (
     new RegExp(`/cases/${applicationId}/eligibility/check-result$`),
   );
 };
-
-export const returnToTaskListFromEligibilityResult = async (
-  page: Page,
-  applicationId: string,
-): Promise<void> => {
-  await page.getByRole("button", { name: "Save and continue" }).click();
-  await expect(page).toHaveURL(taskListUrlPattern(applicationId));
-};
