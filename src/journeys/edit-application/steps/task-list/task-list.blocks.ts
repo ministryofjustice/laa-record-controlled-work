@@ -25,6 +25,7 @@ import {
   CONTEXT_DATA_KEYS,
   PARAMS_KEYS,
 } from "#/journeys/journey.constants.js";
+import { Status } from "#/journeys/journey.types.js";
 import { H2 } from "#/lib/constants/headings.js";
 import { t } from "#/lib/i18n.js";
 
@@ -72,8 +73,23 @@ export function taskList(): BlockDefinition[] {
     GovUKTaskList({
       items: [
         taskItem(
-          t("journeys.editApplication.taskList.meansAssessment.taskItem.label"),
-          Format("/cases/%1/eligibility/", Params(PARAMS_KEYS.applicationID)),
+          t(
+            "journeys.createApplication.taskList.meansAssessment.taskItem.label",
+          ),
+          match(Data(CONTEXT_DATA_KEYS.meansAssessment))
+            .branch(
+              Condition.Equals(Status.COMPLETED),
+              Format(
+                "/cases/%1/eligibility/?destination=check-answers",
+                Params(PARAMS_KEYS.applicationID),
+              ),
+            )
+            .otherwise(
+              Format(
+                "/cases/%1/eligibility/",
+                Params(PARAMS_KEYS.applicationID),
+              ),
+            ),
           Data(CONTEXT_DATA_KEYS.meansAssessment),
         ),
       ],
@@ -127,7 +143,7 @@ function eligibilityResult(): HtmlBlock {
       `<div class="eligibility-result-box">
         <h2 class="govuk-heading-s">%1</h2>
         <p class="govuk-body">%2</p>
-        <p class="govuk-!-margin-bottom-0"><a class="govuk-link" href="/cases/%3/eligibility/">%4</a></p>
+        <p class="govuk-!-margin-bottom-0"><a class="govuk-link" href="/cases/%3/eligibility/?destination=check-result">%4</a></p>
       </div>`,
       t("journeys.editApplication.taskList.eligibilityResult.title"),
       eligibleContent,

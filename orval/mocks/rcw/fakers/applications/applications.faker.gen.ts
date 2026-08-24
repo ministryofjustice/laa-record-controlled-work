@@ -111,6 +111,7 @@ export const getGetApplicationResponseMock = <
     declaration: {
       id: faker.string.uuid(),
       declarationConfirmation: faker.datatype.boolean(),
+      dateSigned: faker.date.past().toISOString().slice(0, 10),
       createdAt: faker.date.past().toISOString().slice(0, 19) + "Z",
       createdBy: faker.string.alpha({ length: { min: 10, max: 20 } }),
       modifiedAt: faker.date.past().toISOString().slice(0, 19) + "Z",
