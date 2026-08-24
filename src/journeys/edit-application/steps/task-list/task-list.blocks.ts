@@ -73,9 +73,7 @@ export function taskList(): BlockDefinition[] {
     GovUKTaskList({
       items: [
         taskItem(
-          t(
-            "journeys.createApplication.taskList.meansAssessment.taskItem.label",
-          ),
+          t("journeys.editApplication.taskList.meansAssessment.taskItem.label"),
           match(Data(CONTEXT_DATA_KEYS.meansAssessment))
             .branch(
               Condition.Equals(Status.COMPLETED),
