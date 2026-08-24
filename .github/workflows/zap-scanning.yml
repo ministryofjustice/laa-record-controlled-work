@@ -51,7 +51,7 @@ jobs:
           docker run --rm --network host \
             -v "$(pwd)":/zap/wrk:rw \
             -t zaproxy/zap-stable \
-            zap.sh -cmd -autorun /zap/wrk/zap.yaml
+            zap.sh -cmd -port 8090 -autorun /zap/wrk/zap.yaml
 
       - name: Upload ZAP HTML Report
         if: always()
