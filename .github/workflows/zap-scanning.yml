@@ -1,0 +1,66 @@
+name: ZAP Security Scanning
+on:
+  workflow_dispatch: # Allow manual triggering only
+  workflow_call: # Allow this workflow to be called by other workflows
+    inputs:
+      sha:
+        description: "Commit SHA to check out"
+        type: string
+        default: ''
+
+jobs:
+  zap-scan:
+    name: ZAP Scan
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ inputs.sha || github.sha }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@21162887f0d6e25b4e8eafb0cf44cf9bf7f6acd3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+
+      - name: Start docker-compose stack
+        run: docker/compose/up --ci
+        env:
+          DOCKER_BUILDKIT: "1"
+          COMPOSE_DOCKER_CLI_BUILD: "1"
+          COMPOSE_BAKE: "true"
+          GITHUB_TOKEN: ${{ github.token }}
+          PDA_API_KEY: ci-placeholder
+
+      - name: Create tmp directory for ZAP reports
+        run: |
+          mkdir -p tmp
+          chmod 777 tmp
+
+      - name: Run ZAP Automation Framework scan
+        run: |
+          docker run --rm --network host \
+            -v "$(pwd)":/zap/wrk:rw \
+            -t zaproxy/zap-stable \
+            zap.sh -cmd -autorun /zap/wrk/zap.yaml
+
+      - name: Upload ZAP HTML Report
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: zap-scan-report-html
+          path: tmp/zap-baseline-report.html
+          retention-days: 14
+
+      - name: Tear down stack
+        if: always()
+        run: docker compose -f docker-compose.yml -f docker-compose.override.yml down --volumes --remove-orphans

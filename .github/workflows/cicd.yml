@@ -138,6 +138,14 @@ jobs:
     with:
       sha: ${{ github.event.pull_request.head.sha || github.sha }}
 
+  zap-scan:
+    name: Security
+    if: github.event_name == 'pull_request'
+    needs: setup
+    uses: ./.github/workflows/zap-scanning.yml
+    with:
+      sha: ${{ github.event.pull_request.head.sha || github.sha }}
+
   build-image:
     name: Build Docker Image
     runs-on: ubuntu-latest
