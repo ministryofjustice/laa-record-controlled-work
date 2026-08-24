@@ -52,7 +52,7 @@
     "accessible-autocomplete": "^3.0.1",
     "body-parser": "^2.3.0",
     "compression": "^1.8.1",
-    "connect-redis": "^9.0.0",
+    "connect-redis": "^10.0.0",
     "cookie-parser": "~1.4.7",
     "csrf-sync": "^4.2.1",
     "dotenv": "^17.4.2",
