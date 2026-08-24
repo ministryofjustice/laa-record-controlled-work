@@ -48,7 +48,10 @@ export const signStep = (): ReturnType<typeof step> => {
           effects: [declarationEffects.submitSignedDeclaration()],
           next: [
             redirect({
-              goto: "ufn",
+              goto: Format(
+                "/cases/%1/task-list",
+                Params(PARAMS_KEYS.applicationID),
+              ),
             }),
           ],
         },

@@ -96,5 +96,5 @@ test("Client Declaration - Sign Declaration step", async ({
   await page.getByRole("textbox", { name: "Month" }).fill("2");
   await page.getByRole("textbox", { name: "Year" }).fill("2026");
   await page.getByRole("button", { name: "Continue" }).click();
-  await expect(page).toHaveURL(`/cases/${applicationId}/declaration/ufn`);
+  await expect(page).toHaveURL(`/cases/${applicationId}/task-list`);
 });
