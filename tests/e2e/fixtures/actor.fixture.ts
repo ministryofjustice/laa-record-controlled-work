@@ -29,6 +29,7 @@ import {
 import { selectOfficeByCode } from "#tests/e2e/flows/office.flow.js";
 import {
   openMeansAssessmentFromTaskList,
+  submitApplication,
   viewCompletedEligibilityAssessment,
 } from "#tests/e2e/flows/task-list.flow.js";
 
@@ -50,6 +51,7 @@ export interface Actor {
   returnToTaskList: (applicationId: string) => Promise<void>;
   selectOfficeByCode: (code: string) => Promise<void>;
   startNewCase: () => Promise<void>;
+  submitApplication: (applicationId: string) => Promise<void>;
   submitCheckAnswers: (applicationId: string) => Promise<void>;
   viewCompletedEligibilityAssessment: (applicationId: string) => Promise<void>;
 }
@@ -109,6 +111,9 @@ export const createActor = (page: Page): Actor => ({
   },
   startNewCase: async () => {
     await startNewCase(page);
+  },
+  submitApplication: async (applicationId: string) => {
+    await submitApplication(page, applicationId);
   },
   submitCheckAnswers: async (applicationId: string) => {
     await submitCheckAnswers(page, applicationId);

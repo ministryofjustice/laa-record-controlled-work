@@ -1,11 +1,9 @@
 import { test, expect } from "../../fixtures/index.js";
-import { application } from "../../msw/fixtures/rcw.fixtures.js";
+import { completeApplication } from "../../msw/fixtures/rcw.fixtures.js";
 
-test("Client Declaration - Client Declaration step", async ({
-  withSelectedOffice: page,
-}) => {
-  const applicationId = application.id;
-
+test("Client Declaration - Client Declaration step", async ({ withSelectedOffice: page }) => {
+    const applicationId = completeApplication.id;
+  
   // ==========================================================================
   // Client Declaration page
   // ==========================================================================
@@ -43,7 +41,7 @@ test("Client Declaration - Client Declaration step", async ({
 test("Client Declaration - Sign Declaration step", async ({
   withSelectedOffice: page,
 }) => {
-  const applicationId = application.id;
+  const applicationId = completeApplication.id;
 
   // ==========================================================================
   // Sign Declaration page

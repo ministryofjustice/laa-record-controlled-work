@@ -29,12 +29,16 @@ describe("Task list step", () => {
   const getApplicationStub = sinon
     .stub()
     .resolves({ status: 200, data: mockData });
+  const updateApplicationStatusStub = sinon.stub().resolves({ status: 204 });
 
   const client = createForgeTestClient(
     editApplicationJourney,
     editApplicationEffectsRegistry,
     {
-      dependencies: { getApplication: getApplicationStub },
+      dependencies: {
+        getApplication: getApplicationStub,
+        updateApplicationStatus: updateApplicationStatusStub,
+      },
     },
   );
   const session = {};
@@ -50,7 +54,7 @@ describe("Task list step", () => {
     let heading: RenderBlock;
     let body: RenderBlock;
     let taskLists: RenderBlock[];
-    let submitButton: RenderBlock;
+    let buttonGroupBlock: RenderBlock;
 
     const getEvidenceAndDeclarationItems = (lists: RenderBlock[]) =>
       lists[2].properties.items as RenderedTaskListItem[];
@@ -64,7 +68,7 @@ describe("Task list step", () => {
       renderResult = result as TestRenderResult;
       [heading, body] = renderResult.getBlocksByVariant("html");
       taskLists = renderResult.getBlocksByVariant("govukTaskList");
-      [submitButton] = renderResult.getBlocksByVariant("govukButton");
+      [buttonGroupBlock] = renderResult.getBlocksByVariant("templateWrapper");
     });
 
     it("renders the client name as the heading", () => {
@@ -312,7 +316,58 @@ describe("Task list step", () => {
     });
 
     it("renders the save and return button", () => {
-      expect(submitButton.properties.text).to.equal("Save and return later");
+      const slots = buttonGroupBlock.properties.slots as Record<
+        string,
+        RenderBlock[]
+      >;
+      const saveAndReturnBtn = slots.child1[0];
+      expect(saveAndReturnBtn.properties.value).to.equal("return");
+      expect(saveAndReturnBtn.properties.text).to.equal(
+        "Save and return later",
+      );
+    });
+
+    it("hides the Record Controlled Work button when readyForSubmission is false", async () => {
+      getApplicationStub.resolves({
+        status: 200,
+        data: getGetApplicationResponseMock({ eligibility: {} }),
+      });
+
+      const result = await client.get(`/cases/${uuid}/task-list`, {
+        session: {},
+      });
+      expect(result.type).to.equal("render");
+      const incompleteRender = result as TestRenderResult;
+      const [incompleteButtonGroup] =
+        incompleteRender.getBlocksByVariant("templateWrapper");
+      const incompleteSlots = incompleteButtonGroup.properties.slots as Record<
+        string,
+        RenderBlock[]
+      >;
+      const submitBtn = incompleteSlots.child0[0];
+      expect(submitBtn.properties.classes).to.equal("govuk-!-display-none");
+    });
+
+    it("shows the Record Controlled Work button when readyForSubmission is true", async () => {
+      getApplicationStub.resolves({
+        status: 200,
+        data: getGetApplicationResponseMock(),
+      });
+
+      const result = await client.get(`/cases/${uuid}/task-list`, {
+        session: {},
+      });
+      expect(result.type).to.equal("render");
+      const readyRender = result as TestRenderResult;
+      const [readyButtonGroup] =
+        readyRender.getBlocksByVariant("templateWrapper");
+      const readySlots = readyButtonGroup.properties.slots as Record<
+        string,
+        RenderBlock[]
+      >;
+      const submitBtn = readySlots.child0[0];
+      expect(submitBtn.properties.value).to.equal("submit");
+      expect(submitBtn.properties.classes).to.equal("");
     });
   });
 
@@ -320,10 +375,22 @@ describe("Task list step", () => {
     it("redirects to the cases list", async () => {
       const result = await client.post(`/cases/${uuid}/task-list`, {
         session,
+        body: { action: "return" },
       });
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
       expect(redirectResult.url).to.equal("/cases");
+    });
+
+    // TODO will update when submission page is completed
+    it("redirects to /submittedPage when submit is clicked", async () => {
+      const result = await client.post(`/cases/${uuid}/task-list`, {
+        session,
+        body: { action: "submit" },
+      });
+      expect(result.type).to.equal("redirect");
+      const redirectResult = result as TestRedirectResult;
+      expect(redirectResult.url).to.equal("/submittedPage-TODO");
     });
   });
 });

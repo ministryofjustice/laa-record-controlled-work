@@ -209,41 +209,6 @@
         "answerValues": {
           "noFixedAddress": "No fixed address"
         }
-      },
-      "taskList": {
-        "clientDetails": {
-          "title": "About your client",
-          "taskItem": {
-            "label": "Client details"
-          }
-        },
-        "meansAssessment": {
-          "title": "Means assessment",
-          "taskItem": {
-            "label": "Income and capital"
-          }
-        },
-        "eligibilityResult": {
-          "title": "Eligibility result",
-          "eligible": "Your client qualifies financially for civil legal aid based on the information you entered.",
-          "viewResult": "View result"
-        },
-        "EvidenceAndDeclaration": {
-          "title": "Evidence and declarations",
-          "taskItem": {
-            "evidence": {
-              "label": "Evidence"
-            },
-            "declaration": {
-              "label": "Client declaration"
-            }
-          }
-        },
-        "status": {
-          "cannotStart": "Cannot start yet",
-          "incomplete": "Incomplete",
-          "completed": "Completed"
-        }
       }
     },
     "evidence": {
@@ -396,6 +361,46 @@
           "have their legal aid stopped and have to pay back the costs"
         ],
         "confirmButton": "Confirm and continue"
+      }
+    },
+    "editApplication": {
+      "taskList": {
+        "clientDetails": {
+          "title": "About your client",
+          "taskItem": {
+            "label": "Client details"
+          }
+        },
+        "meansAssessment": {
+          "title": "Means assessment",
+          "taskItem": {
+            "label": "Income and capital"
+          }
+        },
+        "EvidenceAndDeclaration": {
+          "title": "Evidence and declarations",
+          "taskItem": {
+            "evidence": {
+              "label": "Evidence"
+            },
+            "declaration": {
+              "label": "Client declaration"
+            }
+          }
+        },
+        "status": {
+          "cannotStart": "Cannot start yet",
+          "incomplete": "Incomplete",
+          "completed": "Completed"
+        },
+        "submitButton": {
+          "label": "Record controlled work"
+        },
+        "eligibilityResult": {
+          "title": "Eligibility result",
+          "eligible": "Your client qualifies financially for civil legal aid based on the information you entered.",
+          "viewResult": "View result"
+        }
       }
     }
   }

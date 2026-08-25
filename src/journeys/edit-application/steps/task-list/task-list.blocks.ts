@@ -4,6 +4,7 @@ import {
   Format,
   match,
   Params,
+  when,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 import {
   type BlockDefinition,
@@ -13,6 +14,7 @@ import {
 import {
   GovUKBody,
   GovUKButton,
+  GovUKButtonGroup,
   GovUKHeading,
   GovUKTaskList,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
@@ -55,27 +57,23 @@ export function heading(
  */
 export function taskList(): BlockDefinition[] {
   return [
-    sectionHeading(
-      t("journeys.createApplication.taskList.clientDetails.title"),
-    ),
+    sectionHeading(t("journeys.editApplication.taskList.clientDetails.title")),
     GovUKTaskList({
       items: [
         taskItem(
-          t("journeys.createApplication.taskList.clientDetails.taskItem.label"),
+          t("journeys.editApplication.taskList.clientDetails.taskItem.label"),
           "/cases/new/check-answers",
           Data(CONTEXT_DATA_KEYS.clientDetailsStatus),
         ),
       ],
     }),
     sectionHeading(
-      t("journeys.createApplication.taskList.meansAssessment.title"),
+      t("journeys.editApplication.taskList.meansAssessment.title"),
     ),
     GovUKTaskList({
       items: [
         taskItem(
-          t(
-            "journeys.createApplication.taskList.meansAssessment.taskItem.label",
-          ),
+          t("journeys.editApplication.taskList.meansAssessment.taskItem.label"),
           match(Data(CONTEXT_DATA_KEYS.meansAssessment))
             .branch(
               Condition.Equals(Status.COMPLETED),
@@ -96,13 +94,13 @@ export function taskList(): BlockDefinition[] {
     }),
     eligibilityResult(),
     sectionHeading(
-      t("journeys.createApplication.taskList.EvidenceAndDeclaration.title"),
+      t("journeys.editApplication.taskList.EvidenceAndDeclaration.title"),
     ),
     GovUKTaskList({
       items: [
         taskItem(
           t(
-            "journeys.createApplication.taskList.EvidenceAndDeclaration.taskItem.evidence.label",
+            "journeys.editApplication.taskList.EvidenceAndDeclaration.taskItem.evidence.label",
           ),
           Format(
             "/cases/%1/evidence/have-evidence",
@@ -112,7 +110,7 @@ export function taskList(): BlockDefinition[] {
         ),
         taskItem(
           t(
-            "journeys.createApplication.taskList.EvidenceAndDeclaration.taskItem.declaration.label",
+            "journeys.editApplication.taskList.EvidenceAndDeclaration.taskItem.declaration.label",
           ),
           Format("/cases/%1/declaration/", Params(PARAMS_KEYS.applicationID)),
           Data(CONTEXT_DATA_KEYS.declarationStatus),
@@ -134,7 +132,7 @@ function eligibilityResult(): HtmlBlock {
   )
     .branch(
       Condition.Equals("eligible"),
-      t("journeys.createApplication.taskList.eligibilityResult.eligible"),
+      t("journeys.editApplication.taskList.eligibilityResult.eligible"),
     )
     .otherwise("");
 
@@ -145,10 +143,10 @@ function eligibilityResult(): HtmlBlock {
         <p class="govuk-body">%2</p>
         <p class="govuk-!-margin-bottom-0"><a class="govuk-link" href="/cases/%3/eligibility/?destination=check-result">%4</a></p>
       </div>`,
-      t("journeys.createApplication.taskList.eligibilityResult.title"),
+      t("journeys.editApplication.taskList.eligibilityResult.title"),
       eligibleContent,
       Params(PARAMS_KEYS.applicationID),
-      t("journeys.createApplication.taskList.eligibilityResult.viewResult"),
+      t("journeys.editApplication.taskList.eligibilityResult.viewResult"),
     ),
     visibleWhen: Data(CONTEXT_DATA_KEYS.application)
       .path(APPLICATION_DATA_KEYS.eligibilityOverallResult)
@@ -171,7 +169,23 @@ function sectionHeading(
   });
 }
 
-export const saveAndReturnButton: GovUKButton = GovUKButton({
+const saveAndReturnButton: GovUKButton = GovUKButton({
   classes: "govuk-button--secondary",
   text: t("common.saveAndReturn"),
+  value: "return",
 });
+
+const submitButton: GovUKButton = GovUKButton({
+  classes: when(
+    Data(CONTEXT_DATA_KEYS.readyForSubmission).match(Condition.Equals(true)),
+  )
+    .then("")
+    .else("govuk-!-display-none"),
+  text: t("journeys.editApplication.taskList.submitButton.label"),
+  value: "submit",
+});
+
+export const buttonGroup = (): HtmlBlock =>
+  GovUKButtonGroup({
+    buttons: [submitButton, saveAndReturnButton],
+  });

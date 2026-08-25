@@ -35,18 +35,18 @@ export function taskItem(
   const tag = match(status)
     .branch(Condition.Equals(Status.INCOMPLETE), {
       classes: "govuk-tag--blue",
-      text: t("journeys.createApplication.taskList.status.incomplete"),
+      text: t("journeys.editApplication.taskList.status.incomplete"),
     })
     .otherwise(null);
 
   const text = match(status)
     .branch(
       Condition.Equals(Status.CANNOT_START),
-      t("journeys.createApplication.taskList.status.cannotStart"),
+      t("journeys.editApplication.taskList.status.cannotStart"),
     )
     .branch(
       Condition.Equals(Status.COMPLETED),
-      t("journeys.createApplication.taskList.status.completed"),
+      t("journeys.editApplication.taskList.status.completed"),
     )
     .otherwise("");
 

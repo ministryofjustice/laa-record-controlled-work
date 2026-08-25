@@ -28,7 +28,10 @@ describe("loadApplication", () => {
   beforeEach(() => {
     sinon.stub(config.api, "useMockAccessToken").value(true);
     getApplicationStub = sinon.stub();
-    deps = { getApplication: getApplicationStub };
+    deps = {
+      getApplication: getApplicationStub,
+      updateApplicationStatus: sinon.stub(),
+    };
     setData = sinon.stub();
     getSession = sinon.stub().returns({
       id: "session-id",
