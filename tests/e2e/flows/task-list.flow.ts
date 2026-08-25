@@ -48,7 +48,9 @@ export const submitApplication = async (
   applicationId: string,
 ): Promise<void> => {
   await page.getByRole("button", { name: "Record controlled work" }).click();
-  await expect(page).toHaveURL(new RegExp(`/cases/${applicationId}/confirmation`));
+  await expect(page).toHaveURL(
+    new RegExp(`/cases/${applicationId}/confirmation`),
+  );
 };
 
 export const viewCompletedEligibilityAssessment = async (
