@@ -1,13 +1,18 @@
+import type { ResolvableString } from "@ministryofjustice/hmpps-forge/core/components";
+
+import { Data } from "@ministryofjustice/hmpps-forge/core/authoring";
+import { NunjucksGenerators } from "@ministryofjustice/hmpps-forge/express-nunjucks";
+
 import {
   APPLICATION_DATA_KEYS,
   CONTEXT_DATA_KEYS,
-  PARAMS_KEYS,
 } from "#/journeys/journey.constants.js";
-import { Data, Params } from "@ministryofjustice/hmpps-forge/core/authoring";
-import { ResolvableString } from "@ministryofjustice/hmpps-forge/core/components";
-import { NunjucksGenerators } from "@ministryofjustice/hmpps-forge/express-nunjucks";
 import { t } from "#/lib/i18n.js";
 
+/**
+ *  format the reference number for the confirmation panel of the edit application journey.
+ *  @returns ResolvableString with the body text and reference number for the confirmation panel.
+ */
 export function formatReferenceNumber(): ResolvableString {
   return NunjucksGenerators.String({
     data: {
