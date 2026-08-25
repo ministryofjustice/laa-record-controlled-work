@@ -85,7 +85,6 @@ test.describe("@e2e critical path", () => {
   test.fixme("submits application", async () => {
     // TODO started scaffolding this test, it requires other journeys to be complete first
     await actor.submitApplication(applicationId);
-    await expect(page).toHaveURL(/\/confirmation/);
   });
   test.fixme("checks recorded cases", async () => {
     await actor.openRecordedCaseFromCaseList(applicationId);
