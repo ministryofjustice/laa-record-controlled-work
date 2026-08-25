@@ -54,6 +54,12 @@ describe("Confirmation step", () => {
 
     it("renders the alert panel with the correct content", () => {
       expect(panel.properties.titleText).to.include("Controlled work recorded");
+      expect(panel.properties.html).to.include(
+        "Reference number",
+      );
+      expect(panel.properties.html).to.include(
+        `${mockData.applicationRefNumber}`,
+      );
     });
 
     it("renders the correct heading content", () => {
