@@ -64,7 +64,7 @@ test("Edit Application - Task List step - Record Controlled Work button - Confir
   const confirmationHeading = page.getByRole("heading", { name: "Controlled work recorded" });
   await expect(confirmationHeading).toBeVisible();
 
-  const returnToCaseListButton = page.getByRole("link", { name: "Return to case list" });
+  const returnToCaseListButton = page.getByRole("button", { name: "Return to case list" });
   await expect(returnToCaseListButton).toBeVisible();
 
   await returnToCaseListButton.click();
