@@ -45,7 +45,6 @@ export const taskListStep = (): ReturnType<typeof step> =>
     onAccess: [
       access({
         effects: [
-          editApplicationEffects.loadApplication(),
           editApplicationEffects.setTaskListStatuses(),
         ],
       }),
@@ -77,7 +76,7 @@ const submitApplication = (): SubmitHook =>
       effects: [editApplicationEffects.submitApplication()],
       next: [
         redirect({
-          goto: "/submittedPage-TODO",
+          goto: "confirmation",
         }),
       ],
     },

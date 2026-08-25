@@ -401,6 +401,18 @@
           "eligible": "Your client qualifies financially for civil legal aid based on the information you entered.",
           "viewResult": "View result"
         }
+      },
+      "confirmation": {
+        "panel": {
+          "title": "Controlled work recorded",
+          "body": "Reference number"
+        },
+        "nextHeading": "What happens next",
+        "nextList": [
+          "The LAA will store the details you've provided. You must <a href='#'>save a copy</a> for your own records which you should keep along with any evidence provided by your client.",
+          "Your client's file may be audited and assessed by the LAA at a later date."
+        ],
+        "returnButton": "Return to case list"
       }
     }
   }
