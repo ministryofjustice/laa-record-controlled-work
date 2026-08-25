@@ -10,7 +10,6 @@ import { createForgeTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import { editApplicationEffectsRegistry } from "#/journeys/edit-application/editApplication.effects.js";
 import { editApplicationJourney } from "#/journeys/edit-application/editApplication.journey.js";
-import { taskListStep } from "#/journeys/edit-application/steps/task-list/task-list.step.js";
 
 type RenderedTaskListItem = {
   title: { text: string };
@@ -382,15 +381,14 @@ describe("Task list step", () => {
       expect(redirectResult.url).to.equal("/cases");
     });
 
-    // TODO will update when submission page is completed
-    it("redirects to /submittedPage when submit is clicked", async () => {
+    it("redirects to /confirmation page when submit is clicked", async () => {
       const result = await client.post(`/cases/${uuid}/task-list`, {
         session,
         body: { action: "submit" },
       });
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
-      expect(redirectResult.url).to.equal("/submittedPage-TODO");
+      expect(redirectResult.url).to.equal(`/cases/${uuid}/confirmation`);
     });
   });
 });

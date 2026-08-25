@@ -49,7 +49,7 @@ export const submitApplication = async (
 ): Promise<void> => {
   await page.getByRole("button", { name: "Record controlled work" }).click();
   // TODO: Update this to the correct URL once the submission journey is implemented
-  await expect(page).toHaveURL(/\/submittedPage-TODO/);
+  await expect(page).toHaveURL(/\/confirmation/);
 };
 
 export const viewCompletedEligibilityAssessment = async (
