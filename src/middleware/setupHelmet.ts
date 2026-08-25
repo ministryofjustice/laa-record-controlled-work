@@ -20,14 +20,14 @@ const RANDOMBYTES = 16;
  * @param {Response} res - Express response object.
  * @param {NextFunction} next - Express next function.
  */
-export const nonceMiddleware = (
+export default function nonceMiddleware(
   req: Request,
   res: Response,
   next: NextFunction,
-): void => {
-  res.locals.cspNonce = crypto.randomBytes(RANDOMBYTES).toString("base64"); // Generate a secure random nonce
+): void {
+  res.locals.cspNonce = crypto.randomBytes(RANDOMBYTES).toString("base64");
   next();
-};
+}
 
 /**
  * Sets up Helmet's Content Security Policy (CSP) with a dynamic nonce.
