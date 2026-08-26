@@ -8,6 +8,7 @@ import {
 import { formatReferenceNumber } from "#/journeys/edit-application/steps/confirmation/confirmation.formatter.js";
 import { H2 } from "#/lib/constants/headings.js";
 import { t, tt } from "#/lib/i18n.js";
+import { HtmlBlock } from "@ministryofjustice/hmpps-forge/core/components";
 
 /**
  *  generate the confirmation panel for the edit application journey.
@@ -45,7 +46,7 @@ export function returnButton(): GovUKButton {
  * generate the list of statements for the confirmation step of the edit application journey.
  *  @returns array of GovUKBody components with the text for each statement.
  */
-export function statement(): Array<ReturnType<typeof GovUKBody>> {
+export function statement(): HtmlBlock[] {
   const items = tt("journeys.editApplication.confirmation.nextList");
   return items.map((text) => GovUKBody({ text }));
 }
