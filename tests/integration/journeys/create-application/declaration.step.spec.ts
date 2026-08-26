@@ -8,7 +8,7 @@ import {
   createApplicationEffectsRegistry,
 } from "#/journeys/create-application/create-application.effects.js";
 
-import { declarationStep } from "#/journeys/create-application/steps/declaration.step.js";
+import { declarationStep } from "#/journeys/create-application/steps/declaration/declaration.step.js";
 import { ecfStep } from "#/journeys/create-application/steps/ecf.step.js";
 import { createForgeTestClient } from "../../utils/helpers.js";
 import { createApplicationJourney } from "#/journeys/create-application/create-application.journey.js";

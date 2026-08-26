@@ -6,13 +6,13 @@ import {
   Transformer,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
-import { backLink } from "#/journeys/common.blocks.js";
 import {
   APPLICATION_DATA_KEYS,
   APPLICATIONS_DATA_KEYS,
   CLIENT_DETAILS_DATA_KEYS,
   CONTEXT_DATA_KEYS,
 } from "#/journeys/journey.constants.js";
+import { backLink } from "#/journeys/shared.blocks.js";
 import {
   caseReferenceNumber,
   heading,
