@@ -2,7 +2,7 @@ import type { HtmlBlock } from "@ministryofjustice/hmpps-forge/core/components";
 
 import { GovUKBody } from "@ministryofjustice/hmpps-forge/govuk-components";
 
-// TODO - this should be in the i18n file, but it contains HTML which is not supported by the i18n library
+// TODO - hardcoded until we have proper designs
 
 /**
  * Creates a body block with instructions to complete ECF application forms.
