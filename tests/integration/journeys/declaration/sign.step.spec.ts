@@ -30,12 +30,6 @@ describe("Declaration sign step", () => {
   describe(`GET /cases/:applicationId/declaration/sign`, () => {
     let render: TestRenderResult;
 
-    function getButtonGroupContent(): string {
-      const [buttonGroup] = render.getBlocksByVariant("govukButtonGroup");
-      expect(buttonGroup).to.exist;
-      return JSON.stringify(buttonGroup);
-    }
-
     before(async () => {
       const result = await client.get(`/cases/${uuid}/declaration/sign`);
       render = result as TestRenderResult;
@@ -134,13 +128,13 @@ describe("Declaration sign step", () => {
     });
 
     it("shows the expected 'continue' button", () => {
-      const content = getButtonGroupContent();
-      expect(content).to.include("continue");
+      const block = getBlockWithContent(render, "govukButtonGroup", "continue");
+      expect(block).to.exist;
     });
 
     it("shows the expected 'save and return later' button", () => {
-      const content = getButtonGroupContent();
-      expect(content).to.include("return");
+      const block = getBlockWithContent(render, "govukButtonGroup", "return");
+      expect(block).to.exist;
     });
   });
 

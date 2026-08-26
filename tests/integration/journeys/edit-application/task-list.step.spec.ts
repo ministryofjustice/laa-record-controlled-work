@@ -11,6 +11,7 @@ import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import { editApplicationEffectsRegistry } from "#/journeys/edit-application/editApplication.effects.js";
 import { editApplicationJourney } from "#/journeys/edit-application/editApplication.journey.js";
 import { taskListStep } from "#/journeys/edit-application/steps/task-list/task-list.step.js";
+import { getBlockWithContent } from "../../utils/getBlockWithContent.helper.js";
 
 type RenderedTaskListItem = {
   title: { text: string };
@@ -54,12 +55,6 @@ describe("Task list step", () => {
     let heading: RenderBlock;
     let body: RenderBlock;
     let taskLists: RenderBlock[];
-
-    function getButtonGroupContent(source: TestRenderResult): string {
-      const [buttonGroup] = source.getBlocksByVariant("govukButtonGroup");
-      expect(buttonGroup).to.exist;
-      return JSON.stringify(buttonGroup);
-    }
 
     const getEvidenceAndDeclarationItems = (lists: RenderBlock[]) =>
       lists[2].properties.items as RenderedTaskListItem[];
@@ -321,9 +316,9 @@ describe("Task list step", () => {
     });
 
     it("renders the save and return button", () => {
-      const content = getButtonGroupContent(renderResult);
-      expect(content).to.include("return");
-      expect(content).to.include("Save and return later");
+      const block = getBlockWithContent(renderResult, "govukButtonGroup", "return");
+      expect(block).to.exist;
+      expect(JSON.stringify(block)).to.include("Save and return later");
     });
 
     it("hides the Record Controlled Work button when readyForSubmission is false", async () => {
@@ -337,9 +332,9 @@ describe("Task list step", () => {
       });
       expect(result.type).to.equal("render");
       const incompleteRender = result as TestRenderResult;
-      const content = getButtonGroupContent(incompleteRender);
-      expect(content).to.include("submit");
-      expect(content).to.include("govuk-!-display-none");
+      const block = getBlockWithContent(incompleteRender, "govukButtonGroup", "submit");
+      expect(block).to.exist;
+      expect(JSON.stringify(block)).to.include("govuk-!-display-none");
     });
 
     it("shows the Record Controlled Work button when readyForSubmission is true", async () => {
@@ -353,9 +348,9 @@ describe("Task list step", () => {
       });
       expect(result.type).to.equal("render");
       const readyRender = result as TestRenderResult;
-      const content = getButtonGroupContent(readyRender);
-      expect(content).to.include("submit");
-      expect(content).to.not.include("govuk-!-display-none");
+      const block = getBlockWithContent(readyRender, "govukButtonGroup", "submit");
+      expect(block).to.exist;
+      expect(JSON.stringify(block)).to.not.include("govuk-!-display-none");
     });
   });
 

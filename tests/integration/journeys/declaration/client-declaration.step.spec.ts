@@ -5,6 +5,7 @@ import {
 import { expect } from "chai";
 
 import { createForgeTestClient } from "../../utils/helpers.js";
+import { getBlockWithContent } from "../../utils/getBlockWithContent.helper.js";
 import { DeclarationJourney } from "#/journeys/declaration/declaration.journey.js";
 import sinon from "sinon";
 import { declarationEffectRegistry } from "#/journeys/declaration/declaration.effects.js";
@@ -28,12 +29,6 @@ describe("Declaration step", () => {
 
   describe(`GET /cases/${uuid}/declaration/confirm`, () => {
     let renderResult: TestRenderResult;
-
-    function getButtonGroupContent(): string {
-      const [buttonGroup] = renderResult.getBlocksByVariant("govukButtonGroup");
-      expect(buttonGroup).to.exist;
-      return JSON.stringify(buttonGroup);
-    }
 
     before(async () => {
       const result = await client.get(`/cases/${uuid}/declaration/confirm`);
@@ -68,13 +63,13 @@ describe("Declaration step", () => {
     });
 
     it("renders a Confirm and Continue button", () => {
-      const content = getButtonGroupContent();
-      expect(content).to.include("continue");
+      const block = getBlockWithContent(renderResult, "govukButtonGroup", "continue");
+      expect(block).to.exist;
     });
 
     it("renders a Save and Return button", () => {
-      const content = getButtonGroupContent();
-      expect(content).to.include("return");
+      const block = getBlockWithContent(renderResult, "govukButtonGroup", "return");
+      expect(block).to.exist;
     });
   });
 

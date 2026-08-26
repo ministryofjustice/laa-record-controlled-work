@@ -13,6 +13,7 @@ import { TestRenderResult } from "@ministryofjustice/hmpps-forge/core/testing";
  * - govukHeading
  * - govukButton
  * - govukDateInputFull
+ * - govukButtonGroup
  *
  * @param render  Forge test harness render result.
  * @param variant  Block variant to search for — this is the `variant` property of the `RenderBlock`, not the component name.
@@ -46,6 +47,9 @@ export function getBlockWithContent(
         break;
       case "govukDateInputFull":
         blockContent = block.properties.label as string;
+        break;
+      case "govukButtonGroup":
+        blockContent = JSON.stringify(block);
         break;
       default:
         throw new Error(`Unsupported variant: ${variant}`);
