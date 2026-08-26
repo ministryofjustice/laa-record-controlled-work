@@ -1,0 +1,17 @@
+name: Deploy to Staging (Manual)
+
+on:
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: "Commit SHA to deploy (defaults to latest main)"
+        type: string
+        default: ''
+
+jobs:
+  deploy-staging:
+    uses: ./.github/workflows/deploy-environment.yml
+    with:
+      app-environment: staging
+      sha: ${{ inputs.sha || github.sha }}
+    secrets: inherit
