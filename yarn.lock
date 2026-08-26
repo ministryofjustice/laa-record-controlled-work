@@ -4842,11 +4842,11 @@ __metadata:
   linkType: hard
 
 "get-tsconfig@npm:^4.14.0, get-tsconfig@npm:^4.8.1":
-  version: 4.14.2
-  resolution: "get-tsconfig@npm:4.14.2"
+  version: 4.14.3
+  resolution: "get-tsconfig@npm:4.14.3"
   dependencies:
     resolve-pkg-maps: "npm:^1.0.0"
-  checksum: 10c0/0b6e4fafd34adcc992258f9874a366222fac76b165a4b9c102fe25056a3f9c4dae1e365c213c040e56b0bd45fd5671343f9410d153af1aab0bbf699a54d59c1b
+  checksum: 10c0/22119bb5b7e37b922a973bfb50deac89ca845cef50a24cd27b6c628f314e91a2bccceb186e0b5183e231ad6480d7173738912975332caf60678af39b7236eeac
   languageName: node
   linkType: hard
 
@@ -7314,9 +7314,9 @@ __metadata:
   linkType: hard
 
 "remeda@npm:^2.33.6":
-  version: 2.40.0
-  resolution: "remeda@npm:2.40.0"
-  checksum: 10c0/dd86a2dd5c6409d6a64e6482499919e2f266e2f03b8eaf8a9353d7c1440371d1fea9ce84c58ceb2fa40a56b41590b85e8026a53dfad498bd2d37577a000a9ef1
+  version: 2.42.0
+  resolution: "remeda@npm:2.42.0"
+  checksum: 10c0/d4762b2ca17533ebe321ee8cd73cff7bfff503b21a3208ad3bd1866ac2824e671be92d9542d452a39cd1d77c62591dbcaabeca5a64e1ce7a1c9602592832f2ad
   languageName: node
   linkType: hard
 
