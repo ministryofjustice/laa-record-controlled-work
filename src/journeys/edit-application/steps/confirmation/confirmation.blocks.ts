@@ -1,5 +1,3 @@
-import type { HtmlBlock } from "@ministryofjustice/hmpps-forge/core/components";
-
 import {
   GovUKBody,
   GovUKButton,
@@ -15,7 +13,7 @@ import { t, tt } from "#/lib/i18n.js";
  *  generate the confirmation panel for the edit application journey.
  *  @returns GovUKPanel component with the reference number and title text for the confirmation step.
  */
-export function confirmationPanel(): ReturnType<typeof GovUKPanel> {
+export function confirmationPanel(): GovUKPanel {
   return GovUKPanel({
     html: formatReferenceNumber(),
     titleText: t("journeys.editApplication.confirmation.panel.title"),
@@ -37,7 +35,7 @@ export function heading(): ReturnType<typeof GovUKHeading> {
  *. generate the return button for the confirmation step of the edit application journey.
  *  @returns GovUKButton component with the text for the return button.
  */
-export function returnButton(): ReturnType<typeof GovUKButton> {
+export function returnButton(): GovUKButton {
   return GovUKButton({
     text: t("journeys.editApplication.confirmation.returnButton"),
   });
@@ -47,7 +45,7 @@ export function returnButton(): ReturnType<typeof GovUKButton> {
  * generate the list of statements for the confirmation step of the edit application journey.
  *  @returns array of GovUKBody components with the text for each statement.
  */
-export function statement(): HtmlBlock[] {
+export function statement(): Array<ReturnType<typeof GovUKBody>> {
   const items = tt("journeys.editApplication.confirmation.nextList");
   return items.map((text) => GovUKBody({ text }));
 }
