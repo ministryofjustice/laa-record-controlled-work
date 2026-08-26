@@ -1,5 +1,5 @@
 import {
-  journey,
+  createForgePackage,
   type AccessHook,
   type JourneyDefinition,
   type StepDefinition,
@@ -35,10 +35,12 @@ export function createForgeTestClient<TDeps>(
 
   sourceJourney.reachability = { disableReachabilityChecks: true };
 
-  const testPackage = createTestPackage({
-    functions: effectsRegistry,
-    journey: sourceJourney,
-  });
+  const testPackage = createTestPackage(
+    createForgePackage({
+      functions: effectsRegistry,
+      journey: sourceJourney,
+    }),
+  );
   return new ForgeTestHarness()
     .registerGlobalComponents(govukComponents)
     .registerGlobalComponents(mojComponents)
