@@ -3,6 +3,7 @@ import {
   Condition,
   redirect,
   step,
+  type StepDefinition,
   submit,
   type SubmitHook,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
@@ -23,8 +24,14 @@ import { t } from "#/lib/i18n.js";
 const DECLARATION_PATH = `${JourneyPath.CREATE_APPLICATION}/provider-declaration`;
 const TITLE = t("journeys.createApplication.ecf.title");
 
-export const ecfStep = (journeyCode: string): ReturnType<typeof step> =>
-  step({
+/**
+ * Defines the ECF step for the create application journey.
+ *
+ * @param {string} journeyCode - The journey code for saving draft answers
+ * @returns {StepDefinition} A step definition for the ECF eligibility question page
+ */
+export function ecfStep(journeyCode: string): StepDefinition {
+  return step({
     blocks: [
       backLink(DECLARATION_PATH),
       clientDetailsCaption(),
@@ -37,9 +44,19 @@ export const ecfStep = (journeyCode: string): ReturnType<typeof step> =>
     reachability: { entryWhen: true },
     title: TITLE,
   });
+}
 
-const onSubmission = (journeyCode: string): SubmitHook =>
-  submit({
+/**
+ * Handles form submission for the ECF question step.
+ * Saves draft answers and routes based on whether ECF was selected:
+ * - If "yes": redirects to ECF dropout step
+ * - If "no": redirects to legal aid before step
+ *
+ * @param {string} journeyCode - The journey code for saving draft answers
+ * @returns {SubmitHook} A submit hook with validation and conditional routing logic
+ */
+function onSubmission(journeyCode: string): SubmitHook {
+  return submit({
     onValid: {
       effects: [CreateApplicationEffects.saveDraftAnswers(journeyCode)],
       next: [
@@ -50,6 +67,7 @@ const onSubmission = (journeyCode: string): SubmitHook =>
     },
     validate: true,
   });
+}
 
 const redirectToECFDropout = redirect({
   goto: StepCode.ECF_DROPOUT,
