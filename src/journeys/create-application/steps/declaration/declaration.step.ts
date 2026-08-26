@@ -1,6 +1,7 @@
 import {
   redirect,
   step,
+  type StepDefinition,
   submit,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
@@ -14,8 +15,13 @@ const TITLE = t("journeys.createApplication.declaration.title");
 const AGREE_AND_CONTINUE = t("journeys.createApplication.declaration.continue");
 const ROOT = "/";
 
-export const declarationStep = (): ReturnType<typeof step> =>
-  step({
+/**
+ * Defines the provider declaration step for the create application journey.
+ *
+ * @returns {StepDefinition} A step definition for the provider declaration page
+ */
+export function declarationStep(): StepDefinition {
+  return step({
     blocks: [
       backLink(ROOT),
       heading(TITLE),
@@ -27,6 +33,7 @@ export const declarationStep = (): ReturnType<typeof step> =>
     reachability: { entryWhen: true },
     title: TITLE,
   });
+}
 
 const onSubmission = submit({
   onAlways: {
