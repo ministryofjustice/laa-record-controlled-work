@@ -45,21 +45,17 @@ describe("View recorded client details step", () => {
     });
 
     it("renders the client name as the heading", () => {
-      const heading = renderResult
-        .getBlocksByVariant("html")
-        .find((b) =>
-          String(b.properties.classes).includes("govuk-heading-xl"),
-        ) as RenderBlock;
+      const [heading] = renderResult.getBlocksByVariant("govukHeading");
 
       const clientName = `${mockData.clientDetails.firstName} ${mockData.clientDetails.lastName}`;
-      expect(heading?.properties.content).to.equal(clientName);
+      expect(heading.properties.text).to.equal(clientName);
     });
 
     it("renders the reference number", () => {
       const referenceNumber = renderResult
-        .getBlocksByVariant("html")
+        .getBlocksByVariant("govukBody")
         .find((b) =>
-          String(b.properties.content).includes("Reference number:"),
+          String(b.properties.text).includes("Reference number:"),
         ) as RenderBlock;
 
       expect(referenceNumber).to.exist;
@@ -75,12 +71,12 @@ describe("View recorded client details step", () => {
         },
       );
       const recordedOn = renderResult
-        .getBlocksByVariant("html")
+        .getBlocksByVariant("govukBody")
         .find((b) =>
-          String(b.properties.content).includes("Recorded on:"),
+          String(b.properties.text).includes("Recorded on:"),
         ) as RenderBlock;
       expect(recordedOn).to.exist;
-      expect(recordedOn?.properties.content).to.include(recordedOnDate);
+      expect(recordedOn?.properties.text).to.include(recordedOnDate);
     });
 
     it("renders the status tag", () => {

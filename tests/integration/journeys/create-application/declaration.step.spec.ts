@@ -39,14 +39,14 @@ describe("Declaration step", () => {
 
     it("renders declaration body copy including the privacy policy link", () => {
       const body = renderResult
-        .getBlocksByVariant("html")
+        .getBlocksByVariant("govukBody")
         .find(
           (block) =>
-            typeof block.properties.content === "string" &&
-            block.properties.content.includes("By continuing, you agree that"),
+            typeof block.properties.text === "string" &&
+            block.properties.text.includes("By continuing, you agree that"),
         );
       expect(body).to.not.equal(undefined);
-      const text = body?.properties.content as string;
+      const text = body?.properties.text as string;
 
       expect(text).to.include("By continuing, you agree that");
       expect(text).to.include('href="/privacy-policy"');

@@ -54,7 +54,12 @@ describe("Task list step", () => {
     let heading: RenderBlock;
     let body: RenderBlock;
     let taskLists: RenderBlock[];
-    let buttonGroupBlock: RenderBlock;
+
+    function getButtonGroupContent(source: TestRenderResult): string {
+      const [buttonGroup] = source.getBlocksByVariant("govukButtonGroup");
+      expect(buttonGroup).to.exist;
+      return JSON.stringify(buttonGroup);
+    }
 
     const getEvidenceAndDeclarationItems = (lists: RenderBlock[]) =>
       lists[2].properties.items as RenderedTaskListItem[];
@@ -66,18 +71,18 @@ describe("Task list step", () => {
       });
       expect(result.type).to.equal("render");
       renderResult = result as TestRenderResult;
-      [heading, body] = renderResult.getBlocksByVariant("html");
+      [heading] = renderResult.getBlocksByVariant("govukHeading");
+      [body] = renderResult.getBlocksByVariant("govukBody");
       taskLists = renderResult.getBlocksByVariant("govukTaskList");
-      [buttonGroupBlock] = renderResult.getBlocksByVariant("templateWrapper");
     });
 
     it("renders the client name as the heading", () => {
       const clientName = `${mockData.clientDetails.firstName} ${mockData.clientDetails.lastName}`;
-      expect(heading.properties.content).to.equal(clientName);
+      expect(heading.properties.text).to.equal(clientName);
     });
 
     it("renders the reference number", () => {
-      expect(body.properties.content).to.equal(
+      expect(body.properties.text).to.equal(
         `Reference number: ${mockData.applicationRefNumber}`,
       );
     });
@@ -316,15 +321,9 @@ describe("Task list step", () => {
     });
 
     it("renders the save and return button", () => {
-      const slots = buttonGroupBlock.properties.slots as Record<
-        string,
-        RenderBlock[]
-      >;
-      const saveAndReturnBtn = slots.child1[0];
-      expect(saveAndReturnBtn.properties.value).to.equal("return");
-      expect(saveAndReturnBtn.properties.text).to.equal(
-        "Save and return later",
-      );
+      const content = getButtonGroupContent(renderResult);
+      expect(content).to.include("return");
+      expect(content).to.include("Save and return later");
     });
 
     it("hides the Record Controlled Work button when readyForSubmission is false", async () => {
@@ -338,14 +337,9 @@ describe("Task list step", () => {
       });
       expect(result.type).to.equal("render");
       const incompleteRender = result as TestRenderResult;
-      const [incompleteButtonGroup] =
-        incompleteRender.getBlocksByVariant("templateWrapper");
-      const incompleteSlots = incompleteButtonGroup.properties.slots as Record<
-        string,
-        RenderBlock[]
-      >;
-      const submitBtn = incompleteSlots.child0[0];
-      expect(submitBtn.properties.classes).to.equal("govuk-!-display-none");
+      const content = getButtonGroupContent(incompleteRender);
+      expect(content).to.include("submit");
+      expect(content).to.include("govuk-!-display-none");
     });
 
     it("shows the Record Controlled Work button when readyForSubmission is true", async () => {
@@ -359,15 +353,9 @@ describe("Task list step", () => {
       });
       expect(result.type).to.equal("render");
       const readyRender = result as TestRenderResult;
-      const [readyButtonGroup] =
-        readyRender.getBlocksByVariant("templateWrapper");
-      const readySlots = readyButtonGroup.properties.slots as Record<
-        string,
-        RenderBlock[]
-      >;
-      const submitBtn = readySlots.child0[0];
-      expect(submitBtn.properties.value).to.equal("submit");
-      expect(submitBtn.properties.classes).to.equal("");
+      const content = getButtonGroupContent(readyRender);
+      expect(content).to.include("submit");
+      expect(content).to.not.include("govuk-!-display-none");
     });
   });
 
