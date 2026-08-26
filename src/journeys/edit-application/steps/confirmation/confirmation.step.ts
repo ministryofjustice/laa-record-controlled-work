@@ -1,6 +1,7 @@
 import {
   redirect,
   step,
+  StepDefinition,
   submit,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
@@ -11,7 +12,7 @@ import {
   statement,
 } from "./confirmation.blocks.js";
 
-export const confirmationStep = (): ReturnType<typeof step> =>
+export const confirmationStep = (): StepDefinition =>
   step({
     blocks: [confirmationPanel(), heading(), ...statement(), returnButton()],
     onSubmission: [
