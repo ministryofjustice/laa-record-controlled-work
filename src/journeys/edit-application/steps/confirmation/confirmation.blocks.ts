@@ -1,3 +1,5 @@
+import type { HtmlBlock } from "@ministryofjustice/hmpps-forge/core/components";
+
 import {
   GovUKBody,
   GovUKButton,
@@ -8,7 +10,6 @@ import {
 import { formatReferenceNumber } from "#/journeys/edit-application/steps/confirmation/confirmation.formatter.js";
 import { H2 } from "#/lib/constants/headings.js";
 import { t, tt } from "#/lib/i18n.js";
-import { HtmlBlock } from "@ministryofjustice/hmpps-forge/core/components";
 
 /**
  *  generate the confirmation panel for the edit application journey.
