@@ -1,6 +1,7 @@
 import {
   redirect,
   step,
+  type StepDefinition,
   submit,
   type SubmitHook,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
@@ -19,8 +20,14 @@ const HEADING = t("journeys.createApplication.ecfDropout.heading");
 const TITLE = t("journeys.createApplication.ecfDropout.title");
 const RETURN_TO_CASE_LIST = t("journeys.createApplication.ecfDropout.button");
 
-export const ineligibleStep = (journeyCode: string): ReturnType<typeof step> =>
-  step({
+/**
+ * Defines the ECF dropout/ineligibility step for the create application journey.
+ *
+ * @param {string} journeyCode - The journey code for clearing draft answers
+ * @returns {StepDefinition} A step definition for the ECF dropout page
+ */
+export function ineligibleStep(journeyCode: string): StepDefinition {
+  return step({
     blocks: [
       backLink(ECF_PATH),
       heading(HEADING),
@@ -32,12 +39,21 @@ export const ineligibleStep = (journeyCode: string): ReturnType<typeof step> =>
     path: "/ecf-dropout",
     title: TITLE,
   });
+}
 
-const onSubmission = (journeyCode: string): SubmitHook =>
-  submit({
+/**
+ * Handles form submission for the ECF dropout step.
+ * Clears all draft answers from the journey and redirects to the home page.
+ *
+ * @param {string} journeyCode - The journey code for clearing draft answers
+ * @returns {SubmitHook} A submit hook that clears answers and redirects home
+ */
+function onSubmission(journeyCode: string): SubmitHook {
+  return submit({
     onValid: {
       effects: [CreateApplicationEffects.clearAllDraftAnswers(journeyCode)],
       next: [redirect({ goto: "/" })],
     },
     validate: true,
   });
+}
