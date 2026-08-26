@@ -2,7 +2,12 @@ import { expect } from "chai";
 import { describe, it } from "mocha";
 import sinon from "sinon";
 import { createForgeTestClient } from "../../../../integration/utils/helpers.js";
-import { type ForgeTestClient, TestRenderResult, TestResult } from "@ministryofjustice/hmpps-forge/core/testing";
+import {
+  expectErrorOutcome,
+  type ForgeTestClient,
+  TestRenderResult,
+  TestResult,
+} from "@ministryofjustice/hmpps-forge/core/testing";
 import { yourCasesEffectsRegistry } from "#/journeys/your-cases/your-cases.effects.js";
 import { yourCasesJourney } from "#/journeys/your-cases/your-cases.journey.js";
 import { ApiResponseError, ApiValidationError } from "#/api/clients/api.errors.js";
@@ -98,19 +103,22 @@ describe("LoadYourCaseList", () => {
       const cause = new Error("network error");
       const stub = sinon.stub().rejects(cause);
       const result = await getErrorFromYourCases(stub);
-      if (result.type === "error") {
-        expect(result.error).to.be.instanceOf(ApiResponseError);
-        const apiError = result.error as ApiResponseError;
-        expect(apiError.cause).to.equal(cause);
-      }
+      expectErrorOutcome(result);
+
+      const error = result.error.cause;
+      expect(error).to.be.instanceOf(ApiResponseError);
+
+      const apiError = error as ApiResponseError;
+      expect(apiError.cause).to.equal(cause);
     });
 
     it("throws ApiResponseError when getApplications returns a non-200 status", async () => {
       const stub = sinon.stub().resolves({ status: 500, data: {} });
       const result = await getErrorFromYourCases(stub);
-      if (result.type === "error") {
-        expect(result.error).to.be.instanceOf(ApiResponseError);
-      }
+      expectErrorOutcome(result);
+
+      const error = result.error.cause;
+      expect(error).to.be.instanceOf(ApiResponseError);
     });
 
     it("throws ApiValidationError when getApplications returns invalid data", async () => {
@@ -119,12 +127,13 @@ describe("LoadYourCaseList", () => {
         .resolves({ status: 200, data: { invalid: true } });
 
       const result = await getErrorFromYourCases(stub);
-      if (result.type === "error") {
-        const error = result.error;
-        expect(error).to.be.instanceOf(ApiValidationError);
-        const apiError = error as ApiValidationError;
-        expect(apiError.message).to.include("failed schema validation");
-      }
+      expectErrorOutcome(result);
+
+      const error = result.error.cause;
+      expect(error).to.be.instanceOf(ApiValidationError);
+
+      const apiError = error as ApiValidationError;
+      expect(apiError.message).to.include("failed schema validation");
     });
   });
 });
