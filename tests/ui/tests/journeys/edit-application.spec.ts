@@ -42,7 +42,7 @@ test("Edit Application - Task List step", async ({ withSelectedOffice: page }) =
 
 });
 
-test("Edit Application - Task List step - Record Controlled Work button", async ({ withSelectedOffice: page }) => {
+test("Edit Application - Task List step - Record Controlled Work button - Confirm", async ({ withSelectedOffice: page }) => {
   const applicationId = completeApplication.id;
 
   await page.goto(`/cases/${applicationId}/task-list`);
@@ -59,5 +59,15 @@ test("Edit Application - Task List step - Record Controlled Work button", async 
 
   await submitButton.click();
 
-  await expect(page).toHaveURL("/submittedPage-TODO");
+  await expect(page).toHaveURL(`/cases/${applicationId}/confirmation`);
+
+  const confirmationHeading = page.getByRole("heading", { name: "Controlled work recorded" });
+  await expect(confirmationHeading).toBeVisible();
+
+  const returnToCaseListButton = page.getByRole("button", { name: "Return to case list" });
+  await expect(returnToCaseListButton).toBeVisible();
+
+  await returnToCaseListButton.click();
+
+  await expect(page).toHaveURL("/cases");
 });

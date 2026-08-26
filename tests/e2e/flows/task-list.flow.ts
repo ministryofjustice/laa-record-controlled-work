@@ -45,11 +45,12 @@ export const openMeansAssessmentFromTaskList = async (
 
 export const submitApplication = async (
   page: Page,
-  _applicationId: string,
+  applicationId: string,
 ): Promise<void> => {
   await page.getByRole("button", { name: "Record controlled work" }).click();
-  // TODO: Update this to the correct URL once the submission journey is implemented
-  await expect(page).toHaveURL(/\/submittedPage-TODO/);
+  await expect(page).toHaveURL(
+    new RegExp(`/cases/${applicationId}/confirmation`),
+  );
 };
 
 export const viewCompletedEligibilityAssessment = async (

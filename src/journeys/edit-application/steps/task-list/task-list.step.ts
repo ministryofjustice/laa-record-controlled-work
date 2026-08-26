@@ -44,10 +44,7 @@ export const taskListStep = (): ReturnType<typeof step> =>
     ],
     onAccess: [
       access({
-        effects: [
-          editApplicationEffects.loadApplication(),
-          editApplicationEffects.setTaskListStatuses(),
-        ],
+        effects: [editApplicationEffects.setTaskListStatuses()],
       }),
     ],
     onSubmission: [saveAndReturn(), submitApplication()],
@@ -70,14 +67,13 @@ const saveAndReturn = (): SubmitHook =>
     when: Post("action").match(Condition.Equals("return")),
   });
 
-// TODO: no submission page completed yet
 const submitApplication = (): SubmitHook =>
   submit({
     onAlways: {
       effects: [editApplicationEffects.submitApplication()],
       next: [
         redirect({
-          goto: "/submittedPage-TODO",
+          goto: "confirmation",
         }),
       ],
     },
