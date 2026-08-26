@@ -1,8 +1,6 @@
 import {
   Answer,
   Condition,
-  Format,
-  Params,
   Query,
   redirect,
   step,
@@ -11,8 +9,7 @@ import {
 
 import { evidenceEffects } from "#/journeys/evidence/evidence.effects.js";
 import { doYouHaveEvidenceRadioInput } from "#/journeys/evidence/steps/do-you-have-evidence/do-you-have-evidence.blocks.js";
-import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
-import { backLink, caption, continueButton } from "#/journeys/shared.blocks.js";
+import { caption, continueButton } from "#/journeys/shared.blocks.js";
 import { t } from "#/lib/i18n.js";
 
 export const doYouHaveEvidence = (
@@ -20,9 +17,6 @@ export const doYouHaveEvidence = (
 ): ReturnType<typeof step> =>
   step({
     blocks: [
-      backLink(
-        Format("/cases/%1/task-list/", Params(PARAMS_KEYS.applicationID)),
-      ),
       caption(t("journeys.evidence.caption")),
       doYouHaveEvidenceRadioInput,
       continueButton(),
