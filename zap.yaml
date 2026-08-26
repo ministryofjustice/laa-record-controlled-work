@@ -1,9 +1,5 @@
 # ZAP Automation Framework plan for laa-record-controlled-work.
-#
-# Runs against the local docker-compose stack (see docker/compose/up --ci) and uses
-# Browser Based Authentication to drive the same mock OAuth2 sign-in flow used by the
-# Playwright E2E tests (tests/e2e/flows/auth.flow.ts). The mock IdP login form
-# (mock-oauth2-login.html) is pre-filled with valid defaults.
+# Uses browser based authentication to drive the same mock OAuth2 sign-in flow
 env:
   contexts:
     - name: rcw
@@ -15,21 +11,17 @@ env:
         method: "browser"
         parameters:
           loginPageUrl: "http://localhost:8080/"
-          loginPageWait: 10
+          loginPageWait: 15
           browserId: "firefox-headless"
           steps:
             - description: "Submit the mock OAuth2 sign-in form (fields are pre-filled with valid defaults)"
               type: "CLICK"
               xpath: "//button[@type='submit']"
-              timeout: 5000
+              timeout: 20000
         verification:
-          method: "poll"
-          pollUrl: "http://localhost:8080/"
-          pollFrequency: 1
-          pollUnits: "requests"
-          loggedOutRegex: "\\QMock OAuth2 Server Sign-in\\E"
+          method: "autodetect"
       sessionManagement:
-        method: "cookie"
+        method: "autodetect"
       users:
         - name: "test-user"
           credentials:
@@ -51,11 +43,23 @@ jobs:
   - type: "outputSummary"
     parameters:
       format: "Long"
-      summaryFile: "/zap/wrk/tmp/zap_out.json"
+      summaryFile: "/zap/wrk/zap-results/zap_out.json"
   - type: "report"
     parameters:
       reportDescription: "RCW ZAP Baseline Scan"
-      reportDir: "/zap/wrk/tmp/"
+      reportDir: "/zap/wrk/zap-results/"
       reportFile: "zap-baseline-report"
       reportTitle: "RCW ZAP Scanning Report"
       template: "traditional-html"
+  - type: "report"
+    parameters:
+      reportDir: "/zap/wrk/zap-results/"
+      reportFile: "zap-auth-diagnostics"
+      template: "auth-report-json"
+    sites:
+      - "http://localhost:8080"
+    sections:
+      - "summary"
+      - "diagnostics"
+      - "diagnosticsscreenshots"
+      - "diagnosticswebelements"

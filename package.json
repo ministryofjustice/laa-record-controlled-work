@@ -23,6 +23,8 @@
     "dev:watch": "op run --env-file=.env -- yarn watch",
     "dev:docker": "./docker/compose/up",
     "dev:docker:entra": "./docker/compose/up --entra",
+    "security:zap": "./scripts/zap/zap-run-local.sh",
+    "security:zap:ci": "./scripts/zap/zap-run-cicd.sh",
     "watch": "yarn build && concurrently \"tsc --watch\" \"node public/esbuild/esbuild.js --watch\" \"nodemon --exec 'npx tsx msw/dev-server-with-msw.ts'\"",
     "build": "yarn clean && tsc -p tsconfig.build.json && node public/esbuild/esbuild.js",
     "clean": "rimraf public",

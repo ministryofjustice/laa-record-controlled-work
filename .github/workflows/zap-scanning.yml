@@ -41,26 +41,17 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           PDA_API_KEY: ci-placeholder
 
-      - name: Create tmp directory for ZAP reports
-        run: |
-          mkdir -p tmp
-          chmod 777 tmp
-
       - name: Run ZAP Automation Framework scan
-        run: |
-          docker run --rm --network host \
-            -v "$(pwd)":/zap/wrk:rw \
-            -t zaproxy/zap-stable \
-            zap.sh -cmd -port 8090 -autorun /zap/wrk/zap.yaml
+        run: yarn security:zap:ci
 
       - name: Upload ZAP HTML Report
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: zap-scan-report-html
-          path: tmp/zap-baseline-report.html
+          path: zap-results/zap-baseline-report.html
           retention-days: 14
 
       - name: Tear down stack
         if: always()
-        run: docker compose -f docker-compose.yml -f docker-compose.override.yml down --volumes --remove-orphans
+        run: docker compose -f docker-compose.yml -f docker-compose.override.yml -f docker/compose/ci.yml -f docker/compose/zap.yml down --volumes --remove-orphans
