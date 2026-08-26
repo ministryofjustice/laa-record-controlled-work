@@ -20,8 +20,13 @@ const VALIDATION_MESSAGE = t(
   "journeys.createApplication.legalAidBefore.validation.required",
 );
 
-export const legalAidBeforeRadioInput = (): GovUKRadioInput =>
-  GovUKRadioInput({
+/**
+ * Creates a GovUK-styled radio input for the legal aid history question.
+ *
+ * @returns {GovUKRadioInput} A GovUK radio input component with legal aid history options
+ */
+export function legalAidBeforeRadioInput(): GovUKRadioInput {
+  return GovUKRadioInput({
     code: AnswerKey.legalAidBefore,
     fieldset: {
       legend: {
@@ -51,3 +56,4 @@ export const legalAidBeforeRadioInput = (): GovUKRadioInput =>
       }),
     ],
   });
+}

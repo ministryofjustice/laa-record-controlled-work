@@ -3,6 +3,7 @@ import {
   Condition,
   redirect,
   step,
+  type StepDefinition,
   submit,
   type SubmitHook,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
@@ -26,10 +27,14 @@ import { t } from "#/lib/i18n.js";
 const ECF_PATH = `${JourneyPath.CREATE_APPLICATION}/ecf`;
 const TITLE = t("journeys.createApplication.legalAidBefore.title");
 
-export const legalAidBeforeStep = (
-  journeyCode: string,
-): ReturnType<typeof step> =>
-  step({
+/**
+ * Defines the legal aid history step for the create application journey.
+ *
+ * @param {string} journeyCode - The journey code for saving draft answers
+ * @returns {StepDefinition} A step definition for the legal aid history question page
+ */
+export function legalAidBeforeStep(journeyCode: string): StepDefinition {
+  return step({
     blocks: [
       backLink(ECF_PATH),
       clientDetailsCaption(),
@@ -44,9 +49,19 @@ export const legalAidBeforeStep = (
     },
     title: TITLE,
   });
+}
 
-const onSubmission = (journeyCode: string): SubmitHook =>
-  submit({
+/**
+ * Handles form submission for the legal aid history question step.
+ * Saves draft answers and routes based on the answer:
+ * - If "same matter": redirects to legal aid last 6 months step
+ * - Otherwise: redirects to client details step
+ *
+ * @param {string} journeyCode - The journey code for saving draft answers
+ * @returns {SubmitHook} A submit hook with validation and conditional routing logic
+ */
+function onSubmission(journeyCode: string): SubmitHook {
+  return submit({
     onValid: {
       effects: [CreateApplicationEffects.saveDraftAnswers(journeyCode)],
       next: [
@@ -57,6 +72,7 @@ const onSubmission = (journeyCode: string): SubmitHook =>
     },
     validate: true,
   });
+}
 
 const redirectWhenSameMatter = redirect({
   goto: StepCode.LEGAL_AID_LAST_6_MONTHS,
