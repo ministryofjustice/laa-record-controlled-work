@@ -1,7 +1,7 @@
 import {
   redirect,
   step,
-  StepDefinition,
+  type StepDefinition,
   submit,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
