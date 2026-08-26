@@ -48,9 +48,9 @@ describe("Your Cases recorded step", () => {
       renderResult = result as TestRenderResult;
       [recordButton] = renderResult.getBlocksByVariant("govukLinkButton");
       selectedOffice = renderResult
-        .getBlocksByVariant("html")
+        .getBlocksByVariant("govukBody")
         .find((b) =>
-          String(b.properties.content).includes("Office:"),
+          String(b.properties.text).includes("Office:"),
         ) as RenderBlock;
       [table] = renderResult.getBlocksByVariant("govukTable");
       [subNavigation] = renderResult.getBlocksByVariant("mojSubNavigation");
@@ -133,9 +133,9 @@ describe("Your Cases recorded step", () => {
         (b) => b.properties.visibleWhen !== false,
       );
       const body = renderResult
-        .getBlocksByVariant("html")
+        .getBlocksByVariant("govukBody")
         .find((b) =>
-          String(b.properties.content).includes("You have no recorded cases"),
+          String(b.properties.text).includes("You have no recorded cases"),
         ) as RenderBlock;
 
       expect(visibleTables).to.have.length(0);

@@ -30,6 +30,12 @@ describe("Declaration sign step", () => {
   describe(`GET /cases/:applicationId/declaration/sign`, () => {
     let render: TestRenderResult;
 
+    function getButtonGroupContent(): string {
+      const [buttonGroup] = render.getBlocksByVariant("govukButtonGroup");
+      expect(buttonGroup).to.exist;
+      return JSON.stringify(buttonGroup);
+    }
+
     before(async () => {
       const result = await client.get(`/cases/${uuid}/declaration/sign`);
       render = result as TestRenderResult;
@@ -60,10 +66,14 @@ describe("Declaration sign step", () => {
     });
 
     it("shows the expected page heading", () => {
-      const block = getBlockWithContent(render, "html", "Sign the declaration");
+      const block = getBlockWithContent(
+        render,
+        "govukHeading",
+        "Sign the declaration",
+      );
 
       expect(block).to.exist;
-      expect(block.properties.tag).to.equal("h1");
+      expect(block.properties.level).to.equal(1);
     });
 
     [
@@ -71,7 +81,7 @@ describe("Declaration sign step", () => {
       "You must save a copy along with any evidence provided by your client. Your client’s file may be audited and assessed by the LAA at a later date.",
     ].forEach((paragraph, index) => {
       it(`shows the expected statement (${index})`, () => {
-        const block = getBlockWithContent(render, "html", paragraph);
+        const block = getBlockWithContent(render, "govukBody", paragraph);
         expect(block).to.exist;
       });
     });
@@ -90,12 +100,12 @@ describe("Declaration sign step", () => {
     it("shows the expected confirmation heading", () => {
       const block = getBlockWithContent(
         render,
-        "html",
+        "govukHeading",
         "Confirmation of signed declaration",
       );
 
       expect(block).to.exist;
-      expect(block.properties.tag).to.equal("h2");
+      expect(block.properties.level).to.equal(2);
     });
 
     it("shows the expected checkbox", () => {
@@ -124,21 +134,13 @@ describe("Declaration sign step", () => {
     });
 
     it("shows the expected 'continue' button", () => {
-      const block = getBlockWithContent(render, "templateWrapper", "Continue");
-      expect(block).to.exist;
-      expect(block.variant).to.equal("govukButton");
-      expect(block.properties.value).to.equal("continue");
+      const content = getButtonGroupContent();
+      expect(content).to.include("continue");
     });
 
     it("shows the expected 'save and return later' button", () => {
-      const block = getBlockWithContent(
-        render,
-        "templateWrapper",
-        "Save and return later",
-      );
-      expect(block).to.exist;
-      expect(block.variant).to.equal("govukButton");
-      expect(block.properties.value).to.equal("return");
+      const content = getButtonGroupContent();
+      expect(content).to.include("return");
     });
   });
 

@@ -9,7 +9,8 @@ import { TestRenderResult } from "@ministryofjustice/hmpps-forge/core/testing";
  *
  * Supported block variants:
  * - html
- * - templateWrapper (gets the block's children)
+ * - govukBody
+ * - govukHeading
  * - govukButton
  * - govukDateInputFull
  *
@@ -23,22 +24,7 @@ export function getBlockWithContent(
   variant: string,
   content: string,
 ) {
-  let blocks = render.getBlocksByVariant(variant);
-
-  // Gnarly workaround for `templateWrapper` blocks, which contain arrays of `RenderBlocks` in their slots. We only care
-  // about the slotted blocks for testing, so we flatten them out into a single array of `RenderBlock`s.
-  if (variant === "templateWrapper") {
-    blocks = blocks.reduce(
-      (acc: RenderBlock[], block: RenderBlock): RenderBlock[] => {
-        const slots = Object.values(
-          block.properties.slots as Record<string, RenderBlock[]>,
-        );
-        const blocks = slots.reduce((acc, slot) => [...acc, ...slot]);
-        return [...acc, ...blocks];
-      },
-      [],
-    );
-  }
+  const blocks = render.getBlocksByVariant(variant);
 
   // Find the `RenderBlock` with the requested content. Different variants have different paths to their content, which
   // we account for in the switch. Errors about undefined properties _may_ mean you have a block that we haven't handled yet.
@@ -48,6 +34,12 @@ export function getBlockWithContent(
     switch (block.variant) {
       case "html":
         blockContent = block.properties.content as string;
+        break;
+      case "govukBody":
+        blockContent = block.properties.text as string;
+        break;
+      case "govukHeading":
+        blockContent = block.properties.text as string;
         break;
       case "govukButton":
         blockContent = block.properties.text as string;
