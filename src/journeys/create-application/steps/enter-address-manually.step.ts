@@ -27,9 +27,6 @@ export const enterAddressManuallyStep = (
 ): ReturnType<typeof step> =>
   step({
     blocks: [
-      GovUKBackLink({
-        href: "/cases/new/have-a-home-address",
-      }),
       HtmlBlock({
         content: `<span class="govuk-caption-l">${t("journeys.createApplication.caption")}</span>`,
       }),
@@ -155,4 +152,5 @@ export const enterAddressManuallyStep = (
       entryWhen: Query("returnTo").match(Condition.Equals("check-answers")),
     },
     title: t("journeys.createApplication.enterAddressManually.title"),
+    backlink: ''
   });
