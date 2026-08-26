@@ -2,26 +2,14 @@ import type { HtmlBlock } from "@ministryofjustice/hmpps-forge/core/components";
 
 import { GovUKBody } from "@ministryofjustice/hmpps-forge/govuk-components";
 
-// TODO - hardcoded until we have proper designs
+import { tt } from "#/lib/i18n.js";
 
 /**
  * Creates a body block with instructions to complete ECF application forms.
  *
  * @returns {HtmlBlock} A GovUK body component with ECF form completion instructions
  */
-export function ecfDroupoutBody(): HtmlBlock {
-  return GovUKBody({
-    text: 'Continue to complete the <a href="/government/publications/legal-aid-exceptional-case-funding-form-and-guidance">ECF application form CIV ECF 1</a> and <a href="/government/publications/cw1-financial-eligibility-for-legal-aid-clients">form CW1</a> for your client.',
-  });
-}
-
-/**
- * Creates a body block with instructions for submitting completed ECF forms.
- *
- * @returns {HtmlBlock} A GovUK body component with form submission email instructions
- */
-export function submitFormsBody(): HtmlBlock {
-  return GovUKBody({
-    text: 'Send completed forms to: <a href="mailto:contactECC@justice.gov.uk">contactECC@justice.gov.uk</a>',
-  });
+export function ecfDroupoutBody(): HtmlBlock[] {
+  const items = tt("journeys.createApplication.ecfDropout.heading");
+  return items.map((text) => GovUKBody({ text }));
 }

@@ -8,10 +8,7 @@ import {
 import { t } from "i18next";
 
 import { CreateApplicationEffects } from "#/journeys/create-application/create-application.effects.js";
-import {
-  ecfDroupoutBody,
-  submitFormsBody,
-} from "#/journeys/create-application/steps/ecfDropout/ecfDropout.blocks.js";
+import { ecfDroupoutBody } from "#/journeys/create-application/steps/ecfDropout/ecfDropout.blocks.js";
 import { JourneyPath } from "#/journeys/JourneyPath.enum.js";
 import { backLink, button, heading } from "#/journeys/shared.blocks.js";
 
@@ -31,8 +28,7 @@ export function ineligibleStep(journeyCode: string): StepDefinition {
     blocks: [
       backLink(ECF_PATH),
       heading(HEADING),
-      ecfDroupoutBody(),
-      submitFormsBody(),
+      ...ecfDroupoutBody(),
       button(RETURN_TO_CASE_LIST),
     ],
     onSubmission: [onSubmission(journeyCode)],
