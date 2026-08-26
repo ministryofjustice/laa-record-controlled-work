@@ -22,6 +22,7 @@ import {
   completeCreateCaseShortestPath,
   startNewCase,
 } from "#tests/e2e/flows/create-case.flow.js";
+import { completeDeclaration } from "#tests/e2e/flows/declaration.flow.js";
 import {
   completeEvidenceNoPath,
   completeEvidenceYesPath,
@@ -32,7 +33,6 @@ import {
   submitApplication,
   viewCompletedEligibilityAssessment,
 } from "#tests/e2e/flows/task-list.flow.js";
-import { completeDeclaration } from "#tests/e2e/flows/declaration.flow.js";
 
 export interface Actor {
   assertEligibilityResultVisible: () => Promise<void>;
