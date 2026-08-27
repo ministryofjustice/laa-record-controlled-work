@@ -1,0 +1,65 @@
+# ZAP Automation Framework plan for laa-record-controlled-work.
+# Uses browser based authentication to drive the same mock OAuth2 sign-in flow
+env:
+  contexts:
+    - name: rcw
+      urls:
+        - "http://localhost:8080"
+      excludePaths:
+        - "http://localhost:8080/auth/code/callback.*"
+      authentication:
+        method: "browser"
+        parameters:
+          loginPageUrl: "http://localhost:8080/"
+          loginPageWait: 15
+          browserId: "firefox-headless"
+          steps:
+            - description: "Submit the mock OAuth2 sign-in form (fields are pre-filled with valid defaults)"
+              type: "CLICK"
+              xpath: "//button[@type='submit']"
+              timeout: 20000
+        verification:
+          method: "autodetect"
+      sessionManagement:
+        method: "autodetect"
+      users:
+        - name: "test-user"
+          credentials:
+            username: "test.user@example.com"
+            password: "NOTUSED"
+  parameters:
+    failOnError: true
+    progressToStdout: true
+jobs:
+  - type: "spider"
+    parameters:
+      context: "rcw"
+      user: "test-user"
+      url: "http://localhost:8080/"
+      maxDuration: 5
+  - type: "passiveScan-wait"
+    parameters:
+      maxDuration: 5
+  - type: "outputSummary"
+    parameters:
+      format: "Long"
+      summaryFile: "/zap/wrk/zap-results/zap_out.json"
+  - type: "report"
+    parameters:
+      reportDescription: "RCW ZAP Baseline Scan"
+      reportDir: "/zap/wrk/zap-results/"
+      reportFile: "zap-baseline-report"
+      reportTitle: "RCW ZAP Scanning Report"
+      template: "traditional-html"
+  - type: "report"
+    parameters:
+      reportDir: "/zap/wrk/zap-results/"
+      reportFile: "zap-auth-diagnostics"
+      template: "auth-report-json"
+    sites:
+      - "http://localhost:8080"
+    sections:
+      - "summary"
+      - "diagnostics"
+      - "diagnosticsscreenshots"
+      - "diagnosticswebelements"
