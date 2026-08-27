@@ -20,6 +20,7 @@ import { t } from "#/lib/i18n.js";
 
 export const confirmStep = (): ReturnType<typeof step> =>
   step({
+    backlink: "../task-list/",
     blocks: [
       caption,
       confirmHeading(),

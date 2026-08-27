@@ -33,7 +33,6 @@ export function ecfStep(journeyCode: string): StepDefinition {
     code: StepCode.ECF,
     onSubmission: [onSubmission(journeyCode)],
     path: "/ecf",
-    reachability: { entryWhen: true },
     title: TITLE,
   });
 }

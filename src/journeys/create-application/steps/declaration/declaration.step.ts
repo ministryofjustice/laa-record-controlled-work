@@ -13,6 +13,7 @@ import { t } from "#/lib/i18n.js";
 const TITLE = t("journeys.createApplication.declaration.title");
 
 const AGREE_AND_CONTINUE = t("journeys.createApplication.declaration.continue");
+const ROOT = "/";
 
 /**
  * Defines the provider declaration step for the create application journey.
@@ -21,6 +22,7 @@ const AGREE_AND_CONTINUE = t("journeys.createApplication.declaration.continue");
  */
 export function declarationStep(): StepDefinition {
   return step({
+    backlink: ROOT,
     blocks: [heading(TITLE), body(), button(AGREE_AND_CONTINUE)],
     onSubmission: [onSubmission],
     path: "/provider-declaration",

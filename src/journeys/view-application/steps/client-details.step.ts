@@ -45,6 +45,7 @@ const clientName = Format(
 
 export const clientDetailsStep = (): ReturnType<typeof step> =>
   step({
+    backlink: "/cases/recorded",
     blocks: [
       statusTag("Recorded"),
       heading(clientName),

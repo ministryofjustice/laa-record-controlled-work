@@ -3,9 +3,7 @@ import {
   TestRenderResult,
 } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
-import {
-  createApplicationEffectsRegistry,
-} from "#/journeys/create-application/create-application.effects.js";
+import { createApplicationEffectsRegistry } from "#/journeys/create-application/create-application.effects.js";
 
 import { createForgeTestClient } from "../../utils/helpers.js";
 import { createApplicationJourney } from "#/journeys/create-application/create-application.journey.js";
@@ -27,6 +25,11 @@ describe("Declaration step", () => {
 
     it("sets the expected step title", () => {
       expect(renderResult.context.step.title).to.equal("Declaration");
+    });
+
+    it("renders a backlink to the start page", () => {
+      const [backLink] = renderResult.getBlocksByVariant("govukBackLink");
+      expect(backLink.properties.href).to.equal("/");
     });
 
     it("renders declaration body copy including the privacy policy link", () => {

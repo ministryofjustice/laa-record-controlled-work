@@ -16,6 +16,7 @@ export const doYouHaveEvidence = (
   journeyCode: string,
 ): ReturnType<typeof step> =>
   step({
+    backlink: "../task-list/",
     blocks: [
       caption(t("journeys.evidence.caption")),
       doYouHaveEvidenceRadioInput,
