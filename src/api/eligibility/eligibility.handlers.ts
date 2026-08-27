@@ -13,8 +13,8 @@ import {
   ApplicationIdParam,
   PutEligibilityRequestBody,
 } from "#/api/eligibility/eligibility.types.js";
+import { BAD_REQUEST, OK, UNAUTHORIZED } from "#/app/enums/httpStatus.enum.js";
 import { NotAuthenticatedError } from "#/auth/auth.errors.js";
-import { BAD_REQUEST, OK, UNAUTHORIZED } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
 
 export const createGetEligibilityHandler =

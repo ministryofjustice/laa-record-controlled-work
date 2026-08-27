@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { OK } from "#/lib/constants/http.js";
+import { OK } from "#/app/enums/httpStatus.enum.js";
 
 const router: Router = Router();
 

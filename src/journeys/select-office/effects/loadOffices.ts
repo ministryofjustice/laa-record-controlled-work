@@ -9,6 +9,7 @@ import {
 } from "#/api/clients/api.errors.js";
 import { getPdaApiDefaultOptions } from "#/api/clients/getPdaApiDefaultOptions.js";
 import { ProviderFirmOfficeListDto } from "#/api/clients/pda/model/providerFirmOfficeListDto.zod.gen.js";
+import { HTTP_STATUS } from "#/app/enums/httpStatus.enum.js";
 import { ID_TOKEN_CLAIMS_KEYS } from "#/auth/auth.constants.js";
 import config from "#/config.js";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
@@ -17,7 +18,6 @@ import {
   InvalidSessionError,
 } from "#/journeys/journey.errors.js";
 import { mapAvailableOffices } from "#/journeys/select-office/mappers/mapAvailableOffices.js";
-import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { PDA_MSW_LAA_ACCOUNTS_HEADER } from "#/lib/constants/pda.js";
 import { logger } from "#/logger.js";
 

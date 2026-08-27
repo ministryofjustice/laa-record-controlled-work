@@ -6,7 +6,7 @@ import {
   FOUND,
   INTERNAL_SERVER_ERROR,
   UNAUTHORIZED,
-} from "#/lib/constants/http.js";
+} from "#/app/enums/httpStatus.enum.js";
 import sinon from "sinon";
 import { EntraService } from "#/auth/entra.service.js";
 import { authCodeCallback } from "#/auth/auth.handlers.js";

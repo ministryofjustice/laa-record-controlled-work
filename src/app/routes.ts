@@ -1,9 +1,9 @@
 import type { Express, Request, Response } from "express";
 
 import eligibilityRouter from "#/api/eligibility/eligibility.routes.js";
+import { OK } from "#/app/enums/httpStatus.enum.js";
 import authRouter from "#/auth/auth.routes.js";
 import config from "#/config.js";
-import { OK } from "#/lib/constants/http.js";
 import { createAuthLimiter } from "#/middleware/setupRateLimit.js";
 
 import { requireAuth } from "./middleware/requireAuth.middleware.js";

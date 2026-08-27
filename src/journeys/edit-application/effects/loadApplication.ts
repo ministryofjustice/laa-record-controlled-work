@@ -9,12 +9,12 @@ import {
 } from "#/api/clients/api.errors.js";
 import { getRcwApiDefaultOptions } from "#/api/clients/getRcwApiDefaultOptions.js";
 import { Application } from "#/api/clients/rcw/model/application.zod.gen.js";
+import { HTTP_STATUS } from "#/app/enums/httpStatus.enum.js";
 import { getAuthDebugHeaders } from "#/auth/auth.debug.js";
 import {
   CONTEXT_DATA_KEYS,
   PARAMS_KEYS,
 } from "#/journeys/journey.constants.js";
-import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
 
 export const loadApplication =

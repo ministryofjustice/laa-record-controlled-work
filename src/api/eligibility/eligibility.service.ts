@@ -9,9 +9,9 @@ import {
   LoadEligibilityAssessmentError,
   SaveEligibilityAssessmentError,
 } from "#/api/eligibility/eligibility.errors.js";
+import { HTTP_STATUS } from "#/app/enums/httpStatus.enum.js";
 import { getAuthDebugHeaders } from "#/auth/auth.debug.js";
 import { NotAuthenticatedError } from "#/auth/auth.errors.js";
-import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { type Either, failure, success } from "#/lib/either.js";
 import { logger } from "#/logger.js";
 
