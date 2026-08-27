@@ -33,25 +33,29 @@ describe("Auth Handlers", () => {
 
   beforeEach(() => {
     authServiceStub = {
-      initiateAuthCodeFlow: sinon.stub().resolves(success({
-        authCodeUrl: AUTH_CODE_URL,
-        authState: "test-state",
-        returnTo: "/",
-        pkceCodes: {},
-        authCodeUrlRequest: {},
-        authCodeRequest: {},
-      })),
-      exchangeAuthCode: sinon.stub().resolves(success({
-        accessToken: "access-token",
-        idToken: "id-token",
-        account: {
-          environment: "login.microsoftonline.com",
-          homeAccountId: "test-uid.test-tenant-id",
-          localAccountId: "test-uid",
-          tenantId: "test-tenant-id",
-          username: "testuser@example.com",
-        },
-      })),
+      initiateAuthCodeFlow: sinon.stub().resolves(
+        success({
+          authCodeUrl: AUTH_CODE_URL,
+          authState: "test-state",
+          returnTo: "/",
+          pkceCodes: {},
+          authCodeUrlRequest: {},
+          authCodeRequest: {},
+        }),
+      ),
+      exchangeAuthCode: sinon.stub().resolves(
+        success({
+          accessToken: "access-token",
+          idToken: "id-token",
+          account: {
+            environment: "login.microsoftonline.com",
+            homeAccountId: "test-uid.test-tenant-id",
+            localAccountId: "test-uid",
+            tenantId: "test-tenant-id",
+            username: "testuser@example.com",
+          },
+        }),
+      ),
     };
 
     sinon
@@ -80,8 +84,8 @@ describe("Auth Handlers", () => {
 
       expect(res.status).to.equal(FOUND);
       expect(res.headers.location).to.equal(AUTH_CODE_URL);
-      expect(authServiceStub.initiateAuthCodeFlow.calledOnceWith(returnTo)).to.be
-        .true;
+      expect(authServiceStub.initiateAuthCodeFlow.calledOnceWith(returnTo)).to
+        .be.true;
     });
 
     it("ignores returnTo query parameter when it is not a safe app-relative path", async () => {
@@ -91,9 +95,8 @@ describe("Auth Handlers", () => {
 
       expect(res.status).to.equal(FOUND);
       expect(res.headers.location).to.equal(AUTH_CODE_URL);
-      expect(
-        authServiceStub.initiateAuthCodeFlow.calledOnceWith(undefined),
-      ).to.be.true;
+      expect(authServiceStub.initiateAuthCodeFlow.calledOnceWith(undefined)).to
+        .be.true;
     });
 
     it("calls next(error) when initiateAuthCodeFlow() fails", async () => {
@@ -153,13 +156,11 @@ describe("Auth Handlers", () => {
     });
 
     it("responds with 400 and the Entra callback error description when auth provider returns an error", async () => {
-      const res = await request(mockApp)
-        .get("/auth/code/callback")
-        .query({
-          error: "invalid_scope",
-          error_description:
-            "AADSTS650053: The application requested scope is invalid",
-        });
+      const res = await request(mockApp).get("/auth/code/callback").query({
+        error: "invalid_scope",
+        error_description:
+          "AADSTS650053: The application requested scope is invalid",
+      });
 
       expect(authServiceStub.exchangeAuthCode.called).to.be.false;
       expect(res.status).to.equal(BAD_REQUEST);
@@ -233,8 +234,8 @@ describe("Auth Handlers", () => {
 
       expect(createStub.calledOnceWithExactly({ sessionId: "new-session-id" }))
         .to.be.true;
-      expect((res.redirect as sinon.SinonStub).calledOnceWithExactly("/"))
-        .to.be.true;
+      expect((res.redirect as sinon.SinonStub).calledOnceWithExactly("/")).to.be
+        .true;
       expect(next.called).to.be.false;
     });
 
@@ -391,4 +392,3 @@ describe("Auth Handlers", () => {
     });
   });
 });
-
