@@ -23,7 +23,7 @@ export const doYouHaveEvidence = (
       backLink(
         Format("/cases/%1/task-list/", Params(PARAMS_KEYS.applicationID)),
       ),
-      caption,
+      caption(t("journeys.evidence.caption")),
       doYouHaveEvidenceRadioInput,
       continueButton(),
     ],

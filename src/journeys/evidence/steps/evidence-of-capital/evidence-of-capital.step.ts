@@ -29,7 +29,7 @@ export const evidenceOfCapital = (
           Params(PARAMS_KEYS.applicationID),
         ),
       ),
-      caption,
+      caption(t("journeys.evidence.caption")),
       heading,
       label,
       capitalEvidenceGroup,
