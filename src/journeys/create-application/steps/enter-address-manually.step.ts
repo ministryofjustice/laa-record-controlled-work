@@ -9,7 +9,6 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 import { HtmlBlock } from "@ministryofjustice/hmpps-forge/core/components";
 import {
-  GovUKBackLink,
   GovUKButton,
   GovUKHeading,
   GovUKTextInput,
@@ -152,5 +151,4 @@ export const enterAddressManuallyStep = (
       entryWhen: Query("returnTo").match(Condition.Equals("check-answers")),
     },
     title: t("journeys.createApplication.enterAddressManually.title"),
-    backlink: ''
   });

@@ -5,10 +5,8 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 import {
   HtmlBlock,
-  type ResolvableString,
 } from "@ministryofjustice/hmpps-forge/core/components";
 import {
-  GovUKBackLink,
   GovUKButton,
   GovUKHeading,
   GovUKRadioInput,
@@ -16,18 +14,6 @@ import {
 
 import { H1 } from "#/lib/constants/headings.js";
 import { t } from "#/lib/i18n.js";
-
-/**
- * Creates a GovUK-styled back link component.
- *
- * @param {ResolvableString} url - The URL destination for the back link
- * @returns {GovUKBackLink} A GovUK back link component
- */
-export function backLink(url: ResolvableString): GovUKBackLink {
-  return GovUKBackLink({
-    href: url,
-  });
-}
 
 /**
  * Creates a GovUK-styled caption block with the given text.

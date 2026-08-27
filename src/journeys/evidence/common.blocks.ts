@@ -1,9 +1,5 @@
-import {
-  HtmlBlock
-} from "@ministryofjustice/hmpps-forge/core/components";
-import {
-  GovUKButton,
-} from "@ministryofjustice/hmpps-forge/govuk-components";
+import { HtmlBlock } from "@ministryofjustice/hmpps-forge/core/components";
+import { GovUKButton } from "@ministryofjustice/hmpps-forge/govuk-components";
 
 import { t } from "#/lib/i18n.js";
 
