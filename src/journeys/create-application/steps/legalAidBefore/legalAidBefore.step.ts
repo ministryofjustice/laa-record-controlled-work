@@ -11,9 +11,7 @@ import {
 import { AnswerKey } from "#/journeys/AnswerKey.enum.js";
 import { CreateApplicationEffects } from "#/journeys/create-application/create-application.effects.js";
 import { legalAidBeforeRadioInput } from "#/journeys/create-application/steps/legalAidBefore/legalAidBefore.blocks.js";
-import { JourneyPath } from "#/journeys/JourneyPath.enum.js";
 import {
-  backLink,
   clientDetailsCaption,
   continueButton,
 } from "#/journeys/shared.blocks.js";
@@ -24,7 +22,6 @@ import {
 import { StepCode } from "#/journeys/StepCode.enum.js";
 import { t } from "#/lib/i18n.js";
 
-const ECF_PATH = `${JourneyPath.CREATE_APPLICATION}/ecf`;
 const TITLE = t("journeys.createApplication.legalAidBefore.title");
 
 /**
@@ -36,7 +33,6 @@ const TITLE = t("journeys.createApplication.legalAidBefore.title");
 export function legalAidBeforeStep(journeyCode: string): StepDefinition {
   return step({
     blocks: [
-      backLink(ECF_PATH),
       clientDetailsCaption(),
       legalAidBeforeRadioInput(),
       continueButton(),

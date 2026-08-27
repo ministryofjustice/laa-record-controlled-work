@@ -12,7 +12,6 @@ import {
   CLIENT_DETAILS_DATA_KEYS,
   CONTEXT_DATA_KEYS,
 } from "#/journeys/journey.constants.js";
-import { backLink } from "#/journeys/shared.blocks.js";
 import {
   caseReferenceNumber,
   heading,
@@ -47,7 +46,6 @@ const clientName = Format(
 export const clientDetailsStep = (): ReturnType<typeof step> =>
   step({
     blocks: [
-      backLink("/cases/recorded"),
       statusTag("Recorded"),
       heading(clientName),
       caseReferenceNumber(referenceNumber),

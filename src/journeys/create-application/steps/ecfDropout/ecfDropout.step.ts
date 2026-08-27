@@ -9,10 +9,8 @@ import { t } from "i18next";
 
 import { CreateApplicationEffects } from "#/journeys/create-application/create-application.effects.js";
 import { ecfDroupoutBody } from "#/journeys/create-application/steps/ecfDropout/ecfDropout.blocks.js";
-import { JourneyPath } from "#/journeys/JourneyPath.enum.js";
-import { backLink, button, heading } from "#/journeys/shared.blocks.js";
+import { button, heading } from "#/journeys/shared.blocks.js";
 
-const ECF_PATH = `${JourneyPath.CREATE_APPLICATION}/ecf`;
 const HEADING = t("journeys.createApplication.ecfDropout.heading");
 const TITLE = t("journeys.createApplication.ecfDropout.title");
 const RETURN_TO_CASE_LIST = t("journeys.createApplication.ecfDropout.button");
@@ -26,7 +24,6 @@ const RETURN_TO_CASE_LIST = t("journeys.createApplication.ecfDropout.button");
 export function ineligibleStep(journeyCode: string): StepDefinition {
   return step({
     blocks: [
-      backLink(ECF_PATH),
       heading(HEADING),
       ...ecfDroupoutBody(),
       button(RETURN_TO_CASE_LIST),

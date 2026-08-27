@@ -1,6 +1,4 @@
-import {
-  HtmlBlock,
-} from "@ministryofjustice/hmpps-forge/core/components";
+import { HtmlBlock } from "@ministryofjustice/hmpps-forge/core/components";
 
 import { t } from "#/lib/i18n.js";
 

@@ -3,9 +3,7 @@ import {
   Self,
   validation,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
-import {
-  HtmlBlock,
-} from "@ministryofjustice/hmpps-forge/core/components";
+import { HtmlBlock } from "@ministryofjustice/hmpps-forge/core/components";
 import {
   GovUKButton,
   GovUKHeading,
