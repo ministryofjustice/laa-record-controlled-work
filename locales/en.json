@@ -55,14 +55,16 @@
         "evidence": "Evidence"
       },
       "summaryCardTitles": {
-        "aboutTheClient": "About the client"
+        "aboutTheClient": "About the client",
+        "caseDetails": "Case details"
       },
       "summaryCardRows": {
         "fullName": "Full name",
         "dateOfBirth": "Date of birth",
         "nationalInsuranceNumber": "National Insurance number",
         "address": "Address",
-        "legalAidBefore": "Accessed legal aid before"
+        "legalAidBefore": "Accessed legal aid before",
+        "ecf": "ECF"
       }
     }
   },

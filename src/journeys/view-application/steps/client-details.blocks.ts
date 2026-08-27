@@ -86,3 +86,26 @@ export function aboutTheClientSummaryCard(): ReturnType<
     ],
   });
 }
+
+
+export function caseDetailsSummaryCard(): ReturnType<
+  typeof GovUKSummaryList
+> {
+  return GovUKSummaryList({
+    card: {
+      title: {
+        text: t("pages.view.summaryCardTitles.caseDetails"),
+      },
+    },
+    rows: [
+      {
+        key: {
+          text: t("pages.view.summaryCardRows.ecf"),
+        },
+        value: {
+          text: "False",
+        },
+      },
+    ],
+  });
+}

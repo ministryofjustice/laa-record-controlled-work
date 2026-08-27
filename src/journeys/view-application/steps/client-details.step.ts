@@ -4,7 +4,7 @@ import {
   StepDefinition,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 import { t } from "#/lib/i18n.js";
-import { aboutTheClientSummaryCard, subNavigation } from "#/journeys/view-application/steps/client-details.blocks.js";
+import { aboutTheClientSummaryCard, subNavigation, caseDetailsSummaryCard } from "#/journeys/view-application/steps/client-details.blocks.js";
 import {
   caseReferenceNumber,
   heading,
@@ -26,7 +26,8 @@ export const clientDetailsStep = (): StepDefinition =>
       printButton(),
       subNavigation(),
       subHeading(t("pages.view.tabs.ClientDetails")),
-      aboutTheClientSummaryCard()
+      aboutTheClientSummaryCard(),
+      caseDetailsSummaryCard(),
     ],
     onAccess: [
       access({
