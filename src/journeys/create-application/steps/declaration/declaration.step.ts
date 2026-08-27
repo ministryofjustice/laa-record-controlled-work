@@ -6,7 +6,7 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
 import { body } from "#/journeys/create-application/steps/declaration/declaration.blocks.js";
-import { backLink, button, heading } from "#/journeys/shared.blocks.js";
+import { button, heading } from "#/journeys/shared.blocks.js";
 import { StepCode } from "#/journeys/StepCode.enum.js";
 import { t } from "#/lib/i18n.js";
 
@@ -22,12 +22,8 @@ const ROOT = "/";
  */
 export function declarationStep(): StepDefinition {
   return step({
-    blocks: [
-      backLink(ROOT),
-      heading(TITLE),
-      body(),
-      button(AGREE_AND_CONTINUE),
-    ],
+    backlink: ROOT,
+    blocks: [heading(TITLE), body(), button(AGREE_AND_CONTINUE)],
     onSubmission: [onSubmission],
     path: "/provider-declaration",
     reachability: { entryWhen: true },
