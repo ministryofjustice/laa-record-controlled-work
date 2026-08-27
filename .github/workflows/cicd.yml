@@ -235,6 +235,9 @@ jobs:
   deploy-staging:
     name: Deploy
     if: github.ref == 'refs/heads/main'
+    concurrency:
+      group: deploy-staging-${{ github.ref }}
+      cancel-in-progress: false
     needs:
       - deploy-uat
     uses: ./.github/workflows/deploy-environment.yml
