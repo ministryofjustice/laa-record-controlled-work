@@ -47,6 +47,13 @@
           "dateRecorded": "Date recorded"
         }
       }
+    },
+    "view": {
+      "tabs": {
+        "ClientDetails": "Client Details",
+        "meansAssessment": "Means Assessment",
+        "evidence": "Evidence"
+      }
     }
   },
   "journeys": {

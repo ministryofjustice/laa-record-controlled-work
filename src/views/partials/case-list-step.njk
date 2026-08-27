@@ -1,5 +1,13 @@
 {% extends "base.njk" %}
 
+{% block beforeContent %}
+  {% if step.backlink %}
+    <a href="{{ step.backlink }}" class="govuk-back-link">Back</a>
+  {% else %}
+    <div class="govuk-!-margin-bottom-5"></div>
+  {% endif %}
+{% endblock %}
+
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
