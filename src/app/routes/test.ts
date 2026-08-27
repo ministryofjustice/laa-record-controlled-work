@@ -8,7 +8,6 @@ const FIRM_CODE = 12345;
 const LAA_ACCOUNTS = ["R1XEVG", "VGHVEY", "3TVRNM"];
 
 router.get("/signin", (req, res, next) => {
-  console.error("HELLO FISH");
   req.session.isAuthenticated = true;
   req.session.account = {
     environment: "login.microsoftonline.com",

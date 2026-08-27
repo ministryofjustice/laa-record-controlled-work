@@ -1,4 +1,4 @@
-import type { NextFunction, Request, RequestHandler, Response } from "express";
+import type { RequestHandler } from "express";
 import type { IncomingMessage, ServerResponse } from "node:http";
 
 import helmet from "helmet";
@@ -10,9 +10,6 @@ import config from "#/config.js";
  *
  * This *must* be registered after the `cspNonce` middleware to ensure that the nonce is available for use in the CSP directives.
  *
- * @param {Request} req  The Express request object.
- * @param {Response} res  The Express response object.
- * @param {NextFunction} next  The next middleware function in the stack.
  * @returns {RequestHandler}  The configured Helmet middleware.
  */
 function helmetMiddleware(): RequestHandler {

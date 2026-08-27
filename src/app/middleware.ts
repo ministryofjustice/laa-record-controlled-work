@@ -12,7 +12,6 @@ import { locale } from "#/app/middleware/locale.middleware.js";
 import { isEnv } from "#/app/utils/isEnv.js";
 import config from "#/config.js";
 import { createSession } from "#/lib/session.js";
-import { requireAuth } from "#/middleware/requireAuth.js";
 import { setupConfig } from "#/middleware/setupConfigs.js";
 import { setupCsrf } from "#/middleware/setupCsrf.js";
 import { setupRateLimit } from "#/middleware/setupRateLimit.js";

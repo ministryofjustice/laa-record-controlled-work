@@ -4,9 +4,9 @@ import eligibilityRouter from "#/api/eligibility/eligibility.routes.js";
 import authRouter from "#/auth/auth.routes.js";
 import config from "#/config.js";
 import { OK } from "#/lib/constants/http.js";
-import { requireAuth } from "#/middleware/requireAuth.js";
 import { createAuthLimiter } from "#/middleware/setupRateLimit.js";
 
+import { requireAuth } from "./middleware/requireAuth.middleware.js";
 import testRoutes from "./routes/test.js";
 
 export const initRoutes = (app: Express): void => {
