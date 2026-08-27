@@ -232,17 +232,17 @@ jobs:
       - snyk-infra
     secrets: inherit
 
-  # deploy-staging:
-  #   if: github.ref == 'refs/heads/main'
-  #   concurrency:
-  #     group: deploy-staging-${{ github.ref }}
-  #     cancel-in-progress: false
-  #   needs:
-  #     - deploy-uat
-  #   uses: ./.github/workflows/deploy-environment.yml
-  #   with:
-  #     app-environment: staging
-  #   secrets: inherit
+  deploy-staging:
+    name: Deploy
+    if: github.ref == 'refs/heads/main'
+    needs:
+      - deploy-uat
+    uses: ./.github/workflows/deploy-environment.yml
+    with:
+      app-environment: staging
+      sha: ${{ github.event.pull_request.head.sha || github.sha }}
+    secrets: inherit
+
 
   # deploy-production:
   #   if: github.ref == 'refs/heads/main'
