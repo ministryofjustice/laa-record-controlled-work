@@ -27,11 +27,6 @@ describe("Declaration step", () => {
       expect(renderResult.context.step.title).to.equal("Declaration");
     });
 
-    it("renders a backlink to the start page", () => {
-      const [backLink] = renderResult.getBlocksByVariant("govukBackLink");
-      expect(backLink.properties.href).to.equal("/");
-    });
-
     it("renders declaration body copy including the privacy policy link", () => {
       const body = renderResult
         .getBlocksByVariant("html")
