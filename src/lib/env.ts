@@ -10,6 +10,11 @@ const optionalEnvSchema = z.object({
   CONTACT_PHONE: z.string().optional(),
   DEPARTMENT_NAME: z.string().optional(),
   DEPARTMENT_URL: z.url().optional(),
+  ENTRA_ADDITIONAL_SCOPES: z
+    .string()
+    .transform((value) => value.split(",").map((scope) => scope.trim()))
+    .pipe(z.array(z.string().min(1)))
+    .optional(),
   PDA_API_BASE_URL: z.url().optional(),
   PDA_API_MODE: z.enum(["msw", "api"]).optional(),
   PDA_MSW_OFFICE_COUNT: z.coerce.number().optional(),
