@@ -20,7 +20,6 @@ export const extractApplicationIdFromViewPath = (
 ): string | undefined => {
   const pathSegments = pathname.split("/");
 
-  console.error("Path segments:", pathSegments); // Debugging line to log the path segments
   if (
     pathSegments.length !== EXPECTED_VIEW_PATH_SEGMENT_COUNT ||
     pathSegments[CASES_SEGMENT_INDEX] !== "cases" ||
