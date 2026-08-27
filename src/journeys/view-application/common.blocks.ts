@@ -1,4 +1,5 @@
 import { CONTEXT_DATA_KEYS, APPLICATION_DATA_KEYS, APPLICATIONS_DATA_KEYS, CLIENT_DETAILS_DATA_KEYS } from "#/journeys/journey.constants.js";
+import { H1, H2 } from "#/lib/constants/headings.js";
 import { Data, Format, Transformer } from "@ministryofjustice/hmpps-forge/core/authoring";
 import {
   HtmlBlock,
@@ -25,7 +26,7 @@ const recordedOnDate = Data(CONTEXT_DATA_KEYS.application)
     }),
   );
 
-const clientName = Format(
+export const clientName = Format(
   "%1 %2",
   Data(CONTEXT_DATA_KEYS.application).path(CLIENT_DETAILS_DATA_KEYS.firstName),
   Data(CONTEXT_DATA_KEYS.application).path(CLIENT_DETAILS_DATA_KEYS.lastName),
@@ -52,6 +53,7 @@ export function caseReferenceNumber(): ReturnType<typeof GovUKBody> {
 export function heading(
 ): ReturnType<typeof GovUKHeading> {
   return GovUKHeading({
+    level: H1,
     size: "xl",
     text: clientName,
   });
@@ -88,5 +90,13 @@ export function recordedOn(): ReturnType<typeof GovUKBody> {
 export function statusTag(text: string): HtmlBlock {
   return HtmlBlock({
     content: `<div class="govuk-!-margin-bottom-4"><div class="govuk-tag govuk-tag--purple">${text}</div></div>`,
+  });
+}
+
+export function subHeading(text: string): ReturnType<typeof GovUKHeading> {
+  return GovUKHeading({
+    level: H2,
+    size: "m",
+    text: text,
   });
 }

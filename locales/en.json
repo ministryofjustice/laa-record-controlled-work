@@ -50,9 +50,19 @@
     },
     "view": {
       "tabs": {
-        "ClientDetails": "Client Details",
+        "ClientDetails": "Client and case details",
         "meansAssessment": "Means Assessment",
         "evidence": "Evidence"
+      },
+      "summaryCardTitles": {
+        "aboutTheClient": "About the client"
+      },
+      "summaryCardRows": {
+        "fullName": "Full name",
+        "dateOfBirth": "Date of birth",
+        "nationalInsuranceNumber": "National Insurance number",
+        "address": "Address",
+        "legalAidBefore": "Accessed legal aid before"
       }
     }
   },

@@ -69,6 +69,8 @@ export const loadCaseDetails =
       throw ApiValidationError.from(result.error);
     }
 
+console.error("Application data after parsing:", result.data);
+
     const application: Application = result.data;
     context.setData(CONTEXT_DATA_KEYS.application, application);
   };
