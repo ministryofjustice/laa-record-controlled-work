@@ -16,6 +16,7 @@ rcw:
   env:
     NODE_ENV: staging
     ENTRA_REDIRECT_URI: https://laa-record-controlled-work-staging.cloud-platform.service.justice.gov.uk/auth/code/callback
+    ENTRA_ADDITIONAL_SCOPES: api://rcw-api-staging/Applications.Read
     RCW_API_BASE_URL: http://laa-record-controlled-work-api.laa-record-controlled-work-api-staging.svc:8081
     PDA_API_BASE_URL: https://laa-provider-details-api-staging.apps.live.cloud-platform.service.justice.gov.uk
 
