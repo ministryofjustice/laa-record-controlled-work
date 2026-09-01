@@ -2,34 +2,26 @@ import type { Page } from "@playwright/test";
 
 import { expect } from "@playwright/test";
 
+import { match } from "path-to-regexp";
+
 import {
-  extractApplicationIdFromTaskListPath,
   isTaskListPath,
 } from "#tests/e2e/flows/task-list.flow.js";
 
 export const CASE_LIST_URL_PATTERN = new RegExp("/cases$");
 
-const CASES_SEGMENT_INDEX = 1;
-const APPLICATION_ID_CAPTURE_GROUP_INDEX = 2;
-const VIEW_SEGMENT_INDEX = 3;
-const CLIENT_DETAILS_SEGMENT_INDEX = 4;
-const EXPECTED_VIEW_PATH_SEGMENT_COUNT = 5;
-
-export const extractApplicationIdFromViewPath = (
+export const extractApplicationIdFromPath = (
+  pathPattern: string,
   pathname: string,
 ): string | undefined => {
-  const pathSegments = pathname.split("/");
 
-  if (
-    pathSegments.length !== EXPECTED_VIEW_PATH_SEGMENT_COUNT ||
-    pathSegments[CASES_SEGMENT_INDEX] !== "cases" ||
-    pathSegments[VIEW_SEGMENT_INDEX] !== "view" ||
-    pathSegments[CLIENT_DETAILS_SEGMENT_INDEX] !== "client-details"
-  ) {
-    return undefined;
+  const matcher = match(pathPattern);
+  const matched = matcher(pathname);
+
+  if (matched) {
+    const applicationId = matched.params.id;
+    return Array.isArray(applicationId) ? applicationId[0] : applicationId;
   }
-
-  return pathSegments[APPLICATION_ID_CAPTURE_GROUP_INDEX];
 };
 
 export const isCaseListPath = (pathname: string): boolean =>
@@ -66,7 +58,8 @@ export const openDraftCaseFromCaseList = async (
   await expect(draftCaseLink).toBeVisible();
   await draftCaseLink.click();
 
-  const openedApplicationId = extractApplicationIdFromTaskListPath(
+  const openedApplicationId = extractApplicationIdFromPath(
+    '/cases/:id/task-list',
     new URL(page.url()).pathname,
   );
 
@@ -91,7 +84,8 @@ export const openRecordedCaseFromCaseList = async (
   await expect(recordedCaseLink).toBeVisible();
   await recordedCaseLink.click();
 
-  const openedApplicationId = extractApplicationIdFromViewPath(
+  const openedApplicationId = extractApplicationIdFromPath(
+    "/cases/:id/view/client-details",
     new URL(page.url()).pathname,
   );
 
