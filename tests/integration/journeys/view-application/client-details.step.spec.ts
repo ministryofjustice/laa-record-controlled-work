@@ -104,6 +104,18 @@ describe("View recorded client details step", () => {
       const subNavigation = renderResult
         .getBlocksByVariant("mojSubNavigation");
       expect(subNavigation).to.exist;
+      const items = subNavigation[0].properties.items as {
+        text: string;
+        href: string;
+        active?: boolean;
+      }[];
+      expect(items[0].text).to.equal("Client and case details");
+      expect(items[0].href).to.equal("client-details");
+      expect(items[0].active).to.equal(true);
+      expect(items[1].text).to.equal("Means Assessment");
+      expect(items[1].href).to.equal("means-assessment");
+      expect(items[2].text).to.equal("Evidence");
+      expect(items[2].href).to.equal("evidence");
     });
 
     it("renders the client details panel", () => {
