@@ -146,6 +146,14 @@ export const nunjucksT = (
   options?: Record<string, unknown>,
 ): string => t(key, options);
 
+/**
+ * Nunjucks global function for templates
+ * Usage in templates: {{ tt("common.back") }}
+ * @param {string} key - Translation key
+ * @returns {string} The translated string
+ */
+export const nunjucksTt = (key: string): string[] => tt(key);
+
 // Auto-initialise when this module is first imported so that it is available
 // in forge step definitions.
 initializeI18nextSync();

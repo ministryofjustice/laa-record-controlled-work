@@ -7,11 +7,12 @@ import config from "#/config.js";
 import { createAuthLimiter } from "#/middleware/setupRateLimit.js";
 
 import { requireAuth } from "./middleware/requireAuth.middleware.js";
+import { errorRouter } from "./routes/error.routes.js";
 import testRoutes from "./routes/test.js";
 
 export const initRoutes = (app: Express): void => {
   // Root endpoint - serves the main page of the application.
-  app.get("/", requireAuth, (req: Request, res: Response): void => {
+  app.get("/", requireAuth, (req: Request, res: Response, next): void => {
     res.render("main/index");
   });
 
@@ -23,6 +24,9 @@ export const initRoutes = (app: Express): void => {
   app.get("/health", (req: Request, res: Response): void => {
     res.status(OK).send("Healthy");
   });
+
+  // Error routes - static pages for various error scenarios.
+  app.use("/error", errorRouter);
 
   // Auth.
   app.use("/auth", createAuthLimiter(config), authRouter);

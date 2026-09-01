@@ -4,7 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import nunjucks from "nunjucks";
 
-import { nunjucksT } from "#/lib/i18n.js";
+import { nunjucksT, nunjucksTt } from "#/lib/i18n.js";
 
 const FIRST_IN_ARRAY = 0;
 
@@ -76,6 +76,7 @@ export const setupNunjucks = (app: Application): nunjucks.Environment => {
 
   // Add global variables
   nunjucksEnv.addGlobal("t", nunjucksT);
+  nunjucksEnv.addGlobal("tt", nunjucksTt);
 
   interface ValidationError {
     blockCode?: string;
