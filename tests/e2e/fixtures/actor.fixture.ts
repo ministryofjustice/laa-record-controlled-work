@@ -1,6 +1,7 @@
 import type { Page } from "@playwright/test";
 
 import { assertInProgressCaseVisible } from "#tests/e2e/assertions/case-list.assert.js";
+import { assertRecordedCaseVisible } from "#tests/e2e/assertions/recorded-case.assert.js";
 import {
   assertEligibilityResultVisible,
   assertTaskStatus,
@@ -37,6 +38,7 @@ import {
 export interface Actor {
   assertEligibilityResultVisible: () => Promise<void>;
   assertInProgressCaseVisible: (clientName: string) => Promise<void>;
+  assertRecordedCaseVisible: (clientName: string) => Promise<void>;
   assertTaskStatus: (taskName: string, expectedStatus: string) => Promise<void>;
   changeBankBalance: (applicationId: string) => Promise<void>;
   completeCcqShortestEligiblePath: (applicationId: string) => Promise<void>;
@@ -68,6 +70,9 @@ export const createActor = (page: Page): Actor => ({
   },
   assertInProgressCaseVisible: async (clientName: string) => {
     await assertInProgressCaseVisible(page, clientName);
+  },
+  assertRecordedCaseVisible: async (clientName: string) => {
+    await assertRecordedCaseVisible(page, clientName);
   },
   assertTaskStatus: async (taskName: string, expectedStatus: string) => {
     await assertTaskStatus(page, taskName, expectedStatus);
