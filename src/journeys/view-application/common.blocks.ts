@@ -42,7 +42,6 @@ export const clientName = Format(
 
 /**
  * Builds a GovUKBody block for the case reference number.
- * @param caseRefNumber - The text content for the Body.
  * @returns A GovUKBody block definition.
  */
 export function caseReferenceNumber(): ReturnType<typeof GovUKBody> {
@@ -55,7 +54,6 @@ export function caseReferenceNumber(): ReturnType<typeof GovUKBody> {
 
 /**
  * Builds a heading block.
- * @param text - The text content for the heading.
  * @returns A heading block definition.
  */
 export function heading(): ReturnType<typeof GovUKHeading> {
@@ -79,7 +77,6 @@ export function printButton(): GovUKButton {
 
 /**
  * Builds a GovUKBody block for the recorded on date.
- * @param recordedOnDate - The text content for the recorded on date.
  * @returns A GovUKBody block definition for the recorded on date.
  */
 export function recordedOn(): ReturnType<typeof GovUKBody> {
@@ -101,8 +98,9 @@ export function statusTag(text: string): HtmlBlock {
 }
 
 /**
- *
- * @param text
+ *  Builds a subheading block.
+ *  @param text - The text content for the subheading.
+ *  @returns A subheading block definition.
  */
 export function subHeading(text: string): ReturnType<typeof GovUKHeading> {
   return GovUKHeading({

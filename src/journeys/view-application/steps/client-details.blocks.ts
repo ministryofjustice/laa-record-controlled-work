@@ -18,7 +18,8 @@ import {
 import { t } from "#/lib/i18n.js";
 
 /**
- *
+ *  Render the data about the client in a summary card
+ *  @returns GovUKSummaryList component
  */
 export function aboutTheClientSummaryCard(): ReturnType<
   typeof GovUKSummaryList
@@ -85,7 +86,8 @@ export function aboutTheClientSummaryCard(): ReturnType<
 }
 
 /**
- *
+ *  Render the data about the case in a summary card
+ *  @returns GovUKSummaryList component
  */
 export function caseDetailsSummaryCard(): ReturnType<typeof GovUKSummaryList> {
   return GovUKSummaryList({
@@ -108,7 +110,8 @@ export function caseDetailsSummaryCard(): ReturnType<typeof GovUKSummaryList> {
 }
 
 /**
- *
+ *  Render the subnavigation with the current page set to active
+ *  @returns MOJSubNavigation component
  */
 export function subNavigation(): ReturnType<typeof MOJSubNavigation> {
   return MOJSubNavigation({
