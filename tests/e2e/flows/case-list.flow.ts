@@ -1,12 +1,9 @@
 import type { Page } from "@playwright/test";
 
 import { expect } from "@playwright/test";
-
 import { match } from "path-to-regexp";
 
-import {
-  isTaskListPath,
-} from "#tests/e2e/flows/task-list.flow.js";
+import { isTaskListPath } from "#tests/e2e/flows/task-list.flow.js";
 
 export const CASE_LIST_URL_PATTERN = new RegExp("/cases$");
 
@@ -14,12 +11,12 @@ export const extractApplicationIdFromPath = (
   pathPattern: string,
   pathname: string,
 ): string | undefined => {
-
   const matcher = match(pathPattern);
   const matched = matcher(pathname);
 
-  if (matched) {
+  if (matched !== false) {
     const applicationId = matched.params.id;
+    // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- it's an array
     return Array.isArray(applicationId) ? applicationId[0] : applicationId;
   }
 };
@@ -59,7 +56,7 @@ export const openDraftCaseFromCaseList = async (
   await draftCaseLink.click();
 
   const openedApplicationId = extractApplicationIdFromPath(
-    '/cases/:id/task-list',
+    "/cases/:id/task-list",
     new URL(page.url()).pathname,
   );
 
