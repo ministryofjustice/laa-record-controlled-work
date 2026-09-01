@@ -3,9 +3,9 @@ import type { Page } from "@playwright/test";
 import { expect } from "@playwright/test";
 
 import {
-  extractApplicationIdFromTaskListPath,
   taskListUrlPattern,
 } from "#tests/e2e/flows/task-list.flow.js";
+import { extractApplicationIdFromPath } from "#tests/e2e/flows/case-list.flow.js";
 
 const clickContinue = async (page: Page): Promise<void> => {
   await page.getByRole("button", { name: "Continue" }).click();
@@ -58,7 +58,8 @@ export const completeCreateCaseShortestPath = async (
   await page.getByRole("button", { name: "Save and continue" }).click();
   await expect(page).toHaveURL(taskListUrlPattern());
 
-  const applicationId = extractApplicationIdFromTaskListPath(
+  const applicationId = extractApplicationIdFromPath(
+    '/cases/:id/task-list',
     new URL(page.url()).pathname,
   );
 
