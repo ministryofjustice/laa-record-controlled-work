@@ -99,5 +99,34 @@ describe("View recorded client details step", () => {
         .find((b) => b.properties.text === "Print this case");
       expect(printButton).to.exist;
     });
+
+    it("renders the subnavigation", () => {
+      const subNavigation = renderResult
+        .getBlocksByVariant("mojSubNavigation");
+      expect(subNavigation).to.exist;
+    });
+
+    it("renders the client details panel", () => {
+      const clientDetailsPanel = renderResult
+        .getBlocksByVariant("govukSummaryList")
+        .find((b) =>
+          String((b.properties.card as { title: { text: string } }).title.text).includes(
+            "About the client",
+          ),
+        ) as RenderBlock;
+
+      expect(clientDetailsPanel).to.exist;
+    });
+
+    it("renders the case details panel", () => {
+      const caseDetailsPanel = renderResult
+        .getBlocksByVariant("govukSummaryList")
+        .find((b) =>
+          String((b.properties.card as { title: { text: string } }).title.text).includes(
+            "Case details",
+          ),
+        ) as RenderBlock;
+      expect(caseDetailsPanel).to.exist;
+    });
   });
 });
