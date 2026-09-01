@@ -22,6 +22,7 @@ import {
   completeCreateCaseShortestPath,
   startNewCase,
 } from "#tests/e2e/flows/create-case.flow.js";
+import { completeDeclaration } from "#tests/e2e/flows/declaration.flow.js";
 import {
   completeEvidenceNoPath,
   completeEvidenceYesPath,
@@ -40,6 +41,7 @@ export interface Actor {
   changeBankBalance: (applicationId: string) => Promise<void>;
   completeCcqShortestEligiblePath: (applicationId: string) => Promise<void>;
   completeCreateCaseShortestPath: () => Promise<string>;
+  completeDeclaration: (applicationId: string) => Promise<void>;
   completeEvidenceNoPath: (applicationId: string) => Promise<void>;
   completeEvidenceYesPath: (applicationId: string) => Promise<void>;
   gotoCase: (applicationId: string) => Promise<void>;
@@ -76,9 +78,11 @@ export const createActor = (page: Page): Actor => ({
   completeCcqShortestEligiblePath: async (applicationId: string) => {
     await completeCcqShortestEligiblePath(page, applicationId);
   },
-
   completeCreateCaseShortestPath: async () =>
     await completeCreateCaseShortestPath(page),
+  completeDeclaration: async (applicationId: string) => {
+    await completeDeclaration(page, applicationId);
+  },
   completeEvidenceNoPath: async (applicationId: string) => {
     await completeEvidenceNoPath(page, applicationId);
   },
