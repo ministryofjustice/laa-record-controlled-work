@@ -1,10 +1,9 @@
 import {
   access,
   step,
-  StepDefinition,
+  type StepDefinition,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
-import { t } from "#/lib/i18n.js";
-import { aboutTheClientSummaryCard, subNavigation, caseDetailsSummaryCard } from "#/journeys/view-application/steps/client-details.blocks.js";
+
 import {
   caseReferenceNumber,
   heading,
@@ -13,7 +12,13 @@ import {
   statusTag,
   subHeading,
 } from "#/journeys/view-application/common.blocks.js";
+import {
+  aboutTheClientSummaryCard,
+  caseDetailsSummaryCard,
+  subNavigation,
+} from "#/journeys/view-application/steps/client-details.blocks.js";
 import { viewApplicationEffects } from "#/journeys/view-application/viewApplication.effects.js";
+import { t } from "#/lib/i18n.js";
 
 export const clientDetailsStep = (): StepDefinition =>
   step({

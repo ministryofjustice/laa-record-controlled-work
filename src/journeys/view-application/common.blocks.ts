@@ -1,14 +1,22 @@
-import { CONTEXT_DATA_KEYS, APPLICATION_DATA_KEYS, APPLICATIONS_DATA_KEYS, CLIENT_DETAILS_DATA_KEYS } from "#/journeys/journey.constants.js";
-import { H1, H2 } from "#/lib/constants/headings.js";
-import { Data, Format, Transformer } from "@ministryofjustice/hmpps-forge/core/authoring";
 import {
-  HtmlBlock,
-} from "@ministryofjustice/hmpps-forge/core/components";
+  Data,
+  Format,
+  Transformer,
+} from "@ministryofjustice/hmpps-forge/core/authoring";
+import { HtmlBlock } from "@ministryofjustice/hmpps-forge/core/components";
 import {
   GovUKBody,
   GovUKButton,
   GovUKHeading,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
+
+import {
+  APPLICATION_DATA_KEYS,
+  APPLICATIONS_DATA_KEYS,
+  CLIENT_DETAILS_DATA_KEYS,
+  CONTEXT_DATA_KEYS,
+} from "#/journeys/journey.constants.js";
+import { H1, H2 } from "#/lib/constants/headings.js";
 
 const referenceNumber = Data(CONTEXT_DATA_KEYS.application).path(
   APPLICATION_DATA_KEYS.applicationRefNumber,
@@ -50,8 +58,7 @@ export function caseReferenceNumber(): ReturnType<typeof GovUKBody> {
  * @param text - The text content for the heading.
  * @returns A heading block definition.
  */
-export function heading(
-): ReturnType<typeof GovUKHeading> {
+export function heading(): ReturnType<typeof GovUKHeading> {
   return GovUKHeading({
     level: H1,
     size: "xl",
@@ -93,10 +100,14 @@ export function statusTag(text: string): HtmlBlock {
   });
 }
 
+/**
+ *
+ * @param text
+ */
 export function subHeading(text: string): ReturnType<typeof GovUKHeading> {
   return GovUKHeading({
     level: H2,
     size: "m",
-    text: text,
+    text,
   });
 }
