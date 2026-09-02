@@ -20,22 +20,28 @@ export function requireAuth(
   const { originalUrl, session } = req;
 
   if (BYPASS_PATHS.includes(originalUrl) || originalUrl.startsWith("/auth/")) {
-    logger.error(`Skipping authentication for public path: ${originalUrl}`);
+    logger.debug(`Skipping authentication for public path "${originalUrl}"`);
     next();
     return;
   }
+
   if (session.isAuthenticated) {
-    logger.error(`User is authenticated`);
+    logger.debug(`User is authenticated`);
     res.locals.isAuthenticated = session.isAuthenticated;
     res.locals.user = session.account;
     next();
     return;
   }
+
   req.session.returnTo = originalUrl;
 
   if (session.selectedOffice === undefined) {
+    logger.debug(
+      'User is authenticated but has not selected an office, redirecting to "/select-office"',
+    );
     req.session.returnTo = "/select-office";
   }
-  logger.error("User is NOT authenticated, redirecting to /auth/signin");
+
+  logger.debug('User is NOT authenticated, redirecting to "/auth/signin"');
   res.redirect("/auth/signin");
 }
