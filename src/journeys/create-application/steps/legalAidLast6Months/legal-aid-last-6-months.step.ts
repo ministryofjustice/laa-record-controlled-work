@@ -4,18 +4,19 @@ import {
   submit,
   type SubmitHook,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
-import { HtmlBlock } from "@ministryofjustice/hmpps-forge/core/components";
-import { GovUKButton } from "@ministryofjustice/hmpps-forge/govuk-components";
 
 import { CreateApplicationEffects } from "#/journeys/create-application/create-application.effects.js";
 import { legalAidLast6MonthsRadioInput } from "#/journeys/create-application/steps/legalAidLast6Months/legal-aid-last-6-months.blocks.js";
+import {
+  clientDetailsCaption,
+  continueButton,
+} from "#/journeys/shared.blocks.js";
 import {
   hasCheckAnswersInQuery,
   redirectToCheckAnswers,
 } from "#/journeys/shared.hook.js";
 import { StepCode } from "#/journeys/StepCode.enum.js";
 import { t } from "#/lib/i18n.js";
-import { clientDetailsCaption, continueButton } from "#/journeys/shared.blocks.js";
 
 const TITLE = t("journeys.createApplication.legalAidLast6Months.title");
 
@@ -26,7 +27,7 @@ export const legalAidLast6MonthsStep = (
     blocks: [
       clientDetailsCaption(),
       legalAidLast6MonthsRadioInput(),
-      continueButton()
+      continueButton(),
     ],
     onSubmission: [onSubmission(journeyCode)],
     path: "/legal-aid-last-6-months",
