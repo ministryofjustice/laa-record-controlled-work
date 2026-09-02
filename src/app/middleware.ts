@@ -7,13 +7,13 @@ import type { CreateRedisStore, GetRedisClient } from "#/lib/redis.js";
 import { ENV } from "#/app/env.enum.js";
 import { compression } from "#/app/middleware/compression.middleware.js";
 import { cspNonce } from "#/app/middleware/cspNonce.middleware.js";
+import { addCsrfToLocals, csrf } from "#/app/middleware/csrf.middleware.js";
 import { helmet } from "#/app/middleware/helmet.middleware.js";
 import { locale } from "#/app/middleware/locale.middleware.js";
 import { isEnv } from "#/app/utils/isEnv.js";
 import config from "#/config.js";
 import { createSession } from "#/lib/session.js";
 import { setupConfig } from "#/middleware/setupConfigs.js";
-import { setupCsrf } from "#/middleware/setupCsrf.js";
 import { setupRateLimit } from "#/middleware/setupRateLimit.js";
 import { setupRequestLogging } from "#/middleware/setupRequestLogging.js";
 
@@ -63,6 +63,10 @@ export async function initMiddleware(
   // Setup internationalization.
   app.use(locale());
 
+  // Setup CSRF protection.
+  app.use(csrf);
+  app.use(addCsrfToLocals);
+
   // Set up rate limiting
   // TODO Refactor to pure middleware, rather than a setup method.
   setupRateLimit(app, config);
@@ -74,10 +78,6 @@ export async function initMiddleware(
   // Set up request logging based on environment
   // TODO Refactor to pure middleware, rather than a setup method.
   setupRequestLogging(app);
-
-  // Set up CSRF protection.
-  // TODO Refactor to pure middleware, rather than a setup method.
-  setupCsrf(app);
 
   // Auth.
   // app.use(requireAuth);
