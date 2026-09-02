@@ -15,6 +15,7 @@ import {
 } from "#/journeys/shared.hook.js";
 import { StepCode } from "#/journeys/StepCode.enum.js";
 import { t } from "#/lib/i18n.js";
+import { clientDetailsCaption, continueButton } from "#/journeys/shared.blocks.js";
 
 const TITLE = t("journeys.createApplication.legalAidLast6Months.title");
 
@@ -23,11 +24,9 @@ export const legalAidLast6MonthsStep = (
 ): ReturnType<typeof step> =>
   step({
     blocks: [
-      HtmlBlock({
-        content: `<span class="govuk-caption-l">${t("journeys.createApplication.caption")}</span>`,
-      }),
+      clientDetailsCaption(),
       legalAidLast6MonthsRadioInput(),
-      GovUKButton({ text: t("common.continue") }),
+      continueButton()
     ],
     onSubmission: [onSubmission(journeyCode)],
     path: "/legal-aid-last-6-months",
