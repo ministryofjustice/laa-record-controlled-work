@@ -47,7 +47,7 @@ export const casesTable = (cases: ChainableRef): GovUKTable =>
     rows: cases.each(
       Iterator.Map([
         {
-          text: Item().path(APPLICATIONS_DATA_KEYS.name)
+          text: Item().path(APPLICATIONS_DATA_KEYS.name),
         },
         { text: Item().path(APPLICATIONS_DATA_KEYS.applicationRefNumber) },
         {
