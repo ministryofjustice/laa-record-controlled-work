@@ -90,7 +90,10 @@ test.describe("@e2e critical path", () => {
     await actor.submitApplication(applicationId);
   });
 
-  test("checks recorded cases", async () => {
+  /**
+   * This has been temporarily removed as the view recorded case functionality has been removed temporarily.
+   */
+  test.skip("checks recorded cases", async () => {
     await actor.openRecordedCaseFromCaseList(applicationId);
   });
 
