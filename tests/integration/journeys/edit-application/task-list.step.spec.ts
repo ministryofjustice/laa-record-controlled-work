@@ -29,12 +29,18 @@ describe("Task list step", () => {
   const getApplicationStub = sinon
     .stub()
     .resolves({ status: 200, data: mockData });
+  const updateApplicationStatusStub = sinon
+    .stub()
+    .resolves({ status: 204, data: undefined });
 
   const client = createForgeTestClient(
     editApplicationJourney,
     editApplicationEffectsRegistry,
     {
-      dependencies: { getApplication: getApplicationStub },
+      dependencies: {
+        getApplication: getApplicationStub,
+        updateApplicationStatus: updateApplicationStatusStub,
+      },
     },
   );
   const session = {};
@@ -82,7 +88,7 @@ describe("Task list step", () => {
       expect(taskLists.length).to.equal(3);
     });
 
-    it("renders an eligibility result indicator without content for an ineligible assessment", async () => {
+    it("renders the ineligible result and hides evidence and declaration", async () => {
       getApplicationStub.resolves({
         status: 200,
         data: getGetApplicationResponseMock({
@@ -100,8 +106,12 @@ describe("Task list step", () => {
 
       expect(result.type).to.equal("render");
       const eligibilityResultRender = result as TestRenderResult;
+      const lists = eligibilityResultRender
+        .getBlocksByVariant("govukTaskList")
+        .filter((block) => block.properties.visibleWhen !== false);
       const indicators = eligibilityResultRender
         .getBlocksByVariant("html")
+        .filter((block) => block.properties.visibleWhen !== false)
         .filter((block) =>
           String(block.properties.content).includes("Eligibility result"),
         );
@@ -109,9 +119,24 @@ describe("Task list step", () => {
       expect(indicators).to.have.length(1);
       const indicator = String(indicators[0].properties.content);
       expect(indicator).to.include("Eligibility result");
-      expect(indicator).to.not.include(
-        "Your client qualifies financially for civil legal aid",
+      expect(indicator).to.include(
+        "Your client does not qualify financially for civil legal aid based on the information you entered.",
       );
+      expect(lists).to.have.length(2);
+      expect(
+        eligibilityResultRender
+          .getBlocksByVariant("html")
+          .filter((block) => block.properties.visibleWhen !== false)
+          .some((block) =>
+            String(block.properties.content).includes("Evidence and Declaration"),
+          ),
+      ).to.equal(false);
+      expect(
+        eligibilityResultRender
+          .getBlocksByVariant("govukButton")
+          .filter((block) => block.properties.visibleWhen !== false)
+          .some((block) => block.properties.text === "Close case"),
+      ).to.equal(true);
       expect(indicator).to.include(
         `href="/cases/${uuid}/eligibility/?destination=check-result"`,
       );
@@ -324,6 +349,32 @@ describe("Task list step", () => {
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
       expect(redirectResult.url).to.equal("/cases");
+    });
+
+    it("closes an ineligible case when Close case is submitted", async () => {
+      getApplicationStub.resolves({
+        status: 200,
+        data: getGetApplicationResponseMock({
+          eligibility: {
+            result: {
+              result_summary: { overall_result: { result: "ineligible" } },
+            },
+          },
+        }),
+      });
+
+      const result = await client.post(`/cases/${uuid}/task-list`, {
+        session: {},
+        body: { action: "close" },
+      });
+
+      expect(result.type).to.equal("redirect");
+      expect(updateApplicationStatusStub.calledOnce).to.equal(true);
+      expect(updateApplicationStatusStub.firstCall.args[0]).to.equal(uuid);
+      expect(updateApplicationStatusStub.firstCall.args[1]).to.deep.equal({
+        applicationState: "COMPLETED",
+        eTag: 0,
+      });
     });
   });
 });
