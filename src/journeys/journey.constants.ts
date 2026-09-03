@@ -30,6 +30,7 @@ export const OVERSEAS_EXCLUSIVE_ADDRESS_FIELDS = Object.values(
 
 export const CONTEXT_DATA_KEYS = {
   application: "application",
+  applicationETag: "applicationETag",
   applicationID: "applicationID",
   availableOffices: "availableOffices",
   caseList: "caseList",
