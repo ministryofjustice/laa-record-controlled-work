@@ -8,6 +8,7 @@ import {
 import {
   type BlockDefinition,
   HtmlBlock,
+  type ResolvableBoolean,
   type ResolvableString,
 } from "@ministryofjustice/hmpps-forge/core/components";
 import {
@@ -97,6 +98,9 @@ export function taskList(): BlockDefinition[] {
     eligibilityResult(),
     sectionHeading(
       t("journeys.createApplication.taskList.EvidenceAndDeclaration.title"),
+      Data(CONTEXT_DATA_KEYS.application)
+        .path(APPLICATION_DATA_KEYS.eligibilityOverallResult)
+        .match(Condition.Equals("eligible")),
     ),
     GovUKTaskList({
       items: [
@@ -118,6 +122,9 @@ export function taskList(): BlockDefinition[] {
           Data(CONTEXT_DATA_KEYS.declarationStatus),
         ),
       ],
+      visibleWhen: Data(CONTEXT_DATA_KEYS.application)
+        .path(APPLICATION_DATA_KEYS.eligibilityOverallResult)
+        .match(Condition.Equals("eligible")),
     }),
   ];
 }
@@ -127,7 +134,7 @@ export function taskList(): BlockDefinition[] {
  * @returns The eligibility result HTML block.
  */
 function eligibilityResult(): HtmlBlock {
-  const eligibleContent = match(
+  const eligibilityContent = match(
     Data(CONTEXT_DATA_KEYS.application).path(
       APPLICATION_DATA_KEYS.eligibilityOverallResult,
     ),
@@ -135,6 +142,10 @@ function eligibilityResult(): HtmlBlock {
     .branch(
       Condition.Equals("eligible"),
       t("journeys.createApplication.taskList.eligibilityResult.eligible"),
+    )
+    .branch(
+      Condition.Equals("ineligible"),
+      t("journeys.createApplication.taskList.eligibilityResult.ineligible"),
     )
     .otherwise("");
 
@@ -146,7 +157,7 @@ function eligibilityResult(): HtmlBlock {
         <p class="govuk-!-margin-bottom-0"><a class="govuk-link" href="/cases/%3/eligibility/?destination=check-result">%4</a></p>
       </div>`,
       t("journeys.createApplication.taskList.eligibilityResult.title"),
-      eligibleContent,
+      eligibilityContent,
       Params(PARAMS_KEYS.applicationID),
       t("journeys.createApplication.taskList.eligibilityResult.viewResult"),
     ),
@@ -159,15 +170,22 @@ function eligibilityResult(): HtmlBlock {
 /**
  * Builds a section heading for each task list group.
  * @param text - The text content for the section heading.
+ * @param visibleWhen - Optional condition controlling whether the heading is rendered.
  * @returns A section heading block definition.
  */
 function sectionHeading(
   text: ResolvableString,
+  visibleWhen?: ResolvableBoolean,
 ): ReturnType<typeof GovUKHeading> {
+  if (visibleWhen === undefined) {
+    return GovUKHeading({ classes: "govuk-label--m", level: H2, text });
+  }
+
   return GovUKHeading({
     classes: "govuk-label--m",
     level: H2,
     text,
+    visibleWhen,
   });
 }
 

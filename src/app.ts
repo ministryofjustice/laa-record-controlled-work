@@ -20,6 +20,7 @@ import {
   getApplications,
   updateApplicationDeclaration,
   updateApplicationEvidence,
+  updateApplicationStatus,
 } from "#/api/clients/rcw/schema/applications/applications.gen.js";
 import eligibilityRouter from "#/api/eligibility/eligibility.routes.js";
 import authRouter from "#/auth/auth.routes.js";
@@ -114,7 +115,10 @@ const createApp = async (
     .registerGlobalFunctions(nunjucksFunctions)
     .registerPackage(yourCasesPackage, { getApplications })
     .registerPackage(selectOfficePackage, { getAllProviderOffices })
-    .registerPackage(editApplicationPackage, { getApplication })
+    .registerPackage(editApplicationPackage, {
+      getApplication,
+      updateApplicationStatus,
+    })
     .registerPackage(createApplicationJourney, { createApplication })
     .registerPackage(declaration, { updateApplicationDeclaration })
     .registerPackage(evidencePackage, { updateApplicationEvidence })
