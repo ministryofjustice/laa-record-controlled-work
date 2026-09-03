@@ -2,7 +2,6 @@ import {
   type ChainableRef,
   Condition,
   Data,
-  Format,
   Item,
   Iterator,
   Transformer,
