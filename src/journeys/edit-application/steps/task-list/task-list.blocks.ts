@@ -175,3 +175,12 @@ export const saveAndReturnButton: GovUKButton = GovUKButton({
   classes: "govuk-button--secondary",
   text: t("common.saveAndReturn"),
 });
+
+export const closeCaseButton: GovUKButton = GovUKButton({
+  name: "action",
+  text: "Close case",
+  value: "close",
+  visibleWhen: Data(CONTEXT_DATA_KEYS.application)
+    .path(APPLICATION_DATA_KEYS.eligibilityOverallResult)
+    .match(Condition.Equals("ineligible")),
+});
