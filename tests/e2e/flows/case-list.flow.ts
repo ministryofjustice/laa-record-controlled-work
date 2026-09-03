@@ -67,32 +67,28 @@ export const openDraftCaseFromCaseList = async (
   return openedApplicationId;
 };
 
-/**
- * This has been temporarily commented out as the recorded view has been deprioritised.
- */
+export const openRecordedCaseFromCaseList = async (
+  page: Page,
+  applicationId: string,
+): Promise<string> => {
+  await gotoCaseList(page);
+  await page.getByRole("link", { name: "Recorded" }).click();
 
-// export const openRecordedCaseFromCaseList = async (
-//   page: Page,
-//   applicationId: string,
-// ): Promise<string> => {
-//   await gotoCaseList(page);
-//   await page.getByRole("link", { name: "Recorded" }).click();
+  const recordedCaseLink = page
+    .locator(`a[href='/cases/${applicationId}/view']`)
+    .first();
 
-//   const recordedCaseLink = page
-//     .locator(`a[href='/cases/${applicationId}/view']`)
-//     .first();
+  await expect(recordedCaseLink).toBeVisible();
+  await recordedCaseLink.click();
 
-//   await expect(recordedCaseLink).toBeVisible();
-//   await recordedCaseLink.click();
+  const openedApplicationId = extractApplicationIdFromPath(
+    "/cases/:id/view/client-details",
+    new URL(page.url()).pathname,
+  );
 
-//   const openedApplicationId = extractApplicationIdFromPath(
-//     "/cases/:id/view/client-details",
-//     new URL(page.url()).pathname,
-//   );
+  if (openedApplicationId === undefined) {
+    throw new Error("Failed to extract application ID from view URL");
+  }
 
-//   if (openedApplicationId === undefined) {
-//     throw new Error("Failed to extract application ID from view URL");
-//   }
-
-//   return openedApplicationId;
-// };
+  return openedApplicationId;
+};

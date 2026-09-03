@@ -91,11 +91,11 @@ test.describe("@e2e critical path", () => {
   });
 
   /**
-   * This has been temporarily removed as the recorded view has been deprioritised.
+   * This has been temporarily removed as the view recorded case functionality has been removed temporarily.
    */
-  // test.fixme("checks recorded cases", async () => {
-  //   await actor.openRecordedCaseFromCaseList(applicationId);
-  // });
+  test.skip("checks recorded cases", async () => {
+    await actor.openRecordedCaseFromCaseList(applicationId);
+  });
 
   test.fixme("exports case", async () => {});
 });

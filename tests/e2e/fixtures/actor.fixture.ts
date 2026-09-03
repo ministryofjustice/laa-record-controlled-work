@@ -10,6 +10,7 @@ import {
   gotoCase,
   gotoCaseList,
   openDraftCaseFromCaseList,
+  openRecordedCaseFromCaseList,
 } from "#tests/e2e/flows/case-list.flow.js";
 import {
   changeBankBalance,
@@ -47,6 +48,7 @@ export interface Actor {
   gotoCaseList: () => Promise<void>;
   login: () => Promise<void>;
   openDraftCaseFromCaseList: (applicationId: string) => Promise<string>;
+  openRecordedCaseFromCaseList: (applicationId: string) => Promise<string>;
   openMeansAssessmentFromTaskList: (applicationId: string) => Promise<void>;
   returnToTaskList: (applicationId: string) => Promise<void>;
   selectOfficeByCode: (code: string) => Promise<void>;
@@ -98,6 +100,9 @@ export const createActor = (page: Page): Actor => ({
   },
   openDraftCaseFromCaseList: async (applicationId: string) => {
     return await openDraftCaseFromCaseList(page, applicationId);
+  },
+  openRecordedCaseFromCaseList: async (applicationId: string) => {
+    return await openRecordedCaseFromCaseList(page, applicationId);
   },
   openMeansAssessmentFromTaskList: async (applicationId: string) => {
     await openMeansAssessmentFromTaskList(page, applicationId);
