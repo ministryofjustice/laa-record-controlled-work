@@ -90,9 +90,12 @@ test.describe("@e2e critical path", () => {
     await actor.submitApplication(applicationId);
   });
 
-  test("checks recorded cases", async () => {
-    await actor.openRecordedCaseFromCaseList(applicationId);
-  });
+  /**
+   * This has been temporarily removed as the recorded view has been deprioritised.
+   */
+  // test.fixme("checks recorded cases", async () => {
+  //   await actor.openRecordedCaseFromCaseList(applicationId);
+  // });
 
   test.fixme("exports case", async () => {});
 });
