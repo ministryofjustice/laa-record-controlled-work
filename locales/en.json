@@ -59,7 +59,7 @@
     "createApplication": {
       "declaration": {
         "title": "Declaration",
-        "text": "By continuing, you agree that:<br><ul><li>your client has instructed you, the provider, to act on their behalf</li><li>your client has read the LAA privacy policy (opens in a new window or tab)</li><li>you'll give complete and correct information</li></ul>",
+        "text": "By continuing, you agree that:<br><ul class=\"govuk-list govuk-list--bullet govuk-!-margin-bottom-6\"><li>your client has instructed you, the provider, to act on their behalf</li><li>your client has read the <a target=\"_blank\" href=\"/privacy-policy\">LAA privacy policy (opens in a new window or tab)</a></li><li>you'll give complete and correct information</li></ul>",
         "continue": "Agree and continue"
       },
       "caption": "Client and case details",
@@ -68,6 +68,15 @@
         "validation": {
           "required": "Please select an option"
         }
+      },
+      "ecfDropout": {
+        "title": "You are ineligible",
+        "heading": "You cannot use this service for this type of case",
+        "text": [
+          "Continue to complete the <a href=\"/government/publications/legal-aid-exceptional-case-funding-form-and-guidance\">ECF application form CIV ECF 1</a> and <a href=\"/government/publications/cw1-financial-eligibility-for-legal-aid-clients\">form CW1</a> for your client.",
+          "Send completed forms to: <a href=\"mailto:contactECC@justice.gov.uk\">contactECC@justice.gov.uk</a>"
+        ],
+        "button": "Return to case list"
       },
       "legalAidBefore": {
         "title": "Has your client accessed legal aid before?",
@@ -397,6 +406,58 @@
           "have their legal aid stopped and have to pay back the costs"
         ],
         "confirmButton": "Confirm and continue"
+      }
+    },
+    "editApplication": {
+      "taskList": {
+        "clientDetails": {
+          "title": "About your client",
+          "taskItem": {
+            "label": "Client details"
+          }
+        },
+        "meansAssessment": {
+          "title": "Means assessment",
+          "taskItem": {
+            "label": "Income and capital"
+          }
+        },
+        "EvidenceAndDeclaration": {
+          "title": "Evidence and declarations",
+          "taskItem": {
+            "evidence": {
+              "label": "Evidence"
+            },
+            "declaration": {
+              "label": "Client declaration"
+            }
+          }
+        },
+        "status": {
+          "cannotStart": "Cannot start yet",
+          "incomplete": "Incomplete",
+          "completed": "Completed"
+        },
+        "submitButton": {
+          "label": "Record controlled work"
+        },
+        "eligibilityResult": {
+          "title": "Eligibility result",
+          "eligible": "Your client qualifies financially for civil legal aid based on the information you entered.",
+          "viewResult": "View result"
+        }
+      },
+      "confirmation": {
+        "panel": {
+          "title": "Controlled work recorded",
+          "body": "Reference number"
+        },
+        "nextHeading": "What happens next",
+        "nextList": [
+          "The LAA will store the details you've provided. You must <a href='#'>save a copy</a> for your own records which you should keep along with any evidence provided by your client.",
+          "Your client's file may be audited and assessed by the LAA at a later date."
+        ],
+        "returnButton": "Return to case list"
       }
     }
   }

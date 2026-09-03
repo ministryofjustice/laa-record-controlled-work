@@ -6,7 +6,6 @@ import {
   Transformer,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
-import { backLink } from "#/journeys/common.blocks.js";
 import {
   APPLICATION_DATA_KEYS,
   APPLICATIONS_DATA_KEYS,
@@ -46,8 +45,8 @@ const clientName = Format(
 
 export const clientDetailsStep = (): ReturnType<typeof step> =>
   step({
+    backlink: "/cases/recorded",
     blocks: [
-      backLink("/cases/recorded"),
       statusTag("Recorded"),
       heading(clientName),
       caseReferenceNumber(referenceNumber),

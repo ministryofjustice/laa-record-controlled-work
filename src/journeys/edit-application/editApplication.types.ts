@@ -1,6 +1,7 @@
 import type { EffectFunctionContext } from "@ministryofjustice/hmpps-forge/core";
 
 import type { Application } from "#/api/clients/rcw/model/application.zod.gen.js";
+import type { ApplicationState } from "#/api/clients/rcw/model/applicationState.zod.gen.js";
 import type {
   getApplication,
   updateApplicationStatus,
@@ -19,9 +20,11 @@ export type EditApplicationContext = EffectFunctionContext<
 
 export interface EditApplicationData extends Record<string, unknown> {
   [CONTEXT_DATA_KEYS.application]: Application;
+  [CONTEXT_DATA_KEYS.applicationStatus]: ApplicationState;
   [CONTEXT_DATA_KEYS.clientDetailsStatus]: Status;
   [CONTEXT_DATA_KEYS.declarationStatus]: Status;
   [CONTEXT_DATA_KEYS.evidenceStatus]: Status;
+  [CONTEXT_DATA_KEYS.readyForSubmission]: boolean;
 }
 
 export interface EditApplicationEffectsDeps {

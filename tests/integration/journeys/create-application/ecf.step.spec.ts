@@ -3,12 +3,7 @@ import {
   TestRedirectResult,
 } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
-import {
-  CreateApplicationEffects,
-  createApplicationEffectsRegistry,
-} from "#/journeys/create-application/create-application.effects.js";
-import { ineligibleStep } from "#/journeys/create-application/steps/ecf-dropout.step.js";
-import { ecfStep } from "#/journeys/create-application/steps/ecf.step.js";
+import { createApplicationEffectsRegistry } from "#/journeys/create-application/create-application.effects.js";
 import { createForgeTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import { createApplicationJourney } from "#/journeys/create-application/create-application.journey.js";
@@ -16,7 +11,7 @@ import { createApplicationJourney } from "#/journeys/create-application/create-a
 describe("ECF step", () => {
   const client = createForgeTestClient(
     createApplicationJourney,
-    createApplicationEffectsRegistry
+    createApplicationEffectsRegistry,
   );
 
   describe("GET /cases/new/ecf", () => {
@@ -46,7 +41,7 @@ describe("ECF step", () => {
 
   describe("POST /cases/new/ecf", () => {
     const fieldCode = "ecf";
-    
+
     it("should show validation error if no option is selected", async () => {
       const result = await client.post("/cases/new/ecf");
       expect(result.type).to.equal("render");
@@ -76,9 +71,7 @@ describe("ECF step", () => {
       });
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
-      expect(redirectResult.url).to.equal(
-        "/cases/new/legal-aid-before",
-      );
+      expect(redirectResult.url).to.equal("/cases/new/legal-aid-before");
     });
   });
 });

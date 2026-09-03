@@ -10,7 +10,6 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 import { HtmlBlock } from "@ministryofjustice/hmpps-forge/core/components";
 import {
-  GovUKBackLink,
   GovUKButton,
   GovUKRadioInput,
   GovUKTextInput,
@@ -22,9 +21,6 @@ import { t } from "#/lib/i18n.js";
 export const niNumberStep = (journeyCode: string): ReturnType<typeof step> =>
   step({
     blocks: [
-      GovUKBackLink({
-        href: "/cases/new/client-details",
-      }),
       HtmlBlock({
         content: `<span class="govuk-caption-l">${t("journeys.createApplication.caption")}</span>`,
       }),

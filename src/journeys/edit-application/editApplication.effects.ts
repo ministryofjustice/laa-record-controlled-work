@@ -5,6 +5,7 @@ import type { EditApplicationEffectsDeps } from "#/journeys/edit-application/edi
 import { closeIneligibleCase } from "#/journeys/edit-application/effects/closeIneligibleCase.js";
 import { loadApplication } from "#/journeys/edit-application/effects/loadApplication.js";
 import { setTaskListStatuses } from "#/journeys/edit-application/effects/setTaskListStatuses.js";
+import { submitApplication } from "#/journeys/edit-application/effects/submitApplication.js";
 import {
   clearAllDraftAnswers,
   clearFieldAnswers,
@@ -26,4 +27,5 @@ export const editApplicationEffects = {
   saveDraftAnswers: editApplicationEffectsRegistry.register(saveDraftAnswers),
   setTaskListStatuses:
     editApplicationEffectsRegistry.register(setTaskListStatuses),
+  submitApplication: editApplicationEffectsRegistry.register(submitApplication),
 };

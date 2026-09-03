@@ -1,18 +1,11 @@
 import {
   Condition,
-  Format,
-  Params,
   Query,
   redirect,
   step,
   submit,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
-import {
-  backLink,
-  caption,
-  continueButton,
-} from "#/journeys/evidence/common.blocks.js";
 import { evidenceEffects } from "#/journeys/evidence/evidence.effects.js";
 import {
   childCareEvidenceGroup,
@@ -23,7 +16,7 @@ import {
   label,
   maintenanceEvidenceGroup,
 } from "#/journeys/evidence/steps/evidence-of-expenditure/evidence-of-expenditure.blocks.js";
-import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
+import { caption, continueButton } from "#/journeys/shared.blocks.js";
 import { t } from "#/lib/i18n.js";
 
 export const evidenceOfExpenditure = (
@@ -31,13 +24,7 @@ export const evidenceOfExpenditure = (
 ): ReturnType<typeof step> =>
   step({
     blocks: [
-      backLink(
-        Format(
-          "/cases/%1/evidence/evidence-of-income",
-          Params(PARAMS_KEYS.applicationID),
-        ),
-      ),
-      caption,
+      caption(t("journeys.evidence.caption")),
       heading,
       description,
       label,
@@ -45,7 +32,7 @@ export const evidenceOfExpenditure = (
       housingCostsEvidenceGroup,
       childCareEvidenceGroup,
       maintenanceEvidenceGroup,
-      continueButton,
+      continueButton(),
     ],
     onSubmission: [
       submit({

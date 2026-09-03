@@ -1,8 +1,8 @@
+import { completeApplication } from "#msw/fixtures/rcw.js";
 import { test, expect } from "../../fixtures/index.js";
-import { application } from "../../msw/fixtures/rcw.fixtures.js";
 
 test("evidence flow", async ({ withSelectedOffice: page }) => {
-  const applicationId = application.id;
+  const applicationId = completeApplication.id;
 
   await page.goto(`/cases/${applicationId}/evidence/have-evidence`);
 

@@ -1,20 +1,24 @@
 serviceAccount:
-  name: "your-github-action-service-account"
+  name: rcw-github-action-service-account
 
 ingress:
   hosts:
-    - host: your-staging-namespace.cloud-platform.service.justice.gov.uk
+    - host: laa-record-controlled-work-staging.cloud-platform.service.justice.gov.uk
       paths:
         - path: /
           pathType: Prefix
   annotations:
-    external-dns.alpha.kubernetes.io/set-identifier: "ingress-name-laa-record-controlled-work-laa-record-controlled-work-staging-green"
+    external-dns.alpha.kubernetes.io/set-identifier: laa-record-controlled-work-laa-record-controlled-work-staging-green
 
 rcw:
   replicaCount: 2
 
   env:
-    NODE_ENV: "staging"
+    NODE_ENV: staging
+    ENTRA_REDIRECT_URI: https://laa-record-controlled-work-staging.cloud-platform.service.justice.gov.uk/auth/code/callback
+    ENTRA_ADDITIONAL_SCOPES: api://rcw-api-staging/Applications.Read
+    RCW_API_BASE_URL: http://laa-record-controlled-work-api.laa-record-controlled-work-api-staging.svc:8081
+    PDA_API_BASE_URL: https://laa-provider-details-api-staging.apps.live.cloud-platform.service.justice.gov.uk
 
 ccq:
   replicaCount: 2

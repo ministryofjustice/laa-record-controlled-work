@@ -1,9 +1,7 @@
 import {
   Answer,
   Condition,
-  Format,
   or,
-  Params,
   Query,
   redirect,
   step,
@@ -11,11 +9,6 @@ import {
   validation,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
-import {
-  backLink,
-  caption,
-  continueButton,
-} from "#/journeys/evidence/common.blocks.js";
 import { evidenceEffects } from "#/journeys/evidence/evidence.effects.js";
 import {
   asylumSupportEvidenceGroup,
@@ -28,7 +21,7 @@ import {
   stateBenefitsEvidenceGroup,
   taxCreditsEvidenceGroup,
 } from "#/journeys/evidence/steps/evidence-of-income/evidence-of-income.blocks.js";
-import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
+import { caption, continueButton } from "#/journeys/shared.blocks.js";
 import { t } from "#/lib/i18n.js";
 
 export const evidenceOfIncome = (
@@ -36,13 +29,7 @@ export const evidenceOfIncome = (
 ): ReturnType<typeof step> =>
   step({
     blocks: [
-      backLink(
-        Format(
-          "/cases/%1/evidence/have-evidence",
-          Params(PARAMS_KEYS.applicationID),
-        ),
-      ),
-      caption,
+      caption(t("journeys.evidence.caption")),
       heading,
       description,
       employedEvidenceGroup,
@@ -52,7 +39,7 @@ export const evidenceOfIncome = (
       stateBenefitsEvidenceGroup,
       asylumSupportEvidenceGroup,
       taxCreditsEvidenceGroup,
-      continueButton,
+      continueButton(),
     ],
     onSubmission: [
       submit({

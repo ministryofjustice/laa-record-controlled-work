@@ -1,5 +1,5 @@
 import { Office } from "#/journeys/select-office/select-office.types.js";
-import { requireAuth } from "#/middleware/requireAuth.js";
+import { requireAuth } from "#/app/middleware/requireAuth.middleware.js";
 import { expect } from "chai";
 import type { Request, Response } from "express";
 import sinon from "sinon";
@@ -28,7 +28,10 @@ describe("requireAuth", () => {
   it("stores req.originalUrl in session.returnTo when unauthenticated user has selected office", () => {
     const { req, res, next, session } = createMocks({
       originalUrl: "/some/page",
-      selectedOffice: { address: "1 High Street, Leeds, LS1 1AA", code: "LEEDS-01" },
+      selectedOffice: {
+        address: "1 High Street, Leeds, LS1 1AA",
+        code: "LEEDS-01",
+      },
     });
 
     requireAuth(req, res, next);

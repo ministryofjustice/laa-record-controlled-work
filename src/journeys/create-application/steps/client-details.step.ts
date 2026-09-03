@@ -9,7 +9,6 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 import { HtmlBlock } from "@ministryofjustice/hmpps-forge/core/components";
 import {
-  GovUKBackLink,
   GovUKButton,
   GovUKDateInputFull,
   GovUKHeading,
@@ -26,9 +25,6 @@ export const clientDetailsStep = (
 ): ReturnType<typeof step> =>
   step({
     blocks: [
-      GovUKBackLink({
-        href: "/cases/new/legal-aid-before",
-      }),
       HtmlBlock({
         content: `<span class="govuk-caption-l">${t("journeys.createApplication.caption")}</span>`,
       }),

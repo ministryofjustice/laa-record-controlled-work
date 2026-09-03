@@ -22,6 +22,7 @@ import {
   completeCreateCaseShortestPath,
   startNewCase,
 } from "#tests/e2e/flows/create-case.flow.js";
+import { completeDeclaration } from "#tests/e2e/flows/declaration.flow.js";
 import {
   completeEvidenceNoPath,
   completeEvidenceYesPath,
@@ -29,6 +30,7 @@ import {
 import { selectOfficeByCode } from "#tests/e2e/flows/office.flow.js";
 import {
   openMeansAssessmentFromTaskList,
+  submitApplication,
   viewCompletedEligibilityAssessment,
 } from "#tests/e2e/flows/task-list.flow.js";
 
@@ -39,6 +41,7 @@ export interface Actor {
   changeBankBalance: (applicationId: string) => Promise<void>;
   completeCcqShortestEligiblePath: (applicationId: string) => Promise<void>;
   completeCreateCaseShortestPath: () => Promise<string>;
+  completeDeclaration: (applicationId: string) => Promise<void>;
   completeEvidenceNoPath: (applicationId: string) => Promise<void>;
   completeEvidenceYesPath: (applicationId: string) => Promise<void>;
   gotoCase: (applicationId: string) => Promise<void>;
@@ -50,6 +53,7 @@ export interface Actor {
   returnToTaskList: (applicationId: string) => Promise<void>;
   selectOfficeByCode: (code: string) => Promise<void>;
   startNewCase: () => Promise<void>;
+  submitApplication: (applicationId: string) => Promise<void>;
   submitCheckAnswers: (applicationId: string) => Promise<void>;
   viewCompletedEligibilityAssessment: (applicationId: string) => Promise<void>;
 }
@@ -74,9 +78,11 @@ export const createActor = (page: Page): Actor => ({
   completeCcqShortestEligiblePath: async (applicationId: string) => {
     await completeCcqShortestEligiblePath(page, applicationId);
   },
-
   completeCreateCaseShortestPath: async () =>
     await completeCreateCaseShortestPath(page),
+  completeDeclaration: async (applicationId: string) => {
+    await completeDeclaration(page, applicationId);
+  },
   completeEvidenceNoPath: async (applicationId: string) => {
     await completeEvidenceNoPath(page, applicationId);
   },
@@ -109,6 +115,9 @@ export const createActor = (page: Page): Actor => ({
   },
   startNewCase: async () => {
     await startNewCase(page);
+  },
+  submitApplication: async (applicationId: string) => {
+    await submitApplication(page, applicationId);
   },
   submitCheckAnswers: async (applicationId: string) => {
     await submitCheckAnswers(page, applicationId);

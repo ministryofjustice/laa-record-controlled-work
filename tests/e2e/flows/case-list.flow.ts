@@ -1,13 +1,25 @@
 import type { Page } from "@playwright/test";
 
 import { expect } from "@playwright/test";
+import { match } from "path-to-regexp";
 
-import {
-  extractApplicationIdFromTaskListPath,
-  isTaskListPath,
-} from "#tests/e2e/flows/task-list.flow.js";
+import { isTaskListPath } from "#tests/e2e/flows/task-list.flow.js";
 
 export const CASE_LIST_URL_PATTERN = new RegExp("/cases$");
+
+export const extractApplicationIdFromPath = (
+  pathPattern: string,
+  pathname: string,
+): string | undefined => {
+  const matcher = match(pathPattern);
+  const matched = matcher(pathname);
+
+  if (matched !== false) {
+    const applicationId = matched.params.id;
+    // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- it's an array
+    return Array.isArray(applicationId) ? applicationId[0] : applicationId;
+  }
+};
 
 export const isCaseListPath = (pathname: string): boolean =>
   pathname === "/cases";
@@ -43,7 +55,8 @@ export const openDraftCaseFromCaseList = async (
   await expect(draftCaseLink).toBeVisible();
   await draftCaseLink.click();
 
-  const openedApplicationId = extractApplicationIdFromTaskListPath(
+  const openedApplicationId = extractApplicationIdFromPath(
+    "/cases/:id/task-list",
     new URL(page.url()).pathname,
   );
 
@@ -62,13 +75,14 @@ export const openRecordedCaseFromCaseList = async (
   await page.getByRole("link", { name: "Recorded" }).click();
 
   const recordedCaseLink = page
-    .locator(`a[href='/cases/${applicationId}/view/client-details']`)
+    .locator(`a[href='/cases/${applicationId}/view']`)
     .first();
 
   await expect(recordedCaseLink).toBeVisible();
   await recordedCaseLink.click();
 
-  const openedApplicationId = extractApplicationIdFromTaskListPath(
+  const openedApplicationId = extractApplicationIdFromPath(
+    "/cases/:id/view/client-details",
     new URL(page.url()).pathname,
   );
 

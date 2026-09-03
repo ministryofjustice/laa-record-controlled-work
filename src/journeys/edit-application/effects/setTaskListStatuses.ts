@@ -70,8 +70,21 @@ export const setTaskListStatuses =
       getDeclarationValues(application),
     );
 
+    const applicationStatus = context.getData(
+      CONTEXT_DATA_KEYS.application,
+    ).applicationState;
+
+    const readyForSubmission = [
+      clientDetailsStatus,
+      meansAssessment,
+      evidenceStatus,
+      declarationStatus,
+    ].every((status) => status === Status.COMPLETED);
+
     context.setData(CONTEXT_DATA_KEYS.clientDetailsStatus, clientDetailsStatus);
     context.setData(CONTEXT_DATA_KEYS.evidenceStatus, evidenceStatus);
     context.setData(CONTEXT_DATA_KEYS.declarationStatus, declarationStatus);
     context.setData(CONTEXT_DATA_KEYS.meansAssessment, meansAssessment);
+    context.setData(CONTEXT_DATA_KEYS.applicationStatus, applicationStatus);
+    context.setData(CONTEXT_DATA_KEYS.readyForSubmission, readyForSubmission);
   };

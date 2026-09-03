@@ -3,11 +3,7 @@ import {
   TestRedirectResult,
 } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
-import {
-  CreateApplicationEffects,
-  createApplicationEffectsRegistry,
-} from "#/journeys/create-application/create-application.effects.js";
-import { legalAidBeforeStep } from "#/journeys/create-application/steps/legal-aid-before.step.js";
+import { createApplicationEffectsRegistry } from "#/journeys/create-application/create-application.effects.js";
 import { createForgeTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import { createApplicationJourney } from "#/journeys/create-application/create-application.journey.js";
@@ -67,9 +63,7 @@ describe("Legal aid before step", () => {
       });
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
-      expect(redirectResult.url).to.equal(
-        "/cases/new/legal-aid-last-6-months",
-      );
+      expect(redirectResult.url).to.equal("/cases/new/legal-aid-last-6-months");
     });
 
     it("should redirect to client details step if yes, different matter", async () => {
