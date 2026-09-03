@@ -48,8 +48,8 @@ export interface Actor {
   gotoCaseList: () => Promise<void>;
   login: () => Promise<void>;
   openDraftCaseFromCaseList: (applicationId: string) => Promise<string>;
-  openRecordedCaseFromCaseList: (applicationId: string) => Promise<string>;
   openMeansAssessmentFromTaskList: (applicationId: string) => Promise<void>;
+  openRecordedCaseFromCaseList: (applicationId: string) => Promise<string>;
   returnToTaskList: (applicationId: string) => Promise<void>;
   selectOfficeByCode: (code: string) => Promise<void>;
   startNewCase: () => Promise<void>;
@@ -101,11 +101,11 @@ export const createActor = (page: Page): Actor => ({
   openDraftCaseFromCaseList: async (applicationId: string) => {
     return await openDraftCaseFromCaseList(page, applicationId);
   },
-  openRecordedCaseFromCaseList: async (applicationId: string) => {
-    return await openRecordedCaseFromCaseList(page, applicationId);
-  },
   openMeansAssessmentFromTaskList: async (applicationId: string) => {
     await openMeansAssessmentFromTaskList(page, applicationId);
+  },
+  openRecordedCaseFromCaseList: async (applicationId: string) => {
+    return await openRecordedCaseFromCaseList(page, applicationId);
   },
   returnToTaskList: async (applicationId: string) => {
     await returnToTaskList(page, applicationId);
