@@ -7,7 +7,7 @@ import {
   CreateApplicationEffects,
   createApplicationEffectsRegistry,
 } from "#/journeys/create-application/create-application.effects.js";
-import { clientDetailsStep } from "#/journeys/create-application/steps/client-details.step.js";
+import { clientDetailsStep } from "#/journeys/create-application/steps/clientDetails/client-details.step.js";
 import { createForgeTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import { createApplicationJourney } from "#/journeys/create-application/create-application.journey.js";
