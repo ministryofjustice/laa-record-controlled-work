@@ -89,6 +89,10 @@ export default {
   csrf: {
     cookieName: "_csrf",
     httpOnly: true,
+    ignoredPaths: [
+      "/api/applications/:applicationId/eligibility",
+      "/auth/code/callback",
+    ],
     secure: useHttps,
   } satisfies CsrfConfig,
 

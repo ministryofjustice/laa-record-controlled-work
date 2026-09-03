@@ -56,6 +56,7 @@ export interface Config {
 export interface CsrfConfig {
   cookieName: string;
   httpOnly: boolean;
+  ignoredPaths: string[];
   secure: boolean;
 }
 
