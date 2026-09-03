@@ -35,12 +35,12 @@ export const handleGlobalErrors = (): ErrorRequestHandler => {
       // Handle both 403 and 404 as Not Found to avoid enumeration of resources.
       case statusCode === HTTP_STATUS.FORBIDDEN:
       case statusCode === HTTP_STATUS.NOT_FOUND:
-        res.status(HTTP_STATUS.NOT_FOUND).render("main/error-404"); // .redirect("/error/404");
+        res.status(HTTP_STATUS.NOT_FOUND).render("main/error-404");
         return;
       // Handle other 5xx requests as generic errors.
       case statusCode >= HTTP_STATUS.INTERNAL_SERVER_ERROR:
       default:
-        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).redirect("/error/500");
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).render("main/error-500");
     }
   };
 };
