@@ -14,6 +14,7 @@ import type { Status } from "#/journeys/journey.types.js";
 import { editApplicationEffects } from "#/journeys/edit-application/editApplication.effects.js";
 import {
   caseReferenceNumber,
+  closeCaseButton,
   heading,
   saveAndReturnButton,
   taskList,
@@ -49,6 +50,7 @@ export const taskListStep = (): ReturnType<typeof step> =>
       caseReferenceNumber(referenceNumber),
       ...taskList(),
       saveAndReturnButton,
+      closeCaseButton,
     ],
     onAccess: [
       access({
@@ -61,6 +63,7 @@ export const taskListStep = (): ReturnType<typeof step> =>
     onSubmission: [
       submit({
         onAlways: {
+          effects: [editApplicationEffects.closeIneligibleCase()],
           next: [
             redirect({
               goto: "/cases",
