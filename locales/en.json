@@ -444,6 +444,7 @@
         "eligibilityResult": {
           "title": "Eligibility result",
           "eligible": "Your client qualifies financially for civil legal aid based on the information you entered.",
+          "ineligible": "Your client does not qualify financially for civil legal aid based on the information you entered.",
           "viewResult": "View result"
         }
       },

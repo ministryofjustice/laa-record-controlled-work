@@ -14,7 +14,6 @@ import { editApplicationEffects } from "#/journeys/edit-application/editApplicat
 import {
   buttonGroup,
   caseReferenceNumber,
-  closeCaseButton,
   heading,
   taskList,
 } from "#/journeys/edit-application/steps/task-list/task-list.blocks.js";

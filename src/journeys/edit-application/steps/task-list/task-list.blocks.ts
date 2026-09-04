@@ -96,7 +96,7 @@ export function taskList(): BlockDefinition[] {
     eligibilityResult(),
     sectionHeading(
       t("journeys.editApplication.taskList.EvidenceAndDeclaration.title"),
-            Data(CONTEXT_DATA_KEYS.application)
+      Data(CONTEXT_DATA_KEYS.application)
         .path(APPLICATION_DATA_KEYS.eligibilityOverallResult)
         .match(Condition.Equals("eligible")),
     ),

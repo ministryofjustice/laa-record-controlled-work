@@ -131,10 +131,16 @@ describe("Task list step", () => {
           ),
       ).to.equal(false);
       expect(
-        eligibilityResultRender
-          .getBlocksByVariant("govukButton")
-          .filter((block) => block.properties.visibleWhen !== false)
-          .some((block) => block.properties.text === "Close case"),
+        Object.values(
+          (eligibilityResultRender.getBlocksByVariant("templateWrapper")[0]
+            .properties.slots ?? {}) as Record<string, RenderBlock[]>,
+        )
+          .flat()
+          .some(
+            (block) =>
+              block.properties.visibleWhen !== false &&
+              block.properties.text === "Close case",
+          ),
       ).to.equal(true);
       expect(indicator).to.include(
         `href="/cases/${uuid}/eligibility/?destination=check-result"`,
@@ -426,6 +432,8 @@ describe("Task list step", () => {
         applicationState: "COMPLETED",
         eTag: 0,
       });
+    });
+
     it("redirects to /confirmation page when submit is clicked", async () => {
       const result = await client.post(`/cases/${uuid}/task-list`, {
         session,

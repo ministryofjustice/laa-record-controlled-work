@@ -7,6 +7,7 @@ import {
 
 import {
   applications,
+  completeApplication,
   createApplicationResponse,
   incompleteApplication,
 } from "../fixtures/rcw.js";
@@ -14,6 +15,10 @@ import {
 export const rcwHandlers = [
   getGetApplicationsMockHandler(applications),
   getCreateApplicationMockHandler(createApplicationResponse),
-  getGetApplicationMockHandler(incompleteApplication),
+  getGetApplicationMockHandler((info) =>
+    info.params.id === completeApplication.id
+      ? completeApplication
+      : incompleteApplication,
+  ),
   getUpdateApplicationEvidenceMockHandler(),
 ];
