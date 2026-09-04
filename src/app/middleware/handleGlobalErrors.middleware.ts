@@ -24,7 +24,7 @@ export const handleGlobalErrors = (): ErrorRequestHandler => {
     res: Response,
     next: NextFunction,
   ): void {
-    const statusCode: HTTP_STATUS =
+    const statusCode: number =
       err.statusCode ?? HTTP_STATUS.INTERNAL_SERVER_ERROR;
 
     switch (true) {
