@@ -19,4 +19,10 @@ export const incompleteApplication = getGetApplicationResponseMock({
   eligibility: { data: {} },
 });
 
-export const completeApplication = getGetApplicationResponseMock();
+export const completeApplication = getGetApplicationResponseMock({
+  eligibility: {
+    result: {
+      result_summary: { overall_result: { result: "eligible" } },
+    },
+  },
+});

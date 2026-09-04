@@ -218,6 +218,42 @@
         "answerValues": {
           "noFixedAddress": "No fixed address"
         }
+      },
+      "taskList": {
+        "clientDetails": {
+          "title": "About your client",
+          "taskItem": {
+            "label": "Client details"
+          }
+        },
+        "meansAssessment": {
+          "title": "Means assessment",
+          "taskItem": {
+            "label": "Income and capital"
+          }
+        },
+        "eligibilityResult": {
+          "title": "Eligibility result",
+          "eligible": "Your client qualifies financially for civil legal aid based on the information you entered.",
+          "ineligible": "Your client does not qualify financially for civil legal aid based on the information you entered.",
+          "viewResult": "View result"
+        },
+        "EvidenceAndDeclaration": {
+          "title": "Evidence and declarations",
+          "taskItem": {
+            "evidence": {
+              "label": "Evidence"
+            },
+            "declaration": {
+              "label": "Client declaration"
+            }
+          }
+        },
+        "status": {
+          "cannotStart": "Cannot start yet",
+          "incomplete": "Incomplete",
+          "completed": "Completed"
+        }
       }
     },
     "evidence": {
@@ -408,6 +444,7 @@
         "eligibilityResult": {
           "title": "Eligibility result",
           "eligible": "Your client qualifies financially for civil legal aid based on the information you entered.",
+          "ineligible": "Your client does not qualify financially for civil legal aid based on the information you entered.",
           "viewResult": "View result"
         }
       },
