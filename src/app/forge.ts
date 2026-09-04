@@ -27,6 +27,8 @@ import { selectOfficePackage } from "#/journeys/select-office/select-office.jour
 import { viewApplicationPackage } from "#/journeys/view-application/viewApplication.package.js";
 import { yourCasesPackage } from "#/journeys/your-cases/your-cases.journey.js";
 import { setupNunjucks } from "#/middleware/setupNunjucks.js";
+import { editClientDetailsPackage } from "#/journeys/edit-client-details/editClientDetails.package.js";
+import { loadApplicationAsAnswers } from "#/journeys/edit-client-details/effects/loadApplicationAsAnswers.js";
 
 /**
  * Initializes Forge for the Express application.
@@ -51,7 +53,8 @@ export function initForge(app: Express): void {
     .registerPackage(createApplicationJourney, { createApplication })
     .registerPackage(declaration, { updateApplicationDeclaration })
     .registerPackage(evidencePackage, { updateApplicationEvidence })
-    .registerPackage(viewApplicationPackage, { getApplication });
+    .registerPackage(viewApplicationPackage, { getApplication })
+    .registerPackage(editClientDetailsPackage, { getApplication, updateApplicationStatus });
 
   const forgeRouter = createExpressRouter(forge, { nunjucksEnv });
   app.use("/", requireAuth, forgeRouter);
