@@ -4,7 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import nunjucks from "nunjucks";
 
-import { nunjucksT } from "#/lib/i18n.js";
+import { nunjucksT, nunjucksTt } from "#/lib/i18n.js";
 
 const FIRST_IN_ARRAY = 0;
 
@@ -60,7 +60,7 @@ export const setupNunjucks = (app: Application): nunjucks.Environment => {
   // Tell Nunjucks where to look for njk files
   const nunjucksEnv = nunjucks.configure(
     [
-      path.join(process.cwd(), "public", "views"), // Main views directory
+      path.join(process.cwd(), "src", "views"), // Main views directory
       "node_modules/govuk-frontend/dist", // GOV.UK Frontend templates
       "node_modules/govuk-frontend/dist/components/", // GOV.UK components
       "node_modules/@ministryofjustice/frontend", // MoJ Design System components
@@ -76,6 +76,7 @@ export const setupNunjucks = (app: Application): nunjucks.Environment => {
 
   // Add global variables
   nunjucksEnv.addGlobal("t", nunjucksT);
+  nunjucksEnv.addGlobal("tt", nunjucksTt);
 
   interface ValidationError {
     blockCode?: string;
