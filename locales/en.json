@@ -47,6 +47,25 @@
           "dateRecorded": "Date recorded"
         }
       }
+    },
+    "view": {
+      "tabs": {
+        "ClientDetails": "Client and case details",
+        "meansAssessment": "Means Assessment",
+        "evidence": "Evidence"
+      },
+      "summaryCardTitles": {
+        "aboutTheClient": "About the client",
+        "caseDetails": "Case details"
+      },
+      "summaryCardRows": {
+        "fullName": "Full name",
+        "dateOfBirth": "Date of birth",
+        "nationalInsuranceNumber": "National Insurance number",
+        "address": "Address",
+        "legalAidBefore": "Accessed legal aid before",
+        "ecf": "ECF"
+      }
     }
   },
   "journeys": {

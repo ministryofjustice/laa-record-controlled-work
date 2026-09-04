@@ -1,57 +1,38 @@
 import {
   access,
-  Data,
-  Format,
   step,
-  Transformer,
+  type StepDefinition,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
-import {
-  APPLICATION_DATA_KEYS,
-  APPLICATIONS_DATA_KEYS,
-  CLIENT_DETAILS_DATA_KEYS,
-  CONTEXT_DATA_KEYS,
-} from "#/journeys/journey.constants.js";
 import {
   caseReferenceNumber,
   heading,
   printButton,
   recordedOn,
   statusTag,
+  subHeading,
+} from "#/journeys/view-application/common.blocks.js";
+import {
+  aboutTheClientSummaryCard,
+  caseDetailsSummaryCard,
+  subNavigation,
 } from "#/journeys/view-application/steps/client-details.blocks.js";
 import { viewApplicationEffects } from "#/journeys/view-application/viewApplication.effects.js";
+import { t } from "#/lib/i18n.js";
 
-const referenceNumber = Data(CONTEXT_DATA_KEYS.application).path(
-  APPLICATION_DATA_KEYS.applicationRefNumber,
-);
-
-const recordedOnDate = Data(CONTEXT_DATA_KEYS.application)
-  .path(APPLICATIONS_DATA_KEYS.modifiedAt)
-  .pipe(
-    Transformer.String.FormatDate({
-      day: "numeric",
-      locale: "en-GB",
-      month: "short",
-      timeZone: "Europe/London",
-      year: "numeric",
-    }),
-  );
-
-const clientName = Format(
-  "%1 %2",
-  Data(CONTEXT_DATA_KEYS.application).path(CLIENT_DETAILS_DATA_KEYS.firstName),
-  Data(CONTEXT_DATA_KEYS.application).path(CLIENT_DETAILS_DATA_KEYS.lastName),
-);
-
-export const clientDetailsStep = (): ReturnType<typeof step> =>
+export const clientDetailsStep = (): StepDefinition =>
   step({
     backlink: "/cases/recorded",
     blocks: [
       statusTag("Recorded"),
-      heading(clientName),
-      caseReferenceNumber(referenceNumber),
-      recordedOn(recordedOnDate),
+      heading(),
+      caseReferenceNumber(),
+      recordedOn(),
       printButton(),
+      subNavigation(),
+      subHeading(t("pages.view.tabs.ClientDetails")),
+      aboutTheClientSummaryCard(),
+      caseDetailsSummaryCard(),
     ],
     onAccess: [
       access({

@@ -95,6 +95,7 @@ test.describe("@e2e critical path", () => {
    */
   test.skip("checks recorded cases", async () => {
     await actor.openRecordedCaseFromCaseList(applicationId);
+    await actor.assertRecordedCaseVisible("Test User");
   });
 
   test.fixme("exports case", async () => {});
