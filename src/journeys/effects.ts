@@ -115,6 +115,8 @@ export const saveDraftAnswers =
       ...session.journeyDrafts[journeyCode],
       ...context.getAllAnswers(),
     };
+
+    console.log("answers saved in context during create:", session.journeyDrafts[journeyCode]);
   };
 
 export const {
