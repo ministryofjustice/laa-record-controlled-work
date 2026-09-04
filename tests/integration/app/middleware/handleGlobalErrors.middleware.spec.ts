@@ -1,7 +1,7 @@
 import express, { Express } from "express";
 import { handleGlobalErrors } from "#/app/middleware/handleGlobalErrors.middleware.js";
 import request from "supertest";
-import { HTTP_STATUS } from "#/app/enums/httpStatus.enum.js";
+import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { NotFoundError } from "#/app/errors/NotFoundError.js";
 import { expect } from "chai";
 import { ApplicationError } from "#/app/errors/ApplicationError.js";

@@ -2,13 +2,13 @@ import express from "express";
 
 import type { CreateRedisStore, GetRedisClient } from "#/lib/redis.js";
 
-import { HTTP_STATUS } from "#/app/enums/httpStatus.enum.js";
 import { initForge } from "#/app/forge.js";
 import { initMiddleware } from "#/app/middleware.js";
 import { handleGlobalErrors } from "#/app/middleware/handleGlobalErrors.middleware.js";
 import { logGlobalErrors } from "#/app/middleware/logGlobalError.middleware.js";
 import { initRoutes } from "#/app/routes.js";
 import { initSecurity } from "#/app/security.js";
+import { HTTP_STATUS } from "#/lib/constants/http.js";
 
 interface Dependencies {
   createRedisStore?: CreateRedisStore;

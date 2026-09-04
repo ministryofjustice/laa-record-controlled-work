@@ -2,7 +2,6 @@ import type { UpdateEvidenceRequestBody } from "#/api/clients/rcw/model/updateEv
 
 import { ApiResponseError } from "#/api/clients/api.errors.js";
 import { getRcwApiDefaultOptions } from "#/api/clients/getRcwApiDefaultOptions.js";
-import { HTTP_STATUS } from "#/app/enums/httpStatus.enum.js";
 import { getAuthDebugHeaders } from "#/auth/auth.debug.js";
 import {
   type EvidenceContext,
@@ -15,6 +14,7 @@ import {
   InvalidEvidenceError,
   InvalidSessionError,
 } from "#/journeys/journey.errors.js";
+import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
 
 export const updateEvidence =

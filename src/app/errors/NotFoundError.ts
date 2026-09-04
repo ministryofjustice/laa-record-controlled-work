@@ -1,7 +1,7 @@
 /* eslint-disable jsdoc/require-jsdoc -- Not required */
 
-import { HTTP_STATUS } from "#/app/enums/httpStatus.enum.js";
 import { ApplicationError } from "#/app/errors/ApplicationError.js";
+import { HTTP_STATUS } from "#/lib/constants/http.js";
 
 export class NotFoundError extends ApplicationError {
   constructor() {

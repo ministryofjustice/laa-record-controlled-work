@@ -2,7 +2,6 @@ import type { updateApplicationDeclarationResponse } from "#/api/clients/rcw/sch
 
 import { ApiResponseError } from "#/api/clients/api.errors.js";
 import { getRcwApiDefaultOptions } from "#/api/clients/getRcwApiDefaultOptions.js";
-import { HTTP_STATUS } from "#/app/enums/httpStatus.enum.js";
 import { getAuthDebugHeaders } from "#/auth/auth.debug.js";
 import { AnswerKey as A } from "#/journeys/AnswerKey.js";
 import {
@@ -11,6 +10,7 @@ import {
   UndefinedSessionError,
 } from "#/journeys/errors.js";
 import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
+import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
 
 import type {

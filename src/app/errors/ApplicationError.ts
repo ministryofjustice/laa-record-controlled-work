@@ -1,9 +1,9 @@
 /* eslint-disable jsdoc/require-jsdoc -- Not required */
 
-import { HTTP_STATUS } from "#/app/enums/httpStatus.enum.js";
+import { HTTP_STATUS } from "#/lib/constants/http.js";
 
 export class ApplicationError extends Error {
-  statusCode?: HTTP_STATUS;
+  statusCode?: number;
 
   constructor(message: string) {
     super();

@@ -3,11 +3,6 @@ import type { NextFunction, Request, Response } from "express";
 import { promisify } from "node:util";
 
 import {
-  BAD_REQUEST,
-  INTERNAL_SERVER_ERROR,
-  UNAUTHORIZED,
-} from "#/app/enums/httpStatus.enum.js";
-import {
   MissingAuthCodeRequestError,
   StateMismatchError,
 } from "#/auth/auth.errors.js";
@@ -23,6 +18,11 @@ import {
 import { EntraService } from "#/auth/entra.service.js";
 import { getMsalCacheKey } from "#/auth/msal.cache-key.js";
 import config from "#/config.js";
+import {
+  BAD_REQUEST,
+  INTERNAL_SERVER_ERROR,
+  UNAUTHORIZED,
+} from "#/lib/constants/http.js";
 import { getRedisClient } from "#/lib/redis.js";
 import { logger } from "#/logger.js";
 

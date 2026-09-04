@@ -6,9 +6,9 @@ import type {
 import { ApiResponseError } from "#/api/clients/api.errors.js";
 import { getRcwApiDefaultOptions } from "#/api/clients/getRcwApiDefaultOptions.js";
 import { ApplicationState } from "#/api/clients/rcw/model/applicationState.zod.gen.js";
-import { HTTP_STATUS } from "#/app/enums/httpStatus.enum.js";
 import { getAuthDebugHeaders } from "#/auth/auth.debug.js";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
+import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
 // TODO: etag not currently being returned from rcw api, so hardcoding for now.
 // Once rcw api is updated to return etag, this can be removed and the etag can be retrieved from the application data in context.

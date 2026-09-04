@@ -13,7 +13,7 @@ import { SessionData } from "express-session";
 import { Agent, request as undiciRequest, setGlobalDispatcher } from "undici";
 import type { RedisClientType } from "redis";
 import { createRedisClient as createAppRedisClient } from "#/lib/redis.js";
-import { FOUND, OK } from "#/app/enums/httpStatus.enum.js";
+import { FOUND, OK } from "#/lib/constants/http.js";
 
 const REDIS_PORT = 6379;
 const IDP_PORT = 8080;

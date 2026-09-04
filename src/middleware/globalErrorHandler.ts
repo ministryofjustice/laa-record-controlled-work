@@ -7,7 +7,7 @@ import {
   NOT_FOUND,
   SERVICE_UNAVAILABLE,
   UNAUTHORIZED,
-} from "#/app/enums/httpStatus.enum.js";
+} from "#/lib/constants/http.js";
 import { DomainError } from "#/lib/errors/domainError.js";
 
 const ErrorStatuses: Record<string, number> = {

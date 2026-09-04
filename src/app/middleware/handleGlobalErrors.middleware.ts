@@ -5,7 +5,7 @@ import type {
   Response,
 } from "express";
 
-import { HTTP_STATUS } from "#/app/enums/httpStatus.enum.js";
+import { HTTP_STATUS } from "#/lib/constants/http.js";
 
 import type { ApplicationError } from "../errors/ApplicationError.js";
 

@@ -1,6 +1,6 @@
 import express from "express";
 
-import { HTTP_STATUS } from "#/app/enums/httpStatus.enum.js";
+import { HTTP_STATUS } from "#/lib/constants/http.js";
 
 const router = express.Router({ mergeParams: true });
 

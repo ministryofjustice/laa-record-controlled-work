@@ -11,7 +11,7 @@ import {
   INTERNAL_SERVER_ERROR,
   OK,
   UNAUTHORIZED,
-} from "#/app/enums/httpStatus.enum.js";
+} from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
 import { createEligibilityRouter } from "#/api/eligibility/eligibility.routes.js";
 
