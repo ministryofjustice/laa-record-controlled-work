@@ -17,11 +17,8 @@ export const loadApplicationAsAnswers =
     }
 
     const application = context.getData(CONTEXT_DATA_KEYS.application);
-    console.log("Application data:", application);
 
     const answersArray = ApplicationDto.toAnswers(application);
-
-    console.log("Answers array:", answersArray);
 
     for (const [code, value] of Object.entries(answersArray)) {
       if (!context.hasAnswer(code)) {
@@ -35,6 +32,4 @@ export const loadApplicationAsAnswers =
       ...session.journeyDrafts[journeyCode],
       ...context.getAllAnswers(),
     };
-
-    console.log("answers in context:", session.journeyDrafts[journeyCode]);
   };
