@@ -1,7 +1,7 @@
 import type { CreateApplicationRequestBody } from "#/api/clients/rcw/model/createApplicationRequestBody.zod.gen.js";
 import type { AnswersOutput } from "#/journeys/create-application/data/answers.zod.js";
 
-import {
+{
   OVERSEAS_ADDRESS_FIELDS,
   UK_ADDRESS_FIELDS,
 } from "#/journeys/journey.constants.js";
@@ -170,6 +170,35 @@ export class ApplicationDto {
       county: answers[UK_ADDRESS_FIELDS.county],
       postcode: answers[UK_ADDRESS_FIELDS.postcode],
       townOrCity: answers[UK_ADDRESS_FIELDS.townOrCity],
+
+    };
+  }
+
+  /**
+   * Creates an answers output instance from the provided application.
+   * @param application - The application from which to create the answers output instance.
+   * @returns AnswersOutput instance.
+   */
+  public static toAnswers(application: CreateApplicationRequestBody): AnswersOutput {
+    return {
+      [AnswerKey.addressLine1]: application.clientDetails.address?.addressLine1,
+      [AnswerKey.addressLine2]: application.clientDetails.address?.addressLine2,
+      [AnswerKey.addressLine3]: application.clientDetails.address?.addressLine3,
+      [AnswerKey.addressLine4]: application.clientDetails.address?.addressLine4,
+      [AnswerKey.country]: application.clientDetails.address?.country,
+      [AnswerKey.county]: application.clientDetails.address?.county,
+      [AnswerKey.dateOfBirth]: application.clientDetails.dateOfBirth,
+      [AnswerKey.ecf]: "no",
+      [AnswerKey.firstName]: application.clientDetails.firstName,
+      [AnswerKey.hasNINumber]: application.clientDetails.niNumber ? "yes" : "no",
+      [AnswerKey.haveAHomeAddress]: application.clientDetails.hasFixedAddress ? "yes" : "no",
+      [AnswerKey.lastName]: application.clientDetails.lastName,
+      [AnswerKey.legalAidBefore]: application.scopingQuestions?.priorLegalAid as string,
+      [AnswerKey.legalAidLast6Months]: application.legalAidLast6Months ? "yes" : "no",
+      [AnswerKey.niNumber]: application.clientDetails.niNumber,
+      [AnswerKey.postcode]: application.clientDetails.address?.postCode,
+      [AnswerKey.reasonForYes]: application.reasonForReapplication,
+      [AnswerKey.townOrCity]: application.clientDetails.address?.townOrCity,
     };
   }
 
