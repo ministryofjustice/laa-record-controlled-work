@@ -30,6 +30,7 @@ export const enterOverseasAddressStep = (
   journeyCode: string,
 ): ReturnType<typeof step> =>
   step({
+    backlink: "enter-address-manually?returnTo=check-answers",
     blocks: [
       HtmlBlock({
         content: `<span class="govuk-caption-l">${t("journeys.createApplication.caption")}</span>`,

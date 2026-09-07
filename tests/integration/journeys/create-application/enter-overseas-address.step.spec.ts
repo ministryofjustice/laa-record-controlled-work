@@ -42,6 +42,12 @@ describe("Enter overseas address step", () => {
       expect(renderResult.context.step.title).to.equal("Enter your client's overseas home address");
     });
 
+    it("has a back link to manual address entry", () => {
+      expect(renderResult.context.step.backlink).to.equal(
+        "enter-address-manually?returnTo=check-answers",
+      );
+    });
+
     it("renders a country input", () => {
       const label = countryInput.properties.label as { text: string };
       expect(label.text).to.equal("Country");
