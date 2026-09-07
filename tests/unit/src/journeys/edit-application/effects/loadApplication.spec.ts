@@ -57,7 +57,7 @@ describe("loadApplication", () => {
 
     expect(getApplicationStub.calledOnceWith(applicationId)).to.equal(true);
     expect(
-      setData.calledOnceWith(CONTEXT_DATA_KEYS.application, mockApplication),
+      setData.calledWith(CONTEXT_DATA_KEYS.application, mockApplication),
     ).to.equal(true);
   });
 

@@ -44,10 +44,13 @@ export const taskListStep = (): ReturnType<typeof step> =>
     ],
     onAccess: [
       access({
-        effects: [editApplicationEffects.setTaskListStatuses()],
+        effects: [
+          editApplicationEffects.loadApplication(),
+          editApplicationEffects.setTaskListStatuses(),
+        ],
       }),
     ],
-    onSubmission: [saveAndReturn(), submitApplication()],
+    onSubmission: [saveAndReturn(), submitApplication(), closeApplication()],
     path: "/task-list",
     reachability: {
       entryWhen: true,
@@ -78,4 +81,17 @@ const submitApplication = (): SubmitHook =>
       ],
     },
     when: Post("action").match(Condition.Equals("submit")),
+  });
+
+const closeApplication = (): SubmitHook =>
+  submit({
+    onAlways: {
+      effects: [editApplicationEffects.closeIneligibleCase()],
+      next: [
+        redirect({
+          goto: "/cases",
+        }),
+      ],
+    },
+    when: Post("action").match(Condition.Equals("close")),
   });

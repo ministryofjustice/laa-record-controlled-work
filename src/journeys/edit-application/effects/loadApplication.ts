@@ -17,6 +17,8 @@ import {
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
 
+const DEFAULT_ETAG = 0;
+
 export const loadApplication =
   (deps: EditApplicationEffectsDeps) =>
   async (context: EditApplicationContext): Promise<void> => {
@@ -71,4 +73,11 @@ export const loadApplication =
 
     const application: Application = result.data;
     context.setData(CONTEXT_DATA_KEYS.application, application);
+
+    const headers = response.headers as Headers | undefined;
+    const eTag = headers?.get("etag");
+    context.setData(
+      CONTEXT_DATA_KEYS.applicationETag,
+      eTag ? Number.parseInt(eTag, 10) : DEFAULT_ETAG,
+    );
   };
