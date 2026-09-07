@@ -238,7 +238,7 @@ test("create application flow", async ({ withSelectedOffice: page }) => {
   // Check that all answers are displayed correctly
   const summaryList = page.locator(".govuk-summary-list");
   const rows = summaryList.locator(".govuk-summary-list__row");
-  await expect(rows).toHaveCount(7);
+  await expect(rows).toHaveCount(8);
   await expect(rows.locator(".govuk-summary-list__value")).toHaveText([
     // ECF
     "No",
@@ -252,18 +252,25 @@ test("create application flow", async ({ withSelectedOffice: page }) => {
     "Doe",
     // Date of birth
     "15 June 1990",
+    // National Insurance number
+    "No",
     // Address
     "10 Some Street, SomeCity, AB1 2CD",
   ], { useInnerText: true });
 
-  const changeAddressLink = rows.nth(6).locator(".govuk-summary-list__actions a");
+  const changeAddressLink = rows
+    .filter({ has: page.getByText("Address", { exact: true }) })
+    .locator(".govuk-summary-list__actions a");
   await expect(changeAddressLink).toHaveAttribute(
     "href",
-    "enter-address-manually?returnTo=check-answers",
+    "have-a-home-address?returnTo=check-answers",
   );
   await changeAddressLink.click();
   
-  // Verify redirection back to the enter address manually page
+  // Verify redirection back to the home address question
+  await expect(page).toHaveURL("/cases/new/have-a-home-address?returnTo=check-answers");
+  await page.getByRole("radio", { name: "Yes" }).check();
+  await page.getByRole("button", { name: "Continue" }).click();
   await expect(page).toHaveURL("/cases/new/enter-address-manually?returnTo=check-answers");
   
   // ==========================================================================
@@ -300,7 +307,11 @@ test("create application flow", async ({ withSelectedOffice: page }) => {
   await expect(page).toHaveURL("/cases/new/check-answers");
 
   // Verify address has been updated in the summary list
-  await expect(rows.nth(6).locator(".govuk-summary-list__value")).toHaveText(
+  await expect(
+    rows
+      .filter({ has: page.getByText("Address", { exact: true }) })
+      .locator(".govuk-summary-list__value"),
+  ).toHaveText(
     "10 Some Other Street, Australia",
     { useInnerText: true },
   );

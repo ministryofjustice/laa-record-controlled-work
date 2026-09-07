@@ -202,6 +202,7 @@ describe("Check answers step", () => {
         "have-a-home-address?returnTo=check-answers",
       );
     });
+
   });
 
   describe("POST /cases/new/check-answers", () => {

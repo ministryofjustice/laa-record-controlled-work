@@ -40,19 +40,6 @@ export function formatAddress(): ResolvableString {
 }
 
 /**
- * Formats the address change link.
- * @returns The address change URL.
- */
-export function formatAddressChangeHref(): ResolvableString {
-  return match(Answer("haveAHomeAddress"))
-    .branch(
-      Condition.Equals("no"),
-      "have-a-home-address?returnTo=check-answers",
-    )
-    .otherwise(formatChangeAddressRedirect());
-}
-
-/**
  * Formats the address summary value.
  * @returns The address HTML or no-fixed-address text.
  */

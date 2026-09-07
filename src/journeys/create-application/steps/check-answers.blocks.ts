@@ -14,7 +14,6 @@ import {
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
 import {
-  formatAddressChangeHref,
   formatAddressValue,
   formatDateOfBirth,
   formatEcfLabel,
@@ -130,7 +129,7 @@ export const summaryList = GovUKSummaryList({
       },
     }),
     SummaryRow({
-      href: formatAddressChangeHref(),
+      href: "have-a-home-address?returnTo=check-answers",
       labelKey: "journeys.createApplication.checkAnswers.answerLabels.address",
       value: { html: formatAddressValue() },
     }),
