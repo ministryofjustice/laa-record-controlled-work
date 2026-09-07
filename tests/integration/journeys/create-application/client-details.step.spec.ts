@@ -74,6 +74,24 @@ describe("Client details step", () => {
       expect(redirectResult.url).to.equal("/cases/new/ni-number");
     });
 
+    it("should return to check answers when edited from check answers", async () => {
+      const result = await client.post(
+        "/cases/new/client-details",
+        {
+          query: { returnTo: "check-answers" },
+          body: {
+            firstName: "John",
+            lastName: "Doe",
+            dateOfBirth: { year: "2000", month: "2", day: "2" },
+          } as unknown as Record<string, string | string[]>,
+        },
+      );
+
+      expect(result.type).to.equal("redirect");
+      const redirectResult = result as TestRedirectResult;
+      expect(redirectResult.url).to.equal("/cases/new/check-answers");
+    });
+
     const validationErrorTests: Array<{
       description: string;
       body: Record<string, string | string[] | Record<string, string>>;
