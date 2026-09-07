@@ -95,6 +95,19 @@ describe("NI number step", () => {
       );
     });
 
+    it("returns to check answers when edited from check answers", async () => {
+      const result = await client.post(
+        "/cases/new/ni-number",
+        {
+          query: { returnTo: "check-answers" },
+          body: { hasNINumber: "yes", niNumber: "JN123456A" }, // gitleaks:allow - fake NI number used to test valid format acceptance
+        },
+      );
+      expect(result.type).to.equal("redirect");
+      const redirectResult = result as TestRedirectResult;
+      expect(redirectResult.url).to.equal("/cases/new/check-answers");
+    });
+
     it("redirects to the home address step when no is selected", async () => {
       const result = await client.post("/cases/new/ni-number", {
         body: { hasNINumber: "no" },

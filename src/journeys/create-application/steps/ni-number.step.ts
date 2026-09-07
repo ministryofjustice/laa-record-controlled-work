@@ -1,7 +1,6 @@
 import {
   Answer,
   Condition,
-  Query,
   redirect,
   Self,
   step,
@@ -16,6 +15,10 @@ import {
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
 import { CreateApplicationEffects } from "#/journeys/create-application/create-application.effects.js";
+import {
+  hasCheckAnswersInQuery,
+  redirectToCheckAnswers,
+} from "#/journeys/shared.hook.js";
 import { t } from "#/lib/i18n.js";
 
 export const niNumberStep = (journeyCode: string): ReturnType<typeof step> =>
@@ -85,10 +88,8 @@ export const niNumberStep = (journeyCode: string): ReturnType<typeof step> =>
         onValid: {
           effects: [CreateApplicationEffects.saveDraftAnswers(journeyCode)],
           next: [
-            redirect({
-              goto: "check-answers",
-              when: Query("returnTo").match(Condition.Equals("check-answers")),
-            }),
+            redirectToCheckAnswers,
+
             redirect({ goto: "have-a-home-address" }),
           ],
         },
@@ -97,7 +98,7 @@ export const niNumberStep = (journeyCode: string): ReturnType<typeof step> =>
     ],
     path: "/ni-number",
     reachability: {
-      entryWhen: Query("returnTo").match(Condition.Equals("check-answers")),
+      entryWhen: hasCheckAnswersInQuery,
     },
     title: t("journeys.createApplication.niNumber.title"),
   });
