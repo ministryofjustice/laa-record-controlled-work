@@ -51,8 +51,8 @@ function onSubmission(journeyCode: string): SubmitHook {
     onValid: {
       effects: [CreateApplicationEffects.saveDraftAnswers(journeyCode)],
       next: [
-        redirectToCheckAnswers,
         redirectToECFDropout,
+        redirectToCheckAnswers,
         redirectToLegalAidBefore,
       ],
     },
