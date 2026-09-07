@@ -316,3 +316,44 @@ test("create application flow", async ({ withSelectedOffice: page }) => {
   await expect(page).toHaveURL(`/cases/${applicationId}/task-list`);
 
 });
+
+test("changing no fixed address to yes from check answers reaches address entry", async ({
+  withSelectedOffice: page,
+}) => {
+  await page.goto("/cases/new/provider-declaration");
+  await page.getByRole("button", { name: "Agree and continue" }).click();
+
+  await page.getByRole("radio", { name: "No" }).check();
+  await page.getByRole("button", { name: "Continue" }).click();
+  await page.getByRole("radio", { name: "No" }).check();
+  await page.getByRole("button", { name: "Continue" }).click();
+
+  await page.getByLabel("First name").fill("Jane");
+  await page.getByLabel("Last name").fill("Doe");
+  await page.getByLabel("Day").fill("15");
+  await page.getByLabel("Month").fill("6");
+  await page.getByLabel("Year").fill("1990");
+  await page.getByRole("button", { name: "Continue" }).click();
+
+  await page.getByRole("radio", { name: "No" }).check();
+  await page.getByRole("button", { name: "Continue" }).click();
+  await page.getByRole("radio", { name: "No, they have no fixed address" }).check();
+  await page.getByRole("button", { name: "Continue" }).click();
+  await expect(page).toHaveURL("/cases/new/check-answers");
+
+  const addressRow = page.locator(".govuk-summary-list__row").last();
+  await expect(addressRow.locator(".govuk-summary-list__actions a")).toHaveAttribute(
+    "href",
+    "have-a-home-address?returnTo=check-answers",
+  );
+  await addressRow.locator(".govuk-summary-list__actions a").click();
+
+  await page.getByRole("radio", { name: "Yes" }).check();
+  await page.getByRole("button", { name: "Continue" }).click();
+  await expect(page).toHaveURL(
+    "/cases/new/enter-address-manually?returnTo=check-answers",
+  );
+  await expect(
+    page.getByRole("heading", { name: /Enter your client's home address/ }),
+  ).toBeVisible();
+});
