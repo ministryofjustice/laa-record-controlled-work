@@ -1,7 +1,7 @@
 import {
+  and,
   Answer,
   Condition,
-  Query,
   redirect,
   Self,
   step,
@@ -15,6 +15,10 @@ import {
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
 import { CreateApplicationEffects } from "#/journeys/create-application/create-application.effects.js";
+import {
+  hasCheckAnswersInQuery,
+  redirectToCheckAnswers,
+} from "#/journeys/shared.hook.js";
 import { t } from "#/lib/i18n.js";
 
 export const haveAHomeAddressStep = (
@@ -66,13 +70,20 @@ export const haveAHomeAddressStep = (
           effects: [CreateApplicationEffects.saveDraftAnswers(journeyCode)],
           next: [
             redirect({
-              goto: "check-answers",
-              when: Query("returnTo").match(Condition.Equals("check-answers")),
+              goto: "enter-address-manually?returnTo=check-answers",
+              when: and(
+                hasCheckAnswersInQuery,
+                Answer("haveAHomeAddress").match(Condition.Equals("yes")),
+              ),
             }),
+
+            redirectToCheckAnswers,
+
             redirect({
               goto: "enter-address-manually",
               when: Answer("haveAHomeAddress").match(Condition.Equals("yes")),
             }),
+
             redirect({
               goto: "check-answers",
               when: Answer("haveAHomeAddress").match(Condition.Equals("no")),
@@ -84,7 +95,7 @@ export const haveAHomeAddressStep = (
     ],
     path: "/have-a-home-address",
     reachability: {
-      entryWhen: Query("returnTo").match(Condition.Equals("check-answers")),
+      entryWhen: hasCheckAnswersInQuery,
     },
     title: t("journeys.createApplication.haveAHomeAddress.title"),
   });

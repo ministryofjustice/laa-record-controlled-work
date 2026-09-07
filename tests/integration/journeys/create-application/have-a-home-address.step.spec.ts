@@ -85,6 +85,38 @@ describe("Have A Home Address Step", () => {
       );
     });
 
+    it("should preserve check answers when redirecting to enter address manually", async () => {
+      const result = await client.post(
+        "/cases/new/have-a-home-address",
+        {
+          query: { returnTo: "check-answers" },
+          body: {
+            haveAHomeAddress: "yes",
+          },
+        },
+      );
+      expect(result.type).to.equal("redirect");
+      const redirectResult = result as TestRedirectResult;
+      expect(redirectResult.url).to.equal(
+        "/cases/new/enter-address-manually?returnTo=check-answers",
+      );
+    });
+
+    it("should return to check answers when no is selected from check answers", async () => {
+      const result = await client.post(
+        "/cases/new/have-a-home-address",
+        {
+          query: { returnTo: "check-answers" },
+          body: {
+            haveAHomeAddress: "no",
+          },
+        },
+      );
+      expect(result.type).to.equal("redirect");
+      const redirectResult = result as TestRedirectResult;
+      expect(redirectResult.url).to.equal("/cases/new/check-answers");
+    });
+
     it("should redirect to Check answers step if no", async () => {
       const result = await client.post(
         "/cases/new/have-a-home-address",
