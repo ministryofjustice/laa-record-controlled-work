@@ -66,6 +66,23 @@ describe("Legal aid before step", () => {
       expect(redirectResult.url).to.equal("/cases/new/legal-aid-last-6-months");
     });
 
+    it("should preserve check answers when redirecting to legal aid last 6 months", async () => {
+      const result = await client.post(
+        "/cases/new/legal-aid-before",
+        {
+          query: { returnTo: "check-answers" },
+          body: {
+            legalAidBefore: "yesSameMatter",
+          },
+        },
+      );
+      expect(result.type).to.equal("redirect");
+      const redirectResult = result as TestRedirectResult;
+      expect(redirectResult.url).to.equal(
+        "/cases/new/legal-aid-last-6-months?returnTo=check-answers",
+      );
+    });
+
     it("should redirect to client details step if yes, different matter", async () => {
       const result = await client.post("/cases/new/legal-aid-before", {
         body: {
@@ -75,6 +92,23 @@ describe("Legal aid before step", () => {
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
       expect(redirectResult.url).to.equal("/cases/new/client-details");
+    });
+
+    it("should preserve check answers when redirecting to client details", async () => {
+      const result = await client.post(
+        "/cases/new/legal-aid-before",
+        {
+          query: { returnTo: "check-answers" },
+          body: {
+            legalAidBefore: "yesDifferentMatter",
+          },
+        },
+      );
+      expect(result.type).to.equal("redirect");
+      const redirectResult = result as TestRedirectResult;
+      expect(redirectResult.url).to.equal(
+        "/cases/new/client-details?returnTo=check-answers",
+      );
     });
 
     it("should redirect to client details step if no, different matter", async () => {

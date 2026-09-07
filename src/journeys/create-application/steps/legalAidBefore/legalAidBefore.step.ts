@@ -1,4 +1,5 @@
 import {
+  and,
   Answer,
   Condition,
   redirect,
@@ -61,18 +62,33 @@ function onSubmission(journeyCode: string): SubmitHook {
     onValid: {
       effects: [CreateApplicationEffects.saveDraftAnswers(journeyCode)],
       next: [
+        redirect({
+          goto: `${StepCode.LEGAL_AID_LAST_6_MONTHS}?returnTo=check-answers`,
+          when: and(
+            hasCheckAnswersInQuery,
+            Answer(AnswerKey.legalAidBefore).match(
+              Condition.Equals("yesSameMatter"),
+            ),
+          ),
+        }),
+
+        redirect({
+          goto: `${StepCode.CLIENT_DETAILS}?returnTo=check-answers`,
+          when: hasCheckAnswersInQuery,
+        }),
+
         redirectToCheckAnswers,
-        redirectWhenSameMatter,
+
+        redirect({
+          goto: StepCode.LEGAL_AID_LAST_6_MONTHS,
+          when: Answer(AnswerKey.legalAidBefore).match(
+            Condition.Equals("yesSameMatter"),
+          ),
+        }),
+
         redirect({ goto: StepCode.CLIENT_DETAILS }),
       ],
     },
     validate: true,
   });
 }
-
-const redirectWhenSameMatter = redirect({
-  goto: StepCode.LEGAL_AID_LAST_6_MONTHS,
-  when: Answer(AnswerKey.legalAidBefore).match(
-    Condition.Equals("yesSameMatter"),
-  ),
-});

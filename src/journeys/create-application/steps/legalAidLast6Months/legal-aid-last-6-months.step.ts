@@ -50,6 +50,7 @@ function onSubmission(journeyCode: string): SubmitHook {
     onValid: {
       effects: [CreateApplicationEffects.saveDraftAnswers(journeyCode)],
       next: [
+        redirectToClientDetailsFromCheckAnswers,
         redirectToCheckAnswers,
         redirect({ goto: StepCode.CLIENT_DETAILS }),
       ],
@@ -57,3 +58,8 @@ function onSubmission(journeyCode: string): SubmitHook {
     validate: true,
   });
 }
+
+const redirectToClientDetailsFromCheckAnswers = redirect({
+  goto: `${StepCode.CLIENT_DETAILS}?returnTo=check-answers`,
+  when: hasCheckAnswersInQuery,
+});
