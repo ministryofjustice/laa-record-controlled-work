@@ -107,6 +107,36 @@ describe("Check answers step", () => {
       expect(niNumberRow).to.not.be.undefined;
     });
 
+    it("renders no when hasNINumber is 'no'", async () => {
+      const result = await client.get("/cases/new/check-answers", {
+        session: {
+          ...session,
+          journeyDrafts: {
+            createApplication: {
+              ...session.journeyDrafts.createApplication,
+              hasNINumber: "no",
+              niNumber: undefined,
+            },
+          },
+        },
+      });
+
+      expect(result.type).to.equal("render");
+      const noNiRender = result as TestRenderResult;
+      const [noNiSummaryList] = noNiRender.getBlocksByVariant(
+        "govukSummaryList",
+      );
+      const rows = noNiSummaryList.properties.rows as Array<{
+        key: { text: string };
+        value: { text: string };
+      }>;
+      const niNumberRow = rows.find(
+        (row) => row.key.text === "National Insurance number",
+      );
+
+      expect(niNumberRow?.value.text).to.equal("No");
+    });
+
     it("renders the address in the correct format", () => {
       const rows = summaryList.properties.rows as Array<{
         key: { text: string };
