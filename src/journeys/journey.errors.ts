@@ -7,7 +7,7 @@ export class InvalidEvidenceError extends DomainError {
   constructor(cause?: unknown) {
     super("Invalid Evidence Answers", cause);
   }
-}
+} 
 
 export class InvalidFirmCodeClaimError extends DomainError {
   public readonly name = "InvalidFirmCodeClaimError";
