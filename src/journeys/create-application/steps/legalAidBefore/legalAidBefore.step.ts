@@ -72,11 +72,6 @@ function onSubmission(journeyCode: string): SubmitHook {
           ),
         }),
 
-        redirect({
-          goto: `${StepCode.CLIENT_DETAILS}?returnTo=check-answers`,
-          when: hasCheckAnswersInQuery,
-        }),
-
         redirectToCheckAnswers,
 
         redirect({
