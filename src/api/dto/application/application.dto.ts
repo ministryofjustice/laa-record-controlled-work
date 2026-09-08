@@ -7,6 +7,17 @@ import {
 } from "#/journeys/journey.constants.js";
 import { mapCountryNameToIsoCode } from "#/lib/countries.js";
 
+interface Address {
+  addressLine1: string;
+  addressLine2?: string;
+  addressLine3?: string;
+  addressLine4?: string;
+  country: string;
+  county?: string;
+  postcode?: string;
+  townOrCity?: string;
+}
+
 interface Application {
   addressLine1: string;
   addressLine2?: string;
@@ -25,17 +36,6 @@ interface Application {
   providerOfficeCode: string;
   reasonForReapplication?: string;
   scopingQuestions: Record<string, unknown>;
-  townOrCity?: string;
-}
-
-interface Address {
-  addressLine1: string;
-  addressLine2?: string;
-  addressLine3?: string;
-  addressLine4?: string;
-  country: string;
-  county?: string;
-  postcode?: string;
   townOrCity?: string;
 }
 
@@ -81,11 +81,13 @@ export class ApplicationDto {
     answers: AnswersOutput,
     providerOfficeCode: string,
   ): ApplicationDto {
+    const hasFixedAddress = answers.haveAHomeAddress === "yes";
+
     return new ApplicationDto({
-      ...this.getAddressFromAnswers(answers),
+      ...this.getAddressFromAnswers(answers, hasFixedAddress),
       dateOfBirth: answers.dateOfBirth,
       firstName: answers.firstName,
-      hasFixedAddress: answers.haveAHomeAddress === "yes",
+      hasFixedAddress,
       lastName: answers.lastName,
       legalAidBefore: answers.legalAidBefore,
       legalAidLast6Months: answers.legalAidLast6Months === "yes",
@@ -100,36 +102,67 @@ export class ApplicationDto {
 
   /**
    * Set the address fields based off whether the address is UK or overseas.
-   * @param answers
+   * @param answers - The answers from which to extract the address fields.
+   * @param hasFixedAddress - boolean reused from above.
+   * @returns Address object containing the address fields.
    */
-  public static getAddressFromAnswers(answers: AnswersOutput) {
+  public static getAddressFromAnswers(
+    answers: AnswersOutput,
+    hasFixedAddress: boolean,
+  ): Address {
     const isUkAddress = answers[UK_ADDRESS_FIELDS.country] === "United Kingdom";
 
-    const countryName = isUkAddress
-      ? answers[UK_ADDRESS_FIELDS.country]
-      : answers[OVERSEAS_ADDRESS_FIELDS.country];
-    const hasFixedAddress = answers.haveAHomeAddress === "yes";
+    return isUkAddress
+      ? this.getUkAddressFromAnswers(answers, hasFixedAddress)
+      : this.getOverseasAddressFromAnswers(answers, hasFixedAddress);
+  }
+
+  /**
+   * Extract UK address fields from the answers.
+   * @param answers - The answers from which to extract the address fields.
+   * @param hasFixedAddress - boolean reused from above.
+   * @returns Address object containing the UK address fields.
+   */
+  private static getUkAddressFromAnswers(
+    answers: AnswersOutput,
+    hasFixedAddress: boolean,
+  ): Address {
+    const countryName = answers[UK_ADDRESS_FIELDS.country];
 
     return {
-      addressLine1: isUkAddress
-        ? answers[UK_ADDRESS_FIELDS.addressLine1]
-        : answers[OVERSEAS_ADDRESS_FIELDS.addressLine1],
-      addressLine2: isUkAddress
-        ? answers[UK_ADDRESS_FIELDS.addressLine2]
-        : answers[OVERSEAS_ADDRESS_FIELDS.addressLine2],
-      addressLine3: isUkAddress
-        ? undefined
-        : answers[OVERSEAS_ADDRESS_FIELDS.addressLine3],
-      addressLine4: isUkAddress
-        ? undefined
-        : answers[OVERSEAS_ADDRESS_FIELDS.addressLine4],
+      addressLine1: answers[UK_ADDRESS_FIELDS.addressLine1],
+      addressLine2: answers[UK_ADDRESS_FIELDS.addressLine2],
       country:
         hasFixedAddress && countryName
           ? mapCountryNameToIsoCode(countryName)
           : undefined,
-      county: isUkAddress ? answers[UK_ADDRESS_FIELDS.county] : undefined,
-      postcode: isUkAddress ? answers[UK_ADDRESS_FIELDS.postcode] : undefined,
-      townOrCity: isUkAddress ? answers[UK_ADDRESS_FIELDS.townOrCity] : undefined,
+      county: answers[UK_ADDRESS_FIELDS.county],
+      postcode: answers[UK_ADDRESS_FIELDS.postcode],
+      townOrCity: answers[UK_ADDRESS_FIELDS.townOrCity],
+    } as Address;
+  }
+
+  /**
+   * Extract overseas address fields from the answers.
+   * @param answers - The answers from which to extract the address fields.
+   * @param hasFixedAddress - boolean reused from above.
+   * @returns Address object containing the overseas address fields.
+   */
+  private static getOverseasAddressFromAnswers(
+    answers: AnswersOutput,
+    hasFixedAddress: boolean,
+  ): Address {
+    const countryName = answers[OVERSEAS_ADDRESS_FIELDS.country];
+
+    return {
+      addressLine1: answers[OVERSEAS_ADDRESS_FIELDS.addressLine1],
+      addressLine2: answers[OVERSEAS_ADDRESS_FIELDS.addressLine2],
+      addressLine3: answers[OVERSEAS_ADDRESS_FIELDS.addressLine3],
+      addressLine4: answers[OVERSEAS_ADDRESS_FIELDS.addressLine4],
+      country:
+        hasFixedAddress && countryName
+          ? mapCountryNameToIsoCode(countryName)
+          : undefined,
     } as Address;
   }
 
