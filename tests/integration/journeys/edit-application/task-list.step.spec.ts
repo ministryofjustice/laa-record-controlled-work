@@ -127,7 +127,9 @@ describe("Task list step", () => {
           .getBlocksByVariant("html")
           .filter((block) => block.properties.visibleWhen !== false)
           .some((block) =>
-            String(block.properties.content).includes("Evidence and Declaration"),
+            String(block.properties.content).includes(
+              "Evidence and Declaration",
+            ),
           ),
       ).to.equal(false);
       expect(
@@ -248,7 +250,9 @@ describe("Task list step", () => {
           .items as RenderedTaskListItem[];
         const meansAssessmentItem = meansAssessmentItems[0];
 
-        expect(meansAssessmentItem.href).to.equal(`/cases/${uuid}/eligibility/`);
+        expect(meansAssessmentItem.href).to.equal(
+          `/cases/${uuid}/eligibility/`,
+        );
         expect(meansAssessmentItem.status.tag?.text).to.equal("Incomplete");
       });
     });
@@ -375,9 +379,22 @@ describe("Task list step", () => {
     });
 
     it("shows the Record Controlled Work button when readyForSubmission is true", async () => {
+      const completeMockData = getGetApplicationResponseMock({
+        eligibility: eligibilityResult,
+        evidence: {
+          evidenceExemptionCode: "something",
+          evidenceExemptionReason: "something",
+          incomeEvidenceChecklist: { complete: true },
+          expenditureCapitalEvidenceChecklist: { complete: true },
+        },
+        declaration: {
+          declarationConfirmation: true,
+        },
+      });
+
       getApplicationStub.resolves({
         status: 200,
-        data: getGetApplicationResponseMock(),
+        data: completeMockData,
       });
 
       const result = await client.get(`/cases/${uuid}/task-list`, {
