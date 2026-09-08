@@ -94,7 +94,7 @@ describe("Legal aid before 6 months step", () => {
       expect(
         renderResult.getValidationErrorsByFieldCode(reasonForYesFieldCode)[0]
           .message,
-      ).to.equal("The reason must be 500 characters or fewer");
+      ).to.equal("Reason must not exceed 500 characters");
     });
 
     it("should redirect to legal aid last 6 months step if yes", async () => {
