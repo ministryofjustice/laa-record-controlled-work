@@ -2,7 +2,6 @@ import { access, journey } from "@ministryofjustice/hmpps-forge/core/authoring";
 
 import { checkAnswersStep } from "#/journeys/edit-client-details/steps/check-answers/check-answers.step.js";
 import { clientDetailsStep } from "#/journeys/create-application/steps/client-details.step.js";
-import { declarationStep } from "#/journeys/create-application/steps/declaration/declaration.step.js";
 import { ecfStep } from "#/journeys/create-application/steps/ecf/ecf.step.js";
 import { ineligibleStep } from "#/journeys/create-application/steps/ecfDropout/ecfDropout.step.js";
 import { enterAddressManuallyStep } from "#/journeys/create-application/steps/enter-address-manually.step.js";
@@ -30,7 +29,6 @@ export const editClientDetailsJourney = journey({
   path: "/cases/:applicationID/edit-client-details",
   reachability: { disableReachabilityChecks: false },
   steps: [
-    declarationStep(),
     ecfStep(JourneyCode.EDIT_CLIENT_DETAILS),
     ineligibleStep(JourneyCode.EDIT_CLIENT_DETAILS),
     legalAidBeforeStep(JourneyCode.EDIT_CLIENT_DETAILS),
