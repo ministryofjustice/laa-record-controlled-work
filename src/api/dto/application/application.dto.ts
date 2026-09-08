@@ -28,6 +28,8 @@ interface Application {
   townOrCity?: string;
 }
 
+interface Address {
+  addressLine1: string;
   addressLine2?: string;
   addressLine3?: string;
   addressLine4?: string;
@@ -35,6 +37,7 @@ interface Application {
   county?: string;
   postcode?: string;
   townOrCity?: string;
+}
 
 /**
  * Data transfer object for an application.
