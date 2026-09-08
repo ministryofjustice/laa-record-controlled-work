@@ -1,8 +1,10 @@
 import type { CreateApplicationRequestBody } from "#/api/clients/rcw/model/createApplicationRequestBody.zod.gen.js";
 import type { AnswersOutput } from "#/journeys/create-application/data/answers.zod.js";
 
-import { ADDRESS_FIELD } from "#/journeys/journey.constants.js";
-import { mapCountryNameToIsoCode } from "#/lib/countries.js";
+import { OVERSEAS_ADDRESS_FIELDS, UK_ADDRESS_FIELDS } from "#/journeys/journey.constants.js";
+import {
+  mapCountryNameToIsoCode,
+} from "#/lib/countries.js";
 
 interface Application {
   addressLine1: string;
@@ -68,18 +70,21 @@ export class ApplicationDto {
     providerOfficeCode: string,
   ): ApplicationDto {
     const hasFixedAddress = answers.haveAHomeAddress === "yes";
-    const countryName = answers[ADDRESS_FIELD.country];
+
+    const isUkAddress = answers[UK_ADDRESS_FIELDS.country] !== undefined;
+
+    const countryName = isUkAddress ? answers[UK_ADDRESS_FIELDS.country] : answers[OVERSEAS_ADDRESS_FIELDS.country];
 
     return new ApplicationDto({
-      addressLine1: answers[ADDRESS_FIELD.addressLine1] ?? "",
-      addressLine2: answers[ADDRESS_FIELD.addressLine2],
-      addressLine3: answers[ADDRESS_FIELD.addressLine3],
-      addressLine4: answers[ADDRESS_FIELD.addressLine4],
+      addressLine1: (isUkAddress ? answers[UK_ADDRESS_FIELDS.addressLine1] : answers[OVERSEAS_ADDRESS_FIELDS.addressLine1]) ?? "",
+      addressLine2: isUkAddress ? answers[UK_ADDRESS_FIELDS.addressLine2] : answers[OVERSEAS_ADDRESS_FIELDS.addressLine2],
+      addressLine3: isUkAddress ? "" : answers[OVERSEAS_ADDRESS_FIELDS.addressLine3],
+      addressLine4: isUkAddress ? "" : answers[OVERSEAS_ADDRESS_FIELDS.addressLine4],
       country:
         hasFixedAddress && countryName
           ? mapCountryNameToIsoCode(countryName)
           : "",
-      county: answers[ADDRESS_FIELD.county],
+      county:  isUkAddress ? answers[UK_ADDRESS_FIELDS.county] : "",
       dateOfBirth: answers.dateOfBirth,
       firstName: answers.firstName,
       hasFixedAddress,
@@ -87,13 +92,13 @@ export class ApplicationDto {
       legalAidBefore: answers.legalAidBefore,
       legalAidLast6Months: answers.legalAidLast6Months === "yes",
       niNumber: answers.niNumber,
-      postcode: answers[ADDRESS_FIELD.postcode],
+      postcode: isUkAddress ? answers[UK_ADDRESS_FIELDS.postcode] : "",
       providerOfficeCode,
       reasonForReapplication: answers.reasonForYes,
       scopingQuestions: {
         priorLegalAid: answers.legalAidBefore,
       },
-      townOrCity: answers[ADDRESS_FIELD.townOrCity],
+      townOrCity: isUkAddress ? answers[UK_ADDRESS_FIELDS.townOrCity] : "",
     });
   }
 
