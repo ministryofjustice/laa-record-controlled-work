@@ -12,15 +12,15 @@ export const BadRequestResponse = zod.object({
   status: zod.int().describe("HTTP status code"),
   detail: zod
     .string()
-    .optional()
+    .nullish()
     .describe("Human-readable explanation specific to this occurrence"),
   instance: zod
     .url()
-    .optional()
+    .nullish()
     .describe("URI reference identifying the specific occurrence"),
   reason: zod
     .string()
-    .optional()
+    .nullish()
     .describe(
       "Machine-readable code identifying the exact violation, e.g. APPLICATION_NOT_FOUND",
     ),
