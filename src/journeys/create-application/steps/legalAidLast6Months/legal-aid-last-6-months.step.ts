@@ -1,4 +1,6 @@
 import {
+  Answer,
+  Condition,
   redirect,
   step,
   submit,
@@ -29,24 +31,41 @@ export const legalAidLast6MonthsStep = (
       legalAidLast6MonthsRadioInput(),
       continueButton(),
     ],
-    onSubmission: [onSubmission(journeyCode)],
+    onSubmission: [
+      submitValidNo(journeyCode),
+      submitValidYes(journeyCode),
+
+      submit({
+        onInvalid: {},
+        validate: true,
+      }),
+    ],
     path: "/legal-aid-last-6-months",
     reachability: {
       entryWhen: hasCheckAnswersInQuery,
     },
     title: TITLE,
   });
+const submitValidNo = (journeyCode: string): SubmitHook =>
+  submit({
+    onValid: {
+      effects: [
+        CreateApplicationEffects.clearFieldAnswers(journeyCode, [
+          "reasonForYes",
+        ]),
+        CreateApplicationEffects.saveDraftAnswers(journeyCode),
+      ],
+      next: [
+        redirectToCheckAnswers,
+        redirect({ goto: StepCode.CLIENT_DETAILS }),
+      ],
+    },
+    validate: true,
+    when: Answer("legalAidLast6Months").match(Condition.Equals("no")),
+  });
 
-/**
- * Handles form submission for the legal aid in last 6 months question step.
- * Saves draft answers and routes based on the answer:
- * - redirects to client details step
- *
- * @param {string} journeyCode - The journey code for saving draft answers
- * @returns {SubmitHook} A submit hook with validation and conditional routing logic
- */
-function onSubmission(journeyCode: string): SubmitHook {
-  return submit({
+const submitValidYes = (journeyCode: string): SubmitHook =>
+  submit({
     onValid: {
       effects: [CreateApplicationEffects.saveDraftAnswers(journeyCode)],
       next: [
@@ -55,5 +74,5 @@ function onSubmission(journeyCode: string): SubmitHook {
       ],
     },
     validate: true,
+    when: Answer("legalAidLast6Months").match(Condition.Equals("yes")),
   });
-}

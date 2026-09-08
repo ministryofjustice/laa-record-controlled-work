@@ -93,7 +93,7 @@ describe("Legal aid before 6 months step", () => {
       expect(redirectResult.url).to.equal("/cases/new/client-details");
     });
 
-    it("should preserve check answers when redirecting to client details", async () => {
+    it("should return to check answers when edited from check answers", async () => {
       const result = await client.post(
         "/cases/new/legal-aid-last-6-months",
         {
@@ -106,23 +106,33 @@ describe("Legal aid before 6 months step", () => {
       );
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
-      expect(redirectResult.url).to.equal(
-        "/cases/new/client-details?returnTo=check-answers",
-      );
+      expect(redirectResult.url).to.equal("/cases/new/check-answers");
     });
 
     it("should redirect to client details step if no, different matter", async () => {
+      const session = {
+        journeyDrafts: {
+          createApplication: {
+            legalAidLast6Months: "yes",
+            reasonForYes: "Existing reason",
+          },
+        },
+      };
       const result = await client.post(
         "/cases/new/legal-aid-last-6-months",
         {
           body: {
             legalAidLast6Months: "no",
           },
+          session,
         },
       );
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
       expect(redirectResult.url).to.equal("/cases/new/client-details");
+      expect(session.journeyDrafts.createApplication).to.deep.equal({
+        legalAidLast6Months: "no",
+      });
     });
   });
 });
