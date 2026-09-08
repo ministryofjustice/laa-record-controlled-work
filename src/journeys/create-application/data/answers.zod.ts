@@ -2,15 +2,6 @@ import { z as zod } from "zod";
 
 export const Answers = zod
   .object({
-    osAddressLine1: zod.string().optional(),
-    osAddressLine2: zod.string().optional(),
-    osAddressLine3: zod.string().optional(),
-    osAddressLine4: zod.string().optional(),
-    osCountry: zod.string().optional(),
-    ukCountry: zod.string().optional(),
-    ukAddressLine1: zod.string().optional(),
-    ukAddressLine2: zod.string().optional(),
-    ukCounty: zod.string().optional(),
     dateOfBirth: zod.string(),
     ecf: zod.string(),
     firstName: zod.string(),
@@ -20,8 +11,17 @@ export const Answers = zod
     legalAidBefore: zod.string(),
     legalAidLast6Months: zod.string().optional(),
     niNumber: zod.string().optional(),
-    ukPostcode: zod.string().optional(),
+    osAddressLine1: zod.string().optional(),
+    osAddressLine2: zod.string().optional(),
+    osAddressLine3: zod.string().optional(),
+    osAddressLine4: zod.string().optional(),
+    osCountry: zod.string().optional(),
     reasonForYes: zod.string().optional(),
+    ukAddressLine1: zod.string().optional(),
+    ukAddressLine2: zod.string().optional(),
+    ukCountry: zod.string().optional(),
+    ukCounty: zod.string().optional(),
+    ukPostcode: zod.string().optional(),
     ukTownOrCity: zod.string().optional(),
   })
   .superRefine((answers, context) => {

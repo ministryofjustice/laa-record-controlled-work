@@ -17,7 +17,7 @@ import {
 import { CreateApplicationEffects } from "#/journeys/create-application/create-application.effects.js";
 import {
   OVERSEAS_ADDRESS_FIELDS,
-  UK_ADDRESS_FIELDS
+  UK_ADDRESS_FIELDS,
 } from "#/journeys/journey.constants.js";
 import { t } from "#/lib/i18n.js";
 

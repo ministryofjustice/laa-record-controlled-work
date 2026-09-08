@@ -5,10 +5,10 @@ import { Applications } from "#/api/clients/rcw/model/applications.zod.gen.js";
 export const UK_ADDRESS_FIELDS = {
   addressLine1: "ukAddressLine1",
   addressLine2: "ukAddressLine2",
+  country: "ukCountry",
   county: "ukCounty",
   postcode: "ukPostcode",
   townOrCity: "ukTownOrCity",
-  country: "ukCountry",
 } as const;
 
 export const OVERSEAS_ADDRESS_FIELDS = {

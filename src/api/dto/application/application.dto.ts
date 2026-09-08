@@ -1,10 +1,11 @@
 import type { CreateApplicationRequestBody } from "#/api/clients/rcw/model/createApplicationRequestBody.zod.gen.js";
 import type { AnswersOutput } from "#/journeys/create-application/data/answers.zod.js";
 
-import { OVERSEAS_ADDRESS_FIELDS, UK_ADDRESS_FIELDS } from "#/journeys/journey.constants.js";
 import {
-  mapCountryNameToIsoCode,
-} from "#/lib/countries.js";
+  OVERSEAS_ADDRESS_FIELDS,
+  UK_ADDRESS_FIELDS,
+} from "#/journeys/journey.constants.js";
+import { mapCountryNameToIsoCode } from "#/lib/countries.js";
 
 interface Application {
   addressLine1: string;
@@ -26,6 +27,14 @@ interface Application {
   scopingQuestions: Record<string, unknown>;
   townOrCity?: string;
 }
+
+  addressLine2?: string;
+  addressLine3?: string;
+  addressLine4?: string;
+  country: string;
+  county?: string;
+  postcode?: string;
+  townOrCity?: string;
 
 /**
  * Data transfer object for an application.
@@ -69,37 +78,56 @@ export class ApplicationDto {
     answers: AnswersOutput,
     providerOfficeCode: string,
   ): ApplicationDto {
-    const hasFixedAddress = answers.haveAHomeAddress === "yes";
-
-    const isUkAddress = answers[UK_ADDRESS_FIELDS.country] !== undefined;
-
-    const countryName = isUkAddress ? answers[UK_ADDRESS_FIELDS.country] : answers[OVERSEAS_ADDRESS_FIELDS.country];
-
     return new ApplicationDto({
-      addressLine1: (isUkAddress ? answers[UK_ADDRESS_FIELDS.addressLine1] : answers[OVERSEAS_ADDRESS_FIELDS.addressLine1]) ?? "",
-      addressLine2: isUkAddress ? answers[UK_ADDRESS_FIELDS.addressLine2] : answers[OVERSEAS_ADDRESS_FIELDS.addressLine2],
-      addressLine3: isUkAddress ? "" : answers[OVERSEAS_ADDRESS_FIELDS.addressLine3],
-      addressLine4: isUkAddress ? "" : answers[OVERSEAS_ADDRESS_FIELDS.addressLine4],
-      country:
-        hasFixedAddress && countryName
-          ? mapCountryNameToIsoCode(countryName)
-          : "",
-      county:  isUkAddress ? answers[UK_ADDRESS_FIELDS.county] : "",
+      ...this.getAddressFromAnswers(answers),
       dateOfBirth: answers.dateOfBirth,
       firstName: answers.firstName,
-      hasFixedAddress,
+      hasFixedAddress: answers.haveAHomeAddress === "yes",
       lastName: answers.lastName,
       legalAidBefore: answers.legalAidBefore,
       legalAidLast6Months: answers.legalAidLast6Months === "yes",
       niNumber: answers.niNumber,
-      postcode: isUkAddress ? answers[UK_ADDRESS_FIELDS.postcode] : "",
       providerOfficeCode,
       reasonForReapplication: answers.reasonForYes,
       scopingQuestions: {
         priorLegalAid: answers.legalAidBefore,
       },
-      townOrCity: isUkAddress ? answers[UK_ADDRESS_FIELDS.townOrCity] : "",
     });
+  }
+
+  /**
+   * Set the address fields based off whether the address is UK or overseas.
+   * @param answers
+   */
+  public static getAddressFromAnswers(answers: AnswersOutput) {
+    const isUkAddress = answers[UK_ADDRESS_FIELDS.country] === "United Kingdom";
+
+    const countryName = isUkAddress
+      ? answers[UK_ADDRESS_FIELDS.country]
+      : answers[OVERSEAS_ADDRESS_FIELDS.country];
+    const hasFixedAddress = answers.haveAHomeAddress === "yes";
+
+    return {
+      addressLine1: isUkAddress
+        ? answers[UK_ADDRESS_FIELDS.addressLine1]
+        : answers[OVERSEAS_ADDRESS_FIELDS.addressLine1],
+      addressLine2: isUkAddress
+        ? answers[UK_ADDRESS_FIELDS.addressLine2]
+        : answers[OVERSEAS_ADDRESS_FIELDS.addressLine2],
+      addressLine3: isUkAddress
+        ? ""
+        : answers[OVERSEAS_ADDRESS_FIELDS.addressLine3],
+      addressLine4: isUkAddress
+        ? ""
+        : answers[OVERSEAS_ADDRESS_FIELDS.addressLine4],
+      country:
+        hasFixedAddress && countryName
+          ? mapCountryNameToIsoCode(countryName)
+          : "",
+      county: isUkAddress ? answers[UK_ADDRESS_FIELDS.county] : "",
+      postcode: isUkAddress ? answers[UK_ADDRESS_FIELDS.postcode] : "",
+      townOrCity: isUkAddress ? answers[UK_ADDRESS_FIELDS.townOrCity] : "",
+    } as Address;
   }
 
   /**
