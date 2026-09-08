@@ -20,9 +20,18 @@ export const incompleteApplication = getGetApplicationResponseMock({
 });
 
 export const completeApplication = getGetApplicationResponseMock({
+  declaration: {
+    declarationConfirmation: true,
+  },
   eligibility: {
     result: {
       result_summary: { overall_result: { result: "eligible" } },
     },
+  },
+  evidence: {
+    evidenceExemptionCode: "none",
+    evidenceExemptionReason: "Not exempt",
+    expenditureCapitalEvidenceChecklist: { complete: true },
+    incomeEvidenceChecklist: { complete: true },
   },
 });
