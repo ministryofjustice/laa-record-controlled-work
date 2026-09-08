@@ -171,10 +171,21 @@ export const createApplication = async (
   createApplicationRequestBody?: CreateApplicationRequestBody,
   options?: RequestInit,
 ): Promise<createApplicationResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
   const res = await fetch(getCreateApplicationUrl(), {
     ...options,
     method: "POST",
-    headers: { "Content-Type": "application/json", ...options?.headers },
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
     body: JSON.stringify(createApplicationRequestBody),
   });
 
@@ -320,10 +331,21 @@ export const updateApplicationEvidence = async (
   updateEvidenceRequestBody: UpdateEvidenceRequestBody,
   options?: RequestInit,
 ): Promise<updateApplicationEvidenceResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
   const res = await fetch(getUpdateApplicationEvidenceUrl(id), {
     ...options,
     method: "PUT",
-    headers: { "Content-Type": "application/json", ...options?.headers },
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
     body: JSON.stringify(updateEvidenceRequestBody),
   });
 
@@ -404,10 +426,21 @@ export const updateApplicationMeans = async (
   updateMeansDataRequestBody: UpdateMeansDataRequestBody,
   options?: RequestInit,
 ): Promise<updateApplicationMeansResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
   const res = await fetch(getUpdateApplicationMeansUrl(id), {
     ...options,
     method: "PUT",
-    headers: { "Content-Type": "application/json", ...options?.headers },
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
     body: JSON.stringify(updateMeansDataRequestBody),
   });
 
@@ -489,10 +522,21 @@ export const updateApplicationDeclaration = async (
   updateDeclarationRequestBody: UpdateDeclarationRequestBody,
   options?: RequestInit,
 ): Promise<updateApplicationDeclarationResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
   const res = await fetch(getUpdateApplicationDeclarationUrl(id), {
     ...options,
     method: "PUT",
-    headers: { "Content-Type": "application/json", ...options?.headers },
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
     body: JSON.stringify(updateDeclarationRequestBody),
   });
 
@@ -573,10 +617,21 @@ export const updateApplicationStatus = async (
   updateApplicationStatusRequestBody: UpdateApplicationStatusRequestBody,
   options?: RequestInit,
 ): Promise<updateApplicationStatusResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
   const res = await fetch(getUpdateApplicationStatusUrl(id), {
     ...options,
     method: "PATCH",
-    headers: { "Content-Type": "application/json", ...options?.headers },
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
     body: JSON.stringify(updateApplicationStatusRequestBody),
   });
 
