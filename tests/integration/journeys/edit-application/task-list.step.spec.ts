@@ -131,18 +131,14 @@ describe("Task list step", () => {
             String(block.properties.content).includes("Evidence and Declaration"),
           ),
       ).to.equal(false);
-      expect(
-        Object.values(
-          (eligibilityResultRender.getBlocksByVariant("templateWrapper")[0]
-            .properties.slots ?? {}) as Record<string, RenderBlock[]>,
-        )
-          .flat()
-          .some(
-            (block) =>
-              block.properties.visibleWhen !== false &&
-              block.properties.text === "Close case",
-          ),
-      ).to.equal(true);
+      const [buttonGroup] = eligibilityResultRender.getBlocksByVariant(
+        "govukButtonGroup",
+      );
+      const buttons = buttonGroup.properties.buttons as RenderBlock[];
+      const closeCaseButton = buttons.find(
+        (button) => button.properties.text === "Close case",
+      );
+      expect(closeCaseButton).to.exist;
       expect(indicator).to.include(
         `href="/cases/${uuid}/eligibility/?destination=check-result"`,
       );
