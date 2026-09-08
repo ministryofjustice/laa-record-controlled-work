@@ -118,18 +118,18 @@ export class ApplicationDto {
         ? answers[UK_ADDRESS_FIELDS.addressLine2]
         : answers[OVERSEAS_ADDRESS_FIELDS.addressLine2],
       addressLine3: isUkAddress
-        ? ""
+        ? undefined
         : answers[OVERSEAS_ADDRESS_FIELDS.addressLine3],
       addressLine4: isUkAddress
-        ? ""
+        ? undefined
         : answers[OVERSEAS_ADDRESS_FIELDS.addressLine4],
       country:
         hasFixedAddress && countryName
           ? mapCountryNameToIsoCode(countryName)
-          : "",
-      county: isUkAddress ? answers[UK_ADDRESS_FIELDS.county] : "",
-      postcode: isUkAddress ? answers[UK_ADDRESS_FIELDS.postcode] : "",
-      townOrCity: isUkAddress ? answers[UK_ADDRESS_FIELDS.townOrCity] : "",
+          : undefined,
+      county: isUkAddress ? answers[UK_ADDRESS_FIELDS.county] : undefined,
+      postcode: isUkAddress ? answers[UK_ADDRESS_FIELDS.postcode] : undefined,
+      townOrCity: isUkAddress ? answers[UK_ADDRESS_FIELDS.townOrCity] : undefined,
     } as Address;
   }
 

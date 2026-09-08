@@ -12,12 +12,12 @@ const answers = {
   hasNINumber: "yes",
   niNumber: "QQ123456C", // gitleaks:allow - fake NI number used to test data mapping
   haveAHomeAddress: "yes",
-  addressLine1: "123 Test Street",
-  addressLine2: "Test Area",
-  townOrCity: "Manchester",
-  county: "Greater Manchester",
-  postcode: "A12 3BC",
-  country: "United Kingdom",
+  ukAddressLine1: "123 Test Street",
+  ukAddressLine2: "Test Area",
+  ukTownOrCity: "Manchester",
+  ukCounty: "Greater Manchester",
+  ukPostcode: "A12 3BC",
+  ukCountry: "United Kingdom",
 };
 
 describe("fromAnswers method", () => {
@@ -62,8 +62,6 @@ describe("fromAnswers method", () => {
     const result = ApplicationDto.fromAnswers(
       {
         ...answers,
-        addressLine1: undefined,
-        country: undefined,
         haveAHomeAddress: "no",
       },
       providerOfficeCode,
