@@ -46,6 +46,7 @@ export const legalAidLast6MonthsStep = (
     },
     title: TITLE,
   });
+
 const submitValidNo = (journeyCode: string): SubmitHook =>
   submit({
     onValid: {
