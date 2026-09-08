@@ -103,6 +103,17 @@ describe("Have A Home Address Step", () => {
     });
 
     it("should return to check answers when no is selected from check answers", async () => {
+      const session = {
+        journeyDrafts: {
+          createApplication: {
+            haveAHomeAddress: "yes",
+            addressLine1: "10 Some Street",
+            townOrCity: "SomeCity",
+            postcode: "AB1 2CD",
+            country: "United Kingdom",
+          },
+        },
+      };
       const result = await client.post(
         "/cases/new/have-a-home-address",
         {
@@ -110,11 +121,15 @@ describe("Have A Home Address Step", () => {
           body: {
             haveAHomeAddress: "no",
           },
+          session,
         },
       );
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
       expect(redirectResult.url).to.equal("/cases/new/check-answers");
+      expect(session.journeyDrafts.createApplication).to.deep.equal({
+        haveAHomeAddress: "no",
+      });
     });
 
     it("should redirect to Check answers step if no", async () => {

@@ -1,5 +1,4 @@
 import {
-  and,
   Answer,
   Condition,
   redirect,
@@ -15,6 +14,7 @@ import {
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
 import { CreateApplicationEffects } from "#/journeys/create-application/create-application.effects.js";
+import { ADDRESS_FIELD } from "#/journeys/journey.constants.js";
 import {
   hasCheckAnswersInQuery,
   redirectToCheckAnswers,
@@ -67,29 +67,36 @@ export const haveAHomeAddressStep = (
     onSubmission: [
       submit({
         onValid: {
+          effects: [
+            CreateApplicationEffects.clearFieldAnswers(
+              journeyCode,
+              Object.values(ADDRESS_FIELD),
+            ),
+            CreateApplicationEffects.saveDraftAnswers(journeyCode),
+          ],
+          next: [redirectToCheckAnswers, redirect({ goto: "check-answers" })],
+        },
+
+        validate: true,
+        when: Answer("haveAHomeAddress").match(Condition.Equals("no")),
+      }),
+      submit({
+        onValid: {
           effects: [CreateApplicationEffects.saveDraftAnswers(journeyCode)],
           next: [
             redirect({
               goto: "enter-address-manually?returnTo=check-answers",
-              when: and(
-                hasCheckAnswersInQuery,
-                Answer("haveAHomeAddress").match(Condition.Equals("yes")),
-              ),
+              when: hasCheckAnswersInQuery,
             }),
 
-            redirectToCheckAnswers,
-
-            redirect({
-              goto: "enter-address-manually",
-              when: Answer("haveAHomeAddress").match(Condition.Equals("yes")),
-            }),
-
-            redirect({
-              goto: "check-answers",
-              when: Answer("haveAHomeAddress").match(Condition.Equals("no")),
-            }),
+            redirect({ goto: "enter-address-manually" }),
           ],
         },
+        validate: true,
+        when: Answer("haveAHomeAddress").match(Condition.Equals("yes")),
+      }),
+      submit({
+        onInvalid: {},
         validate: true,
       }),
     ],
