@@ -14,29 +14,54 @@ import { t } from "#/lib/i18n.js";
  * Formats a client's address for display.
  * @returns The formatted address HTML.
  */
-export function formatAddress(): ResolvableString {
+export function formatOsAddress(): ResolvableString {
+
   return NunjucksGenerators.String({
     data: {
-      country: Answer("country"),
-      county: Answer("county"),
-      line1: Answer("addressLine1"),
-      line2: Answer("addressLine2"),
-      line3: Answer("addressLine3"),
-      line4: Answer("addressLine4"),
-      postcode: Answer("postcode"),
-      town: Answer("townOrCity"),
+      country: Answer("osCountry"),
+      line1: Answer("osAddressLine1"),
+      line2: Answer("osAddressLine2"),
+      line3: Answer("osAddressLine3"),
+      line4: Answer("osAddressLine4"),
     },
     template: `
       {{ line1 }},<br />
       {% if line2 %}{{ line2 }},<br />{% endif %}
       {% if line3 %}{{ line3 }},<br />{% endif %}
       {% if line4 %}{{ line4 }},<br />{% endif %}
+      {% if country %}{{ country }}<br />{% endif %}
+    `,
+  });
+}
+
+/**
+ * Formats a client's address for display.
+ * @returns The formatted address HTML.
+ */
+export function formatUkAddress(): ResolvableString {
+
+  return NunjucksGenerators.String({
+    data: {
+      county: Answer("ukCounty"),
+      line1: Answer("ukAddressLine1"),
+      line2: Answer("ukAddressLine2"),
+      postcode: Answer("ukPostcode"),
+      town: Answer("ukTownOrCity"),
+    },
+    template: `
+      {{ line1 }},<br />
+      {% if line2 %}{{ line2 }},<br />{% endif %}
       {% if town %}{{ town }},<br />{% endif %}
       {% if county %}{{ county }},<br />{% endif %}
-      {% if country and country != "United Kingdom" %}{{ country }}<br />{% endif %}
       {% if postcode %}{{ postcode }}<br />{% endif %}
     `,
   });
+}
+
+export function formatAddressDecider(): ResolvableString {
+  return match(Answer("ukCountry"))
+    .branch(Condition.Equals("United Kingdom"), formatUkAddress())
+    .otherwise(formatOsAddress());
 }
 
 /**
@@ -62,7 +87,7 @@ export function formatAddressValue(): ResolvableString {
   );
 
   return match(Answer("haveAHomeAddress"))
-    .branch(Condition.Equals("yes"), formatAddress())
+    .branch(Condition.Equals("yes"), formatAddressDecider())
     .otherwise(no);
 }
 
@@ -71,7 +96,7 @@ export function formatAddressValue(): ResolvableString {
  * @returns The address entry URL.
  */
 export function formatChangeAddressRedirect(): ResolvableString {
-  return match(Answer("postcode"))
+  return match(Answer("ukPostcode"))
     .branch(
       Condition.IsRequired(),
       "enter-address-manually?returnTo=check-answers",
