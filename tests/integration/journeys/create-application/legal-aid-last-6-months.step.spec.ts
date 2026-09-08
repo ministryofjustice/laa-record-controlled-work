@@ -78,6 +78,25 @@ describe("Legal aid before 6 months step", () => {
       );
     });
 
+    it("should show validation error if the reason is longer than 500 characters", async () => {
+      const result = await client.post(
+        "/cases/new/legal-aid-last-6-months",
+        {
+          body: {
+            legalAidLast6Months: "yes",
+            reasonForYes: "a".repeat(501),
+          },
+        },
+      );
+      expect(result.type).to.equal("render");
+      const renderResult = result as TestRenderResult;
+      expect(renderResult.context.showValidationFailures).to.equal(true);
+      expect(
+        renderResult.getValidationErrorsByFieldCode(reasonForYesFieldCode)[0]
+          .message,
+      ).to.equal("The reason must be 500 characters or fewer");
+    });
+
     it("should redirect to legal aid last 6 months step if yes", async () => {
       const result = await client.post(
         "/cases/new/legal-aid-last-6-months",
