@@ -9,7 +9,6 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 import { HtmlBlock } from "@ministryofjustice/hmpps-forge/core/components";
 import {
-  GovUKBackLink,
   GovUKButton,
   GovUKHeading,
   GovUKTextInput,
@@ -27,9 +26,6 @@ export const enterAddressManuallyStep = (
 ): ReturnType<typeof step> =>
   step({
     blocks: [
-      GovUKBackLink({
-        href: "/cases/new/have-a-home-address",
-      }),
       HtmlBlock({
         content: `<span class="govuk-caption-l">${t("journeys.createApplication.caption")}</span>`,
       }),

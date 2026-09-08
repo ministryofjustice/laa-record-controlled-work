@@ -11,7 +11,7 @@ import {
 import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
 import { t } from "#/lib/i18n.js";
 
-import { backLink, caption } from "../../declaration.blocks.js";
+import { caption } from "../../declaration.blocks.js";
 import { declarationEffects } from "../../declaration.effects.js";
 import {
   confirmHeading,
@@ -26,12 +26,6 @@ import {
 export const signStep = (): ReturnType<typeof step> => {
   return step({
     blocks: [
-      backLink(
-        Format(
-          "/cases/%1/declaration/confirm",
-          Params(PARAMS_KEYS.applicationID),
-        ),
-      ),
       caption,
       heading(),
       ...statement(),

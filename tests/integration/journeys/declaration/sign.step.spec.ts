@@ -43,15 +43,6 @@ describe("Declaration sign step", () => {
       expect(render.context.step.title).to.equal("Sign the declaration");
     });
 
-    it("shows the expected backlink", () => {
-      const block = render.getBlocksByVariant("govukBackLink")[0];
-
-      expect(block).to.exist;
-      expect(block.properties.href).to.equal(
-        `/cases/${uuid}/declaration/confirm`,
-      );
-    });
-
     it("shows the expected caption", () => {
       const content = "Client declaration";
       const block = getBlockWithContent(render, "html", content);

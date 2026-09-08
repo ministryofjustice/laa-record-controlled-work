@@ -50,7 +50,7 @@ export const taskListStep = (): ReturnType<typeof step> =>
         ],
       }),
     ],
-    onSubmission: [saveAndReturn(), submitApplication()],
+    onSubmission: [saveAndReturn(), submitApplication(), closeApplication()],
     path: "/task-list",
     reachability: {
       entryWhen: true,
@@ -70,16 +70,28 @@ const saveAndReturn = (): SubmitHook =>
     when: Post("action").match(Condition.Equals("return")),
   });
 
-// TODO: no submission page completed yet
 const submitApplication = (): SubmitHook =>
   submit({
     onAlways: {
       effects: [editApplicationEffects.submitApplication()],
       next: [
         redirect({
-          goto: "/submittedPage-TODO",
+          goto: "confirmation",
         }),
       ],
     },
     when: Post("action").match(Condition.Equals("submit")),
+  });
+
+const closeApplication = (): SubmitHook =>
+  submit({
+    onAlways: {
+      effects: [editApplicationEffects.closeIneligibleCase()],
+      next: [
+        redirect({
+          goto: "/cases",
+        }),
+      ],
+    },
+    when: Post("action").match(Condition.Equals("close")),
   });

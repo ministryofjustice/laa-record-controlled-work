@@ -1,0 +1,22 @@
+{% extends "base.njk" %}
+
+{% block pageTitle %}{{ t("pages.error.500.title") }}{% endblock %}
+
+{% set mainClasses = "govuk-main-wrapper--l" %}
+
+{% block content %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h1 class="govuk-heading-l">{{ t("pages.error.500.title") }}</h1>
+            {% for p in tt("pages.error.500.body") %}
+                <p class="govuk-body">{{ p | replace('<a', '<a class="govuk-link"') | safe }}</p>
+            {% endfor %}
+
+            <ul class="govuk-list govuk-list--bullet govuk-list--spaced">
+            {% for item in tt("pages.error.500.contactMethods") %}
+                <li>{{ item | replace('<a', '<a class="govuk-link"') | safe }}</li>
+            {% endfor %}
+            </ul>
+        </div>
+    </div>
+{% endblock %}

@@ -76,19 +76,27 @@ test.describe("@e2e critical path", () => {
 
   test("completes evidence section", async () => {
     await actor.completeEvidenceYesPath(applicationId);
-
     await expect(page).toHaveURL(taskListUrlPattern(applicationId));
     await actor.assertTaskStatus("Evidence", "Completed");
   });
-  test.fixme("completes declaration", async () => {});
 
-  test.fixme("submits application", async () => {
-    // TODO started scaffolding this test, it requires other journeys to be complete first
+  test("completes declaration", async () => {
+    await actor.completeDeclaration(applicationId);
+    await expect(page).toHaveURL(taskListUrlPattern(applicationId));
+    await actor.assertTaskStatus("Declaration", "Completed");
+  });
+
+  test("submits application", async () => {
     await actor.submitApplication(applicationId);
-    await expect(page).toHaveURL(/\/submittedPage-TODO/);
   });
-  test.fixme("checks recorded cases", async () => {
+
+  /**
+   * This has been temporarily removed as the view recorded case functionality has been removed temporarily.
+   */
+  test.skip("checks recorded cases", async () => {
     await actor.openRecordedCaseFromCaseList(applicationId);
+    await actor.assertRecordedCaseVisible("Test User");
   });
+
   test.fixme("exports case", async () => {});
 });
