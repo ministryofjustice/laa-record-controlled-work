@@ -22,7 +22,7 @@ export const Application = zod.object({
   providerOfficeCode: zod.string(),
   meansAssessmentId: zod.uuid().nullish(),
   clientDetails: zod.object({
-    id: zod.uuid().nullish(),
+    id: zod.uuid().nullable(),
     firstName: zod.string(),
     lastName: zod.string(),
     dateOfBirth: zod.iso.date(),
@@ -36,7 +36,7 @@ export const Application = zod.object({
     address: zod
       .union([
         zod.object({
-          id: zod.uuid().nullish(),
+          id: zod.uuid().nullable(),
           addressLine1: zod.string(),
           addressLine2: zod.string().nullish(),
           addressLine3: zod.string().nullish(),
@@ -47,50 +47,44 @@ export const Application = zod.object({
           country: zod
             .string()
             .max(applicationClientDetailsAddressOneCountryMax),
-          createdAt: zod.iso.datetime({ offset: true }).nullish(),
-          modifiedAt: zod.iso.datetime({ offset: true }).nullish(),
+          createdAt: zod.iso.datetime({ offset: true }).nullable(),
+          modifiedAt: zod.iso.datetime({ offset: true }).nullable(),
         }),
         zod.null(),
       ])
       .optional(),
-    createdAt: zod.iso.datetime({ offset: true }).nullish(),
-    modifiedAt: zod.iso.datetime({ offset: true }).nullish(),
+    createdAt: zod.iso.datetime({ offset: true }).nullable(),
+    modifiedAt: zod.iso.datetime({ offset: true }).nullable(),
   }),
   applicationState: zod.enum(["DRAFT", "COMPLETED"]),
-  declaration: zod
-    .union([
-      zod.object({
-        id: zod.uuid().nullish(),
-        declarationConfirmation: zod.boolean().nullish(),
-        dateSigned: zod.iso.date().nullish(),
-        createdAt: zod.iso.datetime({ offset: true }).nullish(),
-        createdBy: zod.string().nullish(),
-        modifiedAt: zod.iso.datetime({ offset: true }).nullish(),
-        modifiedBy: zod.string().nullish(),
-      }),
-      zod.null(),
-    ])
-    .optional(),
-  evidence: zod
-    .union([
-      zod.object({
-        evidenceExemptionCode: zod.string().nullish(),
-        evidenceExemptionReason: zod.string().nullish(),
-        incomeEvidenceChecklist: zod.looseObject({}).nullish(),
-        expenditureCapitalEvidenceChecklist: zod.looseObject({}).nullish(),
-      }),
-      zod.null(),
-    ])
-    .optional(),
-  eligibility: zod
-    .union([
-      zod.object({
-        data: zod.looseObject({}).nullish(),
-        result: zod.looseObject({}).nullish(),
-      }),
-      zod.null(),
-    ])
-    .optional(),
+  declaration: zod.union([
+    zod.object({
+      id: zod.uuid().nullable(),
+      declarationConfirmation: zod.boolean().nullable(),
+      dateSigned: zod.iso.date().nullish(),
+      createdAt: zod.iso.datetime({ offset: true }).nullable(),
+      createdBy: zod.string().nullable(),
+      modifiedAt: zod.iso.datetime({ offset: true }).nullable(),
+      modifiedBy: zod.string().nullable(),
+    }),
+    zod.null(),
+  ]),
+  evidence: zod.union([
+    zod.object({
+      evidenceExemptionCode: zod.string().nullish(),
+      evidenceExemptionReason: zod.string().nullish(),
+      incomeEvidenceChecklist: zod.looseObject({}).nullish(),
+      expenditureCapitalEvidenceChecklist: zod.looseObject({}).nullish(),
+    }),
+    zod.null(),
+  ]),
+  eligibility: zod.union([
+    zod.object({
+      data: zod.looseObject({}).nullish(),
+      result: zod.looseObject({}).nullable(),
+    }),
+    zod.null(),
+  ]),
   reasonForReapplication: zod.string().nullish(),
   meansAssessmentRequired: zod.boolean().nullish(),
   typeOfNonMeans: zod.boolean().nullish(),

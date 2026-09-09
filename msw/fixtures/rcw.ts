@@ -16,12 +16,18 @@ export const applications = [...getGetApplicationsResponseMock()].sort((a, b) =>
 export const createApplicationResponse = getCreateApplicationResponseMock();
 
 export const incompleteApplication = getGetApplicationResponseMock({
-  eligibility: { data: {} },
+  eligibility: null,
 });
 
 export const completeApplication = getGetApplicationResponseMock({
   declaration: {
+    createdAt: null,
+    createdBy: null,
+    dateSigned: null,
     declarationConfirmation: true,
+    id: null,
+    modifiedAt: null,
+    modifiedBy: null,
   },
   eligibility: {
     result: {

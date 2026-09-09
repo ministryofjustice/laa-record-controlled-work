@@ -11,9 +11,10 @@ export const ApplicationOverview = zod.object({
   name: zod.string(),
   applicationRefNumber: zod.string(),
   modifiedAt: zod.iso.datetime({ offset: true }),
-  eligibilityIndication: zod
-    .union([zod.enum(["eligible", "ineligible"]), zod.null()])
-    .optional(),
+  eligibilityIndication: zod.union([
+    zod.enum(["eligible", "ineligible"]),
+    zod.null(),
+  ]),
 });
 
 export type ApplicationOverview = zod.input<typeof ApplicationOverview>;

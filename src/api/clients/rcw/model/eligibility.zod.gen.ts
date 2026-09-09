@@ -8,7 +8,7 @@ import * as zod from "zod";
 
 export const Eligibility = zod.object({
   data: zod.looseObject({}).nullish(),
-  result: zod.looseObject({}).nullish(),
+  result: zod.looseObject({}).nullable(),
 });
 
 export type Eligibility = zod.input<typeof Eligibility>;

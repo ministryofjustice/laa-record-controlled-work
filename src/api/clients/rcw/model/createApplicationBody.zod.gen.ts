@@ -12,7 +12,7 @@ export const createApplicationBodyClientDetailsNiNumberMax = 9;
 export const createApplicationBodyClientDetailsNiNumberRegExp = new RegExp(
   "[A-CEGHJ-NOPR-TW-Z]{2}[0-9]{6}[ABCDs]{1}",
 );
-export const createApplicationBodyClientDetailsAddressOneCountryMax = 2;
+export const createApplicationBodyClientDetailsAddressCountryMax = 2;
 
 export const CreateApplicationBody = zod.object({
   legalAidBefore: zod.string(),
@@ -21,7 +21,6 @@ export const CreateApplicationBody = zod.object({
   providerOfficeCode: zod.string(),
   scopingQuestions: zod.record(zod.string(), zod.unknown()),
   clientDetails: zod.object({
-    id: zod.uuid().nullish(),
     firstName: zod.string(),
     lastName: zod.string(),
     dateOfBirth: zod.iso.date(),
@@ -30,30 +29,22 @@ export const CreateApplicationBody = zod.object({
       .min(createApplicationBodyClientDetailsNiNumberMin)
       .max(createApplicationBodyClientDetailsNiNumberMax)
       .regex(createApplicationBodyClientDetailsNiNumberRegExp)
-      .nullish(),
+      .optional(),
     hasFixedAddress: zod.boolean(),
     address: zod
-      .union([
-        zod.object({
-          id: zod.uuid().nullish(),
-          addressLine1: zod.string(),
-          addressLine2: zod.string().nullish(),
-          addressLine3: zod.string().nullish(),
-          addressLine4: zod.string().nullish(),
-          townOrCity: zod.string().nullish(),
-          postCode: zod.string().nullish(),
-          county: zod.string().nullish(),
-          country: zod
-            .string()
-            .max(createApplicationBodyClientDetailsAddressOneCountryMax),
-          createdAt: zod.iso.datetime({ offset: true }).nullish(),
-          modifiedAt: zod.iso.datetime({ offset: true }).nullish(),
-        }),
-        zod.null(),
-      ])
+      .object({
+        addressLine1: zod.string(),
+        addressLine2: zod.string().optional(),
+        addressLine3: zod.string().optional(),
+        addressLine4: zod.string().optional(),
+        townOrCity: zod.string().optional(),
+        postCode: zod.string().optional(),
+        county: zod.string().nullish(),
+        country: zod
+          .string()
+          .max(createApplicationBodyClientDetailsAddressCountryMax),
+      })
       .optional(),
-    createdAt: zod.iso.datetime({ offset: true }).nullish(),
-    modifiedAt: zod.iso.datetime({ offset: true }).nullish(),
   }),
 });
 

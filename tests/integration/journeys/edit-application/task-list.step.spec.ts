@@ -6,6 +6,7 @@ import { expect } from "chai";
 import sinon from "sinon";
 
 import { getGetApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
+import { completeApplication } from "#msw/fixtures/rcw.js";
 import { createForgeTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import { editApplicationEffectsRegistry } from "#/journeys/edit-application/editApplication.effects.js";
@@ -235,7 +236,7 @@ describe("Task list step", () => {
         getApplicationStub.resolves({
           status: 200,
           data: getGetApplicationResponseMock({
-            eligibility: {},
+            eligibility: null,
           }),
         });
 
@@ -261,15 +262,7 @@ describe("Task list step", () => {
       it("renders declaration as Completed when declaration data is present", async () => {
         getApplicationStub.resolves({
           status: 200,
-          data: getGetApplicationResponseMock({
-            eligibility: eligibilityResult,
-            evidence: {
-              evidenceExemptionCode: "something",
-            },
-            declaration: {
-              declarationConfirmation: true,
-            },
-          }),
+          data: completeApplication,
         });
 
         const result = await client.get(`/cases/${uuid}/task-list`, {
@@ -291,13 +284,10 @@ describe("Task list step", () => {
       it("renders declaration as Incomplete when declaration data is empty", async () => {
         getApplicationStub.resolves({
           status: 200,
-          data: getGetApplicationResponseMock({
-            eligibility: eligibilityResult,
-            evidence: {
-              evidenceExemptionCode: "something",
-            },
-            declaration: {},
-          }),
+          data: {
+            ...completeApplication,
+            declaration: null,
+          },
         });
 
         const result = await client.get(`/cases/${uuid}/task-list`, {
@@ -319,13 +309,10 @@ describe("Task list step", () => {
       it("renders declaration as Cannot start yet when evidence is not complete", async () => {
         getApplicationStub.resolves({
           status: 200,
-          data: getGetApplicationResponseMock({
-            eligibility: eligibilityResult,
-            evidence: {},
-            declaration: {
-              declarationConfirmation: true,
-            },
-          }),
+          data: {
+            ...completeApplication,
+            evidence: null,
+          },
         });
 
         const result = await client.get(`/cases/${uuid}/task-list`, {
@@ -360,7 +347,7 @@ describe("Task list step", () => {
     it("hides the Record Controlled Work button when readyForSubmission is false", async () => {
       getApplicationStub.resolves({
         status: 200,
-        data: getGetApplicationResponseMock({ eligibility: {} }),
+        data: getGetApplicationResponseMock({ eligibility: null }),
       });
 
       const result = await client.get(`/cases/${uuid}/task-list`, {
@@ -379,22 +366,9 @@ describe("Task list step", () => {
     });
 
     it("shows the Record Controlled Work button when readyForSubmission is true", async () => {
-      const completeMockData = getGetApplicationResponseMock({
-        eligibility: eligibilityResult,
-        evidence: {
-          evidenceExemptionCode: "something",
-          evidenceExemptionReason: "something",
-          incomeEvidenceChecklist: { complete: true },
-          expenditureCapitalEvidenceChecklist: { complete: true },
-        },
-        declaration: {
-          declarationConfirmation: true,
-        },
-      });
-
       getApplicationStub.resolves({
         status: 200,
-        data: completeMockData,
+        data: completeApplication,
       });
 
       const result = await client.get(`/cases/${uuid}/task-list`, {

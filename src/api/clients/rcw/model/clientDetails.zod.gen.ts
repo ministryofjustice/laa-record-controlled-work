@@ -15,7 +15,7 @@ export const clientDetailsNiNumberRegExp = new RegExp(
 export const clientDetailsAddressOneCountryMax = 2;
 
 export const ClientDetails = zod.object({
-  id: zod.uuid().nullish(),
+  id: zod.uuid().nullable(),
   firstName: zod.string(),
   lastName: zod.string(),
   dateOfBirth: zod.iso.date(),
@@ -29,7 +29,7 @@ export const ClientDetails = zod.object({
   address: zod
     .union([
       zod.object({
-        id: zod.uuid().nullish(),
+        id: zod.uuid().nullable(),
         addressLine1: zod.string(),
         addressLine2: zod.string().nullish(),
         addressLine3: zod.string().nullish(),
@@ -38,14 +38,14 @@ export const ClientDetails = zod.object({
         postCode: zod.string().nullish(),
         county: zod.string().nullish(),
         country: zod.string().max(clientDetailsAddressOneCountryMax),
-        createdAt: zod.iso.datetime({ offset: true }).nullish(),
-        modifiedAt: zod.iso.datetime({ offset: true }).nullish(),
+        createdAt: zod.iso.datetime({ offset: true }).nullable(),
+        modifiedAt: zod.iso.datetime({ offset: true }).nullable(),
       }),
       zod.null(),
     ])
     .optional(),
-  createdAt: zod.iso.datetime({ offset: true }).nullish(),
-  modifiedAt: zod.iso.datetime({ offset: true }).nullish(),
+  createdAt: zod.iso.datetime({ offset: true }).nullable(),
+  modifiedAt: zod.iso.datetime({ offset: true }).nullable(),
 });
 
 export type ClientDetails = zod.input<typeof ClientDetails>;
