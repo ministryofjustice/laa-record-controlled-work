@@ -7,10 +7,10 @@
 import * as zod from "zod";
 
 export const Evidence = zod.object({
-  evidenceExemptionCode: zod.string().nullish(),
-  evidenceExemptionReason: zod.string().nullish(),
-  incomeEvidenceChecklist: zod.looseObject({}).nullish(),
-  expenditureCapitalEvidenceChecklist: zod.looseObject({}).nullish(),
+  evidenceExemptionCode: zod.string().nullable(),
+  evidenceExemptionReason: zod.string().nullable(),
+  incomeEvidenceChecklist: zod.looseObject({}).nullable(),
+  expenditureCapitalEvidenceChecklist: zod.looseObject({}).nullable(),
 });
 
 export type Evidence = zod.input<typeof Evidence>;

@@ -7,7 +7,7 @@
 import * as zod from "zod";
 
 export const Eligibility = zod.object({
-  data: zod.looseObject({}).nullish(),
+  data: zod.looseObject({}).nullable(),
   result: zod.looseObject({}).nullable(),
 });
 

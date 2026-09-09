@@ -21,6 +21,7 @@ type RenderedTaskListItem = {
 describe("Task list step", () => {
   const uuid = "123e4567-e89b-12d3-a456-426614174000";
   const eligibilityResult = {
+    data: null,
     result: {
       result_summary: { overall_result: { result: "eligible" } },
     },
@@ -93,6 +94,7 @@ describe("Task list step", () => {
         status: 200,
         data: getGetApplicationResponseMock({
           eligibility: {
+            data: null,
             result: {
               result_summary: { overall_result: { result: "ineligible" } },
             },
@@ -155,7 +157,7 @@ describe("Task list step", () => {
       getApplicationStub.resolves({
         status: 200,
         data: getGetApplicationResponseMock({
-          eligibility: { result: {} },
+          eligibility: { data: null, result: {} },
         }),
       });
 
@@ -404,6 +406,7 @@ describe("Task list step", () => {
         status: 200,
         data: getGetApplicationResponseMock({
           eligibility: {
+            data: null,
             result: {
               result_summary: { overall_result: { result: "ineligible" } },
             },

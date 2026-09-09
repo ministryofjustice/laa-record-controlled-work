@@ -71,16 +71,16 @@ export const Application = zod.object({
   ]),
   evidence: zod.union([
     zod.object({
-      evidenceExemptionCode: zod.string().nullish(),
-      evidenceExemptionReason: zod.string().nullish(),
-      incomeEvidenceChecklist: zod.looseObject({}).nullish(),
-      expenditureCapitalEvidenceChecklist: zod.looseObject({}).nullish(),
+      evidenceExemptionCode: zod.string().nullable(),
+      evidenceExemptionReason: zod.string().nullable(),
+      incomeEvidenceChecklist: zod.looseObject({}).nullable(),
+      expenditureCapitalEvidenceChecklist: zod.looseObject({}).nullable(),
     }),
     zod.null(),
   ]),
   eligibility: zod.union([
     zod.object({
-      data: zod.looseObject({}).nullish(),
+      data: zod.looseObject({}).nullable(),
       result: zod.looseObject({}).nullable(),
     }),
     zod.null(),

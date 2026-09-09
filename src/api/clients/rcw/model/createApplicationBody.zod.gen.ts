@@ -39,7 +39,7 @@ export const CreateApplicationBody = zod.object({
         addressLine4: zod.string().optional(),
         townOrCity: zod.string().optional(),
         postCode: zod.string().optional(),
-        county: zod.string().nullish(),
+        county: zod.string().optional(),
         country: zod
           .string()
           .max(createApplicationBodyClientDetailsAddressCountryMax),

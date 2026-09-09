@@ -30,6 +30,7 @@ export const completeApplication = getGetApplicationResponseMock({
     modifiedBy: null,
   },
   eligibility: {
+    data: null,
     result: {
       result_summary: { overall_result: { result: "eligible" } },
     },
