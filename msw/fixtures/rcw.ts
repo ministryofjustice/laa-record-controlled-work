@@ -16,13 +16,29 @@ export const applications = [...getGetApplicationsResponseMock()].sort((a, b) =>
 export const createApplicationResponse = getCreateApplicationResponseMock();
 
 export const incompleteApplication = getGetApplicationResponseMock({
-  eligibility: { data: {} },
+  eligibility: null,
 });
 
 export const completeApplication = getGetApplicationResponseMock({
+  declaration: {
+    createdAt: null,
+    createdBy: null,
+    dateSigned: null,
+    declarationConfirmation: true,
+    id: null,
+    modifiedAt: null,
+    modifiedBy: null,
+  },
   eligibility: {
+    data: null,
     result: {
       result_summary: { overall_result: { result: "eligible" } },
     },
+  },
+  evidence: {
+    evidenceExemptionCode: "none",
+    evidenceExemptionReason: "Not exempt",
+    expenditureCapitalEvidenceChecklist: { complete: true },
+    incomeEvidenceChecklist: { complete: true },
   },
 });

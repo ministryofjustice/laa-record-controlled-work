@@ -12,17 +12,17 @@ export const applicationClientDetailsNiNumberMax = 9;
 export const applicationClientDetailsNiNumberRegExp = new RegExp(
   "[A-CEGHJ-NOPR-TW-Z]{2}[0-9]{6}[ABCDs]{1}",
 );
-export const applicationClientDetailsAddressCountryMax = 2;
+export const applicationClientDetailsAddressOneCountryMax = 2;
 
 export const Application = zod.object({
   id: zod.uuid(),
-  applicationRefNumber: zod.string().optional(),
+  applicationRefNumber: zod.string().nullish(),
   individualLegalAidNumber: zod.uuid(),
   providerFirmCode: zod.string(),
   providerOfficeCode: zod.string(),
-  meansAssessmentId: zod.uuid().optional(),
+  meansAssessmentId: zod.uuid().nullish(),
   clientDetails: zod.object({
-    id: zod.uuid().optional(),
+    id: zod.uuid().nullable(),
     firstName: zod.string(),
     lastName: zod.string(),
     dateOfBirth: zod.iso.date(),
@@ -31,57 +31,65 @@ export const Application = zod.object({
       .min(applicationClientDetailsNiNumberMin)
       .max(applicationClientDetailsNiNumberMax)
       .regex(applicationClientDetailsNiNumberRegExp)
-      .optional(),
+      .nullish(),
     hasFixedAddress: zod.boolean(),
     address: zod
-      .object({
-        id: zod.uuid().optional(),
-        addressLine1: zod.string(),
-        addressLine2: zod.string().optional(),
-        addressLine3: zod.string().optional(),
-        addressLine4: zod.string().optional(),
-        townOrCity: zod.string().optional(),
-        postCode: zod.string().optional(),
-        county: zod.string().optional(),
-        country: zod.string().max(applicationClientDetailsAddressCountryMax),
-        createdAt: zod.iso.datetime({ offset: true }).optional(),
-        modifiedAt: zod.iso.datetime({ offset: true }).optional(),
-      })
+      .union([
+        zod.object({
+          id: zod.uuid().nullable(),
+          addressLine1: zod.string(),
+          addressLine2: zod.string().nullish(),
+          addressLine3: zod.string().nullish(),
+          addressLine4: zod.string().nullish(),
+          townOrCity: zod.string().nullish(),
+          postCode: zod.string().nullish(),
+          county: zod.string().nullish(),
+          country: zod
+            .string()
+            .max(applicationClientDetailsAddressOneCountryMax),
+          createdAt: zod.iso.datetime({ offset: true }).nullable(),
+          modifiedAt: zod.iso.datetime({ offset: true }).nullable(),
+        }),
+        zod.null(),
+      ])
       .optional(),
-    createdAt: zod.iso.datetime({ offset: true }).optional(),
-    modifiedAt: zod.iso.datetime({ offset: true }).optional(),
+    createdAt: zod.iso.datetime({ offset: true }).nullable(),
+    modifiedAt: zod.iso.datetime({ offset: true }).nullable(),
   }),
   applicationState: zod.enum(["DRAFT", "COMPLETED"]),
-  declaration: zod
-    .object({
-      id: zod.uuid().optional(),
-      declarationConfirmation: zod.boolean().optional(),
-      dateSigned: zod.iso.date().optional(),
-      createdAt: zod.iso.datetime({ offset: true }).optional(),
-      createdBy: zod.string().optional(),
-      modifiedAt: zod.iso.datetime({ offset: true }).optional(),
-      modifiedBy: zod.string().optional(),
-    })
-    .optional(),
-  evidence: zod
-    .object({
-      evidenceExemptionCode: zod.string().optional(),
-      evidenceExemptionReason: zod.string().optional(),
-      incomeEvidenceChecklist: zod.looseObject({}).optional(),
-      expenditureCapitalEvidenceChecklist: zod.looseObject({}).optional(),
-    })
-    .optional(),
-  eligibility: zod
-    .object({
-      data: zod.looseObject({}).optional(),
-      result: zod.looseObject({}).optional(),
-    })
-    .optional(),
-  reasonForReapplication: zod.string().optional(),
-  meansAssessmentRequired: zod.boolean().optional(),
-  typeOfNonMeans: zod.boolean().optional(),
-  contribution: zod.string().optional(),
-  scopingQuestions: zod.looseObject({}).optional(),
+  declaration: zod.union([
+    zod.object({
+      id: zod.uuid().nullable(),
+      declarationConfirmation: zod.boolean().nullable(),
+      dateSigned: zod.iso.date().nullish(),
+      createdAt: zod.iso.datetime({ offset: true }).nullable(),
+      createdBy: zod.string().nullable(),
+      modifiedAt: zod.iso.datetime({ offset: true }).nullable(),
+      modifiedBy: zod.string().nullable(),
+    }),
+    zod.null(),
+  ]),
+  evidence: zod.union([
+    zod.object({
+      evidenceExemptionCode: zod.string().nullable(),
+      evidenceExemptionReason: zod.string().nullable(),
+      incomeEvidenceChecklist: zod.looseObject({}).nullable(),
+      expenditureCapitalEvidenceChecklist: zod.looseObject({}).nullable(),
+    }),
+    zod.null(),
+  ]),
+  eligibility: zod.union([
+    zod.object({
+      data: zod.looseObject({}).nullable(),
+      result: zod.looseObject({}).nullable(),
+    }),
+    zod.null(),
+  ]),
+  reasonForReapplication: zod.string().nullish(),
+  meansAssessmentRequired: zod.boolean().nullish(),
+  typeOfNonMeans: zod.boolean().nullish(),
+  contribution: zod.string().nullish(),
+  scopingQuestions: zod.looseObject({}).nullish(),
   applicationType: zod.string(),
   createdAt: zod.iso.datetime({ offset: true }),
   createdBy: zod.string(),
