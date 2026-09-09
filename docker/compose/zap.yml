@@ -11,7 +11,7 @@ services:
     volumes:
       - ./zap.yaml:/zap/wrk/zap.yaml:ro
       - ./zap-results:/zap/wrk/zap-results:rw
-    command: zap.sh -cmd -port 8090 -autorun /zap/wrk/zap.yaml
+    command: zap.sh -cmd -port 8090 -autorun /zap/wrk/zap-results/zap-plan.generated.yaml
     depends_on:
       nginx:
         condition: service_started

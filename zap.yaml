@@ -1,5 +1,4 @@
 # ZAP Automation Framework plan for laa-record-controlled-work.
-# Uses browser based authentication to drive the same mock OAuth2 sign-in flow
 env:
   contexts:
     - name: rcw
@@ -7,38 +6,23 @@ env:
         - "http://localhost:8080"
       excludePaths:
         - "http://localhost:8080/auth/code/callback.*"
-      authentication:
-        method: "browser"
-        parameters:
-          loginPageUrl: "http://localhost:8080/"
-          loginPageWait: 15
-          browserId: "firefox-headless"
-          steps:
-            - description: "Submit the mock OAuth2 sign-in form (fields are pre-filled with valid defaults)"
-              type: "CLICK"
-              xpath: "//button[@type='submit']"
-              timeout: 20000
-        verification:
-          method: "poll"
-          pollUrl: "http://localhost:8080/"
-          pollFrequency: 1
-          pollUnits: "requests"
-          loggedOutRegex: "\\QMock OAuth2 Server Sign-in\\E"
-      sessionManagement:
-        method: "cookie"
-      users:
-        - name: "test-user"
-          credentials:
-            username: "test.user@example.com"
-            password: "NOTUSED"
   parameters:
     failOnError: true
     progressToStdout: true
 jobs:
+  - type: "replacer"
+    parameters:
+      deleteAllRules: true
+    rules:
+      - description: "Inject the pre-authenticated rcw session cookie"
+        url: "http://localhost:8080.*"
+        matchType: "REQ_HEADER"
+        matchString: "Cookie"
+        matchRegex: false
+        replacementString: "rcw.sid=${SESSION_COOKIE}"
   - type: "spider"
     parameters:
       context: "rcw"
-      user: "test-user"
       url: "http://localhost:8080/"
       maxDuration: 5
   - type: "passiveScan-wait"
@@ -55,15 +39,3 @@ jobs:
       reportFile: "zap-baseline-report"
       reportTitle: "RCW ZAP Scanning Report"
       template: "traditional-html"
-  - type: "report"
-    parameters:
-      reportDir: "/zap/wrk/zap-results/"
-      reportFile: "zap-auth-diagnostics"
-      template: "auth-report-json"
-    sites:
-      - "http://localhost:8080"
-    sections:
-      - "summary"
-      - "diagnostics"
-      - "diagnosticsscreenshots"
-      - "diagnosticswebelements"
