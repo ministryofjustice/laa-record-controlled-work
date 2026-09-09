@@ -5,7 +5,9 @@ services:
   zap-scan:
     image: zaproxy/zap-stable
     container_name: rcw-zap-scan
-    network_mode: "host"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+      - "localhost:${NGINX_IP}"
     volumes:
       - ./zap.yaml:/zap/wrk/zap.yaml:ro
       - ./zap-results:/zap/wrk/zap-results:rw

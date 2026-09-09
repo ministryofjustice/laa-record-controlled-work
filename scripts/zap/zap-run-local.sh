@@ -13,6 +13,8 @@ fi
 mkdir -p zap-results
 chmod 777 zap-results
 
+export NGINX_IP="$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' rcw-nginx)"
+
 docker compose \
   "${COMPOSE_FILES[@]}" \
   run --rm --no-deps zap-scan
