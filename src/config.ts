@@ -134,4 +134,6 @@ export default {
     saveUninitialized: false,
     secret: required.SESSION_SECRET,
   } satisfies SessionOptions,
+
+  useHttps,
 } satisfies Config;

@@ -45,7 +45,8 @@ function helmetMiddleware(): RequestHandler {
           },
         ],
         styleSrc: ["'self'", "'unsafe-inline'"], // Allow inline styles if needed
-        upgradeInsecureRequests: [], // Upgrade HTTP to HTTPS
+        // Only upgrade when actually served over HTTPS - otherwise browsers try TLS against our plain-HTTP nginx (e.g. local/CI/ZAP)
+        ...(config.useHttps ? { upgradeInsecureRequests: [] } : {}),
       },
     },
   });
