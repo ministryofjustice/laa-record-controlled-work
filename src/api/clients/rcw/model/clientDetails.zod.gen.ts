@@ -12,10 +12,10 @@ export const clientDetailsNiNumberMax = 9;
 export const clientDetailsNiNumberRegExp = new RegExp(
   "[A-CEGHJ-NOPR-TW-Z]{2}[0-9]{6}[ABCDs]{1}",
 );
-export const clientDetailsAddressCountryMax = 2;
+export const clientDetailsAddressOneCountryMax = 2;
 
 export const ClientDetails = zod.object({
-  id: zod.uuid().optional(),
+  id: zod.uuid().nullable(),
   firstName: zod.string(),
   lastName: zod.string(),
   dateOfBirth: zod.iso.date(),
@@ -24,25 +24,28 @@ export const ClientDetails = zod.object({
     .min(clientDetailsNiNumberMin)
     .max(clientDetailsNiNumberMax)
     .regex(clientDetailsNiNumberRegExp)
-    .optional(),
+    .nullish(),
   hasFixedAddress: zod.boolean(),
   address: zod
-    .object({
-      id: zod.uuid().optional(),
-      addressLine1: zod.string(),
-      addressLine2: zod.string().optional(),
-      addressLine3: zod.string().optional(),
-      addressLine4: zod.string().optional(),
-      townOrCity: zod.string().optional(),
-      postCode: zod.string().optional(),
-      county: zod.string().optional(),
-      country: zod.string().max(clientDetailsAddressCountryMax),
-      createdAt: zod.iso.datetime({ offset: true }).optional(),
-      modifiedAt: zod.iso.datetime({ offset: true }).optional(),
-    })
+    .union([
+      zod.object({
+        id: zod.uuid().nullable(),
+        addressLine1: zod.string(),
+        addressLine2: zod.string().nullish(),
+        addressLine3: zod.string().nullish(),
+        addressLine4: zod.string().nullish(),
+        townOrCity: zod.string().nullish(),
+        postCode: zod.string().nullish(),
+        county: zod.string().nullish(),
+        country: zod.string().max(clientDetailsAddressOneCountryMax),
+        createdAt: zod.iso.datetime({ offset: true }).nullable(),
+        modifiedAt: zod.iso.datetime({ offset: true }).nullable(),
+      }),
+      zod.null(),
+    ])
     .optional(),
-  createdAt: zod.iso.datetime({ offset: true }).optional(),
-  modifiedAt: zod.iso.datetime({ offset: true }).optional(),
+  createdAt: zod.iso.datetime({ offset: true }).nullable(),
+  modifiedAt: zod.iso.datetime({ offset: true }).nullable(),
 });
 
 export type ClientDetails = zod.input<typeof ClientDetails>;

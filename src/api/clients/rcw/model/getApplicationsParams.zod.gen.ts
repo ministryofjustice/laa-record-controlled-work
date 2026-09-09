@@ -13,6 +13,7 @@ export const GetApplicationsParams = zod.object({
   size: zod.int().default(getApplicationsParamsSizeDefault),
   officeId: zod.string().optional(),
   status: zod.enum(["DRAFT", "COMPLETED"]).optional(),
+  eligibilityIndication: zod.enum(["eligible", "ineligible"]).optional(),
 });
 
 export type GetApplicationsParams = zod.input<typeof GetApplicationsParams>;

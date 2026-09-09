@@ -61,7 +61,7 @@ describe("GET /api/applications/:applicationId/eligibility", () => {
     getApplicationStub.resolves({
       data: getGetApplicationResponseMock({
         id: resourceId,
-        eligibility: undefined,
+        eligibility: null,
       }),
       status: 200,
     });
@@ -97,7 +97,7 @@ describe("GET /api/applications/:applicationId/eligibility", () => {
     getApplicationStub.resolves({
       data: getGetApplicationResponseMock({
         id: resourceId,
-        eligibility: { data: { level_of_help: "cw" }, result: undefined },
+        eligibility: { data: { level_of_help: "cw" }, result: null },
       }),
       status: 200,
     });

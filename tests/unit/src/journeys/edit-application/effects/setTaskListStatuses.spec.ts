@@ -27,25 +27,19 @@ describe("setTaskListStatuses", () => {
   it("sets means, evidence and declaration to Cannot start yet when client details are incomplete", () => {
     const application = getGetApplicationResponseMock({
       clientDetails: {
+        id: null,
         firstName: "",
         lastName: "",
         dateOfBirth: "",
         niNumber: "",
         hasFixedAddress: true,
-        address: {
-          addressLine1: "",
-          addressLine2: "",
-          addressLine3: "",
-          addressLine4: "",
-          townOrCity: "",
-          postCode: "",
-          county: "",
-          country: "",
-        },
+        address: null,
+        createdAt: null,
+        modifiedAt: null,
       },
-      eligibility: undefined,
-      evidence: {},
-      declaration: {},
+      eligibility: null,
+      evidence: null,
+      declaration: null,
     });
 
     getData.withArgs(CONTEXT_DATA_KEYS.application).returns(application);
@@ -60,9 +54,9 @@ describe("setTaskListStatuses", () => {
 
   it("sets means assessment to Incomplete when client details are complete but means assessment has not started", () => {
     const application = getGetApplicationResponseMock({
-      eligibility: undefined,
-      evidence: {},
-      declaration: {},
+      eligibility: null,
+      evidence: null,
+      declaration: null,
     });
 
     getData.withArgs(CONTEXT_DATA_KEYS.application).returns(application);
@@ -77,11 +71,14 @@ describe("setTaskListStatuses", () => {
 
   it("sets declaration to Incomplete when means and evidence are complete but declaration is empty", () => {
     const application = getGetApplicationResponseMock({
-      eligibility: { result: { qualified: true } },
+      eligibility: { data: null, result: { qualified: true } },
       evidence: {
         evidenceExemptionCode: "something",
+        evidenceExemptionReason: null,
+        expenditureCapitalEvidenceChecklist: null,
+        incomeEvidenceChecklist: null,
       },
-      declaration: {},
+      declaration: null,
     });
 
     getData.withArgs(CONTEXT_DATA_KEYS.application).returns(application);
@@ -96,12 +93,20 @@ describe("setTaskListStatuses", () => {
 
   it("sets all statuses to Completed when all task list data is present", () => {
     const application = getGetApplicationResponseMock({
-      eligibility: { result: { qualified: true } },
+      eligibility: { data: null, result: { qualified: true } },
       evidence: {
         evidenceExemptionCode: "something",
+        evidenceExemptionReason: null,
+        expenditureCapitalEvidenceChecklist: null,
+        incomeEvidenceChecklist: null,
       },
       declaration: {
         declarationConfirmation: true,
+        id: null,
+        createdAt: null,
+        createdBy: null,
+        modifiedAt: null,
+        modifiedBy: null,
       },
     });
 
