@@ -11,6 +11,16 @@ import { NunjucksGenerators } from "@ministryofjustice/hmpps-forge/express-nunju
 import { t } from "#/lib/i18n.js";
 
 /**
+ * Decides which address formatter to use based on the country
+ * @returns The formatted address
+ */
+export function addressFormatResolver(): ResolvableString {
+  return match(Answer("ukCountry"))
+    .branch(Condition.Equals("United Kingdom"), formatUkAddress())
+    .otherwise(formatOsAddress());
+}
+
+/**
  * Formats the address change link.
  * @returns The address change URL.
  */
@@ -24,16 +34,6 @@ export function formatAddressChangeHref(): ResolvableString {
 }
 
 /**
- * Decides which address formatter to use based on the country
- * @returns The formatted address
- */
-export function formatAddressDecider(): ResolvableString {
-  return match(Answer("ukCountry"))
-    .branch(Condition.Equals("United Kingdom"), formatUkAddress())
-    .otherwise(formatOsAddress());
-}
-
-/**
  * Formats the address summary value.
  * @returns The address HTML or no-fixed-address text.
  */
@@ -43,7 +43,7 @@ export function formatAddressValue(): ResolvableString {
   );
 
   return match(Answer("haveAHomeAddress"))
-    .branch(Condition.Equals("yes"), formatAddressDecider())
+    .branch(Condition.Equals("yes"), addressFormatResolver())
     .otherwise(no);
 }
 
