@@ -42,7 +42,7 @@ jobs:
           PDA_API_KEY: ci-placeholder
 
       - name: Run ZAP Automation Framework scan
-        run: yarn security:zap:ci
+        run: ./scripts/zap/zap-run-cicd.sh
 
       - name: Upload ZAP HTML Report
         if: always()

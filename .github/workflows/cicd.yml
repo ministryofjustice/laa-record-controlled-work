@@ -141,7 +141,6 @@ jobs:
   zap-scan:
     name: Security
     if: github.event_name == 'pull_request'
-    needs: setup
     uses: ./.github/workflows/zap-scanning.yml
     with:
       sha: ${{ github.event.pull_request.head.sha || github.sha }}
