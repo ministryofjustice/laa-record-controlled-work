@@ -67,8 +67,7 @@ const isRcwEntryPath = (pathname: string): boolean =>
 
 const isMockAuthMode = (): boolean => AUTH_MODE === "mock";
 
-const signInWithNonMockOAuth = async (page: Page): Promise<void> => {
-  void page;
+const signInWithNonMockOAuth = async (/*page: Page*/): Promise<void> => {
   await Promise.resolve();
 
   throw new Error(
@@ -169,11 +168,9 @@ export const signInWithMultiOfficeMockOAuth = async (
 };
 
 const signInWithSingleOfficeNonMock = async (
-  page: Page,
-  officeCode: string,
+  /*page: Page,
+  officeCode: string,*/
 ): Promise<void> => {
-  void page;
-  void officeCode;
   await Promise.resolve();
 
   throw new Error(
@@ -183,11 +180,9 @@ const signInWithSingleOfficeNonMock = async (
 };
 
 const signInWithMultiOfficeNonMock = async (
-  page: Page,
-  officeCodes: string[],
+  /*page: Page,
+  officeCodes: string[],*/
 ): Promise<void> => {
-  void page;
-  void officeCodes;
   await Promise.resolve();
 
   throw new Error(
