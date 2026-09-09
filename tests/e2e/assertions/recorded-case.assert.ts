@@ -7,4 +7,10 @@ export const assertRecordedCaseVisible = async (
   clientName: string,
 ): Promise<void> => {
   await expect(page.getByRole("heading", { name: clientName })).toBeVisible();
+
+  await expect(
+    page.getByRole("navigation").filter({
+      has: page.getByRole("link", { name: "Client and case details" }),
+    }),
+  ).toBeVisible();
 };

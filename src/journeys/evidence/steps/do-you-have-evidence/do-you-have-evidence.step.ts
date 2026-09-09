@@ -1,35 +1,26 @@
 import {
   Answer,
   Condition,
-  Format,
-  Params,
   Query,
   redirect,
   step,
   submit,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
-import {
-  backLink,
-  caption,
-  continueButton,
-} from "#/journeys/evidence/common.blocks.js";
 import { evidenceEffects } from "#/journeys/evidence/evidence.effects.js";
 import { doYouHaveEvidenceRadioInput } from "#/journeys/evidence/steps/do-you-have-evidence/do-you-have-evidence.blocks.js";
-import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
+import { caption, continueButton } from "#/journeys/shared.blocks.js";
 import { t } from "#/lib/i18n.js";
 
 export const doYouHaveEvidence = (
   journeyCode: string,
 ): ReturnType<typeof step> =>
   step({
+    backlink: "../task-list/",
     blocks: [
-      backLink(
-        Format("/cases/%1/task-list/", Params(PARAMS_KEYS.applicationID)),
-      ),
-      caption,
+      caption(t("journeys.evidence.caption")),
       doYouHaveEvidenceRadioInput,
-      continueButton,
+      continueButton(),
     ],
     onSubmission: [
       submit({

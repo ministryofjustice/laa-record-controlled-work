@@ -1,24 +1,17 @@
 import {
   Condition,
-  Format,
-  Params,
   Query,
   redirect,
   step,
   submit,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
-import {
-  backLink,
-  caption,
-  continueButton,
-} from "#/journeys/evidence/common.blocks.js";
 import { evidenceEffects } from "#/journeys/evidence/evidence.effects.js";
 import {
   moreDetailsForNoEvidence,
   reasonForNoEvidenceRadioInput,
 } from "#/journeys/evidence/steps/reason-for-no-evidence/reason-for-no-evidence.blocks.js";
-import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
+import { caption, continueButton } from "#/journeys/shared.blocks.js";
 import { t } from "#/lib/i18n.js";
 
 export const reasonForNoEvidence = (
@@ -26,16 +19,10 @@ export const reasonForNoEvidence = (
 ): ReturnType<typeof step> =>
   step({
     blocks: [
-      backLink(
-        Format(
-          "/cases/%1/evidence/have-evidence",
-          Params(PARAMS_KEYS.applicationID),
-        ),
-      ),
-      caption,
+      caption(t("journeys.evidence.caption")),
       reasonForNoEvidenceRadioInput,
       moreDetailsForNoEvidence,
-      continueButton,
+      continueButton(),
     ],
     onSubmission: [
       submit({

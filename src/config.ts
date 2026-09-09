@@ -25,7 +25,7 @@ const DEFAULT_RCW_API_BASE_URL = "http://localhost:8081";
 const DEFAULT_PDA_API_BASE_URL =
   "https://laa-provider-details-api-uat.apps.live.cloud-platform.service.justice.gov.uk";
 const DEFAULT_PDA_MSW_OFFICE_COUNT = 3;
-const ENTRA_APPLICATIONS_READ_SCOPE =
+const DEFAULT_ENTRA_APPLICATIONS_READ_SCOPE =
   "https://devlexternal.onmicrosoft.com/laa-record-controlled-work-api-uat/Applications.Read";
 
 /* eslint-disable @typescript-eslint/no-magic-numbers -- time constants are intuitive */
@@ -89,6 +89,10 @@ export default {
   csrf: {
     cookieName: "_csrf",
     httpOnly: true,
+    ignoredPaths: [
+      "/api/applications/:applicationId/eligibility",
+      "/auth/code/callback",
+    ],
     secure: useHttps,
   } satisfies CsrfConfig,
 
@@ -101,7 +105,10 @@ export default {
       "openid",
       "profile",
       "offline_access",
-      ENTRA_APPLICATIONS_READ_SCOPE,
+
+      ...(optional.ENTRA_ADDITIONAL_SCOPES ?? [
+        DEFAULT_ENTRA_APPLICATIONS_READ_SCOPE,
+      ]),
     ],
   } satisfies EntraConfig,
 

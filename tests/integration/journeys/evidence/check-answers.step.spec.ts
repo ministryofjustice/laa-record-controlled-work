@@ -7,9 +7,6 @@ import sinon from "sinon";
 import { createForgeTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import { evidencePackage } from "#/journeys/evidence/evidence.package.js";
-import { checkAnswersStep } from "#/journeys/evidence/steps/check-answers/check-answers.step.js";
-import { evidenceEffects } from "#/journeys/evidence/evidence.effects.js";
-import { createApplicationJourney } from "#/journeys/create-application/create-application.journey.js";
 import { evidenceJourney } from "#/journeys/evidence/evidence.journey.js";
 
 describe("Check answers step", () => {

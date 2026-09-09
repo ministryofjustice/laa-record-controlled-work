@@ -28,6 +28,8 @@ import type { UnauthorizedResponse } from "#/api/clients/rcw/model/unauthorizedR
 
 import type { UpdateApplicationStatusRequestBody } from "#/api/clients/rcw/model/updateApplicationStatusRequestBody.zod.gen.js";
 
+import type { UpdateDeclarationRequestBody } from "#/api/clients/rcw/model/updateDeclarationRequestBody.zod.gen.js";
+
 import type { UpdateEvidenceRequestBody } from "#/api/clients/rcw/model/updateEvidenceRequestBody.zod.gen.js";
 
 import type { UpdateMeansDataRequestBody } from "#/api/clients/rcw/model/updateMeansDataRequestBody.zod.gen.js";
@@ -169,10 +171,21 @@ export const createApplication = async (
   createApplicationRequestBody?: CreateApplicationRequestBody,
   options?: RequestInit,
 ): Promise<createApplicationResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
   const res = await fetch(getCreateApplicationUrl(), {
     ...options,
     method: "POST",
-    headers: { "Content-Type": "application/json", ...options?.headers },
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
     body: JSON.stringify(createApplicationRequestBody),
   });
 
@@ -318,10 +331,21 @@ export const updateApplicationEvidence = async (
   updateEvidenceRequestBody: UpdateEvidenceRequestBody,
   options?: RequestInit,
 ): Promise<updateApplicationEvidenceResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
   const res = await fetch(getUpdateApplicationEvidenceUrl(id), {
     ...options,
     method: "PUT",
-    headers: { "Content-Type": "application/json", ...options?.headers },
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
     body: JSON.stringify(updateEvidenceRequestBody),
   });
 
@@ -402,10 +426,21 @@ export const updateApplicationMeans = async (
   updateMeansDataRequestBody: UpdateMeansDataRequestBody,
   options?: RequestInit,
 ): Promise<updateApplicationMeansResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
   const res = await fetch(getUpdateApplicationMeansUrl(id), {
     ...options,
     method: "PUT",
-    headers: { "Content-Type": "application/json", ...options?.headers },
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
     body: JSON.stringify(updateMeansDataRequestBody),
   });
 
@@ -419,6 +454,102 @@ export const updateApplicationMeans = async (
     status: res.status,
     headers: res.headers,
   } as updateApplicationMeansResponse;
+};
+
+export type updateApplicationDeclarationResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type updateApplicationDeclarationResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type updateApplicationDeclarationResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type updateApplicationDeclarationResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type updateApplicationDeclarationResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
+
+export type updateApplicationDeclarationResponse409 = {
+  data: ConflictResponse;
+  status: 409;
+};
+
+export type updateApplicationDeclarationResponse500 = {
+  data: InternalServerErrorResponse;
+  status: 500;
+};
+
+export type updateApplicationDeclarationResponseSuccess =
+  updateApplicationDeclarationResponse204 & {
+    headers: Headers;
+  };
+export type updateApplicationDeclarationResponseError = (
+  | updateApplicationDeclarationResponse400
+  | updateApplicationDeclarationResponse401
+  | updateApplicationDeclarationResponse403
+  | updateApplicationDeclarationResponse404
+  | updateApplicationDeclarationResponse409
+  | updateApplicationDeclarationResponse500
+) & {
+  headers: Headers;
+};
+
+export type updateApplicationDeclarationResponse =
+  | updateApplicationDeclarationResponseSuccess
+  | updateApplicationDeclarationResponseError;
+
+export const getUpdateApplicationDeclarationUrl = (id: string) => {
+  return `${config.api.rcw.baseUrl}/api/v1/applications/${id}/declaration`;
+};
+
+/**
+ * @summary Update the signed declaration for an application
+ */
+export const updateApplicationDeclaration = async (
+  id: string,
+  updateDeclarationRequestBody: UpdateDeclarationRequestBody,
+  options?: RequestInit,
+): Promise<updateApplicationDeclarationResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await fetch(getUpdateApplicationDeclarationUrl(id), {
+    ...options,
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(updateDeclarationRequestBody),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: updateApplicationDeclarationResponse["data"] = body
+    ? JSON.parse(body)
+    : undefined;
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as updateApplicationDeclarationResponse;
 };
 
 export type updateApplicationStatusResponse204 = {
@@ -486,10 +617,21 @@ export const updateApplicationStatus = async (
   updateApplicationStatusRequestBody: UpdateApplicationStatusRequestBody,
   options?: RequestInit,
 ): Promise<updateApplicationStatusResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
   const res = await fetch(getUpdateApplicationStatusUrl(id), {
     ...options,
     method: "PATCH",
-    headers: { "Content-Type": "application/json", ...options?.headers },
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
     body: JSON.stringify(updateApplicationStatusRequestBody),
   });
 

@@ -28,7 +28,10 @@ describe("loadApplication", () => {
   beforeEach(() => {
     sinon.stub(config.api, "useMockAccessToken").value(true);
     getApplicationStub = sinon.stub();
-    deps = { getApplication: getApplicationStub };
+    deps = {
+      getApplication: getApplicationStub,
+      updateApplicationStatus: sinon.stub(),
+    };
     setData = sinon.stub();
     getSession = sinon.stub().returns({
       id: "session-id",
@@ -54,7 +57,7 @@ describe("loadApplication", () => {
 
     expect(getApplicationStub.calledOnceWith(applicationId)).to.equal(true);
     expect(
-      setData.calledOnceWith(CONTEXT_DATA_KEYS.application, mockApplication),
+      setData.calledWith(CONTEXT_DATA_KEYS.application, mockApplication),
     ).to.equal(true);
   });
 

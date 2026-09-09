@@ -152,7 +152,8 @@ describe("Auth Integration", () => {
       authRequestDefaults as unknown as MutableAuthRequestDefaults;
 
     mutableMsalConfig.auth.authority = msalOriginalValues.authority;
-    mutableMsalConfig.auth.authorityMetadata = msalOriginalValues.authorityMetadata;
+    mutableMsalConfig.auth.authorityMetadata =
+      msalOriginalValues.authorityMetadata;
     mutableMsalConfig.auth.cloudDiscoveryMetadata =
       msalOriginalValues.cloudDiscoveryMetadata;
     mutableAuthRequestDefaults.redirectUri = msalOriginalValues.redirectUri;
@@ -161,10 +162,7 @@ describe("Auth Integration", () => {
       await sessionRedisClient.quit();
     }
 
-    await Promise.all([
-      redisContainer?.stop(),
-      idpContainer?.stop(),
-    ]);
+    await Promise.all([redisContainer?.stop(), idpContainer?.stop()]);
   });
 
   beforeEach(async () => {
@@ -212,7 +210,6 @@ describe("Auth Integration", () => {
 
   describe("OAuth2 Authorization Code Flow", () => {
     it("unauthenticated user can complete full login flow via mock IdP", async () => {
-
       const signinRes = await unauthenticatedUser.get("/auth/signin");
       expect(signinRes.status).to.equal(FOUND);
 
@@ -227,17 +224,19 @@ describe("Auth Integration", () => {
         body: postBody,
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
       });
- 
+
       // The mock server redirects to our app's callback with code & state.
       // Extract the path+query so we can send it to the app via supertest
       const location = idpResponse.headers.location;
       const callbackLocation = Array.isArray(location) ? location[0] : location;
-      expect(callbackLocation, "IdP response location header").to.be.a("string");
+      expect(callbackLocation, "IdP response location header").to.be.a(
+        "string",
+      );
       const { pathname, search } = new URL(
         callbackLocation as string,
         config.entra.redirectUri,
       );
-    
+
       // Complete the OAuth2 callback by sending the code and state to callback endpoint
       const callbackRes = await unauthenticatedUser.get(pathname + search);
       expect(callbackRes.status).to.equal(FOUND);

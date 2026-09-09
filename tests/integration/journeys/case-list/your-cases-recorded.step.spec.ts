@@ -48,9 +48,9 @@ describe("Your Cases recorded step", () => {
       renderResult = result as TestRenderResult;
       [recordButton] = renderResult.getBlocksByVariant("govukLinkButton");
       selectedOffice = renderResult
-        .getBlocksByVariant("html")
+        .getBlocksByVariant("govukBody")
         .find((b) =>
-          String(b.properties.content).includes("Office:"),
+          String(b.properties.text).includes("Office:"),
         ) as RenderBlock;
       [table] = renderResult.getBlocksByVariant("govukTable");
       [subNavigation] = renderResult.getBlocksByVariant("mojSubNavigation");
@@ -112,9 +112,8 @@ describe("Your Cases recorded step", () => {
       expect(rows).to.have.length(mockData.length);
 
       for (const [i, row] of rows.entries()) {
-        const { id, name, applicationRefNumber, modifiedAt } = mockData[i];
-        expect(row[0].html).to.include(name);
-        expect(row[0].html).to.include(`/cases/${id}`);
+        const { name, applicationRefNumber, modifiedAt } = mockData[i];
+        expect(row[0].text).to.include(name);
         expect(row[1].text).to.equal(applicationRefNumber);
         expect(row[2].text).to.equal(
           dateFormatter.format(new Date(modifiedAt)),
@@ -133,9 +132,9 @@ describe("Your Cases recorded step", () => {
         (b) => b.properties.visibleWhen !== false,
       );
       const body = renderResult
-        .getBlocksByVariant("html")
+        .getBlocksByVariant("govukBody")
         .find((b) =>
-          String(b.properties.content).includes("You have no recorded cases"),
+          String(b.properties.text).includes("You have no recorded cases"),
         ) as RenderBlock;
 
       expect(visibleTables).to.have.length(0);

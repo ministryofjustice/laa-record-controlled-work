@@ -2,41 +2,35 @@ import { Address } from "#/api/clients/rcw/model/address.zod.gen.js";
 import { Application } from "#/api/clients/rcw/model/application.zod.gen.js";
 import { Applications } from "#/api/clients/rcw/model/applications.zod.gen.js";
 
-export const UK_EXCLUSIVE_ADDRESS_FIELD = {
-  county: "county",
-  postcode: "postcode",
-  townOrCity: "townOrCity",
+export const UK_ADDRESS_FIELDS = {
+  addressLine1: "ukAddressLine1",
+  addressLine2: "ukAddressLine2",
+  country: "ukCountry",
+  county: "ukCounty",
+  postcode: "ukPostcode",
+  townOrCity: "ukTownOrCity",
 } as const;
 
-export const OVERSEAS_EXCLUSIVE_ADDRESS_FIELD = {
-  addressLine3: "addressLine3",
-  addressLine4: "addressLine4",
+export const OVERSEAS_ADDRESS_FIELDS = {
+  addressLine1: "osAddressLine1",
+  addressLine2: "osAddressLine2",
+  addressLine3: "osAddressLine3",
+  addressLine4: "osAddressLine4",
+  country: "osCountry",
 } as const;
-
-export const ADDRESS_FIELD = {
-  addressLine1: "addressLine1",
-  addressLine2: "addressLine2",
-  ...UK_EXCLUSIVE_ADDRESS_FIELD,
-  ...OVERSEAS_EXCLUSIVE_ADDRESS_FIELD,
-  country: "country",
-} as const;
-
-export const UK_EXCLUSIVE_ADDRESS_FIELDS = Object.values(
-  UK_EXCLUSIVE_ADDRESS_FIELD,
-);
-export const OVERSEAS_EXCLUSIVE_ADDRESS_FIELDS = Object.values(
-  OVERSEAS_EXCLUSIVE_ADDRESS_FIELD,
-);
 
 export const CONTEXT_DATA_KEYS = {
   application: "application",
+  applicationETag: "applicationETag",
   applicationID: "applicationID",
+  applicationStatus: "applicationStatus",
   availableOffices: "availableOffices",
   caseList: "caseList",
   clientDetailsStatus: "clientDetailsStatus",
   declarationStatus: "declarationStatus",
   evidenceStatus: "evidenceStatus",
   meansAssessment: "meansAssessment",
+  readyForSubmission: "readyForSubmission",
   recordedOn: "recordedOn",
   selectedOffice: "selectedOffice",
   singleOffice: "singleOffice",

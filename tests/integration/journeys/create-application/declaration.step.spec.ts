@@ -3,20 +3,15 @@ import {
   TestRenderResult,
 } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
-import {
-  CreateApplicationEffects,
-  createApplicationEffectsRegistry,
-} from "#/journeys/create-application/create-application.effects.js";
+import { createApplicationEffectsRegistry } from "#/journeys/create-application/create-application.effects.js";
 
-import { declarationStep } from "#/journeys/create-application/steps/declaration.step.js";
-import { ecfStep } from "#/journeys/create-application/steps/ecf.step.js";
 import { createForgeTestClient } from "../../utils/helpers.js";
 import { createApplicationJourney } from "#/journeys/create-application/create-application.journey.js";
 
 describe("Declaration step", () => {
   const client = createForgeTestClient(
     createApplicationJourney,
-    createApplicationEffectsRegistry
+    createApplicationEffectsRegistry,
   );
 
   describe("GET /cases/new/provider-declaration", () => {
@@ -32,21 +27,16 @@ describe("Declaration step", () => {
       expect(renderResult.context.step.title).to.equal("Declaration");
     });
 
-    it("renders a backlink to the start page", () => {
-      const [backLink] = renderResult.getBlocksByVariant("govukBackLink");
-      expect(backLink.properties.href).to.equal("/");
-    });
-
     it("renders declaration body copy including the privacy policy link", () => {
       const body = renderResult
-        .getBlocksByVariant("html")
+        .getBlocksByVariant("govukBody")
         .find(
           (block) =>
-            typeof block.properties.content === "string" &&
-            block.properties.content.includes("By continuing, you agree that"),
+            typeof block.properties.text === "string" &&
+            block.properties.text.includes("By continuing, you agree that"),
         );
       expect(body).to.not.equal(undefined);
-      const text = body?.properties.content as string;
+      const text = body?.properties.text as string;
 
       expect(text).to.include("By continuing, you agree that");
       expect(text).to.include('href="/privacy-policy"');

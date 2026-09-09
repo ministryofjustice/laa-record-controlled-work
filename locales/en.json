@@ -19,7 +19,26 @@
       "defaultHeading": "Landing Page"
     },
     "error": {
-      "pageTitle": "Sorry, there is a problem with the service – {SERVICE_NAME} – GOV.UK"
+      "404": {
+        "title": "Page not found",
+        "body": [
+          "If you typed the web address, check it is correct.",
+          "If you pasted the web address, check you copied the entire address."
+        ]
+      },
+      "500": {
+        "title": "Sorry, there is a problem with the service",
+        "body": [
+          "Try again later.",
+          "We have not saved your answers.",
+          "Use our <a href=\"https://legalaidlearning.justice.gov.uk/\" target=\"_blank\">means assessment resources</a> for guidance on checking a client's eligibility.",
+          "Contact our customer services team for support with legal aid administration or training:"
+        ],
+        "contactMethods": [
+          "telephone: 0300 200 2020",
+          "webchat on <a href=\"https://legalaidlearning.justice.gov.uk/totara/dashboard/index.php?id=34\" target=\"_blank\">our training website</a>"
+        ]
+      }
     },
     "yourCases": {
       "pageTitle": "Your cases",
@@ -47,6 +66,25 @@
           "dateRecorded": "Date recorded"
         }
       }
+    },
+    "view": {
+      "tabs": {
+        "ClientDetails": "Client and case details",
+        "meansAssessment": "Means Assessment",
+        "evidence": "Evidence"
+      },
+      "summaryCardTitles": {
+        "aboutTheClient": "About the client",
+        "caseDetails": "Case details"
+      },
+      "summaryCardRows": {
+        "fullName": "Full name",
+        "dateOfBirth": "Date of birth",
+        "nationalInsuranceNumber": "National Insurance number",
+        "address": "Address",
+        "legalAidBefore": "Accessed legal aid before",
+        "ecf": "ECF"
+      }
     }
   },
   "journeys": {
@@ -59,7 +97,7 @@
     "createApplication": {
       "declaration": {
         "title": "Declaration",
-        "text": "By continuing, you agree that:<br><ul><li>your client has instructed you, the provider, to act on their behalf</li><li>your client has read the LAA privacy policy (opens in a new window or tab)</li><li>you'll give complete and correct information</li></ul>",
+        "text": "By continuing, you agree that:<br><ul class=\"govuk-list govuk-list--bullet govuk-!-margin-bottom-6\"><li>your client has instructed you, the provider, to act on their behalf</li><li>your client has read the <a target=\"_blank\" href=\"/privacy-policy\">LAA privacy policy (opens in a new window or tab)</a></li><li>you'll give complete and correct information</li></ul>",
         "continue": "Agree and continue"
       },
       "caption": "Client and case details",
@@ -68,6 +106,15 @@
         "validation": {
           "required": "Please select an option"
         }
+      },
+      "ecfDropout": {
+        "title": "You are ineligible",
+        "heading": "You cannot use this service for this type of case",
+        "text": [
+          "Continue to complete the <a href=\"/government/publications/legal-aid-exceptional-case-funding-form-and-guidance\">ECF application form CIV ECF 1</a> and <a href=\"/government/publications/cw1-financial-eligibility-for-legal-aid-clients\">form CW1</a> for your client.",
+          "Send completed forms to: <a href=\"mailto:contactECC@justice.gov.uk\">contactECC@justice.gov.uk</a>"
+        ],
+        "button": "Return to case list"
       },
       "legalAidBefore": {
         "title": "Has your client accessed legal aid before?",
@@ -226,6 +273,7 @@
         "eligibilityResult": {
           "title": "Eligibility result",
           "eligible": "Your client qualifies financially for civil legal aid based on the information you entered.",
+          "ineligible": "Your client does not qualify financially for civil legal aid based on the information you entered.",
           "viewResult": "View result"
         },
         "EvidenceAndDeclaration": {
@@ -358,6 +406,27 @@
       }
     },
     "declaration": {
+      "sign": {
+        "title": "Sign the declaration",
+        "statement": [
+          "Download a copy of the details you entered for your client and get them to sign the declaration.",
+          "You must save a copy along with any evidence provided by your client. Your client’s file may be audited and assessed by the LAA at a later date."
+        ],
+        "download": "Download declaration as a PDF",
+        "confirmHeading": "Confirmation of signed declaration",
+        "confirmLabel": "I confirm that I have a signed declaration from my client",
+        "dateLabel": "Date of signature",
+        "dateHint": "This is your case start date and the date you can bill from",
+        "continueButton": "Continue",
+        "error": {
+          "confirmRequired": "You must confirm you have a signed declaration to continue",
+          "dateRequired": "You must confirm the date of signature to continue",
+          "dateInvalid": "Date of signature must be a real date",
+          "dateMissingDay": "Date of signature must include a day",
+          "dateMissingMonth": "Date of signature must include a month",
+          "dateMissingYear": "Date of signature must include a year"
+        }
+      },
       "caption": "Client declaration",
       "confirm": {
         "title": "Confirm the following",
@@ -375,6 +444,59 @@
           "have their legal aid stopped and have to pay back the costs"
         ],
         "confirmButton": "Confirm and continue"
+      }
+    },
+    "editApplication": {
+      "taskList": {
+        "clientDetails": {
+          "title": "About your client",
+          "taskItem": {
+            "label": "Client details"
+          }
+        },
+        "meansAssessment": {
+          "title": "Means assessment",
+          "taskItem": {
+            "label": "Income and capital"
+          }
+        },
+        "EvidenceAndDeclaration": {
+          "title": "Evidence and declarations",
+          "taskItem": {
+            "evidence": {
+              "label": "Evidence"
+            },
+            "declaration": {
+              "label": "Client declaration"
+            }
+          }
+        },
+        "status": {
+          "cannotStart": "Cannot start yet",
+          "incomplete": "Incomplete",
+          "completed": "Completed"
+        },
+        "submitButton": {
+          "label": "Record controlled work"
+        },
+        "eligibilityResult": {
+          "title": "Eligibility result",
+          "eligible": "Your client qualifies financially for civil legal aid based on the information you entered.",
+          "ineligible": "Your client does not qualify financially for civil legal aid based on the information you entered.",
+          "viewResult": "View result"
+        }
+      },
+      "confirmation": {
+        "panel": {
+          "title": "Controlled work recorded",
+          "body": "Reference number"
+        },
+        "nextHeading": "What happens next",
+        "nextList": [
+          "The LAA will store the details you've provided. You must <a href='#'>save a copy</a> for your own records which you should keep along with any evidence provided by your client.",
+          "Your client's file may be audited and assessed by the LAA at a later date."
+        ],
+        "returnButton": "Return to case list"
       }
     }
   }

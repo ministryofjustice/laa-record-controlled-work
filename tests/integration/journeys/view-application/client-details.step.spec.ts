@@ -45,21 +45,17 @@ describe("View recorded client details step", () => {
     });
 
     it("renders the client name as the heading", () => {
-      const heading = renderResult
-        .getBlocksByVariant("html")
-        .find((b) =>
-          String(b.properties.classes).includes("govuk-heading-xl"),
-        ) as RenderBlock;
+      const [heading] = renderResult.getBlocksByVariant("govukHeading");
 
       const clientName = `${mockData.clientDetails.firstName} ${mockData.clientDetails.lastName}`;
-      expect(heading?.properties.content).to.equal(clientName);
+      expect(heading.properties.text).to.equal(clientName);
     });
 
     it("renders the reference number", () => {
       const referenceNumber = renderResult
-        .getBlocksByVariant("html")
+        .getBlocksByVariant("govukBody")
         .find((b) =>
-          String(b.properties.content).includes("Reference number:"),
+          String(b.properties.text).includes("Reference number:"),
         ) as RenderBlock;
 
       expect(referenceNumber).to.exist;
@@ -75,12 +71,12 @@ describe("View recorded client details step", () => {
         },
       );
       const recordedOn = renderResult
-        .getBlocksByVariant("html")
+        .getBlocksByVariant("govukBody")
         .find((b) =>
-          String(b.properties.content).includes("Recorded on:"),
+          String(b.properties.text).includes("Recorded on:"),
         ) as RenderBlock;
       expect(recordedOn).to.exist;
-      expect(recordedOn?.properties.content).to.include(recordedOnDate);
+      expect(recordedOn?.properties.text).to.include(recordedOnDate);
     });
 
     it("renders the status tag", () => {
@@ -98,6 +94,47 @@ describe("View recorded client details step", () => {
         .getBlocksByVariant("govukButton")
         .find((b) => b.properties.text === "Print this case");
       expect(printButton).to.exist;
+    });
+
+    it("renders the subnavigation", () => {
+      const subNavigation = renderResult
+        .getBlocksByVariant("mojSubNavigation");
+      expect(subNavigation).to.exist;
+      const items = subNavigation[0].properties.items as {
+        text: string;
+        href: string;
+        active?: boolean;
+      }[];
+      expect(items[0].text).to.equal("Client and case details");
+      expect(items[0].href).to.equal("client-details");
+      expect(items[0].active).to.equal(true);
+      expect(items[1].text).to.equal("Means Assessment");
+      expect(items[1].href).to.equal("means-assessment");
+      expect(items[2].text).to.equal("Evidence");
+      expect(items[2].href).to.equal("evidence");
+    });
+
+    it("renders the client details panel", () => {
+      const clientDetailsPanel = renderResult
+        .getBlocksByVariant("govukSummaryList")
+        .find((b) =>
+          String((b.properties.card as { title: { text: string } }).title.text).includes(
+            "About the client",
+          ),
+        ) as RenderBlock;
+
+      expect(clientDetailsPanel).to.exist;
+    });
+
+    it("renders the case details panel", () => {
+      const caseDetailsPanel = renderResult
+        .getBlocksByVariant("govukSummaryList")
+        .find((b) =>
+          String((b.properties.card as { title: { text: string } }).title.text).includes(
+            "Case details",
+          ),
+        ) as RenderBlock;
+      expect(caseDetailsPanel).to.exist;
     });
   });
 });

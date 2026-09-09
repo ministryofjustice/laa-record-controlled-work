@@ -61,14 +61,12 @@ describe("GET /api/applications/:applicationId/eligibility", () => {
     getApplicationStub.resolves({
       data: getGetApplicationResponseMock({
         id: resourceId,
-        eligibility: undefined,
+        eligibility: null,
       }),
       status: 200,
     });
 
-    const response = await request(buildApp()).get(
-      eligibilityPath(resourceId),
-    );
+    const response = await request(buildApp()).get(eligibilityPath(resourceId));
 
     expect(response.status).to.equal(OK);
     expect(response.body).to.deep.equal({});
@@ -86,9 +84,7 @@ describe("GET /api/applications/:applicationId/eligibility", () => {
       status: 200,
     });
 
-    const response = await request(buildApp()).get(
-      eligibilityPath(resourceId),
-    );
+    const response = await request(buildApp()).get(eligibilityPath(resourceId));
 
     expect(response.status).to.equal(OK);
     expect(response.body).to.deep.equal({
@@ -101,14 +97,12 @@ describe("GET /api/applications/:applicationId/eligibility", () => {
     getApplicationStub.resolves({
       data: getGetApplicationResponseMock({
         id: resourceId,
-        eligibility: { data: { level_of_help: "cw" }, result: undefined },
+        eligibility: { data: { level_of_help: "cw" }, result: null },
       }),
       status: 200,
     });
 
-    const response = await request(buildApp()).get(
-      eligibilityPath(resourceId),
-    );
+    const response = await request(buildApp()).get(eligibilityPath(resourceId));
 
     expect(response.status).to.equal(OK);
     expect(response.body).to.deep.equal({});
@@ -117,9 +111,7 @@ describe("GET /api/applications/:applicationId/eligibility", () => {
   it("returns 401 when the session cannot be authenticated", async () => {
     sinon.stub(config.api, "useMockAccessToken").value(false);
 
-    const response = await request(buildApp()).get(
-      eligibilityPath(resourceId),
-    );
+    const response = await request(buildApp()).get(eligibilityPath(resourceId));
 
     expect(response.status).to.equal(UNAUTHORIZED);
     expect(getApplicationStub.called).to.equal(false);
@@ -129,9 +121,7 @@ describe("GET /api/applications/:applicationId/eligibility", () => {
     getApplicationStub.resolves({ data: undefined, status: 500 });
     sinon.stub(logger, "error");
 
-    const response = await request(buildApp()).get(
-      eligibilityPath(resourceId),
-    );
+    const response = await request(buildApp()).get(eligibilityPath(resourceId));
 
     expect(response.status).to.equal(INTERNAL_SERVER_ERROR);
   });

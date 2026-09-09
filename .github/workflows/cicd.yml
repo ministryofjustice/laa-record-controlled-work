@@ -159,7 +159,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Set up AWS credentials for ECR and Kubernetes
-        uses: aws-actions/configure-aws-credentials@e6de054238d6b7531b4efff3b6587d9aade6a06c # v6.2.3
+        uses: aws-actions/configure-aws-credentials@cbe3b392738ccf3f987d68400dafcf4b0624a56c # v6.2.4
         with:
           role-to-assume: ${{ secrets.ECR_ROLE_TO_ASSUME }}
           aws-region: ${{ vars.ECR_REGION }}
@@ -240,17 +240,20 @@ jobs:
       - snyk-infra
     secrets: inherit
 
-  # deploy-staging:
-  #   if: github.ref == 'refs/heads/main'
-  #   concurrency:
-  #     group: deploy-staging-${{ github.ref }}
-  #     cancel-in-progress: false
-  #   needs:
-  #     - deploy-uat
-  #   uses: ./.github/workflows/deploy-environment.yml
-  #   with:
-  #     app-environment: staging
-  #   secrets: inherit
+  deploy-staging:
+    name: Deploy
+    if: github.ref == 'refs/heads/main'
+    concurrency:
+      group: deploy-staging-${{ github.ref }}
+      cancel-in-progress: false
+    needs:
+      - deploy-uat
+    uses: ./.github/workflows/deploy-environment.yml
+    with:
+      app-environment: staging
+      sha: ${{ github.event.pull_request.head.sha || github.sha }}
+    secrets: inherit
+
 
   # deploy-production:
   #   if: github.ref == 'refs/heads/main'

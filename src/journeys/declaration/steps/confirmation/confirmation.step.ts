@@ -8,10 +8,7 @@ import {
   submit,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
-import {
-  backLink,
-  caption,
-} from "#/journeys/declaration/declaration.blocks.js";
+import { caption } from "#/journeys/declaration/declaration.blocks.js";
 import {
   confirmBody,
   confirmButtonGroup,
@@ -23,10 +20,8 @@ import { t } from "#/lib/i18n.js";
 
 export const confirmStep = (): ReturnType<typeof step> =>
   step({
+    backlink: "../task-list/",
     blocks: [
-      backLink(
-        Format("/cases/%1/task-list/", Params(PARAMS_KEYS.applicationID)),
-      ),
       caption,
       confirmHeading(),
       confirmBody(),
@@ -35,7 +30,7 @@ export const confirmStep = (): ReturnType<typeof step> =>
     ],
     onSubmission: [
       submit({
-        onValid: {
+        onAlways: {
           next: [
             redirect({
               goto: "sign",

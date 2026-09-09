@@ -1,7 +1,10 @@
 import { access, journey } from "@ministryofjustice/hmpps-forge/core/authoring";
 
-import { confirmStep } from "#/journeys/declaration/steps/confirmation/confirmation.step.js";
-import { JourneyEffects } from "#/journeys/effects.js";
+import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
+
+import { declarationEffects } from "./declaration.effects.js";
+import { confirmStep } from "./steps/confirmation/confirmation.step.js";
+import { signStep } from "./steps/sign/sign.step.js";
 
 const journeyCode = "declaration";
 
@@ -9,12 +12,11 @@ export const DeclarationJourney = journey({
   code: "declaration",
   onAccess: [
     access({
-      effects: [JourneyEffects.LoadDraftAnswers(journeyCode)],
+      effects: [declarationEffects.loadDraftAnswers(journeyCode)],
     }),
   ],
-  path: "/cases/:applicationID/declaration",
-  reachability: { disableReachabilityChecks: false },
-  steps: [confirmStep()],
+  path: `/cases/:${PARAMS_KEYS.applicationID}/declaration`,
+  steps: [confirmStep(), signStep()],
   title: "Declaration",
   view: { template: "partials/form-step" },
 });
