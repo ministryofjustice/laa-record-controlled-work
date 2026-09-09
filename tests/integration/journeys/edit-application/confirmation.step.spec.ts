@@ -65,22 +65,22 @@ describe("Confirmation step", () => {
 
     it("renders the correct heading content", () => {
       const heading = renderResult
-        .getBlocksByVariant("html")
+        .getBlocksByVariant("govukHeading")
         .find(
           (block) =>
-            typeof block.properties.content === "string" &&
-            block.properties.content.includes("What happens next"),
+            typeof block.properties.text === "string" &&
+            block.properties.text.includes("What happens next"),
         );
       expect(heading).to.not.equal(undefined);
     });
 
     it("renders the correct body content", () => {
       const body = renderResult
-        .getBlocksByVariant("html")
+        .getBlocksByVariant("govukBody")
         .find(
           (block) =>
-            typeof block.properties.content === "string" &&
-            block.properties.content.includes(
+            typeof block.properties.text === "string" &&
+            block.properties.text.includes(
               "The LAA will store the details you've provided",
             ),
         );

@@ -5,7 +5,7 @@ import {
 import { expect } from "chai";
 
 import { createForgeTestClient } from "../../utils/helpers.js";
-import { TemplateWrapper } from "@ministryofjustice/hmpps-forge/core/components";
+import { getBlockWithContent } from "../../utils/getBlockWithContent.helper.js";
 import { DeclarationJourney } from "#/journeys/declaration/declaration.journey.js";
 import sinon from "sinon";
 import { declarationEffectRegistry } from "#/journeys/declaration/declaration.effects.js";
@@ -42,14 +42,14 @@ describe("Declaration step", () => {
 
     it("renders declaration body copy including the privacy policy link", () => {
       const body = renderResult
-        .getBlocksByVariant("html")
+        .getBlocksByVariant("govukBody")
         .find(
           (block) =>
-            typeof block.properties.content === "string" &&
-            block.properties.content.includes("Joe Bloggs agrees that:"),
+            typeof block.properties.text === "string" &&
+            block.properties.text.includes("Joe Bloggs agrees that:"),
         );
       expect(body).to.not.equal(undefined);
-      const text = body?.properties.content as string;
+      const text = body?.properties.text as string;
 
       expect(text).to.include("they've read the");
       expect(text).to.include(
@@ -58,23 +58,13 @@ describe("Declaration step", () => {
     });
 
     it("renders a Confirm and Continue button", () => {
-      const buttonGroup = renderResult.getBlocksByVariant(
-        "templateWrapper",
-      )[0] as unknown as TemplateWrapper;
-      // @ts-ignore-next-line
-      const continueButton = buttonGroup.properties.slots.child0[0];
-      expect(continueButton).to.exist;
-      expect(continueButton.properties.value).to.equal("continue");
+      const block = getBlockWithContent(renderResult, "govukButtonGroup", "continue");
+      expect(block).to.exist;
     });
 
     it("renders a Save and Return button", () => {
-      const buttonGroup = renderResult.getBlocksByVariant(
-        "templateWrapper",
-      )[0] as unknown as TemplateWrapper;
-      // @ts-ignore-next-line
-      const returnButton = buttonGroup.properties.slots.child1[0];
-      expect(returnButton).to.exist;
-      expect(returnButton.properties.value).to.equal("return");
+      const block = getBlockWithContent(renderResult, "govukButtonGroup", "return");
+      expect(block).to.exist;
     });
   });
 

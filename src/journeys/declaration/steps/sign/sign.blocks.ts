@@ -1,6 +1,6 @@
 import type {
+  BlockDefinition,
   HtmlBlock,
-  TemplateWrapper,
 } from "@ministryofjustice/hmpps-forge/core/components";
 
 import {
@@ -92,7 +92,7 @@ export const confirmSignedDate = (): GovUKDateInputFull => {
   });
 };
 
-export const continueReturnButtons = (): TemplateWrapper => {
+export const continueReturnButtons = (): BlockDefinition => {
   return GovUKButtonGroup({
     buttons: [
       GovUKButton({
