@@ -1,14 +1,11 @@
 # Adds a ZAP scan service to the SAME compose invocation as the rest of the stack
-# (see scripts/zap/zap-run-local.sh / zap-run-cicd.sh).
+# (see scripts/zap/zap-run-local.sh - local dev only, CI uses a plain `docker run
+# --network host` instead, see scripts/zap/zap-run-cicd.sh).
 services:
-  nginx:
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-
   zap-scan:
     image: zaproxy/zap-stable
     container_name: rcw-zap-scan
-    network_mode: "service:nginx"
+    network_mode: "host"
     volumes:
       - ./zap.yaml:/zap/wrk/zap.yaml:ro
       - ./zap-results:/zap/wrk/zap-results:rw

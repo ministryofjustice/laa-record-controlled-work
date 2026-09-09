@@ -19,9 +19,13 @@ env:
               xpath: "//button[@type='submit']"
               timeout: 20000
         verification:
-          method: "autodetect"
+          method: "poll"
+          pollUrl: "http://localhost:8080/"
+          pollFrequency: 1
+          pollUnits: "requests"
+          loggedOutRegex: "\\QMock OAuth2 Server Sign-in\\E"
       sessionManagement:
-        method: "autodetect"
+        method: "cookie"
       users:
         - name: "test-user"
           credentials:

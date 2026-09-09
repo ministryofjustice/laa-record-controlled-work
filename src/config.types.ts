@@ -51,7 +51,6 @@ export interface Config {
   entra: EntraConfig;
   redis: RedisConfig;
   session: SessionOptions;
-  useHttps: boolean;
 }
 
 export interface CsrfConfig {

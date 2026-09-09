@@ -54,4 +54,4 @@ jobs:
 
       - name: Tear down stack
         if: always()
-        run: docker compose -f docker-compose.yml -f docker-compose.override.yml -f docker/compose/ci.yml -f docker/compose/zap.yml down --volumes --remove-orphans
+        run: docker compose -f docker-compose.yml -f docker-compose.override.yml -f docker/compose/ci.yml down --volumes --remove-orphans

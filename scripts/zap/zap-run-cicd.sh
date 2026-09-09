@@ -4,9 +4,8 @@ set -euo pipefail
 mkdir -p zap-results
 chmod 777 zap-results
 
-docker compose \
-  -f docker-compose.yml \
-  -f docker-compose.override.yml \
-  -f docker/compose/ci.yml \
-  -f docker/compose/zap.yml \
-  run --rm --no-deps zap-scan
+docker run --rm --network host \
+  -v "$(pwd)/zap.yaml":/zap/wrk/zap.yaml:ro \
+  -v "$(pwd)/zap-results":/zap/wrk/zap-results:rw \
+  -t zaproxy/zap-stable \
+  zap.sh -cmd -port 8090 -autorun /zap/wrk/zap.yaml
