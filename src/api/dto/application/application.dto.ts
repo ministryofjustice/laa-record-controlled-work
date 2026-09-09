@@ -1,10 +1,8 @@
 import type { CreateApplicationRequestBody } from "#/api/clients/rcw/model/createApplicationRequestBody.zod.gen.js";
+import { AnswerKey } from "#/journeys/AnswerKey.enum.js";
 import type { AnswersOutput } from "#/journeys/create-application/data/answers.zod.js";
+import { OVERSEAS_ADDRESS_FIELDS, UK_ADDRESS_FIELDS } from "#/journeys/journey.constants.js";
 
-{
-  OVERSEAS_ADDRESS_FIELDS,
-  UK_ADDRESS_FIELDS,
-} from "#/journeys/journey.constants.js";
 import { mapCountryNameToIsoCode } from "#/lib/countries.js";
 
 interface Application {
@@ -175,18 +173,52 @@ export class ApplicationDto {
   }
 
   /**
+   * Extract answers from a UK address.
+   * @param address - The UK address from which to extract the answers.
+   * @returns Partial AnswersOutput object containing the UK address fields.
+   */
+  private static getAnswersFromUkAddress(
+    address: UkAddress,
+  ): Partial<AnswersOutput> {
+    return {
+      [UK_ADDRESS_FIELDS.addressLine1]: address.addressLine1,
+      [UK_ADDRESS_FIELDS.addressLine2]: address.addressLine2,
+      [UK_ADDRESS_FIELDS.county]: address.county,
+      [UK_ADDRESS_FIELDS.country]: address.country,
+      [UK_ADDRESS_FIELDS.postcode]: address.postcode,
+      [UK_ADDRESS_FIELDS.townOrCity]: address.townOrCity,
+    };
+  }
+
+  /**
+   * Extract answers from an overseas address.
+   * @param address - The overseas address from which to extract the answers.
+   * @returns Partial AnswersOutput object containing the overseas address fields.
+   */
+  private static getAnswersFromOverseasAddress(
+    address: OverseasAddress,
+  ): Partial<AnswersOutput> {
+    return {
+      [OVERSEAS_ADDRESS_FIELDS.addressLine1]: address.addressLine1,
+      [OVERSEAS_ADDRESS_FIELDS.addressLine2]: address.addressLine2,
+      [OVERSEAS_ADDRESS_FIELDS.addressLine3]: address.addressLine3,
+      [OVERSEAS_ADDRESS_FIELDS.addressLine4]: address.addressLine4,
+      [OVERSEAS_ADDRESS_FIELDS.country]: address.country,
+    };
+  }
+
+  /**
    * Creates an answers output instance from the provided application.
    * @param application - The application from which to create the answers output instance.
    * @returns AnswersOutput instance.
    */
   public static toAnswers(application: CreateApplicationRequestBody): AnswersOutput {
+    const addressAnswers = application.clientDetails.address?.country === "GB"
+      ? this.getAnswersFromUkAddress(application.clientDetails.address as UkAddress)
+      : this.getAnswersFromOverseasAddress(application.clientDetails.address as OverseasAddress);
+
     return {
-      [AnswerKey.addressLine1]: application.clientDetails.address?.addressLine1,
-      [AnswerKey.addressLine2]: application.clientDetails.address?.addressLine2,
-      [AnswerKey.addressLine3]: application.clientDetails.address?.addressLine3,
-      [AnswerKey.addressLine4]: application.clientDetails.address?.addressLine4,
-      [AnswerKey.country]: application.clientDetails.address?.country,
-      [AnswerKey.county]: application.clientDetails.address?.county,
+      ...addressAnswers,
       [AnswerKey.dateOfBirth]: application.clientDetails.dateOfBirth,
       [AnswerKey.ecf]: "no",
       [AnswerKey.firstName]: application.clientDetails.firstName,
@@ -196,9 +228,7 @@ export class ApplicationDto {
       [AnswerKey.legalAidBefore]: application.scopingQuestions?.priorLegalAid as string,
       [AnswerKey.legalAidLast6Months]: application.legalAidLast6Months ? "yes" : "no",
       [AnswerKey.niNumber]: application.clientDetails.niNumber,
-      [AnswerKey.postcode]: application.clientDetails.address?.postCode,
       [AnswerKey.reasonForYes]: application.reasonForReapplication,
-      [AnswerKey.townOrCity]: application.clientDetails.address?.townOrCity,
     };
   }
 
