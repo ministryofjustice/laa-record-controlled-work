@@ -4,12 +4,10 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
 import {
-  CreateApplicationEffects,
   createApplicationEffectsRegistry,
 } from "#/journeys/create-application/create-application.effects.js";
 import { createForgeTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
-import { checkAnswersStep } from "#/journeys/create-application/steps/check-answers.step.js";
 import sinon from "sinon";
 import { getCreateApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
 import { createApplicationJourney } from "#/journeys/create-application/create-application.journey.js";
@@ -45,10 +43,10 @@ describe("Check answers step", () => {
         hasNINumber: "yes",
         niNumber: "AB123456C", // gitleaks:allow - fake NI number used to tests
         haveAHomeAddress: "yes",
-        addressLine1: "123 Test Street",
-        townOrCity: "Testville",
-        postcode: "TE5 7ST",
-        country: "United Kingdom",
+        ukAddressLine1: "123 Test Street",
+        ukTownOrCity: "Testville",
+        ukPostcode: "TE5 7ST",
+        ukCountry: "United Kingdom",
       },
     },
     selectedOffice: {
@@ -171,10 +169,10 @@ describe("Check answers step", () => {
             createApplication: {
               ...session.journeyDrafts.createApplication,
               haveAHomeAddress: "no",
-              addressLine1: undefined,
-              country: undefined,
-              townOrCity: undefined,
-              postcode: undefined,
+              ukAddressLine1: undefined,
+              ukCountry: undefined,
+              ukTownOrCity: undefined,
+              ukPostcode: undefined,
             },
           },
         },
@@ -227,10 +225,10 @@ describe("Check answers step", () => {
             createApplication: {
               ...session.journeyDrafts.createApplication,
               haveAHomeAddress: "no",
-              addressLine1: undefined,
-              country: undefined,
-              townOrCity: undefined,
-              postcode: undefined,
+              ukAddressLine1: undefined,
+              ukCountry: undefined,
+              ukTownOrCity: undefined,
+              ukPostcode: undefined,
             },
           },
         },

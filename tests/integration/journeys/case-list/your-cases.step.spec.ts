@@ -52,9 +52,9 @@ describe("Your Cases step", () => {
       renderResult = result as TestRenderResult;
       [recordButton] = renderResult.getBlocksByVariant("govukLinkButton");
       selectedOffice = renderResult
-        .getBlocksByVariant("html")
+        .getBlocksByVariant("govukBody")
         .find((b) =>
-          String(b.properties.content).includes("Office:"),
+          String(b.properties.text).includes("Office:"),
         ) as RenderBlock;
       [table] = renderResult.getBlocksByVariant("govukTable");
       [subNavigation] = renderResult.getBlocksByVariant("mojSubNavigation");
@@ -80,7 +80,7 @@ describe("Your Cases step", () => {
     });
 
     it("renders the change link when singleOffice is false", () => {
-      const changeLink = String(selectedOffice.properties.content).includes(
+      const changeLink = String(selectedOffice.properties.text).includes(
         'href="/select-office/"',
       );
       expect(changeLink).to.be.true;
@@ -100,14 +100,14 @@ describe("Your Cases step", () => {
 
       const renderResult = result as TestRenderResult;
       const selectedOfficeBlock = renderResult
-        .getBlocksByVariant("html")
+        .getBlocksByVariant("govukBody")
         .find((b) =>
-          String(b.properties.content).includes("Office:"),
+          String(b.properties.text).includes("Office:"),
         ) as RenderBlock;
 
       expect(selectedOfficeBlock).to.exist;
 
-      const changeLink = String(selectedOfficeBlock.properties.content).includes(
+      const changeLink = String(selectedOfficeBlock.properties.text).includes(
         'href="/select-office/"',
       );
       expect(changeLink).to.be.false;
@@ -171,9 +171,9 @@ describe("Your Cases step", () => {
         (b) => b.properties.visibleWhen !== false,
       );
       const body = renderResult
-        .getBlocksByVariant("html")
+        .getBlocksByVariant("govukBody")
         .find((b) =>
-          String(b.properties.content).includes(
+          String(b.properties.text).includes(
             "You have no cases in progress",
           ),
         ) as RenderBlock;

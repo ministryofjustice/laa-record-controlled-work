@@ -4,11 +4,9 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
 import {
-  CreateApplicationEffects,
   createApplicationEffectsRegistry,
 } from "#/journeys/create-application/create-application.effects.js";
 import { createForgeTestClient } from "../../utils/helpers.js";
-import { enterOverseasAddressStep } from "#/journeys/create-application/steps/enter-overseas-address.step.js";
 import { createApplicationJourney } from "#/journeys/create-application/create-application.journey.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 
@@ -76,11 +74,11 @@ describe("Enter overseas address step", () => {
 
   describe("POST /cases/new/enter-overseas-address", () => {
     const validBody = {
-      country: "Ireland",
-      addressLine1: "10 Some Street",
-      addressLine2: "",
-      addressLine3: "",
-      addressLine4: "",
+      osCountry: "Ireland",
+      osAddressLine1: "10 Some Street",
+      osAddressLine2: "",
+      osAddressLine3: "",
+      osAddressLine4: "",
     };
 
     it("should redirect to check-answers when given valid data", async () => {
@@ -101,15 +99,15 @@ describe("Enter overseas address step", () => {
     }> = [
       {
         description: "address line 1 is missing",
-        body: { ...validBody, addressLine1: "" },
+        body: { ...validBody, osAddressLine1: "" },
         expectedMessage: "Enter address line 1, typically the building and street",
-        fieldCode: "addressLine1",
+        fieldCode: "osAddressLine1",
       },
       {
         description: "country is missing",
-        body: { ...validBody, country: "" },
+        body: { ...validBody, osCountry: "" },
         expectedMessage: "Enter country",
-        fieldCode: "country",
+        fieldCode: "osCountry",
       },
     ];
 

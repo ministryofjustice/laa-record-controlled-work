@@ -6,10 +6,13 @@ import { expect } from "chai";
 import sinon from "sinon";
 
 import { getGetApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
+import { completeApplication } from "#msw/fixtures/rcw.js";
 import { createForgeTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import { editApplicationEffectsRegistry } from "#/journeys/edit-application/editApplication.effects.js";
 import { editApplicationJourney } from "#/journeys/edit-application/editApplication.journey.js";
+import { taskListStep } from "#/journeys/edit-application/steps/task-list/task-list.step.js";
+import { getBlockWithContent } from "../../utils/getBlockWithContent.helper.js";
 
 type RenderedTaskListItem = {
   title: { text: string };
@@ -20,6 +23,7 @@ type RenderedTaskListItem = {
 describe("Task list step", () => {
   const uuid = "123e4567-e89b-12d3-a456-426614174000";
   const eligibilityResult = {
+    data: null,
     result: {
       result_summary: { overall_result: { result: "eligible" } },
     },
@@ -55,7 +59,6 @@ describe("Task list step", () => {
     let heading: RenderBlock;
     let body: RenderBlock;
     let taskLists: RenderBlock[];
-    let buttonGroupBlock: RenderBlock;
 
     const getEvidenceAndDeclarationItems = (lists: RenderBlock[]) =>
       lists[2].properties.items as RenderedTaskListItem[];
@@ -67,18 +70,18 @@ describe("Task list step", () => {
       });
       expect(result.type).to.equal("render");
       renderResult = result as TestRenderResult;
-      [heading, body] = renderResult.getBlocksByVariant("html");
+      [heading] = renderResult.getBlocksByVariant("govukHeading");
+      [body] = renderResult.getBlocksByVariant("govukBody");
       taskLists = renderResult.getBlocksByVariant("govukTaskList");
-      [buttonGroupBlock] = renderResult.getBlocksByVariant("templateWrapper");
     });
 
     it("renders the client name as the heading", () => {
       const clientName = `${mockData.clientDetails.firstName} ${mockData.clientDetails.lastName}`;
-      expect(heading.properties.content).to.equal(clientName);
+      expect(heading.properties.text).to.equal(clientName);
     });
 
     it("renders the reference number", () => {
-      expect(body.properties.content).to.equal(
+      expect(body.properties.text).to.equal(
         `Reference number: ${mockData.applicationRefNumber}`,
       );
     });
@@ -92,6 +95,7 @@ describe("Task list step", () => {
         status: 200,
         data: getGetApplicationResponseMock({
           eligibility: {
+            data: null,
             result: {
               result_summary: { overall_result: { result: "ineligible" } },
             },
@@ -127,21 +131,19 @@ describe("Task list step", () => {
           .getBlocksByVariant("html")
           .filter((block) => block.properties.visibleWhen !== false)
           .some((block) =>
-            String(block.properties.content).includes("Evidence and Declaration"),
+            String(block.properties.content).includes(
+              "Evidence and Declaration",
+            ),
           ),
       ).to.equal(false);
-      expect(
-        Object.values(
-          (eligibilityResultRender.getBlocksByVariant("templateWrapper")[0]
-            .properties.slots ?? {}) as Record<string, RenderBlock[]>,
-        )
-          .flat()
-          .some(
-            (block) =>
-              block.properties.visibleWhen !== false &&
-              block.properties.text === "Close case",
-          ),
-      ).to.equal(true);
+      const [buttonGroup] = eligibilityResultRender.getBlocksByVariant(
+        "govukButtonGroup",
+      );
+      const buttons = buttonGroup.properties.buttons as RenderBlock[];
+      const closeCaseButton = buttons.find(
+        (button) => button.properties.text === "Close case",
+      );
+      expect(closeCaseButton).to.exist;
       expect(indicator).to.include(
         `href="/cases/${uuid}/eligibility/?destination=check-result"`,
       );
@@ -152,7 +154,7 @@ describe("Task list step", () => {
       getApplicationStub.resolves({
         status: 200,
         data: getGetApplicationResponseMock({
-          eligibility: { result: {} },
+          eligibility: { data: null, result: {} },
         }),
       });
 
@@ -233,7 +235,7 @@ describe("Task list step", () => {
         getApplicationStub.resolves({
           status: 200,
           data: getGetApplicationResponseMock({
-            eligibility: {},
+            eligibility: null,
           }),
         });
 
@@ -248,7 +250,9 @@ describe("Task list step", () => {
           .items as RenderedTaskListItem[];
         const meansAssessmentItem = meansAssessmentItems[0];
 
-        expect(meansAssessmentItem.href).to.equal(`/cases/${uuid}/eligibility/`);
+        expect(meansAssessmentItem.href).to.equal(
+          `/cases/${uuid}/eligibility/`,
+        );
         expect(meansAssessmentItem.status.tag?.text).to.equal("Incomplete");
       });
     });
@@ -257,15 +261,7 @@ describe("Task list step", () => {
       it("renders declaration as Completed when declaration data is present", async () => {
         getApplicationStub.resolves({
           status: 200,
-          data: getGetApplicationResponseMock({
-            eligibility: eligibilityResult,
-            evidence: {
-              evidenceExemptionCode: "something",
-            },
-            declaration: {
-              declarationConfirmation: true,
-            },
-          }),
+          data: completeApplication,
         });
 
         const result = await client.get(`/cases/${uuid}/task-list`, {
@@ -287,13 +283,10 @@ describe("Task list step", () => {
       it("renders declaration as Incomplete when declaration data is empty", async () => {
         getApplicationStub.resolves({
           status: 200,
-          data: getGetApplicationResponseMock({
-            eligibility: eligibilityResult,
-            evidence: {
-              evidenceExemptionCode: "something",
-            },
-            declaration: {},
-          }),
+          data: {
+            ...completeApplication,
+            declaration: null,
+          },
         });
 
         const result = await client.get(`/cases/${uuid}/task-list`, {
@@ -315,13 +308,10 @@ describe("Task list step", () => {
       it("renders declaration as Cannot start yet when evidence is not complete", async () => {
         getApplicationStub.resolves({
           status: 200,
-          data: getGetApplicationResponseMock({
-            eligibility: eligibilityResult,
-            evidence: {},
-            declaration: {
-              declarationConfirmation: true,
-            },
-          }),
+          data: {
+            ...completeApplication,
+            evidence: null,
+          },
         });
 
         const result = await client.get(`/cases/${uuid}/task-list`, {
@@ -342,21 +332,15 @@ describe("Task list step", () => {
     });
 
     it("renders the save and return button", () => {
-      const slots = buttonGroupBlock.properties.slots as Record<
-        string,
-        RenderBlock[]
-      >;
-      const saveAndReturnBtn = slots.child1[0];
-      expect(saveAndReturnBtn.properties.value).to.equal("return");
-      expect(saveAndReturnBtn.properties.text).to.equal(
-        "Save and return later",
-      );
+      const block = getBlockWithContent(renderResult, "govukButtonGroup", "return");
+      expect(block).to.exist;
+      expect(JSON.stringify(block)).to.include("Save and return later");
     });
 
     it("hides the Record Controlled Work button when readyForSubmission is false", async () => {
       getApplicationStub.resolves({
         status: 200,
-        data: getGetApplicationResponseMock({ eligibility: {} }),
+        data: getGetApplicationResponseMock({ eligibility: null }),
       });
 
       const result = await client.get(`/cases/${uuid}/task-list`, {
@@ -364,20 +348,15 @@ describe("Task list step", () => {
       });
       expect(result.type).to.equal("render");
       const incompleteRender = result as TestRenderResult;
-      const [incompleteButtonGroup] =
-        incompleteRender.getBlocksByVariant("templateWrapper");
-      const incompleteSlots = incompleteButtonGroup.properties.slots as Record<
-        string,
-        RenderBlock[]
-      >;
-      const submitBtn = incompleteSlots.child0[0];
-      expect(submitBtn.properties.classes).to.equal("govuk-!-display-none");
+      const block = getBlockWithContent(incompleteRender, "govukButtonGroup", "submit");
+      expect(block).to.exist;
+      expect(JSON.stringify(block)).to.include("govuk-!-display-none");
     });
 
     it("shows the Record Controlled Work button when readyForSubmission is true", async () => {
       getApplicationStub.resolves({
         status: 200,
-        data: getGetApplicationResponseMock(),
+        data: completeApplication,
       });
 
       const result = await client.get(`/cases/${uuid}/task-list`, {
@@ -385,15 +364,9 @@ describe("Task list step", () => {
       });
       expect(result.type).to.equal("render");
       const readyRender = result as TestRenderResult;
-      const [readyButtonGroup] =
-        readyRender.getBlocksByVariant("templateWrapper");
-      const readySlots = readyButtonGroup.properties.slots as Record<
-        string,
-        RenderBlock[]
-      >;
-      const submitBtn = readySlots.child0[0];
-      expect(submitBtn.properties.value).to.equal("submit");
-      expect(submitBtn.properties.classes).to.equal("");
+      const block = getBlockWithContent(readyRender, "govukButtonGroup", "submit");
+      expect(block).to.exist;
+      expect(JSON.stringify(block)).to.not.include("govuk-!-display-none");
     });
   });
 
@@ -413,6 +386,7 @@ describe("Task list step", () => {
         status: 200,
         data: getGetApplicationResponseMock({
           eligibility: {
+            data: null,
             result: {
               result_summary: { overall_result: { result: "ineligible" } },
             },
