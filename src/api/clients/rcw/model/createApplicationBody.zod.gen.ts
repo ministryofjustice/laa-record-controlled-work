@@ -21,7 +21,6 @@ export const CreateApplicationBody = zod.object({
   providerOfficeCode: zod.string(),
   scopingQuestions: zod.record(zod.string(), zod.unknown()),
   clientDetails: zod.object({
-    id: zod.uuid().optional(),
     firstName: zod.string(),
     lastName: zod.string(),
     dateOfBirth: zod.iso.date(),
@@ -34,7 +33,6 @@ export const CreateApplicationBody = zod.object({
     hasFixedAddress: zod.boolean(),
     address: zod
       .object({
-        id: zod.uuid().optional(),
         addressLine1: zod.string(),
         addressLine2: zod.string().optional(),
         addressLine3: zod.string().optional(),
@@ -45,12 +43,8 @@ export const CreateApplicationBody = zod.object({
         country: zod
           .string()
           .max(createApplicationBodyClientDetailsAddressCountryMax),
-        createdAt: zod.iso.datetime({ offset: true }).optional(),
-        modifiedAt: zod.iso.datetime({ offset: true }).optional(),
       })
       .optional(),
-    createdAt: zod.iso.datetime({ offset: true }).optional(),
-    modifiedAt: zod.iso.datetime({ offset: true }).optional(),
   }),
 });
 

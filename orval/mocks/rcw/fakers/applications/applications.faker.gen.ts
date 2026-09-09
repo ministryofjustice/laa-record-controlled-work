@@ -47,6 +47,10 @@ export const getGetApplicationsResponseMock = (): ApplicationsMock =>
     name: faker.string.alpha({ length: { min: 10, max: 20 } }),
     applicationRefNumber: faker.string.alpha({ length: { min: 10, max: 20 } }),
     modifiedAt: faker.date.past().toISOString().slice(0, 19) + "Z",
+    eligibilityIndication: faker.helpers.arrayElement([
+      faker.helpers.arrayElement(["eligible", "ineligible"] as const),
+      null,
+    ]),
   }));
 
 export const getCreateApplicationResponseMock = <
@@ -88,19 +92,22 @@ export const getGetApplicationResponseMock = <
         "[A-CEGHJ-NOPR-TW-Z]{2}[0-9]{6}[ABCDs]{1}",
       ),
       hasFixedAddress: faker.datatype.boolean(),
-      address: {
-        id: faker.string.uuid(),
-        addressLine1: faker.string.alpha({ length: { min: 10, max: 20 } }),
-        addressLine2: faker.string.alpha({ length: { min: 10, max: 20 } }),
-        addressLine3: faker.string.alpha({ length: { min: 10, max: 20 } }),
-        addressLine4: faker.string.alpha({ length: { min: 10, max: 20 } }),
-        townOrCity: faker.string.alpha({ length: { min: 10, max: 20 } }),
-        postCode: faker.string.alpha({ length: { min: 10, max: 20 } }),
-        county: faker.string.alpha({ length: { min: 10, max: 20 } }),
-        country: faker.string.alpha({ length: { min: 2, max: 2 } }),
-        createdAt: faker.date.past().toISOString().slice(0, 19) + "Z",
-        modifiedAt: faker.date.past().toISOString().slice(0, 19) + "Z",
-      },
+      address: faker.helpers.arrayElement([
+        {
+          id: faker.string.uuid(),
+          addressLine1: faker.string.alpha({ length: { min: 10, max: 20 } }),
+          addressLine2: faker.string.alpha({ length: { min: 10, max: 20 } }),
+          addressLine3: faker.string.alpha({ length: { min: 10, max: 20 } }),
+          addressLine4: faker.string.alpha({ length: { min: 10, max: 20 } }),
+          townOrCity: faker.string.alpha({ length: { min: 10, max: 20 } }),
+          postCode: faker.string.alpha({ length: { min: 10, max: 20 } }),
+          county: faker.string.alpha({ length: { min: 10, max: 20 } }),
+          country: faker.string.alpha({ length: { min: 2, max: 2 } }),
+          createdAt: faker.date.past().toISOString().slice(0, 19) + "Z",
+          modifiedAt: faker.date.past().toISOString().slice(0, 19) + "Z",
+        },
+        null,
+      ]),
       createdAt: faker.date.past().toISOString().slice(0, 19) + "Z",
       modifiedAt: faker.date.past().toISOString().slice(0, 19) + "Z",
     },
@@ -108,26 +115,32 @@ export const getGetApplicationResponseMock = <
       "DRAFT",
       "COMPLETED",
     ] as const),
-    declaration: {
-      id: faker.string.uuid(),
-      declarationConfirmation: faker.datatype.boolean(),
-      dateSigned: faker.date.past().toISOString().slice(0, 10),
-      createdAt: faker.date.past().toISOString().slice(0, 19) + "Z",
-      createdBy: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      modifiedAt: faker.date.past().toISOString().slice(0, 19) + "Z",
-      modifiedBy: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    },
-    evidence: {
-      evidenceExemptionCode: faker.string.alpha({
-        length: { min: 10, max: 20 },
-      }),
-      evidenceExemptionReason: faker.string.alpha({
-        length: { min: 10, max: 20 },
-      }),
-      incomeEvidenceChecklist: {},
-      expenditureCapitalEvidenceChecklist: {},
-    },
-    eligibility: { data: {}, result: {} },
+    declaration: faker.helpers.arrayElement([
+      {
+        id: faker.string.uuid(),
+        declarationConfirmation: faker.datatype.boolean(),
+        dateSigned: faker.date.past().toISOString().slice(0, 10),
+        createdAt: faker.date.past().toISOString().slice(0, 19) + "Z",
+        createdBy: faker.string.alpha({ length: { min: 10, max: 20 } }),
+        modifiedAt: faker.date.past().toISOString().slice(0, 19) + "Z",
+        modifiedBy: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      },
+      null,
+    ]),
+    evidence: faker.helpers.arrayElement([
+      {
+        evidenceExemptionCode: faker.string.alpha({
+          length: { min: 10, max: 20 },
+        }),
+        evidenceExemptionReason: faker.string.alpha({
+          length: { min: 10, max: 20 },
+        }),
+        incomeEvidenceChecklist: {},
+        expenditureCapitalEvidenceChecklist: {},
+      },
+      null,
+    ]),
+    eligibility: faker.helpers.arrayElement([{ data: {}, result: {} }, null]),
     reasonForReapplication: faker.string.alpha({
       length: { min: 10, max: 20 },
     }),

@@ -7,13 +7,13 @@
 import * as zod from "zod";
 
 export const Declaration = zod.object({
-  id: zod.uuid().optional(),
-  declarationConfirmation: zod.boolean().optional(),
-  dateSigned: zod.iso.date().optional(),
-  createdAt: zod.iso.datetime({ offset: true }).optional(),
-  createdBy: zod.string().optional(),
-  modifiedAt: zod.iso.datetime({ offset: true }).optional(),
-  modifiedBy: zod.string().optional(),
+  id: zod.uuid().nullable(),
+  declarationConfirmation: zod.boolean().nullable(),
+  dateSigned: zod.iso.date().nullish(),
+  createdAt: zod.iso.datetime({ offset: true }).nullable(),
+  createdBy: zod.string().nullable(),
+  modifiedAt: zod.iso.datetime({ offset: true }).nullable(),
+  modifiedBy: zod.string().nullable(),
 });
 
 export type Declaration = zod.input<typeof Declaration>;

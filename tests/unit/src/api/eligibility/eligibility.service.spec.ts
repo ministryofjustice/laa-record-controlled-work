@@ -233,7 +233,7 @@ describe("loadEligibilityAssessment", () => {
     getApplicationStub.resolves({
       data: getGetApplicationResponseMock({
         id: applicationId,
-        eligibility: undefined,
+        eligibility: null,
       }),
       status: 200,
     });
@@ -252,7 +252,7 @@ describe("loadEligibilityAssessment", () => {
     getApplicationStub.resolves({
       data: getGetApplicationResponseMock({
         id: applicationId,
-        eligibility: { data: { level_of_help: "cw" }, result: undefined },
+        eligibility: { data: { level_of_help: "cw" }, result: null },
       }),
       status: 200,
     });
