@@ -4,10 +4,10 @@ import {
   Condition,
   not,
   redirect,
+  type RedirectOutcome,
   step,
   type StepDefinition,
   submit,
-  type SubmitHook,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
 import { AnswerKey } from "#/journeys/AnswerKey.enum.js";
@@ -41,8 +41,33 @@ export function legalAidBeforeStep(journeyCode: string): StepDefinition {
     ],
     code: StepCode.LEGAL_AID_BEFORE,
     onSubmission: [
-      clearReasonWhenNotSameMatter(journeyCode),
-      onSubmission(journeyCode),
+      // clear sub-journey answers if answer not "yesSameMatter"
+      submit({
+        onValid: {
+          effects: [
+            CreateApplicationEffects.clearFieldAnswers(journeyCode, [
+              "legalAidLast6Months",
+              "reasonForYes",
+            ]),
+            CreateApplicationEffects.saveDraftAnswers(journeyCode),
+          ],
+          next: next(),
+        },
+        validate: true,
+        when: not(
+          Answer(AnswerKey.legalAidBefore).match(
+            Condition.Equals("yesSameMatter"),
+          ),
+        ),
+      }),
+
+      submit({
+        onValid: {
+          effects: [CreateApplicationEffects.saveDraftAnswers(journeyCode)],
+          next: next(),
+        },
+        validate: true,
+      }),
     ],
     path: "/legal-aid-before",
     reachability: {
@@ -53,87 +78,31 @@ export function legalAidBeforeStep(journeyCode: string): StepDefinition {
 }
 
 /**
- * Clears the reason when the answer is not about the same matter.
+ * Builds the routes used after a valid legal aid history submission.
  *
- * @param {string} journeyCode - The journey code for saving draft answers
- * @returns {SubmitHook} A conditional cleanup and routing hook
+ * @returns {RedirectOutcome[]} The submission routes
  */
-function clearReasonWhenNotSameMatter(journeyCode: string): SubmitHook {
-  return submit({
-    onValid: {
-      effects: [
-        CreateApplicationEffects.clearFieldAnswers(journeyCode, [
-          "legalAidLast6Months",
-          "reasonForYes",
-        ]),
-        CreateApplicationEffects.saveDraftAnswers(journeyCode),
-      ],
-      next: [
-        redirect({
-          goto: `${StepCode.LEGAL_AID_LAST_6_MONTHS}?returnTo=check-answers`,
-          when: and(
-            hasCheckAnswersInQuery,
-            Answer(AnswerKey.legalAidBefore).match(
-              Condition.Equals("yesSameMatter"),
-            ),
-          ),
-        }),
+function next(): RedirectOutcome[] {
+  return [
+    redirect({
+      goto: `${StepCode.LEGAL_AID_LAST_6_MONTHS}?returnTo=check-answers`,
+      when: and(
+        hasCheckAnswersInQuery,
+        Answer(AnswerKey.legalAidBefore).match(
+          Condition.Equals("yesSameMatter"),
+        ),
+      ),
+    }),
 
-        redirectToCheckAnswers,
+    redirectToCheckAnswers,
 
-        redirect({
-          goto: StepCode.LEGAL_AID_LAST_6_MONTHS,
-          when: Answer(AnswerKey.legalAidBefore).match(
-            Condition.Equals("yesSameMatter"),
-          ),
-        }),
+    redirect({
+      goto: StepCode.LEGAL_AID_LAST_6_MONTHS,
+      when: Answer(AnswerKey.legalAidBefore).match(
+        Condition.Equals("yesSameMatter"),
+      ),
+    }),
 
-        redirect({ goto: StepCode.CLIENT_DETAILS }),
-      ],
-    },
-    validate: true,
-    when: not(
-      Answer(AnswerKey.legalAidBefore).match(Condition.Equals("yesSameMatter")),
-    ),
-  });
-}
-
-/**
- * Handles form submission for the legal aid history question step.
- * Saves draft answers and routes based on the answer:
- * - If "same matter": redirects to legal aid last 6 months step
- * - Otherwise: redirects to client details step
- *
- * @param {string} journeyCode - The journey code for saving draft answers
- * @returns {SubmitHook} A submit hook with validation and conditional routing logic
- */
-function onSubmission(journeyCode: string): SubmitHook {
-  return submit({
-    onValid: {
-      effects: [CreateApplicationEffects.saveDraftAnswers(journeyCode)],
-      next: [
-        redirect({
-          goto: `${StepCode.LEGAL_AID_LAST_6_MONTHS}?returnTo=check-answers`,
-          when: and(
-            hasCheckAnswersInQuery,
-            Answer(AnswerKey.legalAidBefore).match(
-              Condition.Equals("yesSameMatter"),
-            ),
-          ),
-        }),
-
-        redirectToCheckAnswers,
-
-        redirect({
-          goto: StepCode.LEGAL_AID_LAST_6_MONTHS,
-          when: Answer(AnswerKey.legalAidBefore).match(
-            Condition.Equals("yesSameMatter"),
-          ),
-        }),
-
-        redirect({ goto: StepCode.CLIENT_DETAILS }),
-      ],
-    },
-    validate: true,
-  });
+    redirect({ goto: StepCode.CLIENT_DETAILS }),
+  ];
 }
