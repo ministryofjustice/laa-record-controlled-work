@@ -7,17 +7,6 @@ import {
 } from "#/journeys/journey.constants.js";
 import { mapCountryNameToIsoCode } from "#/lib/countries.js";
 
-interface Address {
-  addressLine1: string;
-  addressLine2?: string;
-  addressLine3?: string;
-  addressLine4?: string;
-  country: string;
-  county?: string;
-  postcode?: string;
-  townOrCity?: string;
-}
-
 interface Application {
   addressLine1: string;
   addressLine2?: string;
@@ -36,6 +25,23 @@ interface Application {
   providerOfficeCode: string;
   reasonForReapplication?: string;
   scopingQuestions: Record<string, unknown>;
+  townOrCity?: string;
+}
+
+interface OsAddress {
+  addressLine1: string;
+  addressLine2?: string;
+  addressLine3?: string;
+  addressLine4?: string;
+  country: string;
+}
+
+interface UkAddress {
+  addressLine1: string;
+  addressLine2?: string;
+  country: string;
+  county?: string;
+  postcode?: string;
   townOrCity?: string;
 }
 
@@ -109,37 +115,12 @@ export class ApplicationDto {
   public static getAddressFromAnswers(
     answers: AnswersOutput,
     hasFixedAddress: boolean,
-  ): Address {
+  ): OsAddress | UkAddress {
     const isUkAddress = answers[UK_ADDRESS_FIELDS.country] === "United Kingdom";
 
     return isUkAddress
       ? this.getUkAddressFromAnswers(answers, hasFixedAddress)
       : this.getOverseasAddressFromAnswers(answers, hasFixedAddress);
-  }
-
-  /**
-   * Extract UK address fields from the answers.
-   * @param answers - The answers from which to extract the address fields.
-   * @param hasFixedAddress - boolean reused from above.
-   * @returns Address object containing the UK address fields.
-   */
-  private static getUkAddressFromAnswers(
-    answers: AnswersOutput,
-    hasFixedAddress: boolean,
-  ): Address {
-    const countryName = answers[UK_ADDRESS_FIELDS.country];
-
-    return {
-      addressLine1: answers[UK_ADDRESS_FIELDS.addressLine1],
-      addressLine2: answers[UK_ADDRESS_FIELDS.addressLine2],
-      country:
-        hasFixedAddress && countryName
-          ? mapCountryNameToIsoCode(countryName)
-          : undefined,
-      county: answers[UK_ADDRESS_FIELDS.county],
-      postcode: answers[UK_ADDRESS_FIELDS.postcode],
-      townOrCity: answers[UK_ADDRESS_FIELDS.townOrCity],
-    } as Address;
   }
 
   /**
@@ -151,19 +132,45 @@ export class ApplicationDto {
   private static getOverseasAddressFromAnswers(
     answers: AnswersOutput,
     hasFixedAddress: boolean,
-  ): Address {
-    const countryName = answers[OVERSEAS_ADDRESS_FIELDS.country];
+  ): OsAddress {
+    const countryName: string | undefined =
+      answers[OVERSEAS_ADDRESS_FIELDS.country];
 
     return {
-      addressLine1: answers[OVERSEAS_ADDRESS_FIELDS.addressLine1],
+      addressLine1: answers[OVERSEAS_ADDRESS_FIELDS.addressLine1] ?? "",
       addressLine2: answers[OVERSEAS_ADDRESS_FIELDS.addressLine2],
       addressLine3: answers[OVERSEAS_ADDRESS_FIELDS.addressLine3],
       addressLine4: answers[OVERSEAS_ADDRESS_FIELDS.addressLine4],
       country:
         hasFixedAddress && countryName
           ? mapCountryNameToIsoCode(countryName)
-          : undefined,
-    } as Address;
+          : "",
+    };
+  }
+
+  /**
+   * Extract UK address fields from the answers.
+   * @param answers - The answers from which to extract the address fields.
+   * @param hasFixedAddress - boolean reused from above.
+   * @returns Address object containing the UK address fields.
+   */
+  private static getUkAddressFromAnswers(
+    answers: AnswersOutput,
+    hasFixedAddress: boolean,
+  ): UkAddress {
+    const countryName: string | undefined = answers[UK_ADDRESS_FIELDS.country];
+
+    return {
+      addressLine1: answers[UK_ADDRESS_FIELDS.addressLine1] ?? "",
+      addressLine2: answers[UK_ADDRESS_FIELDS.addressLine2],
+      country:
+        hasFixedAddress && countryName
+          ? mapCountryNameToIsoCode(countryName)
+          : "",
+      county: answers[UK_ADDRESS_FIELDS.county],
+      postcode: answers[UK_ADDRESS_FIELDS.postcode],
+      townOrCity: answers[UK_ADDRESS_FIELDS.townOrCity],
+    };
   }
 
   /**
