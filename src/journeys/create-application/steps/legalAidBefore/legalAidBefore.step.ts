@@ -2,6 +2,7 @@ import {
   and,
   Answer,
   Condition,
+  not,
   redirect,
   step,
   type StepDefinition,
@@ -39,12 +40,61 @@ export function legalAidBeforeStep(journeyCode: string): StepDefinition {
       continueButton(),
     ],
     code: StepCode.LEGAL_AID_BEFORE,
-    onSubmission: [onSubmission(journeyCode)],
+    onSubmission: [
+      clearReasonWhenNotSameMatter(journeyCode),
+      onSubmission(journeyCode),
+    ],
     path: "/legal-aid-before",
     reachability: {
       entryWhen: hasCheckAnswersInQuery,
     },
     title: TITLE,
+  });
+}
+
+/**
+ * Clears the reason when the answer is not about the same matter.
+ *
+ * @param {string} journeyCode - The journey code for saving draft answers
+ * @returns {SubmitHook} A conditional cleanup and routing hook
+ */
+function clearReasonWhenNotSameMatter(journeyCode: string): SubmitHook {
+  return submit({
+    onValid: {
+      effects: [
+        CreateApplicationEffects.clearFieldAnswers(journeyCode, [
+          "legalAidLast6Months",
+          "reasonForYes",
+        ]),
+        CreateApplicationEffects.saveDraftAnswers(journeyCode),
+      ],
+      next: [
+        redirect({
+          goto: `${StepCode.LEGAL_AID_LAST_6_MONTHS}?returnTo=check-answers`,
+          when: and(
+            hasCheckAnswersInQuery,
+            Answer(AnswerKey.legalAidBefore).match(
+              Condition.Equals("yesSameMatter"),
+            ),
+          ),
+        }),
+
+        redirectToCheckAnswers,
+
+        redirect({
+          goto: StepCode.LEGAL_AID_LAST_6_MONTHS,
+          when: Answer(AnswerKey.legalAidBefore).match(
+            Condition.Equals("yesSameMatter"),
+          ),
+        }),
+
+        redirect({ goto: StepCode.CLIENT_DETAILS }),
+      ],
+    },
+    validate: true,
+    when: not(
+      Answer(AnswerKey.legalAidBefore).match(Condition.Equals("yesSameMatter")),
+    ),
   });
 }
 
