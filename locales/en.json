@@ -252,6 +252,7 @@
           "lastName": "Last name",
           "dateOfBirth": "Date of birth",
           "niNumber": "National Insurance number",
+          "haveAHomeAddress": "Has a home address",
           "address": "Address"
         },
         "answerValues": {

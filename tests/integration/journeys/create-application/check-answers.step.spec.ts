@@ -79,7 +79,7 @@ describe("Check answers step", () => {
         key: { text: string };
         value: { text: string };
       }>;
-      expect(rows.length).to.equal(9);
+      expect(rows.length).to.equal(10);
       expect(rows[0].key.text).to.equal("ECF");
       expect(rows[1].key.text).to.equal("Accessed legal aid before");
       expect(rows[1].value.text).to.equal(
@@ -91,7 +91,68 @@ describe("Check answers step", () => {
       expect(rows[5].key.text).to.equal("Last name");
       expect(rows[6].key.text).to.equal("Date of birth");
       expect(rows[7].key.text).to.equal("National Insurance number");
-      expect(rows[8].key.text).to.equal("Address");
+      expect(rows[8].key.text).to.equal("Has a home address");
+      expect(rows[8].value.text).to.equal("Yes");
+      expect(rows[9].key.text).to.equal("Address");
+    });
+
+    it("links the home address row to the home address question", () => {
+      const rows = summaryList.properties.rows as Array<{
+        actions?: { items: Array<{ href: string }> };
+        key: { text: string };
+      }>;
+      const homeAddressRow = rows.find(
+        (row) => row.key.text === "Has a home address",
+      );
+
+      expect(homeAddressRow?.actions?.items[0].href).to.equal(
+        "have-a-home-address?returnTo=check-answers",
+      );
+    });
+
+    it("links the address row to the UK address step for a UK address", () => {
+      const rows = summaryList.properties.rows as Array<{
+        actions?: { items: Array<{ href: string }> };
+        key: { text: string };
+      }>;
+      const addressRow = rows.find((row) => row.key.text === "Address");
+
+      expect(addressRow?.actions?.items[0].href).to.equal(
+        "enter-address-manually?returnTo=check-answers",
+      );
+    });
+
+    it("links the address row to the overseas address step for an overseas address", async () => {
+      const result = await client.get("/cases/new/check-answers", {
+        session: {
+          ...session,
+          journeyDrafts: {
+            createApplication: {
+              ...session.journeyDrafts.createApplication,
+              ukAddressLine1: undefined,
+              ukCountry: undefined,
+              ukTownOrCity: undefined,
+              ukPostcode: undefined,
+              osAddressLine1: "10 Some Other Street",
+              osCountry: "Australia",
+            },
+          },
+        },
+      });
+
+      expect(result.type).to.equal("render");
+      const overseasRender = result as TestRenderResult;
+      const [overseasSummaryList] =
+        overseasRender.getBlocksByVariant("govukSummaryList");
+      const rows = overseasSummaryList.properties.rows as Array<{
+        actions?: { items: Array<{ href: string }> };
+        key: { text: string };
+      }>;
+      const addressRow = rows.find((row) => row.key.text === "Address");
+
+      expect(addressRow?.actions?.items[0].href).to.equal(
+        "enter-overseas-address?returnTo=check-answers",
+      );
     });
 
     it("renders the national insurance number when hasNINumber is 'yes'", () => {
@@ -193,8 +254,12 @@ describe("Check answers step", () => {
       }>;
 
       const addressRow = rows.find((row) => row.key.text === "Address");
+      const homeAddressRow = rows.find(
+        (row) => row.key.text === "Has a home address",
+      );
 
       expect(addressRow).to.not.be.undefined;
+      expect(homeAddressRow?.value.text).to.equal("No");
       expect(addressRow?.value.html).to.equal("No fixed address");
       expect(addressRow?.actions?.items[0].href).to.equal(
         "have-a-home-address?returnTo=check-answers",

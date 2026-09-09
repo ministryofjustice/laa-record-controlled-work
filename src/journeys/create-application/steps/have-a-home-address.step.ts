@@ -14,7 +14,10 @@ import {
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
 import { CreateApplicationEffects } from "#/journeys/create-application/create-application.effects.js";
-import { ADDRESS_FIELD } from "#/journeys/journey.constants.js";
+import {
+  OVERSEAS_ADDRESS_FIELDS,
+  UK_ADDRESS_FIELDS,
+} from "#/journeys/journey.constants.js";
 import {
   hasCheckAnswersInQuery,
   redirectToCheckAnswers,
@@ -68,10 +71,10 @@ export const haveAHomeAddressStep = (
       submit({
         onValid: {
           effects: [
-            CreateApplicationEffects.clearFieldAnswers(
-              journeyCode,
-              Object.values(ADDRESS_FIELD),
-            ),
+            CreateApplicationEffects.clearFieldAnswers(journeyCode, [
+              ...Object.values(UK_ADDRESS_FIELDS),
+              ...Object.values(OVERSEAS_ADDRESS_FIELDS),
+            ]),
             CreateApplicationEffects.saveDraftAnswers(journeyCode),
           ],
           next: [redirectToCheckAnswers, redirect({ goto: "check-answers" })],

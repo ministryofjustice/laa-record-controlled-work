@@ -107,10 +107,12 @@ describe("Have A Home Address Step", () => {
         journeyDrafts: {
           createApplication: {
             haveAHomeAddress: "yes",
-            addressLine1: "10 Some Street",
-            townOrCity: "SomeCity",
-            postcode: "AB1 2CD",
-            country: "United Kingdom",
+            ukAddressLine1: "10 Some Street",
+            ukTownOrCity: "SomeCity",
+            ukPostcode: "AB1 2CD",
+            ukCountry: "United Kingdom",
+            osAddressLine1: "10 Some Other Street",
+            osCountry: "Australia",
           },
         },
       };

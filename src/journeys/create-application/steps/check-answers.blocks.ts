@@ -15,6 +15,7 @@ import {
 
 import {
   formatAddressValue,
+  formatChangeAddressRedirect,
   formatDateOfBirth,
   formatEcfLabel,
   formatLegalAidBeforeLabel,
@@ -130,6 +131,16 @@ export const summaryList = GovUKSummaryList({
     }),
     SummaryRow({
       href: "have-a-home-address?returnTo=check-answers",
+      labelKey:
+        "journeys.createApplication.checkAnswers.answerLabels.haveAHomeAddress",
+      value: {
+        text: match(Answer("haveAHomeAddress"))
+          .branch(Condition.Equals("yes"), t("common.yes"))
+          .otherwise(t("common.no")),
+      },
+    }),
+    SummaryRow({
+      href: formatChangeAddressRedirect(),
       labelKey: "journeys.createApplication.checkAnswers.answerLabels.address",
       value: { html: formatAddressValue() },
     }),

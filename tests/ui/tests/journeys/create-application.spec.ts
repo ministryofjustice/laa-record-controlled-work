@@ -238,7 +238,7 @@ test("create application flow", async ({ withSelectedOffice: page }) => {
   // Check that all answers are displayed correctly
   const summaryList = page.locator(".govuk-summary-list");
   const rows = summaryList.locator(".govuk-summary-list__row");
-  await expect(rows).toHaveCount(8);
+  await expect(rows).toHaveCount(9);
   await expect(rows.locator(".govuk-summary-list__value")).toHaveText([
     // ECF
     "No",
@@ -254,6 +254,8 @@ test("create application flow", async ({ withSelectedOffice: page }) => {
     "15 June 1990",
     // National Insurance number
     "No",
+    // Has a home address
+    "Yes",
     // Address
     "10 Some Street, SomeCity, AB1 2CD",
   ], { useInnerText: true });
@@ -263,14 +265,11 @@ test("create application flow", async ({ withSelectedOffice: page }) => {
     .locator(".govuk-summary-list__actions a");
   await expect(changeAddressLink).toHaveAttribute(
     "href",
-    "have-a-home-address?returnTo=check-answers",
+    "enter-address-manually?returnTo=check-answers",
   );
   await changeAddressLink.click();
-  
-  // Verify redirection back to the home address question
-  await expect(page).toHaveURL("/cases/new/have-a-home-address?returnTo=check-answers");
-  await page.getByRole("radio", { name: "Yes" }).check();
-  await page.getByRole("button", { name: "Continue" }).click();
+
+  // Verify redirection back to the UK address entry page
   await expect(page).toHaveURL("/cases/new/enter-address-manually?returnTo=check-answers");
   
   // ==========================================================================
