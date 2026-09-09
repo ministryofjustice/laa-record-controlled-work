@@ -85,11 +85,11 @@ describe("Enter address manually step", () => {
 
   describe("POST /cases/new/enter-address-manually", () => {
     const validBody = {
-      addressLine1: "10 Some Street",
-      addressLine2: "",
-      townOrCity: "SomeCity",
-      county: "",
-      postcode: "AB1 2CD",
+      ukAddressLine1: "10 Some Street",
+      ukAddressLine2: "",
+      ukTownOrCity: "SomeCity",
+      ukCounty: "",
+      ukPostcode: "AB1 2CD",
     };
 
     it("should redirect to check-answers when given valid data", async () => {
@@ -110,28 +110,28 @@ describe("Enter address manually step", () => {
     }> = [
       {
         description: "address line 1 is missing",
-        body: { ...validBody, addressLine1: "" },
+        body: { ...validBody, ukAddressLine1: "" },
         expectedMessage:
           "Enter address line 1, typically the building and street",
-        fieldCode: "addressLine1",
+        fieldCode: "ukAddressLine1",
       },
       {
         description: "town or city is missing",
-        body: { ...validBody, townOrCity: "" },
+        body: { ...validBody, ukTownOrCity: "" },
         expectedMessage: "Enter town or city",
-        fieldCode: "townOrCity",
+        fieldCode: "ukTownOrCity",
       },
       {
         description: "postcode is missing",
-        body: { ...validBody, postcode: "" },
+        body: { ...validBody, ukPostcode: "" },
         expectedMessage: "Enter postcode",
-        fieldCode: "postcode",
+        fieldCode: "ukPostcode",
       },
       {
         description: "postcode is invalid",
-        body: { ...validBody, postcode: "INVALID" },
+        body: { ...validBody, ukPostcode: "INVALID" },
         expectedMessage: "Enter a valid postcode, for example SW1A 1AA",
-        fieldCode: "postcode",
+        fieldCode: "ukPostcode",
       },
     ];
 

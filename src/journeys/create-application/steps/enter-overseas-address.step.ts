@@ -18,8 +18,8 @@ import {
 import { Autocomplete } from "#/journeys/components/autocomplete/autocomplete.component.js";
 import { CreateApplicationEffects } from "#/journeys/create-application/create-application.effects.js";
 import {
-  ADDRESS_FIELD,
-  UK_EXCLUSIVE_ADDRESS_FIELDS,
+  OVERSEAS_ADDRESS_FIELDS,
+  UK_ADDRESS_FIELDS,
 } from "#/journeys/journey.constants.js";
 import { COUNTRY_NAMES } from "#/lib/countries.js";
 import { t } from "#/lib/i18n.js";
@@ -43,7 +43,7 @@ export const enterOverseasAddressStep = (
         ),
         data: COUNTRY_NAMES,
         field: GovUKTextInput({
-          code: ADDRESS_FIELD.country,
+          code: OVERSEAS_ADDRESS_FIELDS.country,
           label: {
             classes: "govuk-label--m",
             isPageHeading: false,
@@ -71,7 +71,7 @@ export const enterOverseasAddressStep = (
         ),
       }),
       GovUKTextInput({
-        code: ADDRESS_FIELD.addressLine1,
+        code: OVERSEAS_ADDRESS_FIELDS.addressLine1,
         label: {
           isPageHeading: false,
           text: t(
@@ -88,7 +88,7 @@ export const enterOverseasAddressStep = (
         ],
       }),
       GovUKTextInput({
-        code: ADDRESS_FIELD.addressLine2,
+        code: OVERSEAS_ADDRESS_FIELDS.addressLine2,
         label: {
           isPageHeading: false,
           text: t(
@@ -97,7 +97,7 @@ export const enterOverseasAddressStep = (
         },
       }),
       GovUKTextInput({
-        code: ADDRESS_FIELD.addressLine3,
+        code: OVERSEAS_ADDRESS_FIELDS.addressLine3,
         label: {
           isPageHeading: false,
           text: t(
@@ -106,7 +106,7 @@ export const enterOverseasAddressStep = (
         },
       }),
       GovUKTextInput({
-        code: ADDRESS_FIELD.addressLine4,
+        code: OVERSEAS_ADDRESS_FIELDS.addressLine4,
         label: {
           isPageHeading: false,
           text: t(
@@ -122,7 +122,7 @@ export const enterOverseasAddressStep = (
           effects: [
             CreateApplicationEffects.clearFieldAnswers(
               journeyCode,
-              UK_EXCLUSIVE_ADDRESS_FIELDS,
+              Object.values(UK_ADDRESS_FIELDS),
             ),
             CreateApplicationEffects.saveDraftAnswers(journeyCode),
           ],

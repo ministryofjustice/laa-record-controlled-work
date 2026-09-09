@@ -16,8 +16,8 @@ import {
 
 import { CreateApplicationEffects } from "#/journeys/create-application/create-application.effects.js";
 import {
-  ADDRESS_FIELD,
-  OVERSEAS_EXCLUSIVE_ADDRESS_FIELDS,
+  OVERSEAS_ADDRESS_FIELDS,
+  UK_ADDRESS_FIELDS,
 } from "#/journeys/journey.constants.js";
 import { t } from "#/lib/i18n.js";
 
@@ -33,7 +33,7 @@ export const enterAddressManuallyStep = (
         text: t("journeys.createApplication.enterAddressManually.title"),
       }),
       GovUKTextInput({
-        code: ADDRESS_FIELD.addressLine1,
+        code: UK_ADDRESS_FIELDS.addressLine1,
         label: {
           isPageHeading: false,
           text: t(
@@ -50,7 +50,7 @@ export const enterAddressManuallyStep = (
         ],
       }),
       GovUKTextInput({
-        code: ADDRESS_FIELD.addressLine2,
+        code: UK_ADDRESS_FIELDS.addressLine2,
         label: {
           isPageHeading: false,
           text: t(
@@ -60,7 +60,7 @@ export const enterAddressManuallyStep = (
       }),
       GovUKTextInput({
         classes: "govuk-!-width-two-thirds",
-        code: ADDRESS_FIELD.townOrCity,
+        code: UK_ADDRESS_FIELDS.townOrCity,
         label: {
           isPageHeading: false,
           text: t(
@@ -78,7 +78,7 @@ export const enterAddressManuallyStep = (
       }),
       GovUKTextInput({
         classes: "govuk-!-width-two-thirds",
-        code: ADDRESS_FIELD.county,
+        code: UK_ADDRESS_FIELDS.county,
         label: {
           isPageHeading: false,
           text: t(
@@ -88,7 +88,7 @@ export const enterAddressManuallyStep = (
       }),
       GovUKTextInput({
         classes: "govuk-input--width-10",
-        code: ADDRESS_FIELD.postcode,
+        code: UK_ADDRESS_FIELDS.postcode,
         label: {
           isPageHeading: false,
           text: t(
@@ -113,7 +113,7 @@ export const enterAddressManuallyStep = (
       GovUKTextInput({
         classes:
           "govuk-input--width-10 govuk-!-display-none govuk-!-visibility-hidden",
-        code: ADDRESS_FIELD.country,
+        code: UK_ADDRESS_FIELDS.country,
         defaultValue: "United Kingdom",
         label: {
           isPageHeading: false,
@@ -131,7 +131,7 @@ export const enterAddressManuallyStep = (
           effects: [
             CreateApplicationEffects.clearFieldAnswers(
               journeyCode,
-              OVERSEAS_EXCLUSIVE_ADDRESS_FIELDS,
+              Object.values(OVERSEAS_ADDRESS_FIELDS),
             ),
             CreateApplicationEffects.saveDraftAnswers(journeyCode),
           ],

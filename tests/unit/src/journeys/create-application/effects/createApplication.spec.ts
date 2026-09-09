@@ -34,8 +34,8 @@ describe("CreateApplicationEffect", () => {
     getSession = sinon.stub().returns({
       journeyDrafts: {
         [journeyCode]: {
-          addressLine1: "123 Test Street",
-          country: "United Kingdom",
+          ukAddressLine1: "123 Test Street",
+          ukCountry: "United Kingdom",
           dateOfBirth: "1990-01-01",
           ecf: "no",
           firstName: "Jane",
@@ -45,9 +45,9 @@ describe("CreateApplicationEffect", () => {
           legalAidBefore: "yesSameMatter",
           legalAidLast6Months: "yes",
           niNumber: "QQ123456C", // gitleaks:allow - fake NI number used in test fixture
-          postcode: "A12 3BC",
+          ukPostcode: "A12 3BC",
           reasonForYes: "here is a reason",
-          townOrCity: "Manchester",
+          ukTownOrCity: "Manchester",
         },
       },
       selectedOffice: {
@@ -131,8 +131,8 @@ describe("CreateApplicationEffect", () => {
     getSession.returns({
       journeyDrafts: {
         [journeyCode]: {
-          addressLine1: "123 Test Street",
-          country: "United Kingdom",
+          ukAddressLine1: "123 Test Street",
+          ukCountry: "United Kingdom",
           dateOfBirth: "1990-01-01",
           ecf: "no",
           firstName: "Jane",
@@ -142,9 +142,9 @@ describe("CreateApplicationEffect", () => {
           legalAidBefore: "yesSameMatter",
           legalAidLast6Months: "yes",
           niNumber: "QQ123456C", // gitleaks:allow - fake NI number used in test fixture
-          postcode: "A12 3BC",
+          ukPostcode: "A12 3BC",
           reasonForYes: "here is a reason",
-          townOrCity: "Manchester",
+          ukTownOrCity: "Manchester",
         },
       },
     });

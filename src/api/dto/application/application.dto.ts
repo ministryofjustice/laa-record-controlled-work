@@ -1,7 +1,10 @@
 import type { CreateApplicationRequestBody } from "#/api/clients/rcw/model/createApplicationRequestBody.zod.gen.js";
 import type { AnswersOutput } from "#/journeys/create-application/data/answers.zod.js";
 
-import { ADDRESS_FIELD } from "#/journeys/journey.constants.js";
+import {
+  OVERSEAS_ADDRESS_FIELDS,
+  UK_ADDRESS_FIELDS,
+} from "#/journeys/journey.constants.js";
 import { mapCountryNameToIsoCode } from "#/lib/countries.js";
 
 interface Application {
@@ -22,6 +25,23 @@ interface Application {
   providerOfficeCode: string;
   reasonForReapplication?: string;
   scopingQuestions: Record<string, unknown>;
+  townOrCity?: string;
+}
+
+interface OverseasAddress {
+  addressLine1: string;
+  addressLine2?: string;
+  addressLine3?: string;
+  addressLine4?: string;
+  country: string;
+}
+
+interface UkAddress {
+  addressLine1: string;
+  addressLine2?: string;
+  country: string;
+  county?: string;
+  postcode?: string;
   townOrCity?: string;
 }
 
@@ -68,18 +88,9 @@ export class ApplicationDto {
     providerOfficeCode: string,
   ): ApplicationDto {
     const hasFixedAddress = answers.haveAHomeAddress === "yes";
-    const countryName = answers[ADDRESS_FIELD.country];
 
     return new ApplicationDto({
-      addressLine1: answers[ADDRESS_FIELD.addressLine1] ?? "",
-      addressLine2: answers[ADDRESS_FIELD.addressLine2],
-      addressLine3: answers[ADDRESS_FIELD.addressLine3],
-      addressLine4: answers[ADDRESS_FIELD.addressLine4],
-      country:
-        hasFixedAddress && countryName
-          ? mapCountryNameToIsoCode(countryName)
-          : "",
-      county: answers[ADDRESS_FIELD.county],
+      ...this.getAddressFromAnswers(answers, hasFixedAddress),
       dateOfBirth: answers.dateOfBirth,
       firstName: answers.firstName,
       hasFixedAddress,
@@ -87,14 +98,79 @@ export class ApplicationDto {
       legalAidBefore: answers.legalAidBefore,
       legalAidLast6Months: answers.legalAidLast6Months === "yes",
       niNumber: answers.niNumber,
-      postcode: answers[ADDRESS_FIELD.postcode],
       providerOfficeCode,
       reasonForReapplication: answers.reasonForYes,
       scopingQuestions: {
         priorLegalAid: answers.legalAidBefore,
       },
-      townOrCity: answers[ADDRESS_FIELD.townOrCity],
     });
+  }
+
+  /**
+   * Set the address fields based off whether the address is UK or overseas.
+   * @param answers - The answers from which to extract the address fields.
+   * @param hasFixedAddress - boolean reused from above.
+   * @returns Address object containing the address fields.
+   */
+  public static getAddressFromAnswers(
+    answers: AnswersOutput,
+    hasFixedAddress: boolean,
+  ): OverseasAddress | UkAddress {
+    const isUkAddress = answers[UK_ADDRESS_FIELDS.country] === "United Kingdom";
+
+    return isUkAddress
+      ? this.getUkAddressFromAnswers(answers, hasFixedAddress)
+      : this.getOverseasAddressFromAnswers(answers, hasFixedAddress);
+  }
+
+  /**
+   * Extract overseas address fields from the answers.
+   * @param answers - The answers from which to extract the address fields.
+   * @param hasFixedAddress - boolean reused from above.
+   * @returns Address object containing the overseas address fields.
+   */
+  private static getOverseasAddressFromAnswers(
+    answers: AnswersOutput,
+    hasFixedAddress: boolean,
+  ): OverseasAddress {
+    const countryName: string | undefined =
+      answers[OVERSEAS_ADDRESS_FIELDS.country];
+
+    return {
+      addressLine1: answers[OVERSEAS_ADDRESS_FIELDS.addressLine1] ?? "",
+      addressLine2: answers[OVERSEAS_ADDRESS_FIELDS.addressLine2],
+      addressLine3: answers[OVERSEAS_ADDRESS_FIELDS.addressLine3],
+      addressLine4: answers[OVERSEAS_ADDRESS_FIELDS.addressLine4],
+      country:
+        hasFixedAddress && countryName
+          ? mapCountryNameToIsoCode(countryName)
+          : "",
+    };
+  }
+
+  /**
+   * Extract UK address fields from the answers.
+   * @param answers - The answers from which to extract the address fields.
+   * @param hasFixedAddress - boolean reused from above.
+   * @returns Address object containing the UK address fields.
+   */
+  private static getUkAddressFromAnswers(
+    answers: AnswersOutput,
+    hasFixedAddress: boolean,
+  ): UkAddress {
+    const countryName: string | undefined = answers[UK_ADDRESS_FIELDS.country];
+
+    return {
+      addressLine1: answers[UK_ADDRESS_FIELDS.addressLine1] ?? "",
+      addressLine2: answers[UK_ADDRESS_FIELDS.addressLine2],
+      country:
+        hasFixedAddress && countryName
+          ? mapCountryNameToIsoCode(countryName)
+          : "",
+      county: answers[UK_ADDRESS_FIELDS.county],
+      postcode: answers[UK_ADDRESS_FIELDS.postcode],
+      townOrCity: answers[UK_ADDRESS_FIELDS.townOrCity],
+    };
   }
 
   /**

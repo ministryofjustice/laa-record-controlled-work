@@ -11,32 +11,13 @@ import { NunjucksGenerators } from "@ministryofjustice/hmpps-forge/express-nunju
 import { t } from "#/lib/i18n.js";
 
 /**
- * Formats a client's address for display.
- * @returns The formatted address HTML.
+ * Decides which address formatter to use based on the country
+ * @returns The formatted address
  */
-export function formatAddress(): ResolvableString {
-  return NunjucksGenerators.String({
-    data: {
-      country: Answer("country"),
-      county: Answer("county"),
-      line1: Answer("addressLine1"),
-      line2: Answer("addressLine2"),
-      line3: Answer("addressLine3"),
-      line4: Answer("addressLine4"),
-      postcode: Answer("postcode"),
-      town: Answer("townOrCity"),
-    },
-    template: `
-      {{ line1 }},<br />
-      {% if line2 %}{{ line2 }},<br />{% endif %}
-      {% if line3 %}{{ line3 }},<br />{% endif %}
-      {% if line4 %}{{ line4 }},<br />{% endif %}
-      {% if town %}{{ town }},<br />{% endif %}
-      {% if county %}{{ county }},<br />{% endif %}
-      {% if country and country != "United Kingdom" %}{{ country }}<br />{% endif %}
-      {% if postcode %}{{ postcode }}<br />{% endif %}
-    `,
-  });
+export function addressFormatResolver(): ResolvableString {
+  return match(Answer("ukCountry"))
+    .branch(Condition.Equals("United Kingdom"), formatUkAddress())
+    .otherwise(formatOsAddress());
 }
 
 /**
@@ -62,7 +43,7 @@ export function formatAddressValue(): ResolvableString {
   );
 
   return match(Answer("haveAHomeAddress"))
-    .branch(Condition.Equals("yes"), formatAddress())
+    .branch(Condition.Equals("yes"), addressFormatResolver())
     .otherwise(no);
 }
 
@@ -71,7 +52,7 @@ export function formatAddressValue(): ResolvableString {
  * @returns The address entry URL.
  */
 export function formatChangeAddressRedirect(): ResolvableString {
-  return match(Answer("postcode"))
+  return match(Answer("ukPostcode"))
     .branch(
       Condition.IsRequired(),
       "enter-address-manually?returnTo=check-answers",
@@ -133,4 +114,50 @@ export function formatLegalAidLast6MonthsLabel(): ResolvableString {
   return match(Answer("legalAidLast6Months"))
     .branch(Condition.Equals("yes"), yes)
     .otherwise(no);
+}
+
+/**
+ * Formats a client's overseas address for display.
+ * @returns The formatted address HTML.
+ */
+export function formatOsAddress(): ResolvableString {
+  return NunjucksGenerators.String({
+    data: {
+      country: Answer("osCountry"),
+      line1: Answer("osAddressLine1"),
+      line2: Answer("osAddressLine2"),
+      line3: Answer("osAddressLine3"),
+      line4: Answer("osAddressLine4"),
+    },
+    template: `
+      {{ line1 }},<br />
+      {% if line2 %}{{ line2 }},<br />{% endif %}
+      {% if line3 %}{{ line3 }},<br />{% endif %}
+      {% if line4 %}{{ line4 }},<br />{% endif %}
+      {% if country %}{{ country }}<br />{% endif %}
+    `,
+  });
+}
+
+/**
+ * Formats a client's UK address for display.
+ * @returns The formatted address HTML.
+ */
+export function formatUkAddress(): ResolvableString {
+  return NunjucksGenerators.String({
+    data: {
+      county: Answer("ukCounty"),
+      line1: Answer("ukAddressLine1"),
+      line2: Answer("ukAddressLine2"),
+      postcode: Answer("ukPostcode"),
+      town: Answer("ukTownOrCity"),
+    },
+    template: `
+      {{ line1 }},<br />
+      {% if line2 %}{{ line2 }},<br />{% endif %}
+      {% if town %}{{ town }},<br />{% endif %}
+      {% if county %}{{ county }},<br />{% endif %}
+      {% if postcode %}{{ postcode }}<br />{% endif %}
+    `,
+  });
 }
