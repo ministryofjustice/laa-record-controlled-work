@@ -28,7 +28,7 @@ interface Application {
   townOrCity?: string;
 }
 
-interface OsAddress {
+interface OverseasAddress {
   addressLine1: string;
   addressLine2?: string;
   addressLine3?: string;
@@ -115,7 +115,7 @@ export class ApplicationDto {
   public static getAddressFromAnswers(
     answers: AnswersOutput,
     hasFixedAddress: boolean,
-  ): OsAddress | UkAddress {
+  ): OverseasAddress | UkAddress {
     const isUkAddress = answers[UK_ADDRESS_FIELDS.country] === "United Kingdom";
 
     return isUkAddress
@@ -132,7 +132,7 @@ export class ApplicationDto {
   private static getOverseasAddressFromAnswers(
     answers: AnswersOutput,
     hasFixedAddress: boolean,
-  ): OsAddress {
+  ): OverseasAddress {
     const countryName: string | undefined =
       answers[OVERSEAS_ADDRESS_FIELDS.country];
 
