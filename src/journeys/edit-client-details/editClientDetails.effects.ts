@@ -15,6 +15,8 @@ export const editClientDetailsEffectsRegistry =
   new EffectRegistry<EditApplicationEffectsDeps>();
 
 export const editClientDetailsEffects = {
+  clearAllDraftAnswers:
+    editClientDetailsEffectsRegistry.register(clearAllDraftAnswers),
   clearFieldAnswers:
     editClientDetailsEffectsRegistry.register(clearFieldAnswers),
   loadApplication: editClientDetailsEffectsRegistry.register(loadApplication),
@@ -23,5 +25,4 @@ export const editClientDetailsEffects = {
   ),
   loadDraftAnswers: editClientDetailsEffectsRegistry.register(loadDraftAnswers),
   saveDraftAnswers: editClientDetailsEffectsRegistry.register(saveDraftAnswers),
-  clearAllDraftAnswers: editClientDetailsEffectsRegistry.register(clearAllDraftAnswers),
 };
