@@ -15,6 +15,7 @@ import type {
 } from "#/journeys/select-office/select-office.types.js";
 import { PDA_MSW_LAA_ACCOUNTS_HEADER } from "#/lib/constants/pda.js";
 import { logger } from "#/logger.js";
+import { AuthenticationError } from "#/auth/auth.errors.js";
 
 describe("loadOffices", () => {
   let getAllProviderOffices: sinon.SinonStub;
@@ -25,13 +26,14 @@ describe("loadOffices", () => {
   let context: SelectOfficeContext;
 
   const FIRM_CODE = 123;
-  
+
   beforeEach(() => {
     getAllProviderOffices = sinon.stub();
     getSession = sinon.stub().returns({
       account: {
         idTokenClaims: {
           FIRM_CODE,
+          LAA_ACCOUNTS: [],
         },
       },
     });
@@ -206,6 +208,27 @@ describe("loadOffices", () => {
       expect(getAllProviderOffices.notCalled).to.equal(true);
     }
   });
+
+  [undefined, 123].forEach((claim) =>
+    it("throws AuthenticationError when the LAA_ACCOUNTS claim is invalid", async () => {
+      getSession.returns({
+        account: {
+          idTokenClaims: {
+            FIRM_CODE,
+            LAA_ACCOUNTS: claim,
+          },
+        },
+      });
+
+      try {
+        await loadOffices(deps)(context);
+        expect.fail("Expected loadOffices to throw AuthenticationError");
+      } catch (error) {
+        expect(error).to.be.instanceOf(AuthenticationError);
+        expect(getAllProviderOffices.notCalled).to.equal(true);
+      }
+    }),
+  );
 
   it("filters available offices to those in the LAA_ACCOUNTS claim", async () => {
     getSession.returns({
