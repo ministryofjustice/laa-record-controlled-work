@@ -1,11 +1,11 @@
 import {
   Answer,
   Condition,
-  Query,
   redirect,
   Self,
   step,
   submit,
+  type SubmitHook,
   validation,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 import { HtmlBlock } from "@ministryofjustice/hmpps-forge/core/components";
@@ -16,6 +16,10 @@ import {
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
 import { CreateApplicationEffects } from "#/journeys/create-application/create-application.effects.js";
+import {
+  hasCheckAnswersInQuery,
+  redirectToCheckAnswers,
+} from "#/journeys/shared.hook.js";
 import { t } from "#/lib/i18n.js";
 
 export const niNumberStep = (journeyCode: string): ReturnType<typeof step> =>
@@ -80,24 +84,21 @@ export const niNumberStep = (journeyCode: string): ReturnType<typeof step> =>
       }),
       GovUKButton({ text: t("common.continue") }),
     ],
-    onSubmission: [
-      submit({
-        onValid: {
-          effects: [CreateApplicationEffects.saveDraftAnswers(journeyCode)],
-          next: [
-            redirect({
-              goto: "check-answers",
-              when: Query("returnTo").match(Condition.Equals("check-answers")),
-            }),
-            redirect({ goto: "have-a-home-address" }),
-          ],
-        },
-        validate: true,
-      }),
-    ],
+    onSubmission: [saveNiNumber(journeyCode)],
     path: "/ni-number",
     reachability: {
-      entryWhen: Query("returnTo").match(Condition.Equals("check-answers")),
+      entryWhen: hasCheckAnswersInQuery,
     },
     title: t("journeys.createApplication.niNumber.title"),
   });
+
+const saveNiNumber = (journeyCode: string): SubmitHook =>
+  submit({
+    onValid: {
+      effects: [CreateApplicationEffects.saveDraftAnswers(journeyCode)],
+      next: [redirectToCheckAnswers, redirectToHomeAddress],
+    },
+    validate: true,
+  });
+
+const redirectToHomeAddress = redirect({ goto: "have-a-home-address" });

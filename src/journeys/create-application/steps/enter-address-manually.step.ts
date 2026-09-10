@@ -5,6 +5,7 @@ import {
   Self,
   step,
   submit,
+  type SubmitHook,
   validation,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 import { HtmlBlock } from "@ministryofjustice/hmpps-forge/core/components";
@@ -25,6 +26,7 @@ export const enterAddressManuallyStep = (
   journeyCode: string,
 ): ReturnType<typeof step> =>
   step({
+    backlink: "have-a-home-address?returnTo=check-answers",
     blocks: [
       HtmlBlock({
         content: `<span class="govuk-caption-l">${t("journeys.createApplication.caption")}</span>`,
@@ -125,30 +127,27 @@ export const enterAddressManuallyStep = (
       }),
       GovUKButton({ text: t("common.continue") }),
     ],
-    onSubmission: [
-      submit({
-        onValid: {
-          effects: [
-            CreateApplicationEffects.clearFieldAnswers(
-              journeyCode,
-              Object.values(OVERSEAS_ADDRESS_FIELDS),
-            ),
-            CreateApplicationEffects.saveDraftAnswers(journeyCode),
-          ],
-          next: [
-            redirect({
-              goto: "check-answers",
-              when: Query("returnTo").match(Condition.Equals("check-answers")),
-            }),
-            redirect({ goto: "check-answers" }),
-          ],
-        },
-        validate: true,
-      }),
-    ],
+    onSubmission: [saveUkAddress(journeyCode)],
     path: "/enter-address-manually",
     reachability: {
       entryWhen: Query("returnTo").match(Condition.Equals("check-answers")),
     },
     title: t("journeys.createApplication.enterAddressManually.title"),
   });
+
+const saveUkAddress = (journeyCode: string): SubmitHook =>
+  submit({
+    onValid: {
+      effects: [
+        CreateApplicationEffects.clearFieldAnswers(
+          journeyCode,
+          Object.values(OVERSEAS_ADDRESS_FIELDS),
+        ),
+        CreateApplicationEffects.saveDraftAnswers(journeyCode),
+      ],
+      next: [redirectToCheckAnswers],
+    },
+    validate: true,
+  });
+
+const redirectToCheckAnswers = redirect({ goto: "check-answers" });

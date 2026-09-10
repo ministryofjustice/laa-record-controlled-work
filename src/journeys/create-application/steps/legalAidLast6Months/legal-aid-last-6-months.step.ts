@@ -1,4 +1,6 @@
 import {
+  Answer,
+  Condition,
   redirect,
   step,
   submit,
@@ -29,7 +31,11 @@ export const legalAidLast6MonthsStep = (
       legalAidLast6MonthsRadioInput(),
       continueButton(),
     ],
-    onSubmission: [onSubmission(journeyCode)],
+    onSubmission: [
+      saveNoAndClearPriorLegalAidReasonData(journeyCode),
+      saveYes(journeyCode),
+      submitInvalid,
+    ],
     path: "/legal-aid-last-6-months",
     reachability: {
       entryWhen: hasCheckAnswersInQuery,
@@ -37,23 +43,36 @@ export const legalAidLast6MonthsStep = (
     title: TITLE,
   });
 
-/**
- * Handles form submission for the legal aid in last 6 months question step.
- * Saves draft answers and routes based on the answer:
- * - redirects to client details step
- *
- * @param {string} journeyCode - The journey code for saving draft answers
- * @returns {SubmitHook} A submit hook with validation and conditional routing logic
- */
-function onSubmission(journeyCode: string): SubmitHook {
-  return submit({
+const saveNoAndClearPriorLegalAidReasonData = (
+  journeyCode: string,
+): SubmitHook =>
+  submit({
     onValid: {
-      effects: [CreateApplicationEffects.saveDraftAnswers(journeyCode)],
-      next: [
-        redirectToCheckAnswers,
-        redirect({ goto: StepCode.CLIENT_DETAILS }),
+      effects: [
+        CreateApplicationEffects.clearFieldAnswers(journeyCode, [
+          "reasonForYes",
+        ]),
+        CreateApplicationEffects.saveDraftAnswers(journeyCode),
       ],
+      next: [redirectToCheckAnswers, redirectToClientDetails],
     },
     validate: true,
+    when: Answer("legalAidLast6Months").match(Condition.Equals("no")),
   });
-}
+
+const saveYes = (journeyCode: string): SubmitHook =>
+  submit({
+    onValid: {
+      effects: [CreateApplicationEffects.saveDraftAnswers(journeyCode)],
+      next: [redirectToCheckAnswers, redirectToClientDetails],
+    },
+    validate: true,
+    when: Answer("legalAidLast6Months").match(Condition.Equals("yes")),
+  });
+
+const submitInvalid = submit({
+  onInvalid: {},
+  validate: true,
+});
+
+const redirectToClientDetails = redirect({ goto: StepCode.CLIENT_DETAILS });

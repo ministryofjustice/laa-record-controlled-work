@@ -6,6 +6,7 @@ import type {
 import {
   Answer,
   Condition,
+  match,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 import {
   GovUKHeading,
@@ -13,8 +14,8 @@ import {
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
 import {
-  formatAddressChangeHref,
   formatAddressValue,
+  formatChangeAddressRedirect,
   formatDateOfBirth,
   formatEcfLabel,
   formatLegalAidBeforeLabel,
@@ -122,11 +123,24 @@ export const summaryList = GovUKSummaryList({
     SummaryRow({
       href: "ni-number?returnTo=check-answers",
       labelKey: "journeys.createApplication.checkAnswers.answerLabels.niNumber",
-      value: { text: Answer("niNumber") },
-      visibleWhen: Answer("hasNINumber").match(Condition.Equals("yes")),
+      value: {
+        text: match(Answer("hasNINumber"))
+          .branch(Condition.Equals("yes"), Answer("niNumber"))
+          .otherwise(t("common.no")),
+      },
     }),
     SummaryRow({
-      href: formatAddressChangeHref(),
+      href: "have-a-home-address?returnTo=check-answers",
+      labelKey:
+        "journeys.createApplication.checkAnswers.answerLabels.haveAHomeAddress",
+      value: {
+        text: match(Answer("haveAHomeAddress"))
+          .branch(Condition.Equals("yes"), t("common.yes"))
+          .otherwise(t("common.no")),
+      },
+    }),
+    SummaryRow({
+      href: formatChangeAddressRedirect(),
       labelKey: "journeys.createApplication.checkAnswers.answerLabels.address",
       value: { html: formatAddressValue() },
     }),

@@ -24,16 +24,18 @@ export function declarationStep(): StepDefinition {
   return step({
     backlink: ROOT,
     blocks: [heading(TITLE), body(), button(AGREE_AND_CONTINUE)],
-    onSubmission: [onSubmission],
+    onSubmission: [gotoEcfStep],
     path: "/provider-declaration",
     reachability: { entryWhen: true },
     title: TITLE,
   });
 }
 
-const onSubmission = submit({
+const redirectToEcf = redirect({ goto: StepCode.ECF });
+
+const gotoEcfStep = submit({
   onAlways: {
-    next: [redirect({ goto: StepCode.ECF })],
+    next: [redirectToEcf],
   },
   validate: false,
 });

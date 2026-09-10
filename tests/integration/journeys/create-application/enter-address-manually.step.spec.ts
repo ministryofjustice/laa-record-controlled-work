@@ -45,6 +45,12 @@ describe("Enter address manually step", () => {
       );
     });
 
+    it("has a back link to the home address question", () => {
+      expect(renderResult.context.step.backlink).to.equal(
+        "have-a-home-address?returnTo=check-answers",
+      );
+    });
+
     it("renders a link to the overseas address page", () => {
       const linkBlock = renderResult
         .getBlocksByVariant("html")

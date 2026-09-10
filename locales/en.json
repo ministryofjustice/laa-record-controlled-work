@@ -133,7 +133,8 @@
         },
         "validation": {
           "required": "Select if your client got legal help for this matter in the last 6 months",
-          "reasonRequired": "Enter the reason you're creating a new case for the same matter"
+          "reasonRequired": "Enter the reason you're creating a new case for the same matter",
+          "reasonTooLong": "Reason must not exceed 500 characters"
         }
       },
       "clientDetails": {
@@ -251,6 +252,7 @@
           "lastName": "Last name",
           "dateOfBirth": "Date of birth",
           "niNumber": "National Insurance number",
+          "haveAHomeAddress": "Has a home address",
           "address": "Address"
         },
         "answerValues": {

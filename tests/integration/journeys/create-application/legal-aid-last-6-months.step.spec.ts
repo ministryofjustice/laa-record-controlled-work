@@ -78,6 +78,25 @@ describe("Legal aid before 6 months step", () => {
       );
     });
 
+    it("should show validation error if the reason is longer than 500 characters", async () => {
+      const result = await client.post(
+        "/cases/new/legal-aid-last-6-months",
+        {
+          body: {
+            legalAidLast6Months: "yes",
+            reasonForYes: "a".repeat(501),
+          },
+        },
+      );
+      expect(result.type).to.equal("render");
+      const renderResult = result as TestRenderResult;
+      expect(renderResult.context.showValidationFailures).to.equal(true);
+      expect(
+        renderResult.getValidationErrorsByFieldCode(reasonForYesFieldCode)[0]
+          .message,
+      ).to.equal("Reason must not exceed 500 characters");
+    });
+
     it("should redirect to legal aid last 6 months step if yes", async () => {
       const result = await client.post(
         "/cases/new/legal-aid-last-6-months",
@@ -93,18 +112,46 @@ describe("Legal aid before 6 months step", () => {
       expect(redirectResult.url).to.equal("/cases/new/client-details");
     });
 
+    it("should return to check answers when edited from check answers", async () => {
+      const result = await client.post(
+        "/cases/new/legal-aid-last-6-months",
+        {
+          query: { returnTo: "check-answers" },
+          body: {
+            legalAidLast6Months: "yes",
+            reasonForYes: "Some reason",
+          },
+        },
+      );
+      expect(result.type).to.equal("redirect");
+      const redirectResult = result as TestRedirectResult;
+      expect(redirectResult.url).to.equal("/cases/new/check-answers");
+    });
+
     it("should redirect to client details step if no, different matter", async () => {
+      const session = {
+        journeyDrafts: {
+          createApplication: {
+            legalAidLast6Months: "yes",
+            reasonForYes: "Existing reason",
+          },
+        },
+      };
       const result = await client.post(
         "/cases/new/legal-aid-last-6-months",
         {
           body: {
             legalAidLast6Months: "no",
           },
+          session,
         },
       );
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
       expect(redirectResult.url).to.equal("/cases/new/client-details");
+      expect(session.journeyDrafts.createApplication).to.deep.equal({
+        legalAidLast6Months: "no",
+      });
     });
   });
 });
