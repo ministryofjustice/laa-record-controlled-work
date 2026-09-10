@@ -2,12 +2,13 @@ import { expect } from "chai";
 import sinon from "sinon";
 
 import type { ProviderFirmOfficeListDto } from "#/api/clients/pda/model/providerFirmOfficeListDto.zod.gen.js";
-import { ApiResponseError, ApiValidationError } from "#/api/clients/api.errors.js";
+import {
+  ApiResponseError,
+  ApiValidationError,
+} from "#/api/clients/api.errors.js";
 import { getPdaApiDefaultOptions } from "#/api/clients/getPdaApiDefaultOptions.js";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
-import {
-  InvalidFirmCodeClaimError,
-} from "#/journeys/journey.errors.js";
+import { InvalidFirmCodeClaimError } from "#/journeys/journey.errors.js";
 import { loadOffices } from "#/journeys/select-office/effects/loadOffices.js";
 import type {
   SelectOfficeContext,
@@ -82,7 +83,9 @@ describe("loadOffices", () => {
     ).to.equal(true);
 
     expect(setData.calledOnce).to.equal(true);
-    expect(setData.firstCall.args[0]).to.equal(CONTEXT_DATA_KEYS.availableOffices);
+    expect(setData.firstCall.args[0]).to.equal(
+      CONTEXT_DATA_KEYS.availableOffices,
+    );
   });
 
   it("forwards the x-correlation-id request header to the API call", async () => {
@@ -127,9 +130,7 @@ describe("loadOffices", () => {
     getAllProviderOffices.resolves({
       data: {
         firm: { firmName: "Acme Legal LLP" },
-        offices: [
-          { addressLine1: "1 High Street", firmOfficeCode: "0R128U" },
-        ],
+        offices: [{ addressLine1: "1 High Street", firmOfficeCode: "0R128U" }],
       } satisfies ProviderFirmOfficeListDto,
       status: 200,
     });
@@ -243,8 +244,18 @@ describe("loadOffices", () => {
       data: {
         firm: { firmName: "Acme Legal LLP" },
         offices: [
-          { addressLine1: "1 High Street", city: "Leeds", postCode: "LS1 1AA", firmOfficeCode: "OFFICE-01" },
-          { addressLine1: "2 Low Street", city: "York", postCode: "YO1 1BB", firmOfficeCode: "OFFICE-02" },
+          {
+            addressLine1: "1 High Street",
+            city: "Leeds",
+            postCode: "LS1 1AA",
+            firmOfficeCode: "OFFICE-01",
+          },
+          {
+            addressLine1: "2 Low Street",
+            city: "York",
+            postCode: "YO1 1BB",
+            firmOfficeCode: "OFFICE-02",
+          },
         ],
       },
       status: 200,
@@ -262,7 +273,7 @@ describe("loadOffices", () => {
       account: {
         idTokenClaims: {
           FIRM_CODE,
-          LAA_ACCOUNTS: '["0R128U","0R695K"]',
+          LAA_ACCOUNTS: ["0R128U", "0R695K"],
         },
       },
     });
@@ -280,10 +291,7 @@ describe("loadOffices", () => {
     await loadOffices(deps)(context);
 
     const [, offices] = setData.firstCall.args as [string, { code: string }[]];
-    expect(offices.map(({ code }) => code)).to.deep.equal([
-      "0R128U",
-      "0R695K",
-    ]);
+    expect(offices.map(({ code }) => code)).to.deep.equal(["0R128U", "0R695K"]);
   });
 
   it("returns no offices when LAA_ACCOUNTS claim is absent", async () => {
@@ -291,8 +299,18 @@ describe("loadOffices", () => {
       data: {
         firm: { firmName: "Acme Legal LLP" },
         offices: [
-          { addressLine1: "1 High Street", city: "Leeds", postCode: "LS1 1AA", firmOfficeCode: "OFFICE-01" },
-          { addressLine1: "2 Low Street", city: "York", postCode: "YO1 1BB", firmOfficeCode: "OFFICE-02" },
+          {
+            addressLine1: "1 High Street",
+            city: "Leeds",
+            postCode: "LS1 1AA",
+            firmOfficeCode: "OFFICE-01",
+          },
+          {
+            addressLine1: "2 Low Street",
+            city: "York",
+            postCode: "YO1 1BB",
+            firmOfficeCode: "OFFICE-02",
+          },
         ],
       },
       status: 200,
