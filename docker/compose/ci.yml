@@ -13,11 +13,18 @@ services:
     image: ghcr.io/ministryofjustice/laa-record-controlled-work-api:latest
     pull_policy: always
     build: !reset null
+    environment:
+      ISSUER: https://host.docker.internal:9090/default
+      DATASTORE_TOKEN_URI: https://host.docker.internal:9090/default/token
 
   info-and-advice-api:
     image: ghcr.io/ministryofjustice/laa-info-and-advice-datastore:latest
     pull_policy: always
     build: !reset null
+    environment:
+      LAA_OAUTH2_ISSUER_URI: https://host.docker.internal:9090/default
+      LAA_OAUTH2_AUDIENCE: default
+      TRUSTED_CALLER_AUDIENCE: default
 
   # Only exists to build CCQ's image locally; not needed when ccq-embedded is pulled from GHCR.
   ccq-image-prebuild:
