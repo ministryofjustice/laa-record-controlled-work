@@ -16,7 +16,7 @@ services:
     volumes:
       - ./docker/certs/mock-oauth2-server.crt.pem:/etc/mock-oauth2-server.crt.pem:ro
     environment:
-      - LAA_OAUTH2_ISSUER_URI=${LAA_OAUTH2_ISSUER_URI:-https://host.docker.internal:9090/default}
+      - LAA_OAUTH2_ISSUER_URI=https://host.docker.internal:9090/default
     command:
       - sh
       - -c
