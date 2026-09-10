@@ -68,6 +68,7 @@ jobs:
             zap-results/zap-baseline-report.html
             zap-results/zap-baseline-report.json
             zap-results/zap_out.json
+            zap-results/create-case.har
           retention-days: 14
 
       - name: Tear down stack

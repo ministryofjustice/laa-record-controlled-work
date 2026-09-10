@@ -5,6 +5,7 @@ import type {
 } from "@playwright/test";
 
 import { test as base, expect } from "@playwright/test";
+import { readFile, writeFile } from "node:fs/promises";
 
 import {
   type Actor,
@@ -22,9 +23,6 @@ interface HarnessWorkerFixtures {
 const BASE_URL = process.env.E2E_BASE_URL ?? "http://localhost:8080";
 const AUTH_STORAGE_STATE_PATH = process.env.E2E_AUTH_STORAGE_STATE_PATH;
 const ZAP_HAR_PATH = process.env.E2E_ZAP_HAR_PATH;
-// Prevent ZAP recording -1 status codes for font files and the GOV.UK crest.
-const ZAP_HAR_EXCLUDED_ASSETS =
-  "assets/fonts/.*\\.woff2?$|assets/images/govuk-crest\\.svg$";
 const CONTEXT_OPTIONS: BrowserContextOptions = {
   baseURL: BASE_URL,
   ignoreHTTPSErrors: true,
@@ -37,7 +35,6 @@ const ZAP_HAR_OPTIONS: BrowserContextOptions =
           content: "embed",
           mode: "full",
           path: ZAP_HAR_PATH,
-          urlFilter: new RegExp(`${BASE_URL}/(?!${ZAP_HAR_EXCLUDED_ASSETS}).*`),
         },
       };
 
@@ -49,6 +46,28 @@ export const createBrowserContext = async (
     ...CONTEXT_OPTIONS,
     ...options,
   });
+
+interface Har {
+  log: { entries: HarEntry[] };
+}
+
+interface HarEntry {
+  response: { status: number };
+}
+
+// A status of 0 (Chromium's marker for an aborted/cancelled request) makes ZAP's
+// HAR importer fail the whole import, not just skip the offending entry.
+const ABORTED_REQUEST_STATUS = 0;
+
+const removeInvalidHarEntries = async (harPath: string): Promise<void> => {
+  const parsedHar: unknown = JSON.parse(await readFile(harPath, "utf-8"));
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- shape is produced by Playwright's own recordHar, not user input
+  const har = parsedHar as Har;
+  har.log.entries = har.log.entries.filter(
+    (entry) => entry.response.status > ABORTED_REQUEST_STATUS,
+  );
+  await writeFile(harPath, JSON.stringify(har));
+};
 
 export const test = base.extend<HarnessFixtures, HarnessWorkerFixtures>({
   actor: async ({ page }, use): Promise<void> => {
@@ -90,6 +109,10 @@ export const test = base.extend<HarnessFixtures, HarnessWorkerFixtures>({
 
     await use(context);
     await context.close();
+
+    if (ZAP_HAR_PATH !== undefined) {
+      await removeInvalidHarEntries(ZAP_HAR_PATH);
+    }
   },
 
   page: async ({ context }, use): Promise<void> => {
