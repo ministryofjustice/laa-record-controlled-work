@@ -167,6 +167,9 @@ export class ApplicationDto {
   private static getAnswersFromOverseasAddress(
     address: OverseasAddress,
   ): Partial<AnswersOutput> {
+
+    // I added the UK address fields because if addressLine1 and country are not set, then the Overseas page loads empty
+    // and then won't let you continue as it wipes the mandatory fields when you click continue
     return {
       [AnswerKey.osAddressLine1]: address.addressLine1,
       [AnswerKey.osAddressLine2]: address.addressLine2,
@@ -186,6 +189,8 @@ export class ApplicationDto {
   private static getAnswersFromUkAddress(
     address: UkAddress,
   ): Partial<AnswersOutput> {
+
+    // see above comment about why the overseas address fields are also set here
     return {
       [AnswerKey.ukAddressLine1]: address.addressLine1,
       [AnswerKey.ukAddressLine2]: address.addressLine2,
