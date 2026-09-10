@@ -10,25 +10,24 @@ env:
     failOnError: true
     progressToStdout: true
 jobs:
-  - type: "replacer"
-    parameters:
-      deleteAllRules: true
-    rules:
-      - description: "Inject the pre-authenticated rcw session cookie"
-        url: "http://localhost:8080.*"
-        matchType: "REQ_HEADER"
-        matchString: "Cookie"
-        matchRegex: false
-        replacementString: "rcw.sid=${SESSION_COOKIE}"
   - type: "passiveScan-config"
     parameters:
       enableTags: false
       maxAlertsPerRule: 10
+  - type: "import"
+    parameters:
+      fileName: "/zap/wrk/zap-results/create-case.har"
+      type: "har"
   - type: "spider"
     parameters:
       context: "rcw"
       url: "http://localhost:8080/"
       maxDuration: 5
+  - type: "activeScan"
+    parameters:
+      context: "rcw"
+      url: "http://localhost:8080/"
+      maxScanDurationInMins: 5
   - type: "passiveScan-wait"
     parameters:
       maxDuration: 0

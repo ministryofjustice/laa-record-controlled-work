@@ -13,10 +13,15 @@ fi
 mkdir -p zap-results
 chmod 777 zap-results
 
-export NGINX_IP="$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' rcw-nginx)"
-SESSION_COOKIE="$(./scripts/zap/get-session-cookie.sh)"
+E2E_ZAP_HAR_PATH="$(pwd)/zap-results/create-case.har" \
+  yarn playwright test --config=tests/e2e/playwright.config.ts --grep "@zap" --project=chromium --workers=1
 
-sed "s|\${SESSION_COOKIE}|$SESSION_COOKIE|g" zap.yaml > zap-results/zap-plan.generated.yaml
+if [[ ! -s zap-results/create-case.har ]]; then
+  echo "error: Playwright did not create the ZAP journey HAR." >&2
+  exit 1
+fi
+
+export NGINX_IP="$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' rcw-nginx)"
 
 docker compose \
   "${COMPOSE_FILES[@]}" \
