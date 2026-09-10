@@ -21,10 +21,21 @@ interface HarnessWorkerFixtures {
 
 const BASE_URL = process.env.E2E_BASE_URL ?? "http://localhost:8080";
 const AUTH_STORAGE_STATE_PATH = process.env.E2E_AUTH_STORAGE_STATE_PATH;
+const ZAP_HAR_PATH = process.env.E2E_ZAP_HAR_PATH;
 const CONTEXT_OPTIONS: BrowserContextOptions = {
   baseURL: BASE_URL,
   ignoreHTTPSErrors: true,
 };
+const ZAP_HAR_OPTIONS: BrowserContextOptions =
+  ZAP_HAR_PATH === undefined
+    ? {}
+    : {
+        recordHar: {
+          content: "embed",
+          mode: "full",
+          path: ZAP_HAR_PATH,
+        },
+      };
 
 export const createBrowserContext = async (
   browser: Browser,
@@ -66,10 +77,12 @@ export const test = base.extend<HarnessFixtures, HarnessWorkerFixtures>({
   ],
 
   context: async ({ authStorageState, browser }, use): Promise<void> => {
-    const context = await createBrowserContext(
-      browser,
-      authStorageState === undefined ? {} : { storageState: authStorageState },
-    );
+    const context = await createBrowserContext(browser, {
+      ...(authStorageState === undefined
+        ? {}
+        : { storageState: authStorageState }),
+      ...ZAP_HAR_OPTIONS,
+    });
 
     await use(context);
     await context.close();
