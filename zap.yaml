@@ -29,6 +29,11 @@ jobs:
       context: "rcw"
       url: "http://localhost:8080/"
       maxDuration: 5
+  - type: "activeScan"
+    parameters:
+      context: "rcw"
+      url: "http://localhost:8080/"
+      maxScanDurationInMins: 5
   - type: "passiveScan-wait"
     parameters:
       maxDuration: 0
