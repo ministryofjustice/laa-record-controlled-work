@@ -7,13 +7,19 @@ import type {
 import type { PKCECodes } from "#/auth/auth.types.js";
 import type { Office } from "#/journeys/select-office/select-office.types.js";
 
+interface KnownClaims {
+  idTokenClaims?: {
+    LAA_ACCOUNTS?: string | string[];
+  };
+}
+
 interface SessionMsalReference {
   homeAccountId: string;
 }
 
 declare module "express-session" {
   interface SessionData {
-    account?: AccountInfo;
+    account?: AccountInfo & KnownClaims;
     authCodeRequest?: AuthorizationCodeRequest;
     authCodeUrlRequest?: AuthorizationUrlRequest;
     authState?: string;
