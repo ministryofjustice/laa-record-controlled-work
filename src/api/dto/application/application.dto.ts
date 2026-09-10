@@ -1,8 +1,12 @@
+import type { Application as ApplicationZod } from "#/api/clients/rcw/model/application.zod.gen.js";
 import type { CreateApplicationRequestBody } from "#/api/clients/rcw/model/createApplicationRequestBody.zod.gen.js";
-import { AnswerKey } from "#/journeys/AnswerKey.enum.js";
 import type { AnswersOutput } from "#/journeys/create-application/data/answers.zod.js";
-import { OVERSEAS_ADDRESS_FIELDS, UK_ADDRESS_FIELDS } from "#/journeys/journey.constants.js";
 
+import { AnswerKey } from "#/journeys/AnswerKey.enum.js";
+import {
+  OVERSEAS_ADDRESS_FIELDS,
+  UK_ADDRESS_FIELDS,
+} from "#/journeys/journey.constants.js";
 import { mapCountryNameToIsoCode } from "#/lib/countries.js";
 
 interface Application {
@@ -114,11 +118,84 @@ export class ApplicationDto {
     answers: AnswersOutput,
     hasFixedAddress: boolean,
   ): OverseasAddress | UkAddress {
-    const isUkAddress = answers[UK_ADDRESS_FIELDS.country] === "United Kingdom";
+    const isUkAddress = answers[AnswerKey.ukCountry] === "United Kingdom";
 
     return isUkAddress
       ? this.getUkAddressFromAnswers(answers, hasFixedAddress)
       : this.getOverseasAddressFromAnswers(answers, hasFixedAddress);
+  }
+
+  /**
+   * Creates an answers output instance from the provided application.
+   * @param application - The application from which to create the answers output instance.
+   * @returns AnswersOutput instance.
+   */
+  public static toAnswers(application: ApplicationZod): AnswersOutput {
+    const addressAnswers =
+      application.clientDetails.address?.country === "GB"
+        ? this.getAnswersFromUkAddress(
+            application.clientDetails.address as UkAddress,
+          )
+        : this.getAnswersFromOverseasAddress(
+            application.clientDetails.address as OverseasAddress,
+          );
+
+    return {
+      ...addressAnswers,
+      [AnswerKey.dateOfBirth]: application.clientDetails.dateOfBirth,
+      [AnswerKey.ecf]: "no",
+      [AnswerKey.firstName]: application.clientDetails.firstName,
+      [AnswerKey.hasNINumber]: application.clientDetails.niNumber
+        ? "yes"
+        : "no",
+      [AnswerKey.haveAHomeAddress]: application.clientDetails.hasFixedAddress
+        ? "yes"
+        : "no",
+      [AnswerKey.lastName]: application.clientDetails.lastName,
+      [AnswerKey.legalAidBefore]: application.scopingQuestions
+        ?.priorLegalAid as string,
+      [AnswerKey.niNumber]: application.clientDetails.niNumber ?? "",
+      [AnswerKey.reasonForYes]: application.reasonForReapplication ?? "",
+    };
+  }
+
+  /**
+   * Extract answers from an overseas address.
+   * @param address - The overseas address from which to extract the answers.
+   * @returns Partial AnswersOutput object containing the overseas address fields.
+   */
+  private static getAnswersFromOverseasAddress(
+    address: OverseasAddress,
+  ): Partial<AnswersOutput> {
+    return {
+      [AnswerKey.osAddressLine1]: address.addressLine1,
+      [AnswerKey.osAddressLine2]: address.addressLine2,
+      [AnswerKey.osAddressLine3]: address.addressLine3,
+      [AnswerKey.osAddressLine4]: address.addressLine4,
+      [AnswerKey.osCountry]: address.country,
+      [AnswerKey.ukAddressLine1]: address.addressLine1,
+      [AnswerKey.ukCountry]: address.country,
+    };
+  }
+
+  /**
+   * Extract answers from a UK address.
+   * @param address - The UK address from which to extract the answers.
+   * @returns Partial AnswersOutput object containing the UK address fields.
+   */
+  private static getAnswersFromUkAddress(
+    address: UkAddress,
+  ): Partial<AnswersOutput> {
+    return {
+      [AnswerKey.ukAddressLine1]: address.addressLine1,
+      [AnswerKey.ukAddressLine2]: address.addressLine2,
+      [AnswerKey.ukCountry]: address.country,
+      [AnswerKey.ukCounty]: address.county,
+      [AnswerKey.ukPostcode]: address.postcode,
+      [AnswerKey.ukTownOrCity]: address.townOrCity,
+      [AnswerKey.osAddressLine1]: address.addressLine1,
+      [AnswerKey.osCountry]: address.country,
+    };
   }
 
   /**
@@ -132,13 +209,13 @@ export class ApplicationDto {
     hasFixedAddress: boolean,
   ): OverseasAddress {
     const countryName: string | undefined =
-      answers[OVERSEAS_ADDRESS_FIELDS.country];
+      answers[AnswerKey.osCountry];
 
     return {
-      addressLine1: answers[OVERSEAS_ADDRESS_FIELDS.addressLine1] ?? "",
-      addressLine2: answers[OVERSEAS_ADDRESS_FIELDS.addressLine2],
-      addressLine3: answers[OVERSEAS_ADDRESS_FIELDS.addressLine3],
-      addressLine4: answers[OVERSEAS_ADDRESS_FIELDS.addressLine4],
+      addressLine1: answers[AnswerKey.osAddressLine1] ?? "",
+      addressLine2: answers[AnswerKey.osAddressLine2],
+      addressLine3: answers[AnswerKey.osAddressLine3],
+      addressLine4: answers[AnswerKey.osAddressLine4],
       country:
         hasFixedAddress && countryName
           ? mapCountryNameToIsoCode(countryName)
@@ -156,79 +233,18 @@ export class ApplicationDto {
     answers: AnswersOutput,
     hasFixedAddress: boolean,
   ): UkAddress {
-    const countryName: string | undefined = answers[UK_ADDRESS_FIELDS.country];
+    const countryName: string | undefined = answers[AnswerKey.ukCountry];
 
     return {
-      addressLine1: answers[UK_ADDRESS_FIELDS.addressLine1] ?? "",
-      addressLine2: answers[UK_ADDRESS_FIELDS.addressLine2],
+      addressLine1: answers[AnswerKey.ukAddressLine1] ?? "",
+      addressLine2: answers[AnswerKey.ukAddressLine2],
       country:
         hasFixedAddress && countryName
           ? mapCountryNameToIsoCode(countryName)
           : "",
-      county: answers[UK_ADDRESS_FIELDS.county],
-      postcode: answers[UK_ADDRESS_FIELDS.postcode],
-      townOrCity: answers[UK_ADDRESS_FIELDS.townOrCity],
-
-    };
-  }
-
-  /**
-   * Extract answers from a UK address.
-   * @param address - The UK address from which to extract the answers.
-   * @returns Partial AnswersOutput object containing the UK address fields.
-   */
-  private static getAnswersFromUkAddress(
-    address: UkAddress,
-  ): Partial<AnswersOutput> {
-    return {
-      [UK_ADDRESS_FIELDS.addressLine1]: address.addressLine1,
-      [UK_ADDRESS_FIELDS.addressLine2]: address.addressLine2,
-      [UK_ADDRESS_FIELDS.county]: address.county,
-      [UK_ADDRESS_FIELDS.country]: address.country,
-      [UK_ADDRESS_FIELDS.postcode]: address.postcode,
-      [UK_ADDRESS_FIELDS.townOrCity]: address.townOrCity,
-    };
-  }
-
-  /**
-   * Extract answers from an overseas address.
-   * @param address - The overseas address from which to extract the answers.
-   * @returns Partial AnswersOutput object containing the overseas address fields.
-   */
-  private static getAnswersFromOverseasAddress(
-    address: OverseasAddress,
-  ): Partial<AnswersOutput> {
-    return {
-      [OVERSEAS_ADDRESS_FIELDS.addressLine1]: address.addressLine1,
-      [OVERSEAS_ADDRESS_FIELDS.addressLine2]: address.addressLine2,
-      [OVERSEAS_ADDRESS_FIELDS.addressLine3]: address.addressLine3,
-      [OVERSEAS_ADDRESS_FIELDS.addressLine4]: address.addressLine4,
-      [OVERSEAS_ADDRESS_FIELDS.country]: address.country,
-    };
-  }
-
-  /**
-   * Creates an answers output instance from the provided application.
-   * @param application - The application from which to create the answers output instance.
-   * @returns AnswersOutput instance.
-   */
-  public static toAnswers(application: CreateApplicationRequestBody): AnswersOutput {
-    const addressAnswers = application.clientDetails.address?.country === "GB"
-      ? this.getAnswersFromUkAddress(application.clientDetails.address as UkAddress)
-      : this.getAnswersFromOverseasAddress(application.clientDetails.address as OverseasAddress);
-
-    return {
-      ...addressAnswers,
-      [AnswerKey.dateOfBirth]: application.clientDetails.dateOfBirth,
-      [AnswerKey.ecf]: "no",
-      [AnswerKey.firstName]: application.clientDetails.firstName,
-      [AnswerKey.hasNINumber]: application.clientDetails.niNumber ? "yes" : "no",
-      [AnswerKey.haveAHomeAddress]: application.clientDetails.hasFixedAddress ? "yes" : "no",
-      [AnswerKey.lastName]: application.clientDetails.lastName,
-      [AnswerKey.legalAidBefore]: application.scopingQuestions?.priorLegalAid as string,
-      [AnswerKey.legalAidLast6Months]: application.legalAidLast6Months ? "yes" : "no",
-      [AnswerKey.niNumber]: application.clientDetails.niNumber,
-      [AnswerKey.reasonForYes]: application.reasonForReapplication,
+      county: answers[AnswerKey.ukCounty],
+      postcode: answers[AnswerKey.ukPostcode],
+      townOrCity: answers[AnswerKey.ukTownOrCity],
     };
   }
 

@@ -21,6 +21,7 @@ import {
   formatLegalAidLast6MonthsLabel,
 } from "#/journeys/create-application/steps/check-answers.formatters.js";
 import { t } from "#/lib/i18n.js";
+import { AnswerKey } from "#/journeys/AnswerKey.enum.js";
 
 interface ChangeRowArgs {
   href: ResolvableString;
@@ -106,12 +107,12 @@ export const summaryList = GovUKSummaryList({
       href: "client-details?returnTo=check-answers",
       labelKey:
         "journeys.createApplication.checkAnswers.answerLabels.firstName",
-      value: { text: Answer("firstName") },
+      value: { text: Answer(AnswerKey.firstName) },
     }),
     SummaryRow({
       href: "client-details?returnTo=check-answers",
       labelKey: "journeys.createApplication.checkAnswers.answerLabels.lastName",
-      value: { text: Answer("lastName") },
+      value: { text: Answer(AnswerKey.lastName) },
     }),
     SummaryRow({
       href: "client-details?returnTo=check-answers",
