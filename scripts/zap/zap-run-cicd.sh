@@ -12,8 +12,6 @@ if [[ ! -s zap-results/create-case.har ]]; then
   exit 1
 fi
 
-node scripts/zap/sanitise-har.mjs zap-results/create-case.har
-
 SESSION_COOKIE="$(./scripts/zap/get-session-cookie.sh)"
 
 sed "s|\${SESSION_COOKIE}|$SESSION_COOKIE|g" zap.yaml > zap-results/zap-plan.generated.yaml

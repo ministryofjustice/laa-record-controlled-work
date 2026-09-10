@@ -21,8 +21,6 @@ if [[ ! -s zap-results/create-case.har ]]; then
   exit 1
 fi
 
-node scripts/zap/sanitise-har.mjs zap-results/create-case.har
-
 export NGINX_IP="$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' rcw-nginx)"
 SESSION_COOKIE="$(./scripts/zap/get-session-cookie.sh)"
 

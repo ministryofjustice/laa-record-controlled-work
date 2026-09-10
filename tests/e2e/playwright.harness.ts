@@ -34,6 +34,9 @@ const ZAP_HAR_OPTIONS: BrowserContextOptions =
           content: "embed",
           mode: "full",
           path: ZAP_HAR_PATH,
+          urlFilter: new RegExp(
+            `${BASE_URL}/(?!assets/fonts/.*\\.woff2$|assets/images/govuk-crest\\.svg$).*`,
+          ),
         },
       };
 
