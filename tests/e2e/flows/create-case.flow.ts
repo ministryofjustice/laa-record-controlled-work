@@ -54,7 +54,10 @@ export const completeCreateCaseShortestPath = async (
 
   await expect(page).toHaveURL("/cases/new/check-answers");
   await page.getByRole("button", { name: "Save and continue" }).click();
-  await expect(page).toHaveURL(taskListUrlPattern());
+
+  const TEST = 15000;
+  // Submission calls the create-application API before redirecting; CI runners under load can be slow
+  await expect(page).toHaveURL(taskListUrlPattern(), { timeout: TEST });
 
   const applicationId = extractApplicationIdFromPath(
     "/cases/:id/task-list",

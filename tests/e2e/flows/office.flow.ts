@@ -28,6 +28,7 @@ export const selectOfficeByCode = async (
       .check();
     await page.getByRole("button", { name: "Continue" }).click();
   }
-
-  await expect(page).toHaveURL(CASE_LIST_URL_PATTERN);
+  const TEST = 15000;
+  // Selecting an office calls a backend API before redirecting; CI runners under load can be slow
+  await expect(page).toHaveURL(CASE_LIST_URL_PATTERN, { timeout: TEST });
 };
