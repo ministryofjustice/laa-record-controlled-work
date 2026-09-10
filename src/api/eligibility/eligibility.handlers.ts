@@ -46,7 +46,7 @@ export const createGetEligibilityHandler =
       return;
     }
 
-    res.json({ ...(result.value ?? {}) });
+    res.json({ ...result.value });
   };
 
 export const createPutEligibilityHandler =
