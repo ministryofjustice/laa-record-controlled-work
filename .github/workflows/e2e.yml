@@ -56,11 +56,79 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           PDA_API_KEY: ci-placeholder
 
+      - name: Capture dependency image metadata
+        if: always()
+        run: |
+          set +e
+          mkdir -p container-logs
+          compose_files=(
+            -f docker-compose.yml
+            -f docker-compose.override.yml
+            -f docker/compose/ci.yml
+          )
+          {
+            echo "GitHub SHA: $GITHUB_SHA"
+            echo "GitHub ref: $GITHUB_REF"
+            echo "Docker version:"
+            docker version
+            echo "Docker Compose version:"
+            docker compose version
+            echo "Compose images configured:"
+            docker compose "${compose_files[@]}" config --images || true
+            echo "Compose service state:"
+            docker compose "${compose_files[@]}" ps --all || true
+            echo "Compose images:"
+            docker compose "${compose_files[@]}" images || true
+
+            for service in rcw-api info-and-advice-api ccq-embedded cfe rcw; do
+              container_id=$(docker compose "${compose_files[@]}" ps -q "$service" || true)
+              if [[ -z "$container_id" ]]; then
+                echo "service=$service container=not-running"
+                continue
+              fi
+
+              image_id=$(docker inspect --format '{{.Image}}' "$container_id")
+              echo "service=$service container=$container_id"
+              docker image inspect "$image_id" --format \
+                'image_id={{.Id}} created={{.Created}} revision={{index .Config.Labels "org.opencontainers.image.revision"}}'
+              docker image inspect "$image_id" --format '{{range .RepoDigests}}repo_digest={{.}}{{"\\n"}}{{end}}'
+            done
+          } > container-logs/image-metadata.txt 2>&1
+          echo "Metadata collection completed with exit code $?" >> container-logs/image-metadata.txt
+          exit 0
+
+      - name: Upload dependency image metadata
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: e2e-image-metadata
+          path: container-logs/image-metadata.txt
+          if-no-files-found: warn
+          retention-days: 14
+
       - name: Run E2E tests
         run: yarn test:e2e
         env:
           CI: "true"
           E2E_AUTH_MODE: mock
+
+      - name: Collect container logs
+        if: failure()
+        run: |
+          mkdir -p container-logs
+          docker compose \
+            -f docker-compose.yml \
+            -f docker-compose.override.yml \
+            -f docker/compose/ci.yml \
+            logs --no-color > container-logs/docker-compose.log 2>&1 || true
+
+      - name: Upload container logs
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: e2e-container-logs
+          path: container-logs/
+          retention-days: 14
 
       - name: Upload test report
         if: always()
