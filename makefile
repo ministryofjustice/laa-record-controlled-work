@@ -3,7 +3,7 @@ include scripts/makeFiles/docker.mk
 include scripts/makeFiles/tests.mk
 export
 
-.PHONY: install prek-install dev watch docker-up docker-up-entra docker-down build pda-spec api-generate knip lint lint-fix integration integration-watch e2e e2e-ui test-all coverage unit unit-watch db-applications db-scoping-questions run-tests zap zap-ci
+.PHONY: install prek-install dev watch docker-up docker-up-entra docker-down build pda-spec api-generate knip lint lint-fix integration integration-watch e2e e2e-ui test-all coverage unit unit-watch db-applications db-scoping-questions run-tests zap
 
 # 	op run --env-file=.env uses 1Password to load environment variables securely
 # 	you can --no-masking flag means that varaibles is not masked in the output which can be used for debugging
@@ -33,8 +33,6 @@ docker-down:
 zap:
 	yarn security:zap
 
-zap-ci:
-	yarn security:zap:ci
 
 build:
 	yarn build
