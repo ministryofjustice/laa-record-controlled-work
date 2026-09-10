@@ -35,8 +35,10 @@ export interface MockOAuthClaims {
   FIRM_NAME: string;
   LAA_ACCOUNTS: string[];
   name: string;
+  oid: string;
   preferred_username: string;
   scp: string;
+  tid: string;
   USER_EMAIL: string;
   USER_NAME: string;
 }
@@ -53,8 +55,10 @@ export const DEFAULT_MOCK_OAUTH_CLAIMS: MockOAuthClaims = {
   FIRM_NAME: "Test Legal Aid Firm Ltd",
   LAA_ACCOUNTS: DEFAULT_MULTI_OFFICE_CODES,
   name: "Test User",
+  oid: "test_user",
   preferred_username: MOCK_USERNAME,
   scp: "Applications.Read Applications.Write",
+  tid: "test_tenant",
   USER_EMAIL: MOCK_USERNAME,
   USER_NAME: "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
 };
@@ -142,7 +146,7 @@ export const signIn = async (page: Page): Promise<void> => {
     return;
   }
 
-  await signInWithNonMockOAuth(page);
+  await signInWithNonMockOAuth(/* page */);
 };
 
 export const signInWithSingleOfficeMockOAuth = async (
@@ -200,7 +204,7 @@ export const signInWithSingleOffice = async (
     return;
   }
 
-  await signInWithSingleOfficeNonMock(page, officeCode);
+  await signInWithSingleOfficeNonMock(/* page, officeCode */);
 };
 
 export const signInWithMultiOffice = async (
@@ -212,5 +216,5 @@ export const signInWithMultiOffice = async (
     return;
   }
 
-  await signInWithMultiOfficeNonMock(page, officeCodes);
+  await signInWithMultiOfficeNonMock(/* page, officeCodes */);
 };
