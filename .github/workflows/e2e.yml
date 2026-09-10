@@ -59,6 +59,7 @@ jobs:
       - name: Capture dependency image metadata
         if: always()
         run: |
+          set +e
           mkdir -p container-logs
           compose_files=(
             -f docker-compose.yml
@@ -93,6 +94,17 @@ jobs:
               docker image inspect "$image_id" --format '{{range .RepoDigests}}repo_digest={{.}}{{"\\n"}}{{end}}'
             done
           } > container-logs/image-metadata.txt 2>&1
+          echo "Metadata collection completed with exit code $?" >> container-logs/image-metadata.txt
+          exit 0
+
+      - name: Upload dependency image metadata
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: e2e-image-metadata
+          path: container-logs/image-metadata.txt
+          if-no-files-found: warn
+          retention-days: 14
 
       - name: Run E2E tests
         run: yarn test:e2e
