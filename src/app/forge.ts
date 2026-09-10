@@ -22,13 +22,13 @@ import { autocomplete } from "#/journeys/components/autocomplete/autocomplete.co
 import createApplicationJourney from "#/journeys/create-application/create-application.index.js";
 import declaration from "#/journeys/declaration/declaration.package.js";
 import { editApplicationPackage } from "#/journeys/edit-application/editApplication.package.js";
+import { editClientDetailsPackage } from "#/journeys/edit-client-details/editClientDetails.package.js";
+import { loadApplicationAsAnswers } from "#/journeys/edit-client-details/effects/loadApplicationAsAnswers.js";
 import { evidencePackage } from "#/journeys/evidence/evidence.package.js";
 import { selectOfficePackage } from "#/journeys/select-office/select-office.journey.js";
 import { viewApplicationPackage } from "#/journeys/view-application/viewApplication.package.js";
 import { yourCasesPackage } from "#/journeys/your-cases/your-cases.journey.js";
 import { setupNunjucks } from "#/middleware/setupNunjucks.js";
-import { editClientDetailsPackage } from "#/journeys/edit-client-details/editClientDetails.package.js";
-import { loadApplicationAsAnswers } from "#/journeys/edit-client-details/effects/loadApplicationAsAnswers.js";
 
 /**
  * Initializes Forge for the Express application.
@@ -54,7 +54,10 @@ export function initForge(app: Express): void {
     .registerPackage(declaration, { updateApplicationDeclaration })
     .registerPackage(evidencePackage, { updateApplicationEvidence })
     .registerPackage(viewApplicationPackage, { getApplication })
-    .registerPackage(editClientDetailsPackage, { getApplication, updateApplicationStatus });
+    .registerPackage(editClientDetailsPackage, {
+      getApplication,
+      updateApplicationStatus,
+    });
 
   const forgeRouter = createExpressRouter(forge, { nunjucksEnv });
   app.use("/", requireAuth, forgeRouter);

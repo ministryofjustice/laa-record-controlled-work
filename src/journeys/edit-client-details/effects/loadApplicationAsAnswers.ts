@@ -1,8 +1,10 @@
-import { ApplicationDto } from "#/api/dto/application/application.dto.js";
+import type { Application } from "#/api/clients/rcw/model/application.zod.gen.js";
 import type { EditApplicationContext } from "#/journeys/edit-application/editApplication.types.js";
 
+import { ApplicationDto } from "#/api/dto/application/application.dto.js";
 import { isJourneySession } from "#/journeys/effects.js";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
+import { logger } from "#/logger.js";
 
 export const loadApplicationAsAnswers =
   () =>
@@ -16,7 +18,9 @@ export const loadApplicationAsAnswers =
       return;
     }
 
-    const application = context.getData(CONTEXT_DATA_KEYS.application);
+    const application: Application = context.getData(
+      CONTEXT_DATA_KEYS.application,
+    );
 
     const answersArray = ApplicationDto.toAnswers(application);
 
