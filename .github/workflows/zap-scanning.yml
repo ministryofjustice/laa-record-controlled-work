@@ -44,12 +44,15 @@ jobs:
       - name: Run ZAP Automation Framework scan
         run: ./scripts/zap/zap-run-cicd.sh
 
-      - name: Upload ZAP HTML Report
+      - name: Upload ZAP scan reports
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
-          name: zap-scan-report-html
-          path: zap-results/zap-baseline-report.html
+          name: zap-scan-reports
+          path: |
+            zap-results/zap-baseline-report.html
+            zap-results/zap-baseline-report.json
+            zap-results/zap_out.json
           retention-days: 14
 
       - name: Tear down stack

@@ -20,6 +20,10 @@ jobs:
         matchString: "Cookie"
         matchRegex: false
         replacementString: "rcw.sid=${SESSION_COOKIE}"
+  - type: "passiveScan-config"
+    parameters:
+      enableTags: false
+      maxAlertsPerRule: 10
   - type: "spider"
     parameters:
       context: "rcw"
@@ -27,7 +31,7 @@ jobs:
       maxDuration: 5
   - type: "passiveScan-wait"
     parameters:
-      maxDuration: 5
+      maxDuration: 0
   - type: "outputSummary"
     parameters:
       format: "Long"
@@ -39,3 +43,10 @@ jobs:
       reportFile: "zap-baseline-report"
       reportTitle: "RCW ZAP Scanning Report"
       template: "traditional-html"
+  - type: "report"
+    parameters:
+      reportDescription: "RCW ZAP Baseline Scan"
+      reportDir: "/zap/wrk/zap-results/"
+      reportFile: "zap-baseline-report"
+      reportTitle: "RCW ZAP Scanning Report"
+      template: "traditional-json"
