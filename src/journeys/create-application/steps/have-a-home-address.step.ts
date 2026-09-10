@@ -19,10 +19,7 @@ import {
   OVERSEAS_ADDRESS_FIELDS,
   UK_ADDRESS_FIELDS,
 } from "#/journeys/journey.constants.js";
-import {
-  hasCheckAnswersInQuery,
-  redirectToCheckAnswers,
-} from "#/journeys/shared.hook.js";
+import { hasCheckAnswersInQuery } from "#/journeys/shared.hook.js";
 import { t } from "#/lib/i18n.js";
 
 export const haveAHomeAddressStep = (
@@ -117,3 +114,5 @@ const redirectToAddressWithCheckQuery = redirect({
 });
 
 const redirectToAddress = redirect({ goto: "enter-address-manually" });
+
+const redirectToCheckAnswers = redirect({ goto: "check-answers" });
