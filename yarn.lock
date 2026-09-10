@@ -710,7 +710,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ministryofjustice/hmpps-forge@npm:^0.4.0":
+"@ministryofjustice/hmpps-forge@npm:^0.4.2":
   version: 0.4.2
   resolution: "@ministryofjustice/hmpps-forge@npm:0.4.2"
   dependencies:
@@ -5700,7 +5700,7 @@ __metadata:
     "@faker-js/faker": "npm:^10.6.0"
     "@j178/prek": "npm:^0.5.2"
     "@ministryofjustice/frontend": "npm:10.0.1"
-    "@ministryofjustice/hmpps-forge": "npm:^0.4.0"
+    "@ministryofjustice/hmpps-forge": "npm:^0.4.2"
     "@playwright/test": "npm:^1.62.1"
     "@types/chai": "npm:^5.2.3"
     "@types/chai-as-promised": "npm:^8.0.2"
