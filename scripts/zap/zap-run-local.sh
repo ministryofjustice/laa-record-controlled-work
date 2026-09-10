@@ -22,9 +22,6 @@ if [[ ! -s zap-results/create-case.har ]]; then
 fi
 
 export NGINX_IP="$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' rcw-nginx)"
-SESSION_COOKIE="$(./scripts/zap/get-session-cookie.sh)"
-
-sed "s|\${SESSION_COOKIE}|$SESSION_COOKIE|g" zap.yaml > zap-results/zap-plan.generated.yaml
 
 docker compose \
   "${COMPOSE_FILES[@]}" \

@@ -10,16 +10,6 @@ env:
     failOnError: true
     progressToStdout: true
 jobs:
-  - type: "replacer"
-    parameters:
-      deleteAllRules: true
-    rules:
-      - description: "Inject the pre-authenticated rcw session cookie"
-        url: "http://localhost:8080.*"
-        matchType: "REQ_HEADER"
-        matchString: "Cookie"
-        matchRegex: false
-        replacementString: "rcw.sid=${SESSION_COOKIE}"
   - type: "passiveScan-config"
     parameters:
       enableTags: false
