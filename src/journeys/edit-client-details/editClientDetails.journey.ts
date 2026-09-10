@@ -1,7 +1,6 @@
 import { access, journey } from "@ministryofjustice/hmpps-forge/core/authoring";
 
-import { checkAnswersStep } from "#/journeys/edit-client-details/steps/check-answers/check-answers.step.js";
-import { clientDetailsStep } from "#/journeys/create-application/steps/client-details.step.js";
+import { clientDetailsStep } from "#/journeys/create-application/steps/clientDetails/client-details.step.js";
 import { ecfStep } from "#/journeys/create-application/steps/ecf/ecf.step.js";
 import { ineligibleStep } from "#/journeys/create-application/steps/ecfDropout/ecfDropout.step.js";
 import { enterAddressManuallyStep } from "#/journeys/create-application/steps/enter-address-manually.step.js";
@@ -10,11 +9,12 @@ import { haveAHomeAddressStep } from "#/journeys/create-application/steps/have-a
 import { legalAidBeforeStep } from "#/journeys/create-application/steps/legalAidBefore/legalAidBefore.step.js";
 import { legalAidLast6MonthsStep } from "#/journeys/create-application/steps/legalAidLast6Months/legal-aid-last-6-months.step.js";
 import { niNumberStep } from "#/journeys/create-application/steps/ni-number.step.js";
-import { editClientDetailsEffects } from "#/journeys/edit-client-details/editClientDetails.effects.js";
-import { JourneyCode } from "#/journeys/JourneyCode.enum.js";
 import { editApplicationEffects } from "#/journeys/edit-application/editApplication.effects.js";
+import { editClientDetailsEffects } from "#/journeys/edit-client-details/editClientDetails.effects.js";
+import { checkAnswersStep } from "#/journeys/edit-client-details/steps/check-answers/check-answers.step.js";
+import { JourneyCode } from "#/journeys/JourneyCode.enum.js";
 
-const loadDraftAnswers = access({
+const loadApiAnswers = access({
   effects: [
     editApplicationEffects.loadApplication(),
     editClientDetailsEffects.loadApplicationAsAnswers(
@@ -25,7 +25,7 @@ const loadDraftAnswers = access({
 
 export const editClientDetailsJourney = journey({
   code: JourneyCode.EDIT_CLIENT_DETAILS,
-  onAccess: [loadDraftAnswers],
+  onAccess: [loadApiAnswers],
   path: "/cases/:applicationID/edit-client-details",
   reachability: { disableReachabilityChecks: false },
   steps: [

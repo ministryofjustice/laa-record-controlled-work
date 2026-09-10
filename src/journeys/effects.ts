@@ -5,6 +5,8 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
 import type { JourneySession } from "./context.type.ts";
+import { JourneyCode } from "#/journeys/JourneyCode.enum.js";
+import { logger } from "#/logger.js";
 
 export const isJourneySession = (value: unknown): value is JourneySession =>
   typeof value === "object" && value !== null;
@@ -57,6 +59,8 @@ export const clearFieldAnswers =
       return;
     }
 
+    // this seems to remove all the fields except the ones set when the overseas address is saved.
+
     if (session.journeyDrafts?.[journeyCode]) {
       const { [journeyCode]: selectedJourneyDraft, ...otherJourneyDrafts } =
         session.journeyDrafts;
@@ -67,11 +71,15 @@ export const clearFieldAnswers =
         ),
       );
 
+      logger.error("MMMMMM Removing fields from draft answers for journey:", selectedJourneyWithRemovedFields);
+
       session.journeyDrafts = {
         ...otherJourneyDrafts,
         [journeyCode]: selectedJourneyWithRemovedFields,
       };
     }
+
+    logger.error("MMMMMM before clear answers:", context.getAllAnswers());
 
     for (const field of fields) {
       context.clearAnswer(field);

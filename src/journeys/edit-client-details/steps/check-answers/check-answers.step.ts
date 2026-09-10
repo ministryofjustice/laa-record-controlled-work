@@ -1,10 +1,12 @@
 import {
+  access,
   Data,
   Format,
   redirect,
   step,
   submit,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
+import { editClientDetailsEffects } from "#/journeys/edit-client-details/editClientDetails.effects.js";
 
 import {
   heading,
@@ -20,6 +22,11 @@ export const checkAnswersStep = (
   step({
     blocks: [heading, summaryList, submitButton],
     code: "check-answers",
+    onAccess: [
+      access({
+        effects: [editClientDetailsEffects.loadDraftAnswers(journeyCode)],
+      }),
+    ],
     onSubmission: [
       submit({
         onAlways: {
