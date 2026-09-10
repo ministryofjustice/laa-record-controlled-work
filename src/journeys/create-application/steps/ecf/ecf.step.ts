@@ -31,7 +31,7 @@ export function ecfStep(journeyCode: string): StepDefinition {
   return step({
     blocks: [clientDetailsCaption(), ecfQuestion(), continueButton()],
     code: StepCode.ECF,
-    onSubmission: [onSubmission(journeyCode)],
+    onSubmission: [saveEcf(journeyCode)],
     path: "/ecf",
     title: TITLE,
   });
@@ -46,12 +46,12 @@ export function ecfStep(journeyCode: string): StepDefinition {
  * @param {string} journeyCode - The journey code for saving draft answers
  * @returns {SubmitHook} A submit hook with validation and conditional routing logic
  */
-function onSubmission(journeyCode: string): SubmitHook {
+function saveEcf(journeyCode: string): SubmitHook {
   return submit({
     onValid: {
       effects: [CreateApplicationEffects.saveDraftAnswers(journeyCode)],
       next: [
-        redirectToECFDropout,
+        redirectToECFDropoutIfEcfRequired,
         redirectToCheckAnswers,
         redirectToLegalAidBefore,
       ],
@@ -60,7 +60,7 @@ function onSubmission(journeyCode: string): SubmitHook {
   });
 }
 
-const redirectToECFDropout = redirect({
+const redirectToECFDropoutIfEcfRequired = redirect({
   goto: StepCode.ECF_DROPOUT,
   when: Answer(AnswerKey.ecf).match(Condition.Equals("yes")),
 });

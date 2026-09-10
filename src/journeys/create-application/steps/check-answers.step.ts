@@ -4,6 +4,7 @@ import {
   redirect,
   step,
   submit,
+  type SubmitHook,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
 import { CreateApplicationEffects } from "#/journeys/create-application/create-application.effects.js";
@@ -21,22 +22,20 @@ export const checkAnswersStep = (
   step({
     blocks: [heading, summaryList, submitButton],
     code: "check-answers",
-    onSubmission: [
-      submit({
-        onAlways: {
-          effects: [CreateApplicationEffects.createApplication(journeyCode)],
-          next: [
-            redirect({
-              goto: Format(
-                "/cases/%1/task-list",
-                Data(CONTEXT_DATA_KEYS.applicationID),
-              ),
-            }),
-          ],
-        },
-        validate: false,
-      }),
-    ],
+    onSubmission: [createApplicationThenGotoTaskList(journeyCode)],
     path: "/check-answers",
     title: t("journeys.createApplication.checkAnswers.title"),
   });
+
+const createApplicationThenGotoTaskList = (journeyCode: string): SubmitHook =>
+  submit({
+    onAlways: {
+      effects: [CreateApplicationEffects.createApplication(journeyCode)],
+      next: [redirectToTaskList],
+    },
+    validate: false,
+  });
+
+const redirectToTaskList = redirect({
+  goto: Format("/cases/%1/task-list", Data(CONTEXT_DATA_KEYS.applicationID)),
+});

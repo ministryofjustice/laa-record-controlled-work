@@ -5,6 +5,7 @@ import {
   Self,
   step,
   submit,
+  type SubmitHook,
   validation,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 import { HtmlBlock } from "@ministryofjustice/hmpps-forge/core/components";
@@ -83,22 +84,21 @@ export const niNumberStep = (journeyCode: string): ReturnType<typeof step> =>
       }),
       GovUKButton({ text: t("common.continue") }),
     ],
-    onSubmission: [
-      submit({
-        onValid: {
-          effects: [CreateApplicationEffects.saveDraftAnswers(journeyCode)],
-          next: [
-            redirectToCheckAnswers,
-
-            redirect({ goto: "have-a-home-address" }),
-          ],
-        },
-        validate: true,
-      }),
-    ],
+    onSubmission: [saveNiNumber(journeyCode)],
     path: "/ni-number",
     reachability: {
       entryWhen: hasCheckAnswersInQuery,
     },
     title: t("journeys.createApplication.niNumber.title"),
   });
+
+const saveNiNumber = (journeyCode: string): SubmitHook =>
+  submit({
+    onValid: {
+      effects: [CreateApplicationEffects.saveDraftAnswers(journeyCode)],
+      next: [redirectToCheckAnswers, redirectToHomeAddress],
+    },
+    validate: true,
+  });
+
+const redirectToHomeAddress = redirect({ goto: "have-a-home-address" });

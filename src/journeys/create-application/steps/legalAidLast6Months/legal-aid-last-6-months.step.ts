@@ -32,13 +32,9 @@ export const legalAidLast6MonthsStep = (
       continueButton(),
     ],
     onSubmission: [
-      submitValidNo(journeyCode),
-      submitValidYes(journeyCode),
-
-      submit({
-        onInvalid: {},
-        validate: true,
-      }),
+      saveNoAndClearPriorLegalAidReasonData(journeyCode),
+      saveYes(journeyCode),
+      submitInvalid,
     ],
     path: "/legal-aid-last-6-months",
     reachability: {
@@ -47,7 +43,9 @@ export const legalAidLast6MonthsStep = (
     title: TITLE,
   });
 
-const submitValidNo = (journeyCode: string): SubmitHook =>
+const saveNoAndClearPriorLegalAidReasonData = (
+  journeyCode: string,
+): SubmitHook =>
   submit({
     onValid: {
       effects: [
@@ -56,24 +54,25 @@ const submitValidNo = (journeyCode: string): SubmitHook =>
         ]),
         CreateApplicationEffects.saveDraftAnswers(journeyCode),
       ],
-      next: [
-        redirectToCheckAnswers,
-        redirect({ goto: StepCode.CLIENT_DETAILS }),
-      ],
+      next: [redirectToCheckAnswers, redirectToClientDetails],
     },
     validate: true,
     when: Answer("legalAidLast6Months").match(Condition.Equals("no")),
   });
 
-const submitValidYes = (journeyCode: string): SubmitHook =>
+const saveYes = (journeyCode: string): SubmitHook =>
   submit({
     onValid: {
       effects: [CreateApplicationEffects.saveDraftAnswers(journeyCode)],
-      next: [
-        redirectToCheckAnswers,
-        redirect({ goto: StepCode.CLIENT_DETAILS }),
-      ],
+      next: [redirectToCheckAnswers, redirectToClientDetails],
     },
     validate: true,
     when: Answer("legalAidLast6Months").match(Condition.Equals("yes")),
   });
+
+const submitInvalid = submit({
+  onInvalid: {},
+  validate: true,
+});
+
+const redirectToClientDetails = redirect({ goto: StepCode.CLIENT_DETAILS });

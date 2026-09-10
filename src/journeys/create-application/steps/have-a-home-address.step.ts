@@ -5,6 +5,7 @@ import {
   Self,
   step,
   submit,
+  type SubmitHook,
   validation,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 import { HtmlBlock } from "@ministryofjustice/hmpps-forge/core/components";
@@ -68,40 +69,9 @@ export const haveAHomeAddressStep = (
       GovUKButton({ text: t("common.continue") }),
     ],
     onSubmission: [
-      submit({
-        onValid: {
-          effects: [
-            CreateApplicationEffects.clearFieldAnswers(journeyCode, [
-              ...Object.values(UK_ADDRESS_FIELDS),
-              ...Object.values(OVERSEAS_ADDRESS_FIELDS),
-            ]),
-            CreateApplicationEffects.saveDraftAnswers(journeyCode),
-          ],
-          next: [redirectToCheckAnswers, redirect({ goto: "check-answers" })],
-        },
-
-        validate: true,
-        when: Answer("haveAHomeAddress").match(Condition.Equals("no")),
-      }),
-      submit({
-        onValid: {
-          effects: [CreateApplicationEffects.saveDraftAnswers(journeyCode)],
-          next: [
-            redirect({
-              goto: "enter-address-manually?returnTo=check-answers",
-              when: hasCheckAnswersInQuery,
-            }),
-
-            redirect({ goto: "enter-address-manually" }),
-          ],
-        },
-        validate: true,
-        when: Answer("haveAHomeAddress").match(Condition.Equals("yes")),
-      }),
-      submit({
-        onInvalid: {},
-        validate: true,
-      }),
+      saveNoAndClearAddressAnswers(journeyCode),
+      saveYes(journeyCode),
+      submitInvalid,
     ],
     path: "/have-a-home-address",
     reachability: {
@@ -109,3 +79,41 @@ export const haveAHomeAddressStep = (
     },
     title: t("journeys.createApplication.haveAHomeAddress.title"),
   });
+
+const saveNoAndClearAddressAnswers = (journeyCode: string): SubmitHook =>
+  submit({
+    onValid: {
+      effects: [
+        CreateApplicationEffects.clearFieldAnswers(journeyCode, [
+          ...Object.values(UK_ADDRESS_FIELDS),
+          ...Object.values(OVERSEAS_ADDRESS_FIELDS),
+        ]),
+        CreateApplicationEffects.saveDraftAnswers(journeyCode),
+      ],
+      next: [redirectToCheckAnswers],
+    },
+    validate: true,
+    when: Answer("haveAHomeAddress").match(Condition.Equals("no")),
+  });
+
+const saveYes = (journeyCode: string): SubmitHook =>
+  submit({
+    onValid: {
+      effects: [CreateApplicationEffects.saveDraftAnswers(journeyCode)],
+      next: [redirectToAddressWithCheckQuery, redirectToAddress],
+    },
+    validate: true,
+    when: Answer("haveAHomeAddress").match(Condition.Equals("yes")),
+  });
+
+const submitInvalid = submit({
+  onInvalid: {},
+  validate: true,
+});
+
+const redirectToAddressWithCheckQuery = redirect({
+  goto: "enter-address-manually?returnTo=check-answers",
+  when: hasCheckAnswersInQuery,
+});
+
+const redirectToAddress = redirect({ goto: "enter-address-manually" });

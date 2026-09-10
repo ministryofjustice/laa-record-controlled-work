@@ -8,6 +8,7 @@ import {
   step,
   type StepDefinition,
   submit,
+  type SubmitHook,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
 import { AnswerKey } from "#/journeys/AnswerKey.enum.js";
@@ -41,33 +42,8 @@ export function legalAidBeforeStep(journeyCode: string): StepDefinition {
     ],
     code: StepCode.LEGAL_AID_BEFORE,
     onSubmission: [
-      // clear sub-journey answers if answer not "yesSameMatter"
-      submit({
-        onValid: {
-          effects: [
-            CreateApplicationEffects.clearFieldAnswers(journeyCode, [
-              "legalAidLast6Months",
-              "reasonForYes",
-            ]),
-            CreateApplicationEffects.saveDraftAnswers(journeyCode),
-          ],
-          next: next(),
-        },
-        validate: true,
-        when: not(
-          Answer(AnswerKey.legalAidBefore).match(
-            Condition.Equals("yesSameMatter"),
-          ),
-        ),
-      }),
-
-      submit({
-        onValid: {
-          effects: [CreateApplicationEffects.saveDraftAnswers(journeyCode)],
-          next: next(),
-        },
-        validate: true,
-      }),
+      saveNotSameMatterAndClearPriorLegalAidData(journeyCode),
+      saveLegalAidBefore(journeyCode),
     ],
     path: "/legal-aid-before",
     reachability: {
@@ -84,25 +60,55 @@ export function legalAidBeforeStep(journeyCode: string): StepDefinition {
  */
 function next(): RedirectOutcome[] {
   return [
-    redirect({
-      goto: `${StepCode.LEGAL_AID_LAST_6_MONTHS}?returnTo=check-answers`,
-      when: and(
-        hasCheckAnswersInQuery,
-        Answer(AnswerKey.legalAidBefore).match(
-          Condition.Equals("yesSameMatter"),
-        ),
-      ),
-    }),
-
+    redirectToLegalAidLast6MonthsWithCheckQuery,
     redirectToCheckAnswers,
-
-    redirect({
-      goto: StepCode.LEGAL_AID_LAST_6_MONTHS,
-      when: Answer(AnswerKey.legalAidBefore).match(
-        Condition.Equals("yesSameMatter"),
-      ),
-    }),
-
-    redirect({ goto: StepCode.CLIENT_DETAILS }),
+    redirectToLegalAidLast6Months,
+    redirectToClientDetails,
   ];
 }
+
+const saveNotSameMatterAndClearPriorLegalAidData = (
+  journeyCode: string,
+): SubmitHook =>
+  submit({
+    onValid: {
+      effects: [
+        CreateApplicationEffects.clearFieldAnswers(journeyCode, [
+          "legalAidLast6Months",
+          "reasonForYes",
+        ]),
+        CreateApplicationEffects.saveDraftAnswers(journeyCode),
+      ],
+      next: next(),
+    },
+    validate: true,
+    when: not(
+      Answer(AnswerKey.legalAidBefore).match(Condition.Equals("yesSameMatter")),
+    ),
+  });
+
+const saveLegalAidBefore = (journeyCode: string): SubmitHook =>
+  submit({
+    onValid: {
+      effects: [CreateApplicationEffects.saveDraftAnswers(journeyCode)],
+      next: next(),
+    },
+    validate: true,
+  });
+
+const redirectToLegalAidLast6MonthsWithCheckQuery = redirect({
+  goto: `${StepCode.LEGAL_AID_LAST_6_MONTHS}?returnTo=check-answers`,
+  when: and(
+    hasCheckAnswersInQuery,
+    Answer(AnswerKey.legalAidBefore).match(Condition.Equals("yesSameMatter")),
+  ),
+});
+
+const redirectToLegalAidLast6Months = redirect({
+  goto: StepCode.LEGAL_AID_LAST_6_MONTHS,
+  when: Answer(AnswerKey.legalAidBefore).match(
+    Condition.Equals("yesSameMatter"),
+  ),
+});
+
+const redirectToClientDetails = redirect({ goto: StepCode.CLIENT_DETAILS });
