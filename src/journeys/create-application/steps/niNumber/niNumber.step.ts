@@ -1,6 +1,7 @@
 import {
   redirect,
   step,
+  type StepDefinition,
   submit,
   type SubmitHook,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
@@ -29,7 +30,7 @@ const TITLE = t("journeys.createApplication.niNumber.title");
  * @param journeyCode The code for the active journey.
  * @returns A Forge step definition for the National Insurance number page.
  */
-export function niNumberStep(journeyCode: string): ReturnType<typeof step> {
+export function niNumberStep(journeyCode: string): StepDefinition {
   return step({
     blocks: [clientDetailsCaption(), niNumberQuestion(), continueButton()],
     onSubmission: [saveNiNumber(journeyCode)],
