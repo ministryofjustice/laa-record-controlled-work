@@ -114,6 +114,9 @@ export const enterOverseasAddressStep = (
           ),
         },
       }),
+      HtmlBlock({
+        content: `<p class="govuk-body"><a class="govuk-link" href="/cases/new/enter-address-manually">${t("journeys.createApplication.enterOverseasAddress.address.ukAddress")}</a></p>`,
+      }),
       GovUKButton({ text: t("common.continue") }),
     ],
     onSubmission: [saveOverseasAddress(journeyCode)],

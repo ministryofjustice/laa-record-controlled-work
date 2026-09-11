@@ -44,6 +44,20 @@ describe("Enter overseas address step", () => {
       expect(renderResult.context.step.backlink).to.be.undefined;
     });
 
+    it("renders a link to the UK address page", () => {
+      const linkBlock = renderResult
+        .getBlocksByVariant("html")
+        .find((b) =>
+          (b.properties.content as string).includes(
+            "/enter-address-manually",
+          ),
+        );
+      expect(linkBlock).to.exist;
+      expect(linkBlock!.properties.content as string).to.contain(
+        "The address is in the UK",
+      );
+    });
+
     it("renders a country input", () => {
       const label = countryInput.properties.label as { text: string };
       expect(label.text).to.equal("Country");
