@@ -5,7 +5,8 @@ const files = [
   ...globSync("src/api/clients/**/schema/**/*.gen.ts"),
 ];
 
-const SCHEMA_ALIAS_IMPORT = /(#[/]api[/]clients[/][^'"\n]+?\.zod)(?=['"])/g;
+const SCHEMA_ALIAS_IMPORT =
+  /(#[/]api[/]clients[/][^'"\n]+?\.zod)(?:\.gen)?(?=['"])/g;
 
 for (const file of files) {
   const content = readFileSync(file, "utf-8");
