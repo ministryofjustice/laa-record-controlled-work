@@ -30,13 +30,15 @@ The local scan uses the `zap-scan` service defined in [docker/compose/zap.yml](.
 
 The OAuth callback URL is excluded from the ZAP context because it contains one-time authorisation values and should not be crawled again.
 
+ZAP's spider and active scan crawl the live app, not just the imported HAR, so the stack must still be running when they execute. That's why the CI scan runs as the final steps of the existing e2e job instead of a separate workflow, which would have to start its own stack a second time.
+
 ## Files
 
 | File | Responsibility |
 | --- | --- |
 | [zap.yaml](zap.yaml) | ZAP Automation Framework plan: target context, excluded paths, HAR import, scan limits, summary, and reports. |
 | [run-local.sh](run-local.sh) | Local orchestration. Requires a running stack, runs e2e tests, merges HARs, runs ZAP, and opens the report. |
-| [run-cicd.sh](run-cicd.sh) | CI orchestration. Merges the HARs already recorded by the e2e job's test run, then launches ZAP with host networking. |
+| [run-cicd.sh](run-cicd.sh) | CI orchestration. Merges the HARs already recorded by the e2e job's test run, pulls the ZAP image, then launches ZAP with host networking. |
 | [merge-hars.ts](merge-hars.ts) | Command-line wrapper that reads individual HAR files from a directory and merges them. |
 | [har.ts](har.ts) | Creates collision-resistant HAR paths and merges valid HAR entries. |
 | [tests/e2e/playwright.harness.ts](../tests/e2e/playwright.harness.ts) | Records a HAR for every e2e browser context when a ZAP scan is requested. |
@@ -71,6 +73,7 @@ The plan fails on ZAP errors, but reported warnings and alerts do not fail the s
 
 - **The combined HAR cannot be imported:** inspect the individual files in `zap-results/hars/`. [har.ts](har.ts) removes aborted entries with status `0` during merging.
 - **The scan cannot reach the application or mock OAuth2 service:** check Docker host mappings in [docker/compose/zap.yml](../docker/compose/zap.yml).
+
 
 ## Changing coverage
 
