@@ -5,7 +5,7 @@ import { clientDetailsStep } from "#/journeys/create-application/steps/clientDet
 import { declarationStep } from "#/journeys/create-application/steps/declaration/declaration.step.js";
 import { enterAddressManuallyStep } from "#/journeys/create-application/steps/enter-address-manually.step.js";
 import { enterOverseasAddressStep } from "#/journeys/create-application/steps/enter-overseas-address.step.js";
-import { haveAHomeAddressStep } from "#/journeys/create-application/steps/have-a-home-address.step.js";
+import { haveAHomeAddressStep } from "#/journeys/create-application/steps/haveAHomeAddress/haveAHomeAddress.step.js";
 import { legalAidLast6MonthsStep } from "#/journeys/create-application/steps/legalAidLast6Months/legal-aid-last-6-months.step.js";
 import { JourneyCode } from "#/journeys/JourneyCode.enum.js";
 import { JourneyPath } from "#/journeys/JourneyPath.enum.js";
