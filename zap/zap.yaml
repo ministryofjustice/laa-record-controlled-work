@@ -16,7 +16,7 @@ jobs:
       maxAlertsPerRule: 10
   - type: "import"
     parameters:
-      fileName: "/zap/wrk/zap-results/create-case.har"
+      fileName: "/zap/wrk/zap-results/e2e-suite.har"
       type: "har"
   - type: "spider"
     parameters:

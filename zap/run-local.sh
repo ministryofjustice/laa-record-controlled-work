@@ -1,5 +1,5 @@
 #!/bin/bash
-# Runs the ZAP scan locally. Requires the full stack to already be up 
+# Runs the ZAP scan locally. Requires the full stack to already be up
 # (e.g. run `docker/compose/up` in another terminal first)
 set -euo pipefail
 
@@ -10,16 +10,14 @@ if [[ "$(docker compose "${COMPOSE_FILES[@]}" ps --status running --services 2>/
   exit 1
 fi
 
-mkdir -p zap-results
+rm -rf zap-results/hars
+mkdir -p zap-results/hars
 chmod 777 zap-results
 
-E2E_ZAP_HAR_PATH="$(pwd)/zap-results/create-case.har" \
-  yarn playwright test --config=tests/e2e/playwright.config.ts --grep "@zap" --project=chromium --workers=1
+E2E_ZAP_HAR_DIRECTORY="$(pwd)/zap-results/hars" \
+  yarn test:e2e
 
-if [[ ! -s zap-results/create-case.har ]]; then
-  echo "error: Playwright did not create the ZAP journey HAR." >&2
-  exit 1
-fi
+yarn tsx zap/merge-hars.ts zap-results/hars zap-results/e2e-suite.har
 
 export NGINX_IP="$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' rcw-nginx)"
 

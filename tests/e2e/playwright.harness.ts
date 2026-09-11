@@ -5,7 +5,7 @@ import type {
 } from "@playwright/test";
 
 import { test as base, expect } from "@playwright/test";
-import { readFile, writeFile } from "node:fs/promises";
+import { randomUUID } from "node:crypto";
 
 import {
   type Actor,
@@ -13,6 +13,7 @@ import {
   createActor,
 } from "#tests/e2e/fixtures/actor.fixture.js";
 import { AUTH_MODE, signInWithMockOAuth } from "#tests/e2e/flows/auth.flow.js";
+import { createHarPath } from "#zap/har.js";
 
 interface HarnessFixtures extends ActorFixtures {}
 
@@ -22,19 +23,19 @@ interface HarnessWorkerFixtures {
 
 const BASE_URL = process.env.E2E_BASE_URL ?? "http://localhost:8080";
 const AUTH_STORAGE_STATE_PATH = process.env.E2E_AUTH_STORAGE_STATE_PATH;
-const ZAP_HAR_PATH = process.env.E2E_ZAP_HAR_PATH;
+const ZAP_HAR_DIRECTORY = process.env.E2E_ZAP_HAR_DIRECTORY;
 const CONTEXT_OPTIONS: BrowserContextOptions = {
   baseURL: BASE_URL,
   ignoreHTTPSErrors: true,
 };
-const ZAP_HAR_OPTIONS: BrowserContextOptions =
-  ZAP_HAR_PATH === undefined
+const createZapHarOptions = (): BrowserContextOptions =>
+  ZAP_HAR_DIRECTORY === undefined
     ? {}
     : {
         recordHar: {
           content: "embed",
           mode: "full",
-          path: ZAP_HAR_PATH,
+          path: createHarPath(ZAP_HAR_DIRECTORY, randomUUID()),
         },
       };
 
@@ -45,29 +46,8 @@ export const createBrowserContext = async (
   await browser.newContext({
     ...CONTEXT_OPTIONS,
     ...options,
+    ...createZapHarOptions(),
   });
-
-interface Har {
-  log: { entries: HarEntry[] };
-}
-
-interface HarEntry {
-  response: { status: number };
-}
-
-// A status of 0 (Chromium's marker for an aborted/cancelled request) makes ZAP's
-// HAR importer fail the whole import, not just skip the offending entry.
-const ABORTED_REQUEST_STATUS = 0;
-
-const removeInvalidHarEntries = async (harPath: string): Promise<void> => {
-  const parsedHar: unknown = JSON.parse(await readFile(harPath, "utf-8"));
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- shape is produced by Playwright's own recordHar, not user input
-  const har = parsedHar as Har;
-  har.log.entries = har.log.entries.filter(
-    (entry) => entry.response.status > ABORTED_REQUEST_STATUS,
-  );
-  await writeFile(harPath, JSON.stringify(har));
-};
 
 export const test = base.extend<HarnessFixtures, HarnessWorkerFixtures>({
   actor: async ({ page }, use): Promise<void> => {
@@ -104,15 +84,10 @@ export const test = base.extend<HarnessFixtures, HarnessWorkerFixtures>({
       ...(authStorageState === undefined
         ? {}
         : { storageState: authStorageState }),
-      ...ZAP_HAR_OPTIONS,
     });
 
     await use(context);
     await context.close();
-
-    if (ZAP_HAR_PATH !== undefined) {
-      await removeInvalidHarEntries(ZAP_HAR_PATH);
-    }
   },
 
   page: async ({ context }, use): Promise<void> => {

@@ -57,7 +57,7 @@ jobs:
           PDA_API_KEY: ci-placeholder
 
       - name: Run ZAP Automation Framework scan
-        run: ./scripts/zap/zap-run-cicd.sh
+        run: ./zap/run-cicd.sh
 
       - name: Upload ZAP scan reports
         if: always()
@@ -68,7 +68,8 @@ jobs:
             zap-results/zap-baseline-report.html
             zap-results/zap-baseline-report.json
             zap-results/zap_out.json
-            zap-results/create-case.har
+            zap-results/e2e-suite.har
+            zap-results/hars/
           retention-days: 14
 
       - name: Tear down stack
