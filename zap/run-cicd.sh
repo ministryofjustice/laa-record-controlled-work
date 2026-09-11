@@ -5,6 +5,8 @@ set -euo pipefail
 
 yarn tsx zap/merge-hars.ts zap-results/hars zap-results/e2e-suite.har
 
+docker pull zaproxy/zap-stable
+
 docker run --rm --network host \
   -v "$(pwd)/zap/zap.yaml":/zap/wrk/zap.yaml:ro \
   -v "$(pwd)/zap-results":/zap/wrk/zap-results:rw \

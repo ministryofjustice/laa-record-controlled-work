@@ -13,6 +13,7 @@
     "routes/**/*.ts",
     "src/**/*.ts",
     "middleware/**/*.ts",
+    "utils/**/*.ts",
     "zap/**/*.ts"
   ]
 }
