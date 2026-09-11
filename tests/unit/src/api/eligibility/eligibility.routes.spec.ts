@@ -57,55 +57,85 @@ describe("GET /api/applications/:applicationId/eligibility", () => {
     expect(getApplicationStub.called).to.equal(false);
   });
 
-  it("returns an empty body when the application has no eligibility assessment", async () => {
+  it("returns derived client age when the application has no eligibility assessment", async () => {
     getApplicationStub.resolves({
       data: getGetApplicationResponseMock({
         id: resourceId,
         eligibility: null,
+        clientDetails: {
+          ...getGetApplicationResponseMock().clientDetails,
+          dateOfBirth: "1990-01-01",
+        },
       }),
       status: 200,
+    });
+    sinon.useFakeTimers({
+      now: new Date("2026-09-10T12:00:00Z"),
+      toFake: ["Date"],
     });
 
     const response = await request(buildApp()).get(eligibilityPath(resourceId));
 
     expect(response.status).to.equal(OK);
-    expect(response.body).to.deep.equal({});
+    expect(response.body).to.deep.equal({ data: { client_age: "standard" } });
   });
 
   it("returns data/result when a completed assessment is present", async () => {
     getApplicationStub.resolves({
       data: getGetApplicationResponseMock({
         id: resourceId,
+        clientDetails: {
+          ...getGetApplicationResponseMock().clientDetails,
+          dateOfBirth: "1990-01-01",
+        },
         eligibility: {
-          data: { level_of_help: "controlled_legal_representation" },
+          data: {
+            level_of_help: "controlled_legal_representation",
+            client_age: "under_18",
+          },
           result: { indication: true },
         },
       }),
       status: 200,
+    });
+    sinon.useFakeTimers({
+      now: new Date("2026-09-10T12:00:00Z"),
+      toFake: ["Date"],
     });
 
     const response = await request(buildApp()).get(eligibilityPath(resourceId));
 
     expect(response.status).to.equal(OK);
     expect(response.body).to.deep.equal({
-      data: { level_of_help: "controlled_legal_representation" },
+      data: {
+        level_of_help: "controlled_legal_representation",
+        client_age: "standard",
+      },
       result: { indication: true },
     });
   });
 
-  it("returns an empty body when the eligibility assessment is malformed or partial", async () => {
+  it("returns derived client age when the eligibility assessment is malformed or partial", async () => {
     getApplicationStub.resolves({
       data: getGetApplicationResponseMock({
         id: resourceId,
+        clientDetails: {
+          ...getGetApplicationResponseMock().clientDetails,
+          dateOfBirth: "1990-01-01",
+        },
         eligibility: { data: { level_of_help: "cw" }, result: null },
       }),
       status: 200,
+    });
+    sinon.useFakeTimers({
+      now: new Date("2026-09-10T12:00:00Z"),
+      toFake: ["Date"],
     });
 
     const response = await request(buildApp()).get(eligibilityPath(resourceId));
 
     expect(response.status).to.equal(OK);
-    expect(response.body).to.deep.equal({});
+    expect(response.body).to.deep.equal({ data: { client_age: "standard" } });
   });
 
   it("returns 401 when the session cannot be authenticated", async () => {

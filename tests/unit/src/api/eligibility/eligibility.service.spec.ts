@@ -189,6 +189,21 @@ describe("saveEligibilityAssessment", () => {
 describe("loadEligibilityAssessment", () => {
   const applicationId = "123e4567-e89b-12d3-a456-426614174000";
 
+  function getApplicationResponse(
+    dateOfBirth: string,
+    eligibility: {
+      data: Record<string, unknown> | null;
+      result: Record<string, unknown> | null;
+    } | null = null,
+  ) {
+    const response = getGetApplicationResponseMock({
+      id: applicationId,
+      eligibility,
+    });
+    response.clientDetails.dateOfBirth = dateOfBirth;
+    return response;
+  }
+
   let deps: LoadEligibilityAssessmentDeps;
   let getApplicationStub: sinon.SinonStub;
 
@@ -206,15 +221,13 @@ describe("loadEligibilityAssessment", () => {
 
   it("returns the eligibility data/result when a completed assessment is present", async () => {
     getApplicationStub.resolves({
-      data: getGetApplicationResponseMock({
-        id: applicationId,
-        eligibility: {
-          data: { level_of_help: "controlled_legal_representation" },
-          result: { indication: true },
-        },
+      data: getApplicationResponse("1990-01-01", {
+        data: { level_of_help: "controlled_legal_representation" },
+        result: { indication: true },
       }),
       status: 200,
     });
+    sinon.useFakeTimers(new Date("2026-09-10T12:00:00Z"));
 
     const result = (await loadEligibilityAssessment(deps, {
       applicationId,
@@ -224,19 +237,20 @@ describe("loadEligibilityAssessment", () => {
 
     expect(result.error).to.equal(undefined);
     expect(result.value).to.deep.equal({
-      data: { level_of_help: "controlled_legal_representation" },
+      data: {
+        level_of_help: "controlled_legal_representation",
+        client_age: "standard",
+      },
       result: { indication: true },
     });
   });
 
-  it("returns undefined when the application has no eligibility assessment", async () => {
+  it("returns derived client age when the application has no eligibility assessment", async () => {
     getApplicationStub.resolves({
-      data: getGetApplicationResponseMock({
-        id: applicationId,
-        eligibility: null,
-      }),
+      data: getApplicationResponse("1990-01-01"),
       status: 200,
     });
+    sinon.useFakeTimers(new Date("2026-09-10T12:00:00Z"));
 
     const result = (await loadEligibilityAssessment(deps, {
       applicationId,
@@ -245,17 +259,18 @@ describe("loadEligibilityAssessment", () => {
     })) as Success<EligibilityAssessment | undefined>;
 
     expect(result.error).to.equal(undefined);
-    expect(result.value).to.equal(undefined);
+    expect(result.value).to.deep.equal({ data: { client_age: "standard" } });
   });
 
-  it("returns undefined when eligibility data/result is malformed or partial", async () => {
+  it("returns derived client age when eligibility data/result is malformed or partial", async () => {
     getApplicationStub.resolves({
-      data: getGetApplicationResponseMock({
-        id: applicationId,
-        eligibility: { data: { level_of_help: "cw" }, result: null },
+      data: getApplicationResponse("1990-01-01", {
+        data: { level_of_help: "cw" },
+        result: null,
       }),
       status: 200,
     });
+    sinon.useFakeTimers(new Date("2026-09-10T12:00:00Z"));
 
     const result = (await loadEligibilityAssessment(deps, {
       applicationId,
@@ -264,7 +279,151 @@ describe("loadEligibilityAssessment", () => {
     })) as Success<EligibilityAssessment | undefined>;
 
     expect(result.error).to.equal(undefined);
-    expect(result.value).to.equal(undefined);
+    expect(result.value).to.deep.equal({ data: { client_age: "standard" } });
+  });
+
+  it("replaces a saved client age with the value derived from date of birth", async () => {
+    getApplicationStub.resolves({
+      data: getApplicationResponse("2008-09-11", {
+        data: { client_age: "standard" },
+        result: { indication: true },
+      }),
+      status: 200,
+    });
+    sinon.useFakeTimers(new Date("2026-09-10T12:00:00Z"));
+
+    const result = (await loadEligibilityAssessment(deps, {
+      applicationId,
+      homeAccountId: "home-account-id",
+      sessionId: "session-id",
+    })) as Success<EligibilityAssessment>;
+
+    expect(result.value).to.deep.equal({
+      data: { client_age: "under_18" },
+      result: { indication: true },
+    });
+  });
+
+  it("uses under 18 before the 18th birthday and standard on it", async () => {
+    sinon.useFakeTimers(new Date("2026-09-10T12:00:00Z"));
+
+    for (const [dateOfBirth, clientAge] of [
+      ["2008-09-11", "under_18"],
+      ["2008-09-10", "standard"],
+    ]) {
+      getApplicationStub.resolves({
+        data: getApplicationResponse(dateOfBirth),
+        status: 200,
+      });
+
+      const result = (await loadEligibilityAssessment(deps, {
+        applicationId,
+        homeAccountId: "home-account-id",
+        sessionId: "session-id",
+      })) as Success<EligibilityAssessment>;
+
+      expect(result.value?.data.client_age).to.equal(clientAge);
+    }
+  });
+
+  it("changes age range at the UTC birthday midnight", async () => {
+    const clock = sinon.useFakeTimers(new Date("2026-09-10T23:59:59.999Z"));
+    getApplicationStub.resolves({
+      data: getApplicationResponse("2008-09-11"),
+      status: 200,
+    });
+
+    const beforeBirthday = (await loadEligibilityAssessment(deps, {
+      applicationId,
+      homeAccountId: "home-account-id",
+      sessionId: "session-id",
+    })) as Success<EligibilityAssessment>;
+
+    expect(beforeBirthday.value?.data.client_age).to.equal("under_18");
+
+    clock.setSystemTime(new Date("2026-09-11T00:00:00.000Z"));
+
+    const onBirthday = (await loadEligibilityAssessment(deps, {
+      applicationId,
+      homeAccountId: "home-account-id",
+      sessionId: "session-id",
+    })) as Success<EligibilityAssessment>;
+
+    expect(onBirthday.value?.data.client_age).to.equal("standard");
+  });
+
+  it("uses standard before the 60th birthday and over 60 on it", async () => {
+    sinon.useFakeTimers(new Date("2026-09-10T12:00:00Z"));
+
+    for (const [dateOfBirth, clientAge] of [
+      ["1966-09-11", "standard"],
+      ["1966-09-10", "over_60"],
+    ]) {
+      getApplicationStub.resolves({
+        data: getApplicationResponse(dateOfBirth),
+        status: 200,
+      });
+
+      const result = (await loadEligibilityAssessment(deps, {
+        applicationId,
+        homeAccountId: "home-account-id",
+        sessionId: "session-id",
+      })) as Success<EligibilityAssessment>;
+
+      expect(result.value?.data.client_age).to.equal(clientAge);
+    }
+  });
+
+  it("handles leap-day dates using calendar birthdays", async () => {
+    const clock = sinon.useFakeTimers(new Date("2026-02-28T12:00:00Z"));
+    getApplicationStub.resolves({
+      data: getApplicationResponse("2008-02-29"),
+      status: 200,
+    });
+
+    const beforeBirthday = (await loadEligibilityAssessment(deps, {
+      applicationId,
+      homeAccountId: "home-account-id",
+      sessionId: "session-id",
+    })) as Success<EligibilityAssessment>;
+
+    expect(beforeBirthday.value?.data.client_age).to.equal("under_18");
+
+    clock.setSystemTime(new Date("2026-03-01T12:00:00Z"));
+
+    const onBirthday = (await loadEligibilityAssessment(deps, {
+      applicationId,
+      homeAccountId: "home-account-id",
+      sessionId: "session-id",
+    })) as Success<EligibilityAssessment>;
+
+    expect(onBirthday.value?.data.client_age).to.equal("standard");
+  });
+
+  it("handles a leap-day client reaching 60 on February 29", async () => {
+    const clock = sinon.useFakeTimers(new Date("2028-02-28T12:00:00Z"));
+    getApplicationStub.resolves({
+      data: getApplicationResponse("1968-02-29"),
+      status: 200,
+    });
+
+    const beforeBirthday = (await loadEligibilityAssessment(deps, {
+      applicationId,
+      homeAccountId: "home-account-id",
+      sessionId: "session-id",
+    })) as Success<EligibilityAssessment>;
+
+    expect(beforeBirthday.value?.data.client_age).to.equal("standard");
+
+    clock.setSystemTime(new Date("2028-02-29T12:00:00Z"));
+
+    const onBirthday = (await loadEligibilityAssessment(deps, {
+      applicationId,
+      homeAccountId: "home-account-id",
+      sessionId: "session-id",
+    })) as Success<EligibilityAssessment>;
+
+    expect(onBirthday.value?.data.client_age).to.equal("over_60");
   });
 
   it("returns a NotAuthenticatedError failure when the session cannot be authenticated", async () => {
