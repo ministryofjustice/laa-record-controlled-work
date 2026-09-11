@@ -14,7 +14,7 @@ import { checkAnswersStep } from "./steps/check-answers.step.js";
 import { ecfStep } from "./steps/ecf/ecf.step.js";
 import { ineligibleStep } from "./steps/ecfDropout/ecfDropout.step.js";
 import { legalAidBeforeStep } from "./steps/legalAidBefore/legalAidBefore.step.js";
-import { niNumberStep } from "./steps/ni-number.step.js";
+import { niNumberStep } from "./steps/niNumber/niNumber.step.js";
 
 const loadDraftAnswers = access({
   effects: [
