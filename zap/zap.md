@@ -22,7 +22,7 @@ The local scan uses the `zap-scan` service defined in [docker/compose/zap.yml](.
 
 ## Scan flow
 
-1. [run-local.sh](run-local.sh) and [run-cicd.sh](run-cicd.sh) run every `@e2e` Playwright test against the full stack.
+1. Every `@e2e` Playwright test runs against the full stack (locally via [run-local.sh](run-local.sh), in CI as part of the e2e workflow's own test run).
 2. [tests/e2e/playwright.harness.ts](../tests/e2e/playwright.harness.ts) enables Playwright `recordHar` when `E2E_ZAP_HAR_DIRECTORY` is set. Every browser context writes a separate HAR, including contexts created by serial e2e suites.
 3. [merge-hars.ts](merge-hars.ts) reads the individual HARs, then calls [har.ts](har.ts) to merge valid entries into `zap-results/e2e-suite.har`. Aborted requests with HTTP status `0` are omitted because ZAP cannot import them.
 4. [zap.yaml](zap.yaml) imports the combined HAR, spiders from the application root for up to five minutes, then actively scans for up to five minutes.
@@ -36,14 +36,13 @@ The OAuth callback URL is excluded from the ZAP context because it contains one-
 | --- | --- |
 | [zap.yaml](zap.yaml) | ZAP Automation Framework plan: target context, excluded paths, HAR import, scan limits, summary, and reports. |
 | [run-local.sh](run-local.sh) | Local orchestration. Requires a running stack, runs e2e tests, merges HARs, runs ZAP, and opens the report. |
-| [run-cicd.sh](run-cicd.sh) | CI orchestration. Runs e2e tests and merges HARs before launching ZAP with host networking. |
+| [run-cicd.sh](run-cicd.sh) | CI orchestration. Merges the HARs already recorded by the e2e job's test run, then launches ZAP with host networking. |
 | [merge-hars.ts](merge-hars.ts) | Command-line wrapper that reads individual HAR files from a directory and merges them. |
 | [har.ts](har.ts) | Creates collision-resistant HAR paths and merges valid HAR entries. |
 | [tests/e2e/playwright.harness.ts](../tests/e2e/playwright.harness.ts) | Records a HAR for every e2e browser context when a ZAP scan is requested. |
 | [tests/unit/zap/har.spec.ts](../tests/unit/zap/har.spec.ts) | Verifies HAR path generation and merging behaviour. |
 | [docker/compose/zap.yml](../docker/compose/zap.yml) | Local-only Compose service that mounts the plan and result directory. |
-| [.github/workflows/zap-scanning.yml](../.github/workflows/zap-scanning.yml) | Reusable GitHub Actions workflow that starts the stack, runs the CI scan, uploads results, and tears down the stack. |
-| [.github/workflows/cicd.yml](../.github/workflows/cicd.yml) | Invokes the ZAP workflow for pull requests. |
+| [.github/workflows/e2e.yml](../.github/workflows/e2e.yml) | Runs the e2e suite, then (on pull requests) merges the recorded HARs, runs the ZAP scan against the same still-running stack, and uploads its reports. |
 
 ## Results and CI behaviour
 
@@ -57,7 +56,7 @@ Generated files are placed in `zap-results/`:
 | `zap-baseline-report.json` | JSON version of the report. |
 | `zap_out.json` | ZAP Automation Framework output summary. |
 
-The CI `Security` job runs on pull requests. It starts the stack with `docker/compose/up --ci`, runs all `@e2e` tests, then uploads the reports, merged HAR, and individual HARs as the `zap-scan-reports` artifact for 14 days. Upload and teardown run even when the scan fails.
+The scan runs as part of the `.github/workflows/e2e.yml` job, gated to pull requests only. It reuses the stack and HARs from that job's e2e test run, then uploads the reports, merged HAR, and individual HARs as the `zap-scan-reports` artifact for 14 days. Upload and teardown run even when the scan fails.
 
 The plan fails on ZAP errors, but reported warnings and alerts do not fail the scan. Review the HTML report and `zap_out.json` to decide whether a finding is expected, accepted, or needs remediation.
 

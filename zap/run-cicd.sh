@@ -1,12 +1,7 @@
 #!/bin/bash
+# Merges the HARs already recorded by the e2e workflow's test run, then scans them.
+# Requires zap-results/hars/ to already contain HAR files (see .github/workflows/e2e.yml).
 set -euo pipefail
-
-rm -rf zap-results/hars
-mkdir -p zap-results/hars
-chmod 777 zap-results
-
-E2E_ZAP_HAR_DIRECTORY="$(pwd)/zap-results/hars" \
-  yarn test:e2e
 
 yarn tsx zap/merge-hars.ts zap-results/hars zap-results/e2e-suite.har
 
