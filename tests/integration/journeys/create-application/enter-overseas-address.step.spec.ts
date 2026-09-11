@@ -40,9 +40,21 @@ describe("Enter overseas address step", () => {
       expect(renderResult.context.step.title).to.equal("Enter your client's overseas home address");
     });
 
-    it("has a back link to manual address entry", () => {
-      expect(renderResult.context.step.backlink).to.equal(
-        "enter-address-manually?returnTo=check-answers",
+    it("does not override the derived back link", () => {
+      expect(renderResult.context.step.backlink).to.be.undefined;
+    });
+
+    it("renders a link to the UK address page", () => {
+      const linkBlock = renderResult
+        .getBlocksByVariant("html")
+        .find((b) =>
+          (b.properties.content as string).includes(
+            "/enter-address-manually",
+          ),
+        );
+      expect(linkBlock).to.exist;
+      expect(linkBlock!.properties.content as string).to.contain(
+        "The address is in the UK",
       );
     });
 
