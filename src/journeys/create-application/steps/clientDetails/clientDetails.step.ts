@@ -10,7 +10,7 @@ import {
   dateOfBirthInput,
   firstNameInput,
   lastNameInput,
-} from "#/journeys/create-application/steps/clientDetails/client-details.blocks.js";
+} from "#/journeys/create-application/steps/clientDetails/clientDetails.blocks.js";
 import {
   clientDetailsCaption,
   continueButton,
