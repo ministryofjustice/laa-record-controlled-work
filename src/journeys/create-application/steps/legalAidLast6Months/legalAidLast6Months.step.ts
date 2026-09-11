@@ -8,7 +8,7 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
 import { CreateApplicationEffects } from "#/journeys/create-application/create-application.effects.js";
-import { legalAidLast6MonthsRadioInput } from "#/journeys/create-application/steps/legalAidLast6Months/legal-aid-last-6-months.blocks.js";
+import { legalAidLast6MonthsRadioInput } from "#/journeys/create-application/steps/legalAidLast6Months/legalAidLast6Months.blocks.js";
 import {
   clientDetailsCaption,
   continueButton,
