@@ -35,3 +35,6 @@ coverage/
 
 # PDA API spec
 .pda-api/
+
+# ZAP scan output
+zap-results/

@@ -1,0 +1,51 @@
+# ZAP Automation Framework plan for laa-record-controlled-work.
+env:
+  contexts:
+    - name: rcw
+      urls:
+        - "http://localhost:8080"
+      excludePaths:
+        - "http://localhost:8080/auth/code/callback.*"
+  parameters:
+    failOnError: true
+    progressToStdout: true
+jobs:
+  - type: "passiveScan-config"
+    parameters:
+      enableTags: false
+      maxAlertsPerRule: 10
+  - type: "import"
+    parameters:
+      fileName: "/zap/wrk/zap-results/e2e-suite.har"
+      type: "har"
+  - type: "spider"
+    parameters:
+      context: "rcw"
+      url: "http://localhost:8080/"
+      maxDuration: 5
+  - type: "activeScan"
+    parameters:
+      context: "rcw"
+      url: "http://localhost:8080/"
+      maxScanDurationInMins: 5
+  - type: "passiveScan-wait"
+    parameters:
+      maxDuration: 0
+  - type: "outputSummary"
+    parameters:
+      format: "Long"
+      summaryFile: "/zap/wrk/zap-results/zap_out.json"
+  - type: "report"
+    parameters:
+      reportDescription: "RCW ZAP Baseline Scan"
+      reportDir: "/zap/wrk/zap-results/"
+      reportFile: "zap-baseline-report"
+      reportTitle: "RCW ZAP Scanning Report"
+      template: "traditional-html"
+  - type: "report"
+    parameters:
+      reportDescription: "RCW ZAP Baseline Scan"
+      reportDir: "/zap/wrk/zap-results/"
+      reportFile: "zap-baseline-report"
+      reportTitle: "RCW ZAP Scanning Report"
+      template: "traditional-json"

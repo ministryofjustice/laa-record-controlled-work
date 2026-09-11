@@ -18,7 +18,8 @@
       "#orval/*": ["./orval/*"],
       "#msw/*": ["./msw/*"],
       "#/*": ["./src/*"],
-      "#tests/*": ["./tests/*"]
+      "#tests/*": ["./tests/*"],
+      "#zap/*": ["./zap/*"]
     }
   },
   "include": [
@@ -27,7 +28,8 @@
     "tests/**/*.ts",
     "esbuild/**/*.ts",
     "orval.config.ts",
-    "orval/**/*.ts"
+    "orval/**/*.ts",
+    "zap/**/*.ts"
   ],
   "exclude": ["node_modules", "public", "**/*.js"]
 }
