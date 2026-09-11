@@ -3,11 +3,7 @@ import {
   TestRedirectResult,
 } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
-import {
-  CreateApplicationEffects,
-  createApplicationEffectsRegistry,
-} from "#/journeys/create-application/create-application.effects.js";
-import { niNumberStep } from "#/journeys/create-application/steps/ni-number.step.js";
+import { createApplicationEffectsRegistry } from "#/journeys/create-application/create-application.effects.js";
 import { createForgeTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import { createApplicationJourney } from "#/journeys/create-application/create-application.journey.js";
@@ -54,7 +50,8 @@ describe("NI number step", () => {
       expect(renderResult.context.showValidationFailures).to.equal(true);
 
       expect(
-        renderResult.getValidationErrorsByFieldCode(hasNiNumberfieldCode)[0].message,
+        renderResult.getValidationErrorsByFieldCode(hasNiNumberfieldCode)[0]
+          .message,
       ).to.equal("Select if your client has a National Insurance number");
     });
 
@@ -66,7 +63,8 @@ describe("NI number step", () => {
       const renderResult = result as TestRenderResult;
       expect(renderResult.context.showValidationFailures).to.equal(true);
       expect(
-        renderResult.getValidationErrorsByFieldCode(niNumberfieldCode)[0].message,
+        renderResult.getValidationErrorsByFieldCode(niNumberfieldCode)[0]
+          .message,
       ).to.equal("Enter your client's National Insurance number");
     });
 
@@ -78,7 +76,8 @@ describe("NI number step", () => {
       const renderResult = result as TestRenderResult;
       expect(renderResult.context.showValidationFailures).to.equal(true);
       expect(
-        renderResult.getValidationErrorsByFieldCode(niNumberfieldCode)[0].message,
+        renderResult.getValidationErrorsByFieldCode(niNumberfieldCode)[0]
+          .message,
       ).to.equal(
         "Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C",
       );
@@ -90,19 +89,14 @@ describe("NI number step", () => {
       });
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
-      expect(redirectResult.url).to.equal(
-        "/cases/new/have-a-home-address",
-      );
+      expect(redirectResult.url).to.equal("/cases/new/have-a-home-address");
     });
 
     it("returns to check answers when edited from check answers", async () => {
-      const result = await client.post(
-        "/cases/new/ni-number",
-        {
-          query: { returnTo: "check-answers" },
-          body: { hasNINumber: "yes", niNumber: "JN123456A" }, // gitleaks:allow - fake NI number used to test valid format acceptance
-        },
-      );
+      const result = await client.post("/cases/new/ni-number", {
+        query: { returnTo: "check-answers" },
+        body: { hasNINumber: "yes", niNumber: "JN123456A" }, // gitleaks:allow - fake NI number used to test valid format acceptance
+      });
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
       expect(redirectResult.url).to.equal("/cases/new/check-answers");
@@ -114,9 +108,7 @@ describe("NI number step", () => {
       });
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
-      expect(redirectResult.url).to.equal(
-        "/cases/new/have-a-home-address",
-      );
+      expect(redirectResult.url).to.equal("/cases/new/have-a-home-address");
     });
   });
 });

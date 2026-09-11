@@ -3,7 +3,10 @@ import {
   Self,
   validation,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
-import { HtmlBlock } from "@ministryofjustice/hmpps-forge/core/components";
+import {
+  type BlockDefinition,
+  HtmlBlock,
+} from "@ministryofjustice/hmpps-forge/core/components";
 import {
   GovUKButton,
   GovUKHeading,
@@ -76,26 +79,32 @@ export function button(text: string): GovUKButton {
  * @param {string} code - The field code/answer key identifier
  * @param {string} question - The question text displayed as the legend
  * @param {string} validationErrorMessage - The error message shown if no selection is made
- * @param {boolean} [isPageHeading=true] - Whether the legend should be styled as a page heading
+ * @param {object} [options] - Optional radio input configuration
+ * @param {boolean} [options.isPageHeading=true] - Whether the legend should be styled as a page heading
+ * @param {BlockDefinition | BlockDefinition[]} [options.yesBlock] - Optional content revealed when yes is selected
  * @returns {GovUKRadioInput} A GovUK radio input component with yes/no options
  */
 export function yesOrNoRadioInput(
   code: string,
   question: string,
   validationErrorMessage: string,
-  isPageHeading = true,
+  options: {
+    isPageHeading?: boolean;
+    yesBlock?: BlockDefinition | BlockDefinition[];
+  } = {},
 ): GovUKRadioInput {
   return GovUKRadioInput({
     code,
     fieldset: {
       legend: {
         classes: "govuk-fieldset__legend--l",
-        isPageHeading,
+        isPageHeading: options.isPageHeading ?? true,
         text: question,
       },
     },
     items: [
       {
+        ...(options.yesBlock ? { block: options.yesBlock } : {}),
         text: t("common.yes"),
         value: "yes",
       },
