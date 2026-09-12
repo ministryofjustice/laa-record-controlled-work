@@ -73,7 +73,7 @@
     "@axe-core/playwright": "^4.13.0",
     "@faker-js/faker": "^10.6.0",
     "@j178/prek": "^0.5.2",
-    "@playwright/test": "^1.62.1",
+    "@playwright/test": "^1.63.0",
     "@types/chai": "^5.2.3",
     "@types/chai-as-promised": "^8.0.2",
     "@types/compression": "^1.8.1",
