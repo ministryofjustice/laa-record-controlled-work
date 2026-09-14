@@ -12,10 +12,11 @@ import { CreateApplicationEffects } from "#/journeys/create-application/create-a
 import { summaryList } from "#/journeys/create-application/steps/checkAnswers/checkAnswers.blocks.js";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import { heading, submitButton } from "#/journeys/shared.blocks.js";
+import { StepCode } from "#/journeys/StepCode.enum.js";
 import { t } from "#/lib/i18n.js";
 
 const CHECK_ANSWERS = t("journeys.createApplication.checkAnswers.title");
-
+const TITLE = t("journeys.createApplication.checkAnswers.title");
 /**
  * Creates the check-answers step for the create-application journey.
  *
@@ -25,10 +26,10 @@ const CHECK_ANSWERS = t("journeys.createApplication.checkAnswers.title");
 export function checkAnswersStep(journeyCode: string): StepDefinition {
   return step({
     blocks: [heading(CHECK_ANSWERS), summaryList(), submitButton()],
-    code: "check-answers",
+    code: StepCode.CHECK_ANSWERS,
     onSubmission: [createApplicationThenGotoTaskList(journeyCode)],
     path: "/check-answers",
-    title: t("journeys.createApplication.checkAnswers.title"),
+    title: TITLE,
   });
 }
 
