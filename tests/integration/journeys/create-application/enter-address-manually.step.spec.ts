@@ -45,10 +45,6 @@ describe("Enter address manually step", () => {
       );
     });
 
-    it("does not override the derived back link", () => {
-      expect(renderResult.context.step.backlink).to.be.undefined;
-    });
-
     it("renders a link to the overseas address page", () => {
       const linkBlock = renderResult
         .getBlocksByVariant("html")

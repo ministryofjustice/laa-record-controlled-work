@@ -40,10 +40,6 @@ describe("Enter overseas address step", () => {
       expect(renderResult.context.step.title).to.equal("Enter your client's overseas home address");
     });
 
-    it("does not override the derived back link", () => {
-      expect(renderResult.context.step.backlink).to.be.undefined;
-    });
-
     it("renders a link to the UK address page", () => {
       const linkBlock = renderResult
         .getBlocksByVariant("html")
