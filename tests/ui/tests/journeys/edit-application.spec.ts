@@ -4,7 +4,7 @@ import {
   incompleteApplication,
 } from "../../msw/fixtures/rcw.fixtures.js";
 
-const INCOMPLETE_TASK_LIST_COUNT = 2;
+const INCOMPLETE_TASK_LIST_COUNT = 3;
 const COMPLETE_TASK_LIST_COUNT = 3;
 const CLIENT_DETAILS_TASK_INDEX = 0;
 const MEANS_ASSESSMENT_TASK_INDEX = 1;
