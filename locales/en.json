@@ -238,7 +238,8 @@
           },
           "line4": {
             "label": "Address line 4 (optional)"
-          }
+          },
+          "ukAddress": "The address is in the UK"
         }
       },
       "checkAnswers": {
