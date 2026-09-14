@@ -98,7 +98,7 @@ export function taskList(): BlockDefinition[] {
       t("journeys.editApplication.taskList.EvidenceAndDeclaration.title"),
       Data(CONTEXT_DATA_KEYS.application)
         .path(APPLICATION_DATA_KEYS.eligibilityOverallResult)
-        .match(Condition.Equals("eligible")),
+        .not.match(Condition.Equals("ineligible")),
     ),
     GovUKTaskList({
       items: [
@@ -122,7 +122,7 @@ export function taskList(): BlockDefinition[] {
       ],
       visibleWhen: Data(CONTEXT_DATA_KEYS.application)
         .path(APPLICATION_DATA_KEYS.eligibilityOverallResult)
-        .match(Condition.Equals("eligible")),
+        .not.match(Condition.Equals("ineligible")),
     }),
   ];
 }
