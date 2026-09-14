@@ -3,29 +3,32 @@ import {
   Format,
   redirect,
   step,
+  type StepDefinition,
   submit,
   type SubmitHook,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
 import { CreateApplicationEffects } from "#/journeys/create-application/create-application.effects.js";
-import {
-  heading,
-  summaryList,
-} from "#/journeys/create-application/steps/check-answers.blocks.js";
+import { summaryList } from "#/journeys/create-application/steps/checkAnswers/checkAnswers.blocks.js";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
-import { submitButton } from "#/journeys/shared.blocks.js";
+import { heading, submitButton } from "#/journeys/shared.blocks.js";
 import { t } from "#/lib/i18n.js";
 
-export const checkAnswersStep = (
-  journeyCode: string,
-): ReturnType<typeof step> =>
-  step({
-    blocks: [heading, summaryList, submitButton],
+const CHECK_ANSWERS = t("journeys.createApplication.checkAnswers.title");
+
+/**
+ *
+ * @param journeyCode
+ */
+export function checkAnswersStep(journeyCode: string): StepDefinition {
+  return step({
+    blocks: [heading(CHECK_ANSWERS), summaryList(), submitButton()],
     code: "check-answers",
     onSubmission: [createApplicationThenGotoTaskList(journeyCode)],
     path: "/check-answers",
     title: t("journeys.createApplication.checkAnswers.title"),
   });
+}
 
 const createApplicationThenGotoTaskList = (journeyCode: string): SubmitHook =>
   submit({
