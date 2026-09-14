@@ -8,6 +8,7 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 import { NunjucksGenerators } from "@ministryofjustice/hmpps-forge/express-nunjucks";
 
+import { AnswerKey } from "#/journeys/AnswerKey.enum.js";
 import { UK_ADDRESS_FIELDS } from "#/journeys/journey.constants.js";
 import { t } from "#/lib/i18n.js";
 
@@ -32,7 +33,7 @@ export function formatAddressValue(): ResolvableString {
     "journeys.createApplication.checkAnswers.answerValues.noFixedAddress",
   );
 
-  return match(Answer("haveAHomeAddress"))
+  return match(Answer(AnswerKey.haveAHomeAddress))
     .branch(Condition.Equals("yes"), addressFormatResolver())
     .otherwise(no);
 }
@@ -42,7 +43,7 @@ export function formatAddressValue(): ResolvableString {
  * @returns The address entry URL.
  */
 export function formatChangeAddressRedirect(): ResolvableString {
-  return match(Answer("haveAHomeAddress"))
+  return match(Answer(AnswerKey.haveAHomeAddress))
     .branch(Condition.Equals("yes"), addressStepResolver())
     .otherwise("have-a-home-address?returnTo=check-answers");
 }
@@ -52,7 +53,7 @@ export function formatChangeAddressRedirect(): ResolvableString {
  * @returns The formatted date of birth.
  */
 export function formatDateOfBirth(): ResolvableString {
-  return Answer("dateOfBirth").pipe(
+  return Answer(AnswerKey.dateOfBirth).pipe(
     Transformer.String.ToDate(),
     Transformer.Date.Format("D MMMM YYYY"),
   );
@@ -66,7 +67,7 @@ export function formatEcfLabel(): ResolvableString {
   const yes = t("common.yes");
   const no = t("common.no");
 
-  return match(Answer("ecf"))
+  return match(Answer(AnswerKey.ecf))
     .branch(Condition.Equals("yes"), yes)
     .otherwise(no);
 }
@@ -84,7 +85,7 @@ export function formatLegalAidBeforeLabel(): ResolvableString {
   );
   const no = t("common.no");
 
-  return match(Answer("legalAidBefore"))
+  return match(Answer(AnswerKey.legalAidBefore))
     .branch(Condition.Equals("yesSameMatter"), same)
     .branch(Condition.Equals("yesDifferentMatter"), different)
     .otherwise(no);
@@ -98,7 +99,7 @@ export function formatLegalAidLast6MonthsLabel(): ResolvableString {
   const yes = t("common.yes");
   const no = t("common.no");
 
-  return match(Answer("legalAidLast6Months"))
+  return match(Answer(AnswerKey.legalAidLast6Months))
     .branch(Condition.Equals("yes"), yes)
     .otherwise(no);
 }
@@ -110,11 +111,11 @@ export function formatLegalAidLast6MonthsLabel(): ResolvableString {
 export function formatOsAddress(): ResolvableString {
   return NunjucksGenerators.String({
     data: {
-      country: Answer("osCountry"),
-      line1: Answer("osAddressLine1"),
-      line2: Answer("osAddressLine2"),
-      line3: Answer("osAddressLine3"),
-      line4: Answer("osAddressLine4"),
+      country: Answer(AnswerKey.osCountry),
+      line1: Answer(AnswerKey.osAddressLine1),
+      line2: Answer(AnswerKey.osAddressLine2),
+      line3: Answer(AnswerKey.osAddressLine3),
+      line4: Answer(AnswerKey.osAddressLine4),
     },
     template: `
       {{ line1 }},<br />
@@ -133,11 +134,11 @@ export function formatOsAddress(): ResolvableString {
 export function formatUkAddress(): ResolvableString {
   return NunjucksGenerators.String({
     data: {
-      county: Answer("ukCounty"),
-      line1: Answer("ukAddressLine1"),
-      line2: Answer("ukAddressLine2"),
-      postcode: Answer("ukPostcode"),
-      town: Answer("ukTownOrCity"),
+      county: Answer(AnswerKey.ukCounty),
+      line1: Answer(AnswerKey.ukAddressLine1),
+      line2: Answer(AnswerKey.ukAddressLine2),
+      postcode: Answer(AnswerKey.ukPostcode),
+      town: Answer(AnswerKey.ukTownOrCity),
     },
     template: `
       {{ line1 }},<br />

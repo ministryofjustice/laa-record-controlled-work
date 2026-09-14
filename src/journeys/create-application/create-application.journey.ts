@@ -1,6 +1,7 @@
 import { access, journey } from "@ministryofjustice/hmpps-forge/core/authoring";
 
 import { CreateApplicationEffects } from "#/journeys/create-application/create-application.effects.js";
+import { checkAnswersStep } from "#/journeys/create-application/steps/checkAnswers/checkAnswers.step.js";
 import { clientDetailsStep } from "#/journeys/create-application/steps/clientDetails/clientDetails.step.js";
 import { declarationStep } from "#/journeys/create-application/steps/declaration/declaration.step.js";
 import { enterAddressManuallyStep } from "#/journeys/create-application/steps/enter-address-manually.step.js";
@@ -10,7 +11,6 @@ import { legalAidLast6MonthsStep } from "#/journeys/create-application/steps/leg
 import { JourneyCode } from "#/journeys/JourneyCode.enum.js";
 import { JourneyPath } from "#/journeys/JourneyPath.enum.js";
 
-import { checkAnswersStep } from "./steps/check-answers.step.js";
 import { ecfStep } from "./steps/ecf/ecf.step.js";
 import { ineligibleStep } from "./steps/ecfDropout/ecfDropout.step.js";
 import { legalAidBeforeStep } from "./steps/legalAidBefore/legalAidBefore.step.js";

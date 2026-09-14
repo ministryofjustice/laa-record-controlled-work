@@ -17,6 +17,16 @@ import { H1 } from "#/lib/constants/headings.js";
 import { t } from "#/lib/i18n.js";
 
 /**
+ * Creates a GovUK-styled button with custom text.
+ *
+ * @param {string} text - The button text content
+ * @returns {GovUKButton} A GovUK button component
+ */
+export function button(text: string): GovUKButton {
+  return GovUKButton({ text });
+}
+
+/**
  * Creates a GovUK-styled caption block with the given text.
  *
  * @param {string} text - The caption text content
@@ -45,6 +55,7 @@ export function clientDetailsCaption(): HtmlBlock {
 export function continueButton(): GovUKButton {
   return button(t("common.continue"));
 }
+
 /**
  * Creates a GovUK-styled H1 heading component.
  *
@@ -58,18 +69,13 @@ export function heading(text: string): HtmlBlock {
   });
 }
 
-export const submitButton = GovUKButton({
-  text: t("common.submit"),
-});
-
 /**
- * Creates a GovUK-styled button with custom text.
+ * Creates a GovUK-styled submut button.
  *
- * @param {string} text - The button text content
- * @returns {GovUKButton} A GovUK button component
+ * @returns {GovUKButton} A GovUK button component with "submit" text
  */
-export function button(text: string): GovUKButton {
-  return GovUKButton({ text });
+export function submitButton(): GovUKButton {
+  return button(t("common.submit"));
 }
 
 /**
