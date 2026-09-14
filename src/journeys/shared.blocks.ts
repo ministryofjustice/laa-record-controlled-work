@@ -46,7 +46,6 @@ export function caption(text: string): HtmlBlock {
 export function clientDetailsCaption(): HtmlBlock {
   return caption(t("journeys.createApplication.caption"));
 }
-
 /**
  * Creates a GovUK-styled continue button.
  *
