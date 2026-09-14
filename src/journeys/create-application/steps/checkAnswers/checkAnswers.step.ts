@@ -16,7 +16,6 @@ import { StepCode } from "#/journeys/StepCode.enum.js";
 import { t } from "#/lib/i18n.js";
 
 const CHECK_ANSWERS = t("journeys.createApplication.checkAnswers.title");
-
 /**
  * Creates the check-answers step for the create-application journey.
  *
