@@ -46,6 +46,7 @@ export function caption(text: string): HtmlBlock {
 export function clientDetailsCaption(): HtmlBlock {
   return caption(t("journeys.createApplication.caption"));
 }
+
 /**
  * Creates a GovUK-styled continue button.
  *
@@ -69,7 +70,7 @@ export function heading(text: string): HtmlBlock {
 }
 
 /**
- * Creates a GovUK-styled submit button.
+ * Creates a GovUK-styled submut button.
  *
  * @returns {GovUKButton} A GovUK button component with "submit" text
  */
