@@ -112,6 +112,31 @@ export const t = (key: string, options?: Record<string, unknown>): string => {
 };
 
 /**
+ * Creates a translation function scoped to a key prefix.
+ *
+ * @param prefix Translation key prefix.
+ * @returns A translation function for keys below the prefix.
+ */
+export function fixedT(
+  prefix: string,
+): (key: string, options?: Record<string, unknown>) => string {
+  const [namespace, ...keyPrefixParts] = prefix.split(".");
+  const keyPrefix = keyPrefixParts.join(".");
+
+  return (key, options) => {
+    if (!i18next.isInitialized) {
+      return t(`${prefix}.${key}`, options);
+    }
+
+    return i18next.getFixedT(
+      null,
+      namespace,
+      keyPrefix || undefined,
+    )(key, options);
+  };
+}
+
+/**
  * Get set of translations for a given key, useful for things like multiple paragraphs or list items.
  * @param {string} key Translation key with dot notation for namespaces
  * @returns {string[]} Array of translated strings

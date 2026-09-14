@@ -14,12 +14,16 @@ import { AnswerKey } from "#/journeys/AnswerKey.enum.js";
 import {
   formatAddressValue,
   formatChangeAddressRedirect,
+  formatDateOfBirth,
   formatEcfLabel,
   formatLegalAidBeforeLabel,
   formatLegalAidLast6MonthsLabel,
 } from "#/journeys/create-application/steps/checkAnswers/checkAnswers.formatters.js";
-import { formatDateOfBirth } from "#/journeys/view-application/steps/client-details.formatter.js";
-import { t } from "#/lib/i18n.js";
+import { fixedT, t } from "#/lib/i18n.js";
+
+const answerLabelT = fixedT(
+  "journeys.createApplication.checkAnswers.answerLabels",
+);
 
 interface SummaryRow {
   actions: {
@@ -36,7 +40,7 @@ interface SummaryRow {
 
 interface SummaryRowArgs {
   href: ResolvableString;
-  labelKey: string;
+  label: ResolvableString;
   value: {
     html?: ResolvableString;
     text?: ResolvableString;
@@ -50,81 +54,83 @@ interface SummaryRowArgs {
  * @returns The check-answers summary list.
  */
 export function summaryList(): GovUKSummaryList {
+  const ecf = summaryRow({
+    href: "ecf?returnTo=check-answers",
+    label: answerLabelT("ecf"),
+    value: { text: formatEcfLabel() },
+  });
+  const legalAidBefore = summaryRow({
+    href: "legal-aid-before?returnTo=check-answers",
+    label: answerLabelT("legalAidBefore"),
+    value: { text: formatLegalAidBeforeLabel() },
+  });
+  const legalAidLast6Months = summaryRow({
+    href: "legal-aid-last-6-months?returnTo=check-answers",
+    label: answerLabelT("legalAidLast6Months"),
+    value: { text: formatLegalAidLast6MonthsLabel() },
+    visibleWhen: Answer(AnswerKey.legalAidBefore).match(
+      Condition.Equals("yesSameMatter"),
+    ),
+  });
+  const reasonForYes = summaryRow({
+    href: "legal-aid-last-6-months?returnTo=check-answers",
+    label: answerLabelT("legalAidLast6MonthsReasonForYes"),
+    value: { text: Answer(AnswerKey.reasonForYes) },
+    visibleWhen: Answer(AnswerKey.legalAidLast6Months).match(
+      Condition.Equals("yes"),
+    ),
+  });
+  const firstName = summaryRow({
+    href: "client-details?returnTo=check-answers",
+    label: answerLabelT("firstName"),
+    value: { text: Answer(AnswerKey.firstName) },
+  });
+  const lastName = summaryRow({
+    href: "client-details?returnTo=check-answers",
+    label: answerLabelT("lastName"),
+    value: { text: Answer(AnswerKey.lastName) },
+  });
+  const dateOfBirth = summaryRow({
+    href: "client-details?returnTo=check-answers",
+    label: answerLabelT("dateOfBirth"),
+    value: { text: formatDateOfBirth() },
+  });
+  const niNumber = summaryRow({
+    href: "ni-number?returnTo=check-answers",
+    label: answerLabelT("niNumber"),
+    value: {
+      text: match(Answer(AnswerKey.hasNINumber))
+        .branch(Condition.Equals("yes"), Answer(AnswerKey.niNumber))
+        .otherwise(t("common.no")),
+    },
+  });
+  const homeAddress = summaryRow({
+    href: "have-a-home-address?returnTo=check-answers",
+    label: answerLabelT("haveAHomeAddress"),
+    value: {
+      text: match(Answer(AnswerKey.haveAHomeAddress))
+        .branch(Condition.Equals("yes"), t("common.yes"))
+        .otherwise(t("common.no")),
+    },
+  });
+  const address = summaryRow({
+    href: formatChangeAddressRedirect(),
+    label: answerLabelT("address"),
+    value: { html: formatAddressValue() },
+  });
+
   return GovUKSummaryList({
     rows: [
-      summaryRow({
-        href: "ecf?returnTo=check-answers",
-        labelKey: "journeys.createApplication.checkAnswers.answerLabels.ecf",
-        value: { text: formatEcfLabel() },
-      }),
-      summaryRow({
-        href: "legal-aid-before?returnTo=check-answers",
-        labelKey:
-          "journeys.createApplication.checkAnswers.answerLabels.legalAidBefore",
-        value: { text: formatLegalAidBeforeLabel() },
-      }),
-      summaryRow({
-        href: "legal-aid-last-6-months?returnTo=check-answers",
-        labelKey:
-          "journeys.createApplication.checkAnswers.answerLabels.legalAidLast6Months",
-        value: { text: formatLegalAidLast6MonthsLabel() },
-        visibleWhen: Answer(AnswerKey.legalAidBefore).match(
-          Condition.Equals("yesSameMatter"),
-        ),
-      }),
-      summaryRow({
-        href: "legal-aid-last-6-months?returnTo=check-answers",
-        labelKey:
-          "journeys.createApplication.checkAnswers.answerLabels.legalAidLast6MonthsReasonForYes",
-        value: { text: Answer(AnswerKey.reasonForYes) },
-        visibleWhen: Answer(AnswerKey.legalAidLast6Months).match(
-          Condition.Equals("yes"),
-        ),
-      }),
-      summaryRow({
-        href: "client-details?returnTo=check-answers",
-        labelKey:
-          "journeys.createApplication.checkAnswers.answerLabels.firstName",
-        value: { text: Answer(AnswerKey.firstName) },
-      }),
-      summaryRow({
-        href: "client-details?returnTo=check-answers",
-        labelKey:
-          "journeys.createApplication.checkAnswers.answerLabels.lastName",
-        value: { text: Answer(AnswerKey.lastName) },
-      }),
-      summaryRow({
-        href: "client-details?returnTo=check-answers",
-        labelKey:
-          "journeys.createApplication.checkAnswers.answerLabels.dateOfBirth",
-        value: { text: formatDateOfBirth() },
-      }),
-      summaryRow({
-        href: "ni-number?returnTo=check-answers",
-        labelKey:
-          "journeys.createApplication.checkAnswers.answerLabels.niNumber",
-        value: {
-          text: match(Answer(AnswerKey.hasNINumber))
-            .branch(Condition.Equals("yes"), Answer(AnswerKey.niNumber))
-            .otherwise(t("common.no")),
-        },
-      }),
-      summaryRow({
-        href: "have-a-home-address?returnTo=check-answers",
-        labelKey:
-          "journeys.createApplication.checkAnswers.answerLabels.haveAHomeAddress",
-        value: {
-          text: match(Answer(AnswerKey.haveAHomeAddress))
-            .branch(Condition.Equals("yes"), t("common.yes"))
-            .otherwise(t("common.no")),
-        },
-      }),
-      summaryRow({
-        href: formatChangeAddressRedirect(),
-        labelKey:
-          "journeys.createApplication.checkAnswers.answerLabels.address",
-        value: { html: formatAddressValue() },
-      }),
+      ecf,
+      legalAidBefore,
+      legalAidLast6Months,
+      reasonForYes,
+      firstName,
+      lastName,
+      dateOfBirth,
+      niNumber,
+      homeAddress,
+      address,
     ],
   });
 }
@@ -136,7 +142,7 @@ export function summaryList(): GovUKSummaryList {
  * @returns A configured summary row.
  */
 function summaryRow(args: SummaryRowArgs): SummaryRow {
-  const { href, labelKey, value, visibleWhen } = args;
+  const { href, label, value, visibleWhen } = args;
 
   return {
     actions: {
@@ -144,12 +150,12 @@ function summaryRow(args: SummaryRowArgs): SummaryRow {
         {
           href,
           text: t("common.change"),
-          visuallyHiddenText: t(labelKey),
+          visuallyHiddenText: label,
         },
       ],
     },
     key: {
-      text: t(labelKey),
+      text: label,
     },
     value,
     ...(visibleWhen === undefined ? {} : { visibleWhen }),
