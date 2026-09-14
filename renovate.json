@@ -14,8 +14,8 @@
       "groupName": null
     },
     {
-      "description": "Group playwight packages together to reduce falures",
-      "matchDatasources": ["playwright-core", "@playwright/test"],
+      "description": "Group playwright packages together to reduce failures",
+      "matchPackageNames": ["playwright-core", "@playwright/test"],
       "groupName": "playwright"
     },
     {
