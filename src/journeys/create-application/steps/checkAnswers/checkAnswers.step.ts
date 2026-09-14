@@ -16,7 +16,6 @@ import { StepCode } from "#/journeys/StepCode.enum.js";
 import { t } from "#/lib/i18n.js";
 
 const CHECK_ANSWERS = t("journeys.createApplication.checkAnswers.title");
-const TITLE = t("journeys.createApplication.checkAnswers.title");
 /**
  * Creates the check-answers step for the create-application journey.
  *
@@ -29,7 +28,7 @@ export function checkAnswersStep(journeyCode: string): StepDefinition {
     code: StepCode.CHECK_ANSWERS,
     onSubmission: [createApplicationThenGotoTaskList(journeyCode)],
     path: "/check-answers",
-    title: TITLE,
+    title: CHECK_ANSWERS,
   });
 }
 
