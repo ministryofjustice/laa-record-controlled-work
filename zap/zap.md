@@ -18,6 +18,10 @@ make zap
 
 `make zap` calls `yarn security:zap`, which runs [run-local.sh](run-local.sh). The script checks that the `nginx` service is already running, records HAR files from the full e2e suite, merges them, runs ZAP, and opens the HTML report.
 
+A HAR file is a JSON-formatted archive of browser network traffic. It records the requests and responses made while the Playwright e2e tests run, including URLs, HTTP methods, headers, cookies, status codes, and response data.
+
+The HAR gives ZAP authenticated seed traffic from the e2e journeys, helping it discover and scan application areas covered by those tests without requiring separate manual authentication.
+
 The local scan uses the `zap-scan` service defined in [docker/compose/zap.yml](../docker/compose/zap.yml). It maps `localhost` to the `nginx` container, enabling the plan to scan `http://localhost:8080`, and maps `host.docker.internal` to the Docker host for the mock OAuth2 service.
 
 ## Scan flow
