@@ -6516,9 +6516,9 @@ __metadata:
   linkType: hard
 
 "remeda@npm:^2.33.6":
-  version: 2.45.0
-  resolution: "remeda@npm:2.45.0"
-  checksum: 10c0/34acd7745450451293e715bcaf7408b0412510e5d6c91459179525cdde35e3d352e5c3c76f5f687950c9090c27c2024281017338b7d89d904a735a41e4c9cf22
+  version: 2.46.0
+  resolution: "remeda@npm:2.46.0"
+  checksum: 10c0/8a47eea1eba3c1815f9add06cea7857becb8dd7d01ab99d2780c0c00703845580df00360632894bd9072b1b6270da91ba0e34e346016655ca801191ea2d34a84
   languageName: node
   linkType: hard
 
@@ -7529,21 +7529,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tldts-core@npm:^7.4.11":
-  version: 7.4.11
-  resolution: "tldts-core@npm:7.4.11"
-  checksum: 10c0/df144de6f97458a88146897cdbfb3059a3ddc124f6ceb20c9bae71a6c7c41b553ea83b6791726b2387b10babf1d714f8c95b672e9867bfe146f9788f4811749e
+"tldts-core@npm:^7.4.12":
+  version: 7.4.12
+  resolution: "tldts-core@npm:7.4.12"
+  checksum: 10c0/0571f1e6e9dc05b0b002ce8a5f16ca045a5fb483480b0f802ba609e5f303422e4f0a4076cd2ef406abad4fb58995263af8783f87dfae4d38684c50dce3141e98
   languageName: node
   linkType: hard
 
 "tldts@npm:^7.0.5":
-  version: 7.4.11
-  resolution: "tldts@npm:7.4.11"
+  version: 7.4.12
+  resolution: "tldts@npm:7.4.12"
   dependencies:
-    tldts-core: "npm:^7.4.11"
+    tldts-core: "npm:^7.4.12"
   bin:
     tldts: bin/cli.js
-  checksum: 10c0/c1cf432c4cae47bb6473fc7cbd8b7df0fb98c18b7bcd3fc138ea45a71854705c681a4c998e10b82cc014404693b0b2cd5c23c4c76d6978390a46c604ca0e5398
+  checksum: 10c0/1bb4b5e10d5bf025cf4bfd9b4e304be970b54940f034bb527efb26b4cf0ca5f5760c8c3f4ca525dfa424701631569fd3ed6821c9974b3981560f4ec1d481f9d0
   languageName: node
   linkType: hard
 
