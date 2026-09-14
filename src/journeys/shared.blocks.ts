@@ -72,9 +72,7 @@ export function heading(text: string): HtmlBlock {
  *
  */
 export function submitButton(): GovUKButton {
-  return GovUKButton({
-    text: t("common.submit"),
-  });
+  return button("common.submit");
 }
 
 /**
