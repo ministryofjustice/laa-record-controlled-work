@@ -104,7 +104,7 @@ export function summaryList(): GovUKSummaryList {
         .otherwise(t("common.no")),
     },
   });
-  const homeAddress = summaryRow({
+  const haveAHomeAddress = summaryRow({
     href: "have-a-home-address?returnTo=check-answers",
     label: answerLabelT("haveAHomeAddress"),
     value: {
@@ -129,7 +129,7 @@ export function summaryList(): GovUKSummaryList {
       lastName,
       dateOfBirth,
       niNumber,
-      homeAddress,
+      haveAHomeAddress,
       address,
     ],
   });
