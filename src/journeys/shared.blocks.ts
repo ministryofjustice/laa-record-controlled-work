@@ -75,7 +75,7 @@ export function heading(text: string): HtmlBlock {
  * @returns {GovUKButton} A GovUK button component with "submit" text
  */
 export function submitButton(): GovUKButton {
-  return button("common.submit");
+  return button(t("common.submit"));
 }
 
 /**
