@@ -149,6 +149,9 @@ describe("CreateApplicationEffect", () => {
 
   it("returns an ApiResponseError with ApiValidationError cause when selected office is missing", async () => {
     getSession.returns({
+      cookie: {},
+      id: "session-id",
+      save: sinon.stub(),
       journeyDrafts: {
         [journeyCode]: {
           ukAddressLine1: "123 Test Street",
@@ -183,6 +186,9 @@ describe("CreateApplicationEffect", () => {
 
   it("returns an ApiResponseError with ApiValidationError cause when journey answers are invalid", async () => {
     getSession.returns({
+      cookie: {},
+      id: "session-id",
+      save: sinon.stub(),
       journeyDrafts: {
         [journeyCode]: {
           firstName: "Jane",
