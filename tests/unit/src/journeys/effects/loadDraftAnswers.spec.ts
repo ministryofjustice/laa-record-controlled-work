@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { describe, it } from "mocha";
 import sinon from "sinon";
-import { loadDraftAnswers } from "#/journeys/effects.js";
+import { loadDraftAnswers } from "#/journeys/effects/loadDraftAnswers.js";
 import { type EffectFunctionContext } from "@ministryofjustice/hmpps-forge/core/authoring";
 import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
 

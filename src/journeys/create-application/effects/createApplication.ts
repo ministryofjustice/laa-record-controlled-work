@@ -14,7 +14,7 @@ import { CreateApplicationResponseBody } from "#/api/clients/rcw/model/createApp
 import { ApplicationDto } from "#/api/dto/application/application.dto.js";
 import { getAuthDebugHeaders } from "#/auth/auth.debug.js";
 import { Answers } from "#/journeys/create-application/data/answers.zod.js";
-import { isJourneySession } from "#/journeys/effects.js";
+import { isJourneySession } from "#/journeys/context.type.js";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
