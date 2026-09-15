@@ -13,7 +13,7 @@ describe("ClearFieldAnswers", () => {
   let session: Record<string, unknown>;
 
   beforeEach(() => {
-    session = { cookie: {}, id: "session-id", save: sinon.stub() };
+    session = {};
     getSession = sinon.stub().returns(session);
     getRequestParam = sinon.stub().returns(undefined);
     clearAnswer = sinon.stub();
