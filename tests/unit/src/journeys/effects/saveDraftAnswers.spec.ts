@@ -13,7 +13,7 @@ describe("saveDraftAnswers()", () => {
   let session: Record<string, unknown>;
 
   beforeEach(() => {
-    session = {};
+    session = { cookie: {}, id: "session-id", save: sinon.stub() };
     getSession = sinon.stub().returns(session);
     getRequestParam = sinon.stub().returns(undefined);
     getAllAnswers = sinon.stub().returns({ ecf: "yes" });
