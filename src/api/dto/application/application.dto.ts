@@ -3,10 +3,6 @@ import type { CreateApplicationRequestBody } from "#/api/clients/rcw/model/creat
 import type { AnswersOutput } from "#/journeys/create-application/data/answers.zod.js";
 
 import { AnswerKey } from "#/journeys/AnswerKey.enum.js";
-import {
-  OVERSEAS_ADDRESS_FIELDS,
-  UK_ADDRESS_FIELDS,
-} from "#/journeys/journey.constants.js";
 import { mapCountryNameToIsoCode } from "#/lib/countries.js";
 
 interface Application {
@@ -176,8 +172,6 @@ export class ApplicationDto {
       [AnswerKey.osAddressLine3]: address.addressLine3,
       [AnswerKey.osAddressLine4]: address.addressLine4,
       [AnswerKey.osCountry]: address.country,
-      [AnswerKey.ukAddressLine1]: address.addressLine1,
-      [AnswerKey.ukCountry]: address.country,
     };
   }
 
@@ -198,8 +192,6 @@ export class ApplicationDto {
       [AnswerKey.ukCounty]: address.county,
       [AnswerKey.ukPostcode]: address.postcode,
       [AnswerKey.ukTownOrCity]: address.townOrCity,
-      [AnswerKey.osAddressLine1]: address.addressLine1,
-      [AnswerKey.osCountry]: address.country,
     };
   }
 

@@ -80,8 +80,9 @@ export const clearFieldAnswers =
     }
 
     logger.error("MMMMMM before clear answers:", context.getAllAnswers());
-
+  logger.error("MMMMMM fields to be cleared:", fields);
     for (const field of fields) {
+      logger.error("MMMMMM clearing field:", field);
       context.clearAnswer(field);
     }
   };
