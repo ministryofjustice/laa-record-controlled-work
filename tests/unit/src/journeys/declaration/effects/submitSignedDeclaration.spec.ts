@@ -41,7 +41,9 @@ describe("submitSignedDeclaration", () => {
         }
       }),
       getRequestParam: sinon.stub().returns(applicationId),
-      getSession: sinon.stub().returns({}),
+      getSession: sinon
+        .stub()
+        .returns({ cookie: {}, id: "session-id", save: sinon.stub() }),
       setData: sinon.stub(),
     } as unknown as DeclarationContext;
   };
