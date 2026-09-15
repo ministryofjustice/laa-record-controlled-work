@@ -5,6 +5,7 @@ import type {
 } from "@playwright/test";
 
 import { test as base, expect } from "@playwright/test";
+import { randomUUID } from "node:crypto";
 
 import {
   type Actor,
@@ -12,6 +13,7 @@ import {
   createActor,
 } from "#tests/e2e/fixtures/actor.fixture.js";
 import { AUTH_MODE, signInWithMockOAuth } from "#tests/e2e/flows/auth.flow.js";
+import { createHarPath } from "#zap/har.js";
 
 interface HarnessFixtures extends ActorFixtures {}
 
@@ -21,10 +23,21 @@ interface HarnessWorkerFixtures {
 
 const BASE_URL = process.env.E2E_BASE_URL ?? "http://localhost:8080";
 const AUTH_STORAGE_STATE_PATH = process.env.E2E_AUTH_STORAGE_STATE_PATH;
+const ZAP_HAR_DIRECTORY = process.env.E2E_ZAP_HAR_DIRECTORY;
 const CONTEXT_OPTIONS: BrowserContextOptions = {
   baseURL: BASE_URL,
   ignoreHTTPSErrors: true,
 };
+const createZapHarOptions = (): BrowserContextOptions =>
+  ZAP_HAR_DIRECTORY === undefined
+    ? {}
+    : {
+        recordHar: {
+          content: "embed",
+          mode: "full",
+          path: createHarPath(ZAP_HAR_DIRECTORY, randomUUID()),
+        },
+      };
 
 export const createBrowserContext = async (
   browser: Browser,
@@ -33,6 +46,7 @@ export const createBrowserContext = async (
   await browser.newContext({
     ...CONTEXT_OPTIONS,
     ...options,
+    ...createZapHarOptions(),
   });
 
 export const test = base.extend<HarnessFixtures, HarnessWorkerFixtures>({
@@ -66,10 +80,11 @@ export const test = base.extend<HarnessFixtures, HarnessWorkerFixtures>({
   ],
 
   context: async ({ authStorageState, browser }, use): Promise<void> => {
-    const context = await createBrowserContext(
-      browser,
-      authStorageState === undefined ? {} : { storageState: authStorageState },
-    );
+    const context = await createBrowserContext(browser, {
+      ...(authStorageState === undefined
+        ? {}
+        : { storageState: authStorageState }),
+    });
 
     await use(context);
     await context.close();
