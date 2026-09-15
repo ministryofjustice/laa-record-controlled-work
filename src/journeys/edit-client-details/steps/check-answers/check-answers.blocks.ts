@@ -13,7 +13,6 @@ import {
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
 import {
-  formatAddressChangeHref,
   formatAddressValue,
   formatDateOfBirth,
   formatEcfLabel,
@@ -22,6 +21,7 @@ import {
 } from "#/journeys/create-application/steps/check-answers.formatters.js";
 import { t } from "#/lib/i18n.js";
 import { AnswerKey } from "#/journeys/AnswerKey.enum.js";
+import { formatAddressChangeHref } from "#/journeys/edit-client-details/steps/check-answers/check-answers.formatters.js";
 
 interface ChangeRowArgs {
   href: ResolvableString;

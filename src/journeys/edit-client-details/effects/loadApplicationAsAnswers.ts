@@ -22,10 +22,13 @@ export const loadApplicationAsAnswers =
       CONTEXT_DATA_KEYS.application,
     );
 
-    const answersArray = ApplicationDto.toAnswers(application);
+    logger.error("MMMMMM load appliction as answers - application", application);
 
-    for (const [code, value] of Object.entries(answersArray)) {
-      if (!context.hasAnswer(code)) {
+    const answersArray = ApplicationDto.toAnswers(application);
+    const hasStoredDraft = session.journeyDrafts?.[journeyCode] !== undefined;
+
+    if (!hasStoredDraft) {
+      for (const [code, value] of Object.entries(answersArray)) {
         context.setAnswer(code, value);
       }
     }
@@ -36,4 +39,9 @@ export const loadApplicationAsAnswers =
       ...session.journeyDrafts[journeyCode],
       ...context.getAllAnswers(),
     };
+
+    logger.error(
+      "MMMMMM load appliction as answers - session.journeyDrafts[journeyCode]",
+      session.journeyDrafts[journeyCode],
+    );
   };
