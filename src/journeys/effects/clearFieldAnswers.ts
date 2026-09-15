@@ -1,19 +1,24 @@
 import type { EffectFunctionContext } from "@ministryofjustice/hmpps-forge/core/authoring";
 
-import { isJourneySession } from "#/journeys/context.type.js";
+import { getSessionData } from "#/journeys/shared.helper.js";
 
-export const clearFieldAnswers =
-  () =>
-  (
+/**
+ * Creates the effect that clears specific field answers for the current journey.
+ * @returns The effect function.
+ */
+export function clearFieldAnswers() {
+  /**
+   * Clears the given fields from the journey's stored draft answers and the form context.
+   * @param context The effect function context.
+   * @param journeyCode The code of the journey whose draft answers should be updated.
+   * @param fields The field keys to clear.
+   */
+  return function clearFieldAnswersEffect(
     context: EffectFunctionContext,
     journeyCode: string,
     fields: readonly string[],
-  ): void => {
-    const session = context.getSession();
-
-    if (!isJourneySession(session)) {
-      return;
-    }
+  ): void {
+    const session = getSessionData(context);
 
     if (session.journeyDrafts?.[journeyCode]) {
       const { [journeyCode]: selectedJourneyDraft, ...otherJourneyDrafts } =
@@ -35,3 +40,4 @@ export const clearFieldAnswers =
       context.clearAnswer(field);
     }
   };
+}
