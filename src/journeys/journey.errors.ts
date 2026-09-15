@@ -55,3 +55,24 @@ export class NoAvailableOfficesError extends DomainError {
     super("No Available Offices", cause);
   }
 }
+
+export class UndefinedAnswerError extends Error {
+  constructor(key: string) {
+    super(`No answer value found for key "${key}"`);
+    this.name = "UndefinedAnswerError";
+  }
+}
+
+export class UndefinedJourneyError extends Error {
+  constructor(journeyCode: string) {
+    super(`No Journey Draft value found for journeyCode "${journeyCode}"`);
+    this.name = "UndefinedJourneyError";
+  }
+}
+
+export class UndefinedParamError extends Error {
+  constructor(key: string) {
+    super(`No URL param value found for key "${key}"`);
+    this.name = "UndefinedParamError";
+  }
+}
