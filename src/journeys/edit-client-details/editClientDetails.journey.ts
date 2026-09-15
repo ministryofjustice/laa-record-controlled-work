@@ -1,12 +1,10 @@
-import { access, journey } from "@ministryofjustice/hmpps-forge/core/authoring";
+import { journey } from "@ministryofjustice/hmpps-forge/core/authoring";
 
 import { ecfStep } from "#/journeys/create-application/steps/ecf/ecf.step.js";
 import { ineligibleStep } from "#/journeys/create-application/steps/ecfDropout/ecfDropout.step.js";
 import { enterAddressManuallyStep } from "#/journeys/create-application/steps/enter-address-manually.step.js";
 import { enterOverseasAddressStep } from "#/journeys/create-application/steps/enter-overseas-address.step.js";
 import { legalAidBeforeStep } from "#/journeys/create-application/steps/legalAidBefore/legalAidBefore.step.js";
-import { editApplicationEffects } from "#/journeys/edit-application/editApplication.effects.js";
-import { editClientDetailsEffects } from "#/journeys/edit-client-details/editClientDetails.effects.js";
 import { checkAnswersStep } from "#/journeys/edit-client-details/steps/check-answers/check-answers.step.js";
 import { JourneyCode } from "#/journeys/JourneyCode.enum.js";
 import { legalAidLast6MonthsStep } from "#/journeys/create-application/steps/legalAidLast6Months/legalAidLast6Months.step.js";
@@ -14,18 +12,9 @@ import { clientDetailsStep } from "#/journeys/create-application/steps/clientDet
 import { niNumberStep } from "#/journeys/create-application/steps/niNumber/niNumber.step.js";
 import { haveAHomeAddressStep } from "#/journeys/create-application/steps/haveAHomeAddress/haveAHomeAddress.step.js";
 
-const loadApiAnswers = access({
-  effects: [
-    editApplicationEffects.loadApplication(),
-    editClientDetailsEffects.loadApplicationAsAnswers(
-      JourneyCode.EDIT_CLIENT_DETAILS,
-    ),
-  ],
-});
 
 export const editClientDetailsJourney = journey({
   code: JourneyCode.EDIT_CLIENT_DETAILS,
-  onAccess: [loadApiAnswers],
   path: "/cases/:applicationID/edit-client-details",
   reachability: { disableReachabilityChecks: true },
   steps: [
