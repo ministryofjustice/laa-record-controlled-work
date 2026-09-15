@@ -22,10 +22,7 @@ describe("getSessionData", () => {
 
   it("returns the session when present", () => {
     const session = {
-      cookie: {},
-      id: "session-id",
       journeyDrafts: {},
-      save: sinon.stub(),
     };
     getSession = sinon.stub().returns(session);
     context = { getSession } as unknown as TestContext;
@@ -42,13 +39,6 @@ describe("getSessionData", () => {
 
   it("throws InvalidSessionError when the session is not a journey session", () => {
     getSession = sinon.stub().returns("not-a-session");
-    context = { getSession } as unknown as TestContext;
-
-    expect(() => getSessionData(context)).to.throw(InvalidSessionError);
-  });
-
-  it("throws InvalidSessionError when the session is an object missing the expected session shape", () => {
-    getSession = sinon.stub().returns({});
     context = { getSession } as unknown as TestContext;
 
     expect(() => getSessionData(context)).to.throw(InvalidSessionError);

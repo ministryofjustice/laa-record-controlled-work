@@ -11,7 +11,7 @@ describe("ClearFieldAnswers", () => {
   let session: Record<string, unknown>;
 
   beforeEach(() => {
-    session = { cookie: {}, id: "session-id", save: sinon.stub() };
+    session = {};
     getSession = sinon.stub().returns(session);
     clearAnswer = sinon.stub();
 

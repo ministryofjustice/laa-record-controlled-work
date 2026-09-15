@@ -12,7 +12,7 @@ describe("LoadDraftAnswers", () => {
   let session: Record<string, unknown>;
 
   beforeEach(() => {
-    session = { cookie: {}, id: "session-id", save: sinon.stub() };
+    session = {};
     getSession = sinon.stub().returns(session);
     hasAnswer = sinon.stub().returns(false);
     setAnswer = sinon.stub();
