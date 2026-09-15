@@ -12,6 +12,7 @@ import {
   loadDraftAnswers,
   saveDraftAnswers,
 } from "#/journeys/effects.js";
+import { loadApplicationAsAnswers } from "#/journeys/edit-client-details/effects/loadApplicationAsAnswers.js";
 
 export const editApplicationEffectsRegistry =
   new EffectRegistry<EditApplicationEffectsDeps>();
@@ -28,4 +29,5 @@ export const editApplicationEffects = {
   setTaskListStatuses:
     editApplicationEffectsRegistry.register(setTaskListStatuses),
   submitApplication: editApplicationEffectsRegistry.register(submitApplication),
+  loadApplicationAsAnswers: editApplicationEffectsRegistry.register(loadApplicationAsAnswers),
 };

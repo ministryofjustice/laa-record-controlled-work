@@ -12,16 +12,9 @@ import {
   GovUKSummaryList,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
-import {
-  formatAddressValue,
-  formatDateOfBirth,
-  formatEcfLabel,
-  formatLegalAidBeforeLabel,
-  formatLegalAidLast6MonthsLabel,
-} from "#/journeys/create-application/steps/check-answers.formatters.js";
 import { t } from "#/lib/i18n.js";
 import { AnswerKey } from "#/journeys/AnswerKey.enum.js";
-import { formatAddressChangeHref } from "#/journeys/edit-client-details/steps/check-answers/check-answers.formatters.js";
+import { formatAddressValue, formatChangeAddressRedirect, formatDateOfBirth, formatEcfLabel, formatLegalAidBeforeLabel, formatLegalAidLast6MonthsLabel } from "#/journeys/edit-client-details/steps/check-answers/check-answers.formatters.js";
 
 interface ChangeRowArgs {
   href: ResolvableString;
@@ -127,7 +120,7 @@ export const summaryList = GovUKSummaryList({
       visibleWhen: Answer("hasNINumber").match(Condition.Equals("yes")),
     }),
     SummaryRow({
-      href: formatAddressChangeHref(),
+      href: formatChangeAddressRedirect(),
       labelKey: "journeys.createApplication.checkAnswers.answerLabels.address",
       value: { html: formatAddressValue() },
     }),
