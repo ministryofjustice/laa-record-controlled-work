@@ -10,7 +10,6 @@ import { NunjucksGenerators } from "@ministryofjustice/hmpps-forge/express-nunju
 
 import { t } from "#/lib/i18n.js";
 import { UK_ADDRESS_FIELDS } from "#/journeys/journey.constants.js";
-import { logger } from "#/logger.js";
 
 /**
  * Formats a client's overseas address for display.
