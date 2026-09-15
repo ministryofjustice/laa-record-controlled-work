@@ -31,11 +31,5 @@ export function getSessionData<
  * @returns True if the value is a journey session.
  */
 function isJourneySession(value: unknown): value is JourneySession {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    "id" in value &&
-    "cookie" in value &&
-    "save" in value
-  );
+  return typeof value === "object" && value !== null;
 }
