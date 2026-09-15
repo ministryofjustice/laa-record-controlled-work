@@ -14,6 +14,3 @@ export type JourneyEffectContext = EffectFunctionContext<
  * Each journey owns a key under `session.journeys` so journeys cannot collide.
  */
 export type JourneySession = Partial<SessionData> & Session;
-
-export const isJourneySession = (value: unknown): value is JourneySession =>
-  typeof value === "object" && value !== null;
