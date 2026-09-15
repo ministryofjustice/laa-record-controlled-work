@@ -1,4 +1,3 @@
-import type { EffectFunctionContext } from "@ministryofjustice/hmpps-forge/core";
 import { expect } from "chai";
 import { describe, it } from "mocha";
 import sinon from "sinon";
@@ -9,7 +8,10 @@ import {
 } from "#/api/clients/api.errors.js";
 import config from "#/config.js";
 import { createApplication } from "#/journeys/create-application/effects/createApplication.js";
-import type { CreateApplicationEffectsDeps } from "#/journeys/create-application/create-application.types.js";
+import type {
+  CreateApplicationContext,
+  CreateApplicationEffectsDeps,
+} from "#/journeys/create-application/create-application.types.js";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import { logger } from "#/logger.js";
 import { getCreateApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
@@ -18,7 +20,7 @@ describe("CreateApplicationEffect", () => {
   const journeyCode = "testJourney";
   const applicationId = "123e4567-e89b-12d3-a456-426614174000";
 
-  let context: EffectFunctionContext;
+  let context: CreateApplicationContext;
   let createApplicationStub: sinon.SinonStub;
   let deps: CreateApplicationEffectsDeps;
   let getSession: sinon.SinonStub;
@@ -32,6 +34,9 @@ describe("CreateApplicationEffect", () => {
     } as unknown as CreateApplicationEffectsDeps;
     setData = sinon.stub();
     getSession = sinon.stub().returns({
+      cookie: {},
+      id: "session-id",
+      save: sinon.stub(),
       journeyDrafts: {
         [journeyCode]: {
           ukAddressLine1: "123 Test Street",
@@ -59,7 +64,7 @@ describe("CreateApplicationEffect", () => {
     context = {
       getSession,
       setData,
-    } as unknown as EffectFunctionContext;
+    } as unknown as CreateApplicationContext;
   });
 
   afterEach(() => {
@@ -129,6 +134,9 @@ describe("CreateApplicationEffect", () => {
 
   it("returns an ApiResponseError with ApiValidationError cause when selected office is missing", async () => {
     getSession.returns({
+      cookie: {},
+      id: "session-id",
+      save: sinon.stub(),
       journeyDrafts: {
         [journeyCode]: {
           ukAddressLine1: "123 Test Street",
@@ -163,6 +171,9 @@ describe("CreateApplicationEffect", () => {
 
   it("returns an ApiResponseError with ApiValidationError cause when journey answers are invalid", async () => {
     getSession.returns({
+      cookie: {},
+      id: "session-id",
+      save: sinon.stub(),
       journeyDrafts: {
         [journeyCode]: {
           firstName: "Jane",
