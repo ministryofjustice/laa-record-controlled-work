@@ -1,6 +1,6 @@
 # ZAP Security Scanning
 
-[OWASP ZAP](https://www.zaproxy.org/) is the application's dynamic application security testing (DAST) tool. It scans the running Record Controlled Work stack, using traffic recorded from the e2e test suite as authenticated seed traffic.
+This is the operational reference for RCW's ZAP scan - how to run it and what happens at each step. See [docs/DAST.md](../docs/DAST.md) for why this pattern (HAR-seeded scan of the live stack) was chosen.
 
 ## Running a scan locally
 
