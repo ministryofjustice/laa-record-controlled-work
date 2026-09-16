@@ -70,7 +70,7 @@ export function heading(text: string): HtmlBlock {
 }
 
 /**
- * Creates a GovUK-styled submut button.
+ * Creates a GovUK-styled submit button.
  *
  * @returns {GovUKButton} A GovUK button component with "submit" text
  */
