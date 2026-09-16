@@ -150,6 +150,29 @@ describe("Task list step", () => {
       expect(indicator).to.include("View result");
     });
 
+    it("renders evidence and declaration when no eligibility result is available", async () => {
+      getApplicationStub.resolves({
+        status: 200,
+        data: getGetApplicationResponseMock({
+          eligibility: { data: null, result: {} },
+        }),
+      });
+
+      const result = await client.get(`/cases/${uuid}/task-list`, {
+        session: {},
+      });
+
+      expect(result.type).to.equal("render");
+      const taskListRender = result as TestRenderResult;
+      const taskLists = taskListRender
+        .getBlocksByVariant("govukTaskList")
+        .filter((block) => block.properties.visibleWhen !== false);
+
+      expect(taskLists).to.have.length(3);
+      const items = taskLists[2].properties.items as RenderedTaskListItem[];
+      expect(items).to.have.length(2);
+    });
+
     it("does not render an eligibility result indicator when no result is available", async () => {
       getApplicationStub.resolves({
         status: 200,
