@@ -6,12 +6,14 @@ import { taskListStep } from "#/journeys/edit-application/steps/task-list/task-l
 import { editClientDetailsEffects } from "#/journeys/edit-client-details/editClientDetails.effects.js";
 import { JourneyCode } from "#/journeys/JourneyCode.enum.js";
 
+const editJourneyCode = JourneyCode.EDIT_CLIENT_DETAILS;
+
 const loadApiAnswers = access({
   effects: [
     editApplicationEffects.loadApplication(),
     editClientDetailsEffects.loadApplicationAsAnswers(
-      JourneyCode.EDIT_CLIENT_DETAILS,
-    ),
+      editJourneyCode,
+    )
   ],
 });
 

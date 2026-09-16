@@ -59,8 +59,6 @@ export const clearFieldAnswers =
       return;
     }
 
-    // this seems to remove all the fields except the ones set when the overseas address is saved.
-
     if (session.journeyDrafts?.[journeyCode]) {
       const { [journeyCode]: selectedJourneyDraft, ...otherJourneyDrafts } =
         session.journeyDrafts;
@@ -70,19 +68,14 @@ export const clearFieldAnswers =
           ([key]) => !fields.includes(key),
         ),
       );
-
-      logger.error("MMMMMM Removing fields from draft answers for journey:", selectedJourneyWithRemovedFields);
-
+      
       session.journeyDrafts = {
         ...otherJourneyDrafts,
         [journeyCode]: selectedJourneyWithRemovedFields,
       };
     }
 
-    logger.error("MMMMMM before clear answers:", context.getAllAnswers());
-  logger.error("MMMMMM fields to be cleared:", fields);
     for (const field of fields) {
-      logger.error("MMMMMM clearing field:", field);
       context.clearAnswer(field);
     }
   };
