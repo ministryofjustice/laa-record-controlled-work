@@ -17,7 +17,7 @@ import { logger } from "#/logger.js";
 
 export interface EligibilityAssessment {
   data: Record<string, unknown>;
-  result: Record<string, unknown>;
+  result?: Record<string, unknown>;
 }
 
 export interface LoadEligibilityAssessmentDeps {
@@ -41,11 +41,19 @@ export interface SaveEligibilityAssessmentParams {
   sessionId: string | undefined;
 }
 
+type ClientAgeRange = "over_60" | "standard" | "under_18";
+
+const AGE_ADJUSTMENT = 1;
+const NO_AGE_ADJUSTMENT = 0;
+const SIXTY_YEARS = 60;
+const EIGHTEEN_YEARS = 18;
+const UTC_DATE_SUFFIX = "T00:00:00.000Z";
+
 /**
- * Loads a previously completed eligibility assessment for an application, if one exists.
+ * Loads the CCQ eligibility data for an application, deriving its age group from date of birth.
  * @param deps - RCW API client dependencies.
  * @param params - Application and session/resource identifiers.
- * @returns An `Either` success (the assessment, or `undefined` if none/malformed exists), or a
+ * @returns An `Either` success with derived data, optionally including a resumable result, or a
  * `NotAuthenticatedError`/`LoadEligibilityAssessmentError` failure.
  */
 export async function loadEligibilityAssessment(
@@ -54,7 +62,7 @@ export async function loadEligibilityAssessment(
 ): Promise<
   Either<
     LoadEligibilityAssessmentError | NotAuthenticatedError,
-    EligibilityAssessment | undefined
+    EligibilityAssessment
   >
 > {
   const { applicationId, homeAccountId, sessionId } = params;
@@ -95,7 +103,6 @@ export async function loadEligibilityAssessment(
   }
 
   const parsed = Application.safeParse(response.data);
-
   if (!parsed.success) {
     logger.error(
       "getApplication response data failed validation",
@@ -104,13 +111,16 @@ export async function loadEligibilityAssessment(
     return failure(LoadEligibilityAssessmentError.from(parsed.error));
   }
 
-  const { data, result } = parsed.data.eligibility ?? {};
+  const clientAgeRange = deriveClientAgeRange(
+    parsed.data.clientDetails.dateOfBirth,
+  );
 
+  const { data, result } = parsed.data.eligibility ?? {};
   if (!isRecord(data) || !isRecord(result)) {
-    return success(undefined);
+    return success({ data: { client_age: clientAgeRange } });
   }
 
-  return success({ data, result });
+  return success({ data: { ...data, client_age: clientAgeRange }, result });
 }
 
 /**
@@ -169,6 +179,38 @@ export async function saveEligibilityAssessment(
   }
 
   return success(undefined);
+}
+
+/**
+ * Derives CCQ's age group from an ISO calendar date.
+ * @param dateOfBirth - The client's validated ISO date of birth.
+ * @returns The CCQ age group for today's calendar date.
+ */
+function deriveClientAgeRange(dateOfBirth: string): ClientAgeRange {
+  const birthDate = new Date(`${dateOfBirth}${UTC_DATE_SUFFIX}`);
+  const today = new Date();
+  const birthdayThisYear = new Date(
+    Date.UTC(
+      today.getUTCFullYear(),
+      birthDate.getUTCMonth(),
+      birthDate.getUTCDate(),
+    ),
+  );
+  const birthdayHasPassed = today >= birthdayThisYear;
+  const age =
+    today.getUTCFullYear() -
+    birthDate.getUTCFullYear() -
+    (birthdayHasPassed ? NO_AGE_ADJUSTMENT : AGE_ADJUSTMENT);
+
+  if (age < EIGHTEEN_YEARS) {
+    return "under_18";
+  }
+
+  if (age < SIXTY_YEARS) {
+    return "standard";
+  }
+
+  return "over_60";
 }
 
 /**
