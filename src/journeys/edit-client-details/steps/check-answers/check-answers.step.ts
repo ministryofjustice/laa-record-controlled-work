@@ -2,13 +2,14 @@ import {
   access,
   Data,
   Format,
+  Params,
   redirect,
   step,
   submit,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 import { editClientDetailsEffects } from "#/journeys/edit-client-details/editClientDetails.effects.js";
 
-import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
+import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
 import { submitButton } from "#/journeys/shared.blocks.js";
 import { t } from "#/lib/i18n.js";
 import { heading, summaryList } from "#/journeys/edit-client-details/steps/check-answers/check-answers.blocks.js";
@@ -31,7 +32,7 @@ export const checkAnswersStep = (
             redirect({
               goto: Format(
                 "/cases/%1/task-list",
-                Data(CONTEXT_DATA_KEYS.applicationID),
+                Params(PARAMS_KEYS.applicationID),
               ),
             }),
           ],
