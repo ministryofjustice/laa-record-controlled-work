@@ -2,6 +2,7 @@ import {
   redirect,
   step,
   submit,
+  type SubmitHook,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
 import { CreateApplicationEffects } from "#/journeys/create-application/create-application.effects.js";
@@ -9,7 +10,7 @@ import {
   dateOfBirthInput,
   firstNameInput,
   lastNameInput,
-} from "#/journeys/create-application/steps/clientDetails/client-details.blocks.js";
+} from "#/journeys/create-application/steps/clientDetails/clientDetails.blocks.js";
 import {
   clientDetailsCaption,
   continueButton,
@@ -35,18 +36,21 @@ export const clientDetailsStep = (
       dateOfBirthInput(),
       continueButton(),
     ],
-    onSubmission: [
-      submit({
-        onValid: {
-          effects: [CreateApplicationEffects.saveDraftAnswers(journeyCode)],
-          next: [redirectToCheckAnswers, redirect({ goto: "ni-number" })],
-        },
-        validate: true,
-      }),
-    ],
+    onSubmission: [saveClientDetails(journeyCode)],
     path: "/client-details",
     reachability: {
       entryWhen: hasCheckAnswersInQuery,
     },
     title: TITLE,
   });
+
+const saveClientDetails = (journeyCode: string): SubmitHook =>
+  submit({
+    onValid: {
+      effects: [CreateApplicationEffects.saveDraftAnswers(journeyCode)],
+      next: [redirectToCheckAnswers, redirectToNiNumber],
+    },
+    validate: true,
+  });
+
+const redirectToNiNumber = redirect({ goto: "ni-number" });

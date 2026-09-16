@@ -10,6 +10,7 @@ import {
 import { getPdaApiDefaultOptions } from "#/api/clients/getPdaApiDefaultOptions.js";
 import { ProviderFirmOfficeListDto } from "#/api/clients/pda/model/providerFirmOfficeListDto.zod.gen.js";
 import { ID_TOKEN_CLAIMS_KEYS } from "#/auth/auth.constants.js";
+import { AuthenticationError } from "#/auth/auth.errors.js";
 import config from "#/config.js";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import {
@@ -116,28 +117,24 @@ function getFirmCodeFromSession(context: SelectOfficeContext): number {
 
 /**
  * Reads office codes from array and serialized-array Entra claims.
- * @param claim LAA_ACCOUNTS claim from the authenticated account.
- * @returns Valid office-code strings from the claim.
+ *
+ * @param claim LAA_ACCOUNTS  Claim from the authenticated account.
+ * @returns  Valid office-code strings from the claim.
+ * @throws AuthenticationError  If the claim cannot be processed.
  */
-function parseOfficeCodesClaim(claim: unknown): string[] {
+function parseOfficeCodesClaim(claim: string | string[] | undefined): string[] {
+  // If the claim is a single string, we only have a single office code.
+  if (typeof claim === "string") {
+    return [claim];
+  }
+
+  // If the claim is an array, we have a set of office codes.
   if (Array.isArray(claim)) {
-    return claim.filter(
-      (account): account is string => typeof account === "string",
-    );
+    return claim.filter((item) => typeof item === "string");
   }
 
-  if (typeof claim !== "string") {
-    return [];
-  }
-
-  try {
-    const parsedClaim: unknown = JSON.parse(claim);
-    return Array.isArray(parsedClaim)
-      ? parsedClaim.filter(
-          (account): account is string => typeof account === "string",
-        )
-      : [];
-  } catch {
-    return [];
-  }
+  // Anything else is invalid and can't be processed, so throw an error.
+  throw new AuthenticationError(
+    `Invalid LAA_ACCOUNTS claim format ${typeof claim}: expected string or array of strings`,
+  );
 }

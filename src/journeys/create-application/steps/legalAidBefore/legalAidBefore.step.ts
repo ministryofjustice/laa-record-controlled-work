@@ -1,7 +1,10 @@
 import {
+  and,
   Answer,
   Condition,
+  not,
   redirect,
+  type RedirectOutcome,
   step,
   type StepDefinition,
   submit,
@@ -38,7 +41,10 @@ export function legalAidBeforeStep(journeyCode: string): StepDefinition {
       continueButton(),
     ],
     code: StepCode.LEGAL_AID_BEFORE,
-    onSubmission: [onSubmission(journeyCode)],
+    onSubmission: [
+      saveNotSameMatterAndClearPriorLegalAidData(journeyCode),
+      saveLegalAidBefore(journeyCode),
+    ],
     path: "/legal-aid-before",
     reachability: {
       entryWhen: hasCheckAnswersInQuery,
@@ -48,31 +54,61 @@ export function legalAidBeforeStep(journeyCode: string): StepDefinition {
 }
 
 /**
- * Handles form submission for the legal aid history question step.
- * Saves draft answers and routes based on the answer:
- * - If "same matter": redirects to legal aid last 6 months step
- * - Otherwise: redirects to client details step
+ * Builds the routes used after a valid legal aid history submission.
  *
- * @param {string} journeyCode - The journey code for saving draft answers
- * @returns {SubmitHook} A submit hook with validation and conditional routing logic
+ * @returns {RedirectOutcome[]} The submission routes
  */
-function onSubmission(journeyCode: string): SubmitHook {
-  return submit({
+function next(): RedirectOutcome[] {
+  return [
+    redirectToLegalAidLast6MonthsWithCheckQuery,
+    redirectToCheckAnswers,
+    redirectToLegalAidLast6Months,
+    redirectToClientDetails,
+  ];
+}
+
+const saveNotSameMatterAndClearPriorLegalAidData = (
+  journeyCode: string,
+): SubmitHook =>
+  submit({
+    onValid: {
+      effects: [
+        CreateApplicationEffects.clearFieldAnswers(journeyCode, [
+          "legalAidLast6Months",
+          "reasonForYes",
+        ]),
+        CreateApplicationEffects.saveDraftAnswers(journeyCode),
+      ],
+      next: next(),
+    },
+    validate: true,
+    when: not(
+      Answer(AnswerKey.legalAidBefore).match(Condition.Equals("yesSameMatter")),
+    ),
+  });
+
+const saveLegalAidBefore = (journeyCode: string): SubmitHook =>
+  submit({
     onValid: {
       effects: [CreateApplicationEffects.saveDraftAnswers(journeyCode)],
-      next: [
-        redirectToCheckAnswers,
-        redirectWhenSameMatter,
-        redirect({ goto: StepCode.CLIENT_DETAILS }),
-      ],
+      next: next(),
     },
     validate: true,
   });
-}
 
-const redirectWhenSameMatter = redirect({
+const redirectToLegalAidLast6MonthsWithCheckQuery = redirect({
+  goto: `${StepCode.LEGAL_AID_LAST_6_MONTHS}?returnTo=check-answers`,
+  when: and(
+    hasCheckAnswersInQuery,
+    Answer(AnswerKey.legalAidBefore).match(Condition.Equals("yesSameMatter")),
+  ),
+});
+
+const redirectToLegalAidLast6Months = redirect({
   goto: StepCode.LEGAL_AID_LAST_6_MONTHS,
   when: Answer(AnswerKey.legalAidBefore).match(
     Condition.Equals("yesSameMatter"),
   ),
 });
+
+const redirectToClientDetails = redirect({ goto: StepCode.CLIENT_DETAILS });

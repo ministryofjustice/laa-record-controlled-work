@@ -7,7 +7,7 @@ import {
   CreateApplicationEffects,
   createApplicationEffectsRegistry,
 } from "#/journeys/create-application/create-application.effects.js";
-import { clientDetailsStep } from "#/journeys/create-application/steps/clientDetails/client-details.step.js";
+import { clientDetailsStep } from "#/journeys/create-application/steps/clientDetails/clientDetails.step.js";
 import { createForgeTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import { createApplicationJourney } from "#/journeys/create-application/create-application.journey.js";
@@ -72,6 +72,24 @@ describe("Client details step", () => {
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
       expect(redirectResult.url).to.equal("/cases/new/ni-number");
+    });
+
+    it("should return to check answers when edited from check answers", async () => {
+      const result = await client.post(
+        "/cases/new/client-details",
+        {
+          query: { returnTo: "check-answers" },
+          body: {
+            firstName: "John",
+            lastName: "Doe",
+            dateOfBirth: { year: "2000", month: "2", day: "2" },
+          } as unknown as Record<string, string | string[]>,
+        },
+      );
+
+      expect(result.type).to.equal("redirect");
+      const redirectResult = result as TestRedirectResult;
+      expect(redirectResult.url).to.equal("/cases/new/check-answers");
     });
 
     const validationErrorTests: Array<{

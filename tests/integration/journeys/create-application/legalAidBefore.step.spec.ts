@@ -66,6 +66,23 @@ describe("Legal aid before step", () => {
       expect(redirectResult.url).to.equal("/cases/new/legal-aid-last-6-months");
     });
 
+    it("should preserve check answers when redirecting to legal aid last 6 months", async () => {
+      const result = await client.post(
+        "/cases/new/legal-aid-before",
+        {
+          query: { returnTo: "check-answers" },
+          body: {
+            legalAidBefore: "yesSameMatter",
+          },
+        },
+      );
+      expect(result.type).to.equal("redirect");
+      const redirectResult = result as TestRedirectResult;
+      expect(redirectResult.url).to.equal(
+        "/cases/new/legal-aid-last-6-months?returnTo=check-answers",
+      );
+    });
+
     it("should redirect to client details step if yes, different matter", async () => {
       const result = await client.post("/cases/new/legal-aid-before", {
         body: {
@@ -75,6 +92,50 @@ describe("Legal aid before step", () => {
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
       expect(redirectResult.url).to.equal("/cases/new/client-details");
+    });
+
+    it("should return to check answers when a different matter is selected from check answers", async () => {
+      const result = await client.post(
+        "/cases/new/legal-aid-before",
+        {
+          query: { returnTo: "check-answers" },
+          body: {
+            legalAidBefore: "yesDifferentMatter",
+          },
+        },
+      );
+      expect(result.type).to.equal("redirect");
+      const redirectResult = result as TestRedirectResult;
+      expect(redirectResult.url).to.equal("/cases/new/check-answers");
+    });
+
+    it("should remove the reason when a different answer is selected from check answers", async () => {
+      const session = {
+        journeyDrafts: {
+          createApplication: {
+            legalAidBefore: "yesSameMatter",
+            legalAidLast6Months: "yes",
+            reasonForYes: "Existing reason",
+          },
+        },
+      };
+      const result = await client.post(
+        "/cases/new/legal-aid-before",
+        {
+          query: { returnTo: "check-answers" },
+          body: {
+            legalAidBefore: "yesDifferentMatter",
+          },
+          session,
+        },
+      );
+      expect(result.type).to.equal("redirect");
+      expect((result as TestRedirectResult).url).to.equal(
+        "/cases/new/check-answers",
+      );
+      expect(session.journeyDrafts.createApplication).to.deep.equal({
+        legalAidBefore: "yesDifferentMatter",
+      });
     });
 
     it("should redirect to client details step if no, different matter", async () => {

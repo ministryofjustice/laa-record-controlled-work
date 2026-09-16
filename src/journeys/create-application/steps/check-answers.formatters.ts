@@ -8,29 +8,19 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 import { NunjucksGenerators } from "@ministryofjustice/hmpps-forge/express-nunjucks";
 
+import { UK_ADDRESS_FIELDS } from "#/journeys/journey.constants.js";
 import { t } from "#/lib/i18n.js";
+
+const UNITED_KINGDOM = "United Kingdom";
 
 /**
  * Decides which address formatter to use based on the country
  * @returns The formatted address
  */
 export function addressFormatResolver(): ResolvableString {
-  return match(Answer("ukCountry"))
-    .branch(Condition.Equals("United Kingdom"), formatUkAddress())
+  return match(Answer(UK_ADDRESS_FIELDS.country))
+    .branch(Condition.Equals(UNITED_KINGDOM), formatUkAddress())
     .otherwise(formatOsAddress());
-}
-
-/**
- * Formats the address change link.
- * @returns The address change URL.
- */
-export function formatAddressChangeHref(): ResolvableString {
-  return match(Answer("haveAHomeAddress"))
-    .branch(
-      Condition.Equals("no"),
-      "have-a-home-address?returnTo=check-answers",
-    )
-    .otherwise(formatChangeAddressRedirect());
 }
 
 /**
@@ -52,12 +42,9 @@ export function formatAddressValue(): ResolvableString {
  * @returns The address entry URL.
  */
 export function formatChangeAddressRedirect(): ResolvableString {
-  return match(Answer("ukPostcode"))
-    .branch(
-      Condition.IsRequired(),
-      "enter-address-manually?returnTo=check-answers",
-    )
-    .otherwise("enter-overseas-address?returnTo=check-answers");
+  return match(Answer("haveAHomeAddress"))
+    .branch(Condition.Equals("yes"), addressStepResolver())
+    .otherwise("have-a-home-address?returnTo=check-answers");
 }
 
 /**
@@ -160,4 +147,18 @@ export function formatUkAddress(): ResolvableString {
       {% if postcode %}{{ postcode }}<br />{% endif %}
     `,
   });
+}
+
+/**
+ * Decides which address entry step a change link targets, based on the stored
+ * address type.
+ * @returns The address entry URL.
+ */
+function addressStepResolver(): ResolvableString {
+  return match(Answer(UK_ADDRESS_FIELDS.country))
+    .branch(
+      Condition.Equals(UNITED_KINGDOM),
+      "enter-address-manually?returnTo=check-answers",
+    )
+    .otherwise("enter-overseas-address?returnTo=check-answers");
 }

@@ -28,7 +28,7 @@ export function ineligibleStep(journeyCode: string): StepDefinition {
       ...ecfDroupoutBody(),
       button(RETURN_TO_CASE_LIST),
     ],
-    onSubmission: [onSubmission(journeyCode)],
+    onSubmission: [gotoHome(journeyCode)],
     path: "/ecf-dropout",
     title: TITLE,
   });
@@ -41,12 +41,14 @@ export function ineligibleStep(journeyCode: string): StepDefinition {
  * @param {string} journeyCode - The journey code for clearing draft answers
  * @returns {SubmitHook} A submit hook that clears answers and redirects home
  */
-function onSubmission(journeyCode: string): SubmitHook {
+function gotoHome(journeyCode: string): SubmitHook {
   return submit({
     onValid: {
       effects: [CreateApplicationEffects.clearAllDraftAnswers(journeyCode)],
-      next: [redirect({ goto: "/" })],
+      next: [redirectToHome],
     },
     validate: true,
   });
 }
+
+const redirectToHome = redirect({ goto: "/" });

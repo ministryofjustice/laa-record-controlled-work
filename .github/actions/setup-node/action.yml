@@ -23,7 +23,11 @@ runs:
 
     - name: SLSA Supply Chain Security
       if: steps.node-modules-cache.outputs.cache-hit != 'true'
-      uses: ministryofjustice/devsecops-actions/sca/slsa@4cd163be7859cd130800d6719d925318826038ea
+      uses: ministryofjustice/devsecops-actions/sca/slsa@7dc13c20e2bf541b8a77fa1320a04983b18846f6 # v1.6.0
+      with:
+        # TODO moment@2.31.0 published 15/09/2026, past the 72h minimum age gate on 18/09/2026 - remove after that
+        # TODO proxy-addr@2.0.8 published 15/09/2026, past the 72h minimum age gate on 18/09/2026 - remove after that
+        security-patch-package-exclusion: "moment,proxy-addr"
 
     - name: Install dependencies
       if: steps.node-modules-cache.outputs.cache-hit != 'true'

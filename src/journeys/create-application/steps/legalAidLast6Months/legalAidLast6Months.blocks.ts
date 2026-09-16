@@ -80,6 +80,14 @@ function reasonForYesTextInput(): GovUKCharacterCount {
         condition: Self().match(Condition.IsRequired()),
         message: t(TEXT_VALIDATION),
       }),
+      validation({
+        condition: Self().match(
+          Condition.String.HasMaxLength(REASON_MAX_LENGTH),
+        ),
+        message: t(
+          "journeys.createApplication.legalAidLast6Months.validation.reasonTooLong",
+        ),
+      }),
     ],
   });
 }

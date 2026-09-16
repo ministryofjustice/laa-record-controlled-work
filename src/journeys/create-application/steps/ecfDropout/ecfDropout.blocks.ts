@@ -10,6 +10,6 @@ import { tt } from "#/lib/i18n.js";
  * @returns {HtmlBlock} A GovUK body component with ECF form completion instructions
  */
 export function ecfDroupoutBody(): HtmlBlock[] {
-  const items = tt("journeys.createApplication.ecfDropout.heading");
+  const items = tt("journeys.createApplication.ecfDropout.text");
   return items.map((text) => GovUKBody({ text }));
 }

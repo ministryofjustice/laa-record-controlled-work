@@ -73,5 +73,29 @@ describe("ECF step", () => {
       const redirectResult = result as TestRedirectResult;
       expect(redirectResult.url).to.equal("/cases/new/legal-aid-before");
     });
+
+    it("should return to check answers when edited from check answers", async () => {
+      const result = await client.post("/cases/new/ecf", {
+        query: { returnTo: "check-answers" },
+        body: {
+          ecf: "no",
+        },
+      });
+      expect(result.type).to.equal("redirect");
+      const redirectResult = result as TestRedirectResult;
+      expect(redirectResult.url).to.equal("/cases/new/check-answers");
+    });
+
+    it("should redirect to the dropout step when yes is selected from check answers", async () => {
+      const result = await client.post("/cases/new/ecf", {
+        query: { returnTo: "check-answers" },
+        body: {
+          ecf: "yes",
+        },
+      });
+      expect(result.type).to.equal("redirect");
+      const redirectResult = result as TestRedirectResult;
+      expect(redirectResult.url).to.equal("/cases/new/ecf-dropout");
+    });
   });
 });
