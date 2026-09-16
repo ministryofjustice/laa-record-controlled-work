@@ -39,7 +39,7 @@ interface UkAddress {
   addressLine2?: string;
   country: string;
   county?: string;
-  postcode?: string;
+  postCode?: string;
   townOrCity?: string;
 }
 
@@ -61,7 +61,7 @@ export class ApplicationDto {
   public legalAidBefore = "";
   public legalAidLast6Months?: boolean;
   public niNumber?: string;
-  public postcode?: string;
+  public postCode?: string;
   public providerOfficeCode = "";
   public reasonForReapplication?: string;
   public scopingQuestions: Record<string, unknown> = {};
@@ -190,7 +190,7 @@ export class ApplicationDto {
       [AnswerKey.ukAddressLine2]: address.addressLine2,
       [AnswerKey.ukCountry]: address.country,
       [AnswerKey.ukCounty]: address.county,
-      [AnswerKey.ukPostcode]: address.postcode,
+      [AnswerKey.ukPostcode]: address.postCode,
       [AnswerKey.ukTownOrCity]: address.townOrCity,
     };
   }
@@ -240,7 +240,7 @@ export class ApplicationDto {
           ? mapCountryNameToIsoCode(countryName)
           : "",
       county: answers[AnswerKey.ukCounty],
-      postcode: answers[AnswerKey.ukPostcode],
+      postCode: answers[AnswerKey.ukPostcode],
       townOrCity: answers[AnswerKey.ukTownOrCity],
     };
   }
@@ -266,7 +266,7 @@ export class ApplicationDto {
         addressLine4: this.addressLine4,
         country: this.country,
         county: this.county,
-        postCode: this.postcode,
+        postCode: this.postCode,
         townOrCity: this.townOrCity,
       };
     }

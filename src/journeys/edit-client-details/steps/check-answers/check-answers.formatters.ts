@@ -89,7 +89,7 @@ export function formatAddressValue(): ResolvableString {
  */
 export function formatChangeAddressRedirect(): ResolvableString {
   return match(Answer("haveAHomeAddress"))
-    .branch(Condition.Equals("yes"), addressFormatResolver())
+    .branch(Condition.Equals("yes"), addressStepResolver())
     .otherwise("have-a-home-address?returnTo=check-answers");
 }
 
@@ -147,4 +147,18 @@ export function formatLegalAidLast6MonthsLabel(): ResolvableString {
   return match(Answer("legalAidLast6Months"))
     .branch(Condition.Equals("yes"), yes)
     .otherwise(no);
+}
+
+/**
+ * Decides which address entry step a change link targets, based on the stored
+ * address type.
+ * @returns The address entry URL.
+ */
+function addressStepResolver(): ResolvableString {
+  return match(Answer(UK_ADDRESS_FIELDS.country))
+    .branch(
+      Condition.Equals(UNITED_KINGDOM),
+      "enter-address-manually?returnTo=check-answers",
+    )
+    .otherwise("enter-overseas-address?returnTo=check-answers");
 }

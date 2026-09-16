@@ -25,13 +25,11 @@ export const loadApplicationAsAnswers =
     logger.error("MMMMMM load appliction as answers - application", application);
 
     const answersArray = ApplicationDto.toAnswers(application);
-    const hasStoredDraft = session.journeyDrafts?.[journeyCode] !== undefined;
 
-    if (!hasStoredDraft) {
       for (const [code, value] of Object.entries(answersArray)) {
         context.setAnswer(code, value);
       }
-    }
+
 
     session.journeyDrafts ??= {};
 
