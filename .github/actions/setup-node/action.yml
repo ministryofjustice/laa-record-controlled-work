@@ -27,7 +27,7 @@ runs:
       with:
         # TODO moment@2.31.0 published 15/09/2026, past the 72h minimum age gate on 18/09/2026 - remove after that
         # TODO proxy-addr@2.0.8 published 15/09/2026, past the 72h minimum age gate on 18/09/2026 - remove after that
-        security-patch-package-exclusion: "compression,moment,proxy-addr"
+        security-patch-package-exclusion: "moment,proxy-addr"
 
     - name: Install dependencies
       if: steps.node-modules-cache.outputs.cache-hit != 'true'
