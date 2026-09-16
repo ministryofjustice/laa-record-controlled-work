@@ -4,7 +4,6 @@ import type { EditApplicationContext } from "#/journeys/edit-application/editApp
 import { ApplicationDto } from "#/api/dto/application/application.dto.js";
 import { isJourneySession } from "#/journeys/effects.js";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
-import { logger } from "#/logger.js";
 
 export const loadApplicationAsAnswers =
   () =>
@@ -22,14 +21,11 @@ export const loadApplicationAsAnswers =
       CONTEXT_DATA_KEYS.application,
     );
 
-    logger.error("MMMMMM load appliction as answers - application", application);
-
     const answersArray = ApplicationDto.toAnswers(application);
 
-      for (const [code, value] of Object.entries(answersArray)) {
-        context.setAnswer(code, value);
-      }
-
+    for (const [code, value] of Object.entries(answersArray)) {
+      context.setAnswer(code, value);
+    }
 
     session.journeyDrafts ??= {};
 
@@ -37,9 +33,4 @@ export const loadApplicationAsAnswers =
       ...session.journeyDrafts[journeyCode],
       ...context.getAllAnswers(),
     };
-
-    logger.error(
-      "MMMMMM load appliction as answers - session.journeyDrafts[journeyCode]",
-      session.journeyDrafts[journeyCode],
-    );
   };

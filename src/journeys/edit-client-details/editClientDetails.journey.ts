@@ -1,4 +1,4 @@
-import { journey } from "@ministryofjustice/hmpps-forge/core/authoring";
+import { access, journey } from "@ministryofjustice/hmpps-forge/core/authoring";
 
 import { ecfStep } from "#/journeys/create-application/steps/ecf/ecf.step.js";
 import { ineligibleStep } from "#/journeys/create-application/steps/ecfDropout/ecfDropout.step.js";
@@ -11,23 +11,30 @@ import { legalAidLast6MonthsStep } from "#/journeys/create-application/steps/leg
 import { clientDetailsStep } from "#/journeys/create-application/steps/clientDetails/clientDetails.step.js";
 import { niNumberStep } from "#/journeys/create-application/steps/niNumber/niNumber.step.js";
 import { haveAHomeAddressStep } from "#/journeys/create-application/steps/haveAHomeAddress/haveAHomeAddress.step.js";
+import { editClientDetailsEffects } from "#/journeys/edit-client-details/editClientDetails.effects.js";
 
+const editJourneyCode = JourneyCode.EDIT_CLIENT_DETAILS;
 
 export const editClientDetailsJourney = journey({
-  code: JourneyCode.EDIT_CLIENT_DETAILS,
+  code: editJourneyCode,
   path: "/cases/:applicationID/edit-client-details",
+  onAccess: [
+    access({
+      effects: [editClientDetailsEffects.loadDraftAnswers(editJourneyCode)],
+    }),
+  ],
   reachability: { disableReachabilityChecks: true },
   steps: [
-    ecfStep(JourneyCode.EDIT_CLIENT_DETAILS),
-    ineligibleStep(JourneyCode.EDIT_CLIENT_DETAILS),
-    legalAidBeforeStep(JourneyCode.EDIT_CLIENT_DETAILS),
-    legalAidLast6MonthsStep(JourneyCode.EDIT_CLIENT_DETAILS),
-    clientDetailsStep(JourneyCode.EDIT_CLIENT_DETAILS),
-    niNumberStep(JourneyCode.EDIT_CLIENT_DETAILS),
-    haveAHomeAddressStep(JourneyCode.EDIT_CLIENT_DETAILS),
-    enterAddressManuallyStep(JourneyCode.EDIT_CLIENT_DETAILS),
-    enterOverseasAddressStep(JourneyCode.EDIT_CLIENT_DETAILS),
-    checkAnswersStep(JourneyCode.EDIT_CLIENT_DETAILS),
+    ecfStep(editJourneyCode),
+    ineligibleStep(editJourneyCode),
+    legalAidBeforeStep(editJourneyCode),
+    legalAidLast6MonthsStep(editJourneyCode),
+    clientDetailsStep(editJourneyCode),
+    niNumberStep(editJourneyCode),
+    haveAHomeAddressStep(editJourneyCode),
+    enterAddressManuallyStep(editJourneyCode),
+    enterOverseasAddressStep(editJourneyCode),
+    checkAnswersStep(editJourneyCode),
   ],
   title: "Edit client details",
   view: { template: "partials/form-step" },

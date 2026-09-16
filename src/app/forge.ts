@@ -23,7 +23,6 @@ import createApplicationJourney from "#/journeys/create-application/create-appli
 import declaration from "#/journeys/declaration/declaration.package.js";
 import { editApplicationPackage } from "#/journeys/edit-application/editApplication.package.js";
 import { editClientDetailsPackage } from "#/journeys/edit-client-details/editClientDetails.package.js";
-import { loadApplicationAsAnswers } from "#/journeys/edit-client-details/effects/loadApplicationAsAnswers.js";
 import { evidencePackage } from "#/journeys/evidence/evidence.package.js";
 import { selectOfficePackage } from "#/journeys/select-office/select-office.journey.js";
 import { viewApplicationPackage } from "#/journeys/view-application/viewApplication.package.js";
