@@ -66,7 +66,7 @@ export const clearFieldAnswers =
           ([key]) => !fields.includes(key),
         ),
       );
-      
+
       session.journeyDrafts = {
         ...otherJourneyDrafts,
         [journeyCode]: selectedJourneyWithRemovedFields,

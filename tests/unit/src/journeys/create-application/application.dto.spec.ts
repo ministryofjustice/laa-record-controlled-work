@@ -150,7 +150,7 @@ describe("toAnswers method", () => {
       ukTownOrCity: "Manchester",
       ukCounty: "Greater Manchester",
       ukPostcode: "A12 3BC",
-      ukCountry: "United Kingdom",
+      ukCountry: "GB",
     });
     expect(result).to.not.have.any.keys(
       "osAddressLine1",
@@ -183,7 +183,7 @@ describe("toAnswers method", () => {
     expect(result).to.include({
       osAddressLine1: "10 Rue de Rivoli",
       osAddressLine3: "Paris",
-      osCountry: "France",
+      osCountry: "FR",
     });
     expect(result).to.not.have.any.keys(
       "ukAddressLine1",

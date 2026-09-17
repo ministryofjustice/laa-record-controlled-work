@@ -6,13 +6,13 @@ import { closeIneligibleCase } from "#/journeys/edit-application/effects/closeIn
 import { loadApplication } from "#/journeys/edit-application/effects/loadApplication.js";
 import { setTaskListStatuses } from "#/journeys/edit-application/effects/setTaskListStatuses.js";
 import { submitApplication } from "#/journeys/edit-application/effects/submitApplication.js";
+import { loadApplicationAsAnswers } from "#/journeys/edit-client-details/effects/loadApplicationAsAnswers.js";
 import {
   clearAllDraftAnswers,
   clearFieldAnswers,
   loadDraftAnswers,
   saveDraftAnswers,
 } from "#/journeys/effects.js";
-import { loadApplicationAsAnswers } from "#/journeys/edit-client-details/effects/loadApplicationAsAnswers.js";
 
 export const editApplicationEffectsRegistry =
   new EffectRegistry<EditApplicationEffectsDeps>();
@@ -24,10 +24,12 @@ export const editApplicationEffects = {
   closeIneligibleCase:
     editApplicationEffectsRegistry.register(closeIneligibleCase),
   loadApplication: editApplicationEffectsRegistry.register(loadApplication),
+  loadApplicationAsAnswers: editApplicationEffectsRegistry.register(
+    loadApplicationAsAnswers,
+  ),
   loadDraftAnswers: editApplicationEffectsRegistry.register(loadDraftAnswers),
   saveDraftAnswers: editApplicationEffectsRegistry.register(saveDraftAnswers),
   setTaskListStatuses:
     editApplicationEffectsRegistry.register(setTaskListStatuses),
   submitApplication: editApplicationEffectsRegistry.register(submitApplication),
-  loadApplicationAsAnswers: editApplicationEffectsRegistry.register(loadApplicationAsAnswers),
 };
