@@ -18,11 +18,15 @@ export const initRoutes = (app: Express): void => {
 
   // Health endpoints - used for liveness and readiness probes.
   app.get("/status", (req: Request, res: Response): void => {
-    res.status(OK).send("OK");
+    req.session.destroy(() => {
+      res.status(OK).send("OK");
+    });
   });
 
   app.get("/health", (req: Request, res: Response): void => {
-    res.status(OK).send("Healthy");
+    req.session.destroy(() => {
+      res.status(OK).send("Healthy");
+    });
   });
 
   // Auth.
