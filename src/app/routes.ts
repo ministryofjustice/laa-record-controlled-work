@@ -2,12 +2,12 @@ import type { Express, Request, Response } from "express";
 
 import eligibilityRouter from "#/api/eligibility/eligibility.routes.js";
 import authRouter from "#/auth/auth.routes.js";
+import { requireAuth } from "#/auth/middleware/requireAuth.middleware.js";
 import config from "#/config.js";
 import exportRouter from "#/export/export.routes.js";
 import { OK } from "#/lib/constants/http.js";
 import { createAuthLimiter } from "#/middleware/setupRateLimit.js";
 
-import { requireAuth } from "./middleware/requireAuth.middleware.js";
 import testRoutes from "./routes/test.js";
 
 /**
@@ -16,7 +16,7 @@ import testRoutes from "./routes/test.js";
  */
 export function initRoutes(app: Express): void {
   // Root endpoint - serves the main page of the application.
-  app.get("/", requireAuth, (req: Request, res: Response): void => {
+  app.get("/", requireAuth(), (req: Request, res: Response): void => {
     res.render("main/index");
   });
 
@@ -39,7 +39,7 @@ export function initRoutes(app: Express): void {
   // CCQ
   app.use(
     "/api/applications/:applicationId/eligibility",
-    requireAuth,
+    requireAuth(),
     eligibilityRouter,
   );
 
@@ -47,7 +47,7 @@ export function initRoutes(app: Express): void {
 
   // Forge: Prioritise `/cases/(evidence|ineligible|new|recorded)` over `/cases/:applicationId`
   // and redirect case URL's to the task list.
-  app.get("/cases/:applicationId", requireAuth, (req, res, next) => {
+  app.get("/cases/:applicationId", requireAuth(), (req, res, next) => {
     let { applicationId } = req.params;
     const priority = ["evidence", "ineligible", "new", "recorded"];
 
@@ -70,4 +70,4 @@ export function initRoutes(app: Express): void {
   ) {
     app.use("/test", testRoutes);
   }
-};
+}

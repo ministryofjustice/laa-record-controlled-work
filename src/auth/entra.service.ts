@@ -208,6 +208,34 @@ export class EntraService {
   }
 
   /**
+   * Attempt to refresh the existing auth token.
+   *
+   * @param homeAccountId  The MSAL home account ID for the authenticated session.
+   * @param scopes  The scopes for which to request a new access token.
+   * @returns A promise that resolves to either a TokenRefreshError or the refreshed access token.
+   */
+  public async refreshToken(
+    homeAccountId: string,
+    scopes: readonly string[],
+  ): Promise<Either<TokenRefreshError, string>> {
+    const account = await this.msalClient
+      .getTokenCache()
+      .getAccountByHomeId(homeAccountId);
+
+    if (account === null) {
+      return failure(new TokenRefreshError());
+    }
+
+    const result: AuthenticationResult =
+      await this.msalClient.acquireTokenSilent({
+        account,
+        scopes: [...scopes],
+      });
+
+    return success(result.accessToken);
+  }
+
+  /**
    * Builds the MSAL authorisation URL request and related auth flow state.
    * When the callback hostname differs from the configured redirect URI hostname (ephemeral environments),
    * the state parameter includes a signed relay target so UAT can forward the callback.
