@@ -1,6 +1,5 @@
+import * as Sentry from "@sentry/node";
 import express from "express";
-
-const Sentry = require("@sentry/node");
 
 import type { CreateRedisStore, GetRedisClient } from "#/lib/redis.js";
 
@@ -33,7 +32,7 @@ const createApp = async (
   await initMiddleware(app, dependencies);
   initRoutes(app);
   initForge(app);
-  
+
   Sentry.setupExpressErrorHandler(app);
 
   // If the route wasn't handled by any other route or middleware, assume a 404. This must be registered after all other routes and *most* middleware.
