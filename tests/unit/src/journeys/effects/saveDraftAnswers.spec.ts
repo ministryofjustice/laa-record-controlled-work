@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { describe, it } from "mocha";
 import sinon from "sinon";
-import { saveDraftAnswers } from "#/journeys/effects.js";
+import { saveDraftAnswers } from "#/journeys/effects/saveDraftAnswers.js";
 import { type EffectFunctionContext } from "@ministryofjustice/hmpps-forge/core/authoring";
 
 describe("saveDraftAnswers()", () => {

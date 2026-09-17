@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { describe, it } from "mocha";
 import sinon from "sinon";
-import { clearAllDraftAnswers } from "#/journeys/effects.js";
+import { clearAllDraftAnswers } from "#/journeys/effects/clearAllDraftAnswers.js";
 import { type EffectFunctionContext } from "@ministryofjustice/hmpps-forge/core/authoring";
 
 describe("ClearAllDraftAnswers", () => {

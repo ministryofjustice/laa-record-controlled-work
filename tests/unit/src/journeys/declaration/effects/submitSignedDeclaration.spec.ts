@@ -6,10 +6,10 @@ import { faker } from "@faker-js/faker";
 import { logger } from "#/logger.js";
 import { ApiResponseError } from "#/api/clients/api.errors.js";
 import {
+  InvalidSessionError,
   UndefinedAnswerError,
   UndefinedParamError,
-  UndefinedSessionError,
-} from "#/journeys/errors.js";
+} from "#/journeys/journey.errors.js";
 
 describe("submitSignedDeclaration", () => {
   const applicationId = faker.string.uuid();
@@ -69,7 +69,7 @@ describe("submitSignedDeclaration", () => {
       await submitSignedDeclaration(deps)(context);
       expect.fail("Expected submitSignedDeclaration to reject");
     } catch (error) {
-      expect(error).to.be.instanceOf(UndefinedSessionError);
+      expect(error).to.be.instanceOf(InvalidSessionError);
     }
   });
 
