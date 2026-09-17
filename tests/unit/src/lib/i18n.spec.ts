@@ -10,6 +10,7 @@ import { expect } from "chai";
 import sinon from "sinon";
 
 import {
+  fixedT,
   i18next,
   initializeI18nextSync,
   nunjucksT,
@@ -64,6 +65,15 @@ describe("i18nLoader", () => {
           common: {
             greeting: "Hello {name}",
             saveAndReturn: "Save and return later",
+          },
+          journeys: {
+            createApplication: {
+              checkAnswers: {
+                answerLabels: {
+                  ecf: "ECF",
+                },
+              },
+            },
           },
         },
       },
@@ -164,6 +174,18 @@ describe("i18nLoader", () => {
         await initTranslationResources();
 
         expect(nunjucksT("saveAndReturn")).to.equal(t("saveAndReturn"));
+      });
+    });
+
+    describe("fixedT", () => {
+      it("should translate keys below a fixed prefix", async () => {
+        await initTranslationResources();
+
+        const answerLabelT = fixedT(
+          "journeys.createApplication.checkAnswers.answerLabels",
+        );
+
+        expect(answerLabelT("ecf")).to.equal("ECF");
       });
     });
   });
