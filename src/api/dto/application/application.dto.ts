@@ -132,14 +132,15 @@ export class ApplicationDto {
    * @returns AnswersOutput instance.
    */
   public static toAnswers(application: ApplicationZod): AnswersOutput {
-    const addressAnswers =
-      application.clientDetails.address?.country === "GB"
+    const addressAnswers = application.clientDetails.hasFixedAddress
+      ? application.clientDetails.address?.country === "GB"
         ? this.getAnswersFromUkAddress(
             application.clientDetails.address as UkAddress,
           )
         : this.getAnswersFromOverseasAddress(
             application.clientDetails.address as OverseasAddress,
-          );
+          )
+      : {};
 
     return {
       ...addressAnswers,
