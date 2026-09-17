@@ -1,4 +1,5 @@
 import * as Sentry from "@sentry/node";
+import { nodeProfilingIntegration } from "@sentry/profiling-node";
 import cookieParser from "cookie-parser";
 import express, { type Express } from "express";
 import session from "express-session";
@@ -76,8 +77,13 @@ export async function initMiddleware(
       debug: process.env.SENTRY_DEBUG === "true",
       dsn: sentryDsn,
       environment: process.env.SENTRY_ENV ?? "production",
-      integrations: [Sentry.httpIntegration(), Sentry.expressIntegration()],
+      integrations: [
+        Sentry.httpIntegration(),
+        Sentry.expressIntegration(),
+        nodeProfilingIntegration(),
+      ],
       // 10% of all requests will be used for performance sampling
+      profilesSampleRate: SENTRY_DEFAULT_SAMPLE_RATE,
       tracesSampler: (samplingContext: { name?: string }) => {
         const transactionName = samplingContext.name;
 
