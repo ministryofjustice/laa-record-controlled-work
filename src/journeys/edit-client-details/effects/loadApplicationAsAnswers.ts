@@ -22,10 +22,7 @@ export const loadApplicationAsAnswers =
       CONTEXT_DATA_KEYS.application,
     );
 
-    logger.error("MMMMMM application: ", application);
-
     const answersArray = ApplicationDto.toAnswers(application);
-    logger.error("MMMMMM answersArray: ", answersArray);
 
     for (const [code, value] of Object.entries(answersArray)) {
       context.setAnswer(code, value);
