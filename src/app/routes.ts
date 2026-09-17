@@ -10,7 +10,11 @@ import { createAuthLimiter } from "#/middleware/setupRateLimit.js";
 import { requireAuth } from "./middleware/requireAuth.middleware.js";
 import testRoutes from "./routes/test.js";
 
-export const initRoutes = (app: Express): void => {
+/**
+ * Initializes the routes for the Express application.
+ * @param app  Express application.
+ */
+export function initRoutes(app: Express): void {
   // Root endpoint - serves the main page of the application.
   app.get("/", requireAuth, (req: Request, res: Response): void => {
     res.render("main/index");
