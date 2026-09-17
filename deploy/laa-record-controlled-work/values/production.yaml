@@ -19,6 +19,7 @@ rcw:
     ENTRA_ADDITIONAL_SCOPES: api://rcw-api/Applications.Read
     RCW_API_BASE_URL: http://laa-record-controlled-work-api-production.laa-record-controlled-work-api.svc:8081
     PDA_API_BASE_URL: https://laa-provider-details-api-prod.apps.live.cloud-platform.service.justice.gov.uk/
+    SENTRY_ENV: "production"
 
 ccq:
   replicaCount: 2
