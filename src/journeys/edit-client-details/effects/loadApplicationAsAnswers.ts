@@ -4,7 +4,6 @@ import type { EditApplicationContext } from "#/journeys/edit-application/editApp
 import { ApplicationDto } from "#/api/dto/application/application.dto.js";
 import { isJourneySession } from "#/journeys/effects.js";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
-import { logger } from "#/logger.js";
 
 export const loadApplicationAsAnswers =
   () =>
