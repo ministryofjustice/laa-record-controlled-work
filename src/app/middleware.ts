@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/node";
 import cookieParser from "cookie-parser";
 import express, { type Express } from "express";
 import session from "express-session";
@@ -18,7 +19,8 @@ import { setupConfig } from "#/middleware/setupConfigs.js";
 import { setupRateLimit } from "#/middleware/setupRateLimit.js";
 import { setupRequestLogging } from "#/middleware/setupRequestLogging.js";
 
-const Sentry = require("@sentry/node");
+const SENTRY_HEALTHCHECK_SAMPLE_RATE = 0;
+const SENTRY_DEFAULT_SAMPLE_RATE = 0.01;
 
 interface Dependencies {
   createRedisStore?: CreateRedisStore;
@@ -71,42 +73,25 @@ export async function initMiddleware(
 
   if (sentryDsn) {
     Sentry.init({
-      dsn: sentryDsn,
       debug: process.env.SENTRY_DEBUG === "true",
-      environment: process.env.SENTRY_ENV || "production",
-      integrations: [
-        Sentry.httpIntegration({ tracing: true }),
-        Sentry.expressIntegration({ app }),
-      ],
+      dsn: sentryDsn,
+      environment: process.env.SENTRY_ENV ?? "production",
+      integrations: [Sentry.httpIntegration(), Sentry.expressIntegration()],
       // 10% of all requests will be used for performance sampling
-      tracesSampler: (samplingContext?: {
-        transactionContext?: { name?: string };
-      }) => {
-        const transactionName =
-          samplingContext &&
-          samplingContext.transactionContext &&
-          samplingContext.transactionContext.name;
+      tracesSampler: (samplingContext: { name?: string }) => {
+        const transactionName = samplingContext.name;
 
         if (
-          (transactionName && transactionName.includes("ping")) ||
-          (transactionName && transactionName.includes("/healthcheck"))
+          transactionName &&
+          (transactionName.includes("ping") ||
+            transactionName.includes("/healthcheck"))
         ) {
-          return 0;
+          return SENTRY_HEALTHCHECK_SAMPLE_RATE;
         }
 
-        return 0.01;
+        return SENTRY_DEFAULT_SAMPLE_RATE;
       },
     });
-
-    app.use(
-      Sentry.Handlers.requestHandler({
-        // Ensure we don't include `data` to avoid sending any PPI
-        request: ["cookies", "headers", "method", "query_string", "url"],
-        user: ["id", "username", "permissions"],
-      }),
-    );
-
-    app.use(Sentry.Handlers.tracingHandler());
   }
   // Setup CSRF protection.
   app.use(csrf);
