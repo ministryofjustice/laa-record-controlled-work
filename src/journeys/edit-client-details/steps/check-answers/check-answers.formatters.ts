@@ -8,8 +8,8 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 import { NunjucksGenerators } from "@ministryofjustice/hmpps-forge/express-nunjucks";
 
-import { t } from "#/lib/i18n.js";
 import { UK_ADDRESS_FIELDS } from "#/journeys/journey.constants.js";
+import { t } from "#/lib/i18n.js";
 
 /**
  * Formats a client's overseas address for display.

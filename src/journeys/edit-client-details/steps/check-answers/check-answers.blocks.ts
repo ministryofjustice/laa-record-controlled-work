@@ -12,9 +12,16 @@ import {
   GovUKSummaryList,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
-import { t } from "#/lib/i18n.js";
 import { AnswerKey } from "#/journeys/AnswerKey.enum.js";
-import { formatAddressValue, formatChangeAddressRedirect, formatDateOfBirth, formatEcfLabel, formatLegalAidBeforeLabel, formatLegalAidLast6MonthsLabel } from "#/journeys/edit-client-details/steps/check-answers/check-answers.formatters.js";
+import {
+  formatAddressValue,
+  formatChangeAddressRedirect,
+  formatDateOfBirth,
+  formatEcfLabel,
+  formatLegalAidBeforeLabel,
+  formatLegalAidLast6MonthsLabel,
+} from "#/journeys/edit-client-details/steps/check-answers/check-answers.formatters.js";
+import { t } from "#/lib/i18n.js";
 
 interface ChangeRowArgs {
   href: ResolvableString;

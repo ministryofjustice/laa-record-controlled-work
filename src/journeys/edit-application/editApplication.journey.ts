@@ -11,17 +11,13 @@ const editJourneyCode = JourneyCode.EDIT_CLIENT_DETAILS;
 const loadApiAnswers = access({
   effects: [
     editApplicationEffects.loadApplication(),
-    editClientDetailsEffects.loadApplicationAsAnswers(
-      editJourneyCode,
-    )
+    editClientDetailsEffects.loadApplicationAsAnswers(editJourneyCode),
   ],
 });
 
 export const editApplicationJourney = journey({
   code: "editApplication",
-  onAccess: [
-    loadApiAnswers,
-  ],
+  onAccess: [loadApiAnswers],
   path: "/cases/:applicationID",
   reachability: { disableReachabilityChecks: true },
   steps: [taskListStep(), confirmationStep()],
