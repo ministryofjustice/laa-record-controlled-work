@@ -11,11 +11,14 @@ import { addCsrfToLocals, csrf } from "#/app/middleware/csrf.middleware.js";
 import { helmet } from "#/app/middleware/helmet.middleware.js";
 import { locale } from "#/app/middleware/locale.middleware.js";
 import { isEnv } from "#/app/utils/isEnv.js";
+import { resolveSentryDsn } from "#/app/utils/resolveSentryDsn.js";
 import config from "#/config.js";
 import { createSession } from "#/lib/session.js";
 import { setupConfig } from "#/middleware/setupConfigs.js";
 import { setupRateLimit } from "#/middleware/setupRateLimit.js";
 import { setupRequestLogging } from "#/middleware/setupRequestLogging.js";
+
+const Sentry = require("@sentry/node");
 
 interface Dependencies {
   createRedisStore?: CreateRedisStore;
@@ -63,6 +66,48 @@ export async function initMiddleware(
   // Setup internationalization.
   app.use(locale());
 
+  // Setup Sentry
+  const sentryDsn = resolveSentryDsn();
+
+  if (sentryDsn) {
+    Sentry.init({
+      dsn: sentryDsn,
+      debug: process.env.SENTRY_DEBUG === "true",
+      environment: process.env.SENTRY_ENV || "production",
+      integrations: [
+        Sentry.httpIntegration({ tracing: true }),
+        Sentry.expressIntegration({ app }),
+      ],
+      // 10% of all requests will be used for performance sampling
+      tracesSampler: (samplingContext?: {
+        transactionContext?: { name?: string };
+      }) => {
+        const transactionName =
+          samplingContext &&
+          samplingContext.transactionContext &&
+          samplingContext.transactionContext.name;
+
+        if (
+          (transactionName && transactionName.includes("ping")) ||
+          (transactionName && transactionName.includes("/healthcheck"))
+        ) {
+          return 0;
+        }
+
+        return 0.01;
+      },
+    });
+
+    app.use(
+      Sentry.Handlers.requestHandler({
+        // Ensure we don't include `data` to avoid sending any PPI
+        request: ["cookies", "headers", "method", "query_string", "url"],
+        user: ["id", "username", "permissions"],
+      }),
+    );
+
+    app.use(Sentry.Handlers.tracingHandler());
+  }
   // Setup CSRF protection.
   app.use(csrf);
   app.use(addCsrfToLocals);
