@@ -6,11 +6,11 @@ import { AnswerKey } from "#/journeys/AnswerKey.enum.js";
 import { mapCountryNameToIsoCode } from "#/lib/countries.js";
 
 interface Application {
-  addressLine1: string;
+  addressLine1?: string;
   addressLine2?: string;
   addressLine3?: string;
   addressLine4?: string;
-  country: string;
+  country?: string;
   county?: string;
   dateOfBirth: string;
   firstName: string;
@@ -48,11 +48,11 @@ interface UkAddress {
  * @param application - The application data to be transferred.
  */
 export class ApplicationDto {
-  public addressLine1 = "";
+  public addressLine1?: string;
   public addressLine2?: string;
   public addressLine3?: string;
   public addressLine4?: string;
-  public country = "";
+  public country?: string;
   public county?: string;
   public dateOfBirth = "";
   public firstName = "";
@@ -87,8 +87,10 @@ export class ApplicationDto {
   ): ApplicationDto {
     const hasFixedAddress = answers.haveAHomeAddress === "yes";
 
+    const address = hasFixedAddress ? this.getAddressFromAnswers(answers) : {};
+
     return new ApplicationDto({
-      ...this.getAddressFromAnswers(answers, hasFixedAddress),
+      ...address,
       dateOfBirth: answers.dateOfBirth,
       firstName: answers.firstName,
       hasFixedAddress,
@@ -107,23 +109,35 @@ export class ApplicationDto {
   /**
    * Set the address fields based off whether the address is UK or overseas.
    * @param answers - The answers from which to extract the address fields.
-   * @param hasFixedAddress - boolean reused from above.
    * @returns Address object containing the address fields.
    */
   public static getAddressFromAnswers(
     answers: AnswersOutput,
-    hasFixedAddress: boolean,
   ): OverseasAddress | UkAddress {
-
-    if (!hasFixedAddress) {
-      return { addressLine1: "", country: "" };
-    }
-
     const isUkAddress = answers[AnswerKey.ukCountry] === "United Kingdom";
 
     return isUkAddress
-      ? this.getUkAddressFromAnswers(answers, hasFixedAddress)
-      : this.getOverseasAddressFromAnswers(answers, hasFixedAddress);
+      ? this.getUkAddressFromAnswers(answers)
+      : this.getOverseasAddressFromAnswers(answers);
+  }
+
+  /**
+   * Creates answers output from the provided address.
+   * @param application - The application from which to extract the address fields.
+   * @returns Partial AnswersOutput instance containing the address fields.
+   */
+  public static getAnswersFromAddress(
+    application: ApplicationZod,
+  ): Partial<AnswersOutput> {
+    const { address } = application.clientDetails;
+
+    if (!address) {
+      throw new Error("Address is not defined in the application.");
+    }
+
+    return address.country === "GB"
+      ? this.getAnswersFromUkAddress(address as UkAddress)
+      : this.getAnswersFromOverseasAddress(address as OverseasAddress);
   }
 
   /**
@@ -133,13 +147,7 @@ export class ApplicationDto {
    */
   public static toAnswers(application: ApplicationZod): AnswersOutput {
     const addressAnswers = application.clientDetails.hasFixedAddress
-      ? application.clientDetails.address?.country === "GB"
-        ? this.getAnswersFromUkAddress(
-            application.clientDetails.address as UkAddress,
-          )
-        : this.getAnswersFromOverseasAddress(
-            application.clientDetails.address as OverseasAddress,
-          )
+      ? this.getAnswersFromAddress(application)
       : {};
 
     return {
@@ -154,7 +162,8 @@ export class ApplicationDto {
         ? "yes"
         : "no",
       [AnswerKey.lastName]: application.clientDetails.lastName,
-      [AnswerKey.legalAidBefore]: application.scopingQuestions?.priorLegalAid as string, 
+      [AnswerKey.legalAidBefore]: application.scopingQuestions
+        ?.priorLegalAid as string,
       [AnswerKey.legalAidLast6Months]:
         application.scopingQuestions?.priorLegalAid === "yesSameMatter" &&
         application.reasonForReapplication
@@ -206,12 +215,10 @@ export class ApplicationDto {
   /**
    * Extract overseas address fields from the answers.
    * @param answers - The answers from which to extract the address fields.
-   * @param hasFixedAddress - boolean reused from above.
    * @returns Address object containing the overseas address fields.
    */
   private static getOverseasAddressFromAnswers(
     answers: AnswersOutput,
-    hasFixedAddress: boolean,
   ): OverseasAddress {
     const countryName: string | undefined = answers[AnswerKey.osCountry];
 
@@ -220,32 +227,22 @@ export class ApplicationDto {
       addressLine2: answers[AnswerKey.osAddressLine2],
       addressLine3: answers[AnswerKey.osAddressLine3],
       addressLine4: answers[AnswerKey.osAddressLine4],
-      country:
-        hasFixedAddress && countryName
-          ? mapCountryNameToIsoCode(countryName)
-          : "",
+      country: countryName ? mapCountryNameToIsoCode(countryName) : "",
     };
   }
 
   /**
    * Extract UK address fields from the answers.
    * @param answers - The answers from which to extract the address fields.
-   * @param hasFixedAddress - boolean reused from above.
    * @returns Address object containing the UK address fields.
    */
-  private static getUkAddressFromAnswers(
-    answers: AnswersOutput,
-    hasFixedAddress: boolean,
-  ): UkAddress {
+  private static getUkAddressFromAnswers(answers: AnswersOutput): UkAddress {
     const countryName: string | undefined = answers[AnswerKey.ukCountry];
 
     return {
       addressLine1: answers[AnswerKey.ukAddressLine1] ?? "",
       addressLine2: answers[AnswerKey.ukAddressLine2],
-      country:
-        hasFixedAddress && countryName
-          ? mapCountryNameToIsoCode(countryName)
-          : "",
+      country: countryName ? mapCountryNameToIsoCode(countryName) : "",
       county: answers[AnswerKey.ukCounty],
       postCode: answers[AnswerKey.ukPostcode],
       townOrCity: answers[AnswerKey.ukTownOrCity],

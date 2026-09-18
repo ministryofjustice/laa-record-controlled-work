@@ -39,7 +39,6 @@ export const loadApplication =
       });
 
       response = await deps.getApplication(applicationID, opts);
-
     } catch (error) {
       logger.error("Error fetching application", error, {
         api: "getApplication",
