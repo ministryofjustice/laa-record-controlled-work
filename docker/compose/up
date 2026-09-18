@@ -17,7 +17,7 @@ ENTRA_MODE=false
 CI_MODE=false
 NO_BUILD=false
 
-# Parse named arguments
+# Parse named arguments.
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --entra) ENTRA_MODE=true; shift ;;
@@ -30,15 +30,15 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-if $NO_BUILD && ! $CI_MODE; then
+if [[ "$NO_BUILD" == true && "$CI_MODE" != true ]]; then
   echo "error: --no-build requires --ci" >&2
   exit 1
 fi
 
 confirm() {
   local prompt="$1" reply
-  if $CI_MODE; then
-    return 0  # Skip confirmation in CI mode
+  if [[ "$CI_MODE" == true ]]; then
+    return 0
   fi
   if [[ ! -t 0 ]]; then
     echo "error: no interactive terminal available to confirm: $prompt" >&2
@@ -55,30 +55,29 @@ require_confirm() {
   }
 }
 
+require_commands() {
+  local command
+  for command in "$@"; do
+    command -v "$command" >/dev/null 2>&1 || {
+      echo "error: $command is required but not installed" >&2
+      exit 1
+    }
+  done
+}
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 PARENT_DIR="$(dirname "$REPO_ROOT")"
 cd "$REPO_ROOT"
 
-# In CI mode, only require git and docker (skip op requirement)
-if $CI_MODE; then
-  for cmd in git docker; do
-    command -v "$cmd" >/dev/null 2>&1 || {
-      echo "error: $cmd is required but not installed" >&2
-      exit 1
-    }
-  done
+# CI does not use 1Password, so it only needs git and Docker.
+if [[ "$CI_MODE" == true ]]; then
+  require_commands git docker
 else
-  for cmd in git docker op; do
-    command -v "$cmd" >/dev/null 2>&1 || {
-      echo "error: $cmd is required but not installed" >&2
-      exit 1
-    }
-  done
+  require_commands git docker op
 fi
 
-# Derive sibling clone URLs from this repo's own remote, so ssh/https and the org stay
-# consistent with whatever the developer already uses.
+# Keep sibling clone URLs consistent with this repository's remote.
 ORG_URL="$(git remote get-url origin)"
 ORG_URL="${ORG_URL%/*}"
 
@@ -94,7 +93,7 @@ clone_if_missing() {
   require_confirm "Run 'git clone $url $dir'?"
   # Remove a partial clone if this is interrupted, so re-running this script retries cleanly.
   trap 'rm -rf "$dir"' INT TERM
-  if $CI_MODE; then
+  if [[ "$CI_MODE" == true ]]; then
     git clone --depth 1 --single-branch "$url" "$dir"
   else
     git clone "$url" "$dir"
@@ -117,59 +116,105 @@ ensure_env_file() {
   mv "$dir/$file.tmp" "$dir/$file"
 }
 
+ensure_entra_env_files() {
+  [[ "$ENTRA_MODE" == true ]] || return 0
+
+  ensure_env_file "$REPO_ROOT" .env.entra .env.entra.example
+  ensure_env_file "$API_DIR" .env.entra .env.entra.example
+  ensure_env_file "$DATASTORE_DIR" .env.entra .env.entra.example
+}
+
+build_ccq_image_if_missing() {
+  [[ "$CI_MODE" == true ]] && return 0
+  docker image inspect laa-check-client-qualifies:latest >/dev/null 2>&1 && return 0
+
+  # docker-compose.embedded.yml sets pull_policy: never.
+  echo "laa-check-client-qualifies:latest image is missing."
+  require_confirm "Run 'make -C $CCQ_DIR build'?"
+  make -C "$CCQ_DIR" build
+}
+
+ensure_docker_host_entry() {
+  # Docker Desktop on macOS does not add this browser host entry automatically.
+  if grep -qE '(^|[[:space:]])host\.docker\.internal([[:space:]]|$)' /etc/hosts 2>/dev/null; then
+    return 0
+  fi
+
+  if [[ "$CI_MODE" == true ]]; then
+    echo "Adding host.docker.internal to /etc/hosts..."
+    echo '127.0.0.1 host.docker.internal' | sudo tee -a /etc/hosts >/dev/null
+    return 0
+  fi
+
+  echo "warning: host.docker.internal not found in /etc/hosts - add it so the mock OAuth2 login page loads in your browser:" >&2
+  echo "  echo '127.0.0.1 host.docker.internal' | sudo tee -a /etc/hosts" >&2
+}
+
+build_env_files() {
+  ENV_FILES=(--env-file="$API_DIR/.env")
+  if [[ "$ENTRA_MODE" == true ]]; then
+    ENV_FILES+=(--env-file="$API_DIR/.env.entra")
+  fi
+  ENV_FILES+=(--env-file="$DATASTORE_DIR/.env")
+  if [[ "$ENTRA_MODE" == true ]]; then
+    ENV_FILES+=(--env-file="$DATASTORE_DIR/.env.entra")
+  fi
+  ENV_FILES+=(--env-file=.env)
+  if [[ "$ENTRA_MODE" == true ]]; then
+    ENV_FILES+=(--env-file=.env.entra)
+  fi
+}
+
+build_compose_files() {
+  COMPOSE_FILES=(-f docker-compose.yml -f docker-compose.override.yml)
+  if [[ "$CI_MODE" == true ]]; then
+    COMPOSE_FILES+=(-f docker/compose/ci.yml)
+  fi
+  if [[ "$NO_BUILD" == true ]]; then
+    COMPOSE_FILES+=(-f docker/compose/ci.rcw.yml)
+  fi
+  if [[ "$ENTRA_MODE" == true ]]; then
+    COMPOSE_FILES+=(-f docker-compose.entra.yml)
+  fi
+}
+
 ensure_env_file "$REPO_ROOT" .env .env.example
 ensure_env_file "$API_DIR" .env .env.example
 ensure_env_file "$DATASTORE_DIR" .env .env.example
 ensure_env_file "$CCQ_DIR" .env .env.sample
 
-if $ENTRA_MODE; then
-  ensure_env_file "$REPO_ROOT" .env.entra .env.entra.example
-  ensure_env_file "$API_DIR" .env.entra .env.entra.example
-  ensure_env_file "$DATASTORE_DIR" .env.entra .env.entra.example
-fi
+ensure_entra_env_files
+build_ccq_image_if_missing
+ensure_docker_host_entry
+build_env_files
+build_compose_files
 
-# docker-compose.embedded.yml sets pull_policy: never - build the image locally if missing.
-if ! $CI_MODE && ! docker image inspect laa-check-client-qualifies:latest >/dev/null 2>&1; then
-  echo "laa-check-client-qualifies:latest image is missing."
-  require_confirm "Run 'make -C $CCQ_DIR build'?"
-  make -C "$CCQ_DIR" build
-fi
-
-# MSAL requires an https authority even for the mock IdP (see docker/certs) - Docker Desktop
-# on Mac doesn't add this automatically, but the browser needs it to reach the login page.
-if ! grep -qE '(^|[[:space:]])host\.docker\.internal([[:space:]]|$)' /etc/hosts 2>/dev/null; then
-  if $CI_MODE; then
-    echo "Adding host.docker.internal to /etc/hosts..."
-    echo '127.0.0.1 host.docker.internal' | sudo tee -a /etc/hosts >/dev/null
-  else
-    echo "warning: host.docker.internal not found in /etc/hosts - add it so the mock OAuth2 login page loads in your browser:" >&2
-    echo "  echo '127.0.0.1 host.docker.internal' | sudo tee -a /etc/hosts" >&2
+if [[ "$CI_MODE" == true ]]; then
+  # Pull runtime images while building RCW, then wait for health.
+  auth_mode="mock-issuer"
+  if [[ "$ENTRA_MODE" == true ]]; then
+    auth_mode="entra"
   fi
-fi
 
-ENV_FILES=(--env-file="$API_DIR/.env")
-$ENTRA_MODE && ENV_FILES+=(--env-file="$API_DIR/.env.entra")
-ENV_FILES+=(--env-file="$DATASTORE_DIR/.env")
-$ENTRA_MODE && ENV_FILES+=(--env-file="$DATASTORE_DIR/.env.entra")
-ENV_FILES+=(--env-file=.env)
-$ENTRA_MODE && ENV_FILES+=(--env-file=.env.entra)
+  echo "==> Starting docker compose stack (CI mode, $auth_mode):"
+  pull_status=0
+  docker compose "${COMPOSE_FILES[@]}" "${ENV_FILES[@]}" pull --ignore-buildable &
+  pull_pid=$!
 
-COMPOSE_FILES=(-f docker-compose.yml -f docker-compose.override.yml)
-if $CI_MODE; then
-  COMPOSE_FILES+=(-f docker/compose/ci.yml)
-fi
-$NO_BUILD && COMPOSE_FILES+=(-f docker/compose/ci.rcw.yml)
-$ENTRA_MODE && COMPOSE_FILES+=(-f docker-compose.entra.yml)
-
-if $CI_MODE; then
-  # CI mode: build first (parallel where possible), then start and wait for health.
-  echo "==> Starting docker compose stack (CI mode, $($ENTRA_MODE && echo 'entra' || echo 'mock-issuer')):"
+  build_status=0
   if ! $NO_BUILD; then
     printf '        docker compose %s %s build --parallel\n' "${COMPOSE_FILES[*]}" "${ENV_FILES[*]}"
-    docker compose "${COMPOSE_FILES[@]}" "${ENV_FILES[@]}" build --parallel
+    docker compose "${COMPOSE_FILES[@]}" "${ENV_FILES[@]}" build --parallel || build_status=$?
   fi
-  printf '        docker compose %s %s up -d --wait --no-build\n' "${COMPOSE_FILES[*]}" "${ENV_FILES[*]}"
-  if ! docker compose "${COMPOSE_FILES[@]}" "${ENV_FILES[@]}" up -d --wait --no-build; then
+
+  wait "$pull_pid" || pull_status=$?
+  if (( build_status != 0 || pull_status != 0 )); then
+    echo "==> Docker image preparation failed (build=$build_status, pull=$pull_status)."
+    exit 1
+  fi
+
+  printf '        docker compose %s %s up -d --wait --no-build --pull never\n' "${COMPOSE_FILES[*]}" "${ENV_FILES[*]}"
+  if ! docker compose "${COMPOSE_FILES[@]}" "${ENV_FILES[@]}" up -d --wait --no-build --pull never; then
     echo "==> Docker compose failed; service state:"
     docker compose "${COMPOSE_FILES[@]}" "${ENV_FILES[@]}" ps --all || true
     echo "==> Docker compose logs:"
@@ -177,7 +222,12 @@ if $CI_MODE; then
     exit 1
   fi
 else
-  echo "==> Starting docker compose stack (interactive mode, $($ENTRA_MODE && echo 'entra' || echo 'mock-issuer')):"
+  auth_mode="mock-issuer"
+  if [[ "$ENTRA_MODE" == true ]]; then
+    auth_mode="entra"
+  fi
+
+  echo "==> Starting docker compose stack (interactive mode, $auth_mode):"
   echo "      op run"
   printf '        %s\n' "${ENV_FILES[@]}"
   echo "        -- docker compose ${COMPOSE_FILES[*]} up --watch --build"
