@@ -1,3 +1,5 @@
+import * as Sentry from "@sentry/node";
+import { nodeProfilingIntegration } from "@sentry/profiling-node";
 import cookieParser from "cookie-parser";
 import express, { type Express } from "express";
 import session from "express-session";
@@ -11,11 +13,15 @@ import { addCsrfToLocals, csrf } from "#/app/middleware/csrf.middleware.js";
 import { helmet } from "#/app/middleware/helmet.middleware.js";
 import { locale } from "#/app/middleware/locale.middleware.js";
 import { isEnv } from "#/app/utils/isEnv.js";
+import { resolveSentryDsn } from "#/app/utils/resolveSentryDsn.js";
 import config from "#/config.js";
 import { createSession } from "#/lib/session.js";
 import { setupConfig } from "#/middleware/setupConfigs.js";
 import { setupRateLimit } from "#/middleware/setupRateLimit.js";
 import { setupRequestLogging } from "#/middleware/setupRequestLogging.js";
+
+const SENTRY_HEALTHCHECK_SAMPLE_RATE = 0;
+const SENTRY_DEFAULT_SAMPLE_RATE = 0.01;
 
 interface Dependencies {
   createRedisStore?: CreateRedisStore;
@@ -63,6 +69,36 @@ export async function initMiddleware(
   // Setup internationalization.
   app.use(locale());
 
+  // Setup Sentry
+  const sentryDsn = resolveSentryDsn();
+
+  if (sentryDsn) {
+    Sentry.init({
+      debug: process.env.SENTRY_DEBUG === "true",
+      dsn: sentryDsn,
+      environment: process.env.SENTRY_ENV ?? "production",
+      integrations: [
+        Sentry.httpIntegration(),
+        Sentry.expressIntegration(),
+        nodeProfilingIntegration(),
+      ],
+      // 10% of all requests will be used for performance sampling
+      profilesSampleRate: SENTRY_DEFAULT_SAMPLE_RATE,
+      tracesSampler: (samplingContext: { name?: string }) => {
+        const transactionName = samplingContext.name;
+
+        if (
+          transactionName &&
+          (transactionName.includes("ping") ||
+            transactionName.includes("/healthcheck"))
+        ) {
+          return SENTRY_HEALTHCHECK_SAMPLE_RATE;
+        }
+
+        return SENTRY_DEFAULT_SAMPLE_RATE;
+      },
+    });
+  }
   // Setup CSRF protection.
   app.use(csrf);
   app.use(addCsrfToLocals);

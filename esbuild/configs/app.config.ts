@@ -27,6 +27,8 @@ const externalModules: string[] = [
   "connect-redis",
   "redis",
   "pino",
+  "@sentry/node",
+  "@sentry/profiling-node",
 ];
 
 export const appConfig = (watch = false): BuildOptions => ({

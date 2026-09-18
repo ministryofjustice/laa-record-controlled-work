@@ -45,6 +45,9 @@ function helmetMiddleware(): RequestHandler {
           },
         ],
         styleSrc: ["'self'", "'unsafe-inline'"], // Allow inline styles if needed
+        ...(process.env.SENTRY_CSP_REPORT_ENDPOINT
+          ? { reportUri: [process.env.SENTRY_CSP_REPORT_ENDPOINT] }
+          : {}),
         upgradeInsecureRequests: [], // Upgrade HTTP to HTTPS
       },
     },

@@ -15,6 +15,7 @@ rcw:
 
   env:
     NODE_ENV: "production"
+    SENTRY_ENV: "production"
 
 ccq:
   replicaCount: 2
