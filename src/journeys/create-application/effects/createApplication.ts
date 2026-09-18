@@ -45,7 +45,7 @@ const buildApplicationData = (
     answersFormatted.data,
     providerOfficeCode,
   );
-    
+
   return applicationDto.toRcwApi();
 };
 
