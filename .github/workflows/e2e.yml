@@ -156,9 +156,44 @@ jobs:
           jq -r '
             [.site[].alerts[]]
             | group_by(.riskcode)
+            | map({
+                riskcode: .[0].riskcode,
+                count: length
+              })
+            | sort_by(.riskcode | tonumber)
             | .[]
-            | "| \(. [0].riskdesc) | \(length) |"
+            | if .riskcode == "3" then
+                "| 🔴 High | \(.count) |"
+              elif .riskcode == "2" then
+                "| 🟠 Medium | \(.count) |"
+              elif .riskcode == "1" then
+                "| 🟡 Low | \(.count) |"
+              else
+                "| 🔵 Informational | \(.count) |"
+              end
           ' "$REPORT" >> "$GITHUB_STEP_SUMMARY"
+          
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "### Findings" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+
+          echo "| Risk | Alert | URL |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|------|-------|-----|" >> "$GITHUB_STEP_SUMMARY"
+
+          jq -r '
+            .site[].alerts[]
+            | . as $alert
+            | $alert.instances[]
+            | (
+                if $alert.riskcode == "3" then "🔴 High"
+                elif $alert.riskcode == "2" then "🟠 Medium"
+                elif $alert.riskcode == "1" then "🟡 Low"
+                else "🔵 Informational"
+                end
+              ) as $risk
+            | "| \($risk) | \($alert.name) | \(.uri) |"
+          ' "$REPORT" >> "$GITHUB_STEP_SUMMARY"
+          
       - name: Collect container logs
         if: failure()
         run: |
