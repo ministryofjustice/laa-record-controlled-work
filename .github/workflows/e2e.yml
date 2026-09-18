@@ -140,23 +140,25 @@ jobs:
         if: github.event_name == 'pull_request' && always()
         shell: bash
         run: |
+          REPORT="zap-results/zap-baseline-report.json"
+
           echo "## 🔐 OWASP ZAP Scan" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
+
+          if [ ! -f "$REPORT" ]; then
+            echo "⚠️ ZAP report was not found." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
 
           echo "| Risk | Count |" >> "$GITHUB_STEP_SUMMARY"
           echo "|------|------:|" >> "$GITHUB_STEP_SUMMARY"
 
           jq -r '
-            .site[0].alerts
+            [.site[].alerts[]]
             | group_by(.riskcode)
-            | map({
-                risk: .[0].riskdesc,
-                count: length
-              })
             | .[]
-            | "| \(.risk) | \(.count) |"
-          ' zap-results/zap-baseline-report.json >> "$GITHUB_STEP_SUMMARY"
-
+            | "| \(. [0].riskdesc) | \(length) |"
+          ' "$REPORT" >> "$GITHUB_STEP_SUMMARY"
       - name: Collect container logs
         if: failure()
         run: |
