@@ -45,12 +45,12 @@
     "test": "yarn test:unit && yarn test:integration && yarn test:ui"
   },
   "engines": {
-    "node": "26.8.1"
+    "node": "26.8.2"
   },
   "dependencies": {
     "@azure/msal-node": "^5.6.0",
     "@ministryofjustice/frontend": "10.0.1",
-    "@ministryofjustice/hmpps-forge": "^0.4.2",
+    "@ministryofjustice/hmpps-forge": "^0.4.3",
     "accessible-autocomplete": "^3.0.1",
     "compression": "^1.8.2",
     "connect-redis": "^10.0.0",
@@ -69,7 +69,7 @@
     "path-to-regexp": "^8.4.2",
     "pino": "^10.3.1",
     "redis": "^6.2.1",
-    "zod": "^4.5.4"
+    "zod": "^4.6.2"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
@@ -85,11 +85,11 @@
     "@types/express-session": "^1.19.0",
     "@types/mocha": "^10.0.10",
     "@types/morgan": "^1.9.10",
-    "@types/node": "^25.9.5",
+    "@types/node": "^25.9.6",
     "@types/nunjucks": "^3.2.6",
     "@types/sinon": "^22.0.0",
     "@types/supertest": "^7.2.1",
-    "@typescript-eslint/parser": "^8.69.0",
+    "@typescript-eslint/parser": "^8.70.0",
     "c8": "^12.0.0",
     "chai": "^6.2.2",
     "chai-as-promised": "^8.0.2",
@@ -101,12 +101,12 @@
     "eslint": "^10.10.0",
     "eslint-config-love": "^155.0.0",
     "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-jsdoc": "^64.3.6",
+    "eslint-plugin-jsdoc": "^64.3.9",
     "eslint-plugin-jsonc": "^3.4.2",
     "eslint-plugin-perfectionist": "^5.11.0",
     "eslint-plugin-prettier": "^5.5.6",
     "globals": "^17.12.0",
-    "knip": "^6.34.0",
+    "knip": "^6.35.1",
     "mocha": "^11.8.0",
     "msw": "^2.15.0",
     "nodemon": "^3.1.14",
