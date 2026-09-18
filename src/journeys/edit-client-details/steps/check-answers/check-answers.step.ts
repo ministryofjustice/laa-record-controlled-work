@@ -7,11 +7,11 @@ import {
   submit,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
-import { editClientDetailsEffects } from "#/journeys/edit-client-details/editClientDetails.effects.js";
 import {
   heading,
   summaryList,
 } from "#/journeys/create-application/steps/check-answers.blocks.js";
+import { editClientDetailsEffects } from "#/journeys/edit-client-details/editClientDetails.effects.js";
 import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
 import { submitButton } from "#/journeys/shared.blocks.js";
 import { t } from "#/lib/i18n.js";
