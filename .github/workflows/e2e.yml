@@ -106,12 +106,94 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
+      - name: Prepare ZAP HAR directory
+        run: |
+          rm -rf zap-results/hars
+          mkdir -p zap-results/hars
+          chmod 777 zap-results
+
       - name: Run E2E tests
         run: yarn test:e2e
         env:
           CI: "true"
           E2E_AUTH_MODE: mock
+          E2E_ZAP_HAR_DIRECTORY: ${{ github.workspace }}/zap-results/hars
 
+      - name: Run ZAP Automation Framework scan
+        if: github.event_name == 'pull_request'
+        run: ./zap/run-cicd.sh
+
+      - name: Upload ZAP scan reports
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: zap-scan-reports
+          path: |
+            zap-results/zap-baseline-report.html
+            zap-results/zap-baseline-report.json
+            zap-results/zap_out.json
+            zap-results/e2e-suite.har
+            zap-results/hars/
+          retention-days: 14
+
+      - name: Create ZAP summary
+        if: github.event_name == 'pull_request' && always()
+        shell: bash
+        run: |
+          REPORT="zap-results/zap-baseline-report.json"
+
+          echo "## 🔐 OWASP ZAP Scan" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+
+          if [ ! -f "$REPORT" ]; then
+            echo "⚠️ ZAP report was not found." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          echo "| Risk | Count |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|------|------:|" >> "$GITHUB_STEP_SUMMARY"
+
+          jq -r '
+            [.site[].alerts[]]
+            | group_by(.riskcode)
+            | map({
+                riskcode: .[0].riskcode,
+                count: length
+              })
+            | sort_by(.riskcode | tonumber)
+            | .[]
+            | if .riskcode == "3" then
+                "| 🔴 High | \(.count) |"
+              elif .riskcode == "2" then
+                "| 🟠 Medium | \(.count) |"
+              elif .riskcode == "1" then
+                "| 🟡 Low | \(.count) |"
+              else
+                "| 🔵 Informational | \(.count) |"
+              end
+          ' "$REPORT" >> "$GITHUB_STEP_SUMMARY"
+          
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "### Findings" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+
+          echo "| Risk | Alert | URL |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|------|-------|-----|" >> "$GITHUB_STEP_SUMMARY"
+
+          jq -r '
+            .site[].alerts[]
+            | . as $alert
+            | $alert.instances[]
+            | (
+                if $alert.riskcode == "3" then "🔴 High"
+                elif $alert.riskcode == "2" then "🟠 Medium"
+                elif $alert.riskcode == "1" then "🟡 Low"
+                else "🔵 Informational"
+                end
+              ) as $risk
+            | "| \($risk) | \($alert.name) | \(.uri) |"
+          ' "$REPORT" >> "$GITHUB_STEP_SUMMARY"
+          
       - name: Collect container logs
         if: failure()
         run: |

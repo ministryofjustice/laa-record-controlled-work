@@ -1,0 +1,29 @@
+#!/bin/bash
+# Runs the ZAP scan locally. Requires the full stack to already be up
+# (e.g. run `docker/compose/up` in another terminal first)
+set -euo pipefail
+
+COMPOSE_FILES=(-f docker-compose.yml -f docker-compose.override.yml -f docker/compose/zap.yml)
+
+if [[ "$(docker compose "${COMPOSE_FILES[@]}" ps --status running --services 2>/dev/null | grep -cx nginx)" -eq 0 ]]; then
+  echo "error: the stack isn't running yet. Start it first with 'docker/compose/up' in another terminal, then re-run this script." >&2
+  exit 1
+fi
+
+rm -rf zap-results/hars
+mkdir -p zap-results/hars
+chmod 777 zap-results
+
+E2E_ZAP_HAR_DIRECTORY="$(pwd)/zap-results/hars" \
+  yarn test:e2e
+
+yarn tsx zap/merge-hars.ts zap-results/hars zap-results/e2e-suite.har
+
+export NGINX_IP="$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' rcw-nginx)"
+
+docker compose \
+  "${COMPOSE_FILES[@]}" \
+  run --rm --no-deps zap-scan
+
+echo "--- Opening report ---"
+open zap-results/zap-baseline-report.html
