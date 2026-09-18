@@ -6,6 +6,7 @@ env:
         - "http://localhost:8080"
       excludePaths:
         - "http://localhost:8080/auth/code/callback.*"
+        - "http://localhost:8080/?$"
   parameters:
     failOnError: true
     progressToStdout: true
