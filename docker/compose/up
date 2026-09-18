@@ -162,14 +162,26 @@ $NO_BUILD && COMPOSE_FILES+=(-f docker/compose/ci.rcw.yml)
 $ENTRA_MODE && COMPOSE_FILES+=(-f docker-compose.entra.yml)
 
 if $CI_MODE; then
-  # CI mode: build first (parallel where possible), then start and wait for health.
+  # CI mode: pull runtime images while building the RCW image, then start and wait for health.
   echo "==> Starting docker compose stack (CI mode, $($ENTRA_MODE && echo 'entra' || echo 'mock-issuer')):"
+  pull_status=0
+  docker compose "${COMPOSE_FILES[@]}" "${ENV_FILES[@]}" pull --ignore-buildable &
+  pull_pid=$!
+
+  build_status=0
   if ! $NO_BUILD; then
     printf '        docker compose %s %s build --parallel\n' "${COMPOSE_FILES[*]}" "${ENV_FILES[*]}"
-    docker compose "${COMPOSE_FILES[@]}" "${ENV_FILES[@]}" build --parallel
+    docker compose "${COMPOSE_FILES[@]}" "${ENV_FILES[@]}" build --parallel || build_status=$?
   fi
-  printf '        docker compose %s %s up -d --wait --no-build\n' "${COMPOSE_FILES[*]}" "${ENV_FILES[*]}"
-  if ! docker compose "${COMPOSE_FILES[@]}" "${ENV_FILES[@]}" up -d --wait --no-build; then
+
+  wait "$pull_pid" || pull_status=$?
+  if (( build_status != 0 || pull_status != 0 )); then
+    echo "==> Docker image preparation failed (build=$build_status, pull=$pull_status)."
+    exit 1
+  fi
+
+  printf '        docker compose %s %s up -d --wait --no-build --pull never\n' "${COMPOSE_FILES[*]}" "${ENV_FILES[*]}"
+  if ! docker compose "${COMPOSE_FILES[@]}" "${ENV_FILES[@]}" up -d --wait --no-build --pull never; then
     echo "==> Docker compose failed; service state:"
     docker compose "${COMPOSE_FILES[@]}" "${ENV_FILES[@]}" ps --all || true
     echo "==> Docker compose logs:"
