@@ -3,6 +3,7 @@ import type { Express, Request, Response } from "express";
 import eligibilityRouter from "#/api/eligibility/eligibility.routes.js";
 import authRouter from "#/auth/auth.routes.js";
 import config from "#/config.js";
+import exportRouter from "#/export/export.routes.js";
 import { OK } from "#/lib/constants/http.js";
 import { createAuthLimiter } from "#/middleware/setupRateLimit.js";
 
@@ -33,6 +34,8 @@ export const initRoutes = (app: Express): void => {
     requireAuth,
     eligibilityRouter,
   );
+
+  app.use("/cases/:applicationId/export", requireAuth, exportRouter);
 
   // Forge: Prioritise `/cases/(evidence|ineligible|new|recorded)` over `/cases/:applicationId`
   // and redirect case URL's to the task list.
