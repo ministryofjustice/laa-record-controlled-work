@@ -45,6 +45,7 @@
       "automerge": true,
       "automergeType": "pr",
 
+      "minimumReleaseAgeComment": "Set to null on purpose - 7d age gate enforced by yarn resolver config",
       "minimumReleaseAge": null
     },
     {
