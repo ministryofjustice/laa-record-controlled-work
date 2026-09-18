@@ -11,7 +11,7 @@ import { editClientDetailsEffects } from "#/journeys/edit-client-details/editCli
 import {
   heading,
   summaryList,
-} from "#/journeys/edit-client-details/steps/check-answers/check-answers.blocks.js";
+} from "#/journeys/create-application/steps/check-answers.blocks.js";
 import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
 import { submitButton } from "#/journeys/shared.blocks.js";
 import { t } from "#/lib/i18n.js";
