@@ -26,6 +26,10 @@ interface Application {
   townOrCity?: string;
 }
 
+type ApplicationAddress = NonNullable<
+  ApplicationZod["clientDetails"]["address"]
+>;
+
 interface OverseasAddress {
   addressLine1: string;
   addressLine2?: string;
@@ -136,8 +140,8 @@ export class ApplicationDto {
     }
 
     return address.country === "GB"
-      ? this.getAnswersFromUkAddress(address as UkAddress)
-      : this.getAnswersFromOverseasAddress(address as OverseasAddress);
+      ? this.getAnswersFromUkAddress(address)
+      : this.getAnswersFromOverseasAddress(address);
   }
 
   /**
@@ -149,6 +153,7 @@ export class ApplicationDto {
     const addressAnswers = application.clientDetails.hasFixedAddress
       ? this.getAnswersFromAddress(application)
       : {};
+    const priorLegalAid = this.getPriorLegalAid(application);
 
     return {
       ...addressAnswers,
@@ -162,8 +167,7 @@ export class ApplicationDto {
         ? "yes"
         : "no",
       [AnswerKey.lastName]: application.clientDetails.lastName,
-      [AnswerKey.legalAidBefore]: application.scopingQuestions
-        ?.priorLegalAid as string,
+      [AnswerKey.legalAidBefore]: priorLegalAid,
       [AnswerKey.legalAidLast6Months]:
         application.scopingQuestions?.priorLegalAid === "yesSameMatter" &&
         application.reasonForReapplication
@@ -180,15 +184,15 @@ export class ApplicationDto {
    * @returns Partial AnswersOutput object containing the overseas address fields.
    */
   private static getAnswersFromOverseasAddress(
-    address: OverseasAddress,
+    address: ApplicationAddress,
   ): Partial<AnswersOutput> {
     // I added the UK address fields because if addressLine1 and country are not set, then the Overseas page loads empty
     // and then won't let you continue as it wipes the mandatory fields when you click continue
     return {
       [AnswerKey.osAddressLine1]: address.addressLine1,
-      [AnswerKey.osAddressLine2]: address.addressLine2,
-      [AnswerKey.osAddressLine3]: address.addressLine3,
-      [AnswerKey.osAddressLine4]: address.addressLine4,
+      [AnswerKey.osAddressLine2]: address.addressLine2 ?? undefined,
+      [AnswerKey.osAddressLine3]: address.addressLine3 ?? undefined,
+      [AnswerKey.osAddressLine4]: address.addressLine4 ?? undefined,
       [AnswerKey.osCountry]: address.country,
     };
   }
@@ -199,16 +203,16 @@ export class ApplicationDto {
    * @returns Partial AnswersOutput object containing the UK address fields.
    */
   private static getAnswersFromUkAddress(
-    address: UkAddress,
+    address: ApplicationAddress,
   ): Partial<AnswersOutput> {
     // see above comment about why the overseas address fields are also set here
     return {
       [AnswerKey.ukAddressLine1]: address.addressLine1,
-      [AnswerKey.ukAddressLine2]: address.addressLine2,
+      [AnswerKey.ukAddressLine2]: address.addressLine2 ?? undefined,
       [AnswerKey.ukCountry]: address.country,
-      [AnswerKey.ukCounty]: address.county,
-      [AnswerKey.ukPostcode]: address.postCode,
-      [AnswerKey.ukTownOrCity]: address.townOrCity,
+      [AnswerKey.ukCounty]: address.county ?? undefined,
+      [AnswerKey.ukPostcode]: address.postCode ?? undefined,
+      [AnswerKey.ukTownOrCity]: address.townOrCity ?? undefined,
     };
   }
 
@@ -229,6 +233,17 @@ export class ApplicationDto {
       addressLine4: answers[AnswerKey.osAddressLine4],
       country: countryName ? mapCountryNameToIsoCode(countryName) : "",
     };
+  }
+
+  /**
+   * Extract the prior legal aid answer from the application.
+   * @param application - The application from which to extract the answer.
+   * @returns The prior legal aid answer or an empty string.
+   */
+  private static getPriorLegalAid(application: ApplicationZod): string {
+    const priorLegalAid = application.scopingQuestions?.priorLegalAid;
+
+    return typeof priorLegalAid === "string" ? priorLegalAid : "";
   }
 
   /**
@@ -264,11 +279,11 @@ export class ApplicationDto {
 
     if (this.hasFixedAddress) {
       clientDetails.address = {
-        addressLine1: this.addressLine1,
+        addressLine1: this.addressLine1 ?? "",
         addressLine2: this.addressLine2,
         addressLine3: this.addressLine3,
         addressLine4: this.addressLine4,
-        country: this.country,
+        country: this.country ?? "",
         county: this.county,
         postCode: this.postCode,
         townOrCity: this.townOrCity,

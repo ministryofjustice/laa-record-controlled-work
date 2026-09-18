@@ -7,10 +7,7 @@ import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 
 export const loadApplicationAsAnswers =
   () =>
-  async (
-    context: EditApplicationContext,
-    journeyCode: string,
-  ): Promise<void> => {
+  (context: EditApplicationContext, journeyCode: string): void => {
     const session = context.getSession();
 
     if (!isJourneySession(session)) {
