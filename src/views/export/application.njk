@@ -7,21 +7,26 @@
     <title>Record civil controlled work - Export</title>
   </head>
   <body class="app-export">
-    <main class="govuk-width-container">
-      <p class="govuk-body app-export__case-summary">
-        <span>{{ t("pages.export.client") }}:</span>
-        <strong>{{ clientName or t("pages.export.notProvided") }}</strong>
-        <span>{{ t("pages.export.referenceNumber") }}:</span>
-        <strong>{{ applicationRefNumber or t("pages.export.notProvided") }}</strong>
-      </p>
+    <main class="govuk-main-wrapper">
+      <div class="govuk-width-container">
+        <div>
+          <p class="govuk-body govuk-!-font-size-16">
+            <span>{{ t("pages.export.client") }}:</span>
+            <strong class="govuk-!-margin-right-2">{{ clientName or t("pages.export.notProvided") }}</strong>
+            <span>{{ t("pages.export.referenceNumber") }}:</span>
+            <strong>{{ applicationRefNumber or t("pages.export.notProvided") }}</strong>
+          </p>
 
-      <img
-        class="app-export__logo"
-        src="/views/icons/laa-logo.svg"
-        alt="{{ t('pages.export.logoAlt') }}"
-      >
+          <img
+            class="govuk-!-margin-top-8"
+            width="30%"
+            src="/views/icons/laa-logo.svg"
+            alt="{{ t('pages.export.logoAlt') }}"
+          >
 
-      <h1 class="govuk-heading-xl app-export__heading">{{ config.app.service.name }}</h1>
+          <h1 class="govuk-heading-xl govuk-!-margin-top-2">{{ config.app.service.name }}</h1>
+        </div>
+      </div>
     </main>
   </body>
 </html>
