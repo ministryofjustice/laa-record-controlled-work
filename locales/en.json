@@ -18,6 +18,12 @@
     "index": {
       "defaultHeading": "Landing Page"
     },
+    "export": {
+      "client": "Client",
+      "logoAlt": "Legal Aid Agency logo",
+      "notProvided": "Not provided",
+      "referenceNumber": "Reference number"
+    },
     "error": {
       "404": {
         "title": "Page not found",

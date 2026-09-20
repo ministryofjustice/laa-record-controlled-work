@@ -1,0 +1,52 @@
+.app-export {
+  background: #fff;
+}
+
+.app-export__case-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.app-export__case-summary strong {
+  margin-right: 1rem;
+}
+
+.app-export__logo {
+  display: block;
+  height: auto;
+  margin-top: 2rem;
+  max-width: 320px;
+  width: 30%;
+}
+
+.app-export__heading {
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 40.0625em) {
+  .app-export__logo {
+    max-width: 240px;
+    width: 50%;
+  }
+}
+
+@media print {
+  .app-export {
+    color: #000;
+  }
+
+  .app-export__case-summary {
+    margin-top: 0;
+  }
+
+  .app-export__logo {
+    max-width: 240px;
+    width: 30%;
+  }
+
+  .app-export__heading {
+    break-after: avoid;
+  }
+}
