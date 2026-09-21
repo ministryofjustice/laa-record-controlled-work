@@ -16,11 +16,13 @@ import {
 } from "#/journeys/journey.constants.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
+import * as Sentry from "@sentry/node";
 
 export const loadCaseDetails =
   (deps: ViewApplicationEffectsDeps) =>
   async (context: ViewApplicationContext): Promise<void> => {
     let response;
+    let startTime: number = 0;
 
     try {
       const session = context.getSession();
@@ -36,13 +38,30 @@ export const loadCaseDetails =
         sessionId: session?.id,
       });
 
+      startTime = performance.now();
       response = await deps.getApplication(applicationID, opts);
     } catch (error) {
+      const duration = performance.now() - startTime;
+      Sentry.metrics.distribution("api_response_time", duration, {
+        unit: "millisecond",
+        attributes: {
+          endpoint: "getApplication",
+        }
+      });
       logger.error("Error fetching application", error, {
         api: "getApplication",
       });
       throw ApiResponseError.from(error);
     }
+
+    const duration = performance.now() - startTime;
+    Sentry.metrics.distribution("api_response_time", duration, {
+      unit: "millisecond",
+      attributes: {
+        endpoint: "getApplication",
+        status: response.status,
+      }
+    });
 
     if (response.status !== HTTP_STATUS.OK) {
       logger.error(

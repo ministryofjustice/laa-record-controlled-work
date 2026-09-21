@@ -18,6 +18,8 @@ import { isJourneySession } from "#/journeys/effects.js";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
+import * as Sentry from "@sentry/node";
+
 
 const buildApplicationData = (
   journeyAnswers: Record<string, unknown>,
@@ -55,7 +57,7 @@ export const createApplication =
     journeyCode: string,
   ): Promise<void> => {
     let response: createApplicationResponse;
-
+    let startTime: number = 0;
     try {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Session shape is constrained by app session typing.
       const session = context.getSession() as
@@ -81,9 +83,16 @@ export const createApplication =
         homeAccountId: session.msal?.homeAccountId,
         sessionId: session.id,
       });
-
+      startTime = performance.now();
       response = await deps.createApplication(dataForApi, opts);
     } catch (error) {
+      const duration = performance.now() - startTime;
+      Sentry.metrics.distribution("api_response_time", duration, {
+        unit: "millisecond",
+        attributes: {
+          endpoint: "createApplication",
+        }
+      });
       logger.error(
         `Error creating application for journey ${journeyCode}:`,
         error,
@@ -93,6 +102,15 @@ export const createApplication =
       );
       throw ApiResponseError.from(error);
     }
+
+    const duration = performance.now() - startTime;
+    Sentry.metrics.distribution("api_response_time", duration, {
+      unit: "millisecond",
+      attributes: {
+        endpoint: "createApplication",
+        status: response.status,
+      }
+    });
 
     if (response.status !== HTTP_STATUS.CREATED) {
       logger.error(

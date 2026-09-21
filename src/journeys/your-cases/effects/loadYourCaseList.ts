@@ -13,6 +13,7 @@ import { getAuthDebugHeaders } from "#/auth/auth.debug.js";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
+import * as Sentry from "@sentry/node";
 
 type ApplicationStatus = "COMPLETED" | "DRAFT";
 
@@ -20,23 +21,40 @@ export const loadYourCaseList =
   (deps: YourCasesEffectsDeps) =>
   async (context: CaseListContext, status: ApplicationStatus) => {
     let response;
-
+    let startTime: number = 0;
     try {
       const session = context.getSession();
       const opts = await getRcwApiDefaultOptions({
         homeAccountId: session?.msal?.homeAccountId,
         sessionId: session?.id,
       });
+      startTime = performance.now();
       response = await deps.getApplications(
         { officeId: session?.selectedOffice?.code, status },
         opts,
       );
     } catch (error) {
+      const duration = performance.now() - startTime;
+      Sentry.metrics.distribution("api_response_time", duration, {
+        unit: "millisecond",
+        attributes: {
+          endpoint: "getApplications",
+        }
+      });
       logger.error("Error fetching applications", error, {
         api: "getApplications",
       });
       throw ApiResponseError.from(error);
     }
+
+    const duration = performance.now() - startTime;
+    Sentry.metrics.distribution("api_response_time", duration, {
+      unit: "millisecond",
+      attributes: {
+        endpoint: "getApplications",
+        status: response.status,
+      }
+    });
 
     if (response.status !== HTTP_STATUS.OK) {
       logger.error(
