@@ -1,3 +1,5 @@
+import * as Sentry from "@sentry/node";
+
 import type {
   ViewApplicationContext,
   ViewApplicationEffectsDeps,
@@ -16,13 +18,12 @@ import {
 } from "#/journeys/journey.constants.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
-import * as Sentry from "@sentry/node";
 
 export const loadCaseDetails =
   (deps: ViewApplicationEffectsDeps) =>
   async (context: ViewApplicationContext): Promise<void> => {
     let response;
-    let startTime: number = 0;
+    let startTime = 0;
 
     try {
       const session = context.getSession();
@@ -43,10 +44,10 @@ export const loadCaseDetails =
     } catch (error) {
       const duration = performance.now() - startTime;
       Sentry.metrics.distribution("api_response_time", duration, {
-        unit: "millisecond",
         attributes: {
           endpoint: "getApplication",
-        }
+        },
+        unit: "millisecond",
       });
       logger.error("Error fetching application", error, {
         api: "getApplication",
@@ -56,11 +57,11 @@ export const loadCaseDetails =
 
     const duration = performance.now() - startTime;
     Sentry.metrics.distribution("api_response_time", duration, {
-      unit: "millisecond",
       attributes: {
         endpoint: "getApplication",
         status: response.status,
-      }
+      },
+      unit: "millisecond",
     });
 
     if (response.status !== HTTP_STATUS.OK) {

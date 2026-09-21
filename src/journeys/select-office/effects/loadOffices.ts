@@ -1,3 +1,5 @@
+import * as Sentry from "@sentry/node";
+
 import type {
   SelectOfficeContext,
   SelectOfficeEffectsDeps,
@@ -21,12 +23,11 @@ import { mapAvailableOffices } from "#/journeys/select-office/mappers/mapAvailab
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { PDA_MSW_LAA_ACCOUNTS_HEADER } from "#/lib/constants/pda.js";
 import { logger } from "#/logger.js";
-import * as Sentry from "@sentry/node";
 
 export const loadOffices =
   (deps: SelectOfficeEffectsDeps) => async (context: SelectOfficeContext) => {
     let response;
-    let startTime: number = 0;
+    let startTime = 0;
     const firmCode = getFirmCodeFromSession(context);
     const laaAccounts =
       context.getSession()?.account?.idTokenClaims?.[
@@ -51,10 +52,10 @@ export const loadOffices =
     } catch (error) {
       const duration = performance.now() - startTime;
       Sentry.metrics.distribution("api_response_time", duration, {
-        unit: "millisecond",
         attributes: {
           endpoint: "getAllProviderOffices",
-        }
+        },
+        unit: "millisecond",
       });
       logger.error("Error fetching offices", error, {
         api: "getAllProviderOffices",
@@ -64,11 +65,11 @@ export const loadOffices =
 
     const duration = performance.now() - startTime;
     Sentry.metrics.distribution("api_response_time", duration, {
-      unit: "millisecond",
       attributes: {
         endpoint: "getAllProviderOffices",
         status: response.status,
-      }
+      },
+      unit: "millisecond",
     });
 
     if (response.status !== HTTP_STATUS.OK) {

@@ -1,3 +1,6 @@
+import * as Sentry from "@sentry/node";
+import { stat } from "node:fs";
+
 import type {
   EditApplicationContext,
   EditApplicationEffectsDeps,
@@ -16,8 +19,6 @@ import {
 } from "#/journeys/journey.constants.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
-import * as Sentry from "@sentry/node";
-import { stat } from "node:fs";
 
 const DEFAULT_ETAG = 0;
 
@@ -25,7 +26,7 @@ export const loadApplication =
   (deps: EditApplicationEffectsDeps) =>
   async (context: EditApplicationContext): Promise<void> => {
     let response;
-    let startTime: number = 0;
+    let startTime = 0;
     try {
       const session = context.getSession();
       const applicationID = context.getRequestParam(PARAMS_KEYS.applicationID);
@@ -44,10 +45,10 @@ export const loadApplication =
     } catch (error) {
       const duration = performance.now() - startTime;
       Sentry.metrics.distribution("api_response_time", duration, {
-        unit: "millisecond",
         attributes: {
           endpoint: "getApplication",
-        }
+        },
+        unit: "millisecond",
       });
       logger.error("Error fetching application", error, {
         api: "getApplication",
@@ -56,13 +57,13 @@ export const loadApplication =
     }
     const duration = performance.now() - startTime;
     Sentry.metrics.distribution("api_response_time", duration, {
-      unit: "millisecond",
       attributes: {
         endpoint: "getApplication",
         status: response.status,
-      }
+      },
+      unit: "millisecond",
     });
-    
+
     if (response.status !== HTTP_STATUS.OK) {
       logger.error(
         "getApplication did not return 200",

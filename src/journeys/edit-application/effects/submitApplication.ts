@@ -1,3 +1,5 @@
+import * as Sentry from "@sentry/node";
+
 import type {
   EditApplicationContext,
   EditApplicationEffectsDeps,
@@ -10,7 +12,6 @@ import { getAuthDebugHeaders } from "#/auth/auth.debug.js";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
-import * as Sentry from "@sentry/node";
 // TODO: etag not currently being returned from rcw api, so hardcoding for now.
 // Once rcw api is updated to return etag, this can be removed and the etag can be retrieved from the application data in context.
 const eTag = 1;
@@ -19,7 +20,7 @@ export const submitApplication =
   (deps: EditApplicationEffectsDeps) =>
   async (context: EditApplicationContext): Promise<void> => {
     let response;
-    let startTime: number = 0;
+    let startTime = 0;
     try {
       const session = context.getSession();
       const { id } = context.getData(CONTEXT_DATA_KEYS.application);
@@ -37,10 +38,10 @@ export const submitApplication =
     } catch (error) {
       const duration = performance.now() - startTime;
       Sentry.metrics.distribution("api_response_time", duration, {
-        unit: "millisecond",
         attributes: {
           endpoint: "updateApplicationStatus",
-        }
+        },
+        unit: "millisecond",
       });
       logger.error("Error submitting application", error, {
         api: "updateApplicationStatus",
@@ -50,13 +51,13 @@ export const submitApplication =
 
     const duration = performance.now() - startTime;
     Sentry.metrics.distribution("api_response_time", duration, {
-      unit: "millisecond",
       attributes: {
         endpoint: "updateApplicationStatus",
         status: response.status,
-      }
+      },
+      unit: "millisecond",
     });
-    
+
     if (response.status !== HTTP_STATUS.NO_CONTENT) {
       logger.error(
         "updateApplicationStatus did not return 204",
