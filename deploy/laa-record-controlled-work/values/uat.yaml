@@ -17,6 +17,7 @@ rcw:
     NODE_ENV: uat
     SENTRY_ENV: uat
     SENTRY_DEBUG: true
+    SENTRY_ENABLED: true
     ENTRA_REDIRECT_URI: https://laa-record-controlled-work-uat.cloud-platform.service.justice.gov.uk/auth/code/callback
     ENTRA_ADDITIONAL_SCOPES: https://devlexternal.onmicrosoft.com/laa-record-controlled-work-api-uat/Applications.Read
     RCW_API_BASE_URL: http://laa-record-controlled-work-api.laa-record-controlled-work-api-uat.svc:8081
