@@ -18,7 +18,7 @@ on:
 jobs:
   deploy:
     name: Deploy to ${{ inputs.app-environment }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     environment: ${{ inputs.app-environment }}
     permissions:
       issues: write # needed for labels

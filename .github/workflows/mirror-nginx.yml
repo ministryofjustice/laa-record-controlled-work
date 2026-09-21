@@ -40,7 +40,7 @@ permissions:
 jobs:
   check:
     name: Check
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     outputs:
       tag: ${{ steps.fetch_metadata.outputs.tag }}
       amd64_digest: ${{ steps.fetch_metadata.outputs.amd64_digest }}
@@ -82,7 +82,7 @@ jobs:
     name: Scan and mirror
     needs: check
     if: needs.check.outputs.proceed == 'true'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     outputs:
       ecr_digest: ${{ steps.push.outputs.ecr_digest }}
     steps:
@@ -138,7 +138,7 @@ jobs:
     name: Raise update PR
     needs: [check, scan-and-mirror]
     if: inputs.dry_run != true
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
