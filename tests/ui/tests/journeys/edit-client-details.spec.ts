@@ -1,13 +1,14 @@
 import { expect, test } from "../../fixtures/index.js";
-import {
-  completeApplication,
-} from "../../msw/fixtures/rcw.fixtures.js";
+import { getGetApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
 
 test("Edit Application - Client details journey", async ({
   withSelectedOffice: page,
 }) => {
-  const applicationId = completeApplication.id;
+  const completeApplication = getGetApplicationResponseMock();
+  completeApplication.clientDetails.hasFixedAddress = true;
 
+  const applicationId = completeApplication.id;
+  
   // ==========================================================================
   // Task list page
   // ==========================================================================
