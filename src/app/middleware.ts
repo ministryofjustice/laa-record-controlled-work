@@ -70,34 +70,36 @@ export async function initMiddleware(
   app.use(locale());
 
   // Setup Sentry
-  const sentryDsn = resolveSentryDsn();
+  if (process.env.SENTRY_ENABLED === "true") {
+    const sentryDsn = resolveSentryDsn();
 
-  if (sentryDsn) {
-    Sentry.init({
-      debug: process.env.SENTRY_DEBUG === "true",
-      dsn: sentryDsn,
-      environment: process.env.SENTRY_ENV ?? "production",
-      integrations: [
-        Sentry.httpIntegration(),
-        Sentry.expressIntegration(),
-        nodeProfilingIntegration(),
-      ],
-      // 10% of all requests will be used for performance sampling
-      profilesSampleRate: SENTRY_DEFAULT_SAMPLE_RATE,
-      tracesSampler: (samplingContext: { name?: string }) => {
-        const transactionName = samplingContext.name;
+    if (sentryDsn) {
+      Sentry.init({
+        debug: process.env.SENTRY_DEBUG === "true",
+        dsn: sentryDsn,
+        environment: process.env.SENTRY_ENV ?? "production",
+        integrations: [
+          Sentry.httpIntegration(),
+          Sentry.expressIntegration(),
+          nodeProfilingIntegration(),
+        ],
+        // 10% of all requests will be used for performance sampling
+        profilesSampleRate: SENTRY_DEFAULT_SAMPLE_RATE,
+        tracesSampler: (samplingContext: { name?: string }) => {
+          const transactionName = samplingContext.name;
 
-        if (
-          transactionName &&
-          (transactionName.includes("ping") ||
-            transactionName.includes("/healthcheck"))
-        ) {
-          return SENTRY_HEALTHCHECK_SAMPLE_RATE;
-        }
+          if (
+            transactionName &&
+            (transactionName.includes("ping") ||
+              transactionName.includes("/healthcheck"))
+          ) {
+            return SENTRY_HEALTHCHECK_SAMPLE_RATE;
+          }
 
-        return SENTRY_DEFAULT_SAMPLE_RATE;
-      },
-    });
+          return SENTRY_DEFAULT_SAMPLE_RATE;
+        },
+      });
+    }
   }
   // Setup CSRF protection.
   app.use(csrf);
