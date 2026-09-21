@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers -- super magic faker values */
 import { faker } from "@faker-js/faker";
 
 import {
@@ -6,7 +7,6 @@ import {
   getGetApplicationsResponseMock,
 } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
 
-// eslint-disable-next-line @typescript-eslint/no-magic-numbers -- deterministic test fixtures
 faker.seed(12345);
 
 export const applications = [...getGetApplicationsResponseMock()].sort((a, b) =>
@@ -45,29 +45,29 @@ export const completeApplication = getGetApplicationResponseMock({
 });
 
 export const clientDetailsApplication = getGetApplicationResponseMock({
-    clientDetails: {
-      id: faker.string.uuid(),
-      firstName: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      lastName: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      dateOfBirth: faker.date.past().toISOString().slice(0, 10),
-      niNumber: faker.helpers.fromRegExp(
-        "[A-CEGHJ-NOPR-TW-Z]{2}[0-9]{6}[ABCDs]{1}",
-      ),
-      hasFixedAddress: true,
-      address: {
-        id: null,
-        addressLine1: "1 test lane",
-        addressLine2: "test area",
-        addressLine3: null,
-        addressLine4: null,
-        townOrCity: "Test Town",
-        postCode: "TE57 1NG",
-        county: "Test County",
-        country: "GB",
-        createdAt: faker.date.past().toISOString().slice(0, 19) + "Z",
-        modifiedAt: faker.date.past().toISOString().slice(0, 19) + "Z",
-      },
-      createdAt: faker.date.past().toISOString().slice(0, 19) + "Z",
-      modifiedAt: faker.date.past().toISOString().slice(0, 19) + "Z",
+  clientDetails: {
+    address: {
+      addressLine1: "1 test lane",
+      addressLine2: "test area",
+      addressLine3: null,
+      addressLine4: null,
+      country: "GB",
+      county: "Test County",
+      createdAt: `${faker.date.past().toISOString().slice(0, 19)}Z`,
+      id: null,
+      modifiedAt: `${faker.date.past().toISOString().slice(0, 19)}Z`,
+      postCode: "TE57 1NG",
+      townOrCity: "Test Town",
     },
+    createdAt: `${faker.date.past().toISOString().slice(0, 19)}Z`,
+    dateOfBirth: faker.date.past().toISOString().slice(0, 10),
+    firstName: faker.string.alpha({ length: { max: 20, min: 10 } }),
+    hasFixedAddress: true,
+    id: faker.string.uuid(),
+    lastName: faker.string.alpha({ length: { max: 20, min: 10 } }),
+    modifiedAt: `${faker.date.past().toISOString().slice(0, 19)}Z`,
+    niNumber: faker.helpers.fromRegExp(
+      "[A-CEGHJ-NOPR-TW-Z]{2}[0-9]{6}[ABCDs]{1}",
+    ),
+  },
 });
