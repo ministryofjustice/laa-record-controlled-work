@@ -1,13 +1,11 @@
 import { expect, test } from "../../fixtures/index.js";
-import { getGetApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
-
+import {
+  clientDetailsApplication,
+} from "../../msw/fixtures/rcw.fixtures.js";
 test("Edit Application - Client details journey", async ({
   withSelectedOffice: page,
 }) => {
-  const completeApplication = getGetApplicationResponseMock();
-  completeApplication.clientDetails.hasFixedAddress = true;
-
-  const applicationId = completeApplication.id;
+  const applicationId = clientDetailsApplication.id;
   
   // ==========================================================================
   // Task list page
@@ -42,18 +40,18 @@ test("Edit Application - Client details journey", async ({
       // Accessed legal aid before
       "No",
       // First name
-      completeApplication.clientDetails.firstName,
+      clientDetailsApplication.clientDetails.firstName,
       // Last name
-      completeApplication.clientDetails.lastName,
+      clientDetailsApplication.clientDetails.lastName,
       // Date of birth
-      new Date(completeApplication.clientDetails.dateOfBirth).toLocaleDateString(
+      new Date(clientDetailsApplication.clientDetails.dateOfBirth).toLocaleDateString(
         "en-GB",
         { day: "numeric", month: "long", year: "numeric" },
       ),
       // National insurance number
-      completeApplication.clientDetails.niNumber ?? "",
+      clientDetailsApplication.clientDetails.niNumber ?? "",
       // Address
-      completeApplication.clientDetails.address?.addressLine1 ?? "",
+      clientDetailsApplication.clientDetails.address?.addressLine1 ?? "",
     ],
     { useInnerText: true },
   );
@@ -63,12 +61,12 @@ test("Edit Application - Client details journey", async ({
     .locator(".govuk-summary-list__actions a");
   await expect(changeAddressLink).toHaveAttribute(
     "href",
-    "enter-overseas-address?returnTo=check-answers",
+    "enter-address-manually?returnTo=check-answers",
   );
   await changeAddressLink.click();
 
-  // Verify redirection back to the overseas address entry page
+  // Verify redirection back to the manual address entry page
   await expect(page).toHaveURL(
-    `/cases/${applicationId}/task-list/details/enter-overseas-address?returnTo=check-answers`,
+    `/cases/${applicationId}/task-list/details/enter-address-manually?returnTo=check-answers`,
   );
 });

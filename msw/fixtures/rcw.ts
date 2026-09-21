@@ -43,3 +43,31 @@ export const completeApplication = getGetApplicationResponseMock({
   },
   providerOfficeCode: "R1XEVG",
 });
+
+export const clientDetailsApplication = getGetApplicationResponseMock({
+    clientDetails: {
+      id: faker.string.uuid(),
+      firstName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      lastName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      dateOfBirth: faker.date.past().toISOString().slice(0, 10),
+      niNumber: faker.helpers.fromRegExp(
+        "[A-CEGHJ-NOPR-TW-Z]{2}[0-9]{6}[ABCDs]{1}",
+      ),
+      hasFixedAddress: true,
+      address: {
+        id: null,
+        addressLine1: "1 test lane",
+        addressLine2: "test area",
+        addressLine3: null,
+        addressLine4: null,
+        townOrCity: "Test Town",
+        postCode: "TE57 1NG",
+        county: "Test County",
+        country: "GB",
+        createdAt: faker.date.past().toISOString().slice(0, 19) + "Z",
+        modifiedAt: faker.date.past().toISOString().slice(0, 19) + "Z",
+      },
+      createdAt: faker.date.past().toISOString().slice(0, 19) + "Z",
+      modifiedAt: faker.date.past().toISOString().slice(0, 19) + "Z",
+    },
+});

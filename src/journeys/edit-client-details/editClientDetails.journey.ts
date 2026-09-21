@@ -23,7 +23,7 @@ export const editClientDetailsJourney = journey({
     }),
   ],
   path: "/cases/:applicationID/task-list/details",
-  reachability: { disableReachabilityChecks: false },
+  reachability: { disableReachabilityChecks: true },
   steps: [
     ecfStep(editJourneyCode),
     ineligibleStep(editJourneyCode),

@@ -9,12 +9,13 @@ import {
 
 import {
   applications,
+  clientDetailsApplication,
   completeApplication,
   createApplicationResponse,
   incompleteApplication,
 } from "../fixtures/rcw.fixtures.js";
 
-const applicationFixtures = [incompleteApplication, completeApplication];
+const applicationFixtures = [incompleteApplication, completeApplication, clientDetailsApplication];
 
 export const rcwHandlers = [
   getGetApplicationsMockHandler(applications),
