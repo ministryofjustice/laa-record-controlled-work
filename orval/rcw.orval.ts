@@ -12,6 +12,7 @@ export const rcwConfig = {
     afterAllFilesWrite: [
       "tsx orval/fixDoubleGenImports.ts",
       "tsx orval/fixSchemaAliasExtensions.ts",
+      "tsx orval/fixNinoFakerRegex.ts",
     ],
   },
   input: {
