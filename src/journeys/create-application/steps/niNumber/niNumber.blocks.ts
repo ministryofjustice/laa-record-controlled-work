@@ -25,7 +25,7 @@ const HAS_NI_NUMBER_VALIDATION = t(
   "journeys.createApplication.niNumber.validation.hasNIRequired",
 );
 const NI_NUMBER_REGEX =
-  "^(?!BG|GB|KN|NK|NT|TN|ZZ)[^DFIQUV][^DFIQUVo][0-9]{6}[ABCD]$";
+  "^(?!BG|GB|KN|NK|NT|TN|ZZ)[A-CEGHJ-NOPR-TW-Z]{2}[0-9]{6}[ABCD]$";
 
 /**
  * Creates the National Insurance number input shown when the client has one.
