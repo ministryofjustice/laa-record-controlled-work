@@ -26,4 +26,4 @@ docker compose \
   run --rm --no-deps zap-scan
 
 echo "--- Opening report ---"
-open zap-results/zap-baseline-report.html
+open zap-results/zap-report.html

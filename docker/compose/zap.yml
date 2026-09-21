@@ -3,7 +3,7 @@
 # host` instead, see zap/run-cicd.sh).
 services:
   zap-scan:
-    image: zaproxy/zap-stable
+    image: zaproxy/zap-stable@sha256:05cbf4cab5d2fdaef55b0cd0b586f22d0ce4f75e0995f3cea2db23afbbdfd2f8
     container_name: rcw-zap-scan
     extra_hosts:
       - "host.docker.internal:host-gateway"

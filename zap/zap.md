@@ -58,8 +58,8 @@ Generated files are placed in `zap-results/`:
 | --- | --- |
 | `hars/` | Individual HAR files, one per e2e browser context. |
 | `e2e-suite.har` | The merged e2e traffic imported by ZAP. |
-| `zap-baseline-report.html` | Human-readable report; opened automatically after a local scan. |
-| `zap-baseline-report.json` | JSON version of the report. |
+| `zap-report.html` | Human-readable report; opened automatically after a local scan. |
+| `zap-report.json` | JSON version of the report. |
 | `zap_out.json` | ZAP Automation Framework output summary. |
 
 The scan runs as part of the `.github/workflows/e2e.yml` job, gated to pull requests only. It reuses the stack and HARs from that job's e2e test run, then uploads the reports, merged HAR, and individual HARs as the `zap-scan-reports` artifact for 14 days. Upload and teardown run even when the scan fails.

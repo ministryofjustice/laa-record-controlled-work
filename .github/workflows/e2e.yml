@@ -129,8 +129,8 @@ jobs:
         with:
           name: zap-scan-reports
           path: |
-            zap-results/zap-baseline-report.html
-            zap-results/zap-baseline-report.json
+            zap-results/zap-report.html
+            zap-results/zap-report.json
             zap-results/zap_out.json
             zap-results/e2e-suite.har
             zap-results/hars/
@@ -140,7 +140,7 @@ jobs:
         if: github.event_name == 'pull_request' && always()
         shell: bash
         run: |
-          REPORT="zap-results/zap-baseline-report.json"
+          REPORT="zap-results/zap-report.json"
 
           echo "## 🔐 OWASP ZAP Scan" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
