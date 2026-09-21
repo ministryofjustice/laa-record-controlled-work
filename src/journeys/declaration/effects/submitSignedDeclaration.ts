@@ -12,6 +12,7 @@ import {
 import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
+import * as Sentry from "@sentry/node";
 
 import type {
   DeclarationContext,
@@ -51,7 +52,7 @@ export const submitSignedDeclaration =
     }
 
     let response: updateApplicationDeclarationResponse;
-
+    let startTime: number = 0;
     try {
       const body = {
         dateSigned: date,
@@ -65,21 +66,38 @@ export const submitSignedDeclaration =
         sessionId: session.id,
       });
 
+      startTime = performance.now();
       response = await deps.updateApplicationDeclaration(
         applicationId,
         body,
         opts,
       );
     } catch (error) {
+      const duration = performance.now() - startTime;
+      Sentry.metrics.distribution("api_response_time", duration, {
+        unit: "millisecond",
+        attributes: {
+          endpoint: "updateApplicationDeclaration",
+        }
+      });
       logger.error("Failed to update application declaration", error, {
         api: "updateApplicationDeclaration",
       });
       throw ApiResponseError.from(error);
     }
 
+    const duration = performance.now() - startTime;
+    Sentry.metrics.distribution("api_response_time", duration, {
+      unit: "millisecond",
+      attributes: {
+        endpoint: "updateApplicationDeclaration",
+        status: response.status,
+      }
+    });
+
     if (response.status !== HTTP_STATUS.NO_CONTENT) {
       const error = new ApiResponseError();
-      logger.error("createApplication did not return 204", error, {
+      logger.error("updateApplicationDeclaration did not return 204", error, {
         api: "updateApplicationDeclaration",
         authHeaders: getAuthDebugHeaders(response.headers),
         data: null,

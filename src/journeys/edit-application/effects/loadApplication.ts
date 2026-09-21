@@ -16,6 +16,8 @@ import {
 } from "#/journeys/journey.constants.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
+import * as Sentry from "@sentry/node";
+import { stat } from "node:fs";
 
 const DEFAULT_ETAG = 0;
 
@@ -23,7 +25,7 @@ export const loadApplication =
   (deps: EditApplicationEffectsDeps) =>
   async (context: EditApplicationContext): Promise<void> => {
     let response;
-
+    let startTime: number = 0;
     try {
       const session = context.getSession();
       const applicationID = context.getRequestParam(PARAMS_KEYS.applicationID);
@@ -37,15 +39,30 @@ export const loadApplication =
         homeAccountId: session?.msal?.homeAccountId,
         sessionId: session?.id,
       });
-
+      startTime = performance.now();
       response = await deps.getApplication(applicationID, opts);
     } catch (error) {
+      const duration = performance.now() - startTime;
+      Sentry.metrics.distribution("api_response_time", duration, {
+        unit: "millisecond",
+        attributes: {
+          endpoint: "getApplication",
+        }
+      });
       logger.error("Error fetching application", error, {
         api: "getApplication",
       });
       throw ApiResponseError.from(error);
     }
-
+    const duration = performance.now() - startTime;
+    Sentry.metrics.distribution("api_response_time", duration, {
+      unit: "millisecond",
+      attributes: {
+        endpoint: "getApplication",
+        status: response.status,
+      }
+    });
+    
     if (response.status !== HTTP_STATUS.OK) {
       logger.error(
         "getApplication did not return 200",

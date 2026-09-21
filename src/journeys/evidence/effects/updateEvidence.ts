@@ -16,12 +16,13 @@ import {
 } from "#/journeys/journey.errors.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
+import * as Sentry from "@sentry/node";
 
 export const updateEvidence =
   (deps: EvidenceEffectsDeps) =>
   async (context: EvidenceContext, journeyCode: string): Promise<void> => {
     let response;
-
+    let startTime: number = 0;
     try {
       const session = context.getSession();
 
@@ -54,12 +55,20 @@ export const updateEvidence =
         sessionId: session.id,
       });
 
+      startTime = performance.now();
       response = await deps.updateApplicationEvidence(
         applicationId,
         updateEvidenceReq,
         opts,
       );
     } catch (error) {
+      const duration = performance.now() - startTime;
+      Sentry.metrics.distribution("api_response_time", duration, {
+        unit: "millisecond",
+        attributes: {
+          endpoint: "updateApplicationEvidence",
+        }
+      });
       logger.error(
         `Error updating evidence for journey ${journeyCode}:`,
         error,
@@ -67,6 +76,15 @@ export const updateEvidence =
       );
       throw ApiResponseError.from(error);
     }
+
+    const duration = performance.now() - startTime;
+    Sentry.metrics.distribution("api_response_time", duration, {
+      unit: "millisecond",
+      attributes: {
+        endpoint: "updateApplicationEvidence",
+        status: response.status,
+      }
+    });
 
     if (response.status !== HTTP_STATUS.NO_CONTENT) {
       logger.error(

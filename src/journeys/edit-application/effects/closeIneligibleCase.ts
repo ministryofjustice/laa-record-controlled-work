@@ -2,7 +2,7 @@ import type {
   EditApplicationContext,
   EditApplicationEffectsDeps,
 } from "#/journeys/edit-application/editApplication.types.js";
-
+import * as Sentry from "@sentry/node";
 import { getRcwApiDefaultOptions } from "#/api/clients/getRcwApiDefaultOptions.js";
 import {
   CONTEXT_DATA_KEYS,
@@ -27,6 +27,8 @@ export const closeIneligibleCase =
       homeAccountId: session?.msal?.homeAccountId,
       sessionId: session?.id,
     });
+    let startTime: number = 0;
+    startTime = performance.now();
     const response = await deps.updateApplicationStatus(
       applicationID,
       {
@@ -35,6 +37,14 @@ export const closeIneligibleCase =
       },
       options,
     );
+    const duration = performance.now() - startTime;
+    Sentry.metrics.distribution("api_response_time", duration, {
+      unit: "millisecond",
+      attributes: {
+        endpoint: "updateApplicationStatus",
+        status: response.status,
+      }
+    });
 
     if (response.status !== HTTP_STATUS.NO_CONTENT) {
       throw new Error("updateApplicationStatus did not return 204");
