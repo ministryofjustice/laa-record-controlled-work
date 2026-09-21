@@ -217,7 +217,7 @@ export class EntraService {
   public async refreshToken(
     homeAccountId: string,
     scopes: readonly string[],
-  ): Promise<Either<TokenRefreshError, string>> {
+  ): Promise<Either<TokenRefreshError, AuthenticationResult>> {
     const account = await this.msalClient
       .getTokenCache()
       .getAccountByHomeId(homeAccountId);
@@ -232,7 +232,7 @@ export class EntraService {
         scopes: [...scopes],
       });
 
-    return success(result.accessToken);
+    return success(result);
   }
 
   /**

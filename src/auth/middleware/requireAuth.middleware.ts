@@ -1,8 +1,9 @@
 import type { NextFunction, Request, RequestHandler, Response } from "express";
 import type { SessionData } from "express-session";
 
-import { refreshAuthToken } from "#/auth/actions/refreshAuthToken.action.js";
+import { refreshToken } from "#/auth/actions/refreshToken.action.js";
 import { AuthenticationError } from "#/auth/auth.errors.js";
+import { updateSessionAuth } from "#/auth/domain/updateSessionAuth.js";
 import { logger } from "#/logger.js";
 
 /**
@@ -43,17 +44,17 @@ export function requireAuth(): RequestHandler {
       const { homeAccountId, idToken } = session.account ?? {};
       const { exp } = session.account?.idTokenClaims ?? {};
 
-      logger.debug("requireAuth(): Checking user auth");
+      logger.info("requireAuth(): Checking user auth");
 
       if (IGNORED_AUTH_PATHS.includes(req.originalUrl)) {
-        logger.debug("requireAuth(): Skipping ignored path");
+        logger.info("requireAuth(): Skipping ignored path");
         next();
       }
 
       // Does the user have a valid auth token?
       // TODO We should decode the ID Token and check against the decoded claims instead of relying on the session data, but this is fine until we can implement that.
       if (homeAccountId === undefined || idToken === undefined) {
-        logger.debug("requireAuth(): No auth token");
+        logger.info("requireAuth(): No auth token");
         delete req.session.account;
         res.redirect("/auth/signin");
         return;
@@ -61,14 +62,21 @@ export function requireAuth(): RequestHandler {
 
       // Is the token expired?
       if (exp === undefined || exp <= NOW) {
-        logger.debug("requireAuth(): User auth expired, attempting refresh");
-        await refreshAuthToken(homeAccountId, sessionId);
-        return;
+        logger.info("requireAuth(): User auth expired, attempting refresh");
+        const result = await refreshToken(homeAccountId, sessionId);
+
+        if (result.error) {
+          delete req.session.account;
+          res.redirect("/auth/signin");
+          return;
+        }
+
+        updateSessionAuth(session, result.value);
       }
 
       // Does the user have a selected office? If not, redirect to the office selection page.
       if (session.selectedOffice === undefined) {
-        logger.debug("requireAuth(): No selected office");
+        logger.info("requireAuth(): No selected office");
         if (req.url !== "/select-office") {
           res.redirect("/select-office");
         }

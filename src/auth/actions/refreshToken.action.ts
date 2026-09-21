@@ -1,23 +1,22 @@
-import type {
-  NotAuthenticatedError,
-  TokenRefreshError,
-} from "#/auth/auth.errors.js";
+import type { AuthenticationResult } from "@azure/msal-node";
+
+import type { TokenRefreshError } from "#/auth/auth.errors.js";
 
 import { EntraService } from "#/auth/entra.service.js";
 import config from "#/config.js";
 import { type Either, failure, success } from "#/lib/either.js";
 
 /**
- * Refreshes the current Entra access token for the authenticated session context.
+ * Refreshes an Entra Access Token.
  *
- * @param homeAccountId - MSAL account reference stored in session.
- * @param sessionId - Session identifier used for scoped MSAL cache access.
+ * @param homeAccountId - MSAL account reference stored in `session.account.homeAccountId`.
+ * @param sessionId - Session identifier stored in `session.id`.
  * @returns Either a refreshed access token or an auth-related refresh error.
  */
-export async function refreshAuthToken(
+export async function refreshToken(
   homeAccountId: string,
   sessionId: string,
-): Promise<Either<NotAuthenticatedError | TokenRefreshError, string>> {
+): Promise<Either<TokenRefreshError, AuthenticationResult>> {
   const entraService = EntraService.create({ sessionId });
 
   const tokenResult = await entraService.refreshToken(
