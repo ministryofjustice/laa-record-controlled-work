@@ -142,7 +142,7 @@ export class ApplicationDto {
       throw new Error("Address is not defined in the application.");
     }
 
-    return address.country === "United Kingdom"
+    return address.country === "GB"
       ? this.getAnswersFromUkAddress(address)
       : this.getAnswersFromOverseasAddress(address);
   }
