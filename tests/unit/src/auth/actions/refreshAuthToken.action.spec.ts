@@ -2,7 +2,7 @@ import { expect } from "chai";
 import { afterEach, describe, it } from "mocha";
 import sinon from "sinon";
 
-import { refreshAuthToken } from "#/auth/actions/refreshAuthToken.action.js";
+import { refreshToken } from "#/auth/actions/refreshToken.action.js";
 import {
   NotAuthenticatedError,
   TokenRefreshError,
@@ -23,7 +23,7 @@ describe("refreshAuthToken", () => {
   it("returns NotAuthenticatedError when session id is missing", async () => {
     sinon.stub(logger, "warn");
 
-    const result = await refreshAuthToken(HOME_ACCOUNT_ID, undefined);
+    const result = await refreshToken(HOME_ACCOUNT_ID, undefined);
 
     expect(result.error).to.be.instanceOf(NotAuthenticatedError);
   });
@@ -31,7 +31,7 @@ describe("refreshAuthToken", () => {
   it("returns NotAuthenticatedError when account reference is missing", async () => {
     sinon.stub(logger, "warn");
 
-    const result = await refreshAuthToken(undefined, SESSION_ID);
+    const result = await refreshToken(undefined, SESSION_ID);
 
     expect(result.error).to.be.instanceOf(NotAuthenticatedError);
   });
@@ -44,12 +44,13 @@ describe("refreshAuthToken", () => {
       acquireDownstreamAccessToken,
     } as unknown as EntraService);
 
-    const result = await refreshAuthToken(
+    const result = await refreshToken(
       ` ${HOME_ACCOUNT_ID} `,
       ` ${SESSION_ID} `,
     );
 
-    expect(createStub.calledOnceWithExactly({ sessionId: SESSION_ID })).to.be.true;
+    expect(createStub.calledOnceWithExactly({ sessionId: SESSION_ID })).to.be
+      .true;
     expect(
       acquireDownstreamAccessToken.calledOnceWithExactly(
         HOME_ACCOUNT_ID,
@@ -68,7 +69,7 @@ describe("refreshAuthToken", () => {
         .resolves(failure(tokenRefreshError)),
     } as unknown as EntraService);
 
-    const result = await refreshAuthToken(HOME_ACCOUNT_ID, SESSION_ID);
+    const result = await refreshToken(HOME_ACCOUNT_ID, SESSION_ID);
 
     expect(result.error).to.equal(tokenRefreshError);
   });
