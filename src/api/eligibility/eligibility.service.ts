@@ -1,6 +1,8 @@
-import {
-  type getApplication,
-  type updateApplicationMeans,
+import * as Sentry from "@sentry/node";
+
+import type {
+  getApplication,
+  updateApplicationMeans,
 } from "#/api/clients/rcw/schema/applications/applications.gen.js";
 
 import { getRcwApiDefaultOptions } from "#/api/clients/getRcwApiDefaultOptions.js";
@@ -14,7 +16,6 @@ import { NotAuthenticatedError } from "#/auth/auth.errors.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { type Either, failure, success } from "#/lib/either.js";
 import { logger } from "#/logger.js";
-import * as Sentry from "@sentry/node";
 
 export interface EligibilityAssessment {
   data: Record<string, unknown>;
@@ -69,7 +70,7 @@ export async function loadEligibilityAssessment(
   const { applicationId, homeAccountId, sessionId } = params;
 
   let response;
-  let startTime: number = 0;
+  let startTime = 0;
   try {
     const opts = await getRcwApiDefaultOptions({ homeAccountId, sessionId });
 
@@ -78,10 +79,10 @@ export async function loadEligibilityAssessment(
   } catch (error) {
     const duration = performance.now() - startTime;
     Sentry.metrics.distribution("api_response_time", duration, {
-      unit: "millisecond",
       attributes: {
         endpoint: "getApplication",
-      }
+      },
+      unit: "millisecond",
     });
 
     if (error instanceof NotAuthenticatedError) {
@@ -99,11 +100,11 @@ export async function loadEligibilityAssessment(
   }
   const duration = performance.now() - startTime;
   Sentry.metrics.distribution("api_response_time", duration, {
-    unit: "millisecond",
     attributes: {
       endpoint: "getApplication",
       status: response.status,
-    }
+    },
+    unit: "millisecond",
   });
   if (response.status !== HTTP_STATUS.OK) {
     logger.error(
@@ -158,7 +159,7 @@ export async function saveEligibilityAssessment(
 
   const { data, result } = splitEligibilityAssessment(eligibilityAssessment);
 
-  let startTime: number = 0;
+  let startTime = 0;
   let response;
   try {
     const opts = await getRcwApiDefaultOptions({
@@ -175,10 +176,10 @@ export async function saveEligibilityAssessment(
   } catch (error) {
     const duration = performance.now() - startTime;
     Sentry.metrics.distribution("api_response_time", duration, {
-      unit: "millisecond",
       attributes: {
         endpoint: "updateApplicationMeans",
-      }
+      },
+      unit: "millisecond",
     });
     if (error instanceof NotAuthenticatedError) {
       return failure(error);
@@ -189,14 +190,14 @@ export async function saveEligibilityAssessment(
     });
     return failure(SaveEligibilityAssessmentError.from(error));
   }
-  
+
   const duration = performance.now() - startTime;
   Sentry.metrics.distribution("api_response_time", duration, {
-    unit: "millisecond",
     attributes: {
       endpoint: "updateApplicationMeans",
       status: response.status,
-    }
+    },
+    unit: "millisecond",
   });
 
   if (response.status !== HTTP_STATUS.NO_CONTENT) {

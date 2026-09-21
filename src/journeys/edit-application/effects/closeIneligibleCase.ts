@@ -1,8 +1,10 @@
+import * as Sentry from "@sentry/node";
+
 import type {
   EditApplicationContext,
   EditApplicationEffectsDeps,
 } from "#/journeys/edit-application/editApplication.types.js";
-import * as Sentry from "@sentry/node";
+
 import { getRcwApiDefaultOptions } from "#/api/clients/getRcwApiDefaultOptions.js";
 import {
   CONTEXT_DATA_KEYS,
@@ -27,7 +29,7 @@ export const closeIneligibleCase =
       homeAccountId: session?.msal?.homeAccountId,
       sessionId: session?.id,
     });
-    let startTime: number = 0;
+    let startTime = 0;
     startTime = performance.now();
     const response = await deps.updateApplicationStatus(
       applicationID,
@@ -39,11 +41,11 @@ export const closeIneligibleCase =
     );
     const duration = performance.now() - startTime;
     Sentry.metrics.distribution("api_response_time", duration, {
-      unit: "millisecond",
       attributes: {
         endpoint: "updateApplicationStatus",
         status: response.status,
-      }
+      },
+      unit: "millisecond",
     });
 
     if (response.status !== HTTP_STATUS.NO_CONTENT) {

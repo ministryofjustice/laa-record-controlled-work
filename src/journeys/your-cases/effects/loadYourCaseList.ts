@@ -1,3 +1,5 @@
+import * as Sentry from "@sentry/node";
+
 import type {
   CaseListContext,
   YourCasesEffectsDeps,
@@ -13,7 +15,6 @@ import { getAuthDebugHeaders } from "#/auth/auth.debug.js";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
-import * as Sentry from "@sentry/node";
 
 type ApplicationStatus = "COMPLETED" | "DRAFT";
 
@@ -21,7 +22,7 @@ export const loadYourCaseList =
   (deps: YourCasesEffectsDeps) =>
   async (context: CaseListContext, status: ApplicationStatus) => {
     let response;
-    let startTime: number = 0;
+    let startTime = 0;
     try {
       const session = context.getSession();
       const opts = await getRcwApiDefaultOptions({
@@ -36,10 +37,10 @@ export const loadYourCaseList =
     } catch (error) {
       const duration = performance.now() - startTime;
       Sentry.metrics.distribution("api_response_time", duration, {
-        unit: "millisecond",
         attributes: {
           endpoint: "getApplications",
-        }
+        },
+        unit: "millisecond",
       });
       logger.error("Error fetching applications", error, {
         api: "getApplications",
@@ -49,11 +50,11 @@ export const loadYourCaseList =
 
     const duration = performance.now() - startTime;
     Sentry.metrics.distribution("api_response_time", duration, {
-      unit: "millisecond",
       attributes: {
         endpoint: "getApplications",
         status: response.status,
-      }
+      },
+      unit: "millisecond",
     });
 
     if (response.status !== HTTP_STATUS.OK) {

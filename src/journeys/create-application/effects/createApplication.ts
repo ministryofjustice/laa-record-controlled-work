@@ -1,6 +1,8 @@
 import type { EffectFunctionContext } from "@ministryofjustice/hmpps-forge/core";
 import type { Session, SessionData } from "express-session";
 
+import * as Sentry from "@sentry/node";
+
 import type { CreateApplicationRequestBody } from "#/api/clients/rcw/model/createApplicationRequestBody.zod.gen.js";
 import type { createApplicationResponse } from "#/api/clients/rcw/schema/applications/applications.gen.js";
 import type { CreateApplicationEffectsDeps } from "#/journeys/create-application/create-application.types.js";
@@ -18,8 +20,6 @@ import { isJourneySession } from "#/journeys/effects.js";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
-import * as Sentry from "@sentry/node";
-
 
 const buildApplicationData = (
   journeyAnswers: Record<string, unknown>,
@@ -57,7 +57,7 @@ export const createApplication =
     journeyCode: string,
   ): Promise<void> => {
     let response: createApplicationResponse;
-    let startTime: number = 0;
+    let startTime = 0;
     try {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Session shape is constrained by app session typing.
       const session = context.getSession() as
@@ -88,10 +88,10 @@ export const createApplication =
     } catch (error) {
       const duration = performance.now() - startTime;
       Sentry.metrics.distribution("api_response_time", duration, {
-        unit: "millisecond",
         attributes: {
           endpoint: "createApplication",
-        }
+        },
+        unit: "millisecond",
       });
       logger.error(
         `Error creating application for journey ${journeyCode}:`,
@@ -105,11 +105,11 @@ export const createApplication =
 
     const duration = performance.now() - startTime;
     Sentry.metrics.distribution("api_response_time", duration, {
-      unit: "millisecond",
       attributes: {
         endpoint: "createApplication",
         status: response.status,
-      }
+      },
+      unit: "millisecond",
     });
 
     if (response.status !== HTTP_STATUS.CREATED) {
