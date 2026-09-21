@@ -3,7 +3,7 @@ import { access, journey } from "@ministryofjustice/hmpps-forge/core/authoring";
 import { CreateApplicationEffects } from "#/journeys/create-application/create-application.effects.js";
 import { clientDetailsStep } from "#/journeys/create-application/steps/clientDetails/clientDetails.step.js";
 import { declarationStep } from "#/journeys/create-application/steps/declaration/declaration.step.js";
-import { enterAddressManuallyStep } from "#/journeys/create-application/steps/enter-address-manually.step.js";
+import { enterAddressManuallyStep } from "#/journeys/create-application/steps/enterAdressManually/enterAddressManually.step.js";
 import { enterOverseasAddressStep } from "#/journeys/create-application/steps/enter-overseas-address.step.js";
 import { haveAHomeAddressStep } from "#/journeys/create-application/steps/haveAHomeAddress/haveAHomeAddress.step.js";
 import { legalAidLast6MonthsStep } from "#/journeys/create-application/steps/legalAidLast6Months/legalAidLast6Months.step.js";
