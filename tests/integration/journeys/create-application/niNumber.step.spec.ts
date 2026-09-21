@@ -83,24 +83,44 @@ describe("NI number step", () => {
       );
     });
 
-    it("shows a validation error if the NI number contains lowercase letters", async () => {
+    it("accepts lowercase letters in a valid NI number", async () => {
       const result = await client.post("/cases/new/ni-number", {
-        body: { hasNINumber: "yes", niNumber: "js101010D" }, // gitleaks:allow - fake NI number used to test invalid format validation
+        body: { hasNINumber: "yes", niNumber: "js101010D" }, // gitleaks:allow - fake NI number used to test lowercase acceptance
       });
-      expect(result.type).to.equal("render");
-      const renderResult = result as TestRenderResult;
-      expect(renderResult.context.showValidationFailures).to.equal(true);
-      expect(
-        renderResult.getValidationErrorsByFieldCode(niNumberfieldCode)[0]
-          .message,
-      ).to.equal(
-        "Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C",
-      );
+      expect(result.type).to.equal("redirect");
+      const redirectResult = result as TestRedirectResult;
+      expect(redirectResult.url).to.equal("/cases/new/have-a-home-address");
+    });
+
+    it("shows a validation error for other invalid standard formats", async () => {
+      for (const niNumber of ["BG123456C", "AO123456C", "AB123456s"]) {
+        const result = await client.post("/cases/new/ni-number", {
+          body: { hasNINumber: "yes", niNumber }, // gitleaks:allow - fake NI number used to test invalid format validation
+        });
+        expect(result.type).to.equal("render");
+        const renderResult = result as TestRenderResult;
+        expect(renderResult.context.showValidationFailures).to.equal(true);
+        expect(
+          renderResult.getValidationErrorsByFieldCode(niNumberfieldCode)[0]
+            .message,
+        ).to.equal(
+          "Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C",
+        );
+      }
     });
 
     it("redirects to the home address step when a valid NI number is given", async () => {
       const result = await client.post("/cases/new/ni-number", {
         body: { hasNINumber: "yes", niNumber: "JN123456A" }, // gitleaks:allow - fake NI number used to test valid format acceptance
+      });
+      expect(result.type).to.equal("redirect");
+      const redirectResult = result as TestRedirectResult;
+      expect(redirectResult.url).to.equal("/cases/new/have-a-home-address");
+    });
+
+    it("accepts formatted NI numbers and normalizes them before continuing", async () => {
+      const result = await client.post("/cases/new/ni-number", {
+        body: { hasNINumber: "yes", niNumber: "j.n12-3456a" }, // gitleaks:allow - fake NI number used to test normalization
       });
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;

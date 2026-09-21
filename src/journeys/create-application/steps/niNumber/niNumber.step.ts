@@ -44,6 +44,9 @@ export function niNumberStep(journeyCode: string): StepDefinition {
 
 const saveNiNumber = (journeyCode: string): SubmitHook =>
   submit({
+    onAlways: {
+      effects: [CreateApplicationEffects.normaliseNiNumber()],
+    },
     onValid: {
       effects: [CreateApplicationEffects.saveDraftAnswers(journeyCode)],
       next: [redirectToCheckAnswers, redirectToHomeAddress],

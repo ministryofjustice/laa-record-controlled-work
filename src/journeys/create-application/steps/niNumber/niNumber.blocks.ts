@@ -24,8 +24,9 @@ const INVALID_VALIDATION = t(
 const HAS_NI_NUMBER_VALIDATION = t(
   "journeys.createApplication.niNumber.validation.hasNIRequired",
 );
+const NI_NUMBER_MAX_LENGTH = 13;
 const NI_NUMBER_REGEX =
-  "^(?!BG|GB|KN|NK|NT|TN|ZZ)[A-CEGHJ-NOPR-TW-Z]{2}[0-9]{6}[ABCD]$";
+  "^(?!BG|GB|KN|NK|NT|TN|ZZ)(?![DFIQUV])[A-Z](?![DFIQUVO])[A-Z][0-9]{6}[ABCD]$";
 
 /**
  * Creates the National Insurance number input shown when the client has one.
@@ -34,10 +35,12 @@ const NI_NUMBER_REGEX =
  */
 export function niNumberInput(): GovUKTextInput {
   return GovUKTextInput({
+    attributes: { maxlength: NI_NUMBER_MAX_LENGTH },
     classes: "govuk-input--width-10",
     code: AnswerKey.niNumber,
     dependentWhen: Answer(AnswerKey.hasNINumber).match(Condition.Equals("yes")),
     label: LABEL,
+    spellcheck: false,
     validWhen: [
       validation({
         condition: Self().match(Condition.IsRequired()),
