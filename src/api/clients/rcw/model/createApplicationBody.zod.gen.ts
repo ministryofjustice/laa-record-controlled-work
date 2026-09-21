@@ -10,7 +10,7 @@ export const createApplicationBodyClientDetailsNiNumberMin = 9;
 export const createApplicationBodyClientDetailsNiNumberMax = 9;
 
 export const createApplicationBodyClientDetailsNiNumberRegExp = new RegExp(
-  "[A-CEGHJ-NOPR-TW-Z]{2}[0-9]{6}[ABCDs]{1}",
+  "^(?!BG|GB|KN|NK|NT|TN|ZZ)(?![DFIQUV])[A-Z](?![DFIQUVO])[A-Z][0-9]{6}[ABCD]$",
 );
 export const createApplicationBodyClientDetailsAddressCountryMax = 2;
 
