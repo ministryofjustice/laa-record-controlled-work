@@ -1,0 +1,10 @@
+.app-export {
+  background: #fff;
+  margin: 0;
+}
+
+@media print {
+  .app-export {
+    color: #000;
+  }
+}

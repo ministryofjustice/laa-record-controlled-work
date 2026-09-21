@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/css/{{ getAsset('main', 'css') }}">
+    <title>Record civil controlled work - Export</title>
+  </head>
+  <body class="app-export">
+    <main class="govuk-main-wrapper">
+      <div class="govuk-width-container">
+        <div>
+          <p class="govuk-body govuk-!-font-size-16">
+            <span>{{ t("pages.export.client") }}:</span>
+            <strong class="govuk-!-margin-right-2">{{ clientName or t("pages.export.notProvided") }}</strong>
+            <span>{{ t("pages.export.referenceNumber") }}:</span>
+            <strong>{{ applicationRefNumber or t("pages.export.notProvided") }}</strong>
+          </p>
+
+          <img
+            class="govuk-!-margin-top-8"
+            width="30%"
+            src="/views/icons/laa-logo.svg"
+            alt="{{ t('pages.export.logoAlt') }}"
+          >
+
+          <h1 class="govuk-heading-xl govuk-!-margin-top-2">{{ config.app.service.name }}</h1>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

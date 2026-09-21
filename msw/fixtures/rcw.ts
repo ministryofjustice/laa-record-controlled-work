@@ -41,4 +41,5 @@ export const completeApplication = getGetApplicationResponseMock({
     expenditureCapitalEvidenceChecklist: { complete: true },
     incomeEvidenceChecklist: { complete: true },
   },
+  providerOfficeCode: "R1XEVG",
 });
