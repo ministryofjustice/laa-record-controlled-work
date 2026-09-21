@@ -5,6 +5,7 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
 import type { JourneySession } from "./context.type.ts";
+import { logger } from "#/logger.js";
 
 export const isJourneySession = (value: unknown): value is JourneySession =>
   typeof value === "object" && value !== null;

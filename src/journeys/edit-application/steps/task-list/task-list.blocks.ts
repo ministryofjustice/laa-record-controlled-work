@@ -64,7 +64,7 @@ export function taskList(): BlockDefinition[] {
         taskItem(
           t("journeys.editApplication.taskList.clientDetails.taskItem.label"),
           Format(
-            "/cases/%1/edit-client-details/?destination=check-answers",
+            "/cases/%1/task-list/details/?destination=check-answers",
             Params(PARAMS_KEYS.applicationID),
           ),
           Data(CONTEXT_DATA_KEYS.clientDetailsStatus),

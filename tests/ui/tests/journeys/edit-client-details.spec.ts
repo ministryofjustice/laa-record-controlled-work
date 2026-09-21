@@ -16,7 +16,7 @@ test("Edit Application - Client details journey", async ({
   await page.goto(`/cases/${applicationId}/task-list`);
 
   // Click the client details link
-  await page.click(`a[href$="/cases/${applicationId}/edit-client-details/?destination=check-answers"]`);
+  await page.click(`a[href$="/cases/${applicationId}/task-list/details/?destination=check-answers"]`);
 
   // ==========================================================================
   // Check answers page
@@ -68,6 +68,6 @@ test("Edit Application - Client details journey", async ({
 
   // Verify redirection back to the overseas address entry page
   await expect(page).toHaveURL(
-    `/cases/${applicationId}/edit-client-details/enter-overseas-address?returnTo=check-answers`,
+    `/cases/${applicationId}/task-list/details/enter-overseas-address?returnTo=check-answers`,
   );
 });

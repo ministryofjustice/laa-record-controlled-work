@@ -22,8 +22,8 @@ export const editClientDetailsJourney = journey({
       effects: [editClientDetailsEffects.loadDraftAnswers(editJourneyCode)],
     }),
   ],
-  path: "/cases/:applicationID/edit-client-details",
-  reachability: { disableReachabilityChecks: true },
+  path: "/cases/:applicationID/task-list/details",
+  reachability: { disableReachabilityChecks: false },
   steps: [
     ecfStep(editJourneyCode),
     ineligibleStep(editJourneyCode),

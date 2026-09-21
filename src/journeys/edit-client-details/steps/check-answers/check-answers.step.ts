@@ -5,6 +5,7 @@ import {
   redirect,
   step,
   submit,
+  tieBreaker,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
 import {
@@ -43,6 +44,9 @@ export const checkAnswersStep = (
       }),
     ],
     path: "/check-answers",
-    reachability: { entryWhen: true },
+    reachability: {
+      entryWhen: true,
+      tieBreakers: [tieBreaker({ priority: 100 })],
+    },
     title: t("journeys.createApplication.checkAnswers.title"),
   });
