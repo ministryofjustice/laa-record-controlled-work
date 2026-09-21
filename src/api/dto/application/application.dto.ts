@@ -3,7 +3,10 @@ import type { CreateApplicationRequestBody } from "#/api/clients/rcw/model/creat
 import type { AnswersOutput } from "#/journeys/create-application/data/answers.zod.js";
 
 import { AnswerKey } from "#/journeys/AnswerKey.enum.js";
-import { mapCountryNameToIsoCode, mapIsoCodeToCountryName } from "#/lib/countries.js";
+import {
+  mapCountryNameToIsoCode,
+  mapIsoCodeToCountryName,
+} from "#/lib/countries.js";
 
 interface Application {
   addressLine1?: string;

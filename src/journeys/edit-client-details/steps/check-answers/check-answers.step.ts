@@ -17,6 +17,8 @@ import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
 import { submitButton } from "#/journeys/shared.blocks.js";
 import { t } from "#/lib/i18n.js";
 
+const tieBreakerPriority = 100;
+
 export const checkAnswersStep = (
   journeyCode: string,
 ): ReturnType<typeof step> =>
@@ -46,7 +48,7 @@ export const checkAnswersStep = (
     path: "/check-answers",
     reachability: {
       entryWhen: true,
-      tieBreakers: [tieBreaker({ priority: 100 })],
+      tieBreakers: [tieBreaker({ priority: tieBreakerPriority })],
     },
     title: t("journeys.createApplication.checkAnswers.title"),
   });
