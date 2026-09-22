@@ -8,9 +8,7 @@ import {
   tieBreaker,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
-import {
-  summaryList,
-} from "#/journeys/create-application/steps/checkAnswers/checkAnswers.blocks.js";
+import { summaryList } from "#/journeys/create-application/steps/checkAnswers/checkAnswers.blocks.js";
 import { editClientDetailsEffects } from "#/journeys/edit-client-details/editClientDetails.effects.js";
 import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
 import { heading, submitButton } from "#/journeys/shared.blocks.js";
