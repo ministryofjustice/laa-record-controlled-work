@@ -4,6 +4,7 @@ import type { EditApplicationContext } from "#/journeys/edit-application/editApp
 import { ApplicationDto } from "#/api/dto/application/application.dto.js";
 import { isJourneySession } from "#/journeys/effects.js";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
+import { getJourneyDraftKey } from "#/journeys/journeyDraftKey.js";
 
 export const loadApplicationAsAnswers =
   () =>
@@ -14,7 +15,9 @@ export const loadApplicationAsAnswers =
       return;
     }
 
-    if (session.journeyDrafts?.[journeyCode]) {
+    const draftKey = getJourneyDraftKey(context, journeyCode);
+
+    if (session.journeyDrafts?.[draftKey]) {
       return;
     }
 
@@ -30,8 +33,8 @@ export const loadApplicationAsAnswers =
 
     session.journeyDrafts ??= {};
 
-    session.journeyDrafts[journeyCode] = {
-      ...session.journeyDrafts[journeyCode],
+    session.journeyDrafts[draftKey] = {
+      ...session.journeyDrafts[draftKey],
       ...context.getAllAnswers(),
     };
   };

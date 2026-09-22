@@ -6,6 +6,8 @@ import {
 
 import type { JourneySession } from "./context.type.ts";
 
+import { getJourneyDraftKey } from "./journeyDraftKey.js";
+
 export const isJourneySession = (value: unknown): value is JourneySession =>
   typeof value === "object" && value !== null;
 
@@ -32,8 +34,10 @@ export const clearAllDraftAnswers =
       return;
     }
 
+    const draftKey = getJourneyDraftKey(context, journeyCode);
+
     if (session.journeyDrafts) {
-      const { [journeyCode]: _selectedJourneyDraft, ...otherJourneyDrafts } =
+      const { [draftKey]: _selectedJourneyDraft, ...otherJourneyDrafts } =
         session.journeyDrafts;
 
       session.journeyDrafts = otherJourneyDrafts;
@@ -57,8 +61,10 @@ export const clearFieldAnswers =
       return;
     }
 
-    if (session.journeyDrafts?.[journeyCode]) {
-      const { [journeyCode]: selectedJourneyDraft, ...otherJourneyDrafts } =
+    const draftKey = getJourneyDraftKey(context, journeyCode);
+
+    if (session.journeyDrafts?.[draftKey]) {
+      const { [draftKey]: selectedJourneyDraft, ...otherJourneyDrafts } =
         session.journeyDrafts;
 
       const selectedJourneyWithRemovedFields = Object.fromEntries(
@@ -69,7 +75,7 @@ export const clearFieldAnswers =
 
       session.journeyDrafts = {
         ...otherJourneyDrafts,
-        [journeyCode]: selectedJourneyWithRemovedFields,
+        [draftKey]: selectedJourneyWithRemovedFields,
       };
     }
 
@@ -87,7 +93,8 @@ export const loadDraftAnswers =
       return;
     }
 
-    const stored = session.journeyDrafts?.[journeyCode];
+    const draftKey = getJourneyDraftKey(context, journeyCode);
+    const stored = session.journeyDrafts?.[draftKey];
 
     if (!stored) {
       return;
@@ -109,10 +116,12 @@ export const saveDraftAnswers =
       return;
     }
 
+    const draftKey = getJourneyDraftKey(context, journeyCode);
+
     session.journeyDrafts ??= {};
 
-    session.journeyDrafts[journeyCode] = {
-      ...session.journeyDrafts[journeyCode],
+    session.journeyDrafts[draftKey] = {
+      ...session.journeyDrafts[draftKey],
       ...context.getAllAnswers(),
     };
   };

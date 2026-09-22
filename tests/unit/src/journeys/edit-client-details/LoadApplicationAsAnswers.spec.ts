@@ -7,7 +7,7 @@ import type { EditApplicationContext } from "#/journeys/edit-application/editApp
 
 import { ApplicationDto } from "#/api/dto/application/application.dto.js";
 import { loadApplicationAsAnswers } from "#/journeys/edit-client-details/effects/loadApplicationAsAnswers.js";
-import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
+import { CONTEXT_DATA_KEYS, PARAMS_KEYS } from "#/journeys/journey.constants.js";
 
 describe("loadApplicationAsAnswers", () => {
   const journeyCode = "editClientDetails";
@@ -19,6 +19,7 @@ describe("loadApplicationAsAnswers", () => {
 
   let context: EditApplicationContext;
   let getData: sinon.SinonStub;
+  let getRequestParam: sinon.SinonStub;
   let getSession: sinon.SinonStub;
   let getAllAnswers: sinon.SinonStub;
   let setAnswer: sinon.SinonStub;
@@ -29,12 +30,17 @@ describe("loadApplicationAsAnswers", () => {
       .stub()
       .withArgs(CONTEXT_DATA_KEYS.application)
       .returns(application);
+    getRequestParam = sinon
+      .stub()
+      .withArgs(PARAMS_KEYS.applicationID)
+      .returns("application-1");
     getSession = sinon.stub();
     getAllAnswers = sinon.stub().returns(answers);
     setAnswer = sinon.stub();
 
     context = {
       getData,
+      getRequestParam,
       getSession,
       getAllAnswers,
       setAnswer,
@@ -70,14 +76,14 @@ describe("loadApplicationAsAnswers", () => {
     expect(setAnswer.calledWithExactly("firstName", "Jane")).to.equal(true);
     expect(setAnswer.calledWithExactly("hasNINumber", "no")).to.equal(true);
     expect(session.journeyDrafts).to.deep.equal({
-      [journeyCode]: { ...answers },
+      [`${journeyCode}:application-1`]: { ...answers },
     });
   });
 
   it("does not overwrite an existing journey draft", () => {
     const session = {
       journeyDrafts: {
-        [journeyCode]: { existingAnswer: "keep" },
+        [`${journeyCode}:application-1`]: { existingAnswer: "keep" },
         anotherJourney: { otherAnswer: "keep" },
       },
     };
@@ -89,7 +95,7 @@ describe("loadApplicationAsAnswers", () => {
     expect(toAnswers.called).to.equal(false);
     expect(setAnswer.called).to.equal(false);
     expect(session.journeyDrafts).to.deep.equal({
-      [journeyCode]: { existingAnswer: "keep" },
+      [`${journeyCode}:application-1`]: { existingAnswer: "keep" },
       anotherJourney: { otherAnswer: "keep" },
     });
   });
@@ -101,7 +107,22 @@ describe("loadApplicationAsAnswers", () => {
     loadApplicationAsAnswers()(context, journeyCode);
 
     expect(session.journeyDrafts).to.deep.equal({
-      [journeyCode]: answers,
+      [`${journeyCode}:application-1`]: answers,
+    });
+  });
+
+  it("keeps drafts separate for different applications", () => {
+    const session = { journeyDrafts: {} };
+    getSession.returns(session);
+
+    loadApplicationAsAnswers()(context, journeyCode);
+    getRequestParam.withArgs(PARAMS_KEYS.applicationID).returns("application-2");
+
+    loadApplicationAsAnswers()(context, journeyCode);
+
+    expect(session.journeyDrafts).to.deep.equal({
+      [`${journeyCode}:application-1`]: answers,
+      [`${journeyCode}:application-2`]: answers,
     });
   });
 });
