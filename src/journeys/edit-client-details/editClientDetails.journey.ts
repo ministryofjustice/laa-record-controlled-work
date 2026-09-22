@@ -19,10 +19,13 @@ export const editClientDetailsJourney = journey({
   code: editJourneyCode,
   onAccess: [
     access({
-      effects: [editClientDetailsEffects.loadDraftAnswers(editJourneyCode)],
+      effects: [
+        editClientDetailsEffects.loadApplicationAsAnswers(editJourneyCode),
+        editClientDetailsEffects.loadDraftAnswers(editJourneyCode),
+      ],
     }),
   ],
-  path: "/cases/:applicationID/task-list/details",
+  path: "/task-list/details",
   reachability: { disableReachabilityChecks: true },
   steps: [
     ecfStep(editJourneyCode),

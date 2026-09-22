@@ -7,10 +7,10 @@ import { expect } from "chai";
 import sinon from "sinon";
 
 import type { Application } from "#/api/clients/rcw/model/application.zod.gen.js";
+import { ApplicationDto } from "#/api/dto/application/application.dto.js";
 import { editApplicationEffectsRegistry } from "#/journeys/edit-application/editApplication.effects.js";
 import { editApplicationJourney } from "#/journeys/edit-application/editApplication.journey.js";
-import { editClientDetailsEffectsRegistry } from "#/journeys/edit-client-details/editClientDetails.effects.js";
-import { editClientDetailsJourney } from "#/journeys/edit-client-details/editClientDetails.journey.js";
+import { JourneyCode } from "#/journeys/JourneyCode.enum.js";
 import { getGetApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
 import { createForgeTestClient } from "../../utils/helpers.js";
 
@@ -59,16 +59,6 @@ describe("Edit client details check answers step", () => {
       },
     },
   );
-  const editClientDetailsClient = createForgeTestClient(
-    editClientDetailsJourney,
-    editClientDetailsEffectsRegistry,
-    {
-      dependencies: {
-        getApplication: getApplicationStub,
-        updateApplicationStatus: updateApplicationStatusStub,
-      },
-    },
-  );
 
   const getCheckAnswers = async (application: Application = ukApplication) => {
     const session = {};
@@ -82,7 +72,7 @@ describe("Edit client details check answers step", () => {
     expect(taskListResult.type).to.equal("render");
     expect(getApplicationStub.called).to.equal(true);
 
-    const result = await editClientDetailsClient.get(
+    const result = await editApplicationClient.get(
       `/cases/${applicationId}/task-list/details/check-answers`,
       { session },
     );
@@ -90,6 +80,18 @@ describe("Edit client details check answers step", () => {
 
     return result as TestRenderResult;
   };
+
+  it("loads the application for direct child access", async () => {
+    getApplicationStub.resetHistory();
+
+    const result = await editApplicationClient.get(
+      `/cases/${applicationId}/task-list/details/check-answers`,
+      { session: {} },
+    );
+
+    expect(result.type).to.equal("render");
+    expect(getApplicationStub.calledOnce).to.equal(true);
+  });
 
   describe("GET /cases/:applicationID/task-list/details/check-answers", () => {
     let renderResult: TestRenderResult;
@@ -265,6 +267,51 @@ describe("Edit client details check answers step", () => {
       );
     });
 
+    it("renders the saved overseas address after switching from UK", async () => {
+      const {
+        ukAddressLine1,
+        ukAddressLine2,
+        ukCountry,
+        ukCounty,
+        ukPostcode,
+        ukTownOrCity,
+        ...savedAnswers
+      } = ApplicationDto.toAnswers(ukApplication);
+      const session = {
+        journeyDrafts: {
+          [JourneyCode.EDIT_CLIENT_DETAILS]: {
+            ...savedAnswers,
+            osAddressLine1: "10 Some Other Street",
+            osAddressLine3: "Paris",
+            osCountry: "France",
+          },
+        },
+      };
+
+      const result = await editApplicationClient.get(
+        `/cases/${applicationId}/task-list/details/check-answers`,
+        { session },
+      );
+      expect(result.type).to.equal("render");
+      const renderResult = result as TestRenderResult;
+      const [savedSummaryList] = renderResult.getBlocksByVariant(
+        "govukSummaryList",
+      );
+      const rows = savedSummaryList.properties.rows as Array<{
+        actions?: { items: Array<{ href: string }> };
+        key: { text: string };
+        value: { html?: string; text?: string };
+      }>;
+      const addressRow = rows.find((row) => row.key.text === "Address");
+
+      expect(addressRow?.actions?.items[0].href).to.equal(
+        "enter-overseas-address?returnTo=check-answers",
+      );
+      expect(addressRow?.value.html).to.match(
+        /10 Some Other Street,<br \/>.*Paris,<br \/>.*France/s,
+      );
+    });
+
     it("does not recall the api when moving between steps", async () => {
       const session = {};
       getApplicationStub.resetHistory();
@@ -294,7 +341,7 @@ describe("Edit client details check answers step", () => {
 
   describe("POST /cases/:applicationID/task-list/details/check-answers", () => {
     it("redirects to the task list", async () => {
-      const result = await editClientDetailsClient.post(
+      const result = await editApplicationClient.post(
         `/cases/${applicationId}/task-list/details/check-answers`,
         { session: {} },
       );

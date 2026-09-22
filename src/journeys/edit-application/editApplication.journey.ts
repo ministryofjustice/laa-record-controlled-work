@@ -3,19 +3,14 @@ import { access, journey } from "@ministryofjustice/hmpps-forge/core/authoring";
 import { editApplicationEffects } from "#/journeys/edit-application/editApplication.effects.js";
 import { confirmationStep } from "#/journeys/edit-application/steps/confirmation/confirmation.step.js";
 import { taskListStep } from "#/journeys/edit-application/steps/task-list/task-list.step.js";
-import { editClientDetailsEffects } from "#/journeys/edit-client-details/editClientDetails.effects.js";
-import { JourneyCode } from "#/journeys/JourneyCode.enum.js";
-
-const editJourneyCode = JourneyCode.EDIT_CLIENT_DETAILS;
+import { editClientDetailsJourney } from "#/journeys/edit-client-details/editClientDetails.journey.js";
 
 const loadApiAnswers = access({
-  effects: [
-    editApplicationEffects.loadApplication(),
-    editClientDetailsEffects.loadApplicationAsAnswers(editJourneyCode),
-  ],
+  effects: [editApplicationEffects.loadApplication()],
 });
 
 export const editApplicationJourney = journey({
+  children: [editClientDetailsJourney],
   code: "editApplication",
   onAccess: [loadApiAnswers],
   path: "/cases/:applicationID",

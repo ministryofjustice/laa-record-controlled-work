@@ -74,7 +74,7 @@ describe("loadApplicationAsAnswers", () => {
     });
   });
 
-  it("loads application answers and retains existing journey data", () => {
+  it("does not overwrite an existing journey draft", () => {
     const session = {
       journeyDrafts: {
         [journeyCode]: { existingAnswer: "keep" },
@@ -85,14 +85,11 @@ describe("loadApplicationAsAnswers", () => {
 
     loadApplicationAsAnswers()(context, journeyCode);
 
-    expect(
-      getData.calledOnceWithExactly(CONTEXT_DATA_KEYS.application),
-    ).to.equal(true);
-    expect(toAnswers.calledOnceWithExactly(application)).to.equal(true);
-    expect(setAnswer.calledWithExactly("firstName", "Jane")).to.equal(true);
-    expect(setAnswer.calledWithExactly("hasNINumber", "no")).to.equal(true);
+    expect(getData.called).to.equal(false);
+    expect(toAnswers.called).to.equal(false);
+    expect(setAnswer.called).to.equal(false);
     expect(session.journeyDrafts).to.deep.equal({
-      [journeyCode]: { existingAnswer: "keep", ...answers },
+      [journeyCode]: { existingAnswer: "keep" },
       anotherJourney: { otherAnswer: "keep" },
     });
   });

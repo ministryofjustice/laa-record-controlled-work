@@ -14,6 +14,10 @@ export const loadApplicationAsAnswers =
       return;
     }
 
+    if (session.journeyDrafts?.[journeyCode]) {
+      return;
+    }
+
     const application: Application = context.getData(
       CONTEXT_DATA_KEYS.application,
     );
