@@ -4,6 +4,12 @@
 # Remap only the host-side publish here; other services still reach it via the
 # container network on its default port.
 services:
+  ccq-embedded:
+    environment:
+      CCQ_EMBEDDED_LAYOUT: rcw/application
+      HOST_SERVICE_URL: http://rcw:3000
+      HOST_SERVICE_SESSION_COOKIES: rcw.sid
+
   # mock-oauth2-server terminates TLS in this stack (see rcw's ENTRA_AUTHORITY_BASE_URL in
   # docker-compose.yml), so it issues tokens with an https `iss` claim - override
   # include.api.yml's http defaults to match, and trust its self-signed cert for the JVM's

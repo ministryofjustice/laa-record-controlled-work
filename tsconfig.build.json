@@ -1,5 +1,5 @@
 {
   "extends": "./tsconfig.json",
-  "include": ["src/**/*.ts", "esbuild/**/*.ts"],
+  "include": ["src/**/*.ts", "esbuild/**/*.ts", "zap/**/*.ts"],
   "exclude": ["node_modules", "public", "**/*.js"]
 }

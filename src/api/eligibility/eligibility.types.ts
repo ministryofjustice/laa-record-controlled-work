@@ -7,9 +7,3 @@ export const PutEligibilityRequestBody = z.object({
 export type PutEligibilityRequestBody = z.infer<
   typeof PutEligibilityRequestBody
 >;
-
-export const ApplicationIdParam = z.object({
-  applicationId: z.uuid(),
-});
-
-export type ApplicationIdParam = z.infer<typeof ApplicationIdParam>;

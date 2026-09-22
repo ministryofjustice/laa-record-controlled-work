@@ -33,7 +33,7 @@ rcw:
   image:
     repository: nginx
     pullPolicy: Always
-    tag: "@sha256:05b8cb60c354a44ab824ea6e7dc69b46d50762cdbe728a347a5b656e6fb3d7c4"
+    tag: "@sha256:abe47724e466aeab9a345d8e46a221c2fa8953c7848bb4a3bd9976a7199f8cf2"
 
   imagePullSecrets: []
   podAnnotations: {}
@@ -167,8 +167,8 @@ ccq:
     CCQ_MODE: embedded
     CCQ_EMBEDDED_LAYOUT: rcw/application
     HOST_SERVICE_ELIGIBILITY_ENDPOINT: /api/applications/%<application_id>s/eligibility
-
     HOST_SERVICE_URL: http://laa-record-controlled-work-rcw:3000
+    HOST_SERVICE_SESSION_COOKIES: __Host-rcw.sid
 
   resources:
     limits:
@@ -185,7 +185,7 @@ nginx:
     # Overridden at deploy time to ECR; see deploy.sh and docker-images.env
     repository: nginxinc/nginx-unprivileged
     pullPolicy: Always
-    tag: alpine@sha256:b54ac358b83fc6c965793fd271839b4ea4cdb6e99895bb19618cbc2ca152d972
+    tag: alpine@sha256:e75f89810bf5bfbcf58a1cfb32a1a11de55b7623d732e67735d513b720d7436a
 
   resources:
     limits:
