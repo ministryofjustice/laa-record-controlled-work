@@ -7,6 +7,7 @@ import {
   Condition,
   Self,
   validation,
+  type ValidationExpr,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 import { GovUKTextInput } from "@ministryofjustice/hmpps-forge/govuk-components";
 import { t } from "i18next";
@@ -41,14 +42,28 @@ const COUNTY_LABEL = t(
 const COUNTRY_CODE = UK_ADDRESS_FIELDS.postcode;
 
 /**
+ * Creates a required-field validation rule for a GOV.UK form field.
  *
- * @param code
- * @param labelText
- * @param options
- * @param options.classes
- * @param options.isRequired
- * @param options.isRequired.validationMessage
- * @param options.defaultValue
+ * @param validationMessage - The translated error message shown when the field is empty.
+ * @returns A validation expression that fails if the answer is blank.
+ */
+function answerIsRequired(validationMessage: ResolvableString): ValidationExpr {
+  return validation({
+    condition: Self().match(Condition.IsRequired()),
+    message: validationMessage,
+  });
+}
+
+/**
+ * Builds a GOV.UK text input block for an address field.
+ *
+ * @param code - The field code used to store the answer.
+ * @param labelText - The visible label for the input.
+ * @param options - Optional rendering and validation settings for the field.
+ * @param options.classes - Additional GOV.UK CSS classes to apply to the input.
+ * @param options.defaultValue - Initial value to pre-populate in the field.
+ * @param options.validations - Validation requirements to apply to the field.
+ * @returns A GOV.UK text input block configured for the supplied field.
  */
 function textInput(
   code: string,
@@ -56,22 +71,9 @@ function textInput(
   options?: {
     classes?: string;
     defaultValue?: string;
-    isRequired?: {
-      validationMessage: ResolvableString;
-    };
+    validations?: ValidationExpr[];
   },
 ): HtmlBlock {
-  const validWhen = options?.isRequired
-    ? {
-        validWhen: [
-          validation({
-            condition: Self().match(Condition.IsRequired()),
-            message: options.isRequired.validationMessage,
-          }),
-        ],
-      }
-    : {};
-
   return GovUKTextInput({
     classes: options?.classes,
     code,
@@ -80,22 +82,18 @@ function textInput(
       isPageHeading: false,
       text: labelText,
     },
-    ...validWhen,
+    validWhen: options?.validations,
   });
 }
 
 const addressLine1 = textInput(LINE_1_CODE, LINE_1_LABEL, {
-  isRequired: {
-    validationMessage: LINE_1_VALIDATION,
-  },
+  validations: [answerIsRequired(LINE_1_VALIDATION)],
 });
 const addressLine2 = textInput(LINE_2_CODE, LINE_2_LABEL);
 
 const townOrCity = textInput(TOWN_CITY_CODE, TOWN_CITY_LABEL, {
   classes: "govuk-!-width-two-thirds",
-  isRequired: {
-    validationMessage: TOWN_CITY_VALIDATION,
-  },
+  validations: [answerIsRequired(TOWN_CITY_VALIDATION)],
 });
 
 const county = textInput(COUNTY_CODE, COUNTY_LABEL, {
