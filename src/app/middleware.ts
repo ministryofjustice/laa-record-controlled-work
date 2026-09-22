@@ -77,7 +77,9 @@ export async function initMiddleware(
         integrations: [
           Sentry.httpIntegration(),
           Sentry.expressIntegration(),
-          Sentry.consoleLoggingIntegration({ levels: ["log", "warn", "error"] }),
+          Sentry.consoleLoggingIntegration({
+            levels: ["log", "warn", "error"],
+          }),
         ],
       });
     }
