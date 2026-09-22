@@ -9,13 +9,14 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
 import {
-  heading,
   summaryList,
-} from "#/journeys/create-application/steps/check-answers.blocks.js";
+} from "#/journeys/create-application/steps/checkAnswers/checkAnswers.blocks.js";
 import { editClientDetailsEffects } from "#/journeys/edit-client-details/editClientDetails.effects.js";
 import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
-import { submitButton } from "#/journeys/shared.blocks.js";
+import { heading, submitButton } from "#/journeys/shared.blocks.js";
 import { t } from "#/lib/i18n.js";
+
+const CHECK_ANSWERS = t("journeys.createApplication.checkAnswers.title");
 
 const tieBreakerPriority = 100;
 
@@ -23,7 +24,7 @@ export const checkAnswersStep = (
   journeyCode: string,
 ): ReturnType<typeof step> =>
   step({
-    blocks: [heading, summaryList, submitButton],
+    blocks: [heading(CHECK_ANSWERS), summaryList(), submitButton()],
     code: "check-answers",
     onAccess: [
       access({
@@ -50,5 +51,5 @@ export const checkAnswersStep = (
       entryWhen: true,
       tieBreakers: [tieBreaker({ priority: tieBreakerPriority })],
     },
-    title: t("journeys.createApplication.checkAnswers.title"),
+    title: CHECK_ANSWERS,
   });
