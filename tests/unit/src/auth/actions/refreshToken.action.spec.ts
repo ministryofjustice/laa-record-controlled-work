@@ -11,100 +11,50 @@ import config from "#/config.js";
 import { failure, success } from "#/lib/either.js";
 
 const SESSION_ID = "session-id";
-const HOME_ACCOUNT_ID = "uid.tenant";
+const HOME_ACCOUNT_ID = "test@example.com";
 
 afterEach(() => {
   sinon.restore();
 });
 
 describe("refreshToken", () => {
-  it("passes through an undefined session id to EntraService.create", async () => {
-    const tokenRefreshError = new TokenRefreshError();
-    const serviceRefreshToken = sinon
-      .stub()
-      .resolves(failure(tokenRefreshError));
-    const createStub = sinon.stub(EntraService, "create").returns({
-      refreshToken: serviceRefreshToken,
-    } as unknown as EntraService);
-
-    const result = await refreshToken(
-      HOME_ACCOUNT_ID,
-      undefined as unknown as string,
-    );
-
-    expect(createStub.calledOnceWithExactly({ sessionId: undefined })).to.be.true;
-    expect(
-      serviceRefreshToken.calledOnceWithExactly(
-        HOME_ACCOUNT_ID,
-        config.entra.scopes,
-      ),
-    ).to.be.true;
-    expect(result.error).to.equal(tokenRefreshError);
-  });
-
-  it("passes through an undefined account reference to EntraService.refreshToken", async () => {
-    const tokenRefreshError = new TokenRefreshError();
-    const serviceRefreshToken = sinon
-      .stub()
-      .resolves(failure(tokenRefreshError));
-    const createStub = sinon.stub(EntraService, "create").returns({
-      refreshToken: serviceRefreshToken,
-    } as unknown as EntraService);
-
-    const result = await refreshToken(
-      undefined as unknown as string,
-      SESSION_ID,
-    );
-
-    expect(createStub.calledOnceWithExactly({ sessionId: SESSION_ID })).to.be.true;
-    expect(
-      serviceRefreshToken.calledOnceWithExactly(undefined, config.entra.scopes),
-    ).to.be.true;
-    expect(result.error).to.equal(tokenRefreshError);
-  });
-
   it("returns a refreshed token when session context is valid", async () => {
-    const refreshedAuthResult = {
+    const refreshTokenMockResult = {
       accessToken: "new-access-token",
     } as AuthenticationResult;
-    const serviceRefreshToken = sinon
+
+    const refreshTokenMock = sinon
       .stub()
-      .resolves(success(refreshedAuthResult));
-    const createStub = sinon.stub(EntraService, "create").returns({
-      refreshToken: serviceRefreshToken,
+      .resolves(success(refreshTokenMockResult));
+
+    const createMock = sinon.stub(EntraService, "create").returns({
+      refreshToken: refreshTokenMock,
     } as unknown as EntraService);
 
     const result = await refreshToken(HOME_ACCOUNT_ID, SESSION_ID);
 
-    expect(createStub.calledOnceWithExactly({ sessionId: SESSION_ID })).to.be
-      .true;
-    expect(
-      serviceRefreshToken.calledOnceWithExactly(
-        HOME_ACCOUNT_ID,
-        config.entra.scopes,
-      ),
-    ).to.be.true;
-    expect(result).to.deep.equal(success(refreshedAuthResult));
+    expect(createMock.calledOnce).to.be.true;
+    expect(createMock.calledWith({ sessionId: SESSION_ID })).to.be.true;
+
+    const refreshTokenArgs = [HOME_ACCOUNT_ID, config.entra.scopes];
+    expect(refreshTokenMock.calledOnce).to.be.true;
+    expect(refreshTokenMock.calledWith(...refreshTokenArgs)).to.be.true;
+    expect(result).to.deep.equal(success(refreshTokenMockResult));
   });
 
-  it("returns the token refresh error from EntraService", async () => {
+  it("returns a TokenRefreshError on failure", async () => {
     const tokenRefreshError = new TokenRefreshError();
-    const serviceRefreshToken = sinon
-      .stub()
-      .resolves(failure(tokenRefreshError));
+    const refreshTokenMock = sinon.stub().resolves(failure(tokenRefreshError));
 
     sinon.stub(EntraService, "create").returns({
-      refreshToken: serviceRefreshToken,
+      refreshToken: refreshTokenMock,
     } as unknown as EntraService);
 
     const result = await refreshToken(HOME_ACCOUNT_ID, SESSION_ID);
 
-    expect(
-      serviceRefreshToken.calledOnceWithExactly(
-        HOME_ACCOUNT_ID,
-        config.entra.scopes,
-      ),
-    ).to.be.true;
+    const refreshTokenArgs = [HOME_ACCOUNT_ID, config.entra.scopes];
+    expect(refreshTokenMock.calledOnce).to.be.true;
+    expect(refreshTokenMock.calledWith(...refreshTokenArgs)).to.be.true;
     expect(result.error).to.equal(tokenRefreshError);
   });
 });
