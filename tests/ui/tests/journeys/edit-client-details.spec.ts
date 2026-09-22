@@ -69,4 +69,20 @@ test("Edit Application - Client details journey", async ({
   await expect(page).toHaveURL(
     `/cases/${applicationId}/task-list/details/enter-address-manually?returnTo=check-answers`,
   );
+
+  // Fill in the new address line 1 in the manual address entry form
+  await page.getByLabel("Address line 1").fill("10 Changed Street");
+
+  await page.getByRole("button", { name: "Continue" }).click();
+
+  // Verify redirection back to the check answers page
+  await expect(page).toHaveURL(
+    `/cases/${applicationId}/task-list/details/check-answers`,
+  );
+
+  // Verify that the updated address is displayed correctly on the check answers page
+  await expect(rows.locator(".govuk-summary-list__value").last()).toContainText(
+    "10 Changed Street",
+    { useInnerText: true },
+  );
 });
