@@ -264,6 +264,32 @@ describe("Edit client details check answers step", () => {
         /10 Some Other Street,<br \/>.*Paris,<br \/>.*France/s,
       );
     });
+
+    it("does not recall the api when moving between steps", async () => {
+      const session = {};
+      getApplicationStub.resetHistory();
+      getApplicationStub.resolves({ status: 200, data: ukApplication });
+
+      const taskListResult = await editApplicationClient.get(
+        `/cases/${applicationId}/task-list`,
+        { session },
+      );
+      expect(taskListResult.type).to.equal("render");
+      const apiCallsAfterEntry = getApplicationStub.callCount;
+
+      const clientDetailsResult = await editClientDetailsClient.get(
+        `/cases/${applicationId}/task-list/details/client-details`,
+        { session },
+      );
+      expect(clientDetailsResult.type).to.equal("render");
+
+      const checkAnswersResult = await editClientDetailsClient.get(
+        `/cases/${applicationId}/task-list/details/check-answers`,
+        { session },
+      );
+      expect(checkAnswersResult.type).to.equal("render");
+      expect(getApplicationStub.callCount).to.equal(apiCallsAfterEntry);
+    });
   });
 
   describe("POST /cases/:applicationID/task-list/details/check-answers", () => {
