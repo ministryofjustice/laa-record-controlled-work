@@ -1,8 +1,9 @@
 import type { NextFunction, Request, RequestHandler, Response } from "express";
-import type { SessionData } from "express-session";
 
-import { refreshToken } from "#/auth/actions/refreshToken.action.js";
-import { AuthenticationError } from "#/auth/auth.errors.js";
+import { destroySessionAuth } from "#/auth/domain/destroySessionAuth.js";
+import { destroySessionOffice } from "#/auth/domain/destroySessionOffice.js";
+import { getOfficeClaimsFromSession } from "#/auth/domain/getOfficeClaimsFromSession.js";
+import { refreshToken } from "#/auth/domain/refreshToken.action.js";
 import { updateSessionAuth } from "#/auth/domain/updateSessionAuth.js";
 import { logger } from "#/logger.js";
 
@@ -53,10 +54,9 @@ export function requireAuth(): RequestHandler {
       }
 
       // Does the user have a valid auth token?
-      // TODO We should decode the ID Token and check against the decoded claims instead of relying on the session data, but this is fine until we can implement that.
       if (!homeAccountId || !idToken) {
         logger.info("requireAuth(): No auth token");
-        delete req.session.account;
+        destroySessionAuth(session);
         res.redirect("/auth/signin");
         return;
       }
@@ -89,6 +89,7 @@ export function requireAuth(): RequestHandler {
 
       if (!allowedOffices.includes(session.selectedOffice.code)) {
         logger.warn("requireAuth(): Office is not in claims");
+        destroySessionOffice(session);
         res.redirect("/select-office");
         return;
       }
@@ -101,26 +102,4 @@ export function requireAuth(): RequestHandler {
       next(error);
     }
   };
-}
-
-/**
- * Get the list of office codes from the idTokenClaims.
- *
- * @param session The request session.
- * @returns List of office codes.
- */
-function getOfficeClaimsFromSession(session: SessionData): string[] {
-  const offices = session.account?.idTokenClaims?.LAA_ACCOUNTS;
-
-  if (Array.isArray(offices)) {
-    return offices;
-  }
-
-  if (typeof offices === "string") {
-    return [offices];
-  }
-
-  throw new AuthenticationError(
-    "Invalid LAA_ACCOUNTS claim, expected string or string[]",
-  );
 }
