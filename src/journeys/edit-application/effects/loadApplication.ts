@@ -1,5 +1,4 @@
 import * as Sentry from "@sentry/node";
-import { stat } from "node:fs";
 
 import type {
   EditApplicationContext,
@@ -55,6 +54,7 @@ export const loadApplication =
       });
       throw ApiResponseError.from(error);
     }
+
     const duration = performance.now() - startTime;
     Sentry.metrics.distribution("api_response_time", duration, {
       attributes: {

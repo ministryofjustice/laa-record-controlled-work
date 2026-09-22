@@ -29,8 +29,8 @@ export const closeIneligibleCase =
       homeAccountId: session?.msal?.homeAccountId,
       sessionId: session?.id,
     });
-    let startTime = 0;
-    startTime = performance.now();
+
+    const startTime = performance.now();
     const response = await deps.updateApplicationStatus(
       applicationID,
       {
