@@ -49,11 +49,12 @@ export function requireAuth(): RequestHandler {
       if (IGNORED_AUTH_PATHS.includes(req.originalUrl)) {
         logger.info("requireAuth(): Skipping ignored path");
         next();
+        return;
       }
 
       // Does the user have a valid auth token?
       // TODO We should decode the ID Token and check against the decoded claims instead of relying on the session data, but this is fine until we can implement that.
-      if (homeAccountId === undefined || idToken === undefined) {
+      if (!homeAccountId || !idToken) {
         logger.info("requireAuth(): No auth token");
         delete req.session.account;
         res.redirect("/auth/signin");
