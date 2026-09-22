@@ -571,30 +571,25 @@ describe("Edit client details check answers step", () => {
       );
     });
 
-    it("does not recall the api when moving between steps", async () => {
-      const session = {};
-      getApplicationStub.resetHistory();
-      getApplicationStub.resolves({ status: 200, data: ukApplication });
+    it("preserves draft answers when navigating between edit steps", async () => {
+      const session = {
+        journeyDrafts: {
+          [draftKey]: {
+            ...ApplicationDto.toAnswers(ukApplication),
+            firstName: "Edited",
+          },
+        },
+      };
 
-      const taskListResult = await editApplicationClient.get(
-        `/cases/${applicationId}/task-list`,
-        { session },
-      );
-      expect(taskListResult.type).to.equal("render");
-      const apiCallsAfterEntry = getApplicationStub.callCount;
-
-      const clientDetailsResult = await editClientDetailsClient.get(
+      const clientDetailsResult = await editApplicationClient.get(
         `/cases/${applicationId}/task-list/details/client-details`,
         { session },
       );
       expect(clientDetailsResult.type).to.equal("render");
 
-      const checkAnswersResult = await editClientDetailsClient.get(
-        `/cases/${applicationId}/task-list/details/check-answers`,
-        { session },
-      );
-      expect(checkAnswersResult.type).to.equal("render");
-      expect(getApplicationStub.callCount).to.equal(apiCallsAfterEntry);
+      const rows = await getCheckAnswersRows(session);
+      expect(rows.find((row) => row.key.text === "First name")?.value.text).to
+        .equal("Edited");
     });
   });
 
