@@ -1786,18 +1786,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sentry/node-cpu-profiler@npm:^2.4.4":
-  version: 2.4.4
-  resolution: "@sentry/node-cpu-profiler@npm:2.4.4"
-  dependencies:
-    detect-libc: "npm:^2.0.3"
-    node-abi: "npm:^3.73.0"
-    node-gyp: "npm:latest"
-  checksum: 10c0/0cf6e21443ac0cee03b95fab4db852bc2163b3ec41f0e3c6e64d77ee07a25dd4ccca6b44592a39d073296f1d9f9d015373c3ed0966ba7038ca47731a37775aab
-  languageName: node
-  linkType: hard
-
-"@sentry/node@npm:10.74.0, @sentry/node@npm:^10.72.0":
+"@sentry/node@npm:^10.72.0":
   version: 10.74.0
   resolution: "@sentry/node@npm:10.74.0"
   dependencies:
@@ -1825,19 +1814,6 @@ __metadata:
     "@opentelemetry/core": ^1.30.1 || ^2.1.0
     "@opentelemetry/sdk-trace-base": ^1.30.1 || ^2.1.0
   checksum: 10c0/f576e12ddac1d5bd64387a79420e3cddbddabfb8f83dbf8fa4e8f7e9362d764c172941dff4e3f697b855a325f4f0bb01870f656129383b97821b02c15245891d
-  languageName: node
-  linkType: hard
-
-"@sentry/profiling-node@npm:^10.73.0":
-  version: 10.74.0
-  resolution: "@sentry/profiling-node@npm:10.74.0"
-  dependencies:
-    "@sentry/core": "npm:10.74.0"
-    "@sentry/node": "npm:10.74.0"
-    "@sentry/node-cpu-profiler": "npm:^2.4.4"
-  bin:
-    sentry-prune-profiler-binaries: scripts/prune-profiler-binaries.js
-  checksum: 10c0/c76cc4613d3e76dc6f7d7d7d58d7b767c55a80231bf20483a9225109d47da16d0a222b3f0dd76f8f7b4817399d4f09516b2fd440a3b1ccd61bec0a2a0b93569e
   languageName: node
   linkType: hard
 
@@ -5413,7 +5389,6 @@ __metadata:
     "@ministryofjustice/hmpps-forge": "npm:^0.4.3"
     "@playwright/test": "npm:^1.63.0"
     "@sentry/node": "npm:^10.72.0"
-    "@sentry/profiling-node": "npm:^10.73.0"
     "@types/chai": "npm:^5.2.3"
     "@types/chai-as-promised": "npm:^8.0.2"
     "@types/compression": "npm:^1.8.1"
@@ -5961,15 +5936,6 @@ __metadata:
   version: 0.6.4
   resolution: "negotiator@npm:0.6.4"
   checksum: 10c0/3e677139c7fb7628a6f36335bf11a885a62c21d5390204590a1a214a5631fcbe5ea74ef6a610b60afe84b4d975cbe0566a23f20ee17c77c73e74b80032108dea
-  languageName: node
-  linkType: hard
-
-"node-abi@npm:^3.73.0":
-  version: 3.96.0
-  resolution: "node-abi@npm:3.96.0"
-  dependencies:
-    semver: "npm:^7.3.5"
-  checksum: 10c0/d5f70cc9c384f807c79fbd3020ec03510d3a3540e95a51cabc9a52f658a474aa9e9a15cd331d6c49eb2d6983c6cfcef7483e1fdb833686584a599041b9d171cd
   languageName: node
   linkType: hard
 
