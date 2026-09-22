@@ -21,18 +21,25 @@ import { t } from "#/lib/i18n.js";
 
 const TITLE = t("journeys.createApplication.ecf.title");
 
+type EcfStepOptions = Pick<StepDefinition, "reachability">;
+
 /**
  * Defines the ECF step for the create application journey.
  *
  * @param {string} journeyCode - The journey code for saving draft answers
+ * @param options - Optional step configuration overrides
  * @returns {StepDefinition} A step definition for the ECF eligibility question page
  */
-export function ecfStep(journeyCode: string): StepDefinition {
+export function ecfStep(
+  journeyCode: string,
+  options: EcfStepOptions = {},
+): StepDefinition {
   return step({
     blocks: [clientDetailsCaption(), ecfQuestion(), continueButton()],
     code: StepCode.ECF,
     onSubmission: [saveEcf(journeyCode)],
     path: "/ecf",
+    ...options,
     title: TITLE,
   });
 }

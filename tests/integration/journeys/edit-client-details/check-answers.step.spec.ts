@@ -14,6 +14,13 @@ import { JourneyCode } from "#/journeys/JourneyCode.enum.js";
 import { getGetApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
 import { createForgeTestClient } from "../../utils/helpers.js";
 
+type SummaryRow = {
+  actions?: { items: Array<{ href: string }> };
+  key: { text: string };
+  value: { html?: string; text?: string };
+  visibleWhen?: boolean;
+};
+
 describe("Edit client details check answers step", () => {
   const applicationId = "123e4567-e89b-12d3-a456-426614174000";
   const ukApplication: Application = getGetApplicationResponseMock({
@@ -42,6 +49,26 @@ describe("Edit client details check answers step", () => {
     reasonForReapplication: "Some reason for help",
     scopingQuestions: { priorLegalAid: "yesSameMatter" },
   });
+  const overseasApplication: Application = getGetApplicationResponseMock({
+    ...ukApplication,
+    clientDetails: {
+      ...ukApplication.clientDetails,
+      address: {
+        id: null,
+        addressLine1: "10 Some Other Street",
+        addressLine2: null,
+        addressLine3: "Paris",
+        addressLine4: null,
+        townOrCity: null,
+        postCode: null,
+        county: null,
+        country: "FR",
+        createdAt: null,
+        modifiedAt: null,
+      },
+    },
+  });
+  const draftKey = `${JourneyCode.EDIT_CLIENT_DETAILS}:${applicationId}`;
   const getApplicationStub = sinon
     .stub()
     .resolves({ status: 200, data: ukApplication });
@@ -53,6 +80,7 @@ describe("Edit client details check answers step", () => {
     editApplicationJourney,
     editApplicationEffectsRegistry,
     {
+      disableReachabilityChecks: false,
       dependencies: {
         getApplication: getApplicationStub,
         updateApplicationStatus: updateApplicationStatusStub,
@@ -62,7 +90,6 @@ describe("Edit client details check answers step", () => {
 
   const getCheckAnswers = async (application: Application = ukApplication) => {
     const session = {};
-    getApplicationStub.resetHistory();
     getApplicationStub.resolves({ status: 200, data: application });
 
     const taskListResult = await editApplicationClient.get(
@@ -70,7 +97,6 @@ describe("Edit client details check answers step", () => {
       { session },
     );
     expect(taskListResult.type).to.equal("render");
-    expect(getApplicationStub.called).to.equal(true);
 
     const result = await editApplicationClient.get(
       `/cases/${applicationId}/task-list/details/check-answers`,
@@ -81,16 +107,267 @@ describe("Edit client details check answers step", () => {
     return result as TestRenderResult;
   };
 
-  it("loads the application for direct child access", async () => {
-    getApplicationStub.resetHistory();
-
+  const getCheckAnswersRows = async (
+    session: Record<string, unknown>,
+  ): Promise<SummaryRow[]> => {
     const result = await editApplicationClient.get(
       `/cases/${applicationId}/task-list/details/check-answers`,
-      { session: {} },
+      { session },
+    );
+    expect(result.type).to.equal("render");
+
+    const [summaryList] = (result as TestRenderResult).getBlocksByVariant(
+      "govukSummaryList",
     );
 
-    expect(result.type).to.equal("render");
-    expect(getApplicationStub.calledOnce).to.equal(true);
+    return summaryList.properties.rows as SummaryRow[];
+  };
+
+  describe("Edit journey entry navigation", () => {
+    it("renders API client data for direct check answers access", async () => {
+      const result = await editApplicationClient.get(
+        `/cases/${applicationId}/task-list/details/check-answers`,
+        { session: {} },
+      );
+
+      expect(result.type).to.equal("render");
+      const [summaryList] = (result as TestRenderResult).getBlocksByVariant(
+        "govukSummaryList",
+      );
+      const rows = summaryList.properties.rows as Array<{
+        key: { text: string };
+        value: { text: string };
+      }>;
+
+      expect(rows.find((row) => row.key.text === "First name")?.value.text).to
+        .equal("John");
+    });
+
+    it("redirects to check answers", async () => {
+      const result = await editApplicationClient.get(
+        `/cases/${applicationId}/task-list/details/`,
+        { session: {} },
+      );
+
+      expect(result.type).to.equal("redirect");
+      expect((result as TestRedirectResult).url).to.equal(
+        `/cases/${applicationId}/task-list/details/check-answers`,
+      );
+    });
+
+    it("redirects direct address access to check answers", async () => {
+      const result = await editApplicationClient.get(
+        `/cases/${applicationId}/task-list/details/enter-address-manually`,
+        {
+          session: {
+            journeyDrafts: {
+              [`${JourneyCode.EDIT_CLIENT_DETAILS}:${applicationId}`]: {
+                ecf: "no",
+                haveAHomeAddress: "no",
+                legalAidBefore: "no",
+              },
+            },
+          },
+        },
+      );
+
+      expect(result.type).to.equal("redirect");
+      expect((result as TestRedirectResult).url).to.equal(
+        `/cases/${applicationId}/task-list/details/check-answers`,
+      );
+    });
+  });
+
+  describe("Address branch changes from check answers", () => {
+    it("submitted 'no fixed address' clears address data and redirects to check-answers", async () => {
+      const session = {
+        journeyDrafts: {
+          [draftKey]: {
+            ...ApplicationDto.toAnswers(ukApplication),
+            osAddressLine1: "10 Some Other Street",
+            osCountry: "France",
+          },
+        },
+      };
+
+      const result = await editApplicationClient.post(
+        `/cases/${applicationId}/task-list/details/have-a-home-address`,
+        {
+          body: { haveAHomeAddress: "no" },
+          query: { returnTo: "check-answers" },
+          session,
+        },
+      );
+
+      expect(result.type).to.equal("redirect");
+      expect((result as TestRedirectResult).url).to.equal(
+        `/cases/${applicationId}/task-list/details/check-answers`,
+      );
+
+      const rows = await getCheckAnswersRows(session);
+      expect(rows.find((row) => row.key.text === "Address")?.value.html).to.equal(
+        "No fixed address",
+      );
+    });
+
+    it("redirect to UK address capture when 'has fixed address' is 'yes'", async () => {
+      const result = await editApplicationClient.post(
+        `/cases/${applicationId}/task-list/details/have-a-home-address`,
+        {
+          body: { haveAHomeAddress: "yes" },
+          query: { returnTo: "check-answers" },
+          session: {
+            journeyDrafts: {
+              [draftKey]: {
+                ...ApplicationDto.toAnswers(ukApplication),
+                haveAHomeAddress: "no",
+              },
+            },
+          },
+        },
+      );
+
+      expect(result.type).to.equal("redirect");
+      expect((result as TestRedirectResult).url).to.equal(
+        `/cases/${applicationId}/task-list/details/enter-address-manually?returnTo=check-answers`,
+      );
+    });
+
+    it("clear UK address when submitting overseas address and redirect to check-answers", async () => {
+      const session = {
+        journeyDrafts: {
+          [draftKey]: ApplicationDto.toAnswers(ukApplication),
+        },
+      };
+
+      const result = await editApplicationClient.post(
+        `/cases/${applicationId}/task-list/details/enter-overseas-address`,
+        {
+          body: {
+            osAddressLine1: "10 Some Other Street",
+            osAddressLine3: "Paris",
+            osCountry: "France",
+          },
+          query: { returnTo: "check-answers" },
+          session,
+        },
+      );
+
+      expect(result.type).to.equal("redirect");
+      expect((result as TestRedirectResult).url).to.equal(
+        `/cases/${applicationId}/task-list/details/check-answers`,
+      );
+
+      const rows = await getCheckAnswersRows(session);
+      const addressRow = rows.find((row) => row.key.text === "Address");
+      expect(addressRow?.actions?.items[0].href).to.equal(
+        "enter-overseas-address?returnTo=check-answers",
+      );
+      expect(addressRow?.value.html).to.match(
+        /10 Some Other Street,<br \/>.*Paris,<br \/>.*France/s,
+      );
+    });
+
+    it("clear overseas address answers when submitting UK address and redirect to check-answers", async () => {
+      const session = {
+        journeyDrafts: {
+          [draftKey]: ApplicationDto.toAnswers(overseasApplication),
+        },
+      };
+
+      const result = await editApplicationClient.post(
+        `/cases/${applicationId}/task-list/details/enter-address-manually`,
+        {
+          body: {
+            ukAddressLine1: "123 Test Street",
+            ukAddressLine2: "Test Area",
+            ukTownOrCity: "Testville",
+            ukPostcode: "TE5 7ST",
+            ukCountry: "United Kingdom",
+          },
+          query: { returnTo: "check-answers" },
+          session,
+        },
+      );
+
+      expect(result.type).to.equal("redirect");
+      expect((result as TestRedirectResult).url).to.equal(
+        `/cases/${applicationId}/task-list/details/check-answers`,
+      );
+
+      const rows = await getCheckAnswersRows(session);
+      const addressRow = rows.find((row) => row.key.text === "Address");
+      expect(addressRow?.actions?.items[0].href).to.equal(
+        "enter-address-manually?returnTo=check-answers",
+      );
+      expect(addressRow?.value.html).to.match(
+        /123 Test Street,<br \/>.*Test Area,<br \/>.*Testville,<br \/>.*TE5 7ST/s,
+      );
+    });
+  });
+
+  describe("Legal aid branch changes from check answers", () => {
+    it("clear dependent answers when 'legal aid before' changes to 'no' and redirect to check-answers", async () => {
+      const session = {
+        journeyDrafts: {
+          [draftKey]: {
+            ...ApplicationDto.toAnswers(ukApplication),
+            legalAidBefore: "yesSameMatter",
+            legalAidLast6Months: "yes",
+            reasonForYes: "Some reason",
+          },
+        },
+      };
+
+      const result = await editApplicationClient.post(
+        `/cases/${applicationId}/task-list/details/legal-aid-before`,
+        {
+          body: { legalAidBefore: "no" },
+          query: { returnTo: "check-answers" },
+          session,
+        },
+      );
+
+      expect(result.type).to.equal("redirect");
+      expect((result as TestRedirectResult).url).to.equal(
+        `/cases/${applicationId}/task-list/details/check-answers`,
+      );
+
+      const rows = await getCheckAnswersRows(session);
+      const visibleRows = rows.filter((row) => row.visibleWhen !== false);
+      expect(
+        visibleRows.some(
+          (row) =>
+            row.key.text ===
+            "Did your client get legal help for this matter in the last 6 months?",
+        ),
+      ).to.equal(false);
+      expect(
+        visibleRows.some(
+          (row) => row.key.text === "Reason for new application for same matter",
+        ),
+      ).to.equal(false);
+    });
+
+    it("redirect to recent legal aid questions when 'yes, same matter' is selected", async () => {
+      const result = await editApplicationClient.post(
+        `/cases/${applicationId}/task-list/details/legal-aid-before`,
+        {
+          body: { legalAidBefore: "yesSameMatter" },
+          query: { returnTo: "check-answers" },
+          session: {
+            journeyDrafts: {
+              [draftKey]: ApplicationDto.toAnswers(ukApplication),
+            },
+          },
+        },
+      );
+
+      expect(result.type).to.equal("redirect");
+      expect((result as TestRedirectResult).url).to.equal(
+        `/cases/${applicationId}/task-list/details/legal-aid-last-6-months?returnTo=check-answers`,
+      );
+    });
   });
 
   describe("GET /cases/:applicationID/task-list/details/check-answers", () => {
@@ -231,24 +508,6 @@ describe("Edit client details check answers step", () => {
     });
 
     it("links and renders an overseas address from the API", async () => {
-      const overseasApplication: Application = getGetApplicationResponseMock({
-        clientDetails: {
-          ...ukApplication.clientDetails,
-          address: {
-            id: null,
-            addressLine1: "10 Some Other Street",
-            addressLine2: null,
-            addressLine3: "Paris",
-            addressLine4: null,
-            townOrCity: null,
-            postCode: null,
-            county: null,
-            country: "FR",
-            createdAt: null,
-            modifiedAt: null,
-          },
-        },
-      });
       const result = await getCheckAnswers(overseasApplication);
       const [overseasSummaryList] =
         result.getBlocksByVariant("govukSummaryList");

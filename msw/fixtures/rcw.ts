@@ -70,4 +70,5 @@ export const clientDetailsApplication = getGetApplicationResponseMock({
       "[A-CEGHJ-NOPR-TW-Z]{2}[0-9]{6}[ABCDs]{1}",
     ),
   },
+  scopingQuestions: { priorLegalAid: "no" },
 });
