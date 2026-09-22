@@ -101,7 +101,7 @@ services:
 
   redis-rcw:
     container_name: rcw-session-redis
-    image: "redis:8.10-alpine@sha256:7d509f5640f5ed199d8781b5f5a45050133efe700aed34491f0b060665066d76"
+    image: "redis:8.10-alpine@sha256:ba6e394f6acc2a695ef1b6944f161b9ca813711739be68319fa0db3470673f1d"
     ports:
       - 6379:6379
     command: >
