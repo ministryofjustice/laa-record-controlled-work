@@ -1,5 +1,6 @@
 import { createForgeTestClient } from "#tests/integration/utils/helpers.js";
 import { faker } from "@faker-js/faker";
+import type { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import {
   TestRedirectResult,
   TestRenderResult,
@@ -71,15 +72,18 @@ describe("Declaration sign step", () => {
       });
     });
 
-    it("shows the expected PDF download button", () => {
-      const block = getBlockWithContent(
-        render,
-        "govukButton",
-        "Download declaration as a PDF",
-      );
+    it("shows the application export link", () => {
+      const block = render
+        .getBlocksByVariant("govukLinkButton")
+        .find((candidate) =>
+          String(candidate.properties.text).includes(
+            "Download declaration as a PDF",
+          ),
+        ) as RenderBlock;
 
       expect(block).to.exist;
-      expect(block.properties.value).to.equal("download-pdf");
+      expect(block.properties.href).to.equal(`/cases/${uuid}/export`);
+      expect(block.properties.attributes).to.deep.equal({ target: "_blank" });
     });
 
     it("shows the expected confirmation heading", () => {

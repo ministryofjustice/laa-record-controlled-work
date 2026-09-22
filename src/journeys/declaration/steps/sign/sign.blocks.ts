@@ -5,6 +5,8 @@ import type {
 
 import {
   Condition,
+  Format,
+  Params,
   Self,
   validation,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
@@ -15,10 +17,12 @@ import {
   GovUKCheckboxInput,
   GovUKDateInputFull,
   GovUKHeading,
+  GovUKLinkButton,
   GovUKValidations,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
 import { AnswerKey as A } from "#/journeys/AnswerKey.js";
+import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
 import { H1, H2 } from "#/lib/constants/headings.js";
 import { t, tt } from "#/lib/i18n.js";
 
@@ -34,10 +38,12 @@ export const statement = (): HtmlBlock[] => {
   return items.map((text) => GovUKBody({ text }));
 };
 
-export const downloadButton = (): GovUKButton => {
-  return GovUKButton({
+export const downloadButton = (): ReturnType<typeof GovUKLinkButton> => {
+  return GovUKLinkButton({
+    attributes: { target: "_blank" },
+    classes: "govuk-button--secondary",
+    href: Format("/cases/%1/export", Params(PARAMS_KEYS.applicationID)),
     text: t("journeys.declaration.sign.download"),
-    value: "download-pdf",
   });
 };
 

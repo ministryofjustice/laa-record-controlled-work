@@ -9,10 +9,8 @@ import {
   loadEligibilityAssessment,
   saveEligibilityAssessment,
 } from "#/api/eligibility/eligibility.service.js";
-import {
-  ApplicationIdParam,
-  PutEligibilityRequestBody,
-} from "#/api/eligibility/eligibility.types.js";
+import { PutEligibilityRequestBody } from "#/api/eligibility/eligibility.types.js";
+import { ApplicationIdParam } from "#/app/route.types.js";
 import { NotAuthenticatedError } from "#/auth/auth.errors.js";
 import { BAD_REQUEST, OK, UNAUTHORIZED } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
