@@ -74,7 +74,11 @@ export async function initMiddleware(
         debug: process.env.SENTRY_DEBUG === "true",
         dsn: sentryDsn,
         environment: process.env.SENTRY_ENV ?? "production",
-        integrations: [Sentry.httpIntegration(), Sentry.expressIntegration()],
+        integrations: [
+          Sentry.httpIntegration(),
+          Sentry.expressIntegration(),
+          Sentry.consoleLoggingIntegration({ levels: ["log", "warn", "error"] }),
+        ],
       });
     }
   }
