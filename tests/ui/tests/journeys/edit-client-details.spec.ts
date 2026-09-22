@@ -70,6 +70,10 @@ test("Edit Application - Client details journey", async ({
     `/cases/${applicationId}/task-list/details/enter-address-manually?returnTo=check-answers`,
   );
 
+  // ==========================================================================
+  // Update information
+  // ==========================================================================
+
   // Fill in the new address line 1 in the manual address entry form
   await page.getByLabel("Address line 1").fill("10 Changed Street");
 
