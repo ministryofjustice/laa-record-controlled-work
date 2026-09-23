@@ -1,6 +1,8 @@
 import type { EffectFunctionContext } from "@ministryofjustice/hmpps-forge/core";
 import type { Session, SessionData } from "express-session";
 
+import * as Sentry from "@sentry/node";
+
 import type { CreateApplicationRequestBody } from "#/api/clients/rcw/model/createApplicationRequestBody.zod.gen.js";
 import type { createApplicationResponse } from "#/api/clients/rcw/schema/applications/applications.gen.js";
 import type { CreateApplicationEffectsDeps } from "#/journeys/create-application/create-application.types.js";
@@ -56,7 +58,7 @@ export const createApplication =
     journeyCode: string,
   ): Promise<void> => {
     let response: createApplicationResponse;
-
+    let startTime = 0;
     try {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Session shape is constrained by app session typing.
       const session = context.getSession() as
@@ -82,9 +84,16 @@ export const createApplication =
         homeAccountId: session.msal?.homeAccountId,
         sessionId: session.id,
       });
-
+      startTime = performance.now();
       response = await deps.createApplication(dataForApi, opts);
     } catch (error) {
+      const duration = performance.now() - startTime;
+      Sentry.metrics.distribution("api_response_time", duration, {
+        attributes: {
+          endpoint: "createApplication",
+        },
+        unit: "millisecond",
+      });
       logger.error(
         `Error creating application for journey ${journeyCode}:`,
         error,
@@ -94,6 +103,15 @@ export const createApplication =
       );
       throw ApiResponseError.from(error);
     }
+
+    const duration = performance.now() - startTime;
+    Sentry.metrics.distribution("api_response_time", duration, {
+      attributes: {
+        endpoint: "createApplication",
+        status: response.status,
+      },
+      unit: "millisecond",
+    });
 
     if (response.status !== HTTP_STATUS.CREATED) {
       logger.error(

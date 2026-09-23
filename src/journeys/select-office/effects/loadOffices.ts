@@ -1,3 +1,5 @@
+import * as Sentry from "@sentry/node";
+
 import type {
   SelectOfficeContext,
   SelectOfficeEffectsDeps,
@@ -25,6 +27,7 @@ import { logger } from "#/logger.js";
 export const loadOffices =
   (deps: SelectOfficeEffectsDeps) => async (context: SelectOfficeContext) => {
     let response;
+    let startTime = 0;
     const firmCode = getFirmCodeFromSession(context);
     const laaAccounts =
       context.getSession()?.account?.idTokenClaims?.[
@@ -44,13 +47,30 @@ export const loadOffices =
             }
           : undefined,
       );
+      startTime = performance.now();
       response = await deps.getAllProviderOffices(firmCode, opts);
     } catch (error) {
+      const duration = performance.now() - startTime;
+      Sentry.metrics.distribution("api_response_time", duration, {
+        attributes: {
+          endpoint: "getAllProviderOffices",
+        },
+        unit: "millisecond",
+      });
       logger.error("Error fetching offices", error, {
         api: "getAllProviderOffices",
       });
       throw ApiResponseError.from(error);
     }
+
+    const duration = performance.now() - startTime;
+    Sentry.metrics.distribution("api_response_time", duration, {
+      attributes: {
+        endpoint: "getAllProviderOffices",
+        status: response.status,
+      },
+      unit: "millisecond",
+    });
 
     if (response.status !== HTTP_STATUS.OK) {
       logger.error(

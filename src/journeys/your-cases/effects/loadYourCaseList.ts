@@ -1,3 +1,5 @@
+import * as Sentry from "@sentry/node";
+
 import type {
   CaseListContext,
   YourCasesEffectsDeps,
@@ -20,23 +22,40 @@ export const loadYourCaseList =
   (deps: YourCasesEffectsDeps) =>
   async (context: CaseListContext, status: ApplicationStatus) => {
     let response;
-
+    let startTime = 0;
     try {
       const session = context.getSession();
       const opts = await getRcwApiDefaultOptions({
         homeAccountId: session?.msal?.homeAccountId,
         sessionId: session?.id,
       });
+      startTime = performance.now();
       response = await deps.getApplications(
         { officeId: session?.selectedOffice?.code, status },
         opts,
       );
     } catch (error) {
+      const duration = performance.now() - startTime;
+      Sentry.metrics.distribution("api_response_time", duration, {
+        attributes: {
+          endpoint: "getApplications",
+        },
+        unit: "millisecond",
+      });
       logger.error("Error fetching applications", error, {
         api: "getApplications",
       });
       throw ApiResponseError.from(error);
     }
+
+    const duration = performance.now() - startTime;
+    Sentry.metrics.distribution("api_response_time", duration, {
+      attributes: {
+        endpoint: "getApplications",
+        status: response.status,
+      },
+      unit: "millisecond",
+    });
 
     if (response.status !== HTTP_STATUS.OK) {
       logger.error(

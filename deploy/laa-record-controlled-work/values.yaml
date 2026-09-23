@@ -130,6 +130,11 @@ rcw:
     ENTRA_REDIRECT_URI: ""
     REDIS_ENABLED: true  
     REDIS_SECRET_NAME: elasticache-redis
+    SENTRY_DSN: "https://34b761d28dfa94a743acb65213b75ed9@o345774.ingest.us.sentry.io/4512061899866112"
+    # Not a secret; the key is exposed in every HTTP response header and page source.
+    SENTRY_CSP_REPORT_ENDPOINT: "https://o345774.ingest.us.sentry.io/api/4512061899866112/security/?sentry_key=34b761d28dfa94a743acb65213b75ed9"
+    SENTRY_ENV: ""
+    SENTRY_DEBUG: false
 
   autoscaling:
     enabled: false

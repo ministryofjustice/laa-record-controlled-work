@@ -1,3 +1,5 @@
+import * as Sentry from "@sentry/node";
+
 import type {
   EditApplicationContext,
   EditApplicationEffectsDeps,
@@ -23,7 +25,7 @@ export const loadApplication =
   (deps: EditApplicationEffectsDeps) =>
   async (context: EditApplicationContext): Promise<void> => {
     let response;
-
+    let startTime = 0;
     try {
       const session = context.getSession();
       const applicationID = context.getRequestParam(PARAMS_KEYS.applicationID);
@@ -37,14 +39,30 @@ export const loadApplication =
         homeAccountId: session?.msal?.homeAccountId,
         sessionId: session?.id,
       });
-
+      startTime = performance.now();
       response = await deps.getApplication(applicationID, opts);
     } catch (error) {
+      const duration = performance.now() - startTime;
+      Sentry.metrics.distribution("api_response_time", duration, {
+        attributes: {
+          endpoint: "getApplication",
+        },
+        unit: "millisecond",
+      });
       logger.error("Error fetching application", error, {
         api: "getApplication",
       });
       throw ApiResponseError.from(error);
     }
+
+    const duration = performance.now() - startTime;
+    Sentry.metrics.distribution("api_response_time", duration, {
+      attributes: {
+        endpoint: "getApplication",
+        status: response.status,
+      },
+      unit: "millisecond",
+    });
 
     if (response.status !== HTTP_STATUS.OK) {
       logger.error(

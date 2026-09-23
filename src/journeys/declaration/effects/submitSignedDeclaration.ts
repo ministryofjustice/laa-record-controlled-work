@@ -1,3 +1,5 @@
+import * as Sentry from "@sentry/node";
+
 import type { updateApplicationDeclarationResponse } from "#/api/clients/rcw/schema/applications/applications.gen.js";
 
 import { ApiResponseError } from "#/api/clients/api.errors.js";
@@ -51,7 +53,7 @@ export const submitSignedDeclaration =
     }
 
     let response: updateApplicationDeclarationResponse;
-
+    let startTime = 0;
     try {
       const body = {
         dateSigned: date,
@@ -65,21 +67,38 @@ export const submitSignedDeclaration =
         sessionId: session.id,
       });
 
+      startTime = performance.now();
       response = await deps.updateApplicationDeclaration(
         applicationId,
         body,
         opts,
       );
     } catch (error) {
+      const duration = performance.now() - startTime;
+      Sentry.metrics.distribution("api_response_time", duration, {
+        attributes: {
+          endpoint: "updateApplicationDeclaration",
+        },
+        unit: "millisecond",
+      });
       logger.error("Failed to update application declaration", error, {
         api: "updateApplicationDeclaration",
       });
       throw ApiResponseError.from(error);
     }
 
+    const duration = performance.now() - startTime;
+    Sentry.metrics.distribution("api_response_time", duration, {
+      attributes: {
+        endpoint: "updateApplicationDeclaration",
+        status: response.status,
+      },
+      unit: "millisecond",
+    });
+
     if (response.status !== HTTP_STATUS.NO_CONTENT) {
       const error = new ApiResponseError();
-      logger.error("createApplication did not return 204", error, {
+      logger.error("updateApplicationDeclaration did not return 204", error, {
         api: "updateApplicationDeclaration",
         authHeaders: getAuthDebugHeaders(response.headers),
         data: null,

@@ -1,3 +1,5 @@
+import * as Sentry from "@sentry/node";
+
 import type {
   EditApplicationContext,
   EditApplicationEffectsDeps,
@@ -18,7 +20,7 @@ export const submitApplication =
   (deps: EditApplicationEffectsDeps) =>
   async (context: EditApplicationContext): Promise<void> => {
     let response;
-
+    let startTime = 0;
     try {
       const session = context.getSession();
       const { id } = context.getData(CONTEXT_DATA_KEYS.application);
@@ -27,17 +29,34 @@ export const submitApplication =
         sessionId: session?.id,
       });
 
+      startTime = performance.now();
       response = await deps.updateApplicationStatus(
         id,
         { applicationState: ApplicationState.enum.COMPLETED, eTag },
         opts,
       );
     } catch (error) {
+      const duration = performance.now() - startTime;
+      Sentry.metrics.distribution("api_response_time", duration, {
+        attributes: {
+          endpoint: "updateApplicationStatus",
+        },
+        unit: "millisecond",
+      });
       logger.error("Error submitting application", error, {
         api: "updateApplicationStatus",
       });
       throw ApiResponseError.from(error);
     }
+
+    const duration = performance.now() - startTime;
+    Sentry.metrics.distribution("api_response_time", duration, {
+      attributes: {
+        endpoint: "updateApplicationStatus",
+        status: response.status,
+      },
+      unit: "millisecond",
+    });
 
     if (response.status !== HTTP_STATUS.NO_CONTENT) {
       logger.error(

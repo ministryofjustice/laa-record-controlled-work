@@ -1,3 +1,5 @@
+import * as Sentry from "@sentry/node";
+
 import type {
   EditApplicationContext,
   EditApplicationEffectsDeps,
@@ -27,6 +29,8 @@ export const closeIneligibleCase =
       homeAccountId: session?.msal?.homeAccountId,
       sessionId: session?.id,
     });
+
+    const startTime = performance.now();
     const response = await deps.updateApplicationStatus(
       applicationID,
       {
@@ -35,6 +39,14 @@ export const closeIneligibleCase =
       },
       options,
     );
+    const duration = performance.now() - startTime;
+    Sentry.metrics.distribution("api_response_time", duration, {
+      attributes: {
+        endpoint: "updateApplicationStatus",
+        status: response.status,
+      },
+      unit: "millisecond",
+    });
 
     if (response.status !== HTTP_STATUS.NO_CONTENT) {
       throw new Error("updateApplicationStatus did not return 204");
