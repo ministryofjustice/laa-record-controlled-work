@@ -10,20 +10,22 @@ import {
 
 import { t } from "#/lib/i18n.js";
 
-export function description() {
+/**
+ * Renders the description text for the "Have evidence of expenditure" step.
+ * @returns {GovUKBody} The description text component.
+ */
+export function description(): GovUKBody {
   return GovUKBody({
-  classes: "govuk-body",
-  text: t("journeys.evidence.haveEvidenceOfExpenditure.description"),
+    classes: "govuk-body",
+    text: t("journeys.evidence.haveEvidenceOfExpenditure.description"),
   });
 }
 
-export function link() {
-  return GovUKBody({
-    text: `<a href="#" class="govuk-link">${t("journeys.evidence.haveEvidenceOfExpenditure.linkText")}</a>`,
-  });
-}
-
-export function haveEvidenceOfExpenditureRadioInput() {
+/**
+ * Renders the radio input for the "Have evidence of expenditure" step.
+ * @returns {GovUKRadioInput} The radio input component.
+ */
+export function haveEvidenceOfExpenditureRadioInput(): GovUKRadioInput {
   return GovUKRadioInput({
     code: "haveEvidenceOfExpenditure",
     items: [
@@ -44,5 +46,15 @@ export function haveEvidenceOfExpenditureRadioInput() {
         ),
       }),
     ],
+  });
+}
+
+/**
+ * Renders the link for the "Have evidence of expenditure" step.
+ * @returns {GovUKBody} The link component.
+ */
+export function link(): GovUKBody {
+  return GovUKBody({
+    text: `<a href="#" class="govuk-link">${t("journeys.evidence.haveEvidenceOfExpenditure.linkText")}</a>`,
   });
 }

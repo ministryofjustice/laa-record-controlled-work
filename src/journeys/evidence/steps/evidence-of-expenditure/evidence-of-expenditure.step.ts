@@ -12,17 +12,19 @@ import {
 import { evidenceEffects } from "#/journeys/evidence/evidence.effects.js";
 import {
   childCareEvidenceGroup,
-  heading,
   housingCostsEvidenceGroup,
   incomeEvidenceGroup,
   label,
   maintenanceEvidenceGroup,
 } from "#/journeys/evidence/steps/evidence-of-expenditure/evidence-of-expenditure.blocks.js";
+import { heading } from "#/journeys/shared.blocks.js";
 import { caption, continueButton } from "#/journeys/shared.blocks.js";
 import { t } from "#/lib/i18n.js";
 
-const TITLE = t("journeys.evidence.evidenceOfExpenditure.title"); 
-const VALIDATION_REQUIRED = t("journeys.evidence.evidenceOfExpenditure.validation.required");
+const TITLE = t("journeys.evidence.evidenceOfExpenditure.title");
+const VALIDATION_REQUIRED = t(
+  "journeys.evidence.evidenceOfExpenditure.validation.required",
+);
 
 export const evidenceOfExpenditure = (
   journeyCode: string,
@@ -30,12 +32,12 @@ export const evidenceOfExpenditure = (
   step({
     blocks: [
       caption(t("journeys.evidence.caption")),
-      heading,
-      label,
-      incomeEvidenceGroup,
-      housingCostsEvidenceGroup,
-      childCareEvidenceGroup,
-      maintenanceEvidenceGroup,
+      heading(TITLE),
+      label(),
+      incomeEvidenceGroup(),
+      housingCostsEvidenceGroup(),
+      childCareEvidenceGroup(),
+      maintenanceEvidenceGroup(),
       continueButton(),
     ],
     onSubmission: [

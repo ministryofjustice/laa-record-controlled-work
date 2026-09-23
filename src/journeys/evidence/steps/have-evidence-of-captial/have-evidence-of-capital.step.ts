@@ -8,9 +8,12 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
 import { evidenceEffects } from "#/journeys/evidence/evidence.effects.js";
+import {
+  description,
+  haveEvidenceOfCapitalRadioInput,
+} from "#/journeys/evidence/steps/have-evidence-of-captial/have-evidence-of-capital.blocks.js";
 import { caption, continueButton, heading } from "#/journeys/shared.blocks.js";
 import { t } from "#/lib/i18n.js";
-import { description, haveEvidenceOfCapitalRadioInput } from "#/journeys/evidence/steps/have-evidence-of-captial/have-evidence-of-capital.blocks.js";
 
 export const haveEvidenceOfCapital = (
   journeyCode: string,
@@ -34,9 +37,11 @@ export const haveEvidenceOfCapital = (
             }),
             redirect({
               goto: "evidence-of-capital",
-              when: Answer("haveEvidenceOfCapital").match(Condition.Equals("yes")),
+              when: Answer("haveEvidenceOfCapital").match(
+                Condition.Equals("yes"),
+              ),
             }),
-            redirect({ goto: "have-evidence-of-capital" }),
+            redirect({ goto: "check-answers" }),
           ],
         },
         validate: true,

@@ -8,9 +8,13 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
 import { evidenceEffects } from "#/journeys/evidence/evidence.effects.js";
+import {
+  description,
+  haveEvidenceOfExpenditureRadioInput,
+  link,
+} from "#/journeys/evidence/steps/have-evidence-of-expenditure/have-evidence-of-expenditure.blocks.js";
 import { caption, continueButton, heading } from "#/journeys/shared.blocks.js";
 import { t } from "#/lib/i18n.js";
-import { description, haveEvidenceOfExpenditureRadioInput, link } from "#/journeys/evidence/steps/have-evidence-of-expenditure/have-evidence-of-expenditure.blocks.js";
 
 export const haveEvidenceOfExpenditure = (
   journeyCode: string,
@@ -35,7 +39,9 @@ export const haveEvidenceOfExpenditure = (
             }),
             redirect({
               goto: "evidence-of-expenditure",
-              when: Answer("haveEvidenceOfExpenditure").match(Condition.Equals("yes")),
+              when: Answer("haveEvidenceOfExpenditure").match(
+                Condition.Equals("yes"),
+              ),
             }),
             redirect({ goto: "have-evidence-of-capital" }),
           ],
