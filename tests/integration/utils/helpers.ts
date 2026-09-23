@@ -26,7 +26,9 @@ import { JourneyEffectsImplementations } from "#/journeys/effects.js";
  */
 export function createForgeTestClient<TDeps>(
   sourceJourney: JourneyDefinition,
-  effectsRegistry: BaseFunctionRegistry<TDeps>,
+  effectsRegistry:
+    | BaseFunctionRegistry<TDeps>
+    | BaseFunctionRegistry<TDeps>[],
   overrides?: {
     additionalFunctions?: BaseFunctionRegistry<TDeps>[];
     dependencies?: TDeps;
@@ -43,7 +45,9 @@ export function createForgeTestClient<TDeps>(
   const testPackage = createTestPackage(
     createForgePackage({
       functions: [
-        effectsRegistry,
+        ...(Array.isArray(effectsRegistry)
+          ? effectsRegistry
+          : [effectsRegistry]),
         ...(overrides?.additionalFunctions ?? []),
       ],
       journey: sourceJourney,
