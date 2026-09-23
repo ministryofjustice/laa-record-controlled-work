@@ -8,7 +8,7 @@ ingress:
         - path: /
           pathType: Prefix
   annotations:
-    external-dns.alpha.kubernetes.io/set-identifier: "ingress-name-laa-record-controlled-work-laa-record-controlled-work-production-green"
+    external-dns.alpha.kubernetes.io/set-identifier: "laa-record-controlled-work-laa-record-controlled-work-production-green"
 
 rcw:
   replicaCount: 2
