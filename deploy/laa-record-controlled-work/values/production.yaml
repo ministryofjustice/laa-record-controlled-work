@@ -1,9 +1,9 @@
 serviceAccount:
-  name: "your-github-action-service-account"
+  name: rcw-github-action-service-account
 
 ingress:
   hosts:
-    - host: your-production-namespace.cloud-platform.service.justice.gov.uk
+    - host: laa-record-controlled-work-production.cloud-platform.service.justice.gov.uk
       paths:
         - path: /
           pathType: Prefix
@@ -14,7 +14,11 @@ rcw:
   replicaCount: 2
 
   env:
-    NODE_ENV: "production"
+    NODE_ENV: production
+    ENTRA_REDIRECT_URI: https://laa-record-controlled-work-production.cloud-platform.service.justice.gov.uk/auth/code/callback
+    ENTRA_ADDITIONAL_SCOPES: api://rcw-api/Applications.Read
+    RCW_API_BASE_URL: http://laa-record-controlled-work-api-production.laa-record-controlled-work-api.svc:8081
+    PDA_API_BASE_URL: https://laa-provider-details-api-prod.apps.live.cloud-platform.service.justice.gov.uk/
 
 ccq:
   replicaCount: 2
