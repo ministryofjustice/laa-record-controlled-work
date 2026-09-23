@@ -88,9 +88,7 @@ export const getGetApplicationResponseMock = <
       firstName: faker.string.alpha({ length: { min: 10, max: 20 } }),
       lastName: faker.string.alpha({ length: { min: 10, max: 20 } }),
       dateOfBirth: faker.date.past().toISOString().slice(0, 10),
-      niNumber: faker.helpers.fromRegExp(
-        "^(?!BG|GB|KN|NK|NT|TN|ZZ)[A-CEGHJ-PR-TW-Z][A-CEGHJ-NPR-TW-Z][0-9]{6}[ABCD]$",
-      ),
+      niNumber: faker.helpers.fromRegExp("AA[0-9]{6}[A-D]"),
       hasFixedAddress: faker.datatype.boolean(),
       address: faker.helpers.arrayElement([
         {
