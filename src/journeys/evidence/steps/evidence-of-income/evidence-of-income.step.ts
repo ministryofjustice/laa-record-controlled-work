@@ -50,7 +50,7 @@ export const evidenceOfIncome = (
               goto: "check-answers",
               when: Query("returnTo").match(Condition.Equals("check-answers")),
             }),
-            redirect({ goto: "evidence-of-expenditure" }),
+            redirect({ goto: "have-evidence-of-expenditure" }),
           ],
         },
         validate: true,

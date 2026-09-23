@@ -1,15 +1,17 @@
 import {
+  Answer,
   Condition,
+  or,
   Query,
   redirect,
   step,
   submit,
+  validation,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
 import { evidenceEffects } from "#/journeys/evidence/evidence.effects.js";
 import {
   childCareEvidenceGroup,
-  description,
   heading,
   housingCostsEvidenceGroup,
   incomeEvidenceGroup,
@@ -19,6 +21,9 @@ import {
 import { caption, continueButton } from "#/journeys/shared.blocks.js";
 import { t } from "#/lib/i18n.js";
 
+const TITLE = t("journeys.evidence.evidenceOfExpenditure.title"); 
+const VALIDATION_REQUIRED = t("journeys.evidence.evidenceOfExpenditure.validation.required");
+
 export const evidenceOfExpenditure = (
   journeyCode: string,
 ): ReturnType<typeof step> =>
@@ -26,7 +31,6 @@ export const evidenceOfExpenditure = (
     blocks: [
       caption(t("journeys.evidence.caption")),
       heading,
-      description,
       label,
       incomeEvidenceGroup,
       housingCostsEvidenceGroup,
@@ -43,7 +47,7 @@ export const evidenceOfExpenditure = (
               goto: "check-answers",
               when: Query("returnTo").match(Condition.Equals("check-answers")),
             }),
-            redirect({ goto: "evidence-of-capital" }),
+            redirect({ goto: "have-evidence-of-capital" }),
           ],
         },
         validate: true,
@@ -53,5 +57,16 @@ export const evidenceOfExpenditure = (
     reachability: {
       entryWhen: Query("returnTo").match(Condition.Equals("check-answers")),
     },
-    title: t("journeys.evidence.evidenceOfExpenditure.title"),
+    title: TITLE,
+    validWhen: [
+      validation({
+        condition: or(
+          Answer("incomeEvidence").match(Condition.IsRequired()),
+          Answer("housingCostsEvidence").match(Condition.IsRequired()),
+          Answer("childCareEvidence").match(Condition.IsRequired()),
+          Answer("maintenanceEvidence").match(Condition.IsRequired()),
+        ),
+        message: VALIDATION_REQUIRED,
+      }),
+    ],
   });

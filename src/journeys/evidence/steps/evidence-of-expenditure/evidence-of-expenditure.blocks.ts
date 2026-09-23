@@ -12,13 +12,6 @@ export const heading = GovUKHeading({
   text: t("journeys.evidence.evidenceOfExpenditure.title"),
 });
 
-export const description = GovUKBody({
-  classes: "govuk-body",
-  text:
-    `${t("journeys.evidence.evidenceOfExpenditure.description")} ` +
-    `<a href="#" target="_blank">${t("journeys.evidence.evidenceOfExpenditure.linkText")}</a>`,
-});
-
 export const label = GovUKBody({
   classes: "govuk-hint",
   text: t("journeys.evidence.evidenceOfExpenditure.hint"),

@@ -7,6 +7,8 @@ import { evidenceOfCapital } from "#/journeys/evidence/steps/evidence-of-capital
 import { evidenceOfExpenditure } from "#/journeys/evidence/steps/evidence-of-expenditure/evidence-of-expenditure.step.js";
 import { evidenceOfIncome } from "#/journeys/evidence/steps/evidence-of-income/evidence-of-income.step.js";
 import { reasonForNoEvidence } from "#/journeys/evidence/steps/reason-for-no-evidence/reason-for-no-evidence.step.js";
+import { haveEvidenceOfExpenditure } from "#/journeys/evidence/steps/have-evidence-of-expenditure/have-evidence-of-expenditure.step.js";
+import { haveEvidenceOfCapital } from "#/journeys/evidence/steps/have-evidence-of-captial/have-evidence-of-capital.step.js";
 
 const journeyCode = "evidence";
 
@@ -23,7 +25,9 @@ export const evidenceJourney = journey({
     doYouHaveEvidence(journeyCode),
     reasonForNoEvidence(journeyCode),
     evidenceOfIncome(journeyCode),
+    haveEvidenceOfExpenditure(journeyCode),
     evidenceOfExpenditure(journeyCode),
+    haveEvidenceOfCapital(journeyCode),
     evidenceOfCapital(journeyCode),
     checkAnswersStep(),
   ],
