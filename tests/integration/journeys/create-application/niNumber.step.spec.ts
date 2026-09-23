@@ -118,21 +118,42 @@ describe("NI number step", () => {
       expect(redirectResult.url).to.equal("/cases/new/have-a-home-address");
     });
 
-    it("accepts formatted NI numbers and stores them normalized", async () => {
-      const session: {
-        journeyDrafts?: Record<string, Record<string, unknown>>;
-      } = {};
-      const result = await client.post("/cases/new/ni-number", {
-        session,
-        body: { hasNINumber: "yes", niNumber: "j.n12-3456a" }, // gitleaks:allow - fake NI number used to test normalization
+    for (const { input, expected } of [
+      { input: "JN 12 34 56 A", expected: "JN123456A" }, // gitleaks:allow - fake NI number used to test human-readable normalization
+      { input: "j.n12-3456a", expected: "JN123456A" }, // gitleaks:allow - fake NI number used to test punctuation and case normalization
+    ]) {
+      it(`accepts ${input} and stores it as ${expected}`, async () => {
+        const session: {
+          journeyDrafts?: Record<string, Record<string, unknown>>;
+        } = {};
+        const result = await client.post("/cases/new/ni-number", {
+          session,
+          body: { hasNINumber: "yes", niNumber: input },
+        });
+        expect(result.type).to.equal("redirect");
+        const redirectResult = result as TestRedirectResult;
+        expect(redirectResult.url).to.equal("/cases/new/have-a-home-address");
+
+        const checkAnswersResult = await client.get(
+          "/cases/new/check-answers",
+          { session },
+        );
+        expect(checkAnswersResult.type).to.equal("render");
+        const checkAnswersRender = checkAnswersResult as TestRenderResult;
+        const [summaryList] = checkAnswersRender.getBlocksByVariant(
+          "govukSummaryList",
+        );
+        const rows = summaryList.properties.rows as Array<{
+          key: { text: string };
+          value: { text: string };
+        }>;
+        const niNumberRow = rows.find(
+          (row) => row.key.text === "National Insurance number",
+        );
+
+        expect(niNumberRow?.value.text).to.equal(expected);
       });
-      expect(result.type).to.equal("redirect");
-      const redirectResult = result as TestRedirectResult;
-      expect(redirectResult.url).to.equal("/cases/new/have-a-home-address");
-      expect(session.journeyDrafts?.createApplication?.niNumber).to.equal(
-        "JN123456A",
-      );
-    });
+    }
 
     it("returns to check answers when edited from check answers", async () => {
       const result = await client.post("/cases/new/ni-number", {
