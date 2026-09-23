@@ -49,7 +49,7 @@ describe("Auth Handlers", () => {
           idToken: "id-token",
           account: {
             environment: "login.microsoftonline.com",
-            homeAccountId: "test-uid.test-tenant-id",
+            homeAccountId: "test.user@example.com",
             localAccountId: "test-uid",
             tenantId: "test-tenant-id",
             username: "testuser@example.com",
@@ -134,10 +134,10 @@ describe("Auth Handlers", () => {
       const sessionResponse = await agent.get("/test/session");
       expect(sessionResponse.status).to.equal(200);
       expect(sessionResponse.body.account).to.include({
-        homeAccountId: "test-uid.test-tenant-id",
+        homeAccountId: "test.user@example.com",
       });
       expect(sessionResponse.body.msal).to.deep.equal({
-        homeAccountId: "test-uid.test-tenant-id",
+        homeAccountId: "test.user@example.com",
       });
       expect(sessionResponse.body).to.not.have.property("accessToken");
       expect(sessionResponse.body).to.not.have.property("idToken");

@@ -1,29 +1,24 @@
 import { Router } from "express";
 
+import {
+  FIRM_NAME,
+  getTestSessionAccount,
+  LAA_ACCOUNT,
+} from "#/auth/actions/getTestSessionAccount.action.js";
 import { OK } from "#/lib/constants/http.js";
 
 const router: Router = Router();
 
-const FIRM_CODE = 12345;
-const LAA_ACCOUNTS = ["R1XEVG", "VGHVEY", "3TVRNM"];
-
 router.get("/signin", (req, res, next) => {
   req.session.isAuthenticated = true;
-  req.session.account = {
-    environment: "login.microsoftonline.com",
-    homeAccountId: "test-uid.test-tenant-id",
-    idToken: "test-id-token",
-    idTokenClaims: {
-      FIRM_CODE,
-      LAA_ACCOUNTS,
-    },
-    localAccountId: "test-uid",
-    name: "Test User",
-    tenantId: "test-tenant-id",
-    username: "testuser@example.com",
+  req.session.account = getTestSessionAccount();
+  req.session.selectedOffice = {
+    address: "123 Test Street",
+    code: LAA_ACCOUNT,
+    firmName: FIRM_NAME,
   };
   req.session.msal = {
-    homeAccountId: "test-uid.test-tenant-id",
+    homeAccountId: "test.user@example.com",
   };
 
   req.session.save((err: unknown) => {

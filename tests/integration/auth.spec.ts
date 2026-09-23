@@ -202,9 +202,7 @@ describe("Auth Integration", () => {
       const raw = await sessionRedisClient.get(keys[0]);
       const session = JSON.parse(raw!) as SessionData;
       expect(session.isAuthenticated).to.equal(true);
-      expect(session.account?.homeAccountId).to.equal(
-        "test-uid.test-tenant-id",
-      );
+      expect(session.account?.homeAccountId).to.equal("test.user@example.com");
     });
   });
 
