@@ -1,28 +1,3 @@
-import { EffectRegistry } from "@ministryofjustice/hmpps-forge/core/authoring";
+import { editApplicationEffects } from "#/journeys/edit-application/editApplication.effects.js";
 
-import type { EditApplicationEffectsDeps } from "#/journeys/edit-application/editApplication.types.js";
-
-import { loadApplication } from "#/journeys/edit-application/effects/loadApplication.js";
-import { loadApplicationAsAnswers } from "#/journeys/edit-client-details/effects/loadApplicationAsAnswers.js";
-import {
-  clearAllDraftAnswers,
-  clearFieldAnswers,
-  loadDraftAnswers,
-  saveDraftAnswers,
-} from "#/journeys/effects.js";
-
-export const editClientDetailsEffectsRegistry =
-  new EffectRegistry<EditApplicationEffectsDeps>();
-
-export const editClientDetailsEffects = {
-  clearAllDraftAnswers:
-    editClientDetailsEffectsRegistry.register(clearAllDraftAnswers),
-  clearFieldAnswers:
-    editClientDetailsEffectsRegistry.register(clearFieldAnswers),
-  loadApplication: editClientDetailsEffectsRegistry.register(loadApplication),
-  loadApplicationAsAnswers: editClientDetailsEffectsRegistry.register(
-    loadApplicationAsAnswers,
-  ),
-  loadDraftAnswers: editClientDetailsEffectsRegistry.register(loadDraftAnswers),
-  saveDraftAnswers: editClientDetailsEffectsRegistry.register(saveDraftAnswers),
-};
+export const editClientDetailsEffects = editApplicationEffects;

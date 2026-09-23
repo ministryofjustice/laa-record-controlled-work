@@ -3,9 +3,11 @@ import { describe, it } from "mocha";
 import sinon from "sinon";
 import { clearFieldAnswers } from "#/journeys/effects.js";
 import { type EffectFunctionContext } from "@ministryofjustice/hmpps-forge/core/authoring";
+import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
 
 describe("ClearFieldAnswers", () => {
   let getSession: sinon.SinonStub;
+  let getRequestParam: sinon.SinonStub;
   let clearAnswer: sinon.SinonStub;
   let context: EffectFunctionContext;
   let session: Record<string, unknown>;
@@ -13,10 +15,12 @@ describe("ClearFieldAnswers", () => {
   beforeEach(() => {
     session = {};
     getSession = sinon.stub().returns(session);
+    getRequestParam = sinon.stub().returns(undefined);
     clearAnswer = sinon.stub();
 
     context = {
       getSession,
+      getRequestParam,
       clearAnswer,
     } as unknown as EffectFunctionContext;
   });
@@ -70,5 +74,21 @@ describe("ClearFieldAnswers", () => {
     clearFieldAnswers()(context, "testJourney", ["addressLine2", "addressLine3"]);
 
     expect(clearAnswer.calledTwice).to.equal(true);
+  });
+
+  it("clears fields from the edit draft for the current application", () => {
+    getRequestParam.withArgs(PARAMS_KEYS.applicationID).returns("application-1");
+    session.journeyDrafts = {
+      "editClientDetails:application-1": { addressLine1: "remove" },
+      "editClientDetails:application-2": { addressLine1: "keep" },
+    };
+
+    clearFieldAnswers()(context, "editClientDetails", ["addressLine1"]);
+
+    const drafts = session.journeyDrafts as Record<string, Record<string, unknown>>;
+    expect(drafts["editClientDetails:application-1"]).to.deep.equal({});
+    expect(drafts["editClientDetails:application-2"]).to.deep.equal({
+      addressLine1: "keep",
+    });
   });
 });
