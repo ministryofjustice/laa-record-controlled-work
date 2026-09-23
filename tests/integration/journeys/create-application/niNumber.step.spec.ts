@@ -4,12 +4,12 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
 import { createApplicationEffectsRegistry } from "#/journeys/create-application/create-application.effects.js";
-import { createForgeTestClient } from "../../utils/helpers.js";
+import { createApplicationTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import { createApplicationJourney } from "#/journeys/create-application/create-application.journey.js";
 
 describe("NI number step", () => {
-  const client = createForgeTestClient(
+  const client = createApplicationTestClient(
     createApplicationJourney,
     createApplicationEffectsRegistry,
   );
@@ -118,13 +118,20 @@ describe("NI number step", () => {
       expect(redirectResult.url).to.equal("/cases/new/have-a-home-address");
     });
 
-    it("accepts formatted NI numbers and normalizes them before continuing", async () => {
+    it("accepts formatted NI numbers and stores them normalized", async () => {
+      const session: {
+        journeyDrafts?: Record<string, Record<string, unknown>>;
+      } = {};
       const result = await client.post("/cases/new/ni-number", {
+        session,
         body: { hasNINumber: "yes", niNumber: "j.n12-3456a" }, // gitleaks:allow - fake NI number used to test normalization
       });
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
       expect(redirectResult.url).to.equal("/cases/new/have-a-home-address");
+      expect(session.journeyDrafts?.createApplication?.niNumber).to.equal(
+        "JN123456A",
+      );
     });
 
     it("returns to check answers when edited from check answers", async () => {

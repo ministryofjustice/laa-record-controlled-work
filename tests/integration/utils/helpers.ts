@@ -1,10 +1,8 @@
 import {
   createForgePackage,
-  type AccessHook,
+  type BaseFunctionRegistry,
   type JourneyDefinition,
-  type StepDefinition,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
-import type { ForgePackageRegistration } from "@ministryofjustice/hmpps-forge/core";
 import {
   createTestPackage,
   type ForgeTestClient,
@@ -15,6 +13,8 @@ import { govukComponents } from "@ministryofjustice/hmpps-forge/govuk-components
 import { mojComponents } from "@ministryofjustice/hmpps-forge/moj-components";
 
 import { autocomplete } from "#/journeys/components/autocomplete/autocomplete.component.js";
+import type { CreateApplicationEffectsDeps } from "#/journeys/create-application/create-application.types.js";
+import { createApplicationTransformersRegistry } from "#/journeys/create-application/create-application.transformers.js";
 import { JourneyEffectsImplementations } from "#/journeys/effects.js";
 
 
@@ -26,8 +26,9 @@ import { JourneyEffectsImplementations } from "#/journeys/effects.js";
  */
 export function createForgeTestClient<TDeps>(
   sourceJourney: JourneyDefinition,
-  effectsRegistry: ForgePackageRegistration<TDeps>["functions"],
+  effectsRegistry: BaseFunctionRegistry<TDeps>,
   overrides?: {
+    additionalFunctions?: BaseFunctionRegistry<TDeps>[];
     dependencies?: TDeps;
   },
 ): ForgeTestClient {
@@ -37,7 +38,10 @@ export function createForgeTestClient<TDeps>(
 
   const testPackage = createTestPackage(
     createForgePackage({
-      functions: effectsRegistry,
+      functions: [
+        effectsRegistry,
+        ...(overrides?.additionalFunctions ?? []),
+      ],
       journey: sourceJourney,
     }),
   );
@@ -49,4 +53,17 @@ export function createForgeTestClient<TDeps>(
     .registerGlobalFunctions(JourneyEffectsImplementations)
     .registerPackage(testPackage, overrides?.dependencies)
     .createClient();
+}
+
+export function createApplicationTestClient(
+  sourceJourney: JourneyDefinition,
+  effectsRegistry: BaseFunctionRegistry<CreateApplicationEffectsDeps>,
+  overrides?: {
+    dependencies?: CreateApplicationEffectsDeps;
+  },
+): ForgeTestClient {
+  return createForgeTestClient(sourceJourney, effectsRegistry, {
+    additionalFunctions: [createApplicationTransformersRegistry],
+    dependencies: overrides?.dependencies,
+  });
 }

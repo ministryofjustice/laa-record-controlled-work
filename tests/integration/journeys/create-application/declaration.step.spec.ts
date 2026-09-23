@@ -5,11 +5,11 @@ import {
 import { expect } from "chai";
 import { createApplicationEffectsRegistry } from "#/journeys/create-application/create-application.effects.js";
 
-import { createForgeTestClient } from "../../utils/helpers.js";
+import { createApplicationTestClient } from "../../utils/helpers.js";
 import { createApplicationJourney } from "#/journeys/create-application/create-application.journey.js";
 
 describe("Declaration step", () => {
-  const client = createForgeTestClient(
+  const client = createApplicationTestClient(
     createApplicationJourney,
     createApplicationEffectsRegistry,
   );

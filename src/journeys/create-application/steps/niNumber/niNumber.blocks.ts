@@ -10,6 +10,7 @@ import {
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
 import { AnswerKey } from "#/journeys/AnswerKey.enum.js";
+import { CreateApplicationTransformers } from "#/journeys/create-application/create-application.transformers.js";
 import { yesOrNoRadioInput } from "#/journeys/shared.blocks.js";
 import { t } from "#/lib/i18n.js";
 
@@ -39,6 +40,7 @@ export function niNumberInput(): GovUKTextInput {
     classes: "govuk-input--width-10",
     code: AnswerKey.niNumber,
     dependentWhen: Answer(AnswerKey.hasNINumber).match(Condition.Equals("yes")),
+    formatters: [CreateApplicationTransformers.normaliseNiNumber()],
     label: LABEL,
     spellcheck: false,
     validWhen: [
