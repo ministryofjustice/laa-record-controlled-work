@@ -943,7 +943,6 @@ __metadata:
 "@orval/angular@npm:8.33.0":
   version: 8.33.0
   resolution: "@orval/angular@npm:8.33.0"
-
   dependencies:
     "@orval/core": "npm:8.33.0"
   checksum: 10c0/12c5d4487354c18a2011a9e1c58aabf97f72bcd7a0832fed8b9069940a7bf5cfbd86d7bb0f7f949127a89ce3d9a5ac28c66cf20cbf6050e173888286db305da6
@@ -3950,8 +3949,8 @@ __metadata:
   linkType: hard
 
 "eslint-plugin-jsdoc@npm:^64.5.0":
-  version: 64.5.0
-  resolution: "eslint-plugin-jsdoc@npm:64.5.0"
+  version: 64.5.2
+  resolution: "eslint-plugin-jsdoc@npm:64.5.2"
   dependencies:
     "@es-joy/jsdoccomment": "npm:~0.97.0"
     "@es-joy/resolve.exports": "npm:1.2.0"
@@ -3970,7 +3969,11 @@ __metadata:
     to-valid-identifier: "npm:^1.0.0"
   peerDependencies:
     eslint: ^7.0.0 || ^8.0.0 || ^9.0.0 || ^10.0.0
-  checksum: 10c0/bb3250ad497eb421d3a589ed48fc0d1cf7b0d7f750057203a7ce32a7d0f231742c6c73017c6293965d12407d58b6e8b2d956adb9f7e9b669b4e235fe086a3e39
+    typescript: "*"
+  peerDependenciesMeta:
+    typescript:
+      optional: true
+  checksum: 10c0/6a71dbba3d7a5e58384e39eb38e8750aa22684fac481baba25baf2f134e75e6bcfab22f8913964b5823fc67fac5faf99b259c2d5b02d60c011a4cf16ab3d3a25
   languageName: node
   linkType: hard
 
@@ -4981,13 +4984,13 @@ __metadata:
   linkType: hard
 
 "import-in-the-middle@npm:^3.0.0":
-  version: 3.5.0
-  resolution: "import-in-the-middle@npm:3.5.0"
+  version: 3.5.1
+  resolution: "import-in-the-middle@npm:3.5.1"
   dependencies:
     cjs-module-lexer: "npm:^2.2.0"
     es-module-lexer: "npm:^3.0.2"
     module-details-from-path: "npm:^1.0.4"
-  checksum: 10c0/f184b29d9d76c929d4dcb73594fcc1539f7dc2536fdc4efac623e5d31f3a97d467b5d2c5eca4c20cad01bb55763de90e63501a2d8d68f68b86925e2db5796c6d
+  checksum: 10c0/347884c4e69a9d1624dac8f23aa6381c25795fae418f12042a32a84bc6538c4fd03ffb8a3d4437170e826395178ad9e3e64cb6db5c14d2b63d692a70edaf03eb
   languageName: node
   linkType: hard
 
