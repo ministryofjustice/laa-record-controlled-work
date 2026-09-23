@@ -240,6 +240,9 @@ describe("Auth Integration", () => {
       expect(callbackRes.status).to.equal(FOUND);
       expect(callbackRes.headers.location).to.equal("/");
 
+      // Mimic office selection, which is not handled by the mock IdP. Without this, auth will fail.
+      await unauthenticatedUser.get("/test/select-office");
+
       // Verify the user is now authenticated and can reach the landing page
       const landingRes = await unauthenticatedUser.get("/");
       expect(landingRes.status).to.equal(OK);
