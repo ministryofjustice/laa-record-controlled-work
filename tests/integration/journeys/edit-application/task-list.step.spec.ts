@@ -11,7 +11,7 @@ import { createForgeTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import { editApplicationEffectsRegistry } from "#/journeys/edit-application/editApplication.effects.js";
 import { editApplicationJourney } from "#/journeys/edit-application/editApplication.journey.js";
-import { taskListStep } from "#/journeys/edit-application/steps/task-list/task-list.step.js";
+import { editApplicationTransformersRegistry } from "#/journeys/edit-application/editApplication.transformers.js";
 import { getBlockWithContent } from "../../utils/getBlockWithContent.helper.js";
 
 type RenderedTaskListItem = {
@@ -40,6 +40,7 @@ describe("Task list step", () => {
     editApplicationJourney,
     editApplicationEffectsRegistry,
     {
+      additionalFunctions: [editApplicationTransformersRegistry],
       dependencies: {
         getApplication: getApplicationStub,
         updateApplicationStatus: updateApplicationStatusStub,
