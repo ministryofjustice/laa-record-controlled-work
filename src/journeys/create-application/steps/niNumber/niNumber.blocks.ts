@@ -27,7 +27,7 @@ const HAS_NI_NUMBER_VALIDATION = t(
 );
 const NI_NUMBER_MAX_LENGTH = 13;
 const NI_NUMBER_REGEX =
-  "^(?!BG|GB|KN|NK|NT|TN|ZZ)(?![DFIQUV])[A-Z](?![DFIQUVO])[A-Z][0-9]{6}[ABCD]$";
+  "^(?!BG|GB|KN|NK|NT|TN|ZZ)[A-CEGHJ-PR-TW-Z][A-CEGHJ-NPR-TW-Z][0-9]{6}[ABCD]$";
 
 /**
  * Creates the National Insurance number input shown when the client has one.
