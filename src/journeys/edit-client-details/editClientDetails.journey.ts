@@ -4,7 +4,7 @@ import { clientDetailsStep } from "#/journeys/create-application/steps/clientDet
 import { ecfStep } from "#/journeys/create-application/steps/ecf/ecf.step.js";
 import { ineligibleStep } from "#/journeys/create-application/steps/ecfDropout/ecfDropout.step.js";
 import { enterAddressManuallyStep } from "#/journeys/create-application/steps/enter-address-manually.step.js";
-import { enterOverseasAddressStep } from "#/journeys/create-application/steps/enter-overseas-address.step.js";
+import { enterOverseasAddressStep } from "#/journeys/create-application/steps/enterOverseasAddress/enterOverseasAddress.step.js";
 import { haveAHomeAddressStep } from "#/journeys/create-application/steps/haveAHomeAddress/haveAHomeAddress.step.js";
 import { legalAidBeforeStep } from "#/journeys/create-application/steps/legalAidBefore/legalAidBefore.step.js";
 import { legalAidLast6MonthsStep } from "#/journeys/create-application/steps/legalAidLast6Months/legalAidLast6Months.step.js";
