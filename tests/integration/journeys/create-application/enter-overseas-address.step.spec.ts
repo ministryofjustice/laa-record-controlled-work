@@ -45,7 +45,7 @@ describe("Enter overseas address step", () => {
         .getBlocksByVariant("html")
         .find((b) =>
           (b.properties.content as string).includes(
-            "/enter-address-manually",
+            "enter-address-manually",
           ),
         );
       expect(linkBlock).to.exist;

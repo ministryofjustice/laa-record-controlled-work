@@ -30,11 +30,15 @@ export function createForgeTestClient<TDeps>(
   overrides?: {
     additionalFunctions?: BaseFunctionRegistry<TDeps>[];
     dependencies?: TDeps;
+    disableReachabilityChecks?: boolean;
   },
 ): ForgeTestClient {
 
 
-  sourceJourney.reachability = { disableReachabilityChecks: true };
+  sourceJourney.reachability = {
+    disableReachabilityChecks:
+      overrides?.disableReachabilityChecks ?? true,
+  };
 
   const testPackage = createTestPackage(
     createForgePackage({

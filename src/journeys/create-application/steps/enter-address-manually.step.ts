@@ -122,7 +122,7 @@ export const enterAddressManuallyStep = (
         },
       }),
       HtmlBlock({
-        content: `<p class="govuk-body"><a class="govuk-link" href="/cases/new/enter-overseas-address">${t("journeys.createApplication.enterAddressManually.nonUkAddress")}</a></p>`,
+        content: `<p class="govuk-body"><a class="govuk-link" href="enter-overseas-address">${t("journeys.createApplication.enterAddressManually.nonUkAddress")}</a></p>`,
       }),
       GovUKButton({ text: t("common.continue") }),
     ],

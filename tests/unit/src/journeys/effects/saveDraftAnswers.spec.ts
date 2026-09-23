@@ -3,9 +3,11 @@ import { describe, it } from "mocha";
 import sinon from "sinon";
 import { saveDraftAnswers } from "#/journeys/effects.js";
 import { type EffectFunctionContext } from "@ministryofjustice/hmpps-forge/core/authoring";
+import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
 
 describe("saveDraftAnswers()", () => {
   let getSession: sinon.SinonStub;
+  let getRequestParam: sinon.SinonStub;
   let getAllAnswers: sinon.SinonStub;
   let context: EffectFunctionContext;
   let session: Record<string, unknown>;
@@ -13,10 +15,12 @@ describe("saveDraftAnswers()", () => {
   beforeEach(() => {
     session = {};
     getSession = sinon.stub().returns(session);
+    getRequestParam = sinon.stub().returns(undefined);
     getAllAnswers = sinon.stub().returns({ ecf: "yes" });
 
     context = {
       getSession,
+      getRequestParam,
       getAllAnswers,
     } as unknown as EffectFunctionContext;
   });
@@ -63,5 +67,14 @@ describe("saveDraftAnswers()", () => {
 
     const drafts = session.journeyDrafts as Record<string, Record<string, unknown>>;
     expect(drafts?.testJourney?.ecf).to.equal("yes");
+  });
+
+  it("saves the edit draft for the current application", () => {
+    getRequestParam.withArgs(PARAMS_KEYS.applicationID).returns("application-1");
+
+    saveDraftAnswers()(context, "editClientDetails");
+
+    const drafts = session.journeyDrafts as Record<string, Record<string, unknown>>;
+    expect(drafts?.["editClientDetails:application-1"]?.ecf).to.equal("yes");
   });
 });

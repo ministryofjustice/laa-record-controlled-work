@@ -48,7 +48,7 @@ describe("Enter address manually step", () => {
       const linkBlock = renderResult
         .getBlocksByVariant("html")
         .find((b) =>
-          (b.properties.content as string).includes("/enter-overseas-address"),
+          (b.properties.content as string).includes("enter-overseas-address"),
         );
       expect(linkBlock).to.exist;
       expect(linkBlock!.properties.content as string).to.contain(

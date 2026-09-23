@@ -1,5 +1,6 @@
 export {
   applications,
+  clientDetailsApplication,
   completeApplication,
   createApplicationResponse,
   incompleteApplication,

@@ -3,9 +3,11 @@ import { describe, it } from "mocha";
 import sinon from "sinon";
 import { loadDraftAnswers } from "#/journeys/effects.js";
 import { type EffectFunctionContext } from "@ministryofjustice/hmpps-forge/core/authoring";
+import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
 
 describe("LoadDraftAnswers", () => {
   let getSession: sinon.SinonStub;
+  let getRequestParam: sinon.SinonStub;
   let hasAnswer: sinon.SinonStub;
   let setAnswer: sinon.SinonStub;
   let context: EffectFunctionContext;
@@ -14,11 +16,13 @@ describe("LoadDraftAnswers", () => {
   beforeEach(() => {
     session = {};
     getSession = sinon.stub().returns(session);
+    getRequestParam = sinon.stub().returns(undefined);
     hasAnswer = sinon.stub().returns(false);
     setAnswer = sinon.stub();
 
     context = {
       getSession,
+      getRequestParam,
       hasAnswer,
       setAnswer,
     } as unknown as EffectFunctionContext;
@@ -57,5 +61,17 @@ describe("LoadDraftAnswers", () => {
     loadDraftAnswers()(context, "testJourney");
 
     expect(setAnswer.called).to.equal(false);
+  });
+
+  it("loads the edit draft for the current application", () => {
+    getRequestParam.withArgs(PARAMS_KEYS.applicationID).returns("application-1");
+    session.journeyDrafts = {
+      "editClientDetails:application-1": { ecf: "yes" },
+      "editClientDetails:application-2": { ecf: "no" },
+    };
+
+    loadDraftAnswers()(context, "editClientDetails");
+
+    expect(setAnswer.calledOnceWithExactly("ecf", "yes")).to.equal(true);
   });
 });

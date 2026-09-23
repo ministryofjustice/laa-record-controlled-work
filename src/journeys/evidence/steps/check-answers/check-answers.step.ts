@@ -17,7 +17,7 @@ import { t } from "#/lib/i18n.js";
 
 export const checkAnswersStep = (): ReturnType<typeof step> =>
   step({
-    blocks: [heading, summaryList, submitButton],
+    blocks: [heading, summaryList, submitButton()],
     code: "check-answers",
     onSubmission: [
       submit({
