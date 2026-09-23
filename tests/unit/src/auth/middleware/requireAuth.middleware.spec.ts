@@ -250,6 +250,7 @@ function createMocks({
 
   const redirect = sinon.stub();
   const res = {
+    locals: {},
     redirect,
   } as unknown as Response;
 
