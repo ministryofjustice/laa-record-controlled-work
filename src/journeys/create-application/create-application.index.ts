@@ -4,8 +4,12 @@ import type { CreateApplicationEffectsDeps } from "#/journeys/create-application
 
 import { createApplicationEffectsRegistry } from "#/journeys/create-application/create-application.effects.js";
 import { createApplicationJourney } from "#/journeys/create-application/create-application.journey.js";
+import { createApplicationTransformersRegistry } from "#/journeys/create-application/create-application.transformers.js";
 
 export default createForgePackage<CreateApplicationEffectsDeps>({
-  functions: [createApplicationEffectsRegistry],
+  functions: [
+    createApplicationEffectsRegistry,
+    createApplicationTransformersRegistry,
+  ],
   journey: createApplicationJourney,
 });

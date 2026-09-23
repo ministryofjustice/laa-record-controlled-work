@@ -10,7 +10,7 @@ export const clientDetailsNiNumberMin = 9;
 export const clientDetailsNiNumberMax = 9;
 
 export const clientDetailsNiNumberRegExp = new RegExp(
-  "[A-CEGHJ-NOPR-TW-Z]{2}[0-9]{6}[ABCDs]{1}",
+  "^(?!BG|GB|KN|NK|NT|TN|ZZ)[A-CEGHJ-PR-TW-Z][A-CEGHJ-NPR-TW-Z][0-9]{6}[ABCD]$",
 );
 export const clientDetailsAddressOneCountryMax = 2;
 

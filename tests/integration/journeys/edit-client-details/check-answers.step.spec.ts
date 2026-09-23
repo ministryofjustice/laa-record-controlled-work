@@ -10,6 +10,7 @@ import type { Application } from "#/api/clients/rcw/model/application.zod.gen.js
 import { ApplicationDto } from "#/api/dto/application/application.dto.js";
 import { editApplicationEffectsRegistry } from "#/journeys/edit-application/editApplication.effects.js";
 import { editApplicationJourney } from "#/journeys/edit-application/editApplication.journey.js";
+import { editApplicationTransformersRegistry } from "#/journeys/edit-application/editApplication.transformers.js";
 import { JourneyCode } from "#/journeys/JourneyCode.enum.js";
 import { getGetApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
 import { createForgeTestClient } from "../../utils/helpers.js";
@@ -80,6 +81,7 @@ describe("Edit client details check answers step", () => {
     editApplicationJourney,
     editApplicationEffectsRegistry,
     {
+      additionalFunctions: [editApplicationTransformersRegistry],
       disableReachabilityChecks: false,
       dependencies: {
         getApplication: getApplicationStub,
@@ -124,6 +126,32 @@ describe("Edit client details check answers step", () => {
   };
 
   describe("Edit journey entry navigation", () => {
+    it("stores a normalized NI number when editing client details", async () => {
+      const session: {
+        journeyDrafts?: Record<string, Record<string, unknown>>;
+      } = {};
+
+      const result = await editApplicationClient.post(
+        `/cases/${applicationId}/task-list/details/ni-number`,
+        {
+          query: { returnTo: "check-answers" },
+          session,
+          body: {
+            hasNINumber: "yes",
+            niNumber: "j.n12-3456a", // gitleaks:allow - fake NI number used to test normalization
+          },
+        },
+      );
+
+      expect(result.type).to.equal("redirect");
+      expect((result as TestRedirectResult).url).to.equal(
+        `/cases/${applicationId}/task-list/details/check-answers`,
+      );
+      expect(
+        session.journeyDrafts?.[draftKey]?.niNumber,
+      ).to.equal("JN123456A");
+    });
+
     it("renders API client data for direct check answers access", async () => {
       const result = await editApplicationClient.get(
         `/cases/${applicationId}/task-list/details/check-answers`,
