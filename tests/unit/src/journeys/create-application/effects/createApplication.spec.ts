@@ -44,7 +44,7 @@ describe("CreateApplicationEffect", () => {
           lastName: "Bloggs",
           legalAidBefore: "yesSameMatter",
           legalAidLast6Months: "yes",
-          niNumber: "QQ123456C", // gitleaks:allow - fake NI number used in test fixture
+          niNumber: "AB123456C", // gitleaks:allow - fake NI number used in test fixture
           ukPostcode: "A12 3BC",
           reasonForYes: "here is a reason",
           ukTownOrCity: "Manchester",
@@ -141,7 +141,7 @@ describe("CreateApplicationEffect", () => {
           lastName: "Bloggs",
           legalAidBefore: "yesSameMatter",
           legalAidLast6Months: "yes",
-          niNumber: "QQ123456C", // gitleaks:allow - fake NI number used in test fixture
+          niNumber: "AB123456C", // gitleaks:allow - fake NI number used in test fixture
           ukPostcode: "A12 3BC",
           reasonForYes: "here is a reason",
           ukTownOrCity: "Manchester",

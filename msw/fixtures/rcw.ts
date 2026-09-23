@@ -66,9 +66,7 @@ export const clientDetailsApplication = getGetApplicationResponseMock({
     id: faker.string.uuid(),
     lastName: faker.string.alpha({ length: { max: 20, min: 10 } }),
     modifiedAt: `${faker.date.past().toISOString().slice(0, 19)}Z`,
-    niNumber: faker.helpers.fromRegExp(
-      "[A-CEGHJ-NOPR-TW-Z]{2}[0-9]{6}[ABCDs]{1}",
-    ),
+    niNumber: "AA123456C", // gitleaks:allow - fake NI number used in test fixture
   },
   scopingQuestions: { priorLegalAid: "no" },
 });

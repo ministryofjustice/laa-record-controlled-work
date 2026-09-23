@@ -12,7 +12,7 @@ describe("Answers schema", () => {
     lastName: "Bloggs",
     dateOfBirth: "1990-01-01",
     hasNINumber: "yes",
-    niNumber: "QQ123456C", // gitleaks:allow - fake NI number used to test schema validation
+    niNumber: "AB123456C", // gitleaks:allow - fake NI number used to test schema validation
     haveAHomeAddress: "yes",
     addressLine1: "123 Test Street",
     addressLine2: "Test Area",
