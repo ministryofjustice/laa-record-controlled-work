@@ -94,6 +94,10 @@ export function requireAuth(): RequestHandler {
         return;
       }
 
+      // Add auth to locals for use in templates.
+      res.locals.isAuthenticated = true;
+      res.locals.user = session.account;
+
       // User is authenticated and has a valid selected office, carry on.
       logger.debug("requireAuth(): User is authenticated");
       next();
