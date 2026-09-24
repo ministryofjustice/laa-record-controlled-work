@@ -16,8 +16,6 @@ rcw:
   env:
     NODE_ENV: "production"
     SENTRY_ENV: "production"
-    SENTRY_ENABLED: true
-    SENTRY_DEBUG: false
 
 ccq:
   replicaCount: 2
