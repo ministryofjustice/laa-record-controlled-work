@@ -1,5 +1,3 @@
-import * as Sentry from "@sentry/node";
-
 import type { UpdateEvidenceRequestBody } from "#/api/clients/rcw/model/updateEvidenceRequestBody.zod.gen.js";
 
 import { ApiResponseError } from "#/api/clients/api.errors.js";
@@ -17,6 +15,7 @@ import {
   InvalidSessionError,
 } from "#/journeys/journey.errors.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
+import * as metrics from "#/lib/metrics.js";
 import { logger } from "#/logger.js";
 
 export const updateEvidence =
@@ -56,20 +55,14 @@ export const updateEvidence =
         sessionId: session.id,
       });
 
-      startTime = performance.now();
+      startTime = metrics.start();
       response = await deps.updateApplicationEvidence(
         applicationId,
         updateEvidenceReq,
         opts,
       );
     } catch (error) {
-      const duration = performance.now() - startTime;
-      Sentry.metrics.distribution("api_response_time", duration, {
-        attributes: {
-          endpoint: "updateApplicationEvidence",
-        },
-        unit: "millisecond",
-      });
+      metrics.duration(startTime, { endpoint: "updateApplicationEvidence" });
       logger.error(
         `Error updating evidence for journey ${journeyCode}:`,
         error,
@@ -78,13 +71,9 @@ export const updateEvidence =
       throw ApiResponseError.from(error);
     }
 
-    const duration = performance.now() - startTime;
-    Sentry.metrics.distribution("api_response_time", duration, {
-      attributes: {
-        endpoint: "updateApplicationEvidence",
-        status: response.status,
-      },
-      unit: "millisecond",
+    metrics.duration(startTime, {
+      endpoint: "updateApplicationEvidence",
+      status: response.status,
     });
 
     if (response.status !== HTTP_STATUS.NO_CONTENT) {

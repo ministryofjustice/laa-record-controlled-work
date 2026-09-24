@@ -1,5 +1,3 @@
-import * as Sentry from "@sentry/node";
-
 import type {
   CaseListContext,
   YourCasesEffectsDeps,
@@ -14,6 +12,7 @@ import { Applications } from "#/api/clients/rcw/model/applications.zod.gen.js";
 import { getAuthDebugHeaders } from "#/auth/auth.debug.js";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
+import * as metrics from "#/lib/metrics.js";
 import { logger } from "#/logger.js";
 
 type ApplicationStatus = "COMPLETED" | "DRAFT";
@@ -29,32 +28,22 @@ export const loadYourCaseList =
         homeAccountId: session?.msal?.homeAccountId,
         sessionId: session?.id,
       });
-      startTime = performance.now();
+      startTime = metrics.start();
       response = await deps.getApplications(
         { officeId: session?.selectedOffice?.code, status },
         opts,
       );
     } catch (error) {
-      const duration = performance.now() - startTime;
-      Sentry.metrics.distribution("api_response_time", duration, {
-        attributes: {
-          endpoint: "getApplications",
-        },
-        unit: "millisecond",
-      });
+      metrics.duration(startTime, { endpoint: "getApplications" });
       logger.error("Error fetching applications", error, {
         api: "getApplications",
       });
       throw ApiResponseError.from(error);
     }
 
-    const duration = performance.now() - startTime;
-    Sentry.metrics.distribution("api_response_time", duration, {
-      attributes: {
-        endpoint: "getApplications",
-        status: response.status,
-      },
-      unit: "millisecond",
+    metrics.duration(startTime, {
+      endpoint: "getApplications",
+      status: response.status,
     });
 
     if (response.status !== HTTP_STATUS.OK) {

@@ -1,8 +1,6 @@
 import type { EffectFunctionContext } from "@ministryofjustice/hmpps-forge/core";
 import type { Session, SessionData } from "express-session";
 
-import * as Sentry from "@sentry/node";
-
 import type { CreateApplicationRequestBody } from "#/api/clients/rcw/model/createApplicationRequestBody.zod.gen.js";
 import type { createApplicationResponse } from "#/api/clients/rcw/schema/applications/applications.gen.js";
 import type { CreateApplicationEffectsDeps } from "#/journeys/create-application/create-application.types.js";
@@ -19,6 +17,7 @@ import { Answers } from "#/journeys/create-application/data/answers.zod.js";
 import { isJourneySession } from "#/journeys/effects.js";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
+import * as metrics from "#/lib/metrics.js";
 import { logger } from "#/logger.js";
 
 const buildApplicationData = (
@@ -83,16 +82,10 @@ export const createApplication =
         homeAccountId: session.msal?.homeAccountId,
         sessionId: session.id,
       });
-      startTime = performance.now();
+      startTime = metrics.start();
       response = await deps.createApplication(dataForApi, opts);
     } catch (error) {
-      const duration = performance.now() - startTime;
-      Sentry.metrics.distribution("api_response_time", duration, {
-        attributes: {
-          endpoint: "createApplication",
-        },
-        unit: "millisecond",
-      });
+      metrics.duration(startTime, { endpoint: "createApplication" });
       logger.error(
         `Error creating application for journey ${journeyCode}:`,
         error,
@@ -103,13 +96,9 @@ export const createApplication =
       throw ApiResponseError.from(error);
     }
 
-    const duration = performance.now() - startTime;
-    Sentry.metrics.distribution("api_response_time", duration, {
-      attributes: {
-        endpoint: "createApplication",
-        status: response.status,
-      },
-      unit: "millisecond",
+    metrics.duration(startTime, {
+      endpoint: "createApplication",
+      status: response.status,
     });
 
     if (response.status !== HTTP_STATUS.CREATED) {
