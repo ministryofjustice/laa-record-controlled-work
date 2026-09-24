@@ -62,6 +62,7 @@ const NON_UK_ADDRESS_TEXT = t(
 );
 const CONTINUE_TEXT = t("common.continue");
 
+// TODO move this to shared.hooks, and replace others with this shared hook
 /**
  * Creates a required-field validation rule for a GOV.UK form field.
  *
@@ -75,6 +76,8 @@ function answerIsRequired(validationMessage: ResolvableString): ValidationExpr {
   });
 }
 
+
+// TODO this textInput moves to shared.blocks.ts
 /**
  * Builds a GOV.UK text input block for an address field.
  *
@@ -94,7 +97,7 @@ function textInput(
     defaultValue?: string;
     validations?: ValidationExpr[];
   },
-): HtmlBlock {
+): GovUKTextInput {
   return GovUKTextInput({
     classes: options?.classes,
     code,
