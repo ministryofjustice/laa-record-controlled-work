@@ -10,7 +10,8 @@ import { NunjucksGenerators } from "@ministryofjustice/hmpps-forge/express-nunju
 import { t } from "#/lib/i18n.js";
 
 /**
- *
+ * Returns the label for the "Do you have evidence?" question based on the user's answer.
+ * @returns {ResolvableString} The label for the "Do you have evidence?" question based on the user's answer.
  */
 export function doYouHaveEvidenceLabel(): ResolvableString {
   return match(Answer("doYouHaveEvidence"))
@@ -19,7 +20,8 @@ export function doYouHaveEvidenceLabel(): ResolvableString {
 }
 
 /**
- *
+ * Returns a formatted list of the user's evidence of expenditure.
+ * @returns {ResolvableString} The formatted list of the user's evidence of expenditure.
  */
 export function evidenceOfCapitalList(): ResolvableString {
   return NunjucksGenerators.String({
@@ -52,9 +54,10 @@ export function evidenceOfCapitalList(): ResolvableString {
 }
 
 /**
- *
+ * Returns a formatted list of the user's evidence of expenditure.
+ * @returns {ResolvableString} The formatted list of the user's evidence of expenditure.
  */
-export function evidenceOfExpenditureList() {
+export function evidenceOfExpenditureList(): ResolvableString {
   return NunjucksGenerators.String({
     data: {
       childCareEvidence: Answer("childCareEvidence"),
@@ -134,7 +137,8 @@ export function evidenceOfExpenditureList() {
 }
 
 /**
- *
+ * Returns a formatted list of the user's evidence of income.
+ * @returns {ResolvableString} The formatted list of the user's evidence of income.
  */
 export function evidenceOfIncomeList(): ResolvableString {
   return NunjucksGenerators.String({
@@ -257,7 +261,8 @@ export function evidenceOfIncomeList(): ResolvableString {
 }
 
 /**
- *
+ * Returns a merged label for the reason for no evidence, including any additional details provided by the user.
+ * @returns {ResolvableString} The merged reason for no evidence label.
  */
 export function hasCapitalEvidenceLabel(): ResolvableString {
   return match(Answer("haveEvidenceOfCapital"))
@@ -266,7 +271,8 @@ export function hasCapitalEvidenceLabel(): ResolvableString {
 }
 
 /**
- *
+ * Returns a label indicating whether the user has evidence of expenditure.
+ * @returns {ResolvableString} The label for the "Do you have evidence of expenditure?" question.
  */
 export function hasExpenditureEvidenceLabel(): ResolvableString {
   return match(Answer("haveEvidenceOfExpenditure"))
@@ -275,7 +281,8 @@ export function hasExpenditureEvidenceLabel(): ResolvableString {
 }
 
 /**
- *
+ * Returns a label indicating whether the user has evidence of capital.
+ * @returns {ResolvableString} The label for the "Do you have evidence of capital?" question.
  */
 export function mergedReasonForNoEvidenceLabel(): ResolvableString {
   return NunjucksGenerators.String({
@@ -291,7 +298,8 @@ export function mergedReasonForNoEvidenceLabel(): ResolvableString {
 }
 
 /**
- *
+ * Returns a label for the reason for no evidence.
+ * @returns {ResolvableString} The label for the reason for no evidence.
  */
 function reasonForNoEvidenceLabel(): ResolvableString {
   return match(Answer("reasonForNoEvidence"))
