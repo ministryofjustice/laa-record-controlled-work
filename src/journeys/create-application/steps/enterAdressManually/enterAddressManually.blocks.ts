@@ -9,7 +9,11 @@ import {
   validation,
   type ValidationExpr,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
-import { GovUKTextInput } from "@ministryofjustice/hmpps-forge/govuk-components";
+
+import {
+  GovUKButton,
+  GovUKTextInput,
+} from "@ministryofjustice/hmpps-forge/govuk-components";
 import { t } from "i18next";
 
 import { UK_ADDRESS_FIELDS } from "#/journeys/journey.constants.js";
@@ -39,7 +43,24 @@ const COUNTY_LABEL = t(
   "journeys.createApplication.enterAddressManually.county.label",
 );
 
-const COUNTRY_CODE = UK_ADDRESS_FIELDS.postcode;
+const COUNTRY_CODE = UK_ADDRESS_FIELDS.country;
+
+
+const POSTCODE_CODE = UK_ADDRESS_FIELDS.postcode;
+const POSTCODE_LABEL = t(
+    "journeys.createApplication.enterAddressManually.postcode.label",
+);
+const POSTCODE_REQUIRED_VALIDATION = t(
+    "journeys.createApplication.enterAddressManually.postcode.validation.required",
+);
+const POSTCODE_INVALID_VALIDATION = t(
+    "journeys.createApplication.enterAddressManually.postcode.validation.invalid",
+);
+
+const NON_UK_ADDRESS_TEXT = t(
+    "journeys.createApplication.enterAddressManually.nonUkAddress",
+);
+const CONTINUE_TEXT = t("common.continue");
 
 /**
  * Creates a required-field validation rule for a GOV.UK form field.
@@ -106,7 +127,16 @@ const country = textInput(COUNTRY_CODE, "", {
   defaultValue: "United Kingdom",
 });
 
-const postcode = "TODO";
+const postcode = textInput(POSTCODE_CODE, POSTCODE_LABEL, {
+  classes: "govuk-input--width-10",
+  validations: [
+    answerIsRequired(POSTCODE_REQUIRED_VALIDATION),
+    validation({
+      condition: Self().match(Condition.Address.IsValidPostcode()),
+      message: POSTCODE_INVALID_VALIDATION,
+    }),
+  ],
+});
 
 // GovUKTextInput({
 //   classes: "govuk-input--width-10",
@@ -142,7 +172,20 @@ const addressInputs = [
   country,
 ];
 
-const nonUkAddressLink = "TODO";
+
+const nonUkAddressLink = HtmlBlock({
+  content: `<p class="govuk-body"><a class="govuk-link" href="enter-overseas-address">${NON_UK_ADDRESS_TEXT}</a></p>`,
+});
+
+const continueButton = GovUKButton({ text: CONTINUE_TEXT });
+
+export const enterAddressManuallyBlocks = [
+  ...addressInputs,
+  nonUkAddressLink,
+  continueButton,
+];
+
+//const nonUkAddressLink = "TODO";
 // HtmlBlock({
 //   content: `<p class="govuk-body"><a class="govuk-link" href="enter-overseas-address">${t("journeys.createApplication.enterAddressManually.nonUkAddress")}</a></p>`,
 // }),
