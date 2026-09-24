@@ -1,5 +1,6 @@
 import type { EffectFunctionContext } from "@ministryofjustice/hmpps-forge/core/authoring";
 
+import { getJourneyDraftKey } from "#/journeys/journeyDraftKey.js";
 import { getSessionData } from "#/journeys/shared.helper.js";
 
 /**
@@ -19,9 +20,10 @@ export function clearFieldAnswers() {
     fields: readonly string[],
   ): void {
     const session = getSessionData(context);
+    const draftKey = getJourneyDraftKey(context, journeyCode);
 
-    if (session.journeyDrafts?.[journeyCode]) {
-      const { [journeyCode]: selectedJourneyDraft, ...otherJourneyDrafts } =
+    if (session.journeyDrafts?.[draftKey]) {
+      const { [draftKey]: selectedJourneyDraft, ...otherJourneyDrafts } =
         session.journeyDrafts;
 
       const selectedJourneyWithRemovedFields = Object.fromEntries(
@@ -32,7 +34,7 @@ export function clearFieldAnswers() {
 
       session.journeyDrafts = {
         ...otherJourneyDrafts,
-        [journeyCode]: selectedJourneyWithRemovedFields,
+        [draftKey]: selectedJourneyWithRemovedFields,
       };
     }
 
