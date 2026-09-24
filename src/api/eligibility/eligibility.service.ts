@@ -1,5 +1,3 @@
-import * as Sentry from "@sentry/node";
-
 import type {
   getApplication,
   updateApplicationMeans,
@@ -15,6 +13,7 @@ import { getAuthDebugHeaders } from "#/auth/auth.debug.js";
 import { NotAuthenticatedError } from "#/auth/auth.errors.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { type Either, failure, success } from "#/lib/either.js";
+import * as metrics from "#/lib/metrics.js";
 import { logger } from "#/logger.js";
 
 export interface EligibilityAssessment {
@@ -74,16 +73,10 @@ export async function loadEligibilityAssessment(
   try {
     const opts = await getRcwApiDefaultOptions({ homeAccountId, sessionId });
 
-    startTime = performance.now();
+    startTime = metrics.start();
     response = await deps.getApplication(applicationId, opts);
   } catch (error) {
-    const duration = performance.now() - startTime;
-    Sentry.metrics.distribution("api_response_time", duration, {
-      attributes: {
-        endpoint: "getApplication",
-      },
-      unit: "millisecond",
-    });
+    metrics.duration(startTime, { endpoint: "getApplication" });
 
     if (error instanceof NotAuthenticatedError) {
       return failure(error);
@@ -98,13 +91,9 @@ export async function loadEligibilityAssessment(
     );
     return failure(LoadEligibilityAssessmentError.from(error));
   }
-  const duration = performance.now() - startTime;
-  Sentry.metrics.distribution("api_response_time", duration, {
-    attributes: {
-      endpoint: "getApplication",
-      status: response.status,
-    },
-    unit: "millisecond",
+  metrics.duration(startTime, {
+    endpoint: "getApplication",
+    status: response.status,
   });
   if (response.status !== HTTP_STATUS.OK) {
     logger.error(
@@ -167,20 +156,14 @@ export async function saveEligibilityAssessment(
       sessionId,
     });
 
-    startTime = performance.now();
+    startTime = metrics.start();
     response = await deps.updateApplicationMeans(
       applicationId,
       { data, result },
       opts,
     );
   } catch (error) {
-    const duration = performance.now() - startTime;
-    Sentry.metrics.distribution("api_response_time", duration, {
-      attributes: {
-        endpoint: "updateApplicationMeans",
-      },
-      unit: "millisecond",
-    });
+    metrics.duration(startTime, { endpoint: "updateApplicationMeans" });
     if (error instanceof NotAuthenticatedError) {
       return failure(error);
     }
@@ -191,13 +174,9 @@ export async function saveEligibilityAssessment(
     return failure(SaveEligibilityAssessmentError.from(error));
   }
 
-  const duration = performance.now() - startTime;
-  Sentry.metrics.distribution("api_response_time", duration, {
-    attributes: {
-      endpoint: "updateApplicationMeans",
-      status: response.status,
-    },
-    unit: "millisecond",
+  metrics.duration(startTime, {
+    endpoint: "updateApplicationMeans",
+    status: response.status,
   });
 
   if (response.status !== HTTP_STATUS.NO_CONTENT) {

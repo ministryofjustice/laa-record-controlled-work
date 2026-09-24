@@ -1,5 +1,3 @@
-import * as Sentry from "@sentry/node";
-
 import type { updateApplicationDeclarationResponse } from "#/api/clients/rcw/schema/applications/applications.gen.js";
 
 import { ApiResponseError } from "#/api/clients/api.errors.js";
@@ -13,6 +11,7 @@ import {
 } from "#/journeys/errors.js";
 import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
+import * as metrics from "#/lib/metrics.js";
 import { logger } from "#/logger.js";
 
 import type {
@@ -67,33 +66,23 @@ export const submitSignedDeclaration =
         sessionId: session.id,
       });
 
-      startTime = performance.now();
+      startTime = metrics.start();
       response = await deps.updateApplicationDeclaration(
         applicationId,
         body,
         opts,
       );
     } catch (error) {
-      const duration = performance.now() - startTime;
-      Sentry.metrics.distribution("api_response_time", duration, {
-        attributes: {
-          endpoint: "updateApplicationDeclaration",
-        },
-        unit: "millisecond",
-      });
+      metrics.duration(startTime, { endpoint: "updateApplicationDeclaration" });
       logger.error("Failed to update application declaration", error, {
         api: "updateApplicationDeclaration",
       });
       throw ApiResponseError.from(error);
     }
 
-    const duration = performance.now() - startTime;
-    Sentry.metrics.distribution("api_response_time", duration, {
-      attributes: {
-        endpoint: "updateApplicationDeclaration",
-        status: response.status,
-      },
-      unit: "millisecond",
+    metrics.duration(startTime, {
+      endpoint: "updateApplicationDeclaration",
+      status: response.status,
     });
 
     if (response.status !== HTTP_STATUS.NO_CONTENT) {

@@ -1,5 +1,3 @@
-import * as Sentry from "@sentry/node";
-
 import type {
   EditApplicationContext,
   EditApplicationEffectsDeps,
@@ -11,6 +9,7 @@ import {
   PARAMS_KEYS,
 } from "#/journeys/journey.constants.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
+import * as metrics from "#/lib/metrics.js";
 
 export const closeIneligibleCase =
   (deps: EditApplicationEffectsDeps) =>
@@ -30,7 +29,7 @@ export const closeIneligibleCase =
       sessionId: session?.id,
     });
 
-    const startTime = performance.now();
+    const startTime = metrics.start();
     const response = await deps.updateApplicationStatus(
       applicationID,
       {
@@ -39,13 +38,9 @@ export const closeIneligibleCase =
       },
       options,
     );
-    const duration = performance.now() - startTime;
-    Sentry.metrics.distribution("api_response_time", duration, {
-      attributes: {
-        endpoint: "updateApplicationStatus",
-        status: response.status,
-      },
-      unit: "millisecond",
+    metrics.duration(startTime, {
+      endpoint: "updateApplicationStatus",
+      status: response.status,
     });
 
     if (response.status !== HTTP_STATUS.NO_CONTENT) {

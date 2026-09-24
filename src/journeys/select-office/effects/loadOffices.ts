@@ -1,5 +1,3 @@
-import * as Sentry from "@sentry/node";
-
 import type {
   SelectOfficeContext,
   SelectOfficeEffectsDeps,
@@ -22,6 +20,7 @@ import {
 import { mapAvailableOffices } from "#/journeys/select-office/mappers/mapAvailableOffices.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { PDA_MSW_LAA_ACCOUNTS_HEADER } from "#/lib/constants/pda.js";
+import * as metrics from "#/lib/metrics.js";
 import { logger } from "#/logger.js";
 
 export const loadOffices =
@@ -47,29 +46,19 @@ export const loadOffices =
             }
           : undefined,
       );
-      startTime = performance.now();
+      startTime = metrics.start();
       response = await deps.getAllProviderOffices(firmCode, opts);
     } catch (error) {
-      const duration = performance.now() - startTime;
-      Sentry.metrics.distribution("api_response_time", duration, {
-        attributes: {
-          endpoint: "getAllProviderOffices",
-        },
-        unit: "millisecond",
-      });
+      metrics.duration(startTime, { endpoint: "getAllProviderOffices" });
       logger.error("Error fetching offices", error, {
         api: "getAllProviderOffices",
       });
       throw ApiResponseError.from(error);
     }
 
-    const duration = performance.now() - startTime;
-    Sentry.metrics.distribution("api_response_time", duration, {
-      attributes: {
-        endpoint: "getAllProviderOffices",
-        status: response.status,
-      },
-      unit: "millisecond",
+    metrics.duration(startTime, {
+      endpoint: "getAllProviderOffices",
+      status: response.status,
     });
 
     if (response.status !== HTTP_STATUS.OK) {
