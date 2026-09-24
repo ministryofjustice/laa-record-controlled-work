@@ -1,5 +1,6 @@
 import type { EffectFunctionContext } from "@ministryofjustice/hmpps-forge/core/authoring";
 
+import { getJourneyDraftKey } from "#/journeys/journeyDraftKey.js";
 import { getSessionData } from "#/journeys/shared.helper.js";
 
 /**
@@ -17,11 +18,12 @@ export function saveDraftAnswers() {
     journeyCode: string,
   ): void {
     const session = getSessionData(context);
+    const draftKey = getJourneyDraftKey(context, journeyCode);
 
     session.journeyDrafts ??= {};
 
-    session.journeyDrafts[journeyCode] = {
-      ...session.journeyDrafts[journeyCode],
+    session.journeyDrafts[draftKey] = {
+      ...session.journeyDrafts[draftKey],
       ...context.getAllAnswers(),
     };
   };

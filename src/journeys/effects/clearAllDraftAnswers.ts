@@ -1,5 +1,6 @@
 import type { EffectFunctionContext } from "@ministryofjustice/hmpps-forge/core/authoring";
 
+import { getJourneyDraftKey } from "#/journeys/journeyDraftKey.js";
 import { getSessionData } from "#/journeys/shared.helper.js";
 
 /**
@@ -17,9 +18,10 @@ export function clearAllDraftAnswers() {
     journeyCode: string,
   ): void {
     const session = getSessionData(context);
+    const draftKey = getJourneyDraftKey(context, journeyCode);
 
     if (session.journeyDrafts) {
-      const { [journeyCode]: _selectedJourneyDraft, ...otherJourneyDrafts } =
+      const { [draftKey]: _selectedJourneyDraft, ...otherJourneyDrafts } =
         session.journeyDrafts;
 
       session.journeyDrafts = otherJourneyDrafts;

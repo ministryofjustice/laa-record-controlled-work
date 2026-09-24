@@ -2,19 +2,14 @@ import type { Application } from "#/api/clients/rcw/model/application.zod.gen.js
 import type { EditApplicationContext } from "#/journeys/edit-application/editApplication.types.js";
 
 import { ApplicationDto } from "#/api/dto/application/application.dto.js";
-import { isJourneySession } from "#/journeys/effects.js";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import { getJourneyDraftKey } from "#/journeys/journeyDraftKey.js";
+import { getSessionData } from "#/journeys/shared.helper.js";
 
 export const loadApplicationAsAnswers =
   () =>
   (context: EditApplicationContext, journeyCode: string): void => {
-    const session = context.getSession();
-
-    if (!isJourneySession(session)) {
-      return;
-    }
-
+    const session = getSessionData(context);
     const draftKey = getJourneyDraftKey(context, journeyCode);
 
     if (session.journeyDrafts?.[draftKey]) {
