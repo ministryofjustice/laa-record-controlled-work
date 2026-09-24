@@ -1,6 +1,6 @@
 import * as Sentry from "@sentry/node";
 
-import { resolveSentryDsn } from "#/app/utils/resolveSentryDsn.js";
+import { resolveSentryDsn } from "#/lib/resolveSentryDsn.js";
 
 /** Initialise Sentry when it is enabled and configured. */
 export function setupSentry(): void {
