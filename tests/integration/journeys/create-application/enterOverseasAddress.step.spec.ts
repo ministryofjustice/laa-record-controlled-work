@@ -29,24 +29,29 @@ describe("Enter overseas address step", () => {
       expect(result.type).to.equal("render");
       renderResult = result as TestRenderResult;
 
-      const [autocompleteBlock] = renderResult.getBlocksByVariant("autocomplete");
+      const [autocompleteBlock] =
+        renderResult.getBlocksByVariant("autocomplete");
 
       countryInput = autocompleteBlock.properties.field as RenderBlock;
-      [addressLine1Input, addressLine2Input, addressLine3Input, addressLine4Input] =
-        renderResult.getBlocksByVariant("govukTextInput");
+      [
+        addressLine1Input,
+        addressLine2Input,
+        addressLine3Input,
+        addressLine4Input,
+      ] = renderResult.getBlocksByVariant("govukTextInput");
     });
 
     it("has the correct title", () => {
-      expect(renderResult.context.step.title).to.equal("Enter your client's overseas home address");
+      expect(renderResult.context.step.title).to.equal(
+        "Enter your client's overseas home address",
+      );
     });
 
     it("renders a link to the UK address page", () => {
       const linkBlock = renderResult
         .getBlocksByVariant("html")
         .find((b) =>
-          (b.properties.content as string).includes(
-            "enter-address-manually",
-          ),
+          (b.properties.content as string).includes("enter-address-manually"),
         );
       expect(linkBlock).to.exist;
       expect(linkBlock!.properties.content as string).to.contain(
@@ -57,7 +62,7 @@ describe("Enter overseas address step", () => {
     it("renders a country input", () => {
       const label = countryInput.properties.label as { text: string };
       expect(label.text).to.equal("Country");
-    });    
+    });
 
     it("renders an address line 1 input", () => {
       const label = addressLine1Input.properties.label as { text: string };
@@ -73,11 +78,11 @@ describe("Enter overseas address step", () => {
       const label = addressLine3Input.properties.label as { text: string };
       expect(label.text).to.equal("Address line 3 (optional)");
     });
-    
+
     it("renders an address line 4 input", () => {
       const label = addressLine4Input.properties.label as { text: string };
       expect(label.text).to.equal("Address line 4 (optional)");
-    });    
+    });
   });
 
   describe("POST /cases/new/enter-overseas-address", () => {
@@ -108,7 +113,8 @@ describe("Enter overseas address step", () => {
       {
         description: "address line 1 is missing",
         body: { ...validBody, osAddressLine1: "" },
-        expectedMessage: "Enter address line 1, typically the building and street",
+        expectedMessage:
+          "Enter address line 1, typically the building and street",
         fieldCode: "osAddressLine1",
       },
       {
@@ -119,7 +125,12 @@ describe("Enter overseas address step", () => {
       },
     ];
 
-    for (const { description, body, expectedMessage, fieldCode } of validationErrorTests) {
+    for (const {
+      description,
+      body,
+      expectedMessage,
+      fieldCode,
+    } of validationErrorTests) {
       it(`should show validation error when ${description}`, async () => {
         const result = await client.post("/cases/new/enter-overseas-address", {
           body,
@@ -135,4 +146,3 @@ describe("Enter overseas address step", () => {
     }
   });
 });
-
