@@ -115,6 +115,7 @@ export const summaryList = GovUKSummaryList({
         ),
       },
       value: { text: hasExpenditureEvidenceLabel() },
+      visibleWhen: Answer("doYouHaveEvidence").match(Condition.Equals("yes")),
     },
     {
       actions: {
@@ -162,6 +163,7 @@ export const summaryList = GovUKSummaryList({
         ),
       },
       value: { text: hasCapitalEvidenceLabel() },
+      visibleWhen: Answer("doYouHaveEvidence").match(Condition.Equals("yes")),
     },
     {
       actions: {
