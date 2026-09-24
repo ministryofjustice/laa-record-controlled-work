@@ -1,4 +1,3 @@
-import * as Sentry from "@sentry/node";
 import cookieParser from "cookie-parser";
 import express, { type Express } from "express";
 import session from "express-session";
@@ -11,8 +10,8 @@ import { cspNonce } from "#/app/middleware/cspNonce.middleware.js";
 import { addCsrfToLocals, csrf } from "#/app/middleware/csrf.middleware.js";
 import { helmet } from "#/app/middleware/helmet.middleware.js";
 import { locale } from "#/app/middleware/locale.middleware.js";
+import { setupSentry } from "#/app/middleware/sentry.middleware.js";
 import { isEnv } from "#/app/utils/isEnv.js";
-import { resolveSentryDsn } from "#/app/utils/resolveSentryDsn.js";
 import config from "#/config.js";
 import { createSession } from "#/lib/session.js";
 import { setupConfig } from "#/middleware/setupConfigs.js";
@@ -65,25 +64,7 @@ export async function initMiddleware(
   // Setup internationalization.
   app.use(locale());
 
-  // Setup Sentry
-  if (process.env.SENTRY_ENABLED === "true") {
-    const sentryDsn = resolveSentryDsn();
-
-    if (sentryDsn) {
-      Sentry.init({
-        debug: process.env.SENTRY_DEBUG === "true",
-        dsn: sentryDsn,
-        environment: process.env.SENTRY_ENV ?? "production",
-        integrations: [
-          Sentry.httpIntegration(),
-          Sentry.expressIntegration(),
-          Sentry.consoleLoggingIntegration({
-            levels: ["log", "warn", "error"],
-          }),
-        ],
-      });
-    }
-  }
+  setupSentry();
   // Setup CSRF protection.
   app.use(csrf);
   app.use(addCsrfToLocals);
