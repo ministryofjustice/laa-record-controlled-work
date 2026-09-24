@@ -15,10 +15,10 @@ describe("toExportApplicationViewModel", () => {
       },
     });
 
-    expect(toExportApplicationViewModel(application)).to.deep.equal({
-      clientName: "Jane Doe",
-      applicationRefNumber: "CW-123456",
-    });
+    const viewModel = toExportApplicationViewModel(application);
+
+    expect(viewModel.clientName).to.equal("Jane Doe");
+    expect(viewModel.applicationRefNumber).to.equal("CW-123456");
   });
 
   it("returns null for blank names and references", () => {
@@ -31,10 +31,10 @@ describe("toExportApplicationViewModel", () => {
       },
     });
 
-    expect(toExportApplicationViewModel(application)).to.deep.equal({
-      clientName: null,
-      applicationRefNumber: null,
-    });
+    const viewModel = toExportApplicationViewModel(application);
+
+    expect(viewModel.clientName).to.equal(null);
+    expect(viewModel.applicationRefNumber).to.equal(null);
   });
 
   it("returns null for a missing reference", () => {
@@ -44,5 +44,20 @@ describe("toExportApplicationViewModel", () => {
 
     expect(toExportApplicationViewModel(application).applicationRefNumber).to
       .equal(null);
+  });
+
+  it("includes the client and case details section", () => {
+    const application = getGetApplicationResponseMock({
+      clientDetails: {
+        ...getGetApplicationResponseMock().clientDetails,
+        firstName: "Jane",
+        lastName: "Doe",
+      },
+    });
+
+    const { clientAndCaseDetails } = toExportApplicationViewModel(application);
+
+    expect(clientAndCaseDetails.firstName).to.equal("Jane");
+    expect(clientAndCaseDetails.lastName).to.equal("Doe");
   });
 });

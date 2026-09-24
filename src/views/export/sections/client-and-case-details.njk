@@ -1,0 +1,102 @@
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{% set accessedLegalAidBeforeText = "" %}
+{% if clientAndCaseDetails.accessedLegalAidBefore == true %}
+  {% set accessedLegalAidBeforeText = t("common.yes") %}
+{% elif clientAndCaseDetails.accessedLegalAidBefore == false %}
+  {% set accessedLegalAidBeforeText = t("common.no") %}
+{% endif %}
+
+{% set addressValue = { text: "" } %}
+{% if clientAndCaseDetails.address.kind == "noFixedAddress" %}
+  {% set addressValue = { text: t("pages.export.clientAndCaseDetails.noFixedAddress") } %}
+{% else %}
+  {% set addressLinesHtml %}{% for line in clientAndCaseDetails.address.lines %}{{ line }}{% if not loop.last %}<br>{% endif %}{% endfor %}{% endset %}
+  {% set addressValue = { html: addressLinesHtml } %}
+{% endif %}
+
+{% set rows = [
+  {
+    key: { text: t("pages.export.clientAndCaseDetails.ecf") },
+    value: { text: t("common.no") }
+  },
+  {
+    key: { text: t("pages.export.clientAndCaseDetails.typeOfFamilyLaw") },
+    value: { text: clientAndCaseDetails.typeOfFamilyLaw or "" }
+  },
+  {
+    key: { text: t("pages.export.clientAndCaseDetails.transitionalEuArrangements") },
+    value: { text: clientAndCaseDetails.transitionalEuArrangements or "" }
+  },
+  {
+    key: { text: t("pages.export.clientAndCaseDetails.protectThemselfOrChildren") },
+    value: { text: clientAndCaseDetails.protectThemselfOrChildren or "" }
+  },
+  {
+    key: { text: t("pages.export.clientAndCaseDetails.evidenceCaseIsInScope") },
+    value: { text: clientAndCaseDetails.evidenceCaseIsInScope or "" }
+  },
+  {
+    key: { text: t("pages.export.clientAndCaseDetails.confirmMerits") },
+    value: { text: clientAndCaseDetails.confirmMerits or "" }
+  },
+  {
+    key: { text: t("pages.export.clientAndCaseDetails.accessedLegalAidBefore") },
+    value: { text: accessedLegalAidBeforeText }
+  }
+] %}
+
+{% if clientAndCaseDetails.sameMatterDetails %}
+  {% set rows = rows.concat([
+    {
+      key: { text: t("pages.export.clientAndCaseDetails.sameMatterWithin6Months") },
+      value: { text: t("common.yes") if clientAndCaseDetails.sameMatterDetails.sameMatterWithin6Months else t("common.no") }
+    }
+  ]) %}
+
+  {% if clientAndCaseDetails.sameMatterDetails.reasonForReapplication %}
+    {% set rows = rows.concat([
+      {
+        key: { text: t("pages.export.clientAndCaseDetails.reasonForReapplication") },
+        value: { text: clientAndCaseDetails.sameMatterDetails.reasonForReapplication }
+      }
+    ]) %}
+  {% endif %}
+{% endif %}
+
+{% set rows = rows.concat([
+  {
+    key: { text: t("pages.export.clientAndCaseDetails.firstName") },
+    value: { text: clientAndCaseDetails.firstName }
+  },
+  {
+    key: { text: t("pages.export.clientAndCaseDetails.lastName") },
+    value: { text: clientAndCaseDetails.lastName }
+  },
+  {
+    key: { text: t("pages.export.clientAndCaseDetails.dateOfBirth") },
+    value: { text: clientAndCaseDetails.dateOfBirth }
+  }
+]) %}
+
+{% if clientAndCaseDetails.niNumber %}
+  {% set rows = rows.concat([
+    {
+      key: { text: t("pages.export.clientAndCaseDetails.niNumber") },
+      value: { text: clientAndCaseDetails.niNumber }
+    }
+  ]) %}
+{% endif %}
+
+{% set rows = rows.concat([
+  {
+    key: { text: t("pages.export.clientAndCaseDetails.address") },
+    value: addressValue
+  }
+]) %}
+
+<h2 class="govuk-heading-l">{{ t("pages.export.clientAndCaseDetails.heading") }}</h2>
+
+{{ govukSummaryList({
+  rows: rows
+}) }}

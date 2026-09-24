@@ -22,7 +22,25 @@
       "client": "Client",
       "logoAlt": "Legal Aid Agency logo",
       "notProvided": "Not provided",
-      "referenceNumber": "Reference number"
+      "referenceNumber": "Reference number",
+      "clientAndCaseDetails": {
+        "heading": "Client and case details",
+        "ecf": "ECF",
+        "typeOfFamilyLaw": "Type of family law",
+        "transitionalEuArrangements": "Transitional EU arrangements or an international maintenance agreement?",
+        "protectThemselfOrChildren": "Legal aid to protect themself or their children",
+        "evidenceCaseIsInScope": "Evidence case is in scope",
+        "confirmMerits": "Confirm merits",
+        "accessedLegalAidBefore": "Accessed legal aid before",
+        "sameMatterWithin6Months": "For the same matter within 6 months",
+        "reasonForReapplication": "Reason for reapplication",
+        "firstName": "First name",
+        "lastName": "Last name",
+        "dateOfBirth": "Date of birth",
+        "niNumber": "National Insurance number",
+        "address": "Address",
+        "noFixedAddress": "No fixed address"
+      }
     },
     "error": {
       "404": {
