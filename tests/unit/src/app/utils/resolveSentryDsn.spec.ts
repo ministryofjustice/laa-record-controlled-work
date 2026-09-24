@@ -1,6 +1,6 @@
 import { expect } from "chai";
 
-import { resolveSentryDsn } from "#/app/utils/resolveSentryDsn.js";
+import { resolveSentryDsn } from "#/lib/resolveSentryDsn.js";
 
 describe("resolveSentryDsn", () => {
   const originalEnv = { ...process.env };
