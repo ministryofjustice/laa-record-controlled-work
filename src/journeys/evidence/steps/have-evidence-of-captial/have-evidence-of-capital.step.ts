@@ -1,10 +1,10 @@
 import {
   Answer,
   Condition,
-  Query,
   redirect,
   step,
   submit,
+  SubmitHook,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
 import { evidenceEffects } from "#/journeys/evidence/evidence.effects.js";
@@ -14,6 +14,7 @@ import {
 } from "#/journeys/evidence/steps/have-evidence-of-captial/have-evidence-of-capital.blocks.js";
 import { caption, continueButton, heading } from "#/journeys/shared.blocks.js";
 import { t } from "#/lib/i18n.js";
+import { hasCheckAnswersInQuery } from "#/journeys/shared.hook.js";
 
 export const haveEvidenceOfCapital = (
   journeyCode: string,
@@ -27,26 +28,50 @@ export const haveEvidenceOfCapital = (
       continueButton(),
     ],
     onSubmission: [
-      submit({
-        onValid: {
-          effects: [evidenceEffects.saveDraftAnswers(journeyCode)],
-          next: [
-            redirect({
-              goto: "check-answers",
-              when: Query("returnTo").match(Condition.Equals("check-answers")),
-            }),
-            redirect({
-              goto: "evidence-of-capital",
-              when: Answer("haveEvidenceOfCapital").match(
-                Condition.Equals("yes"),
-              ),
-            }),
-            redirect({ goto: "check-answers" }),
-          ],
-        },
-        validate: true,
-      }),
+      saveNoAndClearEvidence(journeyCode),
+      saveYes(journeyCode),
     ],
     path: "/have-evidence-of-capital",
     title: t("journeys.evidence.haveEvidenceOfCapital.title"),
   });
+
+const saveNoAndClearEvidence = (journeyCode: string): SubmitHook =>
+  submit({
+    onValid: {
+      effects: [
+        evidenceEffects.clearFieldAnswers(journeyCode, [
+          "capitalEvidence",
+        ]),
+        evidenceEffects.saveDraftAnswers(journeyCode)
+      ],
+      next: [redirectToCheckAnswers],
+    },
+    validate: true,
+    when: Answer("haveEvidenceOfCapital").match(Condition.Equals("no")),
+  });
+
+const saveYes = (journeyCode: string): SubmitHook =>
+  submit({
+    onValid: {
+      effects: [evidenceEffects.saveDraftAnswers(journeyCode)],
+      next: [
+        redirectToEvidenceOfCapitalWithCheckQuery,
+        redirectToEvidenceOfCapital,
+      ],
+    },
+    validate: true,
+    when: Answer("haveEvidenceOfCapital").match(Condition.Equals("yes")),
+  });
+
+const redirectToCheckAnswers = redirect({
+  goto: "check-answers",
+});
+
+const redirectToEvidenceOfCapital = redirect({
+  goto: "evidence-of-capital",
+});
+
+const redirectToEvidenceOfCapitalWithCheckQuery = redirect({
+  goto: "evidence-of-capital?returnTo=check-answers",
+  when: hasCheckAnswersInQuery,
+});

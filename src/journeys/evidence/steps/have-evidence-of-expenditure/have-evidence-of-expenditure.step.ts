@@ -5,6 +5,7 @@ import {
   redirect,
   step,
   submit,
+  SubmitHook,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
 import { evidenceEffects } from "#/journeys/evidence/evidence.effects.js";
@@ -15,6 +16,7 @@ import {
 } from "#/journeys/evidence/steps/have-evidence-of-expenditure/have-evidence-of-expenditure.blocks.js";
 import { caption, continueButton, heading } from "#/journeys/shared.blocks.js";
 import { t } from "#/lib/i18n.js";
+import { hasCheckAnswersInQuery } from "#/journeys/shared.hook.js";
 
 export const haveEvidenceOfExpenditure = (
   journeyCode: string,
@@ -29,26 +31,59 @@ export const haveEvidenceOfExpenditure = (
       continueButton(),
     ],
     onSubmission: [
-      submit({
-        onValid: {
-          effects: [evidenceEffects.saveDraftAnswers(journeyCode)],
-          next: [
-            redirect({
-              goto: "check-answers",
-              when: Query("returnTo").match(Condition.Equals("check-answers")),
-            }),
-            redirect({
-              goto: "evidence-of-expenditure",
-              when: Answer("haveEvidenceOfExpenditure").match(
-                Condition.Equals("yes"),
-              ),
-            }),
-            redirect({ goto: "have-evidence-of-capital" }),
-          ],
-        },
-        validate: true,
-      }),
+      saveNoAndClearEvidence(journeyCode),
+      saveYes(journeyCode),
     ],
     path: "/have-evidence-of-expenditure",
     title: t("journeys.evidence.haveEvidenceOfExpenditure.title"),
   });
+
+
+  const saveNoAndClearEvidence = (journeyCode: string): SubmitHook =>
+  submit({
+    onValid: {
+      effects: [
+        evidenceEffects.clearFieldAnswers(journeyCode, [
+          "childCareEvidence",
+          "housingCostsEvidence",
+          "incomeEvidence",
+          "maintenanceEvidence",
+        ]),
+        evidenceEffects.saveDraftAnswers(journeyCode)
+      ],
+      next: [redirectToCheckAnswers, redirectToHaveEvidenceOfCapital],
+    },
+    validate: true,
+    when: Answer("haveEvidenceOfExpenditure").match(Condition.Equals("no")),
+  });
+
+const saveYes = (journeyCode: string): SubmitHook =>
+  submit({
+    onValid: {
+      effects: [evidenceEffects.saveDraftAnswers(journeyCode)],
+      next: [
+        redirectToEvidenceOfExpenditureWithCheckQuery,
+        redirectToEvidenceOfExpenditure,
+      ],
+    },
+    validate: true,
+    when: Answer("haveEvidenceOfExpenditure").match(Condition.Equals("yes")),
+  });
+
+const redirectToCheckAnswers = redirect({
+  goto: "check-answers",
+  when: hasCheckAnswersInQuery,
+});
+
+const redirectToHaveEvidenceOfCapital = redirect({
+  goto: "have-evidence-of-capital",
+});
+
+const redirectToEvidenceOfExpenditure = redirect({
+  goto: "evidence-of-expenditure",
+});
+
+const redirectToEvidenceOfExpenditureWithCheckQuery = redirect({
+  goto: "evidence-of-expenditure?returnTo=check-answers",
+  when: hasCheckAnswersInQuery,
+});
