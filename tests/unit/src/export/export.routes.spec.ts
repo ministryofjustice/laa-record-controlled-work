@@ -8,7 +8,7 @@ import { describe, it } from "mocha";
 import sinon from "sinon";
 
 import config from "#/config.js";
-import { requireAuth } from "#/app/middleware/requireAuth.middleware.js";
+import { requireAuth } from "#/auth/middleware/requireAuth.middleware.js";
 import { createExportRouter } from "#/export/export.routes.js";
 import { getGetApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
 
@@ -78,10 +78,11 @@ describe("GET /cases/:applicationId/export", () => {
 
   it("redirects anonymous requests to sign in before loading the application", async () => {
     const protectedRouter = express.Router({ mergeParams: true });
-    protectedRouter.use(requireAuth);
+    protectedRouter.use(requireAuth());
     protectedRouter.use(
       createExportRouter({ getApplication: getApplicationStub }),
     );
+
     const app = createMockApp({
       mountPath: MOUNT_PATH,
       router: protectedRouter,

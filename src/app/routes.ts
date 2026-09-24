@@ -43,7 +43,7 @@ export function initRoutes(app: Express): void {
     eligibilityRouter,
   );
 
-  app.use("/cases/:applicationId/export", requireAuth, exportRouter);
+  app.use("/cases/:applicationId/export", requireAuth(), exportRouter);
 
   // Forge: Prioritise `/cases/(evidence|ineligible|new|recorded)` over `/cases/:applicationId`
   // and redirect case URL's to the task list.
