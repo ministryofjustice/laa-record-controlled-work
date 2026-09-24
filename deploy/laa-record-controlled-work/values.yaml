@@ -135,6 +135,7 @@ rcw:
     SENTRY_CSP_REPORT_ENDPOINT: "https://o345774.ingest.us.sentry.io/api/4512061899866112/security/?sentry_key=34b761d28dfa94a743acb65213b75ed9"
     SENTRY_ENV: ""
     SENTRY_DEBUG: false
+    SENTRY_ENABLED: true
 
   autoscaling:
     enabled: false
