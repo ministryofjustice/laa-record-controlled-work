@@ -31,12 +31,16 @@ export const haveEvidenceOfCapital = (
       haveEvidenceOfCapitalRadioInput(),
       continueButton(),
     ],
-    onSubmission: [saveNoAndClearEvidence(journeyCode), saveYes(journeyCode), submitInvalid()],
+    onSubmission: [
+      saveNoAndClearEvidence(journeyCode),
+      saveYes(journeyCode),
+      submitInvalid(),
+    ],
     path: "/have-evidence-of-capital",
     title: t("journeys.evidence.haveEvidenceOfCapital.title"),
   });
 
-  const submitInvalid = (): SubmitHook =>
+const submitInvalid = (): SubmitHook =>
   submit({
     onInvalid: {},
     validate: true,
