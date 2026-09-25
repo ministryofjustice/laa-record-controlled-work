@@ -2,11 +2,11 @@ import { createForgePackage } from "@ministryofjustice/hmpps-forge/core/authorin
 
 import type { EditApplicationEffectsDeps } from "#/journeys/edit-application/editApplication.types.js";
 
-import { editApplicationEffectsRegistry } from "#/journeys/edit-application/editApplication.effects.js";
+import { editClientDetailsEffectsRegistry } from "#/journeys/edit-client-details/editClientDetails.effects.js";
 import { editClientDetailsJourney } from "#/journeys/edit-client-details/editClientDetails.journey.js";
 
 export const editClientDetailsPackage =
   createForgePackage<EditApplicationEffectsDeps>({
-    functions: [editApplicationEffectsRegistry],
+    functions: [editClientDetailsEffectsRegistry],
     journey: editClientDetailsJourney,
   });

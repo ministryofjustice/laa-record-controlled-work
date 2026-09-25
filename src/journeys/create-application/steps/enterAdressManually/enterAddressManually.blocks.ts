@@ -1,13 +1,15 @@
+import type {
+  HtmlBlock,
+  ResolvableString,
+} from "@ministryofjustice/hmpps-forge/core/components";
+
 import {
   Condition,
   Self,
   validation,
   type ValidationExpr,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
-import {
-  HtmlBlock,
-  type ResolvableString,
-} from "@ministryofjustice/hmpps-forge/core/components";
+
 import {
   GovUKButton,
   GovUKTextInput,
@@ -43,19 +45,20 @@ const COUNTY_LABEL = t(
 
 const COUNTRY_CODE = UK_ADDRESS_FIELDS.country;
 
+
 const POSTCODE_CODE = UK_ADDRESS_FIELDS.postcode;
 const POSTCODE_LABEL = t(
-  "journeys.createApplication.enterAddressManually.postcode.label",
+    "journeys.createApplication.enterAddressManually.postcode.label",
 );
 const POSTCODE_REQUIRED_VALIDATION = t(
-  "journeys.createApplication.enterAddressManually.postcode.validation.required",
+    "journeys.createApplication.enterAddressManually.postcode.validation.required",
 );
 const POSTCODE_INVALID_VALIDATION = t(
-  "journeys.createApplication.enterAddressManually.postcode.validation.invalid",
+    "journeys.createApplication.enterAddressManually.postcode.validation.invalid",
 );
 
 const NON_UK_ADDRESS_TEXT = t(
-  "journeys.createApplication.enterAddressManually.nonUkAddress",
+    "journeys.createApplication.enterAddressManually.nonUkAddress",
 );
 const CONTINUE_TEXT = t("common.continue");
 
@@ -72,6 +75,7 @@ function answerIsRequired(validationMessage: ResolvableString): ValidationExpr {
     message: validationMessage,
   });
 }
+
 
 // TODO this textInput moves to shared.blocks.ts
 /**
@@ -137,6 +141,31 @@ const postcode = textInput(POSTCODE_CODE, POSTCODE_LABEL, {
   ],
 });
 
+// GovUKTextInput({
+//   classes: "govuk-input--width-10",
+//   code: UK_ADDRESS_FIELDS.postcode,
+//   label: {
+//     isPageHeading: false,
+//     text: t(
+//       "journeys.createApplication.enterAddressManually.postcode.label",
+//     ),
+//   },
+//   validWhen: [
+//     validation({
+//       condition: Self().match(Condition.IsRequired()),
+//       message: t(
+//         "journeys.createApplication.enterAddressManually.postcode.validation.required",
+//       ),
+//     }),
+//     validation({
+//       condition: Self().match(Condition.Address.IsValidPostcode()),
+//       message: t(
+//         "journeys.createApplication.enterAddressManually.postcode.validation.invalid",
+//       ),
+//     }),
+//   ],
+// }),
+
 const addressInputs = [
   addressLine1,
   addressLine2,
@@ -145,6 +174,7 @@ const addressInputs = [
   postcode,
   country,
 ];
+
 
 const nonUkAddressLink = HtmlBlock({
   content: `<p class="govuk-body"><a class="govuk-link" href="enter-overseas-address">${NON_UK_ADDRESS_TEXT}</a></p>`,
@@ -157,3 +187,13 @@ export const enterAddressManuallyBlocks = [
   nonUkAddressLink,
   continueButton,
 ];
+
+//const nonUkAddressLink = "TODO";
+// HtmlBlock({
+//   content: `<p class="govuk-body"><a class="govuk-link" href="enter-overseas-address">${t("journeys.createApplication.enterAddressManually.nonUkAddress")}</a></p>`,
+// }),
+
+// GovUKButton({ text: t("common.continue") }),
+//   function HtmlBlock(arg0: { content: string; }) {
+//     throw new Error("Function not implemented.");
+//   }
