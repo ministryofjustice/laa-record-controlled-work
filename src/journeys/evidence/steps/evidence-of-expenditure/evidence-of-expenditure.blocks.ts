@@ -1,143 +1,162 @@
 import {
   GovUKBody,
   GovUKCheckboxInput,
-  GovUKHeading,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
-import { H1 } from "#/lib/constants/headings.js";
+import { EvidenceAnswers } from "#/journeys/evidence/evidence.answers.js";
 import { t } from "#/lib/i18n.js";
 
-export const heading = GovUKHeading({
-  level: H1,
-  text: t("journeys.evidence.evidenceOfExpenditure.title"),
-});
+/**
+ * Renders the child care evidence group for the "Evidence of expenditure" step.
+ * @returns {GovUKCheckboxInput} The child care evidence group component.
+ */
+export function childCareEvidenceGroup(): GovUKCheckboxInput {
+  return GovUKCheckboxInput({
+    code: EvidenceAnswers.childCareEvidence,
+    fieldset: {
+      legend: {
+        classes: "govuk-fieldset__legend--m",
+        isPageHeading: false,
+        text: t(
+          "journeys.evidence.evidenceOfExpenditure.groupsOfEvidence.childCare",
+        ),
+      },
+    },
+    items: [
+      {
+        text: t(
+          "journeys.evidence.evidenceOfExpenditure.evidenceTypes.bankStatementsChildCare",
+        ),
+        value: "bankStatementsChildCare",
+      },
+      {
+        text: t(
+          "journeys.evidence.evidenceOfExpenditure.evidenceTypes.agreementOrContract",
+        ),
+        value: "agreementOrContract",
+      },
+    ],
+  });
+}
 
-export const description = GovUKBody({
-  classes: "govuk-body",
-  text:
-    `${t("journeys.evidence.evidenceOfExpenditure.description")} ` +
-    `<a href="#" target="_blank">${t("journeys.evidence.evidenceOfExpenditure.linkText")}</a>`,
-});
+/**
+ * Renders the housing costs evidence group for the "Evidence of expenditure" step.
+ * @returns {GovUKCheckboxInput} The housing costs evidence group component.
+ */
+export function housingCostsEvidenceGroup(): GovUKCheckboxInput {
+  return GovUKCheckboxInput({
+    code: EvidenceAnswers.housingCostsEvidence,
+    fieldset: {
+      legend: {
+        classes: "govuk-fieldset__legend--m",
+        isPageHeading: false,
+        text: t(
+          "journeys.evidence.evidenceOfExpenditure.groupsOfEvidence.housingCosts",
+        ),
+      },
+    },
+    items: [
+      {
+        text: t(
+          "journeys.evidence.evidenceOfExpenditure.evidenceTypes.bankStatementsHousing",
+        ),
+        value: "bankStatementsHousing",
+      },
+      {
+        text: t(
+          "journeys.evidence.evidenceOfExpenditure.evidenceTypes.mortgageStatement",
+        ),
+        value: "mortgageStatement",
+      },
+      {
+        text: t(
+          "journeys.evidence.evidenceOfExpenditure.evidenceTypes.rentStatement",
+        ),
+        value: "rentStatement",
+      },
+    ],
+  });
+}
 
-export const label = GovUKBody({
-  classes: "govuk-hint",
-  text: t("journeys.evidence.evidenceOfExpenditure.hint"),
-});
+/**
+ * Renders the income evidence group for the "Evidence of expenditure" step.
+ * @returns {GovUKCheckboxInput} The income evidence group component.
+ */
+export function incomeEvidenceGroup(): GovUKCheckboxInput {
+  return GovUKCheckboxInput({
+    code: EvidenceAnswers.incomeEvidence,
+    fieldset: {
+      legend: {
+        classes: "govuk-fieldset__legend--m",
+        isPageHeading: false,
+        text: t(
+          "journeys.evidence.evidenceOfExpenditure.groupsOfEvidence.incomeTaxAndNationalInsurance",
+        ),
+      },
+    },
+    items: [
+      {
+        text: t(
+          "journeys.evidence.evidenceOfExpenditure.evidenceTypes.wageSlips",
+        ),
+        value: "wageSlips",
+      },
+      {
+        text: t(
+          "journeys.evidence.evidenceOfExpenditure.evidenceTypes.taxCalculationSheet",
+        ),
+        value: "taxCalculationSheet",
+      },
+    ],
+  });
+}
 
-export const incomeEvidenceGroup = GovUKCheckboxInput({
-  code: "incomeEvidence",
-  fieldset: {
-    legend: {
-      classes: "govuk-fieldset__legend--m",
-      isPageHeading: false,
-      text: t(
-        "journeys.evidence.evidenceOfExpenditure.groupsOfEvidence.incomeTaxAndNationalInsurance",
-      ),
-    },
-  },
-  items: [
-    {
-      text: t(
-        "journeys.evidence.evidenceOfExpenditure.evidenceTypes.wageSlips",
-      ),
-      value: "wageSlips",
-    },
-    {
-      text: t(
-        "journeys.evidence.evidenceOfExpenditure.evidenceTypes.taxCalculationSheet",
-      ),
-      value: "taxCalculationSheet",
-    },
-  ],
-});
+/**
+ * Renders the label for the "Evidence of expenditure" step.
+ * @returns {GovUKBody} The label component.
+ */
+export function label(): GovUKBody {
+  return GovUKBody({
+    classes: "govuk-hint",
+    text: t("journeys.evidence.evidenceOfExpenditure.hint"),
+  });
+}
 
-export const housingCostsEvidenceGroup = GovUKCheckboxInput({
-  code: "housingCostsEvidence",
-  fieldset: {
-    legend: {
-      classes: "govuk-fieldset__legend--m",
-      isPageHeading: false,
-      text: t(
-        "journeys.evidence.evidenceOfExpenditure.groupsOfEvidence.housingCosts",
-      ),
+/**
+ * Renders the maintenance evidence group for the "Evidence of expenditure" step.
+ * @returns {GovUKCheckboxInput} The maintenance evidence group component.
+ */
+export function maintenanceEvidenceGroup(): GovUKCheckboxInput {
+  return GovUKCheckboxInput({
+    code: EvidenceAnswers.maintenanceEvidence,
+    fieldset: {
+      legend: {
+        classes: "govuk-fieldset__legend--m",
+        isPageHeading: false,
+        text: t(
+          "journeys.evidence.evidenceOfExpenditure.groupsOfEvidence.maintenance",
+        ),
+      },
     },
-  },
-  items: [
-    {
-      text: t(
-        "journeys.evidence.evidenceOfExpenditure.evidenceTypes.bankStatementsHousing",
-      ),
-      value: "bankStatementsHousing",
-    },
-    {
-      text: t(
-        "journeys.evidence.evidenceOfExpenditure.evidenceTypes.mortgageStatement",
-      ),
-      value: "mortgageStatement",
-    },
-    {
-      text: t(
-        "journeys.evidence.evidenceOfExpenditure.evidenceTypes.rentStatement",
-      ),
-      value: "rentStatement",
-    },
-  ],
-});
-
-export const childCareEvidenceGroup = GovUKCheckboxInput({
-  code: "childCareEvidence",
-  fieldset: {
-    legend: {
-      classes: "govuk-fieldset__legend--m",
-      isPageHeading: false,
-      text: t(
-        "journeys.evidence.evidenceOfExpenditure.groupsOfEvidence.childCare",
-      ),
-    },
-  },
-  items: [
-    {
-      text: t(
-        "journeys.evidence.evidenceOfExpenditure.evidenceTypes.bankStatementsChildCare",
-      ),
-      value: "bankStatementsChildCare",
-    },
-    {
-      text: t(
-        "journeys.evidence.evidenceOfExpenditure.evidenceTypes.agreementOrContract",
-      ),
-      value: "agreementOrContract",
-    },
-  ],
-});
-
-export const maintenanceEvidenceGroup = GovUKCheckboxInput({
-  code: "maintenanceEvidence",
-  fieldset: {
-    legend: {
-      classes: "govuk-fieldset__legend--m",
-      isPageHeading: false,
-      text: t(
-        "journeys.evidence.evidenceOfExpenditure.groupsOfEvidence.maintenance",
-      ),
-    },
-  },
-  items: [
-    {
-      text: t(
-        "journeys.evidence.evidenceOfExpenditure.evidenceTypes.bankStatementsMaintenance",
-      ),
-      value: "bankStatementsMaintenance",
-    },
-    {
-      text: t(
-        "journeys.evidence.evidenceOfExpenditure.evidenceTypes.maintenanceOrder",
-      ),
-      value: "maintenanceOrder",
-    },
-    {
-      text: t("journeys.evidence.evidenceOfExpenditure.evidenceTypes.receipts"),
-      value: "receipts",
-    },
-  ],
-});
+    items: [
+      {
+        text: t(
+          "journeys.evidence.evidenceOfExpenditure.evidenceTypes.bankStatementsMaintenance",
+        ),
+        value: "bankStatementsMaintenance",
+      },
+      {
+        text: t(
+          "journeys.evidence.evidenceOfExpenditure.evidenceTypes.maintenanceOrder",
+        ),
+        value: "maintenanceOrder",
+      },
+      {
+        text: t(
+          "journeys.evidence.evidenceOfExpenditure.evidenceTypes.receipts",
+        ),
+        value: "receipts",
+      },
+    ],
+  });
+}

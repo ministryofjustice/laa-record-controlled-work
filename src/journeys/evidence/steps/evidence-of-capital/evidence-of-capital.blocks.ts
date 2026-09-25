@@ -9,6 +9,7 @@ import {
   GovUKHeading,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
+import { EvidenceAnswers } from "#/journeys/evidence/evidence.answers.js";
 import { H1 } from "#/lib/constants/headings.js";
 import { t } from "#/lib/i18n.js";
 
@@ -23,7 +24,7 @@ export const label = GovUKBody({
 });
 
 export const capitalEvidenceGroup = GovUKCheckboxInput({
-  code: "capitalEvidence",
+  code: EvidenceAnswers.capitalEvidence,
   items: [
     {
       text: t(

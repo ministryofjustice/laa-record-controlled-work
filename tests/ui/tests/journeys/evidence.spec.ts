@@ -34,6 +34,11 @@ test("evidence flow", async ({ withSelectedOffice: page }) => {
   await page.getByRole("checkbox", { name: "Bank statements" }).check();
   await page.getByRole("button", { name: "Continue" }).click();
 
+  /// Verify redirection to the have evidence of expenditure page
+  await expect(page).toHaveURL(`/cases/${applicationId}/evidence/have-evidence-of-expenditure`);
+  await page.getByRole("radio", { name: "Yes" }).check();
+  await page.getByRole("button", { name: "Continue" }).click();
+
   // Verify redirection to the evidence of expenditure page
   await expect(page).toHaveURL(`/cases/${applicationId}/evidence/evidence-of-expenditure`);
 
@@ -48,6 +53,11 @@ test("evidence flow", async ({ withSelectedOffice: page }) => {
   // Select "Wage slips" and "Bank statements" and submit
   await page.getByRole("checkbox", { name: "Wage slips" }).check();
   await page.getByRole("checkbox", { name: "Mortgage statement" }).check();
+  await page.getByRole("button", { name: "Continue" }).click();
+
+    /// Verify redirection to the have evidence of capital page
+  await expect(page).toHaveURL(`/cases/${applicationId}/evidence/have-evidence-of-capital`);
+  await page.getByRole("radio", { name: "Yes" }).check();
   await page.getByRole("button", { name: "Continue" }).click();
 
   // Verify redirection to the evidence of capital page
@@ -68,6 +78,36 @@ test("evidence flow", async ({ withSelectedOffice: page }) => {
   
   // Verify redirection to the check your answers page
   await expect(page).toHaveURL(`/cases/${applicationId}/evidence/check-answers`);
+
+  // Verify check answers page displays correctly
+  await expect(
+    page.getByRole("heading", {
+      name: /Check your answers/,
+      level: 1,
+    }),
+  ).toBeVisible();
+
+  // Check that all answers are displayed correctly
+  const summaryListFull = page.locator(".govuk-summary-list");
+  const rowsFull = summaryListFull.locator(".govuk-summary-list__row");
+  await expect(rowsFull).toHaveCount(6);
+  await expect(rowsFull.locator(".govuk-summary-list__value")).toHaveText(
+    [
+      // Do yo have evidence
+      "Yes",
+      // Income
+      "Employed (PAYE) income:\nWage slips,\n\nSelf-employed income:\nBank statements,\n",
+      // Do you have evidence of expenditure?
+      "Yes",
+      // Evidence of expenditure
+      "Income Tax and National Insurance:\nWage slips,\n\nHousing costs:\nMortgage statement,",
+      // Do you have evidence of capital?
+      "Yes",
+      // Evidence of capital
+      "	Bank statement,\nShare certificate,\n",
+    ],
+    { useInnerText: true },
+  );
 
   // Navigate back to the have evidence page
   await page.goto(`/cases/${applicationId}/evidence/have-evidence`);

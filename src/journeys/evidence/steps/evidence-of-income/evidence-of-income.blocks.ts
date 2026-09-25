@@ -4,6 +4,7 @@ import {
   GovUKHeading,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
+import { EvidenceAnswers } from "#/journeys/evidence/evidence.answers.js";
 import { H1 } from "#/lib/constants/headings.js";
 import { t } from "#/lib/i18n.js";
 
@@ -18,7 +19,7 @@ export const description = GovUKBody({
 });
 
 export const employedEvidenceGroup = GovUKCheckboxInput({
-  code: "employedEvidence",
+  code: EvidenceAnswers.employedEvidence,
   fieldset: {
     legend: {
       classes: "govuk-fieldset__legend--m",
@@ -37,7 +38,7 @@ export const employedEvidenceGroup = GovUKCheckboxInput({
 });
 
 export const selfEmployedEvidenceGroup = GovUKCheckboxInput({
-  code: "selfEmployedEvidence",
+  code: EvidenceAnswers.selfEmployedEvidence,
   fieldset: {
     legend: {
       classes: "govuk-fieldset__legend--m",
@@ -74,7 +75,7 @@ export const selfEmployedEvidenceGroup = GovUKCheckboxInput({
 });
 
 export const benefitsInKindEvidenceGroup = GovUKCheckboxInput({
-  code: "benefitsInKindEvidence",
+  code: EvidenceAnswers.benefitsInKindEvidence,
   fieldset: {
     legend: {
       classes: "govuk-fieldset__legend--m",
@@ -93,7 +94,7 @@ export const benefitsInKindEvidenceGroup = GovUKCheckboxInput({
 });
 
 export const otherEvidenceGroup = GovUKCheckboxInput({
-  code: "otherEvidence",
+  code: EvidenceAnswers.otherEvidence,
   fieldset: {
     legend: {
       classes: "govuk-fieldset__legend--m",
@@ -142,7 +143,7 @@ export const otherEvidenceGroup = GovUKCheckboxInput({
 });
 
 export const stateBenefitsEvidenceGroup = GovUKCheckboxInput({
-  code: "stateBenefitsEvidence",
+  code: EvidenceAnswers.stateBenefitsEvidence,
   fieldset: {
     legend: {
       classes: "govuk-fieldset__legend--m",
@@ -175,7 +176,7 @@ export const stateBenefitsEvidenceGroup = GovUKCheckboxInput({
 });
 
 export const asylumSupportEvidenceGroup = GovUKCheckboxInput({
-  code: "asylumSupportEvidence",
+  code: EvidenceAnswers.asylumSupportEvidence,
   fieldset: {
     legend: {
       classes: "govuk-fieldset__legend--m",
@@ -196,7 +197,7 @@ export const asylumSupportEvidenceGroup = GovUKCheckboxInput({
 });
 
 export const taxCreditsEvidenceGroup = GovUKCheckboxInput({
-  code: "taxCreditsEvidence",
+  code: EvidenceAnswers.taxCreditsEvidence,
   fieldset: {
     legend: {
       classes: "govuk-fieldset__legend--m",

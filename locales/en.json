@@ -362,11 +362,20 @@
           "required": " You must select an income evidence to continue"
         }
       },
+      "haveEvidenceOfExpenditure": {
+        "title": "Do you have evidence of your client's expenditure?",
+        "description": "You only need to gather evidence of your client's expenditure in some circumstances.",
+        "linkText": "Check the risk-based evidence guidelines (opens in a new window or tab).",
+        "options": {
+          "no": "No, evidence is not required"
+        },
+        "validation": {
+          "required": "Please select an option to continue"
+        }
+      },
       "evidenceOfExpenditure": {
         "title": "Evidence of your client's expenditure",
         "hint": "Select all that apply.",
-        "linkText": "Check the risk-based evidence guidelines (opens in a new window or tab).",
-        "description": "You only need to gather evidence of your client's expenditure if they are close to the threshold and there is a risk of them being ineligible.",
         "groupsOfEvidence": {
           "incomeTaxAndNationalInsurance": "Income Tax and National Insurance",
           "housingCosts": "Housing costs",
@@ -384,6 +393,16 @@
           "bankStatementsMaintenance": "Bank statement",
           "maintenanceOrder": "Maintenance order",
           "receipts": "Receipts"
+        },
+        "validation": {
+          "required": "You must select at least one type of evidence to continue"
+        }
+      },
+      "haveEvidenceOfCapital": {
+        "title": "Do you have evidence of your client's capital?",
+        "description": "You only need to gather evidence of your client's capital if they are close to the threshold and there is a risk of them being ineligible.",
+        "validation": {
+          "required": "Please select an option to continue"
         }
       },
       "evidenceOfCapital": {
@@ -405,10 +424,13 @@
           "doYouHaveEvidence": "Do you have evidence?",
           "reasonForNoEvidence": "Reason for not having evidence",
           "evidenceOfIncome": "Income",
+          "haveEvidenceOfExpenditure": "Do you have evidence of expenditure?",
           "evidenceOfExpenditure": "Expenditure",
+          "haveEvidenceOfCapital": "Do you have evidence of capital?",
           "evidenceOfCapital": "Capital"
         },
         "noEvidenceProvided": "No evidence provided",
+        "noEvidenceRequired": "No, evidence not required",
         "changeLink": {
           "change": "Change"
         }
