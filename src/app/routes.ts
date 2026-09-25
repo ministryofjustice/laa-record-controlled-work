@@ -2,27 +2,35 @@ import type { Express, Request, Response } from "express";
 
 import eligibilityRouter from "#/api/eligibility/eligibility.routes.js";
 import authRouter from "#/auth/auth.routes.js";
+import { requireAuth } from "#/auth/middleware/requireAuth.middleware.js";
 import config from "#/config.js";
 import exportRouter from "#/export/export.routes.js";
 import { OK } from "#/lib/constants/http.js";
 import { createAuthLimiter } from "#/middleware/setupRateLimit.js";
 
-import { requireAuth } from "./middleware/requireAuth.middleware.js";
 import testRoutes from "./routes/test.js";
 
-export const initRoutes = (app: Express): void => {
+/**
+ * Initializes the routes for the Express application.
+ * @param app  Express application.
+ */
+export function initRoutes(app: Express): void {
   // Root endpoint - serves the main page of the application.
-  app.get("/", requireAuth, (req: Request, res: Response): void => {
+  app.get("/", requireAuth(), (req: Request, res: Response): void => {
     res.render("main/index");
   });
 
   // Health endpoints - used for liveness and readiness probes.
   app.get("/status", (req: Request, res: Response): void => {
-    res.status(OK).send("OK");
+    req.session.destroy(() => {
+      res.status(OK).send("OK");
+    });
   });
 
   app.get("/health", (req: Request, res: Response): void => {
-    res.status(OK).send("Healthy");
+    req.session.destroy(() => {
+      res.status(OK).send("Healthy");
+    });
   });
 
   // Auth.
@@ -31,15 +39,15 @@ export const initRoutes = (app: Express): void => {
   // CCQ
   app.use(
     "/api/applications/:applicationId/eligibility",
-    requireAuth,
+    requireAuth(),
     eligibilityRouter,
   );
 
-  app.use("/cases/:applicationId/export", requireAuth, exportRouter);
+  app.use("/cases/:applicationId/export", requireAuth(), exportRouter);
 
   // Forge: Prioritise `/cases/(evidence|ineligible|new|recorded)` over `/cases/:applicationId`
   // and redirect case URL's to the task list.
-  app.get("/cases/:applicationId", requireAuth, (req, res, next) => {
+  app.get("/cases/:applicationId", requireAuth(), (req, res, next) => {
     let { applicationId } = req.params;
     const priority = ["evidence", "ineligible", "new", "recorded"];
 
@@ -62,4 +70,4 @@ export const initRoutes = (app: Express): void => {
   ) {
     app.use("/test", testRoutes);
   }
-};
+}
