@@ -4,7 +4,7 @@ import { expect } from "chai";
 import { afterEach, describe, it } from "mocha";
 import sinon from "sinon";
 
-import { refreshToken } from "#/auth/domain/refreshToken.action.js";
+import { refreshToken } from "#/auth/actions/refreshToken.action.js";
 import { TokenRefreshError } from "#/auth/auth.errors.js";
 import { EntraService } from "#/auth/entra.service.js";
 import config from "#/config.js";
