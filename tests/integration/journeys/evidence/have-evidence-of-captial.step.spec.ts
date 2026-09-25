@@ -20,7 +20,9 @@ describe("Do you have evidence of capital step", () => {
     let radioInput: RenderBlock;
 
     before(async () => {
-      const result = await client.get(`/cases/${applicationId}/evidence/have-evidence-of-capital`);
+      const result = await client.get(
+        `/cases/${applicationId}/evidence/have-evidence-of-capital`,
+      );
       expect(result.type).to.equal("render");
       renderResult = result as TestRenderResult;
       [radioInput] = renderResult.getBlocksByVariant("govukRadioInput");
@@ -42,9 +44,11 @@ describe("Do you have evidence of capital step", () => {
 
   describe("POST /cases/evidence/have-evidence-of-capital", () => {
     const fieldCode = "haveEvidenceOfCapital";
-    
+
     it("should show validation error if no option is selected", async () => {
-      const result = await client.post(`/cases/${applicationId}/evidence/have-evidence-of-capital`);
+      const result = await client.post(
+        `/cases/${applicationId}/evidence/have-evidence-of-capital`,
+      );
       expect(result.type).to.equal("render");
       const renderResult = result as TestRenderResult;
       expect(renderResult.context.showValidationFailures).to.equal(true);
@@ -54,22 +58,30 @@ describe("Do you have evidence of capital step", () => {
     });
 
     it("should redirect to have evidence of capital step if no is selected", async () => {
-      const result = await client.post(`/cases/${applicationId}/evidence/have-evidence-of-capital`, {
-        body: {
-          haveEvidenceOfCapital: "no",
+      const result = await client.post(
+        `/cases/${applicationId}/evidence/have-evidence-of-capital`,
+        {
+          body: {
+            haveEvidenceOfCapital: "no",
+          },
         },
-      });
+      );
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
-      expect(redirectResult.url).to.equal(`/cases/${applicationId}/evidence/check-answers`);
+      expect(redirectResult.url).to.equal(
+        `/cases/${applicationId}/evidence/check-answers`,
+      );
     });
 
     it("should redirect to evidence of capital step if yes is selected", async () => {
-      const result = await client.post(`/cases/${applicationId}/evidence/have-evidence-of-capital`, {
-        body: {
-          haveEvidenceOfCapital: "yes",
+      const result = await client.post(
+        `/cases/${applicationId}/evidence/have-evidence-of-capital`,
+        {
+          body: {
+            haveEvidenceOfCapital: "yes",
+          },
         },
-      });
+      );
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
       expect(redirectResult.url).to.equal(

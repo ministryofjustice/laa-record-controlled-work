@@ -58,6 +58,18 @@ describe("Evidence of expenditure step", () => {
   });
 
   describe("POST /cases/evidence/evidence-of-expenditure", () => {
+    it("should show validation error if no option is selected", async () => {
+      const result = await client.post(
+        "/cases/123e4567-e89b-12d3-a456-426614174000/evidence/evidence-of-expenditure",
+        {
+          body: {},
+        },
+      );
+      expect(result.type).to.equal("render");
+      const renderResult = result as TestRenderResult;
+      expect(renderResult.context.showValidationFailures).to.equal(true);
+    });
+
     it("should redirect to have evidence of capital step if at least one option is selected", async () => {
       const result = await client.post(
         `/cases/${applicationId}/evidence/evidence-of-expenditure`,
