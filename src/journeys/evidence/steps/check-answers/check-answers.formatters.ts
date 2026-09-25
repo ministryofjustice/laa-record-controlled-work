@@ -7,6 +7,7 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 import { NunjucksGenerators } from "@ministryofjustice/hmpps-forge/express-nunjucks";
 
+import { EvidenceAnswers } from "#/journeys/evidence/evidence.answers.js";
 import { t } from "#/lib/i18n.js";
 
 /**
@@ -14,7 +15,7 @@ import { t } from "#/lib/i18n.js";
  * @returns {ResolvableString} The label for the "Do you have evidence?" question based on the user's answer.
  */
 export function doYouHaveEvidenceLabel(): ResolvableString {
-  return match(Answer("doYouHaveEvidence"))
+  return match(Answer(EvidenceAnswers.doYouHaveEvidence))
     .branch(Condition.Equals("yes"), t("common.yes"))
     .otherwise(t("common.no"));
 }
@@ -26,7 +27,7 @@ export function doYouHaveEvidenceLabel(): ResolvableString {
 export function evidenceOfCapitalList(): ResolvableString {
   return NunjucksGenerators.String({
     data: {
-      capitalEvidence: Answer("capitalEvidence"),
+      capitalEvidence: Answer(EvidenceAnswers.capitalEvidence),
       evidenceTypeLabels: {
         bankStatementCapital: t(
           "journeys.evidence.evidenceOfCapital.evidenceTypes.bankStatementCapital",
@@ -60,7 +61,7 @@ export function evidenceOfCapitalList(): ResolvableString {
 export function evidenceOfExpenditureList(): ResolvableString {
   return NunjucksGenerators.String({
     data: {
-      childCareEvidence: Answer("childCareEvidence"),
+      childCareEvidence: Answer(EvidenceAnswers.childCareEvidence),
       evidenceHeadings: {
         childCareEvidence: t(
           "journeys.evidence.evidenceOfExpenditure.groupsOfEvidence.childCare",
@@ -107,9 +108,9 @@ export function evidenceOfExpenditureList(): ResolvableString {
           "journeys.evidence.evidenceOfExpenditure.evidenceTypes.wageSlips",
         ),
       },
-      housingCostsEvidence: Answer("housingCostsEvidence"),
-      incomeEvidence: Answer("incomeEvidence"),
-      maintenanceEvidence: Answer("maintenanceEvidence"),
+      housingCostsEvidence: Answer(EvidenceAnswers.housingCostsEvidence),
+      incomeEvidence: Answer(EvidenceAnswers.incomeEvidence),
+      maintenanceEvidence: Answer(EvidenceAnswers.maintenanceEvidence),
       noEvidenceLabel: t("journeys.evidence.checkAnswers.noEvidenceProvided"),
     },
     template: `
@@ -143,9 +144,9 @@ export function evidenceOfExpenditureList(): ResolvableString {
 export function evidenceOfIncomeList(): ResolvableString {
   return NunjucksGenerators.String({
     data: {
-      asylumSupportEvidence: Answer("asylumSupportEvidence"),
-      benefitsInKindEvidence: Answer("benefitsInKindEvidence"),
-      employedEvidence: Answer("employedEvidence"),
+      asylumSupportEvidence: Answer(EvidenceAnswers.asylumSupportEvidence),
+      benefitsInKindEvidence: Answer(EvidenceAnswers.benefitsInKindEvidence),
+      employedEvidence: Answer(EvidenceAnswers.employedEvidence),
       evidenceHeadings: {
         asylumSupportEvidenceLabel: t(
           "journeys.evidence.evidenceOfIncome.groupsOfEvidence.asylumSupport",
@@ -223,10 +224,10 @@ export function evidenceOfIncomeList(): ResolvableString {
           "journeys.evidence.evidenceOfIncome.evidenceTypes.wageSlips",
         ),
       },
-      otherEvidence: Answer("otherEvidence"),
-      selfEmployedEvidence: Answer("selfEmployedEvidence"),
-      stateBenefitsEvidence: Answer("stateBenefitsEvidence"),
-      taxCreditsEvidence: Answer("taxCreditsEvidence"),
+      otherEvidence: Answer(EvidenceAnswers.otherEvidence),
+      selfEmployedEvidence: Answer(EvidenceAnswers.selfEmployedEvidence),
+      stateBenefitsEvidence: Answer(EvidenceAnswers.stateBenefitsEvidence),
+      taxCreditsEvidence: Answer(EvidenceAnswers.taxCreditsEvidence),
     },
     template: `
     {% if employedEvidence.length > 0 %}
@@ -265,7 +266,7 @@ export function evidenceOfIncomeList(): ResolvableString {
  * @returns {ResolvableString} The merged reason for no evidence label.
  */
 export function hasCapitalEvidenceLabel(): ResolvableString {
-  return match(Answer("haveEvidenceOfCapital"))
+  return match(Answer(EvidenceAnswers.haveEvidenceOfCapital))
     .branch(Condition.Equals("yes"), t("common.yes"))
     .otherwise(t("journeys.evidence.haveEvidenceOfExpenditure.options.no"));
 }
@@ -275,7 +276,7 @@ export function hasCapitalEvidenceLabel(): ResolvableString {
  * @returns {ResolvableString} The label for the "Do you have evidence of expenditure?" question.
  */
 export function hasExpenditureEvidenceLabel(): ResolvableString {
-  return match(Answer("haveEvidenceOfExpenditure"))
+  return match(Answer(EvidenceAnswers.haveEvidenceOfExpenditure))
     .branch(Condition.Equals("yes"), t("common.yes"))
     .otherwise(t("journeys.evidence.haveEvidenceOfExpenditure.options.no"));
 }
@@ -287,7 +288,9 @@ export function hasExpenditureEvidenceLabel(): ResolvableString {
 export function mergedReasonForNoEvidenceLabel(): ResolvableString {
   return NunjucksGenerators.String({
     data: {
-      moreDetailsForNoEvidence: Answer("moreDetailsForNoEvidence"),
+      moreDetailsForNoEvidence: Answer(
+        EvidenceAnswers.moreDetailsForNoEvidence,
+      ),
       reasonForNoEvidence: reasonForNoEvidenceLabel(),
     },
     template: `
@@ -302,7 +305,7 @@ export function mergedReasonForNoEvidenceLabel(): ResolvableString {
  * @returns {ResolvableString} The label for the reason for no evidence.
  */
 function reasonForNoEvidenceLabel(): ResolvableString {
-  return match(Answer("reasonForNoEvidence"))
+  return match(Answer(EvidenceAnswers.reasonForNoEvidence))
     .branch(
       Condition.Equals("notPossibleBeforeStart"),
       t("journeys.evidence.reasonForNoEvidence.options.notPossibleBeforeStart"),

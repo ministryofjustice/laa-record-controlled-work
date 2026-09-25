@@ -4,17 +4,21 @@ import {
   redirect,
   step,
   submit,
-  SubmitHook,
+  type SubmitHook,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
+import {
+  CapitalEvidence,
+  EvidenceAnswers,
+} from "#/journeys/evidence/evidence.answers.js";
 import { evidenceEffects } from "#/journeys/evidence/evidence.effects.js";
 import {
   description,
   haveEvidenceOfCapitalRadioInput,
 } from "#/journeys/evidence/steps/have-evidence-of-captial/have-evidence-of-capital.blocks.js";
 import { caption, continueButton, heading } from "#/journeys/shared.blocks.js";
-import { t } from "#/lib/i18n.js";
 import { hasCheckAnswersInQuery } from "#/journeys/shared.hook.js";
+import { t } from "#/lib/i18n.js";
 
 export const haveEvidenceOfCapital = (
   journeyCode: string,
@@ -27,10 +31,7 @@ export const haveEvidenceOfCapital = (
       haveEvidenceOfCapitalRadioInput(),
       continueButton(),
     ],
-    onSubmission: [
-      saveNoAndClearEvidence(journeyCode),
-      saveYes(journeyCode),
-    ],
+    onSubmission: [saveNoAndClearEvidence(journeyCode), saveYes(journeyCode)],
     path: "/have-evidence-of-capital",
     title: t("journeys.evidence.haveEvidenceOfCapital.title"),
   });
@@ -39,15 +40,15 @@ const saveNoAndClearEvidence = (journeyCode: string): SubmitHook =>
   submit({
     onValid: {
       effects: [
-        evidenceEffects.clearFieldAnswers(journeyCode, [
-          "capitalEvidence",
-        ]),
-        evidenceEffects.saveDraftAnswers(journeyCode)
+        evidenceEffects.clearFieldAnswers(journeyCode, [...CapitalEvidence]),
+        evidenceEffects.saveDraftAnswers(journeyCode),
       ],
       next: [redirectToCheckAnswers],
     },
     validate: true,
-    when: Answer("haveEvidenceOfCapital").match(Condition.Equals("no")),
+    when: Answer(EvidenceAnswers.haveEvidenceOfCapital).match(
+      Condition.Equals("no"),
+    ),
   });
 
 const saveYes = (journeyCode: string): SubmitHook =>
@@ -60,7 +61,9 @@ const saveYes = (journeyCode: string): SubmitHook =>
       ],
     },
     validate: true,
-    when: Answer("haveEvidenceOfCapital").match(Condition.Equals("yes")),
+    when: Answer(EvidenceAnswers.haveEvidenceOfCapital).match(
+      Condition.Equals("yes"),
+    ),
   });
 
 const redirectToCheckAnswers = redirect({

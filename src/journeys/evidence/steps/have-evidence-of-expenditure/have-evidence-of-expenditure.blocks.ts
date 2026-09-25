@@ -8,6 +8,7 @@ import {
   GovUKRadioInput,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
+import { EvidenceAnswers } from "#/journeys/evidence/evidence.answers.js";
 import { t } from "#/lib/i18n.js";
 
 /**
@@ -27,7 +28,7 @@ export function description(): GovUKBody {
  */
 export function haveEvidenceOfExpenditureRadioInput(): GovUKRadioInput {
   return GovUKRadioInput({
-    code: "haveEvidenceOfExpenditure",
+    code: EvidenceAnswers.haveEvidenceOfExpenditure,
     items: [
       {
         text: t("common.yes"),

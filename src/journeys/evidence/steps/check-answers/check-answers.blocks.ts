@@ -9,6 +9,7 @@ import {
   GovUKSummaryList,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
+import { EvidenceAnswers } from "#/journeys/evidence/evidence.answers.js";
 import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
 import { t } from "#/lib/i18n.js";
 
@@ -71,7 +72,9 @@ export const summaryList = GovUKSummaryList({
         ),
       },
       value: { html: mergedReasonForNoEvidenceLabel() },
-      visibleWhen: Answer("doYouHaveEvidence").match(Condition.Equals("no")),
+      visibleWhen: Answer(EvidenceAnswers.doYouHaveEvidence).match(
+        Condition.Equals("no"),
+      ),
     },
     {
       actions: {
@@ -92,7 +95,9 @@ export const summaryList = GovUKSummaryList({
         text: t("journeys.evidence.checkAnswers.answerLabels.evidenceOfIncome"),
       },
       value: { html: evidenceOfIncomeList() },
-      visibleWhen: Answer("doYouHaveEvidence").match(Condition.Equals("yes")),
+      visibleWhen: Answer(EvidenceAnswers.doYouHaveEvidence).match(
+        Condition.Equals("yes"),
+      ),
     },
     {
       actions: {
@@ -115,7 +120,9 @@ export const summaryList = GovUKSummaryList({
         ),
       },
       value: { text: hasExpenditureEvidenceLabel() },
-      visibleWhen: Answer("doYouHaveEvidence").match(Condition.Equals("yes")),
+      visibleWhen: Answer(EvidenceAnswers.doYouHaveEvidence).match(
+        Condition.Equals("yes"),
+      ),
     },
     {
       actions: {
@@ -138,7 +145,7 @@ export const summaryList = GovUKSummaryList({
         ),
       },
       value: { html: evidenceOfExpenditureList() },
-      visibleWhen: Answer("haveEvidenceOfExpenditure").match(
+      visibleWhen: Answer(EvidenceAnswers.haveEvidenceOfExpenditure).match(
         Condition.Equals("yes"),
       ),
     },
@@ -163,7 +170,9 @@ export const summaryList = GovUKSummaryList({
         ),
       },
       value: { text: hasCapitalEvidenceLabel() },
-      visibleWhen: Answer("doYouHaveEvidence").match(Condition.Equals("yes")),
+      visibleWhen: Answer(EvidenceAnswers.doYouHaveEvidence).match(
+        Condition.Equals("yes"),
+      ),
     },
     {
       actions: {
@@ -186,7 +195,7 @@ export const summaryList = GovUKSummaryList({
         ),
       },
       value: { html: evidenceOfCapitalList() },
-      visibleWhen: Answer("haveEvidenceOfCapital").match(
+      visibleWhen: Answer(EvidenceAnswers.haveEvidenceOfCapital).match(
         Condition.Equals("yes"),
       ),
     },

@@ -3,6 +3,7 @@ import {
   GovUKCheckboxInput,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
+import { EvidenceAnswers } from "#/journeys/evidence/evidence.answers.js";
 import { t } from "#/lib/i18n.js";
 
 /**
@@ -11,7 +12,7 @@ import { t } from "#/lib/i18n.js";
  */
 export function childCareEvidenceGroup(): GovUKCheckboxInput {
   return GovUKCheckboxInput({
-    code: "childCareEvidence",
+    code: EvidenceAnswers.childCareEvidence,
     fieldset: {
       legend: {
         classes: "govuk-fieldset__legend--m",
@@ -44,7 +45,7 @@ export function childCareEvidenceGroup(): GovUKCheckboxInput {
  */
 export function housingCostsEvidenceGroup(): GovUKCheckboxInput {
   return GovUKCheckboxInput({
-    code: "housingCostsEvidence",
+    code: EvidenceAnswers.housingCostsEvidence,
     fieldset: {
       legend: {
         classes: "govuk-fieldset__legend--m",
@@ -83,7 +84,7 @@ export function housingCostsEvidenceGroup(): GovUKCheckboxInput {
  */
 export function incomeEvidenceGroup(): GovUKCheckboxInput {
   return GovUKCheckboxInput({
-    code: "incomeEvidence",
+    code: EvidenceAnswers.incomeEvidence,
     fieldset: {
       legend: {
         classes: "govuk-fieldset__legend--m",
@@ -127,7 +128,7 @@ export function label(): GovUKBody {
  */
 export function maintenanceEvidenceGroup(): GovUKCheckboxInput {
   return GovUKCheckboxInput({
-    code: "maintenanceEvidence",
+    code: EvidenceAnswers.maintenanceEvidence,
     fieldset: {
       legend: {
         classes: "govuk-fieldset__legend--m",

@@ -5,10 +5,11 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 import { GovUKRadioInput } from "@ministryofjustice/hmpps-forge/govuk-components";
 
+import { EvidenceAnswers } from "#/journeys/evidence/evidence.answers.js";
 import { t } from "#/lib/i18n.js";
 
 export const doYouHaveEvidenceRadioInput = GovUKRadioInput({
-  code: "doYouHaveEvidence",
+  code: EvidenceAnswers.doYouHaveEvidence,
   fieldset: {
     legend: {
       classes: "govuk-fieldset__legend--l",
