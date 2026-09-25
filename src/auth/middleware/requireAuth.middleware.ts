@@ -12,14 +12,7 @@ import { logger } from "#/logger.js";
  *
  * These are only auth paths - other routes should just not invoke this middleware.
  */
-const IGNORED_AUTH_PATHS = [
-  "/auth/signin",
-  "/auth/signout",
-  "/auth/callback",
-  "/auth/refresh",
-  // Included here because it's a sort-of auth route, but also a part of Forge which defines a single router for all of its routes.
-  "/select-office",
-];
+const IGNORED_AUTH_PATHS = ["/auth/signin", "/auth/signout", "/auth/callback"];
 
 /**
  * Authentication middleware to check if the user is authenticated and has a selected office.
@@ -75,23 +68,28 @@ export function requireAuth(): RequestHandler {
         updateSessionAuth(session, result.value);
       }
 
-      // Does the user have a selected office? If not, redirect to the office selection page.
-      if (session.selectedOffice === undefined) {
-        logger.info("requireAuth(): No selected office");
-        if (req.url !== "/select-office") {
-          res.redirect("/select-office");
+      // Only check selected office if not on the office selection page.
+      const officePathRegex = /^\/select-office(\/.*)?$/;
+
+      if (officePathRegex.exec(req.path) === null) {
+        // Does the user have a selected office? If not, redirect to the office selection page.
+        if (session.selectedOffice === undefined) {
+          logger.info("requireAuth(): No selected office");
+          if (req.url !== "/select-office") {
+            res.redirect("/select-office");
+          }
+          return;
         }
-        return;
-      }
 
-      // Does the selected office match the user's allowed offices? If not, redirect to the office selection page.
-      const allowedOffices = getOfficeClaimsFromSession(session);
+        // Does the selected office match the user's allowed offices? If not, redirect to the office selection page.
+        const allowedOffices = getOfficeClaimsFromSession(session);
 
-      if (!allowedOffices.includes(session.selectedOffice.code)) {
-        logger.warn("requireAuth(): Office is not in claims");
-        destroySessionOffice(session);
-        res.redirect("/select-office");
-        return;
+        if (!allowedOffices.includes(session.selectedOffice.code)) {
+          logger.warn("requireAuth(): Office is not in claims");
+          destroySessionOffice(session);
+          res.redirect("/select-office");
+          return;
+        }
       }
 
       // Add auth to locals for use in templates.
