@@ -226,13 +226,18 @@ export class EntraService {
       return failure(new TokenRefreshError());
     }
 
-    const result: AuthenticationResult =
-      await this.msalClient.acquireTokenSilent({
-        account,
-        scopes: [...scopes],
-      });
+    try {
+      const result: AuthenticationResult =
+        await this.msalClient.acquireTokenSilent({
+          account,
+          scopes: [...scopes],
+        });
 
-    return success(result);
+      return success(result);
+    } catch (error) {
+      logger.error("Failed to acquire token", error);
+      return failure(new TokenRefreshError(error));
+    }
   }
 
   /**

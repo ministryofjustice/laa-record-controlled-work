@@ -1,9 +1,9 @@
 import type { NextFunction, Request, RequestHandler, Response } from "express";
 
+import { refreshToken } from "#/auth/actions/refreshToken.action.js";
 import { destroySessionAuth } from "#/auth/domain/destroySessionAuth.js";
 import { destroySessionOffice } from "#/auth/domain/destroySessionOffice.js";
 import { getOfficeClaimsFromSession } from "#/auth/domain/getOfficeClaimsFromSession.js";
-import { refreshToken } from "#/auth/domain/refreshToken.action.js";
 import { updateSessionAuth } from "#/auth/domain/updateSessionAuth.js";
 import { logger } from "#/logger.js";
 
