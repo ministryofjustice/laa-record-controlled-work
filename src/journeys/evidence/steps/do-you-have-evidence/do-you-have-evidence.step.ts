@@ -29,10 +29,20 @@ export const doYouHaveEvidence = (
       doYouHaveEvidenceRadioInput,
       continueButton(),
     ],
-    onSubmission: [saveNoAndClearEvidence(journeyCode), saveYes(journeyCode)],
+    onSubmission: [
+      saveNoAndClearEvidence(journeyCode),
+      saveYes(journeyCode),
+      submitInvalid(),
+    ],
     path: "/have-evidence",
     reachability: { entryWhen: true },
     title: t("journeys.evidence.doYouHaveEvidence.title"),
+  });
+
+const submitInvalid = (): SubmitHook =>
+  submit({
+    onInvalid: {},
+    validate: true,
   });
 
 const saveNoAndClearEvidence = (journeyCode: string): SubmitHook =>
@@ -48,7 +58,7 @@ const saveNoAndClearEvidence = (journeyCode: string): SubmitHook =>
         ]),
         evidenceEffects.saveDraftAnswers(journeyCode),
       ],
-      next: [redirectToCheckAnswers],
+      next: [redirectToReasonForNoEvidence, redirectToCheckAnswers],
     },
     validate: true,
     when: Answer(EvidenceAnswers.doYouHaveEvidence).match(
@@ -82,6 +92,10 @@ const redirectToEvidenceOfIncome = redirect({ goto: "evidence-of-income" });
 const redirectToEvidenceOfIncomeWithCheckQuery = redirect({
   goto: "evidence-of-income?returnTo=check-answers",
   when: hasCheckAnswersInQuery,
+});
+
+const redirectToReasonForNoEvidence = redirect({
+  goto: "reason-for-no-evidence",
 });
 
 const redirectToCheckAnswers = redirect({

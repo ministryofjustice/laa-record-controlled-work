@@ -84,7 +84,7 @@ describe("Evidence of income step", () => {
       expect(renderResult.context.showValidationFailures).to.equal(true);
     });
 
-    it("should redirect to evidence of expenditure and capital step if at least one option is selected", async () => {
+    it("should redirect to have evidence of expenditure step if at least one option is selected", async () => {
       const result = await client.post(`/cases/${applicationId}/evidence/evidence-of-income`, {
         body: {
           employedEvidence: ["wageSlips"],
@@ -93,7 +93,7 @@ describe("Evidence of income step", () => {
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
       expect(redirectResult.url).to.equal(
-        `/cases/${applicationId}/evidence/evidence-of-expenditure`,
+        `/cases/${applicationId}/evidence/have-evidence-of-expenditure`,
       );
     });
   });
