@@ -4,12 +4,12 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
 import { createApplicationEffectsRegistry } from "#/journeys/create-application/create-application.effects.js";
-import { createForgeTestClient } from "../../utils/helpers.js";
+import { createApplicationTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import { createApplicationJourney } from "#/journeys/create-application/create-application.journey.js";
 
 describe("NI number step", () => {
-  const client = createForgeTestClient(
+  const client = createApplicationTestClient(
     createApplicationJourney,
     createApplicationEffectsRegistry,
   );
@@ -83,6 +83,32 @@ describe("NI number step", () => {
       );
     });
 
+    it("accepts lowercase letters in a valid NI number", async () => {
+      const result = await client.post("/cases/new/ni-number", {
+        body: { hasNINumber: "yes", niNumber: "js101010D" }, // gitleaks:allow - fake NI number used to test lowercase acceptance
+      });
+      expect(result.type).to.equal("redirect");
+      const redirectResult = result as TestRedirectResult;
+      expect(redirectResult.url).to.equal("/cases/new/have-a-home-address");
+    });
+
+    it("shows a validation error for other invalid standard formats", async () => {
+      for (const niNumber of ["BG123456C", "AO123456C", "AB123456s"]) {
+        const result = await client.post("/cases/new/ni-number", {
+          body: { hasNINumber: "yes", niNumber }, // gitleaks:allow - fake NI number used to test invalid format validation
+        });
+        expect(result.type).to.equal("render");
+        const renderResult = result as TestRenderResult;
+        expect(renderResult.context.showValidationFailures).to.equal(true);
+        expect(
+          renderResult.getValidationErrorsByFieldCode(niNumberfieldCode)[0]
+            .message,
+        ).to.equal(
+          "Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C",
+        );
+      }
+    });
+
     it("redirects to the home address step when a valid NI number is given", async () => {
       const result = await client.post("/cases/new/ni-number", {
         body: { hasNINumber: "yes", niNumber: "JN123456A" }, // gitleaks:allow - fake NI number used to test valid format acceptance
@@ -91,6 +117,43 @@ describe("NI number step", () => {
       const redirectResult = result as TestRedirectResult;
       expect(redirectResult.url).to.equal("/cases/new/have-a-home-address");
     });
+
+    for (const { input, expected } of [
+      { input: "JN 12 34 56 A", expected: "JN123456A" }, // gitleaks:allow - fake NI number used to test human-readable normalization
+      { input: "j.n12-3456a", expected: "JN123456A" }, // gitleaks:allow - fake NI number used to test punctuation and case normalization
+    ]) {
+      it(`accepts ${input} and stores it as ${expected}`, async () => {
+        const session: {
+          journeyDrafts?: Record<string, Record<string, unknown>>;
+        } = {};
+        const result = await client.post("/cases/new/ni-number", {
+          session,
+          body: { hasNINumber: "yes", niNumber: input },
+        });
+        expect(result.type).to.equal("redirect");
+        const redirectResult = result as TestRedirectResult;
+        expect(redirectResult.url).to.equal("/cases/new/have-a-home-address");
+
+        const checkAnswersResult = await client.get(
+          "/cases/new/check-answers",
+          { session },
+        );
+        expect(checkAnswersResult.type).to.equal("render");
+        const checkAnswersRender = checkAnswersResult as TestRenderResult;
+        const [summaryList] = checkAnswersRender.getBlocksByVariant(
+          "govukSummaryList",
+        );
+        const rows = summaryList.properties.rows as Array<{
+          key: { text: string };
+          value: { text: string };
+        }>;
+        const niNumberRow = rows.find(
+          (row) => row.key.text === "National Insurance number",
+        );
+
+        expect(niNumberRow?.value.text).to.equal(expected);
+      });
+    }
 
     it("returns to check answers when edited from check answers", async () => {
       const result = await client.post("/cases/new/ni-number", {

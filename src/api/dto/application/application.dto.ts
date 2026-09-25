@@ -1,9 +1,12 @@
-import type { Application as ApplicationZod } from "#/api/clients/rcw/model/application.zod.gen.js";
+import type { Application as ApplicationSchema } from "#/api/clients/rcw/model/application.zod.gen.js";
 import type { CreateApplicationRequestBody } from "#/api/clients/rcw/model/createApplicationRequestBody.zod.gen.js";
 import type { AnswersOutput } from "#/journeys/create-application/data/answers.zod.js";
 
 import { AnswerKey } from "#/journeys/AnswerKey.enum.js";
-import { mapCountryNameToIsoCode } from "#/lib/countries.js";
+import {
+  mapCountryNameToIsoCode,
+  mapIsoCodeToCountryName,
+} from "#/lib/countries.js";
 
 interface Application {
   addressLine1?: string;
@@ -27,7 +30,7 @@ interface Application {
 }
 
 type ApplicationAddress = NonNullable<
-  ApplicationZod["clientDetails"]["address"]
+  ApplicationSchema["clientDetails"]["address"]
 >;
 
 interface OverseasAddress {
@@ -131,7 +134,7 @@ export class ApplicationDto {
    * @returns Partial AnswersOutput instance containing the address fields.
    */
   public static getAnswersFromAddress(
-    application: ApplicationZod,
+    application: ApplicationSchema,
   ): Partial<AnswersOutput> {
     const { address } = application.clientDetails;
 
@@ -149,7 +152,7 @@ export class ApplicationDto {
    * @param application - The application from which to create the answers output instance.
    * @returns AnswersOutput instance.
    */
-  public static toAnswers(application: ApplicationZod): AnswersOutput {
+  public static toAnswers(application: ApplicationSchema): AnswersOutput {
     const addressAnswers = application.clientDetails.hasFixedAddress
       ? this.getAnswersFromAddress(application)
       : {};
@@ -193,7 +196,7 @@ export class ApplicationDto {
       [AnswerKey.osAddressLine2]: address.addressLine2 ?? undefined,
       [AnswerKey.osAddressLine3]: address.addressLine3 ?? undefined,
       [AnswerKey.osAddressLine4]: address.addressLine4 ?? undefined,
-      [AnswerKey.osCountry]: address.country,
+      [AnswerKey.osCountry]: mapIsoCodeToCountryName(address.country),
     };
   }
 
@@ -209,7 +212,7 @@ export class ApplicationDto {
     return {
       [AnswerKey.ukAddressLine1]: address.addressLine1,
       [AnswerKey.ukAddressLine2]: address.addressLine2 ?? undefined,
-      [AnswerKey.ukCountry]: address.country,
+      [AnswerKey.ukCountry]: mapIsoCodeToCountryName(address.country),
       [AnswerKey.ukCounty]: address.county ?? undefined,
       [AnswerKey.ukPostcode]: address.postCode ?? undefined,
       [AnswerKey.ukTownOrCity]: address.townOrCity ?? undefined,
@@ -240,7 +243,7 @@ export class ApplicationDto {
    * @param application - The application from which to extract the answer.
    * @returns The prior legal aid answer or an empty string.
    */
-  private static getPriorLegalAid(application: ApplicationZod): string {
+  private static getPriorLegalAid(application: ApplicationSchema): string {
     const priorLegalAid = application.scopingQuestions?.priorLegalAid;
 
     return typeof priorLegalAid === "string" ? priorLegalAid : "";

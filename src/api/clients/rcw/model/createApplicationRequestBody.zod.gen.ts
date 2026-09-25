@@ -10,7 +10,9 @@ export const createApplicationRequestBodyClientDetailsNiNumberMin = 9;
 export const createApplicationRequestBodyClientDetailsNiNumberMax = 9;
 
 export const createApplicationRequestBodyClientDetailsNiNumberRegExp =
-  new RegExp("[A-CEGHJ-NOPR-TW-Z]{2}[0-9]{6}[ABCDs]{1}");
+  new RegExp(
+    "^(?!BG|GB|KN|NK|NT|TN|ZZ)[A-CEGHJ-PR-TW-Z][A-CEGHJ-NPR-TW-Z][0-9]{6}[ABCD]$",
+  );
 export const createApplicationRequestBodyClientDetailsAddressCountryMax = 2;
 
 export const CreateApplicationRequestBody = zod.object({

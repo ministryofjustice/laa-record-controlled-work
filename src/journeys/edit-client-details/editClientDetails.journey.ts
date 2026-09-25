@@ -3,7 +3,7 @@ import { access, journey } from "@ministryofjustice/hmpps-forge/core/authoring";
 import { clientDetailsStep } from "#/journeys/create-application/steps/clientDetails/clientDetails.step.js";
 import { ecfStep } from "#/journeys/create-application/steps/ecf/ecf.step.js";
 import { ineligibleStep } from "#/journeys/create-application/steps/ecfDropout/ecfDropout.step.js";
-import { enterAddressManuallyStep } from "#/journeys/create-application/steps/enterAdressManually/enterAddressManually.step.js";
+import { enterAddressManuallyStep } from "#/journeys/create-application/steps/enter-address-manually.step.js";
 import { enterOverseasAddressStep } from "#/journeys/create-application/steps/enter-overseas-address.step.js";
 import { haveAHomeAddressStep } from "#/journeys/create-application/steps/haveAHomeAddress/haveAHomeAddress.step.js";
 import { legalAidBeforeStep } from "#/journeys/create-application/steps/legalAidBefore/legalAidBefore.step.js";
@@ -19,13 +19,16 @@ export const editClientDetailsJourney = journey({
   code: editJourneyCode,
   onAccess: [
     access({
-      effects: [editClientDetailsEffects.loadDraftAnswers(editJourneyCode)],
+      effects: [
+        editClientDetailsEffects.loadApplicationAsAnswers(editJourneyCode),
+        editClientDetailsEffects.loadDraftAnswers(editJourneyCode),
+      ],
     }),
   ],
-  path: "/cases/:applicationID/edit-client-details",
-  reachability: { disableReachabilityChecks: true },
+  path: "/task-list/details",
+  reachability: { disableReachabilityChecks: false },
   steps: [
-    ecfStep(editJourneyCode),
+    ecfStep(editJourneyCode, { reachability: { entryWhen: true } }),
     ineligibleStep(editJourneyCode),
     legalAidBeforeStep(editJourneyCode),
     legalAidLast6MonthsStep(editJourneyCode),

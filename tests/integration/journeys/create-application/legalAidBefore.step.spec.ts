@@ -4,12 +4,12 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
 import { createApplicationEffectsRegistry } from "#/journeys/create-application/create-application.effects.js";
-import { createForgeTestClient } from "../../utils/helpers.js";
+import { createApplicationTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import { createApplicationJourney } from "#/journeys/create-application/create-application.journey.js";
 
 describe("Legal aid before step", () => {
-  const client = createForgeTestClient(
+  const client = createApplicationTestClient(
     createApplicationJourney,
     createApplicationEffectsRegistry,
   );

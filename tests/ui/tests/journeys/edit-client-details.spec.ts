@@ -1,13 +1,12 @@
 import { expect, test } from "../../fixtures/index.js";
 import {
-  completeApplication,
+  clientDetailsApplication,
 } from "../../msw/fixtures/rcw.fixtures.js";
-
 test("Edit Application - Client details journey", async ({
   withSelectedOffice: page,
 }) => {
-  const applicationId = completeApplication.id;
-
+  const applicationId = clientDetailsApplication.id;
+  
   // ==========================================================================
   // Task list page
   // ==========================================================================
@@ -16,7 +15,7 @@ test("Edit Application - Client details journey", async ({
   await page.goto(`/cases/${applicationId}/task-list`);
 
   // Click the client details link
-  await page.click(`a[href$="/cases/${applicationId}/edit-client-details/?destination=check-answers"]`);
+  await page.click(`a[href$="/cases/${applicationId}/task-list/details/?destination=check-answers"]`);
 
   // ==========================================================================
   // Check answers page
@@ -41,18 +40,18 @@ test("Edit Application - Client details journey", async ({
       // Accessed legal aid before
       "No",
       // First name
-      completeApplication.clientDetails.firstName,
+      clientDetailsApplication.clientDetails.firstName,
       // Last name
-      completeApplication.clientDetails.lastName,
+      clientDetailsApplication.clientDetails.lastName,
       // Date of birth
-      new Date(completeApplication.clientDetails.dateOfBirth).toLocaleDateString(
+      new Date(clientDetailsApplication.clientDetails.dateOfBirth).toLocaleDateString(
         "en-GB",
         { day: "numeric", month: "long", year: "numeric" },
       ),
       // National insurance number
-      completeApplication.clientDetails.niNumber ?? "",
+      clientDetailsApplication.clientDetails.niNumber ?? "",
       // Address
-      completeApplication.clientDetails.address?.addressLine1 ?? "",
+      clientDetailsApplication.clientDetails.address?.addressLine1 ?? "",
     ],
     { useInnerText: true },
   );
@@ -62,12 +61,32 @@ test("Edit Application - Client details journey", async ({
     .locator(".govuk-summary-list__actions a");
   await expect(changeAddressLink).toHaveAttribute(
     "href",
-    "enter-overseas-address?returnTo=check-answers",
+    "enter-address-manually?returnTo=check-answers",
   );
   await changeAddressLink.click();
 
-  // Verify redirection back to the overseas address entry page
+  // Verify redirection back to the manual address entry page
   await expect(page).toHaveURL(
-    `/cases/${applicationId}/edit-client-details/enter-overseas-address?returnTo=check-answers`,
+    `/cases/${applicationId}/task-list/details/enter-address-manually?returnTo=check-answers`,
+  );
+
+  // ==========================================================================
+  // Update information
+  // ==========================================================================
+
+  // Fill in the new address line 1 in the manual address entry form
+  await page.getByLabel("Address line 1").fill("10 Changed Street");
+
+  await page.getByRole("button", { name: "Continue" }).click();
+
+  // Verify redirection back to the check answers page
+  await expect(page).toHaveURL(
+    `/cases/${applicationId}/task-list/details/check-answers`,
+  );
+
+  // Verify that the updated address is displayed correctly on the check answers page
+  await expect(rows.locator(".govuk-summary-list__value").last()).toContainText(
+    "10 Changed Street",
+    { useInnerText: true },
   );
 });
