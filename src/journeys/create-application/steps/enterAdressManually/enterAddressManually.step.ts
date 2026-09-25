@@ -16,8 +16,10 @@ import { t } from "#/lib/i18n.js";
 const TITLE = t("journeys.createApplication.enterAddressManually.title");
 
 /**
+ * Creates the enter-address-manually step for the specified journey.
  *
- * @param journeyCode
+ * @param journeyCode The code identifying the journey.
+ * @returns The submit hook for saving the UK address.
  */
 export function enterAddressManuallyStep(journeyCode: string): StepDefinition {
   return step({
@@ -32,8 +34,10 @@ export function enterAddressManuallyStep(journeyCode: string): StepDefinition {
 }
 
 /**
+ * Creates the submit hook for saving the UK address.
  *
- * @param journeyCode
+ * @param journeyCode The code identifying the journey.
+ * @returns The submit hook for saving the UK address.
  */
 function saveUkAddress(journeyCode: string): SubmitHook {
   return submit({
