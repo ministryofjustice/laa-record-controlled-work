@@ -33,9 +33,15 @@ export const haveEvidenceOfExpenditure = (
       haveEvidenceOfExpenditureRadioInput(),
       continueButton(),
     ],
-    onSubmission: [saveNoAndClearEvidence(journeyCode), saveYes(journeyCode)],
+    onSubmission: [saveNoAndClearEvidence(journeyCode), saveYes(journeyCode), submitInvalid()],
     path: "/have-evidence-of-expenditure",
     title: t("journeys.evidence.haveEvidenceOfExpenditure.title"),
+  });
+
+  const submitInvalid = (): SubmitHook =>
+  submit({
+    onInvalid: {},
+    validate: true,
   });
 
 const saveNoAndClearEvidence = (journeyCode: string): SubmitHook =>
