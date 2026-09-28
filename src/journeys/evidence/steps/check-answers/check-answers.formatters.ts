@@ -46,7 +46,7 @@ export function evidenceOfCapitalList(): ResolvableString {
     },
     template: `
     {% if capitalEvidence.length > 0 %}
-    {% for item in capitalEvidence %}{{ evidenceTypeLabels[item] }},<br />{% endfor %}
+    {% for item in capitalEvidence %}{{ evidenceTypeLabels[item] }}{% if not loop.last %},{% endif %}<br />{% endfor %}
     {% else %}
     <p>{{ noEvidenceLabel }}</p>
     {% endif %}
@@ -117,18 +117,19 @@ export function evidenceOfExpenditureList(): ResolvableString {
     {% if incomeEvidence.length > 0 or housingCostsEvidence.length > 0 or childCareEvidence.length > 0 or maintenanceEvidence.length > 0 %}
     {% if incomeEvidence.length > 0 %}
     <strong>{{ evidenceHeadings.incomeEvidence }}:</strong><br />
-    {% for item in incomeEvidence %}{{ evidenceTypeLabels[item] }},<br /><br />{% endfor %}{% endif %}
+    {% for item in incomeEvidence %}{{ evidenceTypeLabels[item] }}{% if not loop.last %},{% endif %}{% if loop.last %}<br />{% endif %}<br />{% endfor %}
+    {% endif %}
     {% if housingCostsEvidence.length > 0 %}
     <strong>{{ evidenceHeadings.housingCostsEvidence }}:</strong><br />
-    {% for item in housingCostsEvidence %}{{ evidenceTypeLabels[item] }},<br /><br />{% endfor %}
+    {% for item in housingCostsEvidence %}{{ evidenceTypeLabels[item] }}{% if not loop.last %},{% endif %}{% if loop.last %}<br />{% endif %}<br />{% endfor %}
     {% endif %}
     {% if childCareEvidence.length > 0 %}
     <strong>{{ evidenceHeadings.childCareEvidence }}:</strong><br />
-    {% for item in childCareEvidence %}{{ evidenceTypeLabels[item] }},<br /><br />{% endfor %}
+    {% for item in childCareEvidence %}{{ evidenceTypeLabels[item] }}{% if not loop.last %},{% endif %}{% if loop.last %}<br />{% endif %}<br />{% endfor %}
     {% endif %}
     {% if maintenanceEvidence.length > 0 %}
     <strong>{{ evidenceHeadings.maintenanceEvidence }}:</strong><br />
-    {% for item in maintenanceEvidence %}{{ evidenceTypeLabels[item] }},<br /><br />{% endfor %}
+    {% for item in maintenanceEvidence %}{{ evidenceTypeLabels[item] }}{% if not loop.last %},{% endif %}{% if loop.last %}<br />{% endif %}<br />{% endfor %}
     {% endif %}
     {% else %}
     <p>{{ noEvidenceLabel }}</p>
@@ -232,30 +233,31 @@ export function evidenceOfIncomeList(): ResolvableString {
     template: `
     {% if employedEvidence.length > 0 %}
     <strong>{{ evidenceHeadings.employedEvidenceLabel }}:</strong><br />
-    {% for item in employedEvidence %}{{ evidenceTypeLabels[item] }},<br /><br />{% endfor %}{% endif %}
+    {% for item in employedEvidence %}{{ evidenceTypeLabels[item] }}{% if not loop.last %},{% endif %}{% if loop.last %}<br />{% endif %}<br />{% endfor %}
+    {% endif %}
     {% if selfEmployedEvidence.length > 0 %}
     <strong>{{ evidenceHeadings.selfEmployedEvidenceLabel }}:</strong><br />
-    {% for item in selfEmployedEvidence %}{{ evidenceTypeLabels[item] }},<br /><br />{% endfor %}
+    {% for item in selfEmployedEvidence %}{{ evidenceTypeLabels[item] }}{% if not loop.last %},{% endif %}{% if loop.last %}<br />{% endif %}<br />{% endfor %}
     {% endif %}
     {% if benefitsInKindEvidence.length > 0 %}
     <strong>{{ evidenceHeadings.benefitsInKindEvidenceLabel }}:</strong><br />
-    {% for item in benefitsInKindEvidence %}{{ evidenceTypeLabels[item] }},<br /><br />{% endfor %}
+    {% for item in benefitsInKindEvidence %}{{ evidenceTypeLabels[item] }}{% if not loop.last %},{% endif %}{% if loop.last %}<br />{% endif %}<br />{% endfor %}
     {% endif %}
     {% if otherEvidence.length > 0 %}
     <strong>{{ evidenceHeadings.otherEvidenceLabel }}:</strong><br />
-    {% for item in otherEvidence %}{{ evidenceTypeLabels[item] }},<br /><br />{% endfor %}
+    {% for item in otherEvidence %}{{ evidenceTypeLabels[item] }}{% if not loop.last %},{% endif %}{% if loop.last %}<br />{% endif %}<br />{% endfor %}
     {% endif %}
     {% if stateBenefitsEvidence.length > 0 %}
     <strong>{{ evidenceHeadings.stateBenefitsEvidenceLabel }}:</strong><br />
-    {% for item in stateBenefitsEvidence %}{{ evidenceTypeLabels[item] }},<br /><br />{% endfor %}
+    {% for item in stateBenefitsEvidence %}{{ evidenceTypeLabels[item] }}{% if not loop.last %},{% endif %}{% if loop.last %}<br />{% endif %}<br />{% endfor %}
     {% endif %}
     {% if asylumSupportEvidence.length > 0 %}
     <strong>{{ evidenceHeadings.asylumSupportEvidenceLabel }}:</strong><br />
-    {% for item in asylumSupportEvidence %}{{ evidenceTypeLabels[item] }},<br /><br />{% endfor %}
+    {% for item in asylumSupportEvidence %}{{ evidenceTypeLabels[item] }}{% if not loop.last %},{% endif %}{% if loop.last %}<br />{% endif %}<br />{% endfor %}
     {% endif %}
     {% if taxCreditsEvidence.length > 0 %}
     <strong>{{ evidenceHeadings.taxCreditsEvidenceLabel }}:</strong><br />
-    {% for item in taxCreditsEvidence %}{{ evidenceTypeLabels[item] }},<br /><br />{% endfor %}
+    {% for item in taxCreditsEvidence %}{{ evidenceTypeLabels[item] }}{% if not loop.last %},{% endif %}{% if loop.last %}<br />{% endif %}<br />{% endfor %}
     {% endif %}
   `,
   });
