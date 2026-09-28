@@ -17,13 +17,25 @@ export const completeEvidenceYesPath = async (
   await page.getByRole("checkbox", { name: "Wage slips" }).check();
   await page.getByRole("button", { name: "Continue" }).click();
   await expect(page).toHaveURL(
+    `/cases/${applicationId}/evidence/have-evidence-of-expenditure`,
+  );
+
+  await page.getByRole("radio", { name: "Yes" }).check();
+  await page.getByRole("button", { name: "Continue" }).click();
+  await expect(page).toHaveURL(
     `/cases/${applicationId}/evidence/evidence-of-expenditure`,
   );
 
   await page.getByRole("checkbox", { name: "Wage slips" }).check();
   await page.getByRole("button", { name: "Continue" }).click();
   await expect(page).toHaveURL(
-    `/cases/${applicationId}/evidence/evidence-of-capital`,
+    `/cases/${applicationId}/evidence/have-evidence-of-capital`,
+  );
+
+  await page.getByRole("radio", { name: "Yes" }).check();
+  await page.getByRole("button", { name: "Continue" }).click();
+  await expect(page).toHaveURL(
+    `/cases/${applicationId}/evidence/evidence-of-captial`,
   );
 
   await page.getByRole("checkbox", { name: "Bank statement" }).check();
