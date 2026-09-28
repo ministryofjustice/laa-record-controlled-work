@@ -2,18 +2,13 @@ import {
   Condition,
   Self,
   validation,
-  type ValidationExpr,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
-import {
-  HtmlBlock,
-  type ResolvableString,
-} from "@ministryofjustice/hmpps-forge/core/components";
-import {
-  GovUKButton,
-  GovUKTextInput,
-} from "@ministryofjustice/hmpps-forge/govuk-components";
+import { HtmlBlock } from "@ministryofjustice/hmpps-forge/core/components";
+import { GovUKButton } from "@ministryofjustice/hmpps-forge/govuk-components";
 
 import { UK_ADDRESS_FIELDS } from "#/journeys/journey.constants.js";
+import { textInput } from "#/journeys/shared.blocks.js";
+import { answerIsRequired } from "#/journeys/shared.hook.js";
 import { t } from "#/lib/i18n.js";
 
 const LINE_1_CODE = UK_ADDRESS_FIELDS.addressLine1;
@@ -58,53 +53,6 @@ const NON_UK_ADDRESS_TEXT = t(
   "journeys.createApplication.enterAddressManually.nonUkAddress",
 );
 const CONTINUE_TEXT = t("common.continue");
-
-// TODO move this to shared.hooks, and replace others with this shared hook
-/**
- * Creates a required-field validation rule for a GOV.UK form field.
- *
- * @param validationMessage - The translated error message shown when the field is empty.
- * @returns A validation expression that fails if the answer is blank.
- */
-function answerIsRequired(validationMessage: ResolvableString): ValidationExpr {
-  return validation({
-    condition: Self().match(Condition.IsRequired()),
-    message: validationMessage,
-  });
-}
-
-// TODO this textInput moves to shared.blocks.ts
-/**
- * Builds a GOV.UK text input block for an address field.
- *
- * @param code - The field code used to store the answer.
- * @param labelText - The visible label for the input.
- * @param options - Optional rendering and validation settings for the field.
- * @param options.classes - Additional GOV.UK CSS classes to apply to the input.
- * @param options.defaultValue - Initial value to pre-populate in the field.
- * @param options.validations - Validation requirements to apply to the field.
- * @returns A GOV.UK text input block configured for the supplied field.
- */
-function textInput(
-  code: string,
-  labelText: string,
-  options?: {
-    classes?: string;
-    defaultValue?: string;
-    validations?: ValidationExpr[];
-  },
-): GovUKTextInput {
-  return GovUKTextInput({
-    classes: options?.classes,
-    code,
-    defaultValue: options?.defaultValue,
-    label: {
-      isPageHeading: false,
-      text: labelText,
-    },
-    validWhen: options?.validations,
-  });
-}
 
 const addressLine1 = textInput(LINE_1_CODE, LINE_1_LABEL, {
   validations: [answerIsRequired(LINE_1_VALIDATION)],

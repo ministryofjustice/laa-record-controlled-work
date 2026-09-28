@@ -2,6 +2,7 @@ import {
   Condition,
   Self,
   validation,
+  type ValidationExpr,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 import {
   type BlockDefinition,
@@ -11,6 +12,7 @@ import {
   GovUKButton,
   GovUKHeading,
   GovUKRadioInput,
+  GovUKTextInput,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
 import { H1 } from "#/lib/constants/headings.js";
@@ -76,6 +78,38 @@ export function heading(text: string): HtmlBlock {
  */
 export function submitButton(): GovUKButton {
   return button(t("common.submit"));
+}
+
+/**
+ * Creates a GovUK-styled text input with validation.
+ *
+ * @param code - The field code/answer key identifier
+ * @param labelText - The label text displayed above the input
+ * @param options - Optional text input configuration
+ * @param options.classes - Additional CSS classes to apply to the input
+ * @param options.defaultValue - The default value of the input
+ * @param options.validations - Validation expressions to apply to the input
+ * @returns {GovUKTextInput} A GovUK text input component with validation
+ */
+export function textInput(
+  code: string,
+  labelText: string,
+  options?: {
+    classes?: string;
+    defaultValue?: string;
+    validations?: ValidationExpr[];
+  },
+): GovUKTextInput {
+  return GovUKTextInput({
+    classes: options?.classes,
+    code,
+    defaultValue: options?.defaultValue,
+    label: {
+      isPageHeading: false,
+      text: labelText,
+    },
+    validWhen: options?.validations,
+  });
 }
 
 /**
