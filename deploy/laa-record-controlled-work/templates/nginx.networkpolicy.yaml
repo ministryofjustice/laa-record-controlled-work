@@ -16,7 +16,11 @@ spec:
     - from:
         - namespaceSelector:
             matchLabels:
-              kubernetes.io/metadata.name: "ingress-controllers"
+              component: ingress-controllers
+        - podSelector:
+            matchLabels:
+              {{- include "laa-record-controlled-work.selectorLabels" . | nindent 14 }}
+              app.kubernetes.io/component: test-connection
       ports:
         - protocol: TCP
           port: 8080
