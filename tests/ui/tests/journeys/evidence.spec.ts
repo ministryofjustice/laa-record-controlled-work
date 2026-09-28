@@ -96,15 +96,15 @@ test("evidence flow", async ({ withSelectedOffice: page }) => {
       // Do yo have evidence
       "Yes",
       // Income
-      "Employed (PAYE) income:\nWage slips,\n\nSelf-employed income:\nBank statements,\n",
+      "Employed (PAYE) income:\nWage slips,\n\nSelf-employed income:\nBank statements\n",
       // Do you have evidence of expenditure?
       "Yes",
       // Evidence of expenditure
-      "Income Tax and National Insurance:\nWage slips,\n\nHousing costs:\nMortgage statement,",
+      "Income Tax and National Insurance:\nWage slips,\n\nHousing costs:\nMortgage statement",
       // Do you have evidence of capital?
       "Yes",
       // Evidence of capital
-      "	Bank statement,\nShare certificate,\n",
+      "	Bank statement,\nShare certificate\n",
     ],
     { useInnerText: true },
   );
