@@ -6,12 +6,17 @@ import {
   Condition,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 import { BlockDefinition } from "@ministryofjustice/hmpps-forge/core/components";
-import { GovUKButton, GovUKButtonGroup, GovUKTextInput } from "@ministryofjustice/hmpps-forge/govuk-components";
+import {
+  GovUKButton,
+  GovUKButtonGroup,
+  GovUKTextInput,
+} from "@ministryofjustice/hmpps-forge/govuk-components";
 
 export function ufnInput(): GovUKTextInput {
   return GovUKTextInput({
     code: AnswerKey.DECLARATION_UFN,
     label: {
+      classes: "govuk-fieldset__legend--l",
       text: t("journeys.declaration.ufn.title"),
       isPageHeading: true,
     },
