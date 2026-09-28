@@ -12,35 +12,30 @@ import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
 import { t } from "#/lib/i18n.js";
 
 import { caption } from "../../declaration.blocks.js";
+import { declarationEffects } from "../../declaration.effects.js";
 import {
-  confirmHeading,
-  confirmSignedCheckbox,
-  confirmSignedDate,
-  continueReturnButtons,
-  downloadButton,
-  heading,
-  statement,
-} from "./sign.blocks.js";
+    continueReturnButtons,
+    ufnInput,
+} from "./ufn.blocks.js";
 
-export const signStep = (): ReturnType<typeof step> => {
+export const ufnStep = (): ReturnType<typeof step> => {
   return step({
     blocks: [
       caption,
-      heading(),
-      ...statement(),
-      downloadButton(),
-      confirmHeading(),
-      confirmSignedCheckbox(),
-      confirmSignedDate(),
+      ufnInput(),
       continueReturnButtons(),
     ],
-    code: "declaration-sign",
+    code: "ufn",
     onSubmission: [
       submit({
         onValid: {
+          effects: [declarationEffects.submitSignedDeclaration()],
           next: [
             redirect({
-              goto: "ufn",
+              goto: Format(
+                "/cases/%1/task-list",
+                Params(PARAMS_KEYS.applicationID),
+              ),
             }),
           ],
         },
@@ -61,7 +56,7 @@ export const signStep = (): ReturnType<typeof step> => {
         when: Post("action").match(Condition.Equals("return")),
       }),
     ],
-    path: "/sign",
-    title: t("journeys.declaration.sign.title"),
+    path: "/ufn",
+    title: t("journeys.declaration.ufn.title"),
   });
 };

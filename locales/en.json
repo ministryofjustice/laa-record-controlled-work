@@ -500,6 +500,13 @@
           "have their legal aid stopped and have to pay back the costs"
         ],
         "confirmButton": "Confirm and continue"
+      },
+      "ufn": {
+        "title": "What is the unique file number (UFN) for this case?",
+        "hint": "For example, 160726/001",
+        "validation": {
+          "required": "You must enter a valid UFN in the following format 123456/123 as it matches on SABC."
+        }
       }
     },
     "editApplication": {
