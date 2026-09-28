@@ -1,6 +1,6 @@
 /* eslint-disable jsdoc/require-jsdoc -- logger API is intentionally compact and self-explanatory. */
 
-import * as Sentry from "@sentry/node";
+// import * as Sentry from "@sentry/node";
 import pino, { type Logger } from "pino";
 
 export interface LogContext {
@@ -44,46 +44,46 @@ export class AppLogger {
 
   debug(message: string, fields: LogFields = {}): void {
     this.logger.debug({ context: fields }, message);
-    Sentry.logger.debug(message, {
-      ...this.context,
-      ...redactSensitiveFields(fields),
-    });
+    // Sentry.logger.debug(message, {
+    //   ...this.context,
+    //   ...redactSensitiveFields(fields),
+    // });
   }
   error(message: string, error?: unknown, fields: LogFields = {}): void {
     this.logger.error({ context: fields, err: error }, message);
-    Sentry.logger.error(message, {
-      ...this.context,
-      ...redactSensitiveFields(fields),
-    });
+    // Sentry.logger.error(message, {
+    //   ...this.context,
+    //   ...redactSensitiveFields(fields),
+    // });
 
-    if (error instanceof Error) {
-      Sentry.captureException(error);
-    }
+    // if (error instanceof Error) {
+    //   Sentry.captureException(error);
+    // }
   }
   fatal(message: string, error: unknown, fields: LogFields = {}): void {
     this.logger.fatal({ context: fields, err: error }, message);
-    Sentry.logger.fatal(message, {
-      ...this.context,
-      ...redactSensitiveFields(fields),
-    });
+    // Sentry.logger.fatal(message, {
+    //   ...this.context,
+    //   ...redactSensitiveFields(fields),
+    // });
 
-    if (error instanceof Error) {
-      Sentry.captureException(error);
-    }
+    // if (error instanceof Error) {
+    //   Sentry.captureException(error);
+    // }
   }
   info(message: string, fields: LogFields = {}): void {
     this.logger.info({ context: fields }, message);
-    Sentry.logger.info(message, {
-      ...this.context,
-      ...redactSensitiveFields(fields),
-    });
+    // Sentry.logger.info(message, {
+    //   ...this.context,
+    //   ...redactSensitiveFields(fields),
+    // });
   }
   warn(message: string, fields: LogFields = {}): void {
     this.logger.warn({ context: fields }, message);
-    Sentry.logger.warn(message, {
-      ...this.context,
-      ...redactSensitiveFields(fields),
-    });
+    // Sentry.logger.warn(message, {
+    //   ...this.context,
+    //   ...redactSensitiveFields(fields),
+    // });
   }
 }
 
@@ -108,14 +108,15 @@ export function createLogger(context: LogContext = {}): AppLogger {
 }
 
 // shallow redaction of known-sensitive keys before fields are sent to Sentry as log attributes
-function redactSensitiveFields(fields: LogFields): Record<string, unknown> {
-  return Object.fromEntries(
-    Object.entries(fields).map(([key, value]) => [
-      key,
-      SENSITIVE_FIELD_NAMES.has(key) ? "***" : value,
-    ]),
-  );
-}
+// function redactSensitiveFields(fields: LogFields): Record<string, unknown> {
+//   return Object.fromEntries(
+//     Object.entries(fields).map(([key, value]) => [
+//       key,
+//       SENSITIVE_FIELD_NAMES.has(key) ? "***" : value,
+//     ]),
+//   );
+// }
+
 export const logger = createLogger();
 
 function timestamp(): string {
