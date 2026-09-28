@@ -35,7 +35,7 @@ export const completeEvidenceYesPath = async (
   await page.getByRole("radio", { name: "Yes" }).check();
   await page.getByRole("button", { name: "Continue" }).click();
   await expect(page).toHaveURL(
-    `/cases/${applicationId}/evidence/evidence-of-captial`,
+    `/cases/${applicationId}/evidence/evidence-of-capital`,
   );
 
   await page.getByRole("checkbox", { name: "Bank statement" }).check();
