@@ -184,12 +184,12 @@ describe("loadOffices", () => {
     ).to.equal(true);
   });
 
-  it("throws ApiResponseError when getAllProviderOffices returns a non-200 status", async () => {
+  it("records a redirect response as an error", async () => {
     const distributionStub = sinon.stub(Sentry.metrics, "distribution");
     sinon.stub(logger, "error");
     getAllProviderOffices.resolves({
       data: {},
-      status: 500,
+      status: 302,
     });
 
     try {
@@ -203,7 +203,11 @@ describe("loadOffices", () => {
         "api_response_time",
         sinon.match.number,
         {
-          attributes: { endpoint: "getAllProviderOffices", status: 500 },
+          attributes: {
+            endpoint: "getAllProviderOffices",
+            outcome: "error",
+            status: 302,
+          },
           unit: "millisecond",
         },
       ),

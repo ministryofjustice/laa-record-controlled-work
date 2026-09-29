@@ -48,6 +48,7 @@ export const loadOffices =
       response = await metrics.time(
         "getAllProviderOffices",
         async () => await deps.getAllProviderOffices(firmCode, opts),
+        (status) => status === HTTP_STATUS.OK,
       );
     } catch (error) {
       logger.error("Error fetching offices", error, {

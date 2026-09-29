@@ -57,6 +57,34 @@ describe("metrics", () => {
     ).to.equal(true);
   });
 
+  it("uses caller-provided success criteria", async () => {
+    sinon
+      .stub(performance, "now")
+      .onFirstCall()
+      .returns(100)
+      .onSecondCall()
+      .returns(110);
+    const distributionStub = sinon.stub(Sentry.metrics, "distribution");
+    const response = { status: 302 };
+
+    await metrics.time(
+      "getAllProviderOffices",
+      async () => response,
+      (status) => status === 200,
+    );
+
+    expect(
+      distributionStub.calledOnceWithExactly("api_response_time", 10, {
+        attributes: {
+          endpoint: "getAllProviderOffices",
+          outcome: "error",
+          status: 302,
+        },
+        unit: "millisecond",
+      }),
+    ).to.equal(true);
+  });
+
   it("records a rejected operation once without status and rethrows the error", async () => {
     sinon
       .stub(performance, "now")
