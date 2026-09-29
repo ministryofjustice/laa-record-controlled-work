@@ -1,8 +1,8 @@
 import type { EffectFunctionContext } from "@ministryofjustice/hmpps-forge/core";
 
 import type { updateApplicationDeclaration } from "#/api/clients/rcw/schema/applications/applications.gen.js";
-import type { AnswerKey as A } from "#/journeys/declaration/declaration.answers.js";
 import type { JourneySession } from "#/journeys/context.type.js";
+import type { AnswerKey as A } from "#/journeys/declaration/declaration.answers.js";
 
 export interface DeclarationAnswers extends Record<string, unknown> {
   [A.DECLARATION_SIGNED_CONFIRM]?: string[];

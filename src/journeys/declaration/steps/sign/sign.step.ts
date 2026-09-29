@@ -6,12 +6,12 @@ import {
   redirect,
   step,
   submit,
-  SubmitHook,
+  type SubmitHook,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
-import { redirectToCheckAnswers } from "#/journeys/shared.hook.js";
-
+import { declarationEffects } from "#/journeys/declaration/declaration.effects.js";
 import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
+import { redirectToCheckAnswers } from "#/journeys/shared.hook.js";
 import { t } from "#/lib/i18n.js";
 
 import { caption } from "../../declaration.blocks.js";
@@ -24,7 +24,6 @@ import {
   heading,
   statement,
 } from "./sign.blocks.js";
-import { declarationEffects } from "#/journeys/declaration/declaration.effects.js";
 
 export const signStep = (): ReturnType<typeof step> => {
   return step({

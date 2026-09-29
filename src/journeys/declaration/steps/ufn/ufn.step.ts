@@ -7,24 +7,17 @@ import {
   step,
   submit,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
-import { declarationEffects } from "#/journeys/declaration/declaration.effects.js";
 
+import { declarationEffects } from "#/journeys/declaration/declaration.effects.js";
 import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
 import { t } from "#/lib/i18n.js";
 
 import { caption } from "../../declaration.blocks.js";
-import {
-    continueReturnButtons,
-    ufnInput,
-} from "./ufn.blocks.js";
+import { continueReturnButtons, ufnInput } from "./ufn.blocks.js";
 
 export const ufnStep = (): ReturnType<typeof step> => {
   return step({
-    blocks: [
-      caption,
-      ufnInput(),
-      continueReturnButtons(),
-    ],
+    blocks: [caption, ufnInput(), continueReturnButtons()],
     code: "declaration-ufn",
     onSubmission: [
       submit({

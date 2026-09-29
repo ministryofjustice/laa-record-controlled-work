@@ -1,7 +1,11 @@
+import type { ResolvableString } from "@ministryofjustice/hmpps-forge/core/components";
 
-import { AnswerKey } from "#/journeys/declaration/declaration.answers.js";  
-import { Answer, Transformer } from "@ministryofjustice/hmpps-forge/core/authoring";
-import { ResolvableString } from "@ministryofjustice/hmpps-forge/core/components";
+import {
+  Answer,
+  Transformer,
+} from "@ministryofjustice/hmpps-forge/core/authoring";
+
+import { AnswerKey } from "#/journeys/declaration/declaration.answers.js";
 
 /**
  * Formats a date for display.

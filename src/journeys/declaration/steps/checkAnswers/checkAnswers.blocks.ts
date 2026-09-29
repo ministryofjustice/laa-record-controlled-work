@@ -1,14 +1,17 @@
-import { AnswerKey } from "#/journeys/declaration/declaration.answers.js";
-import { formatDate } from "#/journeys/declaration/steps/checkAnswers/checkAnswers.formatters.js";
-import { fixedT } from "#/lib/i18n.js";
+import type {
+  ResolvableBoolean,
+  ResolvableString,
+} from "@ministryofjustice/hmpps-forge/core/components";
+
 import { Answer } from "@ministryofjustice/hmpps-forge/core/authoring";
-import { ResolvableString, ResolvableBoolean } from "@ministryofjustice/hmpps-forge/core/components";
 import { GovUKSummaryList } from "@ministryofjustice/hmpps-forge/govuk-components";
 import { t } from "i18next";
 
-const answerLabelT = fixedT(
-  "journeys.declaration.checkAnswers.answerLabels",
-);
+import { AnswerKey } from "#/journeys/declaration/declaration.answers.js";
+import { formatDate } from "#/journeys/declaration/steps/checkAnswers/checkAnswers.formatters.js";
+import { fixedT } from "#/lib/i18n.js";
+
+const answerLabelT = fixedT("journeys.declaration.checkAnswers.answerLabels");
 
 interface SummaryRow {
   actions: {
@@ -31,6 +34,28 @@ interface SummaryRowArgs {
     text?: ResolvableString;
   };
   visibleWhen?: ResolvableBoolean;
+}
+
+/**
+ * Creates the check-answers summary list.
+ *
+ * @returns The check-answers summary list.
+ */
+export function summaryList(): GovUKSummaryList {
+  const dateOfSignature = summaryRow({
+    href: "sign?returnTo=check-answers",
+    label: answerLabelT("dateOfSignature"),
+    value: { text: formatDate() },
+  });
+  const ufn = summaryRow({
+    href: "ufn?returnTo=check-answers",
+    label: answerLabelT("ufn"),
+    value: { text: Answer(AnswerKey.DECLARATION_UFN) },
+  });
+
+  return GovUKSummaryList({
+    rows: [dateOfSignature, ufn],
+  });
 }
 
 /**
@@ -58,30 +83,4 @@ function summaryRow(args: SummaryRowArgs): SummaryRow {
     value,
     ...(visibleWhen === undefined ? {} : { visibleWhen }),
   };
-}
-
-/**
- * Creates the check-answers summary list.
- *
- * @returns The check-answers summary list.
- */
-export function summaryList(): GovUKSummaryList {
-  const dateOfSignature = summaryRow({
-    href: "sign?returnTo=check-answers",
-    label: answerLabelT("dateOfSignature"),
-    value: { text: formatDate() },
-  });
-  const ufn = summaryRow({
-    href: "ufn?returnTo=check-answers",
-    label: answerLabelT("ufn"),
-    value: { text: Answer(AnswerKey.DECLARATION_UFN) },
-  });
-  
-
-  return GovUKSummaryList({
-    rows: [
-      dateOfSignature,
-      ufn,
-    ],
-  });
 }
