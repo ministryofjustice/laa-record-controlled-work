@@ -10,9 +10,7 @@ import {
 
 import { declarationEffects } from "#/journeys/declaration/declaration.effects.js";
 import { summaryList } from "#/journeys/declaration/steps/checkAnswers/checkAnswers.blocks.js";
-import {
-  PARAMS_KEYS,
-} from "#/journeys/journey.constants.js";
+import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
 import { heading, submitButton } from "#/journeys/shared.blocks.js";
 import { t } from "#/lib/i18n.js";
 
