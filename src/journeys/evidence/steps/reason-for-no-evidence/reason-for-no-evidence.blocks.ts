@@ -8,12 +8,13 @@ import {
   GovUKRadioInput,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
+import { EvidenceAnswers } from "#/journeys/evidence/evidence.answers.js";
 import { t } from "#/lib/i18n.js";
 
 const REASON_MAX_LENGTH = 500;
 
 export const reasonForNoEvidenceRadioInput = GovUKRadioInput({
-  code: "reasonForNoEvidence",
+  code: EvidenceAnswers.reasonForNoEvidence,
   fieldset: {
     legend: {
       classes: "govuk-fieldset__legend--l",
@@ -48,7 +49,7 @@ export const reasonForNoEvidenceRadioInput = GovUKRadioInput({
 });
 
 export const moreDetailsForNoEvidence = GovUKCharacterCount({
-  code: "moreDetailsForNoEvidence",
+  code: EvidenceAnswers.moreDetailsForNoEvidence,
   label: t("journeys.evidence.reasonForNoEvidence.moreDetails.label"),
   maxLength: REASON_MAX_LENGTH,
   validWhen: [

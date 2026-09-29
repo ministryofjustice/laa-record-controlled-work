@@ -1,4 +1,3 @@
-import { evidenceOfCapital } from "#/journeys/evidence/steps/evidence-of-capital/evidence-of-capital.step.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import {
   TestRedirectResult,
@@ -6,9 +5,7 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
 import { createForgeTestClient } from "../../utils/helpers.js";
-import { evidenceEffects } from "#/journeys/evidence/evidence.effects.js";
 import { evidencePackage } from "#/journeys/evidence/evidence.package.js";
-import { createApplicationJourney } from "#/journeys/create-application/create-application.journey.js";
 import { evidenceJourney } from "#/journeys/evidence/evidence.journey.js";
 
 describe("Evidence of capital step", () => {
