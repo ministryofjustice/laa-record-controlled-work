@@ -25,7 +25,6 @@ describe("requireAuth", () => {
       "/auth/signin",
       "/auth/signout",
       "/auth/callback",
-      "/auth/refresh",
     ];
 
     for (const path of ignoredAuthPaths) {
@@ -42,23 +41,12 @@ describe("requireAuth", () => {
         expect(redirect.called).to.be.false;
       });
     }
-
-    it("bypasses auth checks for unauthenticated requests to /select-office", async () => {
-      const { req, res, next, redirect } = createMocks({
-        account: undefined,
-        originalUrl: "/select-office",
-        url: "/select-office",
-      });
-
-      await requireAuth()(req, res, next);
-
-      expect(next.calledOnceWithExactly()).to.be.true;
-      expect(redirect.called).to.be.false;
-    });
   });
 
   it("redirects to /auth/signin when auth token is missing", async () => {
-    const { req, res, next, redirect, session } = createMocks({ account: undefined });
+    const { req, res, next, redirect, session } = createMocks({
+      account: undefined,
+    });
 
     await requireAuth()(req, res, next);
 
@@ -89,7 +77,8 @@ describe("requireAuth", () => {
 
     await requireAuth()(req, res, next);
 
-    expect(createStub.calledOnceWithExactly({ sessionId: SESSION_ID })).to.be.true;
+    expect(createStub.calledOnceWithExactly({ sessionId: SESSION_ID })).to.be
+      .true;
     expect(
       serviceRefreshToken.calledOnceWithExactly(
         HOME_ACCOUNT_ID,
@@ -116,7 +105,8 @@ describe("requireAuth", () => {
 
     await requireAuth()(req, res, next);
 
-    expect(createStub.calledOnceWithExactly({ sessionId: SESSION_ID })).to.be.true;
+    expect(createStub.calledOnceWithExactly({ sessionId: SESSION_ID })).to.be
+      .true;
     expect(
       serviceRefreshToken.calledOnceWithExactly(
         HOME_ACCOUNT_ID,
@@ -141,6 +131,38 @@ describe("requireAuth", () => {
     await requireAuth()(req, res, next);
 
     expect(redirect.calledOnceWithExactly("/select-office")).to.be.true;
+    expect(next.called).to.be.false;
+  });
+
+  it("allows an authenticated user without a selected office to access /select-office", async () => {
+    const { req, res, next, redirect, session } = createMocks({
+      account: createAccount({ exp: getNowInSeconds() + 600 }),
+      originalUrl: "/select-office",
+      path: "/select-office",
+      selectedOffice: undefined,
+      url: "/select-office",
+    });
+
+    await requireAuth()(req, res, next);
+
+    expect(redirect.called).to.be.false;
+    expect(next.calledOnceWithExactly()).to.be.true;
+    expect(res.locals.isAuthenticated).to.be.true;
+    expect(res.locals.user).to.equal(session.account);
+  });
+
+  it("redirects an unauthenticated user from /select-office to /auth/signin", async () => {
+    const { req, res, next, redirect } = createMocks({
+      account: undefined,
+      originalUrl: "/select-office",
+      path: "/select-office",
+      selectedOffice: undefined,
+      url: "/select-office",
+    });
+
+    await requireAuth()(req, res, next);
+
+    expect(redirect.calledOnceWithExactly("/auth/signin")).to.be.true;
     expect(next.called).to.be.false;
   });
 
@@ -222,11 +244,13 @@ function createAccount({
 function createMocks({
   account,
   originalUrl = "/cases/123",
+  path = "/cases/123",
   selectedOffice,
   url = "/cases/123",
 }: {
   account?: Request["session"]["account"];
   originalUrl?: string;
+  path?: string;
   selectedOffice?: Office;
   url?: string;
 }): {
@@ -244,6 +268,7 @@ function createMocks({
 
   const req = {
     originalUrl,
+    path,
     session,
     url,
   } as Request;
@@ -262,5 +287,3 @@ function getNowInSeconds(): number {
   const MS_PER_SECOND = 1000;
   return Math.floor(Date.now() / MS_PER_SECOND);
 }
-
-
