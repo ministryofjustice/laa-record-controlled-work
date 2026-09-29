@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/node";
 import { expect } from "chai";
 import sinon from "sinon";
 
@@ -53,6 +54,7 @@ describe("loadOffices", () => {
   afterEach(() => sinon.restore());
 
   it("sets available offices in context when API response is valid", async () => {
+    const distributionStub = sinon.stub(Sentry.metrics, "distribution");
     getAllProviderOffices.resolves({
       data: {
         firm: {
@@ -86,6 +88,16 @@ describe("loadOffices", () => {
     expect(setData.firstCall.args[0]).to.equal(
       CONTEXT_DATA_KEYS.availableOffices,
     );
+    expect(
+      distributionStub.calledOnceWithMatch(
+        "api_response_time",
+        sinon.match.number,
+        {
+          attributes: { endpoint: "getAllProviderOffices", status: 200 },
+          unit: "millisecond",
+        },
+      ),
+    ).to.equal(true);
   });
 
   it("forwards the x-correlation-id request header to the API call", async () => {
@@ -148,6 +160,7 @@ describe("loadOffices", () => {
   });
 
   it("throws ApiResponseError when getAllProviderOffices rejects", async () => {
+    const distributionStub = sinon.stub(Sentry.metrics, "distribution");
     sinon.stub(logger, "error");
     const cause = new Error("network error");
     getAllProviderOffices.rejects(cause);
@@ -159,9 +172,20 @@ describe("loadOffices", () => {
       expect(error).to.be.instanceOf(ApiResponseError);
       expect((error as ApiResponseError).cause).to.equal(cause);
     }
+    expect(
+      distributionStub.calledOnceWithMatch(
+        "api_response_time",
+        sinon.match.number,
+        {
+          attributes: { endpoint: "getAllProviderOffices" },
+          unit: "millisecond",
+        },
+      ),
+    ).to.equal(true);
   });
 
   it("throws ApiResponseError when getAllProviderOffices returns a non-200 status", async () => {
+    const distributionStub = sinon.stub(Sentry.metrics, "distribution");
     sinon.stub(logger, "error");
     getAllProviderOffices.resolves({
       data: {},
@@ -174,6 +198,16 @@ describe("loadOffices", () => {
     } catch (error) {
       expect(error).to.be.instanceOf(ApiResponseError);
     }
+    expect(
+      distributionStub.calledOnceWithMatch(
+        "api_response_time",
+        sinon.match.number,
+        {
+          attributes: { endpoint: "getAllProviderOffices", status: 500 },
+          unit: "millisecond",
+        },
+      ),
+    ).to.equal(true);
   });
 
   it("throws ApiValidationError when API response data fails schema validation", async () => {
@@ -194,6 +228,7 @@ describe("loadOffices", () => {
   });
 
   it("throws InvalidFirmCodeClaimError when FIRM_CODE claim is missing", async () => {
+    const distributionStub = sinon.stub(Sentry.metrics, "distribution");
     sinon.stub(logger, "error");
     getSession.returns({
       account: {
@@ -208,6 +243,7 @@ describe("loadOffices", () => {
       expect(error).to.be.instanceOf(InvalidFirmCodeClaimError);
       expect(getAllProviderOffices.notCalled).to.equal(true);
     }
+    expect(distributionStub.notCalled).to.equal(true);
   });
 
   [undefined, 123].forEach((claim) =>

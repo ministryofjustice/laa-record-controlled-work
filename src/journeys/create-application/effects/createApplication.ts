@@ -57,7 +57,6 @@ export const createApplication =
     journeyCode: string,
   ): Promise<void> => {
     let response: createApplicationResponse;
-    let startTime = 0;
     try {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Session shape is constrained by app session typing.
       const session = context.getSession() as
@@ -83,10 +82,11 @@ export const createApplication =
         homeAccountId: session.msal?.homeAccountId,
         sessionId: session.id,
       });
-      startTime = metrics.start();
-      response = await deps.createApplication(dataForApi, opts);
+      response = await metrics.time(
+        "createApplication",
+        async () => await deps.createApplication(dataForApi, opts),
+      );
     } catch (error) {
-      metrics.duration(startTime, { endpoint: "createApplication" });
       logger.error(
         `Error creating application for journey ${journeyCode}:`,
         error,
@@ -96,11 +96,6 @@ export const createApplication =
       );
       throw ApiResponseError.from(error);
     }
-
-    metrics.duration(startTime, {
-      endpoint: "createApplication",
-      status: response.status,
-    });
 
     if (response.status !== HTTP_STATUS.CREATED) {
       logger.error(

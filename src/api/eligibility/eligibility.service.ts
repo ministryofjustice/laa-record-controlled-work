@@ -69,15 +69,14 @@ export async function loadEligibilityAssessment(
   const { applicationId, homeAccountId, sessionId } = params;
 
   let response;
-  let startTime = 0;
   try {
     const opts = await getRcwApiDefaultOptions({ homeAccountId, sessionId });
 
-    startTime = metrics.start();
-    response = await deps.getApplication(applicationId, opts);
+    response = await metrics.time(
+      "getApplication",
+      async () => await deps.getApplication(applicationId, opts),
+    );
   } catch (error) {
-    metrics.duration(startTime, { endpoint: "getApplication" });
-
     if (error instanceof NotAuthenticatedError) {
       return failure(error);
     }
@@ -91,10 +90,6 @@ export async function loadEligibilityAssessment(
     );
     return failure(LoadEligibilityAssessmentError.from(error));
   }
-  metrics.duration(startTime, {
-    endpoint: "getApplication",
-    status: response.status,
-  });
   if (response.status !== HTTP_STATUS.OK) {
     logger.error(
       "getApplication did not return 200",
@@ -148,7 +143,6 @@ export async function saveEligibilityAssessment(
 
   const { data, result } = splitEligibilityAssessment(eligibilityAssessment);
 
-  let startTime = 0;
   let response;
   try {
     const opts = await getRcwApiDefaultOptions({
@@ -156,14 +150,12 @@ export async function saveEligibilityAssessment(
       sessionId,
     });
 
-    startTime = metrics.start();
-    response = await deps.updateApplicationMeans(
-      applicationId,
-      { data, result },
-      opts,
+    const body = { data, result };
+    response = await metrics.time(
+      "updateApplicationMeans",
+      async () => await deps.updateApplicationMeans(applicationId, body, opts),
     );
   } catch (error) {
-    metrics.duration(startTime, { endpoint: "updateApplicationMeans" });
     if (error instanceof NotAuthenticatedError) {
       return failure(error);
     }
@@ -173,11 +165,6 @@ export async function saveEligibilityAssessment(
     });
     return failure(SaveEligibilityAssessmentError.from(error));
   }
-
-  metrics.duration(startTime, {
-    endpoint: "updateApplicationMeans",
-    status: response.status,
-  });
 
   if (response.status !== HTTP_STATUS.NO_CONTENT) {
     logger.error(

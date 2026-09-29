@@ -52,7 +52,6 @@ export const submitSignedDeclaration =
     }
 
     let response: updateApplicationDeclarationResponse;
-    let startTime = 0;
     try {
       const body = {
         dateSigned: date,
@@ -66,24 +65,17 @@ export const submitSignedDeclaration =
         sessionId: session.id,
       });
 
-      startTime = metrics.start();
-      response = await deps.updateApplicationDeclaration(
-        applicationId,
-        body,
-        opts,
+      response = await metrics.time(
+        "updateApplicationDeclaration",
+        async () =>
+          await deps.updateApplicationDeclaration(applicationId, body, opts),
       );
     } catch (error) {
-      metrics.duration(startTime, { endpoint: "updateApplicationDeclaration" });
       logger.error("Failed to update application declaration", error, {
         api: "updateApplicationDeclaration",
       });
       throw ApiResponseError.from(error);
     }
-
-    metrics.duration(startTime, {
-      endpoint: "updateApplicationDeclaration",
-      status: response.status,
-    });
 
     if (response.status !== HTTP_STATUS.NO_CONTENT) {
       const error = new ApiResponseError();
