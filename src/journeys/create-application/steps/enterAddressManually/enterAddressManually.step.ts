@@ -28,7 +28,7 @@ export function enterAddressManuallyStep(journeyCode: string): StepDefinition {
     blocks: [
       clientDetailsCaption(),
       heading(TITLE),
-      ...enterAddressManuallyBlocks,
+      ...enterAddressManuallyBlocks(),
     ],
     onSubmission: [saveUkAddress(journeyCode)],
     path: "/enter-address-manually",

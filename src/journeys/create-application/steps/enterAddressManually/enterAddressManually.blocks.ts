@@ -3,7 +3,10 @@ import {
   Self,
   validation,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
-import { HtmlBlock } from "@ministryofjustice/hmpps-forge/core/components";
+import {
+  type BlockDefinition,
+  HtmlBlock,
+} from "@ministryofjustice/hmpps-forge/core/components";
 import { GovUKButton } from "@ministryofjustice/hmpps-forge/govuk-components";
 
 import { UK_ADDRESS_FIELDS } from "#/journeys/journey.constants.js";
@@ -85,23 +88,51 @@ const postcode = textInput(POSTCODE_CODE, POSTCODE_LABEL, {
   ],
 });
 
-const addressInputs = [
-  addressLine1,
-  addressLine2,
-  townOrCity,
-  county,
-  postcode,
-  country,
-];
+/**
+ * Creates the form blocks for entering a UK address manually.
+ *
+ * @returns The address fields, overseas-address link, and continue button.
+ */
+export function enterAddressManuallyBlocks(): BlockDefinition[] {
+  const addressLine1 = textInput(LINE_1_CODE, LINE_1_LABEL, {
+    validations: [answerIsRequired(LINE_1_VALIDATION)],
+  });
+  const addressLine2 = textInput(LINE_2_CODE, LINE_2_LABEL);
+  const townOrCity = textInput(TOWN_CITY_CODE, TOWN_CITY_LABEL, {
+    classes: "govuk-!-width-two-thirds",
+    validations: [answerIsRequired(TOWN_CITY_VALIDATION)],
+  });
+  const county = textInput(COUNTY_CODE, COUNTY_LABEL, {
+    classes: "govuk-!-width-two-thirds",
+  });
+  const postcode = textInput(POSTCODE_CODE, POSTCODE_LABEL, {
+    classes: "govuk-input--width-10",
+    validations: [
+      answerIsRequired(POSTCODE_REQUIRED_VALIDATION),
+      validation({
+        condition: Self().match(Condition.Address.IsValidPostcode()),
+        message: POSTCODE_INVALID_VALIDATION,
+      }),
+    ],
+  });
+  const country = textInput(COUNTRY_CODE, "", {
+    classes:
+      "govuk-input--width-10 govuk-!-display-none govuk-!-visibility-hidden",
+    defaultValue: "United Kingdom",
+  });
+  const nonUkAddressLink = HtmlBlock({
+    content: `<p class="govuk-body"><a class="govuk-link" href="enter-overseas-address">${NON_UK_ADDRESS_TEXT}</a></p>`,
+  });
+  const continueButton = GovUKButton({ text: CONTINUE_TEXT });
 
-const nonUkAddressLink = HtmlBlock({
-  content: `<p class="govuk-body"><a class="govuk-link" href="enter-overseas-address">${NON_UK_ADDRESS_TEXT}</a></p>`,
-});
-
-const continueButton = GovUKButton({ text: CONTINUE_TEXT });
-
-export const enterAddressManuallyBlocks = [
-  ...addressInputs,
-  nonUkAddressLink,
-  continueButton,
-];
+  return [
+    addressLine1,
+    addressLine2,
+    townOrCity,
+    county,
+    postcode,
+    country,
+    nonUkAddressLink,
+    continueButton,
+  ];
+}
