@@ -20,7 +20,6 @@ export const redirectToCheckAnswers = redirect({
   when: hasCheckAnswersInQuery,
 });
 
-// TODO move this to shared.hooks, and replace others with this shared hook
 /**
  * Creates a required-field validation rule for a GOV.UK form field.
  *

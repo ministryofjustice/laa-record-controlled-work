@@ -1,13 +1,10 @@
+import type { BlockDefinition } from "@ministryofjustice/hmpps-forge/core/components";
+
 import {
   Condition,
   Self,
   validation,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
-import {
-  type BlockDefinition,
-  HtmlBlock,
-} from "@ministryofjustice/hmpps-forge/core/components";
-import { GovUKButton } from "@ministryofjustice/hmpps-forge/govuk-components";
 
 import { UK_ADDRESS_FIELDS } from "#/journeys/journey.constants.js";
 import { textInput } from "#/journeys/shared.blocks.js";
@@ -52,17 +49,12 @@ const POSTCODE_INVALID_VALIDATION = t(
   "journeys.createApplication.enterAddressManually.postcode.validation.invalid",
 );
 
-const NON_UK_ADDRESS_TEXT = t(
-  "journeys.createApplication.enterAddressManually.nonUkAddress",
-);
-const CONTINUE_TEXT = t("common.continue");
-
 /**
  * Creates the form blocks for entering a UK address manually.
  *
  * @returns The address fields, overseas-address link, and continue button.
  */
-export function enterAddressManuallyBlocks(): BlockDefinition[] {
+export function manualAddressInputs(): BlockDefinition[] {
   const addressLine1 = textInput(LINE_1_CODE, LINE_1_LABEL, {
     validations: [answerIsRequired(LINE_1_VALIDATION)],
   });
@@ -89,19 +81,6 @@ export function enterAddressManuallyBlocks(): BlockDefinition[] {
       "govuk-input--width-10 govuk-!-display-none govuk-!-visibility-hidden",
     defaultValue: "United Kingdom",
   });
-  const nonUkAddressLink = HtmlBlock({
-    content: `<p class="govuk-body"><a class="govuk-link" href="enter-overseas-address">${NON_UK_ADDRESS_TEXT}</a></p>`,
-  });
-  const continueButton = GovUKButton({ text: CONTINUE_TEXT });
 
-  return [
-    addressLine1,
-    addressLine2,
-    townOrCity,
-    county,
-    postcode,
-    country,
-    nonUkAddressLink,
-    continueButton,
-  ];
+  return [addressLine1, addressLine2, townOrCity, county, postcode, country];
 }
