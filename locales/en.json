@@ -507,6 +507,13 @@
         "validation": {
           "required": "You must enter a valid UFN in the following format 123456/123 as it matches on SABC."
         }
+      },
+      "checkAnswers": {
+        "title": "Check your answers",
+        "answerLabels": {
+          "dateOfSignature": "Date of signature",
+          "ufn": "UFN"
+        }
       }
     },
     "editApplication": {
