@@ -22,7 +22,11 @@ describe("metrics", () => {
     );
     expect(
       distributionStub.calledOnceWithExactly("api_response_time", 50, {
-        attributes: { endpoint: "getApplication", status: 200 },
+        attributes: {
+          endpoint: "getApplication",
+          outcome: "success",
+          status: 200,
+        },
         unit: "millisecond",
       }),
     ).to.equal(true);
@@ -43,7 +47,11 @@ describe("metrics", () => {
     ).to.equal(response);
     expect(
       distributionStub.calledOnceWithExactly("api_response_time", 25, {
-        attributes: { endpoint: "updateApplicationStatus", status: 409 },
+        attributes: {
+          endpoint: "updateApplicationStatus",
+          outcome: "error",
+          status: 409,
+        },
         unit: "millisecond",
       }),
     ).to.equal(true);
@@ -69,7 +77,7 @@ describe("metrics", () => {
     }
     expect(
       distributionStub.calledOnceWithExactly("api_response_time", 20, {
-        attributes: { endpoint: "getApplication" },
+        attributes: { endpoint: "getApplication", outcome: "error" },
         unit: "millisecond",
       }),
     ).to.equal(true);
