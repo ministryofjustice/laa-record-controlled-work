@@ -7,12 +7,12 @@ import {
   step,
   submit,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
+import { declarationEffects } from "#/journeys/declaration/declaration.effects.js";
 
 import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
 import { t } from "#/lib/i18n.js";
 
 import { caption } from "../../declaration.blocks.js";
-import { declarationEffects } from "../../declaration.effects.js";
 import {
     continueReturnButtons,
     ufnInput,
@@ -25,11 +25,11 @@ export const ufnStep = (): ReturnType<typeof step> => {
       ufnInput(),
       continueReturnButtons(),
     ],
-    code: "ufn",
+    code: "declaration-ufn",
     onSubmission: [
       submit({
         onValid: {
-          effects: [declarationEffects.submitSignedDeclaration()],
+          effects: [declarationEffects.saveDraftAnswers("declaration")],
           next: [
             redirect({
               goto: "check-answers",

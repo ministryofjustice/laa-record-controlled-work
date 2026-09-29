@@ -21,6 +21,7 @@ import {
   heading,
   statement,
 } from "./sign.blocks.js";
+import { declarationEffects } from "#/journeys/declaration/declaration.effects.js";
 
 export const signStep = (): ReturnType<typeof step> => {
   return step({
@@ -38,6 +39,7 @@ export const signStep = (): ReturnType<typeof step> => {
     onSubmission: [
       submit({
         onValid: {
+          effects: [declarationEffects.saveDraftAnswers("declaration")],
           next: [
             redirect({
               goto: "ufn",

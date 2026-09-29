@@ -17,6 +17,7 @@ export const DeclarationJourney = journey({
     }),
   ],
   path: `/cases/:${PARAMS_KEYS.applicationID}/declaration`,
+  reachability: { disableReachabilityChecks: false },
   steps: [confirmStep(), signStep(), ufnStep()],
   title: "Declaration",
   view: { template: "partials/form-step" },
