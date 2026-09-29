@@ -57,37 +57,6 @@ const NON_UK_ADDRESS_TEXT = t(
 );
 const CONTINUE_TEXT = t("common.continue");
 
-const addressLine1 = textInput(LINE_1_CODE, LINE_1_LABEL, {
-  validations: [answerIsRequired(LINE_1_VALIDATION)],
-});
-const addressLine2 = textInput(LINE_2_CODE, LINE_2_LABEL);
-
-const townOrCity = textInput(TOWN_CITY_CODE, TOWN_CITY_LABEL, {
-  classes: "govuk-!-width-two-thirds",
-  validations: [answerIsRequired(TOWN_CITY_VALIDATION)],
-});
-
-const county = textInput(COUNTY_CODE, COUNTY_LABEL, {
-  classes: "govuk-!-width-two-thirds",
-});
-
-const country = textInput(COUNTRY_CODE, "", {
-  classes:
-    "govuk-input--width-10 govuk-!-display-none govuk-!-visibility-hidden",
-  defaultValue: "United Kingdom",
-});
-
-const postcode = textInput(POSTCODE_CODE, POSTCODE_LABEL, {
-  classes: "govuk-input--width-10",
-  validations: [
-    answerIsRequired(POSTCODE_REQUIRED_VALIDATION),
-    validation({
-      condition: Self().match(Condition.Address.IsValidPostcode()),
-      message: POSTCODE_INVALID_VALIDATION,
-    }),
-  ],
-});
-
 /**
  * Creates the form blocks for entering a UK address manually.
  *
