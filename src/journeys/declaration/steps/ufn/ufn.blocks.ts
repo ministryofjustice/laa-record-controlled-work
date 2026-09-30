@@ -14,7 +14,7 @@ import {
 import { AnswerKey } from "#/journeys/declaration/declaration.answers.js";
 import { t } from "#/lib/i18n.js";
 
-const UFN_REGEX = "^[0-9]{6}\/[0-9]{3}$";
+const UFN_REGEX = "^[0-9]{6}/[0-9]{3}$";
 
 /**
  * Creates the continue and return buttons for the declaration journey.

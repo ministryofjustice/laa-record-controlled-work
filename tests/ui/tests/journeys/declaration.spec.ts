@@ -115,7 +115,7 @@ test("Client Declaration - Sign Declaration step", async ({
     .getByRole("textbox", {
       name: "What is the unique file number (UFN) for this case?",
     })
-    .fill("123456");
+    .fill("123456/789");
   await page.getByRole("button", { name: "Continue" }).click();
 
   // ==========================================================================
@@ -142,7 +142,7 @@ test("Client Declaration - Sign Declaration step", async ({
       // Sign date
       "1 February 2026",
       // UFN
-      "123456",
+      "123456/789",
     ],
     { useInnerText: true },
   );
