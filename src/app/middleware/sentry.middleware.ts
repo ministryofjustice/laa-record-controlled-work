@@ -20,6 +20,9 @@ export function setupSentry(): void {
     debug: process.env.SENTRY_DEBUG === "true",
     dsn: sentryDsn,
     environment: process.env.SENTRY_ENV ?? "production",
+    ...(process.env.SENTRY_RELEASE
+      ? { release: process.env.SENTRY_RELEASE }
+      : {}),
     integrations: [
       Sentry.httpIntegration(),
       Sentry.expressIntegration(),
