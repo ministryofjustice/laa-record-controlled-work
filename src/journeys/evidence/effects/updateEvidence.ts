@@ -23,7 +23,6 @@ export const updateEvidence =
   (deps: EvidenceEffectsDeps) =>
   async (context: EvidenceContext, journeyCode: string): Promise<void> => {
     let response;
-    let startTime = 0;
     try {
       const session = context.getSession();
 
@@ -57,14 +56,16 @@ export const updateEvidence =
         sessionId: session.id,
       });
 
-      startTime = metrics.start();
-      response = await deps.updateApplicationEvidence(
-        applicationId,
-        updateEvidenceReq,
-        opts,
+      response = await metrics.time(
+        "updateApplicationEvidence",
+        async () =>
+          await deps.updateApplicationEvidence(
+            applicationId,
+            updateEvidenceReq,
+            opts,
+          ),
       );
     } catch (error) {
-      metrics.duration(startTime, { endpoint: "updateApplicationEvidence" });
       logger.error(
         `Error updating evidence for journey ${journeyCode}:`,
         error,
@@ -72,11 +73,6 @@ export const updateEvidence =
       );
       throw ApiResponseError.from(error);
     }
-
-    metrics.duration(startTime, {
-      endpoint: "updateApplicationEvidence",
-      status: response.status,
-    });
 
     if (response.status !== HTTP_STATUS.NO_CONTENT) {
       logger.error(

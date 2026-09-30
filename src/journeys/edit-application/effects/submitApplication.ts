@@ -19,7 +19,6 @@ export const submitApplication =
   (deps: EditApplicationEffectsDeps) =>
   async (context: EditApplicationContext): Promise<void> => {
     let response;
-    let startTime = 0;
     try {
       const session = context.getSession();
       const { id } = context.getData(CONTEXT_DATA_KEYS.application);
@@ -28,24 +27,21 @@ export const submitApplication =
         sessionId: session?.id,
       });
 
-      startTime = metrics.start();
-      response = await deps.updateApplicationStatus(
-        id,
-        { applicationState: ApplicationState.enum.COMPLETED, eTag },
-        opts,
+      response = await metrics.time(
+        "updateApplicationStatus",
+        async () =>
+          await deps.updateApplicationStatus(
+            id,
+            { applicationState: ApplicationState.enum.COMPLETED, eTag },
+            opts,
+          ),
       );
     } catch (error) {
-      metrics.duration(startTime, { endpoint: "updateApplicationStatus" });
       logger.error("Error submitting application", error, {
         api: "updateApplicationStatus",
       });
       throw ApiResponseError.from(error);
     }
-
-    metrics.duration(startTime, {
-      endpoint: "updateApplicationStatus",
-      status: response.status,
-    });
 
     if (response.status !== HTTP_STATUS.NO_CONTENT) {
       logger.error(

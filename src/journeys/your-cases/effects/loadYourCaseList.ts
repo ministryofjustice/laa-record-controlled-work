@@ -21,30 +21,23 @@ export const loadYourCaseList =
   (deps: YourCasesEffectsDeps) =>
   async (context: CaseListContext, status: ApplicationStatus) => {
     let response;
-    let startTime = 0;
     try {
       const session = context.getSession();
       const opts = await getRcwApiDefaultOptions({
         homeAccountId: session?.msal?.homeAccountId,
         sessionId: session?.id,
       });
-      startTime = metrics.start();
-      response = await deps.getApplications(
-        { officeId: session?.selectedOffice?.code, status },
-        opts,
+      const query = { officeId: session?.selectedOffice?.code, status };
+      response = await metrics.time(
+        "getApplications",
+        async () => await deps.getApplications(query, opts),
       );
     } catch (error) {
-      metrics.duration(startTime, { endpoint: "getApplications" });
       logger.error("Error fetching applications", error, {
         api: "getApplications",
       });
       throw ApiResponseError.from(error);
     }
-
-    metrics.duration(startTime, {
-      endpoint: "getApplications",
-      status: response.status,
-    });
 
     if (response.status !== HTTP_STATUS.OK) {
       logger.error(
