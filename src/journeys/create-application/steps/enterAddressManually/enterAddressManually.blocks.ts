@@ -1,10 +1,12 @@
-import type { BlockDefinition } from "@ministryofjustice/hmpps-forge/core/components";
-
 import {
   Condition,
   Self,
   validation,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
+import {
+  type BlockDefinition,
+  HtmlBlock,
+} from "@ministryofjustice/hmpps-forge/core/components";
 
 import { UK_ADDRESS_FIELDS } from "#/journeys/journey.constants.js";
 import { textInput } from "#/journeys/shared.blocks.js";
@@ -83,4 +85,15 @@ export function manualAddressInputs(): BlockDefinition[] {
   });
 
   return [addressLine1, addressLine2, townOrCity, county, postcode, country];
+}
+
+/**
+ * Creates a link to the overseas-address form.
+ *
+ * @returns The overseas-address link block.
+ */
+export function nonUkAddressLinkBlock(): BlockDefinition {
+  return HtmlBlock({
+    content: `<p class="govuk-body"><a class="govuk-link" href="enter-overseas-address">${t("journeys.createApplication.enterAddressManually.nonUkAddress")}</a></p>`,
+  });
 }

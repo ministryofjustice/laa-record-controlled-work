@@ -7,7 +7,6 @@ import {
   submit,
   type SubmitHook,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
-import { HtmlBlock } from "@ministryofjustice/hmpps-forge/core/components";
 
 import { CreateApplicationEffects } from "#/journeys/create-application/create-application.effects.js";
 import { OVERSEAS_ADDRESS_FIELDS } from "#/journeys/journey.constants.js";
@@ -18,7 +17,10 @@ import {
 } from "#/journeys/shared.blocks.js";
 import { t } from "#/lib/i18n.js";
 
-import { manualAddressInputs } from "./enterAddressManually.blocks.js";
+import {
+  manualAddressInputs,
+  nonUkAddressLinkBlock,
+} from "./enterAddressManually.blocks.js";
 
 const TITLE = t("journeys.createApplication.enterAddressManually.title");
 
@@ -34,9 +36,7 @@ export function enterAddressManuallyStep(journeyCode: string): StepDefinition {
       clientDetailsCaption(),
       heading(TITLE),
       ...manualAddressInputs(),
-      HtmlBlock({
-        content: `<p class="govuk-body"><a class="govuk-link" href="enter-overseas-address">${t("journeys.createApplication.enterAddressManually.nonUkAddress")}</a></p>`,
-      }),
+      nonUkAddressLinkBlock(),
       continueButton(),
     ],
     onSubmission: [saveUkAddress(journeyCode)],
