@@ -10,7 +10,7 @@ import { logger } from "#/logger.js";
  * @param context The effect function context to read the session from.
  * @returns The validated journey session.
  */
-export function getSessionData<
+export function getSessionDataOrThrow<
   TData extends Record<string, unknown> = Record<string, unknown>,
   TAnswers extends Record<string, unknown> = Record<string, unknown>,
   TSession = unknown,

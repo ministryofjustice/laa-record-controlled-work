@@ -9,7 +9,7 @@ import {
   UndefinedAnswerError,
   UndefinedParamError,
 } from "#/journeys/journey.errors.js";
-import { getSessionData } from "#/journeys/shared.helper.js";
+import { getSessionDataOrThrow } from "#/journeys/shared.helper.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import * as metrics from "#/lib/metrics.js";
 import { logger } from "#/logger.js";
@@ -26,7 +26,7 @@ import type {
  */
 export const submitSignedDeclaration =
   (deps: DeclarationDeps) => async (context: DeclarationContext) => {
-    const session = getSessionData(context);
+    const session = getSessionDataOrThrow(context);
     const applicationId = context.getRequestParam(PARAMS_KEYS.applicationID);
     const confirmed = context.getAnswer(A.DECLARATION_SIGNED_CONFIRM);
     const date = context.getAnswer(A.DECLARATION_SIGNED_DATE);

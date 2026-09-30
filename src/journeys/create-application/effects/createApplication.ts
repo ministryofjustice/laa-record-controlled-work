@@ -1,5 +1,4 @@
 import type { EffectFunctionContext } from "@ministryofjustice/hmpps-forge/core";
-import type { Session, SessionData } from "express-session";
 
 import type { CreateApplicationRequestBody } from "#/api/clients/rcw/model/createApplicationRequestBody.zod.gen.js";
 import type { createApplicationResponse } from "#/api/clients/rcw/schema/applications/applications.gen.js";

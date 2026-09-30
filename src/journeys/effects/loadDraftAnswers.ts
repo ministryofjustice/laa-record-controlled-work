@@ -1,7 +1,7 @@
 import type { EffectFunctionContext } from "@ministryofjustice/hmpps-forge/core/authoring";
 
 import { getJourneyDraftKey } from "#/journeys/journeyDraftKey.js";
-import { getSessionData } from "#/journeys/shared.helper.js";
+import { getSessionDataOrThrow } from "#/journeys/shared.helper.js";
 
 /**
  * Creates the effect that loads draft answers into the current form context.
@@ -17,7 +17,7 @@ export function loadDraftAnswers() {
     context: EffectFunctionContext,
     journeyCode: string,
   ): void {
-    const session = getSessionData(context);
+    const session = getSessionDataOrThrow(context);
 
     const draftKey = getJourneyDraftKey(context, journeyCode);
     const stored = session.journeyDrafts?.[draftKey];

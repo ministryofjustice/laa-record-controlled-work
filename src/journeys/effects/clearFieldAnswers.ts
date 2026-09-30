@@ -1,7 +1,7 @@
 import type { EffectFunctionContext } from "@ministryofjustice/hmpps-forge/core/authoring";
 
 import { getJourneyDraftKey } from "#/journeys/journeyDraftKey.js";
-import { getSessionData } from "#/journeys/shared.helper.js";
+import { getSessionDataOrThrow } from "#/journeys/shared.helper.js";
 
 /**
  * Creates the effect that clears specific field answers for the current journey.
@@ -19,7 +19,7 @@ export function clearFieldAnswers() {
     journeyCode: string,
     fields: readonly string[],
   ): void {
-    const session = getSessionData(context);
+    const session = getSessionDataOrThrow(context);
     const draftKey = getJourneyDraftKey(context, journeyCode);
 
     if (session.journeyDrafts?.[draftKey]) {
