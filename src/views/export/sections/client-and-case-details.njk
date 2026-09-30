@@ -1,5 +1,7 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 
+{% set clientDetailsT = fixedT("pages.export.clientAndCaseDetails") %}
+
 {% set accessedLegalAidBeforeText = "" %}
 {% if clientAndCaseDetails.accessedLegalAidBefore == true %}
   {% set accessedLegalAidBeforeText = t("common.yes") %}
@@ -9,7 +11,7 @@
 
 {% set addressValue = { text: "" } %}
 {% if clientAndCaseDetails.address == null %}
-  {% set addressValue = { text: t("pages.export.clientAndCaseDetails.noFixedAddress") } %}
+  {% set addressValue = { text: clientDetailsT("noFixedAddress") } %}
 {% else %}
   {% set addressLinesHtml %}{% for line in clientAndCaseDetails.address %}{{ line }}{% if not loop.last %}<br>{% endif %}{% endfor %}{% endset %}
   {% set addressValue = { html: addressLinesHtml } %}
@@ -17,31 +19,31 @@
 
 {% set rows = [
   {
-    key: { text: t("pages.export.clientAndCaseDetails.ecf") },
+    key: { text: clientDetailsT("ecf") },
     value: { text: t("common.no") }
   },
   {
-    key: { text: t("pages.export.clientAndCaseDetails.typeOfFamilyLaw") },
+    key: { text: clientDetailsT("typeOfFamilyLaw") },
     value: { text: clientAndCaseDetails.typeOfFamilyLaw or "" }
   },
   {
-    key: { text: t("pages.export.clientAndCaseDetails.transitionalEuArrangements") },
+    key: { text: clientDetailsT("transitionalEuArrangements") },
     value: { text: clientAndCaseDetails.transitionalEuArrangements or "" }
   },
   {
-    key: { text: t("pages.export.clientAndCaseDetails.protectThemselfOrChildren") },
+    key: { text: clientDetailsT("protectThemselfOrChildren") },
     value: { text: clientAndCaseDetails.protectThemselfOrChildren or "" }
   },
   {
-    key: { text: t("pages.export.clientAndCaseDetails.evidenceCaseIsInScope") },
+    key: { text: clientDetailsT("evidenceCaseIsInScope") },
     value: { text: clientAndCaseDetails.evidenceCaseIsInScope or "" }
   },
   {
-    key: { text: t("pages.export.clientAndCaseDetails.confirmMerits") },
+    key: { text: clientDetailsT("confirmMerits") },
     value: { text: clientAndCaseDetails.confirmMerits or "" }
   },
   {
-    key: { text: t("pages.export.clientAndCaseDetails.accessedLegalAidBefore") },
+    key: { text: clientDetailsT("accessedLegalAidBefore") },
     value: { text: accessedLegalAidBeforeText }
   }
 ] %}
@@ -49,7 +51,7 @@
 {% if clientAndCaseDetails.sameMatterDetails %}
   {% set rows = rows.concat([
     {
-      key: { text: t("pages.export.clientAndCaseDetails.sameMatterWithin6Months") },
+      key: { text: clientDetailsT("sameMatterWithin6Months") },
       value: { text: t("common.yes") if clientAndCaseDetails.sameMatterDetails.sameMatterWithin6Months else t("common.no") }
     }
   ]) %}
@@ -57,7 +59,7 @@
   {% if clientAndCaseDetails.sameMatterDetails.reasonForReapplication %}
     {% set rows = rows.concat([
       {
-        key: { text: t("pages.export.clientAndCaseDetails.reasonForReapplication") },
+        key: { text: clientDetailsT("reasonForReapplication") },
         value: { text: clientAndCaseDetails.sameMatterDetails.reasonForReapplication }
       }
     ]) %}
@@ -66,15 +68,15 @@
 
 {% set rows = rows.concat([
   {
-    key: { text: t("pages.export.clientAndCaseDetails.firstName") },
+    key: { text: clientDetailsT("firstName") },
     value: { text: clientAndCaseDetails.firstName }
   },
   {
-    key: { text: t("pages.export.clientAndCaseDetails.lastName") },
+    key: { text: clientDetailsT("lastName") },
     value: { text: clientAndCaseDetails.lastName }
   },
   {
-    key: { text: t("pages.export.clientAndCaseDetails.dateOfBirth") },
+    key: { text: clientDetailsT("dateOfBirth") },
     value: { text: clientAndCaseDetails.dateOfBirth }
   }
 ]) %}
@@ -82,7 +84,7 @@
 {% if clientAndCaseDetails.niNumber %}
   {% set rows = rows.concat([
     {
-      key: { text: t("pages.export.clientAndCaseDetails.niNumber") },
+      key: { text: clientDetailsT("niNumber") },
       value: { text: clientAndCaseDetails.niNumber }
     }
   ]) %}
@@ -90,12 +92,12 @@
 
 {% set rows = rows.concat([
   {
-    key: { text: t("pages.export.clientAndCaseDetails.address") },
+    key: { text: clientDetailsT("address") },
     value: addressValue
   }
 ]) %}
 
-<h2 class="govuk-heading-l">{{ t("pages.export.clientAndCaseDetails.heading") }}</h2>
+<h2 class="govuk-heading-l">{{ clientDetailsT("heading") }}</h2>
 
 {{ govukSummaryList({
   rows: rows
