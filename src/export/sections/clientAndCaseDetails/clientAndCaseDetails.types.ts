@@ -1,9 +1,6 @@
-export type ClientAddress =
-  { kind: "formatted"; lines: string[] } | { kind: "noFixedAddress" };
-
 export interface ClientAndCaseDetailsSection {
   accessedLegalAidBefore: boolean | null;
-  address: ClientAddress;
+  address: null | string[];
   confirmMerits: null | string;
   dateOfBirth: string;
   ecf: false;

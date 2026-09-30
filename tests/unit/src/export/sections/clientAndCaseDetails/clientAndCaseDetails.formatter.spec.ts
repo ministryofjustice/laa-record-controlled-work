@@ -43,25 +43,23 @@ describe("formatClientAddress", () => {
           hasFixedAddress: false,
         }),
       ),
-    ).to.deep.equal({ kind: "noFixedAddress" });
+    ).to.equal(null);
   });
 
   it("returns no formatted lines when a fixed address is missing", () => {
-    expect(formatClientAddress(makeClientDetails({ address: null }))).to.deep
-      .equal({ kind: "formatted", lines: [] });
+    expect(formatClientAddress(makeClientDetails({ address: null }))).to.deep.equal(
+      [],
+    );
   });
 
   it("formats a UK address without the country", () => {
-    expect(formatClientAddress(makeClientDetails())).to.deep.equal({
-      kind: "formatted",
-      lines: [
-        "1 Test Lane",
-        "Test Area",
-        "Test Town",
-        "Test County",
-        "TE5 7AA",
-      ],
-    });
+    expect(formatClientAddress(makeClientDetails())).to.deep.equal([
+      "1 Test Lane",
+      "Test Area",
+      "Test Town",
+      "Test County",
+      "TE5 7AA",
+    ]);
   });
 
   it("formats a non-GB address as international", () => {
@@ -69,14 +67,7 @@ describe("formatClientAddress", () => {
       formatClientAddress(
         makeClientDetails({ address: { ...UK_ADDRESS, country: "FR" } }),
       ),
-    ).to.deep.equal({
-      kind: "formatted",
-      lines: [
-        "1 Test Lane",
-        "Test Area",
-        "France",
-      ],
-    });
+    ).to.deep.equal(["1 Test Lane", "Test Area", "France"]);
   });
 
   for (const extraLines of [
@@ -95,15 +86,12 @@ describe("formatClientAddress", () => {
             },
           }),
         ),
-      ).to.deep.equal({
-        kind: "formatted",
-        lines: [
-          "1 Test Lane",
-          "Test Area",
-          ...Object.values(extraLines).filter(Boolean),
-          "France",
-        ],
-      });
+      ).to.deep.equal([
+        "1 Test Lane",
+        "Test Area",
+        ...Object.values(extraLines).filter(Boolean),
+        "France",
+      ]);
     });
   }
 
@@ -121,10 +109,7 @@ describe("formatClientAddress", () => {
           },
         }),
       ),
-    ).to.deep.equal({
-      kind: "formatted",
-      lines: ["1 Test Lane", "Test Town", "TE5 7AA"],
-    });
+    ).to.deep.equal(["1 Test Lane", "Test Town", "TE5 7AA"]);
   });
 });
 

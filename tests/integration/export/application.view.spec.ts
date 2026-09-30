@@ -9,14 +9,11 @@ import config from "#/config.js";
 import type { ClientAndCaseDetailsSection } from "#/export/sections/clientAndCaseDetails/clientAndCaseDetails.types.js";
 import { setupNunjucks } from "#/middleware/setupNunjucks.js";
 
-const formattedAddress = {
-  kind: "formatted" as const,
-  lines: [
-    faker.location.streetAddress(),
-    faker.location.city(),
-    faker.location.zipCode(),
-  ],
-};
+const formattedAddress = [
+  faker.location.streetAddress(),
+  faker.location.city(),
+  faker.location.zipCode(),
+];
 
 const clientAndCaseDetails: ClientAndCaseDetailsSection = {
   accessedLegalAidBefore: false,
@@ -133,8 +130,8 @@ describe("export application view", () => {
     expect(response.text).to.include("National Insurance number");
     expect(response.text).to.include(clientAndCaseDetails.niNumber!);
     expect(response.text).to.include("Address");
-    expect(response.text).to.include(formattedAddress.lines[0]);
-    expect(response.text).to.include(formattedAddress.lines[1]);
-    expect(response.text).to.include(formattedAddress.lines[2]);
+    expect(response.text).to.include(formattedAddress[0]);
+    expect(response.text).to.include(formattedAddress[1]);
+    expect(response.text).to.include(formattedAddress[2]);
   });
 });

@@ -43,7 +43,7 @@ describe("toClientAndCaseDetailsSection", () => {
 
     expect(section).to.deep.equal({
       accessedLegalAidBefore: true,
-      address: { kind: "formatted", lines: [] },
+      address: [],
       confirmMerits: null,
       dateOfBirth: "1 January 1982",
       ecf: false,

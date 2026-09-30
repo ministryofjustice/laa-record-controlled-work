@@ -1,5 +1,4 @@
 import type { ClientDetails } from "#/api/clients/rcw/model/clientDetails.zod.gen.js";
-import type { ClientAddress } from "#/export/sections/clientAndCaseDetails/clientAndCaseDetails.types.js";
 
 import { mapIsoCodeToCountryName } from "#/lib/countries.js";
 
@@ -17,14 +16,14 @@ const DATE_OF_BIRTH_FORMATTER = new Intl.DateTimeFormat("en-GB", {
  */
 export function formatClientAddress(
   clientDetails: ClientDetails,
-): ClientAddress {
+): null | string[] {
   if (!clientDetails.hasFixedAddress) {
-    return { kind: "noFixedAddress" };
+    return null;
   }
 
   const { address } = clientDetails;
   if (!address) {
-    return { kind: "formatted", lines: [] };
+    return [];
   }
 
   const countryCode = address.country.trim();
@@ -46,7 +45,7 @@ export function formatClientAddress(
           countryName,
         ];
 
-  return { kind: "formatted", lines: compactAddressLines(lines) };
+  return compactAddressLines(lines);
 }
 
 /**
