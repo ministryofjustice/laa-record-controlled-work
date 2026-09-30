@@ -1,8 +1,8 @@
 import type { Application } from "#/api/clients/rcw/model/application.zod.gen.js";
-import type { PriorLegalAid } from "#/api/dto/application/scopingQuestions.js";
+import type { PriorLegalAid } from "#/api/dto/application/application.dto.js";
 import type { ClientAndCaseDetailsSection } from "#/export/sections/clientAndCaseDetails/clientAndCaseDetails.types.js";
 
-import { parseScopingQuestions } from "#/api/dto/application/scopingQuestions.js";
+import { parseScopingQuestions } from "#/api/dto/application/application.dto.js";
 import {
   formatClientAddress,
   formatDateOfBirth,

@@ -1,3 +1,5 @@
+import * as zod from "zod";
+
 import type { Application as ApplicationSchema } from "#/api/clients/rcw/model/application.zod.gen.js";
 import type { CreateApplicationRequestBody } from "#/api/clients/rcw/model/createApplicationRequestBody.zod.gen.js";
 import type { AnswersOutput } from "#/journeys/create-application/data/answers.zod.js";
@@ -7,6 +9,22 @@ import {
   mapCountryNameToIsoCode,
   mapIsoCodeToCountryName,
 } from "#/lib/countries.js";
+
+export const PriorLegalAidEnum = zod.enum([
+  "no",
+  "yesDifferentMatter",
+  "yesSameMatter",
+]);
+
+export type PriorLegalAid = zod.infer<typeof PriorLegalAidEnum>;
+
+// TODO - temporary defining scoping questions here due to api returning a loose Object in the application schema model
+//  So add new recognised scoping questions here as they are needed.
+const ScopingQuestionsSchema = zod.object({
+  priorLegalAid: PriorLegalAidEnum.optional().catch(undefined),
+});
+
+export type ScopingQuestions = zod.infer<typeof ScopingQuestionsSchema>;
 
 interface Application {
   addressLine1?: string;
@@ -25,7 +43,7 @@ interface Application {
   postcode?: string;
   providerOfficeCode: string;
   reasonForReapplication?: string;
-  scopingQuestions: Record<string, unknown>;
+  scopingQuestions: ScopingQuestions;
   townOrCity?: string;
 }
 
@@ -71,7 +89,7 @@ export class ApplicationDto {
   public postCode?: string;
   public providerOfficeCode = "";
   public reasonForReapplication?: string;
-  public scopingQuestions: Record<string, unknown> = {};
+  public scopingQuestions: ScopingQuestions = {};
   public townOrCity?: string;
 
   /**
@@ -107,9 +125,9 @@ export class ApplicationDto {
       niNumber: answers.niNumber,
       providerOfficeCode,
       reasonForReapplication: answers.reasonForYes,
-      scopingQuestions: {
+      scopingQuestions: parseScopingQuestions({
         priorLegalAid: answers.legalAidBefore,
-      },
+      }),
     });
   }
 
@@ -244,9 +262,9 @@ export class ApplicationDto {
    * @returns The prior legal aid answer or an empty string.
    */
   private static getPriorLegalAid(application: ApplicationSchema): string {
-    const priorLegalAid = application.scopingQuestions?.priorLegalAid;
-
-    return typeof priorLegalAid === "string" ? priorLegalAid : "";
+    return (
+      parseScopingQuestions(application.scopingQuestions).priorLegalAid ?? ""
+    );
   }
 
   /**
@@ -302,4 +320,17 @@ export class ApplicationDto {
       scopingQuestions: this.scopingQuestions,
     };
   }
+}
+
+/**
+ * Reads the recognised scoping question answers from a loose scoping questions blob.
+ * @param scopingQuestions Scoping questions returned by the application API.
+ * @returns The recognised scoping question answers, ignoring unrecognised or invalid values.
+ */
+export function parseScopingQuestions(
+  scopingQuestions: unknown,
+): ScopingQuestions {
+  const parsed = ScopingQuestionsSchema.safeParse(scopingQuestions);
+
+  return parsed.success ? parsed.data : {};
 }
