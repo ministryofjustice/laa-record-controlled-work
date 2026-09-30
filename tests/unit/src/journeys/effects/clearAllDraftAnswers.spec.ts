@@ -82,4 +82,18 @@ describe("ClearAllDraftAnswers", () => {
       ecf: "no",
     });
   });
+
+  it("clears only the current application's evidence draft", () => {
+    getRequestParam.withArgs(PARAMS_KEYS.applicationID).returns("application-1");
+    session.journeyDrafts = {
+      "evidence:application-1": { ecf: "yes" },
+      "evidence:application-2": { ecf: "no" },
+    };
+
+    clearAllDraftAnswers()(context, "evidence");
+
+    const drafts = session.journeyDrafts as Record<string, unknown>;
+    expect(drafts["evidence:application-1"]).to.be.undefined;
+    expect(drafts["evidence:application-2"]).to.deep.equal({ ecf: "no" });
+  });
 });

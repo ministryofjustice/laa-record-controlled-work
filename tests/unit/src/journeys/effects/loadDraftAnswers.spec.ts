@@ -74,4 +74,30 @@ describe("LoadDraftAnswers", () => {
 
     expect(setAnswer.calledOnceWithExactly("ecf", "yes")).to.equal(true);
   });
+
+  it("loads only the current application's evidence draft", () => {
+    getRequestParam.onCall(0).returns("application-1");
+    getRequestParam.onCall(1).returns("application-2");
+    session.journeyDrafts = {
+      "evidence:application-1": { ecf: "yes" },
+      "evidence:application-2": { ecf: "no" },
+    };
+
+    loadDraftAnswers()(context, "evidence");
+    loadDraftAnswers()(context, "evidence");
+
+    expect(setAnswer.firstCall.args).to.deep.equal(["ecf", "yes"]);
+    expect(setAnswer.secondCall.args).to.deep.equal(["ecf", "no"]);
+  });
+
+  it("does not load an unscoped evidence draft for an application", () => {
+    getRequestParam.withArgs(PARAMS_KEYS.applicationID).returns("application-1");
+    session.journeyDrafts = {
+      evidence: { ecf: "legacy" },
+    };
+
+    loadDraftAnswers()(context, "evidence");
+
+    expect(setAnswer.called).to.equal(false);
+  });
 });

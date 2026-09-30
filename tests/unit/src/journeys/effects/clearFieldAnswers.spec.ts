@@ -91,4 +91,30 @@ describe("ClearFieldAnswers", () => {
       addressLine1: "keep",
     });
   });
+
+  it("clears fields from only the current application's evidence draft", () => {
+    getRequestParam.onCall(0).returns("application-1");
+    getRequestParam.onCall(1).returns("application-2");
+    session.journeyDrafts = {
+      "evidence:application-1": {
+        addressLine1: "remove",
+        addressLine2: "keep",
+      },
+      "evidence:application-2": {
+        addressLine1: "keep",
+        addressLine2: "remove",
+      },
+    };
+
+    clearFieldAnswers()(context, "evidence", ["addressLine1"]);
+    clearFieldAnswers()(context, "evidence", ["addressLine2"]);
+
+    const drafts = session.journeyDrafts as Record<string, Record<string, unknown>>;
+    expect(drafts["evidence:application-1"]).to.deep.equal({
+      addressLine2: "keep",
+    });
+    expect(drafts["evidence:application-2"]).to.deep.equal({
+      addressLine1: "keep",
+    });
+  });
 });

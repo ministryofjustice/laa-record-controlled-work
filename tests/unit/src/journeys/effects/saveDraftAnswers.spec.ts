@@ -4,6 +4,7 @@ import sinon from "sinon";
 import { saveDraftAnswers } from "#/journeys/effects.js";
 import { type EffectFunctionContext } from "@ministryofjustice/hmpps-forge/core/authoring";
 import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
+import { JourneyCode } from "#/journeys/JourneyCode.enum.js";
 
 describe("saveDraftAnswers()", () => {
   let getSession: sinon.SinonStub;
@@ -76,5 +77,26 @@ describe("saveDraftAnswers()", () => {
 
     const drafts = session.journeyDrafts as Record<string, Record<string, unknown>>;
     expect(drafts?.["editClientDetails:application-1"]?.ecf).to.equal("yes");
+  });
+
+  it("saves evidence drafts independently for each application", () => {
+    getRequestParam.onCall(0).returns("application-1");
+    getRequestParam.onCall(1).returns("application-2");
+    getAllAnswers.onCall(0).returns({ ecf: "yes" });
+    getAllAnswers.onCall(1).returns({ ecf: "no" });
+
+    saveDraftAnswers()(context, "evidence");
+    saveDraftAnswers()(context, "evidence");
+
+    const drafts = session.journeyDrafts as Record<string, Record<string, unknown>>;
+    expect(drafts["evidence:application-1"]).to.deep.equal({ ecf: "yes" });
+    expect(drafts["evidence:application-2"]).to.deep.equal({ ecf: "no" });
+  });
+
+  it("keeps the create-application journey key without an application ID", () => {
+    saveDraftAnswers()(context, JourneyCode.CREATE_APPLICATION);
+
+    const drafts = session.journeyDrafts as Record<string, Record<string, unknown>>;
+    expect(drafts[JourneyCode.CREATE_APPLICATION]).to.deep.equal({ ecf: "yes" });
   });
 });
