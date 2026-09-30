@@ -1,44 +1,30 @@
 import * as Sentry from "@sentry/node";
 
-import { BAD_REQUEST } from "#/lib/constants/http.js";
+export interface MetricAttributes extends Record<string, unknown> {
+  endpoint: string;
+  status?: number;
+}
 
 /**
- * Time a client operation and report its resolved HTTP status, if any.
- * @param endpoint - API operation name.
- * @param operation - Client operation to time.
- * @param isSuccess - Predicate for successful response statuses.
- * @returns The original client response.
+ * Record the elapsed time for an RCW API request.
+ * @param startTime - The timestamp returned by `start`.
+ * @param attributes - Attributes to attach to the Sentry metric.
  */
-export async function time<Response extends { status: number }>(
-  endpoint: string,
-  operation: () => Promise<Response>,
-  isSuccess: (status: number) => boolean = (status) => status < BAD_REQUEST,
-): Promise<Response> {
-  const startTime = performance.now();
-  let status: number | undefined;
-  const attributes: Record<string, number | string> = {
-    endpoint,
-    outcome: "error",
-  };
+export function duration(
+  startTime: number,
+  attributes: MetricAttributes,
+): void {
+  const elapsed = performance.now() - startTime;
+  Sentry.metrics.distribution("api_response_time", elapsed, {
+    attributes,
+    unit: "millisecond",
+  });
+}
 
-  try {
-    const response = await operation();
-    ({ status } = response);
-    attributes.outcome = isSuccess(response.status) ? "success" : "error";
-
-    return response;
-  } finally {
-    if (status !== undefined) {
-      attributes.status = status;
-    }
-
-    Sentry.metrics.distribution(
-      "api_response_time",
-      performance.now() - startTime,
-      {
-        attributes,
-        unit: "millisecond",
-      },
-    );
-  }
+/**
+ * Start timing an RCW API request.
+ * @returns The request start timestamp.
+ */
+export function start(): number {
+  return performance.now();
 }

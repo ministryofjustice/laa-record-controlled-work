@@ -29,15 +29,19 @@ export const closeIneligibleCase =
       sessionId: session?.id,
     });
 
-    const body = {
-      applicationState: "COMPLETED" as const,
-      eTag: context.getData<number>(CONTEXT_DATA_KEYS.applicationETag),
-    };
-    const response = await metrics.time(
-      "updateApplicationStatus",
-      async () =>
-        await deps.updateApplicationStatus(applicationID, body, options),
+    const startTime = metrics.start();
+    const response = await deps.updateApplicationStatus(
+      applicationID,
+      {
+        applicationState: "COMPLETED",
+        eTag: context.getData<number>(CONTEXT_DATA_KEYS.applicationETag),
+      },
+      options,
     );
+    metrics.duration(startTime, {
+      endpoint: "updateApplicationStatus",
+      status: response.status,
+    });
 
     if (response.status !== HTTP_STATUS.NO_CONTENT) {
       throw new Error("updateApplicationStatus did not return 204");
