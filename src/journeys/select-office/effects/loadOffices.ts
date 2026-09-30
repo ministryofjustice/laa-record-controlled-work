@@ -26,7 +26,6 @@ import { logger } from "#/logger.js";
 export const loadOffices =
   (deps: SelectOfficeEffectsDeps) => async (context: SelectOfficeContext) => {
     let response;
-    let startTime = 0;
     const firmCode = getFirmCodeFromSession(context);
     const laaAccounts =
       context.getSession()?.account?.idTokenClaims?.[
@@ -46,20 +45,17 @@ export const loadOffices =
             }
           : undefined,
       );
-      startTime = metrics.start();
-      response = await deps.getAllProviderOffices(firmCode, opts);
+      response = await metrics.time(
+        "getAllProviderOffices",
+        async () => await deps.getAllProviderOffices(firmCode, opts),
+        (status) => status === HTTP_STATUS.OK,
+      );
     } catch (error) {
-      metrics.duration(startTime, { endpoint: "getAllProviderOffices" });
       logger.error("Error fetching offices", error, {
         api: "getAllProviderOffices",
       });
       throw ApiResponseError.from(error);
     }
-
-    metrics.duration(startTime, {
-      endpoint: "getAllProviderOffices",
-      status: response.status,
-    });
 
     if (response.status !== HTTP_STATUS.OK) {
       logger.error(

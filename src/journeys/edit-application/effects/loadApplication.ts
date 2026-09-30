@@ -24,7 +24,6 @@ export const loadApplication =
   (deps: EditApplicationEffectsDeps) =>
   async (context: EditApplicationContext): Promise<void> => {
     let response;
-    let startTime = 0;
     try {
       const session = context.getSession();
       const applicationID = context.getRequestParam(PARAMS_KEYS.applicationID);
@@ -38,20 +37,16 @@ export const loadApplication =
         homeAccountId: session?.msal?.homeAccountId,
         sessionId: session?.id,
       });
-      startTime = metrics.start();
-      response = await deps.getApplication(applicationID, opts);
+      response = await metrics.time(
+        "getApplication",
+        async () => await deps.getApplication(applicationID, opts),
+      );
     } catch (error) {
-      metrics.duration(startTime, { endpoint: "getApplication" });
       logger.error("Error fetching application", error, {
         api: "getApplication",
       });
       throw ApiResponseError.from(error);
     }
-
-    metrics.duration(startTime, {
-      endpoint: "getApplication",
-      status: response.status,
-    });
 
     if (response.status !== HTTP_STATUS.OK) {
       logger.error(

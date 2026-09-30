@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/node";
 import { expect } from "chai";
 import { describe, it } from "mocha";
 import sinon from "sinon";
@@ -14,8 +15,10 @@ import {
   saveEligibilityAssessment,
 } from "#/api/eligibility/eligibility.service.js";
 import { getGetApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
-import { LoadEligibilityAssessmentError, SaveEligibilityAssessmentError } from "#/api/eligibility/eligibility.errors.js";
-
+import {
+  LoadEligibilityAssessmentError,
+  SaveEligibilityAssessmentError,
+} from "#/api/eligibility/eligibility.errors.js";
 
 describe("saveEligibilityAssessment", () => {
   const applicationId = "123e4567-e89b-12d3-a456-426614174000";
@@ -58,6 +61,7 @@ describe("saveEligibilityAssessment", () => {
   });
 
   it("returns a NotAuthenticatedError failure when the session cannot be authenticated", async () => {
+    const distributionStub = sinon.stub(Sentry.metrics, "distribution");
     sinon.stub(config.api, "useMockAccessToken").value(false);
 
     const result = await saveEligibilityAssessment(deps, {
@@ -69,6 +73,7 @@ describe("saveEligibilityAssessment", () => {
 
     expect(result.error).to.be.instanceOf(NotAuthenticatedError);
     expect(updateApplicationMeansStub.called).to.equal(false);
+    expect(distributionStub.notCalled).to.equal(true);
   });
 
   it("returns a SaveEligibilityAssessmentError failure when the RCW API does not return 204", async () => {
@@ -100,6 +105,7 @@ describe("saveEligibilityAssessment", () => {
   });
 
   it("returns a SaveEligibilityAssessmentError failure when the RCW API returns 409", async () => {
+    const distributionStub = sinon.stub(Sentry.metrics, "distribution");
     updateApplicationMeansStub.resolves({ data: {}, status: 409 });
     sinon.stub(logger, "error");
 
@@ -111,9 +117,20 @@ describe("saveEligibilityAssessment", () => {
     });
 
     expect(result.error).to.be.instanceOf(SaveEligibilityAssessmentError);
+    expect(
+      distributionStub.calledOnceWithMatch(
+        "api_response_time",
+        sinon.match.number,
+        {
+          attributes: { endpoint: "updateApplicationMeans", status: 409 },
+          unit: "millisecond",
+        },
+      ),
+    ).to.equal(true);
   });
 
   it("returns a SaveEligibilityAssessmentError failure when the RCW API call rejects", async () => {
+    const distributionStub = sinon.stub(Sentry.metrics, "distribution");
     const cause = new Error("network error");
     updateApplicationMeansStub.rejects(cause);
     sinon.stub(logger, "error");
@@ -129,13 +146,25 @@ describe("saveEligibilityAssessment", () => {
     expect((result.error as SaveEligibilityAssessmentError).cause).to.equal(
       cause,
     );
+    expect(
+      distributionStub.calledOnceWithMatch(
+        "api_response_time",
+        sinon.match.number,
+        {
+          attributes: { endpoint: "updateApplicationMeans" },
+          unit: "millisecond",
+        },
+      ),
+    ).to.equal(true);
   });
 
   it("defaults result to {} and forwards the full assessment as data when api_response is missing", async () => {
     updateApplicationMeansStub.resolves({ data: undefined, status: 204 });
 
     await saveEligibilityAssessment(deps, {
-      eligibilityAssessment: { level_of_help: "controlled_legal_representation" },
+      eligibilityAssessment: {
+        level_of_help: "controlled_legal_representation",
+      },
       homeAccountId: "home-account-id",
       applicationId,
       sessionId: "session-id",
@@ -427,6 +456,7 @@ describe("loadEligibilityAssessment", () => {
   });
 
   it("returns a NotAuthenticatedError failure when the session cannot be authenticated", async () => {
+    const distributionStub = sinon.stub(Sentry.metrics, "distribution");
     sinon.stub(config.api, "useMockAccessToken").value(false);
 
     const result = await loadEligibilityAssessment(deps, {
@@ -437,6 +467,7 @@ describe("loadEligibilityAssessment", () => {
 
     expect(result.error).to.be.instanceOf(NotAuthenticatedError);
     expect(getApplicationStub.called).to.equal(false);
+    expect(distributionStub.notCalled).to.equal(true);
   });
 
   it("returns a LoadEligibilityAssessmentError failure when the RCW API does not return 200", async () => {
