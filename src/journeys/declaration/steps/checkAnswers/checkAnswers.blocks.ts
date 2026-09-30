@@ -1,10 +1,11 @@
 import type {
+  BlockDefinition,
   ResolvableBoolean,
   ResolvableString,
 } from "@ministryofjustice/hmpps-forge/core/components";
 
 import { Answer } from "@ministryofjustice/hmpps-forge/core/authoring";
-import { GovUKSummaryList } from "@ministryofjustice/hmpps-forge/govuk-components";
+import { GovUKButton, GovUKButtonGroup, GovUKSummaryList } from "@ministryofjustice/hmpps-forge/govuk-components";
 import { t } from "i18next";
 
 import { AnswerKey } from "#/journeys/declaration/declaration.answers.js";
@@ -83,4 +84,27 @@ function summaryRow(args: SummaryRowArgs): SummaryRow {
     value,
     ...(visibleWhen === undefined ? {} : { visibleWhen }),
   };
+}
+
+/**
+ * Creates the confirm button group for the check-answers page.
+ *
+ * @returns A GOV.UK button group block definition.
+ */
+export function confirmButtonGroup(): BlockDefinition {
+  return GovUKButtonGroup({
+    buttons: [
+      GovUKButton({
+        buttonType: "submit",
+        text: t("journeys.declaration.confirm.confirmButton"),
+        value: "continue",
+      }),
+      GovUKButton({
+        buttonType: "submit",
+        classes: "govuk-button--secondary",
+        text: t("common.saveAndReturn"),
+        value: "return",
+      }),
+    ],
+  });
 }

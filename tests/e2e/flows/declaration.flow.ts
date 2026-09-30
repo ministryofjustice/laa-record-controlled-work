@@ -25,6 +25,6 @@ export const completeDeclaration = async (
   await page.getByRole("button", { name: "Continue" }).click();
   await expect(page).toHaveURL(`/cases/${applicationId}/declaration/check-answers`);
 
-  await page.getByRole("button", { name: "Confirm and continue" }).click();
+  await page.getByRole("button", { name: "Save and continue" }).click();
   await expect(page).toHaveURL(`/cases/${applicationId}/task-list`);
 };

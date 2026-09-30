@@ -1,6 +1,8 @@
 import {
+  Condition,
   Format,
   Params,
+  Post,
   redirect,
   step,
   type StepDefinition,
@@ -9,9 +11,9 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
 import { declarationEffects } from "#/journeys/declaration/declaration.effects.js";
-import { summaryList } from "#/journeys/declaration/steps/checkAnswers/checkAnswers.blocks.js";
+import { summaryList, confirmButtonGroup } from "#/journeys/declaration/steps/checkAnswers/checkAnswers.blocks.js";
 import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
-import { heading, submitButton } from "#/journeys/shared.blocks.js";
+import { heading } from "#/journeys/shared.blocks.js";
 import { t } from "#/lib/i18n.js";
 
 const CHECK_ANSWERS = t("journeys.declaration.checkAnswers.title");
@@ -23,9 +25,9 @@ const CHECK_ANSWERS = t("journeys.declaration.checkAnswers.title");
  */
 export function checkAnswersStep(): StepDefinition {
   return step({
-    blocks: [heading(CHECK_ANSWERS), summaryList(), submitButton()],
+    blocks: [heading(CHECK_ANSWERS), summaryList(), confirmButtonGroup()],
     code: "declaration-check-answers",
-    onSubmission: [SubmitApplicationThenGotoTaskList()],
+    onSubmission: [SubmitApplicationThenGotoTaskList(), ReturnToTaskList()],
     path: "/check-answers",
     title: CHECK_ANSWERS,
   });
@@ -42,9 +44,25 @@ function SubmitApplicationThenGotoTaskList(): SubmitHook {
       effects: [declarationEffects.submitSignedDeclaration()],
       next: [redirectToTaskList],
     },
-    validate: false,
+    when: Post("action").match(Condition.Equals("continue")),
   });
 }
+
+/**
+ * Creates the submission hook that returns the user to the task list without submitting the application.
+ *
+ * @returns A Forge submission hook.
+ */
+function ReturnToTaskList(): SubmitHook {
+  return submit({
+    onAlways: {
+      next: [redirectToTaskList],
+    },
+    when: Post("action").match(Condition.Equals("return")),
+  });
+}
+
+
 
 const redirectToTaskList = redirect({
   goto: Format("/cases/%1/task-list", Params(PARAMS_KEYS.applicationID)),

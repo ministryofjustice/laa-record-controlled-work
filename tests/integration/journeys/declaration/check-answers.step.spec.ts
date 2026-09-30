@@ -9,6 +9,8 @@ import { declarationEffectRegistry } from "#/journeys/declaration/declaration.ef
 import { DeclarationJourney } from "#/journeys/declaration/declaration.journey.js";
 import sinon from "sinon";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
+import { getBlockWithContent } from "#tests/integration/utils/getBlockWithContent.helper.js";
+import { render } from "nunjucks";
 
 describe("Check answers step", () => {
   const uuid = faker.string.uuid();
@@ -80,17 +82,41 @@ describe("Check answers step", () => {
       expect(evidenceRow?.value.text).to.contain("1 June 2024");
     });
 
-    it("renders the submit button", () => {
-      expect(submitButton.properties.text).to.equal("Save and continue");
+    it("shows the expected 'Save and continue' button", () => {
+      const block = getBlockWithContent(renderResult, "govukButtonGroup", "continue");
+      expect(block).to.exist;
+    });
+
+    it("shows the expected 'Save and return later' button", () => {
+      const block = getBlockWithContent(renderResult, "govukButtonGroup", "return");
+      expect(block).to.exist;
     });
   });
 
   describe("POST /cases/:applicationId/declaration/check-answers", () => {
-    it("redirects to the confirmation step", async () => {
+    it("redirects to the task list on continue", async () => {
       const result = await client.post(
         `/cases/${uuid}/declaration/check-answers`,
         {
           session,
+          body: {
+            action: "continue",
+          },
+        },
+      );
+      expect(result.type).to.equal("redirect");
+      const redirectResult = result as TestRedirectResult;
+      expect(redirectResult.url).to.equal(`/cases/${uuid}/task-list`);
+    });
+
+        it("redirects to the task list on return", async () => {
+      const result = await client.post(
+        `/cases/${uuid}/declaration/check-answers`,
+        {
+          session,
+          body: {
+            action: "return",
+          },
         },
       );
       expect(result.type).to.equal("redirect");
