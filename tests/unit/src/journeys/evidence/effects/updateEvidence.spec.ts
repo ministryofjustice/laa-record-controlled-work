@@ -121,6 +121,42 @@ describe("updateEvidence", () => {
     expect(updateApplicationEvidenceStub.called).to.equal(false);
   });
 
+  it("submits only the requested application's evidence draft", async () => {
+    updateApplicationEvidenceStub.resolves({ status: 204 });
+    getSession.returns({
+      id: "session-id",
+      journeyDrafts: {
+        [`${journeyCode}:${applicationId}`]: incomeAnswers,
+        [`${journeyCode}:another-application`]: exemptionAnswers,
+      },
+      msal: { homeAccountId: "home-account-id" },
+    });
+
+    await updateEvidence(deps)(context, journeyCode);
+
+    expect(updateApplicationEvidenceStub.calledOnce).to.equal(true);
+    expect(updateApplicationEvidenceStub.firstCall.args[0]).to.equal(applicationId);
+    expect(
+      updateApplicationEvidenceStub.firstCall.args[1].incomeEvidenceChecklist.employedEvidence,
+    ).to.deep.equal(incomeAnswers.employedEvidence);
+    expect(
+      updateApplicationEvidenceStub.firstCall.args[1].evidenceExemptionCode,
+    ).to.be.undefined;
+  });
+
+  it("does not submit a legacy unscoped draft for an application", async () => {
+    updateApplicationEvidenceStub.resolves({ status: 204 });
+    getSession.returns({
+      id: "session-id",
+      journeyDrafts: { [journeyCode]: incomeAnswers },
+      msal: { homeAccountId: "home-account-id" },
+    });
+
+    await updateEvidence(deps)(context, journeyCode);
+
+    expect(updateApplicationEvidenceStub.called).to.equal(false);
+  });
+
   it("throws ApiResponseError when currentApplicationId is missing from session", async () => {
     getRequestParam.returns(undefined);
     sinon.stub(logger, "error");
