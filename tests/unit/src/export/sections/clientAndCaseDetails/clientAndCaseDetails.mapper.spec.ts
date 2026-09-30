@@ -25,8 +25,15 @@ function makeApplication(
   });
 }
 
+function rowValue(
+  section: ReturnType<typeof toClientAndCaseDetailsSection>,
+  key: string,
+) {
+  return section.rows.find((row) => row.key.text === key)?.value;
+}
+
 describe("toClientAndCaseDetailsSection", () => {
-  it("maps and normalises the client and case details", () => {
+  it("maps client and case details to translated summary rows", () => {
     const section = toClientAndCaseDetailsSection(
       makeApplication({
         clientDetails: {
@@ -41,40 +48,46 @@ describe("toClientAndCaseDetailsSection", () => {
       }),
     );
 
-    expect(section).to.deep.equal({
-      accessedLegalAidBefore: true,
-      address: [],
-      confirmMerits: null,
-      dateOfBirth: "1 January 1982",
-      ecf: false,
-      evidenceCaseIsInScope: null,
-      firstName: "Jane",
-      lastName: "Doe",
-      niNumber: "AA123456C", // gitleaks:allow - fake NI number used to test data mapping
-      protectThemselfOrChildren: null,
-      sameMatterDetails: null,
-      transitionalEuArrangements: null,
-      typeOfFamilyLaw: null,
+    expect(section.heading).to.equal("Client and case details");
+    expect(rowValue(section, "Accessed legal aid before")).to.deep.equal({
+      text: "Yes",
     });
+    expect(rowValue(section, "First name")).to.deep.equal({ text: "Jane" });
+    expect(rowValue(section, "Last name")).to.deep.equal({ text: "Doe" });
+    expect(rowValue(section, "Date of birth")).to.deep.equal({
+      text: "1 January 1982",
+    });
+    expect(rowValue(section, "National Insurance number")).to.deep.equal({
+      text: "AA123456C", // gitleaks:allow - fake NI number used to test data mapping
+    });
+    expect(rowValue(section, "Address")).to.deep.equal({ html: "" });
   });
 
-  it("maps no prior legal aid to false", () => {
+  it("maps no prior legal aid to the translated answer", () => {
     const section = toClientAndCaseDetailsSection(
       makeApplication({ scopingQuestions: { priorLegalAid: "no" } }),
     );
 
-    expect(section.accessedLegalAidBefore).to.equal(false);
-    expect(section.sameMatterDetails).to.equal(null);
+    expect(rowValue(section, "Accessed legal aid before")).to.deep.equal({
+      text: "No",
+    });
+    expect(rowValue(section, "For the same matter within 6 months")).to.equal(
+      undefined,
+    );
   });
 
-  it("maps missing or unrecognised prior legal aid to null", () => {
+  it("maps missing or unrecognised prior legal aid to an empty answer", () => {
     for (const scopingQuestions of [null, {}, { priorLegalAid: "yes" }]) {
       const section = toClientAndCaseDetailsSection(
         makeApplication({ scopingQuestions }),
       );
 
-      expect(section.accessedLegalAidBefore).to.equal(null);
-      expect(section.sameMatterDetails).to.equal(null);
+      expect(rowValue(section, "Accessed legal aid before")).to.deep.equal({
+        text: "",
+      });
+      expect(rowValue(section, "For the same matter within 6 months")).to.equal(
+        undefined,
+      );
     }
   });
 
@@ -86,35 +99,70 @@ describe("toClientAndCaseDetailsSection", () => {
       }),
     );
 
-    expect(section.accessedLegalAidBefore).to.equal(true);
-    expect(section.sameMatterDetails).to.deep.equal({
-      reasonForReapplication: "Further work is required",
-      sameMatterWithin6Months: true,
+    expect(rowValue(section, "Accessed legal aid before")).to.deep.equal({
+      text: "Yes",
+    });
+    expect(rowValue(section, "For the same matter within 6 months")).to.deep.equal({
+      text: "Yes",
+    });
+    expect(rowValue(section, "Reason for reapplication")).to.deep.equal({
+      text: "Further work is required",
     });
   });
 
   for (const reasonForReapplication of [undefined, null, "", "   "]) {
-    it("keeps same-matter details but omits a blank reason", () => {
+    it("includes same-matter row and omits a blank reason", () => {
       const application = makeApplication({
         reasonForReapplication,
         scopingQuestions: { priorLegalAid: "yesSameMatter" },
       });
       application.reasonForReapplication = reasonForReapplication;
 
-      expect(
-        toClientAndCaseDetailsSection(application).sameMatterDetails,
-      ).to.deep.equal({
-        reasonForReapplication: null,
-        sameMatterWithin6Months: false,
+      const section = toClientAndCaseDetailsSection(application);
+
+      expect(rowValue(section, "For the same matter within 6 months")).to.deep.equal({
+        text: "No",
       });
+      expect(rowValue(section, "Reason for reapplication")).to.equal(
+        undefined,
+      );
     });
   }
 
-  it("normalises a missing NI number to null", () => {
+  it("includes the NI number row with an empty value when missing", () => {
     const section = toClientAndCaseDetailsSection(
       makeApplication({ clientDetails: { niNumber: undefined } }),
     );
 
-    expect(section.niNumber).to.equal(null);
+    expect(rowValue(section, "National Insurance number")).to.deep.equal({
+      text: "",
+    });
+  });
+
+  it("escapes address lines before rendering them as HTML", () => {
+    const section = toClientAndCaseDetailsSection(
+      makeApplication({
+        clientDetails: {
+          address: {
+            addressLine1: "<script>",
+            addressLine2: null,
+            addressLine3: null,
+            addressLine4: null,
+            county: null,
+            country: "GB",
+            createdAt: null,
+            id: null,
+            modifiedAt: null,
+            postCode: null,
+            townOrCity: null,
+          },
+          hasFixedAddress: true,
+        },
+      }),
+    );
+
+    expect(rowValue(section, "Address")).to.deep.include({
+      html: "&lt;script&gt;",
+    });
   });
 });

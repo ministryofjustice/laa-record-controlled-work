@@ -57,7 +57,13 @@ describe("toExportApplicationViewModel", () => {
 
     const { clientAndCaseDetails } = toExportApplicationViewModel(application);
 
-    expect(clientAndCaseDetails.firstName).to.equal("Jane");
-    expect(clientAndCaseDetails.lastName).to.equal("Doe");
+    expect(clientAndCaseDetails.rows).to.deep.include({
+      key: { text: "First name" },
+      value: { text: "Jane" },
+    });
+    expect(clientAndCaseDetails.rows).to.deep.include({
+      key: { text: "Last name" },
+      value: { text: "Doe" },
+    });
   });
 });

@@ -14,24 +14,62 @@ const formattedAddress = [
   faker.location.city(),
   faker.location.zipCode(),
 ];
+const dateOfBirth = faker.date
+  .birthdate({ max: 90, min: 18, mode: "age" })
+  .toISOString()
+  .slice(0, 10);
+const formattedDateOfBirth = new Intl.DateTimeFormat("en-GB", {
+  day: "numeric",
+  month: "long",
+  timeZone: "UTC",
+  year: "numeric",
+}).format(new Date(dateOfBirth));
+const firstName = faker.person.firstName();
+const lastName = faker.person.lastName();
+const typeOfFamilyLaw = faker.lorem.words(3);
+const confirmMerits = faker.lorem.sentence();
+const evidenceCaseIsInScope = faker.lorem.sentence();
+const reasonForReapplication = faker.lorem.sentence();
+const niNumber = `AA${faker.string.numeric(6)}C`;
 
 const clientAndCaseDetails: ClientAndCaseDetailsSection = {
-  accessedLegalAidBefore: false,
-  address: formattedAddress,
-  confirmMerits: faker.lorem.sentence(),
-  dateOfBirth: faker.date.birthdate({ max: 90, min: 18, mode: "age" }).toISOString().slice(0, 10),
-  ecf: false,
-  evidenceCaseIsInScope: faker.lorem.sentence(),
-  firstName: faker.person.firstName(),
-  lastName: faker.person.lastName(),
-  niNumber: `AA${faker.string.numeric(6)}C`,
-  protectThemselfOrChildren: "Yes",
-  sameMatterDetails: {
-    reasonForReapplication: faker.lorem.sentence(),
-    sameMatterWithin6Months: true,
-  },
-  transitionalEuArrangements: "No",
-  typeOfFamilyLaw: faker.lorem.words(3),
+  heading: "Client and case details",
+  rows: [
+    { key: { text: "ECF" }, value: { text: "No" } },
+    { key: { text: "Type of family law" }, value: { text: typeOfFamilyLaw } },
+    {
+      key: {
+        text: "Transitional EU arrangements or an international maintenance agreement?",
+      },
+      value: { text: "No" },
+    },
+    {
+      key: { text: "Legal aid to protect themself or their children?" },
+      value: { text: "Yes" },
+    },
+    {
+      key: { text: "Evidence case is in scope" },
+      value: { text: evidenceCaseIsInScope },
+    },
+    { key: { text: "Confirm merits" }, value: { text: confirmMerits } },
+    { key: { text: "Accessed legal aid before" }, value: { text: "No" } },
+    {
+      key: { text: "For the same matter within 6 months" },
+      value: { text: "Yes" },
+    },
+    {
+      key: { text: "Reason for reapplication" },
+      value: { text: reasonForReapplication },
+    },
+    { key: { text: "First name" }, value: { text: firstName } },
+    { key: { text: "Last name" }, value: { text: lastName } },
+    { key: { text: "Date of birth" }, value: { text: formattedDateOfBirth } },
+    { key: { text: "National Insurance number" }, value: { text: niNumber } },
+    {
+      key: { text: "Address" },
+      value: { html: formattedAddress.join("<br>") },
+    },
+  ],
 };
 
 function createViewApp() {
@@ -95,40 +133,34 @@ describe("export application view", () => {
     expect(response.text).to.include("ECF");
     expect(response.text).to.include("No");
     expect(response.text).to.include("Type of family law");
-    expect(response.text).to.include(clientAndCaseDetails.typeOfFamilyLaw!);
+    expect(response.text).to.include(typeOfFamilyLaw);
     expect(response.text).to.include(
       "Transitional EU arrangements or an international maintenance agreement?",
     );
-    expect(response.text).to.include(
-      clientAndCaseDetails.transitionalEuArrangements!,
-    );
+    expect(response.text).to.include("No");
     expect(response.text).to.include(
       "Legal aid to protect themself or their children",
     );
-    expect(response.text).to.include(
-      clientAndCaseDetails.protectThemselfOrChildren!,
-    );
+    expect(response.text).to.include("Yes");
     expect(response.text).to.include("Evidence case is in scope");
-    expect(response.text).to.include(
-      clientAndCaseDetails.evidenceCaseIsInScope!,
-    );
+    expect(response.text).to.include(evidenceCaseIsInScope);
     expect(response.text).to.include("Confirm merits");
-    expect(response.text).to.include(clientAndCaseDetails.confirmMerits!);
+    expect(response.text).to.include(confirmMerits);
     expect(response.text).to.include("Accessed legal aid before");
     expect(response.text).to.include("For the same matter within 6 months");
     expect(response.text).to.include("Yes");
     expect(response.text).to.include("Reason for reapplication");
     expect(response.text).to.include(
-      clientAndCaseDetails.sameMatterDetails!.reasonForReapplication!,
+      reasonForReapplication,
     );
     expect(response.text).to.include("First name");
-    expect(response.text).to.include(clientAndCaseDetails.firstName);
+    expect(response.text).to.include(firstName);
     expect(response.text).to.include("Last name");
-    expect(response.text).to.include(clientAndCaseDetails.lastName);
+    expect(response.text).to.include(lastName);
     expect(response.text).to.include("Date of birth");
-    expect(response.text).to.include(clientAndCaseDetails.dateOfBirth);
+    expect(response.text).to.include(formattedDateOfBirth);
     expect(response.text).to.include("National Insurance number");
-    expect(response.text).to.include(clientAndCaseDetails.niNumber!);
+    expect(response.text).to.include(niNumber);
     expect(response.text).to.include("Address");
     expect(response.text).to.include(formattedAddress[0]);
     expect(response.text).to.include(formattedAddress[1]);
