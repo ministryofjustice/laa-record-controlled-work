@@ -56,23 +56,29 @@ export class NoAvailableOfficesError extends DomainError {
   }
 }
 
-export class UndefinedAnswerError extends Error {
-  constructor(key: string) {
-    super(`No answer value found for key "${key}"`);
-    this.name = "UndefinedAnswerError";
+export class UndefinedAnswerError extends DomainError {
+  public readonly name = "UndefinedAnswerError";
+
+  constructor(key: string, cause?: unknown) {
+    super(`No answer value found for key "${key}"`, cause);
   }
 }
 
-export class UndefinedJourneyError extends Error {
-  constructor(journeyCode: string) {
-    super(`No Journey Draft value found for journeyCode "${journeyCode}"`);
-    this.name = "UndefinedJourneyError";
+export class UndefinedJourneyError extends DomainError {
+  public readonly name = "UndefinedJourneyError";
+
+  constructor(journeyCode: string, cause?: unknown) {
+    super(
+      `No Journey Draft value found for journeyCode "${journeyCode}"`,
+      cause,
+    );
   }
 }
 
-export class UndefinedParamError extends Error {
-  constructor(key: string) {
-    super(`No URL param value found for key "${key}"`);
-    this.name = "UndefinedParamError";
+export class UndefinedParamError extends DomainError {
+  public readonly name = "UndefinedParamError";
+
+  constructor(key: string, cause?: unknown) {
+    super(`No URL param value found for key "${key}"`, cause);
   }
 }
