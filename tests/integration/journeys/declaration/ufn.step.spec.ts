@@ -77,11 +77,42 @@ describe("Declaration UFN step", () => {
   describe(`POST /cases/:applicationId/declaration/ufn`, () => {
     const uuid = faker.string.uuid();
 
+    it("should show validation error if nothing is entered", async () => {
+      const result = (await client.post(`/cases/${uuid}/declaration/ufn`, {
+        body: {
+          action: "continue",
+        },
+      }));
+
+      expect(result.type).to.equal("render");
+      const renderResult = result as TestRenderResult;
+      expect(renderResult.context.showValidationFailures).to.equal(true);
+      expect(renderResult.getValidationErrorsByFieldCode("declarationUfn")[0].message).to.equal(
+        "You must enter a valid UFN"
+      );
+    });
+
+    it("should show validation error if an invalid UFN is entered", async () => {
+      const result = (await client.post(`/cases/${uuid}/declaration/ufn`, {
+        body: {
+          action: "continue",
+          declarationUfn: "invalid-ufn",
+        },
+      }));
+
+      expect(result.type).to.equal("render");
+      const renderResult = result as TestRenderResult;
+      expect(renderResult.context.showValidationFailures).to.equal(true);
+      expect(renderResult.getValidationErrorsByFieldCode("declarationUfn")[0].message).to.equal(
+        "You must enter a valid UFN in the following format 123456/123 as it matches on SABC."
+      );
+    });
+
     it("redirects to the check answers step when 'continue' is clicked", async () => {
       const result = (await client.post(`/cases/${uuid}/declaration/ufn`, {
         body: {
           action: "continue",
-          declarationUfn: ["123456"],
+          declarationUfn: "123456/001",
         },
       })) as TestRedirectResult;
 

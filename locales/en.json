@@ -505,7 +505,8 @@
         "title": "What is the unique file number (UFN) for this case?",
         "hint": "For example, 160726/001",
         "validation": {
-          "required": "You must enter a valid UFN in the following format 123456/123 as it matches on SABC."
+          "required": "You must enter a valid UFN",
+          "format": "You must enter a valid UFN in the following format 123456/123 as it matches on SABC."
         }
       },
       "checkAnswers": {

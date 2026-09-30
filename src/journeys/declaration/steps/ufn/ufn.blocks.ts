@@ -14,6 +14,8 @@ import {
 import { AnswerKey } from "#/journeys/declaration/declaration.answers.js";
 import { t } from "#/lib/i18n.js";
 
+const UFN_REGEX = "^[0-9]{6}\/[0-9]{3}$";
+
 /**
  * Creates the continue and return buttons for the declaration journey.
  * @returns A configured GOV.UK button group block.
@@ -56,6 +58,10 @@ export function ufnInput(): GovUKTextInput {
       validation({
         condition: Self().match(Condition.IsRequired()),
         message: t("journeys.declaration.ufn.validation.required"),
+      }),
+      validation({
+        condition: Self().match(Condition.String.MatchesRegex(UFN_REGEX)),
+        message: t("journeys.declaration.ufn.validation.format"),
       }),
     ],
   });
