@@ -49,6 +49,7 @@ describe("CreateApplicationEffect", () => {
           reasonForYes: "here is a reason",
           ukTownOrCity: "Manchester",
         },
+        anotherJourney: { keep: "yes" },
       },
       selectedOffice: {
         address: "123 Test Street, Manchester, A12 3BC",
@@ -82,6 +83,12 @@ describe("CreateApplicationEffect", () => {
         applicationId,
       ),
     ).to.equal(true);
+
+    const session = getSession.firstCall.returnValue as {
+      journeyDrafts: Record<string, unknown>;
+    };
+    expect(session.journeyDrafts[journeyCode]).to.be.undefined;
+    expect(session.journeyDrafts.anotherJourney).to.deep.equal({ keep: "yes" });
   });
 
   it("returns an ApiResponseError when createApplication responds with non-201", async () => {
@@ -97,6 +104,11 @@ describe("CreateApplicationEffect", () => {
     } catch (error) {
       expect(error).to.be.instanceOf(ApiResponseError);
     }
+
+    const session = getSession.firstCall.returnValue as {
+      journeyDrafts: Record<string, unknown>;
+    };
+    expect(session.journeyDrafts[journeyCode]).to.exist;
   });
 
   it("returns an ApiResponseError when createApplication rejects", async () => {
@@ -111,6 +123,11 @@ describe("CreateApplicationEffect", () => {
       const apiError = error as ApiResponseError;
       expect(apiError.cause).to.equal(cause);
     }
+
+    const session = getSession.firstCall.returnValue as {
+      journeyDrafts: Record<string, unknown>;
+    };
+    expect(session.journeyDrafts[journeyCode]).to.exist;
   });
 
   it("returns an ApiValidationError when createApplication returns no application id", async () => {
@@ -125,6 +142,11 @@ describe("CreateApplicationEffect", () => {
     } catch (error) {
       expect(error).to.be.instanceOf(ApiValidationError);
     }
+
+    const session = getSession.firstCall.returnValue as {
+      journeyDrafts: Record<string, unknown>;
+    };
+    expect(session.journeyDrafts[journeyCode]).to.exist;
   });
 
   it("returns an ApiResponseError with ApiValidationError cause when selected office is missing", async () => {

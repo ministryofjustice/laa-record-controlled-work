@@ -274,12 +274,34 @@ describe("Check answers step", () => {
     });
 
     it("redirects to the confirmation step", async () => {
+      const testSession = {
+        ...session,
+        journeyDrafts: { ...session.journeyDrafts },
+      };
       const result = await client.post("/cases/new/check-answers", {
-        session,
+        session: testSession,
       });
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
       expect(redirectResult.url).to.equal(`/cases/${uuid}/task-list`);
+    });
+
+    it("starts a fresh application journey after successful creation", async () => {
+      const testSession = {
+        ...session,
+        journeyDrafts: { ...session.journeyDrafts },
+      };
+
+      const postResult = await client.post("/cases/new/check-answers", {
+        session: testSession,
+      });
+      expect(postResult.type).to.equal("redirect");
+
+      const getResult = await client.get("/cases/new/provider-declaration", {
+        session: testSession,
+      });
+      expect(getResult.type).to.equal("render");
+      expect(testSession.journeyDrafts.createApplication).to.be.undefined;
     });
 
     it("submits no address when client has no fixed address", async () => {
