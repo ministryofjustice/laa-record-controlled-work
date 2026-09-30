@@ -12,7 +12,7 @@ import {
 
 import { declarationEffects } from "#/journeys/declaration/declaration.effects.js";
 import {
-  confirmButtonGroup,
+  submitButtonGroup,
   summaryList,
 } from "#/journeys/declaration/steps/checkAnswers/checkAnswers.blocks.js";
 import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
@@ -28,7 +28,7 @@ const CHECK_ANSWERS = t("journeys.declaration.checkAnswers.title");
  */
 export function checkAnswersStep(): StepDefinition {
   return step({
-    blocks: [heading(CHECK_ANSWERS), summaryList(), confirmButtonGroup()],
+    blocks: [heading(CHECK_ANSWERS), summaryList(), submitButtonGroup()],
     code: "declaration-check-answers",
     onSubmission: [SubmitApplicationThenGotoTaskList(), ReturnToTaskList()],
     path: "/check-answers",

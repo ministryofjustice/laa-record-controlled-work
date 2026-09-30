@@ -42,16 +42,16 @@ interface SummaryRowArgs {
 }
 
 /**
- * Creates the confirm button group for the check-answers page.
+ * Creates the submit button group for the check-answers page.
  *
  * @returns A GOV.UK button group block definition.
  */
-export function confirmButtonGroup(): BlockDefinition {
+export function submitButtonGroup(): BlockDefinition {
   return GovUKButtonGroup({
     buttons: [
       GovUKButton({
         buttonType: "submit",
-        text: t("journeys.declaration.confirm.confirmButton"),
+        text: t("common.submit"),
         value: "continue",
       }),
       GovUKButton({
