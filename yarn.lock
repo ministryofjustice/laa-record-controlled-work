@@ -23,7 +23,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@azure/msal-node@npm:^6.0.0":
+"@azure/msal-node@npm:^6.0.1":
   version: 6.0.1
   resolution: "@azure/msal-node@npm:6.0.1"
   dependencies:
@@ -5109,7 +5109,7 @@ __metadata:
   resolution: "laa-record-controlled-work@workspace:."
   dependencies:
     "@axe-core/playwright": "npm:^4.13.0"
-    "@azure/msal-node": "npm:^6.0.0"
+    "@azure/msal-node": "npm:^6.0.1"
     "@faker-js/faker": "npm:^10.6.0"
     "@j178/prek": "npm:^0.5.3"
     "@ministryofjustice/frontend": "npm:11.1.0"
