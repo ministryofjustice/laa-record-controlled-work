@@ -20,11 +20,13 @@ import {
 import { mapAvailableOffices } from "#/journeys/select-office/mappers/mapAvailableOffices.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { PDA_MSW_LAA_ACCOUNTS_HEADER } from "#/lib/constants/pda.js";
+import * as metrics from "#/lib/metrics.js";
 import { logger } from "#/logger.js";
 
 export const loadOffices =
   (deps: SelectOfficeEffectsDeps) => async (context: SelectOfficeContext) => {
     let response;
+    let startTime = 0;
     const firmCode = getFirmCodeFromSession(context);
     const laaAccounts =
       context.getSession()?.account?.idTokenClaims?.[
@@ -44,13 +46,20 @@ export const loadOffices =
             }
           : undefined,
       );
+      startTime = metrics.start();
       response = await deps.getAllProviderOffices(firmCode, opts);
     } catch (error) {
+      metrics.duration(startTime, { endpoint: "getAllProviderOffices" });
       logger.error("Error fetching offices", error, {
         api: "getAllProviderOffices",
       });
       throw ApiResponseError.from(error);
     }
+
+    metrics.duration(startTime, {
+      endpoint: "getAllProviderOffices",
+      status: response.status,
+    });
 
     if (response.status !== HTTP_STATUS.OK) {
       logger.error(

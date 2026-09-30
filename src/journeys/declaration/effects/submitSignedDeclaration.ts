@@ -11,6 +11,7 @@ import {
 } from "#/journeys/errors.js";
 import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
+import * as metrics from "#/lib/metrics.js";
 import { logger } from "#/logger.js";
 
 import type {
@@ -51,7 +52,7 @@ export const submitSignedDeclaration =
     }
 
     let response: updateApplicationDeclarationResponse;
-
+    let startTime = 0;
     try {
       const body = {
         dateSigned: date,
@@ -65,21 +66,28 @@ export const submitSignedDeclaration =
         sessionId: session.id,
       });
 
+      startTime = metrics.start();
       response = await deps.updateApplicationDeclaration(
         applicationId,
         body,
         opts,
       );
     } catch (error) {
+      metrics.duration(startTime, { endpoint: "updateApplicationDeclaration" });
       logger.error("Failed to update application declaration", error, {
         api: "updateApplicationDeclaration",
       });
       throw ApiResponseError.from(error);
     }
 
+    metrics.duration(startTime, {
+      endpoint: "updateApplicationDeclaration",
+      status: response.status,
+    });
+
     if (response.status !== HTTP_STATUS.NO_CONTENT) {
       const error = new ApiResponseError();
-      logger.error("createApplication did not return 204", error, {
+      logger.error("updateApplicationDeclaration did not return 204", error, {
         api: "updateApplicationDeclaration",
         authHeaders: getAuthDebugHeaders(response.headers),
         data: null,

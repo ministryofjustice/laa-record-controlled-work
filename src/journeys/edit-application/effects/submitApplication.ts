@@ -9,6 +9,7 @@ import { ApplicationState } from "#/api/clients/rcw/model/applicationState.zod.g
 import { getAuthDebugHeaders } from "#/auth/auth.debug.js";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
+import * as metrics from "#/lib/metrics.js";
 import { logger } from "#/logger.js";
 // TODO: etag not currently being returned from rcw api, so hardcoding for now.
 // Once rcw api is updated to return etag, this can be removed and the etag can be retrieved from the application data in context.
@@ -18,7 +19,7 @@ export const submitApplication =
   (deps: EditApplicationEffectsDeps) =>
   async (context: EditApplicationContext): Promise<void> => {
     let response;
-
+    let startTime = 0;
     try {
       const session = context.getSession();
       const { id } = context.getData(CONTEXT_DATA_KEYS.application);
@@ -27,17 +28,24 @@ export const submitApplication =
         sessionId: session?.id,
       });
 
+      startTime = metrics.start();
       response = await deps.updateApplicationStatus(
         id,
         { applicationState: ApplicationState.enum.COMPLETED, eTag },
         opts,
       );
     } catch (error) {
+      metrics.duration(startTime, { endpoint: "updateApplicationStatus" });
       logger.error("Error submitting application", error, {
         api: "updateApplicationStatus",
       });
       throw ApiResponseError.from(error);
     }
+
+    metrics.duration(startTime, {
+      endpoint: "updateApplicationStatus",
+      status: response.status,
+    });
 
     if (response.status !== HTTP_STATUS.NO_CONTENT) {
       logger.error(

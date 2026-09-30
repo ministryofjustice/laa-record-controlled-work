@@ -9,6 +9,7 @@ import {
   PARAMS_KEYS,
 } from "#/journeys/journey.constants.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
+import * as metrics from "#/lib/metrics.js";
 
 export const closeIneligibleCase =
   (deps: EditApplicationEffectsDeps) =>
@@ -27,6 +28,8 @@ export const closeIneligibleCase =
       homeAccountId: session?.msal?.homeAccountId,
       sessionId: session?.id,
     });
+
+    const startTime = metrics.start();
     const response = await deps.updateApplicationStatus(
       applicationID,
       {
@@ -35,6 +38,10 @@ export const closeIneligibleCase =
       },
       options,
     );
+    metrics.duration(startTime, {
+      endpoint: "updateApplicationStatus",
+      status: response.status,
+    });
 
     if (response.status !== HTTP_STATUS.NO_CONTENT) {
       throw new Error("updateApplicationStatus did not return 204");
