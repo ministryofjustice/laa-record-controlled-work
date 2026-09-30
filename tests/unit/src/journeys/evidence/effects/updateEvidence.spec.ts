@@ -47,7 +47,7 @@ describe("updateEvidence", () => {
     deps = { updateApplicationEvidence: updateApplicationEvidenceStub };
     getSession = sinon.stub().returns({
       id: "session-id",
-      journeyDrafts: { [journeyCode]: incomeAnswers },
+      journeyDrafts: { [`${journeyCode}:${applicationId}`]: incomeAnswers },
       msal: { homeAccountId: "home-account-id" },
     });
     getRequestParam = sinon.stub().returns(applicationId);
@@ -90,7 +90,7 @@ describe("updateEvidence", () => {
     beforeEach(() => {
       getSession.returns({
         id: "session-id",
-        journeyDrafts: { [journeyCode]: exemptionAnswers },
+        journeyDrafts: { [`${journeyCode}:${applicationId}`]: exemptionAnswers },
         msal: { homeAccountId: "home-account-id" },
       });
     });
@@ -172,7 +172,9 @@ describe("updateEvidence", () => {
   it("throws ApiResponseError when doYouHaveEvidence has an unexpected value", async () => {
     getSession.returns({
       id: "session-id",
-      journeyDrafts: { [journeyCode]: { doYouHaveEvidence: "maybe" } },
+      journeyDrafts: {
+        [`${journeyCode}:${applicationId}`]: { doYouHaveEvidence: "maybe" },
+      },
       msal: { homeAccountId: "home-account-id" },
     });
     sinon.stub(logger, "warn");
