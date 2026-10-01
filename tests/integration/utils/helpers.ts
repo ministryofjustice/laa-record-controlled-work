@@ -15,7 +15,6 @@ import { mojComponents } from "@ministryofjustice/hmpps-forge/moj-components";
 import { autocomplete } from "#/journeys/components/autocomplete/autocomplete.component.js";
 import type { CreateApplicationEffectsDeps } from "#/journeys/create-application/create-application.types.js";
 import { createApplicationTransformersRegistry } from "#/journeys/create-application/create-application.transformers.js";
-import { JourneyEffectsImplementations } from "#/journeys/effects.js";
 
 
 /**
@@ -58,7 +57,6 @@ export function createForgeTestClient<TDeps>(
     .registerGlobalComponents(mojComponents)
     .registerGlobalComponents([autocomplete])
     .registerGlobalFunctions(nunjucksFunctions)
-    .registerGlobalFunctions(JourneyEffectsImplementations)
     .registerPackage(testPackage, overrides?.dependencies)
     .createClient();
 }

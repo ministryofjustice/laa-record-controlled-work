@@ -1,5 +1,4 @@
 import type { EffectFunctionContext } from "@ministryofjustice/hmpps-forge/core";
-import type { Session, SessionData } from "express-session";
 
 import type { CreateApplicationRequestBody } from "#/api/clients/rcw/model/createApplicationRequestBody.zod.gen.js";
 import type { createApplicationResponse } from "#/api/clients/rcw/schema/applications/applications.gen.js";
@@ -15,8 +14,8 @@ import { CreateApplicationResponseBody } from "#/api/clients/rcw/model/createApp
 import { ApplicationDto } from "#/api/dto/application/application.dto.js";
 import { getAuthDebugHeaders } from "#/auth/auth.debug.js";
 import { Answers } from "#/journeys/create-application/data/answers.zod.js";
-import { isJourneySession } from "#/journeys/effects.js";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
+import { getSessionDataOrThrow } from "#/journeys/shared.helper.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import * as metrics from "#/lib/metrics.js";
 import { logger } from "#/logger.js";
@@ -56,6 +55,7 @@ const clearSessionDraft = (
   journeyCode: string,
 ): void => {
   const { journeyDrafts } = session;
+
   if (!journeyDrafts) {
     return;
   }
@@ -73,13 +73,8 @@ export const createApplication =
     let response: createApplicationResponse;
     let session: JourneySession;
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Session shape is constrained by app session typing.
-      const currentSession = context.getSession() as
-        (Partial<SessionData> & Session) | undefined;
+      const currentSession = getSessionDataOrThrow(context);
 
-      if (!isJourneySession(currentSession)) {
-        return;
-      }
       session = currentSession;
 
       const journeyAnswers = session.journeyDrafts?.[journeyCode];

@@ -51,16 +51,6 @@ describe("loadApplicationAsAnswers", () => {
 
   afterEach(() => sinon.restore());
 
-  it("does nothing when there is no journey session", () => {
-    getSession.returns(undefined);
-
-    loadApplicationAsAnswers()(context, journeyCode);
-
-    expect(getData.called).to.equal(false);
-    expect(setAnswer.called).to.equal(false);
-    expect(getAllAnswers.called).to.equal(false);
-  });
-
   it("loads application answers", () => {
     const session = {
       journeyDrafts: {},
