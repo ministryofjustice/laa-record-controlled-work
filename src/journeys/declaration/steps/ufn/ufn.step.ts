@@ -15,6 +15,7 @@ import { t } from "#/lib/i18n.js";
 
 import { caption } from "../../declaration.blocks.js";
 import { continueReturnButtons, ufnInput } from "./ufn.blocks.js";
+import { hasCheckAnswersInQuery } from "#/journeys/shared.hook.js";
 
 export const ufnStep = (): ReturnType<typeof step> => {
   return step({
@@ -22,6 +23,9 @@ export const ufnStep = (): ReturnType<typeof step> => {
     code: "declaration-ufn",
     onSubmission: [saveAndContinueRedirect(), returnToTaskListRedirect()],
     path: "/ufn",
+    reachability: {
+      entryWhen: hasCheckAnswersInQuery,
+    },
     title: t("journeys.declaration.ufn.title"),
   });
 };

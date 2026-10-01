@@ -11,7 +11,10 @@ import {
 
 import { declarationEffects } from "#/journeys/declaration/declaration.effects.js";
 import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
-import { redirectToCheckAnswers } from "#/journeys/shared.hook.js";
+import {
+  hasCheckAnswersInQuery,
+  redirectToCheckAnswers,
+} from "#/journeys/shared.hook.js";
 import { t } from "#/lib/i18n.js";
 
 import { caption } from "../../declaration.blocks.js";
@@ -40,6 +43,9 @@ export const signStep = (): ReturnType<typeof step> => {
     code: "declaration-sign",
     onSubmission: [saveOnContinue(), returnToTaskListOnReturn()],
     path: "/sign",
+    reachability: {
+      entryWhen: hasCheckAnswersInQuery,
+    },
     title: t("journeys.declaration.sign.title"),
   });
 };
