@@ -25,7 +25,7 @@ describe("Check answers step", () => {
 
   const session = {
     journeyDrafts: {
-      evidence: {
+      [`evidence:${applicationId}`]: {
         doYouHaveEvidence: "yes",
         employedEvidence: ["wageSlips"],
         selfEmployedEvidence: [],
