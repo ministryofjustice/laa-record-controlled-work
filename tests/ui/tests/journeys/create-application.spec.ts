@@ -263,7 +263,7 @@ test("create application flow", async ({ withSelectedOffice: page }) => {
     // ECF
     "No",
     // Family law classification
-    "Private",
+    "Public",
     // Accessed legal aid before
     "Yes, about the same matter",
     // Did your client get legal help for this matter in the last 6 months?
@@ -356,6 +356,8 @@ test("changing no fixed address to yes from check answers reaches address entry"
   await page.getByRole("button", { name: "Agree and continue" }).click();
 
   await page.getByRole("radio", { name: "No" }).check();
+  await page.getByRole("button", { name: "Continue" }).click();
+  await page.getByRole("radio", { name: "Public" }).check();
   await page.getByRole("button", { name: "Continue" }).click();
   await page.getByRole("radio", { name: "No" }).check();
   await page.getByRole("button", { name: "Continue" }).click();
