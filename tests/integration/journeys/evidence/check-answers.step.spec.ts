@@ -6,7 +6,7 @@ import { expect } from "chai";
 import sinon from "sinon";
 import { createForgeTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
-import { evidencePackage } from "#/journeys/evidence/evidence.package.js";
+import { evidenceEffectsRegistry } from "#/journeys/evidence/evidence.effects.js";
 import { evidenceJourney } from "#/journeys/evidence/evidence.journey.js";
 
 describe("Check answers step", () => {
@@ -17,7 +17,7 @@ describe("Check answers step", () => {
 
   const client = createForgeTestClient(
     evidenceJourney,
-    evidencePackage.functions,
+    evidenceEffectsRegistry,
     {
       dependencies: { updateApplicationEvidence: updateApplicationEvidenceStub },
     },
