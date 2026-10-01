@@ -67,7 +67,6 @@ describe("updateEvidence", () => {
     getSession = sinon.stub().returns({
       id: "session-id",
       journeyDrafts: { [`${journeyCode}:${applicationId}`]: incomeAnswers },
-      msal: { homeAccountId: "home-account-id" },
     });
     getRequestParam = sinon.stub().returns(applicationId);
 
@@ -96,7 +95,6 @@ describe("updateEvidence", () => {
       getSession.returns({
         id: "session-id",
         journeyDrafts: { [`${journeyCode}:${applicationId}`]: exemptionAnswers },
-        msal: { homeAccountId: "home-account-id" },
       });
     });
 
@@ -118,7 +116,6 @@ describe("updateEvidence", () => {
     getSession.returns({
       currentApplicationId: applicationId,
       id: "session-id",
-      msal: { homeAccountId: "home-account-id" },
     });
 
     await updateEvidence(deps)(context, journeyCode);
@@ -134,7 +131,6 @@ describe("updateEvidence", () => {
         [`${journeyCode}:${applicationId}`]: incomeAnswers,
         [`${journeyCode}:another-application`]: exemptionAnswers,
       },
-      msal: { homeAccountId: "home-account-id" },
     });
 
     await updateEvidence(deps)(context, journeyCode);
@@ -152,7 +148,6 @@ describe("updateEvidence", () => {
     getSession.returns({
       id: "session-id",
       journeyDrafts: { [journeyCode]: incomeAnswers },
-      msal: { homeAccountId: "home-account-id" },
     });
 
     await updateEvidence(deps)(context, journeyCode);
@@ -178,7 +173,6 @@ describe("updateEvidence", () => {
       journeyDrafts: {
         [`${journeyCode}:${applicationId}`]: { doYouHaveEvidence: "maybe" },
       },
-      msal: { homeAccountId: "home-account-id" },
     });
     sinon.stub(logger, "warn");
     sinon.stub(logger, "error");
