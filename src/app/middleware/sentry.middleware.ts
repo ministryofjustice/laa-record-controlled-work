@@ -16,13 +16,10 @@ export function setupSentry(): void {
     return;
   }
 
-  Sentry.init({
+  const options: Sentry.NodeOptions = {
     debug: process.env.SENTRY_DEBUG === "true",
     dsn: sentryDsn,
     environment: process.env.SENTRY_ENV ?? "production",
-    ...(process.env.SENTRY_RELEASE
-      ? { release: process.env.SENTRY_RELEASE }
-      : {}),
     integrations: [
       Sentry.httpIntegration(),
       Sentry.expressIntegration(),
@@ -43,5 +40,11 @@ export function setupSentry(): void {
         Number.parseFloat(process.env.SENTRY_TRACES_SAMPLE_RATE ?? "0.01"),
       );
     },
-  });
+  };
+
+  if (process.env.SENTRY_RELEASE) {
+    options.release = process.env.SENTRY_RELEASE;
+  }
+
+  Sentry.init(options);
 }
