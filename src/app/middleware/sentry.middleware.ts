@@ -4,30 +4,38 @@ import { resolveSentryDsn } from "#/lib/resolveSentryDsn.js";
 
 const DISABLED_TRACE_SAMPLE_RATE = 0;
 
-/** Initialise Sentry when it is enabled and configured. */
-export function setupSentry(): void {
-  if (process.env.SENTRY_ENABLED !== "true") {
-    return;
-  }
+/**
+ * Creates the Sentry options from the current feature flag configuration.
+ *
+ * @param sentryDsn - The resolved Sentry DSN
+ * @returns Sentry initialization options
+ */
+export function createSentryOptions(sentryDsn: string): Sentry.NodeOptions {
+  const loggingEnabled = process.env.SENTRY_LOGGING_ENABLED !== "false";
+  const tracingEnabled = process.env.SENTRY_TRACING_ENABLED !== "false";
+  const integrations: NonNullable<Sentry.NodeOptions["integrations"]> = [
+    Sentry.httpIntegration(),
+    Sentry.expressIntegration(),
+  ];
 
-  const sentryDsn = resolveSentryDsn();
-
-  if (!sentryDsn) {
-    return;
+  if (loggingEnabled) {
+    integrations.push(
+      Sentry.consoleLoggingIntegration({
+        levels: ["log", "warn", "error"],
+      }),
+    );
   }
 
   const options: Sentry.NodeOptions = {
     debug: process.env.SENTRY_DEBUG === "true",
     dsn: sentryDsn,
     environment: process.env.SENTRY_ENV ?? "production",
-    integrations: [
-      Sentry.httpIntegration(),
-      Sentry.expressIntegration(),
-      Sentry.consoleLoggingIntegration({
-        levels: ["log", "warn", "error"],
-      }),
-    ],
+    integrations,
     tracesSampler: ({ inheritOrSampleWith, name, normalizedRequest }) => {
+      if (!tracingEnabled) {
+        return DISABLED_TRACE_SAMPLE_RATE;
+      }
+
       const requestPath = normalizedRequest?.url
         ? new URL(normalizedRequest.url, "http://localhost").pathname
         : undefined;
@@ -46,5 +54,20 @@ export function setupSentry(): void {
     options.release = process.env.SENTRY_RELEASE;
   }
 
-  Sentry.init(options);
+  return options;
+}
+
+/** Initialise Sentry when it is enabled and configured. */
+export function setupSentry(): void {
+  if (process.env.SENTRY_ENABLED !== "true") {
+    return;
+  }
+
+  const sentryDsn = resolveSentryDsn();
+
+  if (!sentryDsn) {
+    return;
+  }
+
+  Sentry.init(createSentryOptions(sentryDsn));
 }

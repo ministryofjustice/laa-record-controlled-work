@@ -136,6 +136,8 @@ rcw:
     SENTRY_ENV: ""
     SENTRY_DEBUG: false
     SENTRY_ENABLED: true
+    SENTRY_LOGGING_ENABLED: true
+    SENTRY_TRACING_ENABLED: true
     SENTRY_RELEASE: ""
 
   autoscaling:
