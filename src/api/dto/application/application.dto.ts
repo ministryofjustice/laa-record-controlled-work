@@ -110,8 +110,8 @@ export class ApplicationDto {
       providerOfficeCode,
       reasonForReapplication: answers.reasonForYes,
       scopingQuestions: {
-        priorLegalAid: answers.legalAidBefore,
         familyLawClassification: answers.familyLawClassification,
+        priorLegalAid: answers.legalAidBefore,
       },
     });
   }
@@ -155,6 +155,7 @@ export class ApplicationDto {
    * @param application - The application from which to create the answers output instance.
    * @returns AnswersOutput instance.
    */
+  // eslint-disable-next-line complexity -- Got a lot of checks to do here.
   public static toAnswers(application: ApplicationSchema): AnswersOutput {
     const addressAnswers = application.clientDetails.hasFixedAddress
       ? this.getAnswersFromAddress(application)
@@ -168,7 +169,8 @@ export class ApplicationDto {
       [AnswerKey.dateOfBirth]: application.clientDetails.dateOfBirth,
       [AnswerKey.ecf]: "no",
       [AnswerKey.familyLawClassification]:
-        typeof application.scopingQuestions?.familyLawClassification === "string"
+        typeof application.scopingQuestions?.familyLawClassification ===
+        "string"
           ? application.scopingQuestions.familyLawClassification
           : "",
       [AnswerKey.firstName]: application.clientDetails.firstName,
