@@ -6,7 +6,7 @@ import { expect } from "chai";
 import sinon from "sinon";
 import { createForgeTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
-import { evidencePackage } from "#/journeys/evidence/evidence.package.js";
+import { evidenceEffectsRegistry } from "#/journeys/evidence/evidence.effects.js";
 import { evidenceJourney } from "#/journeys/evidence/evidence.journey.js";
 
 describe("Check answers step", () => {
@@ -17,15 +17,15 @@ describe("Check answers step", () => {
 
   const client = createForgeTestClient(
     evidenceJourney,
-    evidencePackage.functions,
+    evidenceEffectsRegistry,
     {
       dependencies: { updateApplicationEvidence: updateApplicationEvidenceStub },
     },
   );
 
-  const session = {
+  const createSession = () => ({
     journeyDrafts: {
-      evidence: {
+      [`evidence:${applicationId}`]: {
         doYouHaveEvidence: "yes",
         employedEvidence: ["wageSlips"],
         selfEmployedEvidence: [],
@@ -39,7 +39,7 @@ describe("Check answers step", () => {
         capitalEvidence: ["bankStatementCapital", "shareCertificate"],
       },
     },
-  };
+  });
 
   describe("GET /cases/evidence/check-answers", () => {
     let renderResult: TestRenderResult;
@@ -50,7 +50,7 @@ describe("Check answers step", () => {
       const result = await client.get(
         `/cases/${applicationId}/evidence/check-answers`,
         {
-          session,
+          session: createSession(),
         },
       );
       expect(result.type).to.equal("render");
@@ -107,7 +107,7 @@ describe("Check answers step", () => {
       const result = await client.post(
         `/cases/${applicationId}/evidence/check-answers`,
         {
-          session,
+          session: createSession(),
         },
       );
       expect(result.type).to.equal("redirect");

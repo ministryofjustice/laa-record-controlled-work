@@ -35,6 +35,25 @@ describe("updateEvidence", () => {
     moreDetailsForNoEvidence: "Client was advised over the phone",
   };
 
+  const incomeEvidenceRequest = {
+    incomeEvidenceChecklist: {
+      employedEvidence: incomeAnswers.employedEvidence,
+      selfEmployedEvidence: incomeAnswers.selfEmployedEvidence,
+      benefitsInKindEvidence: incomeAnswers.benefitsInKindEvidence,
+      otherEvidence: incomeAnswers.otherEvidence,
+      stateBenefitsEvidence: incomeAnswers.stateBenefitsEvidence,
+      asylumSupportEvidence: incomeAnswers.asylumSupportEvidence,
+      taxCreditsEvidence: incomeAnswers.taxCreditsEvidence,
+    },
+    expenditureCapitalEvidenceChecklist: {
+      incomeEvidence: incomeAnswers.incomeEvidence,
+      housingCostsEvidence: incomeAnswers.housingCostsEvidence,
+      childCareEvidence: incomeAnswers.childCareEvidence,
+      maintenanceEvidence: incomeAnswers.maintenanceEvidence,
+      capitalEvidence: incomeAnswers.capitalEvidence,
+    },
+  };
+
   let context: EvidenceContext;
   let updateApplicationEvidenceStub: sinon.SinonStub;
   let deps: EvidenceEffectsDeps;
@@ -47,8 +66,7 @@ describe("updateEvidence", () => {
     deps = { updateApplicationEvidence: updateApplicationEvidenceStub };
     getSession = sinon.stub().returns({
       id: "session-id",
-      journeyDrafts: { [journeyCode]: incomeAnswers },
-      msal: { homeAccountId: "home-account-id" },
+      journeyDrafts: { [`${journeyCode}:${applicationId}`]: incomeAnswers },
     });
     getRequestParam = sinon.stub().returns(applicationId);
 
@@ -64,24 +82,10 @@ describe("updateEvidence", () => {
       await updateEvidence(deps)(context, journeyCode);
 
       expect(
-        updateApplicationEvidenceStub.calledOnceWith(applicationId, {
-          incomeEvidenceChecklist: {
-            employedEvidence: incomeAnswers.employedEvidence,
-            selfEmployedEvidence: incomeAnswers.selfEmployedEvidence,
-            benefitsInKindEvidence: incomeAnswers.benefitsInKindEvidence,
-            otherEvidence: incomeAnswers.otherEvidence,
-            stateBenefitsEvidence: incomeAnswers.stateBenefitsEvidence,
-            asylumSupportEvidence: incomeAnswers.asylumSupportEvidence,
-            taxCreditsEvidence: incomeAnswers.taxCreditsEvidence,
-          },
-          expenditureCapitalEvidenceChecklist: {
-            incomeEvidence: incomeAnswers.incomeEvidence,
-            housingCostsEvidence: incomeAnswers.housingCostsEvidence,
-            childCareEvidence: incomeAnswers.childCareEvidence,
-            maintenanceEvidence: incomeAnswers.maintenanceEvidence,
-            capitalEvidence: incomeAnswers.capitalEvidence,
-          },
-        }),
+        updateApplicationEvidenceStub.calledOnceWith(
+          applicationId,
+          incomeEvidenceRequest,
+        ),
       ).to.equal(true);
     });
   });
@@ -90,8 +94,7 @@ describe("updateEvidence", () => {
     beforeEach(() => {
       getSession.returns({
         id: "session-id",
-        journeyDrafts: { [journeyCode]: exemptionAnswers },
-        msal: { homeAccountId: "home-account-id" },
+        journeyDrafts: { [`${journeyCode}:${applicationId}`]: exemptionAnswers },
       });
     });
 
@@ -113,7 +116,38 @@ describe("updateEvidence", () => {
     getSession.returns({
       currentApplicationId: applicationId,
       id: "session-id",
-      msal: { homeAccountId: "home-account-id" },
+    });
+
+    await updateEvidence(deps)(context, journeyCode);
+
+    expect(updateApplicationEvidenceStub.called).to.equal(false);
+  });
+
+  it("submits only the requested application's evidence draft", async () => {
+    updateApplicationEvidenceStub.resolves({ status: 204 });
+    getSession.returns({
+      id: "session-id",
+      journeyDrafts: {
+        [`${journeyCode}:${applicationId}`]: incomeAnswers,
+        [`${journeyCode}:another-application`]: exemptionAnswers,
+      },
+    });
+
+    await updateEvidence(deps)(context, journeyCode);
+
+    expect(
+      updateApplicationEvidenceStub.calledOnceWith(
+        applicationId,
+        incomeEvidenceRequest,
+      ),
+    ).to.equal(true);
+  });
+
+  it("does not submit a legacy unscoped draft for an application", async () => {
+    updateApplicationEvidenceStub.resolves({ status: 204 });
+    getSession.returns({
+      id: "session-id",
+      journeyDrafts: { [journeyCode]: incomeAnswers },
     });
 
     await updateEvidence(deps)(context, journeyCode);
@@ -136,8 +170,9 @@ describe("updateEvidence", () => {
   it("throws ApiResponseError when doYouHaveEvidence has an unexpected value", async () => {
     getSession.returns({
       id: "session-id",
-      journeyDrafts: { [journeyCode]: { doYouHaveEvidence: "maybe" } },
-      msal: { homeAccountId: "home-account-id" },
+      journeyDrafts: {
+        [`${journeyCode}:${applicationId}`]: { doYouHaveEvidence: "maybe" },
+      },
     });
     sinon.stub(logger, "warn");
     sinon.stub(logger, "error");

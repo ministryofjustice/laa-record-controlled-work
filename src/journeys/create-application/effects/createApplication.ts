@@ -3,6 +3,7 @@ import type { Session, SessionData } from "express-session";
 
 import type { CreateApplicationRequestBody } from "#/api/clients/rcw/model/createApplicationRequestBody.zod.gen.js";
 import type { createApplicationResponse } from "#/api/clients/rcw/schema/applications/applications.gen.js";
+import type { JourneySession } from "#/journeys/context.type.js";
 import type { CreateApplicationEffectsDeps } from "#/journeys/create-application/create-application.types.js";
 
 import {
@@ -50,6 +51,19 @@ const buildApplicationData = (
   return applicationDto.toRcwApi();
 };
 
+const clearSessionDraft = (
+  session: JourneySession,
+  journeyCode: string,
+): void => {
+  const { journeyDrafts } = session;
+  if (!journeyDrafts) {
+    return;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-dynamic-delete -- journeyCode is a consistent journey identifier.
+  delete journeyDrafts[journeyCode];
+};
+
 export const createApplication =
   (deps: CreateApplicationEffectsDeps) =>
   async (
@@ -57,14 +71,16 @@ export const createApplication =
     journeyCode: string,
   ): Promise<void> => {
     let response: createApplicationResponse;
+    let session: JourneySession;
     try {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Session shape is constrained by app session typing.
-      const session = context.getSession() as
+      const currentSession = context.getSession() as
         (Partial<SessionData> & Session) | undefined;
 
-      if (!isJourneySession(session)) {
+      if (!isJourneySession(currentSession)) {
         return;
       }
+      session = currentSession;
 
       const journeyAnswers = session.journeyDrafts?.[journeyCode];
 
@@ -123,4 +139,5 @@ export const createApplication =
     }
 
     context.setData(CONTEXT_DATA_KEYS.applicationID, result.data.id);
+    clearSessionDraft(session, journeyCode);
   };

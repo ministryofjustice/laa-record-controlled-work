@@ -23,6 +23,10 @@ describe("CreateApplicationEffect", () => {
   let deps: CreateApplicationEffectsDeps;
   let getSession: sinon.SinonStub;
   let setData: sinon.SinonStub;
+  let session: {
+    journeyDrafts: Record<string, unknown>;
+    selectedOffice?: { address: string; code: string };
+  };
 
   beforeEach(() => {
     sinon.stub(config.api, "useMockAccessToken").value(true);
@@ -31,7 +35,7 @@ describe("CreateApplicationEffect", () => {
       createApplication: createApplicationStub,
     } as unknown as CreateApplicationEffectsDeps;
     setData = sinon.stub();
-    getSession = sinon.stub().returns({
+    session = {
       journeyDrafts: {
         [journeyCode]: {
           ukAddressLine1: "123 Test Street",
@@ -49,12 +53,14 @@ describe("CreateApplicationEffect", () => {
           reasonForYes: "here is a reason",
           ukTownOrCity: "Manchester",
         },
+        anotherJourney: { keep: "yes" },
       },
       selectedOffice: {
         address: "123 Test Street, Manchester, A12 3BC",
         code: "22439e72-68d3-4770-b435-c352d883d21e",
       },
-    });
+    };
+    getSession = sinon.stub().returns(session);
 
     context = {
       getSession,
@@ -82,6 +88,9 @@ describe("CreateApplicationEffect", () => {
         applicationId,
       ),
     ).to.equal(true);
+
+    expect(session.journeyDrafts[journeyCode]).to.be.undefined;
+    expect(session.journeyDrafts.anotherJourney).to.deep.equal({ keep: "yes" });
   });
 
   it("returns an ApiResponseError when createApplication responds with non-201", async () => {
@@ -94,9 +103,12 @@ describe("CreateApplicationEffect", () => {
 
     try {
       await createApplication(deps)(context, journeyCode);
+      expect.fail("should have thrown");
     } catch (error) {
       expect(error).to.be.instanceOf(ApiResponseError);
     }
+
+    expect(session.journeyDrafts[journeyCode]).to.exist;
   });
 
   it("returns an ApiResponseError when createApplication rejects", async () => {
@@ -106,11 +118,14 @@ describe("CreateApplicationEffect", () => {
 
     try {
       await createApplication(deps)(context, journeyCode);
+      expect.fail("should have thrown");
     } catch (error) {
       expect(error).to.be.instanceOf(ApiResponseError);
       const apiError = error as ApiResponseError;
       expect(apiError.cause).to.equal(cause);
     }
+
+    expect(session.journeyDrafts[journeyCode]).to.exist;
   });
 
   it("returns an ApiValidationError when createApplication returns no application id", async () => {
@@ -122,9 +137,12 @@ describe("CreateApplicationEffect", () => {
 
     try {
       await createApplication(deps)(context, journeyCode);
+      expect.fail("should have thrown");
     } catch (error) {
       expect(error).to.be.instanceOf(ApiValidationError);
     }
+
+    expect(session.journeyDrafts[journeyCode]).to.exist;
   });
 
   it("returns an ApiResponseError with ApiValidationError cause when selected office is missing", async () => {

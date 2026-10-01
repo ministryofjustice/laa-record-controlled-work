@@ -48,9 +48,9 @@ describe("ClearFieldAnswers", () => {
     expect(
       (drafts.testJourney as Record<string, unknown>).addressLine3,
     ).to.be.undefined;
-    expect(clearAnswer.calledTwice).to.equal(true);
-    expect(clearAnswer.firstCall.args[0]).to.equal("addressLine2");
-    expect(clearAnswer.secondCall.args[0]).to.equal("addressLine3");
+    expect(clearAnswer.callCount).to.equal(2);
+    expect(clearAnswer.calledWithExactly("addressLine2")).to.equal(true);
+    expect(clearAnswer.calledWithExactly("addressLine3")).to.equal(true);
   });
 
   it("preserves drafts for other journeys", () => {
@@ -88,6 +88,33 @@ describe("ClearFieldAnswers", () => {
     const drafts = session.journeyDrafts as Record<string, Record<string, unknown>>;
     expect(drafts["editClientDetails:application-1"]).to.deep.equal({});
     expect(drafts["editClientDetails:application-2"]).to.deep.equal({
+      addressLine1: "keep",
+    });
+  });
+
+  it("clears fields from only the current application's evidence draft", () => {
+    session.journeyDrafts = {
+      "evidence:application-1": {
+        addressLine1: "remove",
+        addressLine2: "keep",
+      },
+      "evidence:application-2": {
+        addressLine1: "keep",
+        addressLine2: "remove",
+      },
+    };
+
+    getRequestParam.returns("application-1");
+    clearFieldAnswers()(context, "evidence", ["addressLine1"]);
+
+    getRequestParam.returns("application-2");
+    clearFieldAnswers()(context, "evidence", ["addressLine2"]);
+
+    const drafts = session.journeyDrafts as Record<string, Record<string, unknown>>;
+    expect(drafts["evidence:application-1"]).to.deep.equal({
+      addressLine2: "keep",
+    });
+    expect(drafts["evidence:application-2"]).to.deep.equal({
       addressLine1: "keep",
     });
   });
