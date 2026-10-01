@@ -92,9 +92,7 @@ export const Application = zod.object({
   scopingQuestions: zod
     .union([
       zod.object({
-        priorLegalAid: zod
-          .enum(["no", "yesDifferentMatter", "yesSameMatter"])
-          .optional(),
+        priorLegalAid: zod.enum(["no", "yesDifferentMatter", "yesSameMatter"]),
       }),
       zod.null(),
     ])

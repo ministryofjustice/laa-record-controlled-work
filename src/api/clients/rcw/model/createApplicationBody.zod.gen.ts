@@ -20,9 +20,7 @@ export const CreateApplicationBody = zod.object({
   reasonForReapplication: zod.string().optional(),
   providerOfficeCode: zod.string(),
   scopingQuestions: zod.object({
-    priorLegalAid: zod
-      .enum(["no", "yesDifferentMatter", "yesSameMatter"])
-      .optional(),
+    priorLegalAid: zod.enum(["no", "yesDifferentMatter", "yesSameMatter"]),
   }),
   clientDetails: zod.object({
     firstName: zod.string(),
