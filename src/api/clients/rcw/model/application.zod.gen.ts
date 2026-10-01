@@ -89,14 +89,12 @@ export const Application = zod.object({
   meansAssessmentRequired: zod.boolean().nullish(),
   typeOfNonMeans: zod.boolean().nullish(),
   contribution: zod.string().nullish(),
-  scopingQuestions: zod
-    .union([
-      zod.object({
-        priorLegalAid: zod.enum(["no", "yesDifferentMatter", "yesSameMatter"]),
-      }),
-      zod.null(),
-    ])
-    .optional(),
+  scopingQuestions: zod.union([
+    zod.object({
+      priorLegalAid: zod.enum(["no", "yesDifferentMatter", "yesSameMatter"]),
+    }),
+    zod.null(),
+  ]),
   applicationType: zod.string(),
   createdAt: zod.iso.datetime({ offset: true }),
   createdBy: zod.string(),
