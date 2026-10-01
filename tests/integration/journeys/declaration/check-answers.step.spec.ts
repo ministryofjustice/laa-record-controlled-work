@@ -10,7 +10,6 @@ import { DeclarationJourney } from "#/journeys/declaration/declaration.journey.j
 import sinon from "sinon";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import { getBlockWithContent } from "#tests/integration/utils/getBlockWithContent.helper.js";
-import { render } from "nunjucks";
 
 describe("Check answers step", () => {
   const uuid = faker.string.uuid();
@@ -31,8 +30,8 @@ describe("Check answers step", () => {
 
   const session = {
     journeyDrafts: {
-      declaration: {
-        declarationUfn: "123456",
+      [`declaration:${uuid}`]: {
+        declarationUfn: "123456/123",
         declarationSignedDate: "2024-06-01",
         declarationSignedConfirm: "true",
       },
@@ -70,16 +69,15 @@ describe("Check answers step", () => {
       expect(rows[1].key.text).to.equal("UFN");
     });
 
-    it("renders the evidence in the correct format", () => {
+    it("renders the date in the correct format", () => {
       const rows = summaryList.properties.rows as Array<{
         key: { text: string };
         value: { text: string };
       }>;
-      const evidenceRow = rows.find(
+      const dateRow = rows.find(
         (row) => row.key.text === "Date of signature",
       );
-
-      expect(evidenceRow?.value.text).to.contain("1 June 2024");
+      expect(dateRow?.value.text).to.contain("1 June 2024");
     });
 
     it("shows the expected 'Save and continue' button", () => {
