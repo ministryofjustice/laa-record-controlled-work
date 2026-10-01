@@ -62,6 +62,13 @@
           "telephone: 0300 200 2020",
           "webchat on <a href=\"https://legalaidlearning.justice.gov.uk/totara/dashboard/index.php?id=34\" target=\"_blank\">our training website</a>"
         ]
+      },
+      "noAssignedOffice": {
+        "title": "Service not accessible",
+        "body": [
+          "Your Legal Aid Services user account must be assigned to an office with an active Controlled Work contract in order to use this service.",
+          "Contact your LAA Liaison or a Legal Aid Services administrator within your firm for more information."
+        ]
       }
     },
     "yourCases": {

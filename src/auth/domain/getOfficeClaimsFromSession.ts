@@ -1,6 +1,6 @@
 import type { SessionData } from "express-session";
 
-import { AuthenticationError } from "#/auth/auth.errors.js";
+const ZERO_LENGTH = 0;
 
 /**
  * Get the user's office claims from the session.
@@ -8,10 +8,14 @@ import { AuthenticationError } from "#/auth/auth.errors.js";
  * @param session  Express session office.
  * @returns  List of office codes.
  */
-export function getOfficeClaimsFromSession(session: SessionData): string[] {
+export function getOfficeClaimsFromSession(
+  session: SessionData,
+): string[] | undefined {
   const offices = session.account?.idTokenClaims?.LAA_ACCOUNTS;
 
-  if (Array.isArray(offices)) {
+  // Allow an empty array to fall through to `undefined` to simplify checks, as
+  // semantically it's the same thing.
+  if (Array.isArray(offices) && offices.length !== ZERO_LENGTH) {
     return offices;
   }
 
@@ -19,7 +23,5 @@ export function getOfficeClaimsFromSession(session: SessionData): string[] {
     return [offices];
   }
 
-  throw new AuthenticationError(
-    "Invalid LAA_ACCOUNTS claim, expected string or string[]",
-  );
+  return undefined;
 }
