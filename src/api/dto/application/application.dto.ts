@@ -111,6 +111,7 @@ export class ApplicationDto {
       reasonForReapplication: answers.reasonForYes,
       scopingQuestions: {
         priorLegalAid: answers.legalAidBefore,
+        familyLawClassification: answers.familyLawClassification,
       },
     });
   }
@@ -166,6 +167,10 @@ export class ApplicationDto {
       ...addressAnswers,
       [AnswerKey.dateOfBirth]: application.clientDetails.dateOfBirth,
       [AnswerKey.ecf]: "no",
+      [AnswerKey.familyLawClassification]:
+        typeof application.scopingQuestions?.familyLawClassification === "string"
+          ? application.scopingQuestions.familyLawClassification
+          : "",
       [AnswerKey.firstName]: application.clientDetails.firstName,
       [AnswerKey.hasNINumber]: application.clientDetails.niNumber
         ? "yes"

@@ -62,7 +62,7 @@ export function summaryList(): GovUKSummaryList {
     value: { text: formatEcfLabel() },
   });
   const familyLawClassification = summaryRow({
-    href: "family-law-classification?returnTo=check-answers",
+    href: "family-type-of-case?returnTo=check-answers",
     label: answerLabelT("familyLawClassification"),
     value: { text: formatFamilyLawClassificationLabel() },
   });
