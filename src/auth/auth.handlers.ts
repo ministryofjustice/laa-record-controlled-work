@@ -1,5 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
 
+import { AuthError } from "@azure/msal-node";
 import { promisify } from "node:util";
 
 import {
@@ -15,11 +16,13 @@ import {
   authCodeCallbackErrorSchema,
   authCodeCallbackSchema,
 } from "#/auth/auth.types.js";
+import { EntraErrorCode } from "#/auth/domain/EntraErrorCode.enum.js";
 import { EntraService } from "#/auth/entra.service.js";
 import { getMsalCacheKey } from "#/auth/msal.cache-key.js";
 import config from "#/config.js";
 import {
   BAD_REQUEST,
+  FORBIDDEN,
   INTERNAL_SERVER_ERROR,
   UNAUTHORIZED,
 } from "#/lib/constants/http.js";
@@ -127,6 +130,17 @@ export async function signIn(
       res.redirect(authCodeUrl);
     });
   } catch (error) {
+    if (
+      error instanceof AuthError &&
+      error.errorCode === EntraErrorCode.CUSTOM_AUTH_ERROR.valueOf()
+    ) {
+      logger.info(
+        `Received Entra error "${error.errorCode}" when authenticating user: ${error.message}`,
+      );
+      res.status(FORBIDDEN).render("main/error-no-assigned-role");
+      return;
+    }
+
     next(error);
   }
 }
