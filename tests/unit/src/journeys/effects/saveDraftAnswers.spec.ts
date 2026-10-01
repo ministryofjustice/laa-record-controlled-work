@@ -80,12 +80,13 @@ describe("saveDraftAnswers()", () => {
   });
 
   it("saves evidence drafts independently for each application", () => {
-    getRequestParam.onCall(0).returns("application-1");
-    getRequestParam.onCall(1).returns("application-2");
-    getAllAnswers.onCall(0).returns({ ecf: "yes" });
-    getAllAnswers.onCall(1).returns({ ecf: "no" });
+    getRequestParam.returns("application-1");
+    getAllAnswers.returns({ ecf: "yes" });
 
     saveDraftAnswers()(context, "evidence");
+
+    getRequestParam.returns("application-2");
+    getAllAnswers.returns({ ecf: "no" });
     saveDraftAnswers()(context, "evidence");
 
     const drafts = session.journeyDrafts as Record<string, Record<string, unknown>>;

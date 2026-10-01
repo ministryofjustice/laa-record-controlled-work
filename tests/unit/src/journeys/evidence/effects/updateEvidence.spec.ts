@@ -35,6 +35,25 @@ describe("updateEvidence", () => {
     moreDetailsForNoEvidence: "Client was advised over the phone",
   };
 
+  const incomeEvidenceRequest = {
+    incomeEvidenceChecklist: {
+      employedEvidence: incomeAnswers.employedEvidence,
+      selfEmployedEvidence: incomeAnswers.selfEmployedEvidence,
+      benefitsInKindEvidence: incomeAnswers.benefitsInKindEvidence,
+      otherEvidence: incomeAnswers.otherEvidence,
+      stateBenefitsEvidence: incomeAnswers.stateBenefitsEvidence,
+      asylumSupportEvidence: incomeAnswers.asylumSupportEvidence,
+      taxCreditsEvidence: incomeAnswers.taxCreditsEvidence,
+    },
+    expenditureCapitalEvidenceChecklist: {
+      incomeEvidence: incomeAnswers.incomeEvidence,
+      housingCostsEvidence: incomeAnswers.housingCostsEvidence,
+      childCareEvidence: incomeAnswers.childCareEvidence,
+      maintenanceEvidence: incomeAnswers.maintenanceEvidence,
+      capitalEvidence: incomeAnswers.capitalEvidence,
+    },
+  };
+
   let context: EvidenceContext;
   let updateApplicationEvidenceStub: sinon.SinonStub;
   let deps: EvidenceEffectsDeps;
@@ -64,24 +83,10 @@ describe("updateEvidence", () => {
       await updateEvidence(deps)(context, journeyCode);
 
       expect(
-        updateApplicationEvidenceStub.calledOnceWith(applicationId, {
-          incomeEvidenceChecklist: {
-            employedEvidence: incomeAnswers.employedEvidence,
-            selfEmployedEvidence: incomeAnswers.selfEmployedEvidence,
-            benefitsInKindEvidence: incomeAnswers.benefitsInKindEvidence,
-            otherEvidence: incomeAnswers.otherEvidence,
-            stateBenefitsEvidence: incomeAnswers.stateBenefitsEvidence,
-            asylumSupportEvidence: incomeAnswers.asylumSupportEvidence,
-            taxCreditsEvidence: incomeAnswers.taxCreditsEvidence,
-          },
-          expenditureCapitalEvidenceChecklist: {
-            incomeEvidence: incomeAnswers.incomeEvidence,
-            housingCostsEvidence: incomeAnswers.housingCostsEvidence,
-            childCareEvidence: incomeAnswers.childCareEvidence,
-            maintenanceEvidence: incomeAnswers.maintenanceEvidence,
-            capitalEvidence: incomeAnswers.capitalEvidence,
-          },
-        }),
+        updateApplicationEvidenceStub.calledOnceWith(
+          applicationId,
+          incomeEvidenceRequest,
+        ),
       ).to.equal(true);
     });
   });
@@ -134,14 +139,12 @@ describe("updateEvidence", () => {
 
     await updateEvidence(deps)(context, journeyCode);
 
-    expect(updateApplicationEvidenceStub.calledOnce).to.equal(true);
-    expect(updateApplicationEvidenceStub.firstCall.args[0]).to.equal(applicationId);
     expect(
-      updateApplicationEvidenceStub.firstCall.args[1].incomeEvidenceChecklist.employedEvidence,
-    ).to.deep.equal(incomeAnswers.employedEvidence);
-    expect(
-      updateApplicationEvidenceStub.firstCall.args[1].evidenceExemptionCode,
-    ).to.be.undefined;
+      updateApplicationEvidenceStub.calledOnceWith(
+        applicationId,
+        incomeEvidenceRequest,
+      ),
+    ).to.equal(true);
   });
 
   it("does not submit a legacy unscoped draft for an application", async () => {

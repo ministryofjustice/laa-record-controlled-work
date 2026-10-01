@@ -39,9 +39,9 @@ describe("ClearAllDraftAnswers", () => {
 
     const drafts = session.journeyDrafts as Record<string, unknown>;
     expect(drafts.testJourney).to.be.undefined;
-    expect(clearAnswer.calledTwice).to.equal(true);
-    expect(clearAnswer.firstCall.args[0]).to.equal("ecf");
-    expect(clearAnswer.secondCall.args[0]).to.equal("means");
+    expect(clearAnswer.callCount).to.equal(2);
+    expect(clearAnswer.calledWithExactly("ecf")).to.equal(true);
+    expect(clearAnswer.calledWithExactly("means")).to.equal(true);
   });
 
   it("preserves drafts for other journeys", () => {

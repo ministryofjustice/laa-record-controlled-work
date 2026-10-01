@@ -37,9 +37,7 @@ describe("LoadDraftAnswers", () => {
 
     loadDraftAnswers()(context, "testJourney");
 
-    expect(setAnswer.calledOnce).to.equal(true);
-    expect(setAnswer.firstCall.args[0]).to.equal("ecf");
-    expect(setAnswer.firstCall.args[1]).to.equal("yes");
+    expect(setAnswer.calledOnceWithExactly("ecf", "yes")).to.equal(true);
   });
 
   it("does nothing when no draft exists for this journey", () => {
@@ -76,18 +74,20 @@ describe("LoadDraftAnswers", () => {
   });
 
   it("loads only the current application's evidence draft", () => {
-    getRequestParam.onCall(0).returns("application-1");
-    getRequestParam.onCall(1).returns("application-2");
     session.journeyDrafts = {
       "evidence:application-1": { ecf: "yes" },
       "evidence:application-2": { ecf: "no" },
     };
 
-    loadDraftAnswers()(context, "evidence");
+    getRequestParam.returns("application-1");
     loadDraftAnswers()(context, "evidence");
 
-    expect(setAnswer.firstCall.args).to.deep.equal(["ecf", "yes"]);
-    expect(setAnswer.secondCall.args).to.deep.equal(["ecf", "no"]);
+    getRequestParam.returns("application-2");
+    loadDraftAnswers()(context, "evidence");
+
+    expect(setAnswer.callCount).to.equal(2);
+    expect(setAnswer.calledWithExactly("ecf", "yes")).to.equal(true);
+    expect(setAnswer.calledWithExactly("ecf", "no")).to.equal(true);
   });
 
   it("does not load an unscoped evidence draft for an application", () => {
