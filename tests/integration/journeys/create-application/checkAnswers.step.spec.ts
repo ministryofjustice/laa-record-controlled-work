@@ -30,7 +30,7 @@ describe("Check answers step", () => {
     },
   );
   
-  const session = {
+  const createSession = (answerOverrides: Record<string, unknown> = {}) => ({
     journeyDrafts: {
       createApplication: {
         ecf: "no",
@@ -47,13 +47,14 @@ describe("Check answers step", () => {
         ukTownOrCity: "Testville",
         ukPostcode: "TE5 7ST",
         ukCountry: "United Kingdom",
+        ...answerOverrides,
       },
     },
     selectedOffice: {
       address: "123 Test Street, Testville, TE5 7ST",
       code: "22439e72-68d3-4770-b435-c352d883d21e",
     },
-  };
+  });
 
   describe("GET /cases/new/check-answers", () => {
     let renderResult: TestRenderResult;
@@ -62,7 +63,7 @@ describe("Check answers step", () => {
 
     before(async () => {
       const result = await client.get("/cases/new/check-answers", {
-        session,
+        session: createSession(),
       });
       expect(result.type).to.equal("render");
       renderResult = result as TestRenderResult;
@@ -124,20 +125,14 @@ describe("Check answers step", () => {
 
     it("links the address row to the overseas address step for an overseas address", async () => {
       const result = await client.get("/cases/new/check-answers", {
-        session: {
-          ...session,
-          journeyDrafts: {
-            createApplication: {
-              ...session.journeyDrafts.createApplication,
-              ukAddressLine1: undefined,
-              ukCountry: undefined,
-              ukTownOrCity: undefined,
-              ukPostcode: undefined,
-              osAddressLine1: "10 Some Other Street",
-              osCountry: "Australia",
-            },
-          },
-        },
+        session: createSession({
+          ukAddressLine1: undefined,
+          ukCountry: undefined,
+          ukTownOrCity: undefined,
+          ukPostcode: undefined,
+          osAddressLine1: "10 Some Other Street",
+          osCountry: "Australia",
+        }),
       });
 
       expect(result.type).to.equal("render");
@@ -168,16 +163,10 @@ describe("Check answers step", () => {
 
     it("renders no when hasNINumber is 'no'", async () => {
       const result = await client.get("/cases/new/check-answers", {
-        session: {
-          ...session,
-          journeyDrafts: {
-            createApplication: {
-              ...session.journeyDrafts.createApplication,
-              hasNINumber: "no",
-              niNumber: undefined,
-            },
-          },
-        },
+        session: createSession({
+          hasNINumber: "no",
+          niNumber: undefined,
+        }),
       });
 
       expect(result.type).to.equal("render");
@@ -224,19 +213,13 @@ describe("Check answers step", () => {
 
     it("renders no fixed address row when client has no fixed address", async () => {
       const result = await client.get("/cases/new/check-answers", {
-        session: {
-          ...session,
-          journeyDrafts: {
-            createApplication: {
-              ...session.journeyDrafts.createApplication,
-              haveAHomeAddress: "no",
-              ukAddressLine1: undefined,
-              ukCountry: undefined,
-              ukTownOrCity: undefined,
-              ukPostcode: undefined,
-            },
-          },
-        },
+        session: createSession({
+          haveAHomeAddress: "no",
+          ukAddressLine1: undefined,
+          ukCountry: undefined,
+          ukTownOrCity: undefined,
+          ukPostcode: undefined,
+        }),
       });
 
       expect(result.type).to.equal("render");
@@ -274,12 +257,8 @@ describe("Check answers step", () => {
     });
 
     it("redirects to the confirmation step", async () => {
-      const testSession = {
-        ...session,
-        journeyDrafts: { ...session.journeyDrafts },
-      };
       const result = await client.post("/cases/new/check-answers", {
-        session: testSession,
+        session: createSession(),
       });
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
@@ -287,10 +266,7 @@ describe("Check answers step", () => {
     });
 
     it("starts a fresh application journey after successful creation", async () => {
-      const testSession = {
-        ...session,
-        journeyDrafts: { ...session.journeyDrafts },
-      };
+      const testSession = createSession();
 
       const postResult = await client.post("/cases/new/check-answers", {
         session: testSession,
@@ -306,19 +282,13 @@ describe("Check answers step", () => {
 
     it("submits no address when client has no fixed address", async () => {
       const result = await client.post("/cases/new/check-answers", {
-        session: {
-          ...session,
-          journeyDrafts: {
-            createApplication: {
-              ...session.journeyDrafts.createApplication,
-              haveAHomeAddress: "no",
-              ukAddressLine1: undefined,
-              ukCountry: undefined,
-              ukTownOrCity: undefined,
-              ukPostcode: undefined,
-            },
-          },
-        },
+        session: createSession({
+          haveAHomeAddress: "no",
+          ukAddressLine1: undefined,
+          ukCountry: undefined,
+          ukTownOrCity: undefined,
+          ukPostcode: undefined,
+        }),
       });
 
       expect(result.type).to.equal("redirect");

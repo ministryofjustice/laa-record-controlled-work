@@ -23,7 +23,7 @@ describe("Check answers step", () => {
     },
   );
 
-  const session = {
+  const createSession = () => ({
     journeyDrafts: {
       [`evidence:${applicationId}`]: {
         doYouHaveEvidence: "yes",
@@ -39,7 +39,7 @@ describe("Check answers step", () => {
         capitalEvidence: ["bankStatementCapital", "shareCertificate"],
       },
     },
-  };
+  });
 
   describe("GET /cases/evidence/check-answers", () => {
     let renderResult: TestRenderResult;
@@ -50,7 +50,7 @@ describe("Check answers step", () => {
       const result = await client.get(
         `/cases/${applicationId}/evidence/check-answers`,
         {
-          session,
+          session: createSession(),
         },
       );
       expect(result.type).to.equal("render");
@@ -107,7 +107,7 @@ describe("Check answers step", () => {
       const result = await client.post(
         `/cases/${applicationId}/evidence/check-answers`,
         {
-          session,
+          session: createSession(),
         },
       );
       expect(result.type).to.equal("redirect");
