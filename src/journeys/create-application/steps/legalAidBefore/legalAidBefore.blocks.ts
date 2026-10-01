@@ -5,6 +5,7 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 import { GovUKRadioInput } from "@ministryofjustice/hmpps-forge/govuk-components";
 
+import { PriorLegalAid } from "#/api/clients/rcw/model/priorLegalAid.zod.gen.js";
 import { AnswerKey } from "#/journeys/AnswerKey.enum.js";
 import { t } from "#/lib/i18n.js";
 
@@ -38,15 +39,15 @@ export function legalAidBeforeRadioInput(): GovUKRadioInput {
     items: [
       {
         text: SAME_MATTER,
-        value: "yesSameMatter",
+        value: PriorLegalAid.enum.yesSameMatter,
       },
       {
         text: DIFFERENT_MATTER,
-        value: "yesDifferentMatter",
+        value: PriorLegalAid.enum.yesDifferentMatter,
       },
       {
         text: t("common.no"),
-        value: "no",
+        value: PriorLegalAid.enum.no,
       },
     ],
     validWhen: [

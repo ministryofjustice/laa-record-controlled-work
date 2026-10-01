@@ -1,8 +1,9 @@
 import { expect } from "chai";
 import { ApplicationDto } from "#/api/dto/application/application.dto.js";
 import type { Application } from "#/api/clients/rcw/model/application.zod.gen.js";
+import type { Answers } from "#/journeys/create-application/data/answers.zod.js";
 
-const answers = {
+const answers: Answers = {
   ecf: "yes",
   legalAidBefore: "yesSameMatter",
   legalAidLast6Months: "yes",

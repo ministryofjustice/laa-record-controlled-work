@@ -145,7 +145,16 @@ export const getGetApplicationResponseMock = <
     meansAssessmentRequired: faker.datatype.boolean(),
     typeOfNonMeans: faker.datatype.boolean(),
     contribution: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    scopingQuestions: {},
+    scopingQuestions: faker.helpers.arrayElement([
+      {
+        priorLegalAid: faker.helpers.arrayElement([
+          "no",
+          "yesDifferentMatter",
+          "yesSameMatter",
+        ] as const),
+      },
+      null,
+    ]),
     applicationType: faker.string.alpha({ length: { min: 10, max: 20 } }),
     createdAt: faker.date.past().toISOString().slice(0, 19) + "Z",
     createdBy: faker.string.alpha({ length: { min: 10, max: 20 } }),
