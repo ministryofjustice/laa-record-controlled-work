@@ -100,17 +100,17 @@ export function textInput(
     validations?: ValidationExpr[];
   },
 ): GovUKTextInput {
-  const { classes, defaultValue, validations } = options ?? {};
+  const { classes = "", defaultValue = "", validations = [] } = options ?? {};
 
   return GovUKTextInput({
+    classes,
     code,
+    defaultValue,
     label: {
       isPageHeading: false,
       text: labelText,
     },
-    ...(classes !== undefined ? { classes } : {}),
-    ...(defaultValue !== undefined ? { defaultValue } : {}),
-    ...(validations !== undefined ? { validWhen: validations } : {}),
+    validWhen: validations,
   });
 }
 

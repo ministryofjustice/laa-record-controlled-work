@@ -1,90 +1,101 @@
+import type { GovUKTextInput } from "@ministryofjustice/hmpps-forge/govuk-components";
+
 import {
   Condition,
   Self,
   validation,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
-import {
-  type BlockDefinition,
-  HtmlBlock,
-} from "@ministryofjustice/hmpps-forge/core/components";
+import { HtmlBlock } from "@ministryofjustice/hmpps-forge/core/components";
 
 import { UK_ADDRESS_FIELDS } from "#/journeys/journey.constants.js";
 import { textInput } from "#/journeys/shared.blocks.js";
-import { answerIsRequired } from "#/journeys/shared.hook.js";
-import { t } from "#/lib/i18n.js";
+import { required } from "#/journeys/validation.js";
+import { fixedT } from "#/lib/i18n.js";
 
-const LINE_1_CODE = UK_ADDRESS_FIELDS.addressLine1;
-const LINE_1_LABEL = t(
-  "journeys.createApplication.enterAddressManually.addressLine1.label",
-);
-const LINE_1_VALIDATION = t(
-  "journeys.createApplication.enterAddressManually.addressLine1.validation.required",
-);
-const LINE_2_CODE = UK_ADDRESS_FIELDS.addressLine2;
-const LINE_2_LABEL = t(
-  "journeys.createApplication.enterAddressManually.addressLine2.label",
-);
+const t = fixedT("journeys.createApplication.enterAddressManually");
 
-const TOWN_CITY_CODE = UK_ADDRESS_FIELDS.townOrCity;
-const TOWN_CITY_LABEL = t(
-  "journeys.createApplication.enterAddressManually.townOrCity.label",
-);
-const TOWN_CITY_VALIDATION = t(
-  "journeys.createApplication.enterAddressManually.townOrCity.validation.required",
-);
+interface AddressField {
+  code: string;
+  invalidValidation?: string;
+  label: string;
+  requiredValidation?: string;
+}
 
-const COUNTY_CODE = UK_ADDRESS_FIELDS.county;
-const COUNTY_LABEL = t(
-  "journeys.createApplication.enterAddressManually.county.label",
-);
+const line1 = {
+  code: UK_ADDRESS_FIELDS.addressLine1,
+  label: t("addressLine1.label"),
+  requiredValidation: t("addressLine1.validation.required"),
+} satisfies AddressField;
 
-const COUNTRY_CODE = UK_ADDRESS_FIELDS.country;
+const line2 = {
+  code: UK_ADDRESS_FIELDS.addressLine2,
+  label: t("addressLine2.label"),
+} satisfies AddressField;
 
-const POSTCODE_CODE = UK_ADDRESS_FIELDS.postcode;
-const POSTCODE_LABEL = t(
-  "journeys.createApplication.enterAddressManually.postcode.label",
-);
-const POSTCODE_REQUIRED_VALIDATION = t(
-  "journeys.createApplication.enterAddressManually.postcode.validation.required",
-);
-const POSTCODE_INVALID_VALIDATION = t(
-  "journeys.createApplication.enterAddressManually.postcode.validation.invalid",
-);
+const townOrCity = {
+  code: UK_ADDRESS_FIELDS.townOrCity,
+  label: t("townOrCity.label"),
+  requiredValidation: t("townOrCity.validation.required"),
+} satisfies AddressField;
+
+const county = {
+  code: UK_ADDRESS_FIELDS.county,
+  label: t("county.label"),
+} satisfies AddressField;
+
+const country = {
+  code: UK_ADDRESS_FIELDS.country,
+  label: "",
+} satisfies AddressField;
+
+const postcode = {
+  code: UK_ADDRESS_FIELDS.postcode,
+  invalidValidation: t("postcode.validation.invalid"),
+  label: t("postcode.label"),
+  requiredValidation: t("postcode.validation.required"),
+} satisfies AddressField;
 
 /**
  * Creates the form blocks for entering a UK address manually.
  *
  * @returns The address fields, overseas-address link, and continue button.
  */
-export function manualAddressInputs(): BlockDefinition[] {
-  const addressLine1 = textInput(LINE_1_CODE, LINE_1_LABEL, {
-    validations: [answerIsRequired(LINE_1_VALIDATION)],
+export function manualAddressInputs(): GovUKTextInput[] {
+  const addressLine1 = textInput(line1.code, line1.label, {
+    validations: [required(line1.requiredValidation)],
   });
-  const addressLine2 = textInput(LINE_2_CODE, LINE_2_LABEL);
-  const townOrCity = textInput(TOWN_CITY_CODE, TOWN_CITY_LABEL, {
+  const addressLine2 = textInput(line2.code, line2.label);
+  const townOrCityInput = textInput(townOrCity.code, townOrCity.label, {
     classes: "govuk-!-width-two-thirds",
-    validations: [answerIsRequired(TOWN_CITY_VALIDATION)],
+    validations: [required(townOrCity.requiredValidation)],
   });
-  const county = textInput(COUNTY_CODE, COUNTY_LABEL, {
+  const countyInput = textInput(county.code, county.label, {
     classes: "govuk-!-width-two-thirds",
   });
-  const postcode = textInput(POSTCODE_CODE, POSTCODE_LABEL, {
+  const postcodeInput = textInput(postcode.code, postcode.label, {
     classes: "govuk-input--width-10",
     validations: [
-      answerIsRequired(POSTCODE_REQUIRED_VALIDATION),
+      required(postcode.requiredValidation),
       validation({
         condition: Self().match(Condition.Address.IsValidPostcode()),
-        message: POSTCODE_INVALID_VALIDATION,
+        message: postcode.invalidValidation,
       }),
     ],
   });
-  const country = textInput(COUNTRY_CODE, "", {
+  const countryInput = textInput(country.code, country.label, {
     classes:
       "govuk-input--width-10 govuk-!-display-none govuk-!-visibility-hidden",
     defaultValue: "United Kingdom",
   });
 
-  return [addressLine1, addressLine2, townOrCity, county, postcode, country];
+  return [
+    addressLine1,
+    addressLine2,
+    townOrCityInput,
+    countyInput,
+    postcodeInput,
+    countryInput,
+  ];
 }
 
 /**
@@ -92,7 +103,7 @@ export function manualAddressInputs(): BlockDefinition[] {
  *
  * @returns The overseas-address link block.
  */
-export function nonUkAddressLinkBlock(): BlockDefinition {
+export function nonUkAddressLinkBlock(): HtmlBlock {
   return HtmlBlock({
     content: `<p class="govuk-body"><a class="govuk-link" href="enter-overseas-address">${t("journeys.createApplication.enterAddressManually.nonUkAddress")}</a></p>`,
   });
