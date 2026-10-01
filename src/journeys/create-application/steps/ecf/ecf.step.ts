@@ -72,4 +72,4 @@ const redirectToECFDropoutIfEcfRequired = redirect({
   when: Answer(AnswerKey.ecf).match(Condition.Equals("yes")),
 });
 
-const redirectToLegalAidBefore = redirect({ goto: StepCode.LEGAL_AID_BEFORE });
+const redirectToLegalAidBefore = redirect({ goto: StepCode.FAMILY_TYPE_OF_CASE });
