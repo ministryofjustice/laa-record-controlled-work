@@ -57,6 +57,26 @@ test("create application flow", async ({ withSelectedOffice: page }) => {
   await page.getByRole("button", { name: "Continue" }).click();
 
   // Verify redirection to the legal aid before page
+  await expect(page).toHaveURL("/cases/new/family-type-of-case");
+
+  // ==========================================================================
+  // Family type of case page
+  // ==========================================================================
+
+  // Check for the question
+  await expect(
+    page.getByRole("heading", {
+      name: /What type of family law is it\?/,
+      level: 1,
+    }),
+  ).toBeVisible();
+
+  // Select "Public" and submit
+  await page.getByRole("radio", { name: "Public" }).check();
+  await page.getByRole("button", { name: "Continue" }).click(); 
+
+  // TODO: Update to new routing questions when implemented
+  // Verify redirection to the legal aid before page
   await expect(page).toHaveURL("/cases/new/legal-aid-before");
 
   // ==========================================================================
@@ -238,10 +258,12 @@ test("create application flow", async ({ withSelectedOffice: page }) => {
   // Check that all answers are displayed correctly
   const summaryList = page.locator(".govuk-summary-list");
   const rows = summaryList.locator(".govuk-summary-list__row");
-  await expect(rows).toHaveCount(9);
+  await expect(rows).toHaveCount(10);
   await expect(rows.locator(".govuk-summary-list__value")).toHaveText([
     // ECF
     "No",
+    // Family law classification
+    "Private",
     // Accessed legal aid before
     "Yes, about the same matter",
     // Did your client get legal help for this matter in the last 6 months?

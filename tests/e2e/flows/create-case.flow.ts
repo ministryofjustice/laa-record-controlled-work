@@ -26,6 +26,12 @@ export const completeCreateCaseShortestPath = async (
   await page.getByRole("radio", { name: "No" }).check();
   await clickContinue(page);
 
+  await expect(page).toHaveURL("/cases/new/family-type-of-case");
+  await page.getByRole("radio", { name: "Private" }).check();
+  await clickContinue(page);
+
+  //TODO: Add steps for family-private-non-means-question and family-public-written-notice
+
   await expect(page).toHaveURL("/cases/new/legal-aid-before");
   await page.getByRole("radio", { name: "No" }).check();
   await clickContinue(page);

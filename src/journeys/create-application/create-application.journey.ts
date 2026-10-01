@@ -3,6 +3,7 @@ import { access, journey } from "@ministryofjustice/hmpps-forge/core/authoring";
 import { CreateApplicationEffects } from "#/journeys/create-application/create-application.effects.js";
 import { checkAnswersStep } from "#/journeys/create-application/steps/checkAnswers/checkAnswers.step.js";
 import { clientDetailsStep } from "#/journeys/create-application/steps/clientDetails/clientDetails.step.js";
+import { familyLawClassificationStep } from "#/journeys/create-application/steps/familyLawClassification/familyLawClassification.step.js";
 import { declarationStep } from "#/journeys/create-application/steps/declaration/declaration.step.js";
 import { enterOverseasAddressStep } from "#/journeys/create-application/steps/enter-overseas-address.step.js";
 import { enterAddressManuallyStep } from "#/journeys/create-application/steps/enterAddressManually/enterAddressManually.step.js";
@@ -29,6 +30,7 @@ export const createApplicationJourney = journey({
   reachability: { disableReachabilityChecks: false },
   steps: [
     declarationStep(),
+    familyLawClassificationStep(JourneyCode.CREATE_APPLICATION),
     ecfStep(JourneyCode.CREATE_APPLICATION),
     ineligibleStep(JourneyCode.CREATE_APPLICATION),
     legalAidBeforeStep(JourneyCode.CREATE_APPLICATION),
