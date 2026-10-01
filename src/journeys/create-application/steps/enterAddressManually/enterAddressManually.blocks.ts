@@ -51,7 +51,7 @@ const postcode = {
 /**
  * Creates the form blocks for entering a UK address manually.
  *
- * @returns The address fields, overseas-address link, and continue button.
+ * @returns The address fields
  */
 export function manualAddressInputs(): GovUKTextInput[] {
   const addressLine1 = textInput(line1.code, line1.label, {
