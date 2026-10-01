@@ -98,6 +98,6 @@ export function manualAddressInputs(): GovUKTextInput[] {
  */
 export function nonUkAddressLinkBlock(): HtmlBlock {
   return HtmlBlock({
-    content: `<p class="govuk-body"><a class="govuk-link" href="enter-overseas-address">${addressT("journeys.createApplication.enterAddressManually.nonUkAddress")}</a></p>`,
+    content: `<p class="govuk-body"><a class="govuk-link" href="enter-overseas-address">${addressT("nonUkAddress")}</a></p>`,
   });
 }
