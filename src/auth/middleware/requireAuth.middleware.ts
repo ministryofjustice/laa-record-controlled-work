@@ -8,8 +8,6 @@ import { updateSessionAuth } from "#/auth/domain/updateSessionAuth.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
 
-const ZERO_LENGTH = 0;
-
 /**
  * Paths that should bypass authentication checks.
  *
