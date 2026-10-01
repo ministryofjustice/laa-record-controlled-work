@@ -12,6 +12,7 @@ import { Applications } from "#/api/clients/rcw/model/applications.zod.gen.js";
 import { getAuthDebugHeaders } from "#/auth/auth.debug.js";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
+import * as metrics from "#/lib/metrics.js";
 import { logger } from "#/logger.js";
 
 type ApplicationStatus = "COMPLETED" | "DRAFT";
@@ -20,16 +21,16 @@ export const loadYourCaseList =
   (deps: YourCasesEffectsDeps) =>
   async (context: CaseListContext, status: ApplicationStatus) => {
     let response;
-
     try {
       const session = context.getSession();
       const opts = await getRcwApiDefaultOptions({
         homeAccountId: session?.msal?.homeAccountId,
         sessionId: session?.id,
       });
-      response = await deps.getApplications(
-        { officeId: session?.selectedOffice?.code, status },
-        opts,
+      const query = { officeId: session?.selectedOffice?.code, status };
+      response = await metrics.time(
+        "getApplications",
+        async () => await deps.getApplications(query, opts),
       );
     } catch (error) {
       logger.error("Error fetching applications", error, {

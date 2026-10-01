@@ -9,6 +9,7 @@ import {
   PARAMS_KEYS,
 } from "#/journeys/journey.constants.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
+import * as metrics from "#/lib/metrics.js";
 
 export const closeIneligibleCase =
   (deps: EditApplicationEffectsDeps) =>
@@ -27,13 +28,15 @@ export const closeIneligibleCase =
       homeAccountId: session?.msal?.homeAccountId,
       sessionId: session?.id,
     });
-    const response = await deps.updateApplicationStatus(
-      applicationID,
-      {
-        applicationState: "COMPLETED",
-        eTag: context.getData<number>(CONTEXT_DATA_KEYS.applicationETag),
-      },
-      options,
+
+    const body = {
+      applicationState: "COMPLETED" as const,
+      eTag: context.getData<number>(CONTEXT_DATA_KEYS.applicationETag),
+    };
+    const response = await metrics.time(
+      "updateApplicationStatus",
+      async () =>
+        await deps.updateApplicationStatus(applicationID, body, options),
     );
 
     if (response.status !== HTTP_STATUS.NO_CONTENT) {

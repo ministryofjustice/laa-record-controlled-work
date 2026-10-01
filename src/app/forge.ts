@@ -17,7 +17,7 @@ import {
   updateApplicationEvidence,
   updateApplicationStatus,
 } from "#/api/clients/rcw/schema/applications/applications.gen.js";
-import { requireAuth } from "#/app/middleware/requireAuth.middleware.js";
+import { requireAuth } from "#/auth/middleware/requireAuth.middleware.js";
 import { autocomplete } from "#/journeys/components/autocomplete/autocomplete.component.js";
 import createApplicationJourney from "#/journeys/create-application/create-application.index.js";
 import declaration from "#/journeys/declaration/declaration.package.js";
@@ -59,5 +59,5 @@ export function initForge(app: Express): void {
     });
 
   const forgeRouter = createExpressRouter(forge, { nunjucksEnv });
-  app.use("/", requireAuth, forgeRouter);
+  app.use("/", requireAuth(), forgeRouter);
 }

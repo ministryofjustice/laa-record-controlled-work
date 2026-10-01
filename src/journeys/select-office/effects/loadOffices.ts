@@ -20,6 +20,7 @@ import {
 import { mapAvailableOffices } from "#/journeys/select-office/mappers/mapAvailableOffices.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { PDA_MSW_LAA_ACCOUNTS_HEADER } from "#/lib/constants/pda.js";
+import * as metrics from "#/lib/metrics.js";
 import { logger } from "#/logger.js";
 
 export const loadOffices =
@@ -44,7 +45,11 @@ export const loadOffices =
             }
           : undefined,
       );
-      response = await deps.getAllProviderOffices(firmCode, opts);
+      response = await metrics.time(
+        "getAllProviderOffices",
+        async () => await deps.getAllProviderOffices(firmCode, opts),
+        (status) => status === HTTP_STATUS.OK,
+      );
     } catch (error) {
       logger.error("Error fetching offices", error, {
         api: "getAllProviderOffices",

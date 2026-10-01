@@ -202,9 +202,7 @@ describe("Auth Integration", () => {
       const raw = await sessionRedisClient.get(keys[0]);
       const session = JSON.parse(raw!) as SessionData;
       expect(session.isAuthenticated).to.equal(true);
-      expect(session.account?.homeAccountId).to.equal(
-        "test-uid.test-tenant-id",
-      );
+      expect(session.account?.homeAccountId).to.equal("test.user@example.com");
     });
   });
 
@@ -241,6 +239,9 @@ describe("Auth Integration", () => {
       const callbackRes = await unauthenticatedUser.get(pathname + search);
       expect(callbackRes.status).to.equal(FOUND);
       expect(callbackRes.headers.location).to.equal("/");
+
+      // Mimic office selection, which is not handled by the mock IdP. Without this, auth will fail.
+      await unauthenticatedUser.get("/test/select-office");
 
       // Verify the user is now authenticated and can reach the landing page
       const landingRes = await unauthenticatedUser.get("/");

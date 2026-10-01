@@ -3,6 +3,7 @@ import {
   CryptoProvider,
   InteractionRequiredAuthError,
   type AccountInfo,
+  type AuthenticationResult,
 } from "@azure/msal-node";
 import { EntraService } from "#/auth/entra.service.js";
 import type {
@@ -246,6 +247,59 @@ describe("EntraService", () => {
       expect((error as Error).message).to.equal(
         "EntraService.initiateAuthCodeFlow requires callbackHostname to be a valid hostname",
       );
+    });
+  });
+
+  describe("refreshToken()", () => {
+    beforeEach(() => {
+      msalStub.acquireTokenSilent = sinon.stub().resolves({
+        account: ACCOUNT,
+        idToken: ID_TOKEN,
+        accessToken: ACCESS_TOKEN,
+        expiresOn: TOKEN_EXPIRY,
+      });
+    });
+
+    it("returns a refreshed access token on success", async () => {
+      const result = await service.refreshToken(
+        HOME_ACCOUNT_ID,
+        DOWNSTREAM_SCOPES,
+      );
+
+      expect(result.error).to.be.undefined;
+
+      // @ts-expect-error - result is a Success<TokenExchangeResult> when error is undefined
+      const { account, idToken, accessToken, expiresOn } = result.value;
+
+      expect(account).to.equal(ACCOUNT);
+      expect(idToken).to.equal(ID_TOKEN);
+      expect(accessToken).to.equal(ACCESS_TOKEN);
+      expect(expiresOn).to.equal(TOKEN_EXPIRY);
+    });
+
+    it("returns a TokenRefreshError failure when the cached account cannot be found", async () => {
+      tokenCacheStub.getAccountByHomeId.resolves(null);
+
+      const result = await service.refreshToken(
+        HOME_ACCOUNT_ID,
+        DOWNSTREAM_SCOPES,
+      );
+
+      expect(result.error).to.be.instanceOf(TokenRefreshError);
+    });
+
+    it("returns a TokenRefreshError failure when acquireTokenSilent throws", async () => {
+      const silentFailure = new Error("silent failure");
+
+      (msalStub.acquireTokenSilent as sinon.SinonStub).rejects(silentFailure);
+
+      const result = await service.refreshToken(
+        HOME_ACCOUNT_ID,
+        DOWNSTREAM_SCOPES,
+      );
+
+      expect(result.error).to.be.instanceOf(TokenRefreshError);
+      expect(result.error?.cause).to.equal(silentFailure);
     });
   });
 

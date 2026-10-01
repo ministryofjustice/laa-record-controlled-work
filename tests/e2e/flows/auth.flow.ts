@@ -129,9 +129,6 @@ export const signInWithMockOAuth = async (
   await page.goto("/auth/signin");
   await completeAuthorizeIfPresent(page, options);
 
-  await page.goto("/cases");
-  await completeAuthorizeIfPresent(page, options);
-
   await expect
     .poll(() => isRcwEntryPath(pagePathname(page.url())), {
       message: "Expected to reach RCW after mock OAuth sign-in",

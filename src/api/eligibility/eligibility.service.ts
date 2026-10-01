@@ -13,6 +13,7 @@ import { getAuthDebugHeaders } from "#/auth/auth.debug.js";
 import { NotAuthenticatedError } from "#/auth/auth.errors.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { type Either, failure, success } from "#/lib/either.js";
+import * as metrics from "#/lib/metrics.js";
 import { logger } from "#/logger.js";
 
 export interface EligibilityAssessment {
@@ -71,7 +72,10 @@ export async function loadEligibilityAssessment(
   try {
     const opts = await getRcwApiDefaultOptions({ homeAccountId, sessionId });
 
-    response = await deps.getApplication(applicationId, opts);
+    response = await metrics.time(
+      "getApplication",
+      async () => await deps.getApplication(applicationId, opts),
+    );
   } catch (error) {
     if (error instanceof NotAuthenticatedError) {
       return failure(error);
@@ -86,7 +90,6 @@ export async function loadEligibilityAssessment(
     );
     return failure(LoadEligibilityAssessmentError.from(error));
   }
-
   if (response.status !== HTTP_STATUS.OK) {
     logger.error(
       "getApplication did not return 200",
@@ -147,10 +150,10 @@ export async function saveEligibilityAssessment(
       sessionId,
     });
 
-    response = await deps.updateApplicationMeans(
-      applicationId,
-      { data, result },
-      opts,
+    const body = { data, result };
+    response = await metrics.time(
+      "updateApplicationMeans",
+      async () => await deps.updateApplicationMeans(applicationId, body, opts),
     );
   } catch (error) {
     if (error instanceof NotAuthenticatedError) {

@@ -15,6 +15,7 @@ import {
   PARAMS_KEYS,
 } from "#/journeys/journey.constants.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
+import * as metrics from "#/lib/metrics.js";
 import { logger } from "#/logger.js";
 
 const DEFAULT_ETAG = 0;
@@ -23,7 +24,6 @@ export const loadApplication =
   (deps: EditApplicationEffectsDeps) =>
   async (context: EditApplicationContext): Promise<void> => {
     let response;
-
     try {
       const session = context.getSession();
       const applicationID = context.getRequestParam(PARAMS_KEYS.applicationID);
@@ -37,8 +37,10 @@ export const loadApplication =
         homeAccountId: session?.msal?.homeAccountId,
         sessionId: session?.id,
       });
-
-      response = await deps.getApplication(applicationID, opts);
+      response = await metrics.time(
+        "getApplication",
+        async () => await deps.getApplication(applicationID, opts),
+      );
     } catch (error) {
       logger.error("Error fetching application", error, {
         api: "getApplication",

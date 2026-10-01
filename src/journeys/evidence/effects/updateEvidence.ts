@@ -15,13 +15,13 @@ import {
   InvalidSessionError,
 } from "#/journeys/journey.errors.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
+import * as metrics from "#/lib/metrics.js";
 import { logger } from "#/logger.js";
 
 export const updateEvidence =
   (deps: EvidenceEffectsDeps) =>
   async (context: EvidenceContext, journeyCode: string): Promise<void> => {
     let response;
-
     try {
       const session = context.getSession();
 
@@ -54,10 +54,14 @@ export const updateEvidence =
         sessionId: session.id,
       });
 
-      response = await deps.updateApplicationEvidence(
-        applicationId,
-        updateEvidenceReq,
-        opts,
+      response = await metrics.time(
+        "updateApplicationEvidence",
+        async () =>
+          await deps.updateApplicationEvidence(
+            applicationId,
+            updateEvidenceReq,
+            opts,
+          ),
       );
     } catch (error) {
       logger.error(

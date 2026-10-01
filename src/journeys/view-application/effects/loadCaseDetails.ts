@@ -15,6 +15,7 @@ import {
   PARAMS_KEYS,
 } from "#/journeys/journey.constants.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
+import * as metrics from "#/lib/metrics.js";
 import { logger } from "#/logger.js";
 
 export const loadCaseDetails =
@@ -36,7 +37,10 @@ export const loadCaseDetails =
         sessionId: session?.id,
       });
 
-      response = await deps.getApplication(applicationID, opts);
+      response = await metrics.time(
+        "getApplication",
+        async () => await deps.getApplication(applicationID, opts),
+      );
     } catch (error) {
       logger.error("Error fetching application", error, {
         api: "getApplication",

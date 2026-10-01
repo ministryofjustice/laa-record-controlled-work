@@ -17,6 +17,7 @@ import { Answers } from "#/journeys/create-application/data/answers.zod.js";
 import { isJourneySession } from "#/journeys/effects.js";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
+import * as metrics from "#/lib/metrics.js";
 import { logger } from "#/logger.js";
 
 const buildApplicationData = (
@@ -56,7 +57,6 @@ export const createApplication =
     journeyCode: string,
   ): Promise<void> => {
     let response: createApplicationResponse;
-
     try {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Session shape is constrained by app session typing.
       const session = context.getSession() as
@@ -82,8 +82,10 @@ export const createApplication =
         homeAccountId: session.msal?.homeAccountId,
         sessionId: session.id,
       });
-
-      response = await deps.createApplication(dataForApi, opts);
+      response = await metrics.time(
+        "createApplication",
+        async () => await deps.createApplication(dataForApi, opts),
+      );
     } catch (error) {
       logger.error(
         `Error creating application for journey ${journeyCode}:`,
