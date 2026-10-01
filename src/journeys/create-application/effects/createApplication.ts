@@ -51,17 +51,17 @@ const buildApplicationData = (
   return applicationDto.toRcwApi();
 };
 
-const withoutJourneyDraft = (
-  journeyDrafts: JourneySession["journeyDrafts"],
+const clearSessionDraft = (
+  session: JourneySession,
   journeyCode: string,
-): JourneySession["journeyDrafts"] => {
+): void => {
+  const { journeyDrafts } = session;
   if (!journeyDrafts) {
-    return journeyDrafts;
+    return;
   }
 
-  const { [journeyCode]: _selectedJourneyDraft, ...otherJourneyDrafts } =
-    journeyDrafts;
-  return otherJourneyDrafts;
+  // eslint-disable-next-line @typescript-eslint/no-dynamic-delete -- journeyCode is a consistent journey identifier.
+  delete journeyDrafts[journeyCode];
 };
 
 export const createApplication =
@@ -139,8 +139,5 @@ export const createApplication =
     }
 
     context.setData(CONTEXT_DATA_KEYS.applicationID, result.data.id);
-    session.journeyDrafts = withoutJourneyDraft(
-      session.journeyDrafts,
-      journeyCode,
-    );
+    clearSessionDraft(session, journeyCode);
   };
