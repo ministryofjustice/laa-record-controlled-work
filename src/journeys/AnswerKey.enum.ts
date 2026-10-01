@@ -1,7 +1,7 @@
 export enum AnswerKey {
   dateOfBirth = "dateOfBirth",
-  familyLawClassification = "familyLawClassification",
   ecf = "ecf",
+  familyLawClassification = "familyLawClassification",
   firstName = "firstName",
   hasNINumber = "hasNINumber",
   haveAHomeAddress = "haveAHomeAddress",
