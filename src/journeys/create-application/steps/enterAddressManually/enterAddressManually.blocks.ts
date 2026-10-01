@@ -12,48 +12,41 @@ import { textInput } from "#/journeys/shared.blocks.js";
 import { required } from "#/journeys/validation.js";
 import { fixedT } from "#/lib/i18n.js";
 
-const t = fixedT("journeys.createApplication.enterAddressManually");
-
-interface AddressField {
-  code: string;
-  invalidValidation?: string;
-  label: string;
-  requiredValidation?: string;
-}
+const addressT = fixedT("journeys.createApplication.enterAddressManually");
 
 const line1 = {
   code: UK_ADDRESS_FIELDS.addressLine1,
-  label: t("addressLine1.label"),
-  requiredValidation: t("addressLine1.validation.required"),
-} satisfies AddressField;
+  label: addressT("addressLine1.label"),
+  requiredValidation: addressT("addressLine1.validation.required"),
+};
 
 const line2 = {
   code: UK_ADDRESS_FIELDS.addressLine2,
-  label: t("addressLine2.label"),
-} satisfies AddressField;
+  label: addressT("addressLine2.label"),
+};
 
 const townOrCity = {
   code: UK_ADDRESS_FIELDS.townOrCity,
-  label: t("townOrCity.label"),
-  requiredValidation: t("townOrCity.validation.required"),
-} satisfies AddressField;
+  label: addressT("townOrCity.label"),
+  requiredValidation: addressT("townOrCity.validation.required"),
+};
 
 const county = {
   code: UK_ADDRESS_FIELDS.county,
-  label: t("county.label"),
-} satisfies AddressField;
+  label: addressT("county.label"),
+};
 
 const country = {
   code: UK_ADDRESS_FIELDS.country,
   label: "",
-} satisfies AddressField;
+};
 
 const postcode = {
   code: UK_ADDRESS_FIELDS.postcode,
-  invalidValidation: t("postcode.validation.invalid"),
-  label: t("postcode.label"),
-  requiredValidation: t("postcode.validation.required"),
-} satisfies AddressField;
+  invalidValidation: addressT("postcode.validation.invalid"),
+  label: addressT("postcode.label"),
+  requiredValidation: addressT("postcode.validation.required"),
+};
 
 /**
  * Creates the form blocks for entering a UK address manually.
