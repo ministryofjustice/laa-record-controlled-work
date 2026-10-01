@@ -11,11 +11,11 @@ import {
 
 import { declarationEffects } from "#/journeys/declaration/declaration.effects.js";
 import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
+import { hasCheckAnswersInQuery } from "#/journeys/shared.hook.js";
 import { t } from "#/lib/i18n.js";
 
 import { caption } from "../../declaration.blocks.js";
 import { continueReturnButtons, ufnInput } from "./ufn.blocks.js";
-import { hasCheckAnswersInQuery } from "#/journeys/shared.hook.js";
 
 export const ufnStep = (): ReturnType<typeof step> => {
   return step({
