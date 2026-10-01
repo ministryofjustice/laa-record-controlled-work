@@ -15,7 +15,7 @@ import { ApplicationDto } from "#/api/dto/application/application.dto.js";
 import { getAuthDebugHeaders } from "#/auth/auth.debug.js";
 import { Answers } from "#/journeys/create-application/data/answers.zod.js";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
-import { getSessionData } from "#/journeys/shared.helper.js";
+import { getSessionDataOrThrow } from "#/journeys/shared.helper.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import * as metrics from "#/lib/metrics.js";
 import { logger } from "#/logger.js";
@@ -73,7 +73,7 @@ export const createApplication =
     let response: createApplicationResponse;
     let session: JourneySession;
     try {
-      const currentSession = getSessionData(context);
+      const currentSession = getSessionDataOrThrow(context);
 
       session = currentSession;
 
