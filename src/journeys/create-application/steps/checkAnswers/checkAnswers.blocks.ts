@@ -10,6 +10,7 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 import { GovUKSummaryList } from "@ministryofjustice/hmpps-forge/govuk-components";
 
+import { PriorLegalAid } from "#/api/clients/rcw/model/priorLegalAid.zod.gen.js";
 import { AnswerKey } from "#/journeys/AnswerKey.enum.js";
 import {
   formatAddressValue,
@@ -69,7 +70,7 @@ export function summaryList(): GovUKSummaryList {
     label: answerLabelT("legalAidLast6Months"),
     value: { text: formatLegalAidLast6MonthsLabel() },
     visibleWhen: Answer(AnswerKey.legalAidBefore).match(
-      Condition.Equals("yesSameMatter"),
+      Condition.Equals(PriorLegalAid.enum.yesSameMatter),
     ),
   });
   const reasonForYes = summaryRow({

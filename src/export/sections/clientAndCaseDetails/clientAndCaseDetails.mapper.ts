@@ -1,11 +1,10 @@
 import type { Application } from "#/api/clients/rcw/model/application.zod.gen.js";
-import type { PriorLegalAid } from "#/api/dto/application/application.dto.js";
 import type {
   ClientAndCaseDetailsSection,
   ClientAndCaseDetailsSummaryRow,
 } from "#/export/sections/clientAndCaseDetails/clientAndCaseDetails.types.js";
 
-import { parseScopingQuestions } from "#/api/dto/application/application.dto.js";
+import { PriorLegalAid } from "#/api/clients/rcw/model/priorLegalAid.zod.gen.js";
 import {
   formatClientAddress,
   formatDateOfBirth,
@@ -21,7 +20,7 @@ import { fixedT, t } from "#/lib/i18n.js";
 export function toClientAndCaseDetailsSection(
   application: Application,
 ): ClientAndCaseDetailsSection {
-  const { priorLegalAid } = parseScopingQuestions(application.scopingQuestions);
+  const priorLegalAid = application.scopingQuestions?.priorLegalAid;
   const reasonForReapplication = normaliseOptionalText(
     application.reasonForReapplication,
   );
@@ -105,7 +104,7 @@ function escapeHtml(value: string): string {
 
 /**
  * Maps the prior legal aid answer to its export display value.
- * @param priorLegalAid Recognised prior legal aid answer.
+ * @param priorLegalAid Prior legal aid answer.
  * @returns The translated answer, or an empty string when no answer exists.
  */
 function mapAccessedLegalAidBefore(
@@ -115,7 +114,9 @@ function mapAccessedLegalAidBefore(
     return "";
   }
 
-  return priorLegalAid === "no" ? t("common.no") : t("common.yes");
+  return priorLegalAid === PriorLegalAid.enum.no
+    ? t("common.no")
+    : t("common.yes");
 }
 
 /**
@@ -130,7 +131,7 @@ function mapSameMatterRows(
 ): ClientAndCaseDetailsSummaryRow[] {
   const clientDetailsT = fixedT("pages.export.clientAndCaseDetails");
 
-  if (priorLegalAid !== "yesSameMatter") {
+  if (priorLegalAid !== PriorLegalAid.enum.yesSameMatter) {
     return [];
   }
 

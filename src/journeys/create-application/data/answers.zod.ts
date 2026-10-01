@@ -1,5 +1,7 @@
 import { z as zod } from "zod";
 
+import { PriorLegalAid } from "#/api/clients/rcw/model/priorLegalAid.zod.gen.js";
+
 export const Answers = zod
   .object({
     dateOfBirth: zod.string(),
@@ -8,7 +10,7 @@ export const Answers = zod
     hasNINumber: zod.string(),
     haveAHomeAddress: zod.string(),
     lastName: zod.string(),
-    legalAidBefore: zod.string(),
+    legalAidBefore: PriorLegalAid,
     legalAidLast6Months: zod.string().optional(),
     niNumber: zod.string().optional(),
     osAddressLine1: zod.string().optional(),

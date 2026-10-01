@@ -76,19 +76,17 @@ describe("toClientAndCaseDetailsSection", () => {
     );
   });
 
-  it("maps missing or unrecognised prior legal aid to an empty answer", () => {
-    for (const scopingQuestions of [null, {}, { priorLegalAid: "yes" }]) {
-      const section = toClientAndCaseDetailsSection(
-        makeApplication({ scopingQuestions }),
-      );
+  it("maps missing scoping questions to an empty answer", () => {
+    const section = toClientAndCaseDetailsSection(
+      makeApplication({ scopingQuestions: null }),
+    );
 
-      expect(rowValue(section, "Accessed legal aid before")).to.deep.equal({
-        text: "",
-      });
-      expect(rowValue(section, "For the same matter within 6 months")).to.equal(
-        undefined,
-      );
-    }
+    expect(rowValue(section, "Accessed legal aid before")).to.deep.equal({
+      text: "",
+    });
+    expect(rowValue(section, "For the same matter within 6 months")).to.equal(
+      undefined,
+    );
   });
 
   it("includes same-matter details and a trimmed reason", () => {

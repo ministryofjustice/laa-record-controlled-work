@@ -1,30 +1,14 @@
-import * as zod from "zod";
-
 import type { Application as ApplicationSchema } from "#/api/clients/rcw/model/application.zod.gen.js";
 import type { CreateApplicationRequestBody } from "#/api/clients/rcw/model/createApplicationRequestBody.zod.gen.js";
+import type { ScopingQuestions } from "#/api/clients/rcw/model/scopingQuestions.zod.gen.js";
 import type { AnswersOutput } from "#/journeys/create-application/data/answers.zod.js";
 
+import { PriorLegalAid } from "#/api/clients/rcw/model/priorLegalAid.zod.gen.js";
 import { AnswerKey } from "#/journeys/AnswerKey.enum.js";
 import {
   mapCountryNameToIsoCode,
   mapIsoCodeToCountryName,
 } from "#/lib/countries.js";
-
-export const PriorLegalAidEnum = zod.enum([
-  "no",
-  "yesDifferentMatter",
-  "yesSameMatter",
-]);
-
-export type PriorLegalAid = zod.infer<typeof PriorLegalAidEnum>;
-
-// TODO - temporary defining scoping questions here due to api returning a loose Object in the application schema model
-//  So add new recognised scoping questions here as they are needed.
-const ScopingQuestionsSchema = zod.object({
-  priorLegalAid: PriorLegalAidEnum.optional().catch(undefined),
-});
-
-export type ScopingQuestions = zod.infer<typeof ScopingQuestionsSchema>;
 
 interface Application {
   addressLine1?: string;
@@ -89,7 +73,7 @@ export class ApplicationDto {
   public postCode?: string;
   public providerOfficeCode = "";
   public reasonForReapplication?: string;
-  public scopingQuestions: ScopingQuestions = {};
+  public scopingQuestions!: ScopingQuestions;
   public townOrCity?: string;
 
   /**
@@ -125,9 +109,9 @@ export class ApplicationDto {
       niNumber: answers.niNumber,
       providerOfficeCode,
       reasonForReapplication: answers.reasonForYes,
-      scopingQuestions: parseScopingQuestions({
+      scopingQuestions: {
         priorLegalAid: answers.legalAidBefore,
-      }),
+      },
     });
   }
 
@@ -174,7 +158,9 @@ export class ApplicationDto {
     const addressAnswers = application.clientDetails.hasFixedAddress
       ? this.getAnswersFromAddress(application)
       : {};
-    const priorLegalAid = this.getPriorLegalAid(application);
+    const priorLegalAid = PriorLegalAid.parse(
+      application.scopingQuestions?.priorLegalAid,
+    );
 
     return {
       ...addressAnswers,
@@ -190,7 +176,7 @@ export class ApplicationDto {
       [AnswerKey.lastName]: application.clientDetails.lastName,
       [AnswerKey.legalAidBefore]: priorLegalAid,
       [AnswerKey.legalAidLast6Months]:
-        application.scopingQuestions?.priorLegalAid === "yesSameMatter" &&
+        priorLegalAid === PriorLegalAid.enum.yesSameMatter &&
         application.reasonForReapplication
           ? "yes"
           : "no",
@@ -257,17 +243,6 @@ export class ApplicationDto {
   }
 
   /**
-   * Extract the prior legal aid answer from the application.
-   * @param application - The application from which to extract the answer.
-   * @returns The prior legal aid answer or an empty string.
-   */
-  private static getPriorLegalAid(application: ApplicationSchema): string {
-    return (
-      parseScopingQuestions(application.scopingQuestions).priorLegalAid ?? ""
-    );
-  }
-
-  /**
    * Extract UK address fields from the answers.
    * @param answers - The answers from which to extract the address fields.
    * @returns Address object containing the UK address fields.
@@ -320,17 +295,4 @@ export class ApplicationDto {
       scopingQuestions: this.scopingQuestions,
     };
   }
-}
-
-/**
- * Reads the recognised scoping question answers from a loose scoping questions blob.
- * @param scopingQuestions Scoping questions returned by the application API.
- * @returns The recognised scoping question answers, ignoring unrecognised or invalid values.
- */
-export function parseScopingQuestions(
-  scopingQuestions: unknown,
-): ScopingQuestions {
-  const parsed = ScopingQuestionsSchema.safeParse(scopingQuestions);
-
-  return parsed.success ? parsed.data : {};
 }

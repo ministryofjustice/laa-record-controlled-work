@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers -- super magic faker values */
 import { faker } from "@faker-js/faker";
 
+import { PriorLegalAid } from "#/api/clients/rcw/model/priorLegalAid.zod.gen.js";
 import {
   getCreateApplicationResponseMock,
   getGetApplicationResponseMock,
@@ -36,7 +37,7 @@ const CLIENT_DETAILS = {
     modifiedAt: `${faker.date.past().toISOString().slice(0, 19)}Z`,
     niNumber: `AA${faker.string.numeric(6)}C`,
   },
-  scopingQuestions: { priorLegalAid: "no" },
+  scopingQuestions: { priorLegalAid: PriorLegalAid.enum.no },
 };
 
 const DECLARATION = {
