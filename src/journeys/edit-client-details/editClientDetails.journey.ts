@@ -12,6 +12,7 @@ import { niNumberStep } from "#/journeys/create-application/steps/niNumber/niNum
 import { editClientDetailsEffects } from "#/journeys/edit-client-details/editClientDetails.effects.js";
 import { checkAnswersStep } from "#/journeys/edit-client-details/steps/check-answers/check-answers.step.js";
 import { JourneyCode } from "#/journeys/JourneyCode.enum.js";
+import { familyLawClassificationStep } from "#/journeys/create-application/steps/familyLawClassification/familyLawClassification.step.js";
 
 const editJourneyCode = JourneyCode.EDIT_CLIENT_DETAILS;
 
@@ -29,6 +30,7 @@ export const editClientDetailsJourney = journey({
   reachability: { disableReachabilityChecks: false },
   steps: [
     ecfStep(editJourneyCode, { reachability: { entryWhen: true } }),
+    familyLawClassificationStep(editJourneyCode),
     ineligibleStep(editJourneyCode),
     legalAidBeforeStep(editJourneyCode),
     legalAidLast6MonthsStep(editJourneyCode),

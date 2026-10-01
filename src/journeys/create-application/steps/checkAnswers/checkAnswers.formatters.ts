@@ -78,11 +78,11 @@ export function formatEcfLabel(): ResolvableString {
  * @returns The family law classification answer label.
  */
 export function formatFamilyLawClassificationLabel(): ResolvableString {
-  const publicLaw = t("journeys.createApplication.familyLawClassification.radioButton.publicLaw");
-  const privateLaw = t("journeys.createApplication.familyLawClassification.radioButton.privateLaw");
+  const publicLaw = t("journeys.createApplication.familyLawClassification.radioButton.public");
+  const privateLaw = t("journeys.createApplication.familyLawClassification.radioButton.private");
 
   return match(Answer(AnswerKey.familyLawClassification))
-    .branch(Condition.Equals("publicLaw"), publicLaw)
+    .branch(Condition.Equals("public"), publicLaw)
     .otherwise(privateLaw);
 }
 
