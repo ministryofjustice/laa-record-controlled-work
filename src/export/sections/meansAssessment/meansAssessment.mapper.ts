@@ -8,6 +8,7 @@ import type {
   MeansAssessmentSection,
 } from "#/export/sections/meansAssessment/meansAssessment.types.js";
 
+import { toMeansAssessmentAnswerSummaries } from "#/export/sections/meansAssessment/answers/answers.mapper.js";
 import {
   type CfeCategory,
   cfeResultSchema,
@@ -33,7 +34,7 @@ export function toMeansAssessmentSection(
   }
 
   return {
-    answerSummaries: [],
+    answerSummaries: toMeansAssessmentAnswerSummaries(eligibility?.data),
     calculations: toMeansAssessmentCalculations(
       eligibility?.result,
       eligibility?.data,
