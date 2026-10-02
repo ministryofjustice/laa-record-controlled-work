@@ -11,8 +11,8 @@ import {
 import { AnswerKey } from "#/journeys/AnswerKey.enum.js";
 import { CreateApplicationEffects } from "#/journeys/create-application/create-application.effects.js";
 import {
+  addressSectionHeading,
   countryAutocomplete,
-  overseasAddressHeading,
   overseasAddressInputs,
   ukAddressLinkBlock,
 } from "#/journeys/create-application/steps/enterOverseasAddress/enterOverseasAddress.blocks.js";
@@ -38,7 +38,7 @@ export function enterOverseasAddressStep(journeyCode: string): StepDefinition {
       clientDetailsCaption(),
       heading(TITLE),
       countryAutocomplete(),
-      overseasAddressHeading(),
+      addressSectionHeading(),
       ...overseasAddressInputs(),
       ukAddressLinkBlock(),
       continueButton(),

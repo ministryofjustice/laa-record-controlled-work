@@ -4,6 +4,8 @@ import {
   GovUKTextInput,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
+import type { Autocomplete as AutocompleteBlock } from "#/journeys/components/autocomplete/autocomplete.types.js";
+
 import { AnswerKey } from "#/journeys/AnswerKey.enum.js";
 import { Autocomplete } from "#/journeys/components/autocomplete/autocomplete.component.js";
 import { textInput } from "#/journeys/shared.blocks.js";
@@ -46,11 +48,23 @@ const country = {
 };
 
 /**
+ * Creates the heading for the address section.
+ *
+ * @returns A heading for the address section.
+ */
+export function addressSectionHeading(): GovUKHeading {
+  return GovUKHeading({
+    classes: "govuk-label--m",
+    text: overseasAddressT("address.title"),
+  });
+}
+
+/**
  * Creates the country autocomplete input.
  *
  * @returns An autocomplete containing the supported country names.
  */
-export function countryAutocomplete(): ReturnType<typeof Autocomplete> {
+export function countryAutocomplete(): AutocompleteBlock {
   return Autocomplete({
     clearLinkText: country.clearLinkText,
     data: COUNTRY_NAMES,
@@ -66,18 +80,6 @@ export function countryAutocomplete(): ReturnType<typeof Autocomplete> {
     minLength: MINIMUM_AUTOCOMPLETE_CHARACTERS,
     showAllValues: false,
     showNoOptionsFound: true,
-  });
-}
-
-/**
- * Creates the heading for the overseas address fields.
- *
- * @returns A heading for the address section.
- */
-export function overseasAddressHeading(): ReturnType<typeof GovUKHeading> {
-  return GovUKHeading({
-    classes: "govuk-label--m",
-    text: overseasAddressT("address.title"),
   });
 }
 
