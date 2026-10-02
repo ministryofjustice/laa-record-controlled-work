@@ -69,6 +69,13 @@
           "Your Legal Aid Services user account must be assigned to an office with an active Controlled Work contract in order to use this service.",
           "Contact your LAA Liaison or a Legal Aid Services administrator within your firm for more information."
         ]
+      },
+      "noAssignedRole": {
+        "title": "Service not accessible",
+        "body": [
+          "Your Legal Aid Services user account has not been assigned access to this service.",
+          "Contact your LAA Liaison or a Legal Aid Services administrator within your firm for more information."
+        ]
       }
     },
     "yourCases": {

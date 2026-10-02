@@ -1,11 +1,14 @@
 import type { NextFunction, Request, RequestHandler, Response } from "express";
 
+import { AuthError } from "@azure/msal-node";
+
 import { refreshToken } from "#/auth/actions/refreshToken.action.js";
 import { destroySessionAuth } from "#/auth/domain/destroySessionAuth.js";
 import { destroySessionOffice } from "#/auth/domain/destroySessionOffice.js";
+import { EntraErrorCode } from "#/auth/domain/EntraErrorCode.enum.js";
 import { getOfficeClaimsFromSession } from "#/auth/domain/getOfficeClaimsFromSession.js";
 import { updateSessionAuth } from "#/auth/domain/updateSessionAuth.js";
-import { HTTP_STATUS } from "#/lib/constants/http.js";
+import { FORBIDDEN, HTTP_STATUS } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
 
 /**
@@ -109,6 +112,17 @@ export function requireAuth(): RequestHandler {
       logger.debug("requireAuth(): User is authenticated");
       next();
     } catch (error) {
+      if (
+        error instanceof AuthError &&
+        error.errorCode === EntraErrorCode.CUSTOM_AUTH_ERROR.valueOf()
+      ) {
+        logger.info(
+          `Received Entra error "${error.errorCode}" when authenticating user: ${error.message}`,
+        );
+        res.status(FORBIDDEN).render("main/error-no-assigned-role");
+        return;
+      }
+
       logger.error("requireAuth(): Error checking user auth", error);
       next(error);
     }

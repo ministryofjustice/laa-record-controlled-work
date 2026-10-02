@@ -4,6 +4,7 @@ import session from "express-session";
 import { addCsrfToLocals, csrf } from "#/app/middleware/csrf.middleware.js";
 import authRouter from "#/auth/auth.routes.js";
 import { INTERNAL_SERVER_ERROR } from "#/lib/constants/http.js";
+import { setupNunjucks } from "#/middleware/setupNunjucks.js";
 
 /**
  * Creates a mock Express app for testing routes against.
@@ -29,6 +30,9 @@ export function createMockApp({
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
   app.use(session({ resave: false, saveUninitialized: true, secret: "test" }));
+
+  // Nunjucks is required to support routes calling `Response.render()`.
+  setupNunjucks(app);
 
   if (useCsrf) {
     app.use(csrf);
