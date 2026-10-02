@@ -11,13 +11,10 @@ import {
 import { AnswerKey } from "#/journeys/AnswerKey.enum.js";
 import { CreateApplicationEffects } from "#/journeys/create-application/create-application.effects.js";
 import {
-  addressLine1Input,
-  addressLine2Input,
-  addressLine3Input,
-  addressLine4Input,
   countryAutocomplete,
   overseasAddressHeading,
-  ukAddressLink,
+  overseasAddressInputs,
+  ukAddressLinkBlock,
 } from "#/journeys/create-application/steps/enterOverseasAddress/enterOverseasAddress.blocks.js";
 import { UK_ADDRESS_FIELDS } from "#/journeys/journey.constants.js";
 import {
@@ -42,11 +39,8 @@ export function enterOverseasAddressStep(journeyCode: string): StepDefinition {
       heading(TITLE),
       countryAutocomplete(),
       overseasAddressHeading(),
-      addressLine1Input(),
-      addressLine2Input(),
-      addressLine3Input(),
-      addressLine4Input(),
-      ukAddressLink(),
+      ...overseasAddressInputs(),
+      ukAddressLinkBlock(),
       continueButton(),
     ],
     onSubmission: [saveOverseasAddress(journeyCode)],

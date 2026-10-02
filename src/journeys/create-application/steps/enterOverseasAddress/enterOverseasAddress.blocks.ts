@@ -1,8 +1,3 @@
-import {
-  Condition,
-  Self,
-  validation,
-} from "@ministryofjustice/hmpps-forge/core/authoring";
 import { HtmlBlock } from "@ministryofjustice/hmpps-forge/core/components";
 import {
   GovUKHeading,
@@ -11,101 +6,44 @@ import {
 
 import { AnswerKey } from "#/journeys/AnswerKey.enum.js";
 import { Autocomplete } from "#/journeys/components/autocomplete/autocomplete.component.js";
+import { textInput } from "#/journeys/shared.blocks.js";
+import { required } from "#/journeys/validation.js";
 import { COUNTRY_NAMES } from "#/lib/countries.js";
-import { t } from "#/lib/i18n.js";
+import { fixedT } from "#/lib/i18n.js";
 
 const MINIMUM_AUTOCOMPLETE_CHARACTERS = 2;
 
-const ADDRESS_TITLE = t(
-  "journeys.createApplication.enterOverseasAddress.address.title",
-);
-const COUNTRY_LABEL = t(
-  "journeys.createApplication.enterOverseasAddress.country.label",
-);
-const COUNTRY_REQUIRED_VALIDATION = t(
-  "journeys.createApplication.enterOverseasAddress.country.validation.required",
-);
-const ADDRESS_LINE_1_LABEL = t(
-  "journeys.createApplication.enterOverseasAddress.address.line1.label",
-);
-const ADDRESS_LINE_1_REQUIRED_VALIDATION = t(
-  "journeys.createApplication.enterOverseasAddress.address.line1.validation.required",
-);
-const ADDRESS_LINE_2_LABEL = t(
-  "journeys.createApplication.enterOverseasAddress.address.line2.label",
-);
-const ADDRESS_LINE_3_LABEL = t(
-  "journeys.createApplication.enterOverseasAddress.address.line3.label",
-);
-const ADDRESS_LINE_4_LABEL = t(
-  "journeys.createApplication.enterOverseasAddress.address.line4.label",
+const overseasAddressT = fixedT(
+  "journeys.createApplication.enterOverseasAddress",
 );
 
-/**
- * Creates the required first overseas address line input.
- *
- * @returns A text input for address line 1.
- */
-export function addressLine1Input(): GovUKTextInput {
-  return GovUKTextInput({
-    code: AnswerKey.osAddressLine1,
-    label: {
-      isPageHeading: false,
-      text: ADDRESS_LINE_1_LABEL,
-    },
-    validWhen: [
-      validation({
-        condition: Self().match(Condition.IsRequired()),
-        message: ADDRESS_LINE_1_REQUIRED_VALIDATION,
-      }),
-    ],
-  });
-}
+const line1 = {
+  code: AnswerKey.osAddressLine1,
+  label: overseasAddressT("address.line1.label"),
+  requiredValidation: overseasAddressT("address.line1.validation.required"),
+};
 
-/**
- * Creates the optional second overseas address line input.
- *
- * @returns A text input for address line 2.
- */
-export function addressLine2Input(): GovUKTextInput {
-  return GovUKTextInput({
-    code: AnswerKey.osAddressLine2,
-    label: {
-      isPageHeading: false,
-      text: ADDRESS_LINE_2_LABEL,
-    },
-  });
-}
+const line2 = {
+  code: AnswerKey.osAddressLine2,
+  label: overseasAddressT("address.line2.label"),
+};
 
-/**
- * Creates the optional third overseas address line input.
- *
- * @returns A text input for address line 3.
- */
-export function addressLine3Input(): GovUKTextInput {
-  return GovUKTextInput({
-    code: AnswerKey.osAddressLine3,
-    label: {
-      isPageHeading: false,
-      text: ADDRESS_LINE_3_LABEL,
-    },
-  });
-}
+const line3 = {
+  code: AnswerKey.osAddressLine3,
+  label: overseasAddressT("address.line3.label"),
+};
 
-/**
- * Creates the optional fourth overseas address line input.
- *
- * @returns A text input for address line 4.
- */
-export function addressLine4Input(): GovUKTextInput {
-  return GovUKTextInput({
-    code: AnswerKey.osAddressLine4,
-    label: {
-      isPageHeading: false,
-      text: ADDRESS_LINE_4_LABEL,
-    },
-  });
-}
+const line4 = {
+  code: AnswerKey.osAddressLine4,
+  label: overseasAddressT("address.line4.label"),
+};
+
+const country = {
+  clearLinkText: overseasAddressT("country.clearButton"),
+  code: AnswerKey.osCountry,
+  label: overseasAddressT("country.label"),
+  requiredValidation: overseasAddressT("country.validation.required"),
+};
 
 /**
  * Creates the country autocomplete input.
@@ -114,23 +52,16 @@ export function addressLine4Input(): GovUKTextInput {
  */
 export function countryAutocomplete(): ReturnType<typeof Autocomplete> {
   return Autocomplete({
-    clearLinkText: t(
-      "journeys.createApplication.enterOverseasAddress.country.clearButton",
-    ),
+    clearLinkText: country.clearLinkText,
     data: COUNTRY_NAMES,
     field: GovUKTextInput({
-      code: AnswerKey.osCountry,
+      code: country.code,
       label: {
         classes: "govuk-label--m",
         isPageHeading: false,
-        text: COUNTRY_LABEL,
+        text: country.label,
       },
-      validWhen: [
-        validation({
-          condition: Self().match(Condition.IsRequired()),
-          message: COUNTRY_REQUIRED_VALIDATION,
-        }),
-      ],
+      validWhen: [required(country.requiredValidation)],
     }),
     minLength: MINIMUM_AUTOCOMPLETE_CHARACTERS,
     showAllValues: false,
@@ -146,8 +77,24 @@ export function countryAutocomplete(): ReturnType<typeof Autocomplete> {
 export function overseasAddressHeading(): ReturnType<typeof GovUKHeading> {
   return GovUKHeading({
     classes: "govuk-label--m",
-    text: ADDRESS_TITLE,
+    text: overseasAddressT("address.title"),
   });
+}
+
+/**
+ * Creates the overseas address line inputs.
+ *
+ * @returns The overseas address input fields.
+ */
+export function overseasAddressInputs(): GovUKTextInput[] {
+  const addressLine1 = textInput(line1.code, line1.label, {
+    validations: [required(line1.requiredValidation)],
+  });
+  const addressLine2 = textInput(line2.code, line2.label);
+  const addressLine3 = textInput(line3.code, line3.label);
+  const addressLine4 = textInput(line4.code, line4.label);
+
+  return [addressLine1, addressLine2, addressLine3, addressLine4];
 }
 
 /**
@@ -155,8 +102,8 @@ export function overseasAddressHeading(): ReturnType<typeof GovUKHeading> {
  *
  * @returns A link to the manual UK address step.
  */
-export function ukAddressLink(): ReturnType<typeof HtmlBlock> {
+export function ukAddressLinkBlock(): HtmlBlock {
   return HtmlBlock({
-    content: `<p class="govuk-body"><a class="govuk-link" href="enter-address-manually">${t("journeys.createApplication.enterOverseasAddress.address.ukAddress")}</a></p>`,
+    content: `<p class="govuk-body"><a class="govuk-link" href="enter-address-manually">${overseasAddressT("address.ukAddress")}</a></p>`,
   });
 }
