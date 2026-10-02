@@ -121,10 +121,9 @@ describe("GET /cases/:applicationId/export", () => {
     );
     expect(response.headers.pragma).to.equal("no-cache");
     expect(response.headers.expires).to.equal("0");
-    expect(JSON.parse(response.text)).to.deep.equal({
-      applicationRefNumber: "CW-123456",
-      clientName: "Jane Doe",
-    });
+    expect(response.text).to.contain("Client and case details");
+    expect(response.text).to.contain("Jane Doe");
+    expect(response.text).to.contain("CW-123456");
   });
 
   it("returns 401 when session credentials cannot be used", async () => {
