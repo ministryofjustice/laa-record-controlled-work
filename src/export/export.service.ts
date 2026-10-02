@@ -1,6 +1,6 @@
-import type { getApplication } from "#/api/clients/rcw/schema/applications/applications.gen.js";
+import type { Application } from "#/api/clients/rcw/model/application.zod.gen.js";
+import type { getApplicationResponse } from "#/api/clients/rcw/schema/applications/applications.gen.js";
 import type {
-  ExportApplication,
   LoadApplicationForExportDeps,
   LoadApplicationForExportParams,
 } from "#/export/export.types.js";
@@ -26,10 +26,10 @@ export async function loadApplicationForExport(
 ): Promise<
   Either<
     LoadApplicationForExportError | NotAuthenticatedError | NotFoundError,
-    ExportApplication
+    Application
   >
 > {
-  let response: Awaited<ReturnType<typeof getApplication>>;
+  let response: getApplicationResponse;
 
   try {
     const options = await getRcwApiDefaultOptions({

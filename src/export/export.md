@@ -19,6 +19,14 @@ Use `clientAndCaseDetails` as the example. A section consists of a mapper and a 
 
 The existing client-and-case section is in `src/export/sections/clientAndCaseDetails/`; its template is `src/views/export/sections/client-and-case-details.njk`.
 
+## Means assessment mapping boundary
+
+The export link is presented in `src/journeys/declaration/steps/sign/sign.blocks.ts` after the normal journey reaches the declaration-sign step. The export route itself enforces authentication, API application validation, and selected-office ownership; it does not enforce means-assessment eligibility or `meansAssessmentRequired`. The link's workflow placement is not an API eligibility gate. Do not add a new access rule as part of section mapping.
+
+Entered answers come from `eligibility.data`; saved calculations come from `eligibility.result.result_summary`. The mapper consumes `overall_result.result`, `overall_result.income_contribution`, and `overall_result.capital_contribution`; totals are `gross_income.combined_total_gross_income`, `disposable_income.combined_total_disposable_income`, and `capital.combined_assessed_capital`. For each calculated category it consumes the first `proceeding_types` entry's `result` and `upper_threshold`, matching CCQ's result-summary rules. A category is calculated only when it has a proceeding type and a numeric saved total. It does not derive amounts or thresholds. CFE's `999999999999` upper-threshold sentinel is retained and separately marked as unlimited. Answer summaries have their own view-model collection so they can remain independently valid when calculation results are unavailable.
+
+Expected mapper states use synthetic fixtures: `meansAssessmentRequired: false` returns no section even if stored answers/results say passported and eligible; a supported `eligible` or `contribution_required` result with a valid calculated category is ready, while missing, malformed, unknown, or overall-ineligible results are unavailable. An eligible result with no calculation categories is ready only when saved answers indicate passporting, asylum support with immigration/asylum, or the controlled-work under-18 no-means-test route (`passporting`, `immigration_or_asylum`, `asylum_support`, `client_age`, `controlled_legal_representation`, `aggregated_means`, `regular_income`, and `under_eighteen_assets`); its categories remain `not_calculated`. Zero and pence values are copied unchanged, and ordinary assessments with no calculated categories are unavailable.
+
 ## Tests
 
 Export tests live under `tests/unit/src/export/`, `tests/integration/export/`, and `tests/ui/tests/export.spec.ts`.
