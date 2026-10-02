@@ -23,6 +23,19 @@
       "logoAlt": "Legal Aid Agency logo",
       "notProvided": "Not provided",
       "referenceNumber": "Reference number",
+      "meansAssessment": {
+        "client": {
+          "heading": "Client details",
+          "age": {
+            "label": "What age is your client?",
+            "under18": "Under 18",
+            "standard": "18 to 59",
+            "over60": "60 or over"
+          },
+          "partner": "Does your client have a partner?",
+          "passporting": "Does your client receive a passporting benefit?"
+        }
+      },
       "clientAndCaseDetails": {
         "heading": "Client and case details",
         "ecf": "ECF",
