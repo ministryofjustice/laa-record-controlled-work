@@ -1,6 +1,11 @@
 export interface MeansAssessmentAnswerSummary {
   heading: string;
-  rows: Array<{ key: string; value: string }>;
+  rows: MeansAssessmentAnswerSummaryRow[];
+}
+
+export interface MeansAssessmentAnswerSummaryRow {
+  key: string;
+  value: string;
 }
 
 export type MeansAssessmentCalculations =
