@@ -23,6 +23,7 @@ export const submitApplication =
       const session = context.getSession();
       const { id } = context.getData(CONTEXT_DATA_KEYS.application);
       const opts = await getRcwApiDefaultOptions({
+        correlationId: undefined,
         homeAccountId: session?.msal?.homeAccountId,
         sessionId: session?.id,
       });

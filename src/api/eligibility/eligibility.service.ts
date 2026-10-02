@@ -70,7 +70,11 @@ export async function loadEligibilityAssessment(
 
   let response;
   try {
-    const opts = await getRcwApiDefaultOptions({ homeAccountId, sessionId });
+    const opts = await getRcwApiDefaultOptions({
+      correlationId: undefined,
+      homeAccountId,
+      sessionId,
+    });
 
     response = await metrics.time(
       "getApplication",
@@ -146,6 +150,7 @@ export async function saveEligibilityAssessment(
   let response;
   try {
     const opts = await getRcwApiDefaultOptions({
+      correlationId: undefined,
       homeAccountId,
       sessionId,
     });

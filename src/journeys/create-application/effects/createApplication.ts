@@ -78,7 +78,12 @@ export const createApplication =
         session.selectedOffice?.code,
       );
 
+      const correlationId = context
+        .getRequestHeader("x-correlation-id")
+        ?.toString();
+
       const opts = await getRcwApiDefaultOptions({
+        correlationId,
         homeAccountId: session.msal?.homeAccountId,
         sessionId: session.id,
       });

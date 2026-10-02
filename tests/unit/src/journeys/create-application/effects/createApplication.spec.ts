@@ -57,6 +57,7 @@ describe("CreateApplicationEffect", () => {
     });
 
     context = {
+      getRequestHeader: sinon.stub().returns("test-correlation-id"),
       getSession,
       setData,
     } as unknown as EffectFunctionContext;
