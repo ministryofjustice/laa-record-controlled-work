@@ -3,7 +3,7 @@ import type { updateApplicationDeclarationResponse } from "#/api/clients/rcw/sch
 import { ApiResponseError } from "#/api/clients/api.errors.js";
 import { getRcwApiDefaultOptions } from "#/api/clients/getRcwApiDefaultOptions.js";
 import { getAuthDebugHeaders } from "#/auth/auth.debug.js";
-import { AnswerKey as A } from "#/journeys/AnswerKey.js";
+import { AnswerKey as A } from "#/journeys/declaration/declaration.answers.js";
 import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
 import {
   UndefinedAnswerError,
