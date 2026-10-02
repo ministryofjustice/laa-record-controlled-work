@@ -51,7 +51,7 @@
     "@azure/msal-node": "^6.0.1",
     "@ministryofjustice/frontend": "11.1.0",
     "@ministryofjustice/hmpps-forge": "^0.4.3",
-    "@sentry/node": "^10.72.0",
+    "@sentry/node": "^10.75.3",
     "accessible-autocomplete": "^3.0.2",
     "compression": "^1.8.2",
     "connect-redis": "^10.0.0",
