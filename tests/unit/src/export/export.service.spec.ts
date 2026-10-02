@@ -7,6 +7,7 @@ import { NotAuthenticatedError } from "#/auth/auth.errors.js";
 import config from "#/config.js";
 import type { Success } from "#/lib/either.js";
 import { LoadApplicationForExportError } from "#/export/export.errors.js";
+import { toExportApplicationViewModel } from "#/export/export.mappers.js";
 import { loadApplicationForExport } from "#/export/export.service.js";
 import type { LoadApplicationForExportDeps } from "#/export/export.types.js";
 import { getGetApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
@@ -101,6 +102,37 @@ describe("loadApplicationForExport", () => {
     const result = await loadApplicationForExport(deps, params);
 
     expect(result.error).to.be.instanceOf(LoadApplicationForExportError);
+  });
+
+  it("passes API-valid incompatible calculation fields to the export mapper", async () => {
+    const application = getGetApplicationResponseMock({
+      eligibility: {
+        data: { passporting: false },
+        result: {
+          result_summary: {
+            gross_income: {
+              combined_total_gross_income: "not-a-number",
+              proceeding_types: [
+                { result: "eligible", upper_threshold: 1_000 },
+              ],
+            },
+            overall_result: { result: "eligible" },
+          },
+        },
+      },
+      meansAssessmentRequired: true,
+      providerOfficeCode: "OFFICE-A",
+    });
+    getApplicationStub.resolves({ data: application, status: 200 });
+
+    const result = (await loadApplicationForExport(deps, params)) as Success<
+      ReturnType<typeof getGetApplicationResponseMock>
+    >;
+
+    expect(result.error).to.equal(undefined);
+    expect(
+      toExportApplicationViewModel(result.value).meansAssessment?.calculations,
+    ).to.deep.equal({ status: "unavailable" });
   });
 
   it("returns NotFoundError when the selected office does not own the application", async () => {
