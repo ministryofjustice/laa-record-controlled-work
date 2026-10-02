@@ -21,6 +21,7 @@ export const CreateApplicationBody = zod.object({
   providerOfficeCode: zod.string(),
   scopingQuestions: zod.object({
     priorLegalAid: zod.enum(["no", "yesDifferentMatter", "yesSameMatter"]),
+    familyLawClassification: zod.enum(["public", "private"]),
   }),
   clientDetails: zod.object({
     firstName: zod.string(),

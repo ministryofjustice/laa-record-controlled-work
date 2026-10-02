@@ -17,6 +17,7 @@ import {
   formatChangeAddressRedirect,
   formatDateOfBirth,
   formatEcfLabel,
+  formatFamilyLawClassificationLabel,
   formatLegalAidBeforeLabel,
   formatLegalAidLast6MonthsLabel,
 } from "#/journeys/create-application/steps/checkAnswers/checkAnswers.formatters.js";
@@ -59,6 +60,11 @@ export function summaryList(): GovUKSummaryList {
     href: "ecf?returnTo=check-answers",
     label: answerLabelT("ecf"),
     value: { text: formatEcfLabel() },
+  });
+  const familyLawClassification = summaryRow({
+    href: "family-type-of-case?returnTo=check-answers",
+    label: answerLabelT("familyLawClassification"),
+    value: { text: formatFamilyLawClassificationLabel() },
   });
   const legalAidBefore = summaryRow({
     href: "legal-aid-before?returnTo=check-answers",
@@ -123,6 +129,7 @@ export function summaryList(): GovUKSummaryList {
   return GovUKSummaryList({
     rows: [
       ecf,
+      familyLawClassification,
       legalAidBefore,
       legalAidLast6Months,
       reasonForYes,

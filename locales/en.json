@@ -147,6 +147,16 @@
         ],
         "button": "Return to case list"
       },
+      "familyLawClassification": {
+        "title": "What type of family law is it?",
+        "radioButton": {
+          "private": "Private",
+          "public": "Public"
+        },
+        "validation": {
+          "required": "Please select an option"
+        }
+      },
       "legalAidBefore": {
         "title": "Has your client accessed legal aid before?",
         "radioButton": {
@@ -277,6 +287,7 @@
         "title": "Check your answers",
         "answerLabels": {
           "ecf": "ECF",
+          "familyLawClassification": "Type of family law",
           "legalAidBefore": "Accessed legal aid before",
           "legalAidLast6Months": "Did your client get legal help for this matter in the last 6 months?",
           "legalAidLast6MonthsReasonForYes": "Reason for new application for same matter",

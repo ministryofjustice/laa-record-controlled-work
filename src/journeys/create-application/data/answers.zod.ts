@@ -6,6 +6,7 @@ export const Answers = zod
   .object({
     dateOfBirth: zod.string(),
     ecf: zod.string(),
+    familyLawClassification: zod.string(),
     firstName: zod.string(),
     hasNINumber: zod.string(),
     haveAHomeAddress: zod.string(),
