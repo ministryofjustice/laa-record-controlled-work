@@ -5357,7 +5357,7 @@ __metadata:
     msw: "npm:^2.15.0"
     nodemon: "npm:^3.1.14"
     nunjucks: "npm:^3.2.4"
-    orval: "npm:^8.36.0"
+    orval: "npm:^8.37.0"
     path-to-regexp: "npm:^8.4.2"
     pino: "npm:^10.3.1"
     playwright-core: "npm:^1.63.0"
@@ -5976,7 +5976,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"orval@npm:^8.36.0":
+"orval@npm:^8.37.0":
   version: 8.37.0
   resolution: "orval@npm:8.37.0"
   dependencies:
