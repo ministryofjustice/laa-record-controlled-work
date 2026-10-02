@@ -7,6 +7,7 @@ import {
   getGetApplicationResponseMock,
   getGetApplicationsResponseMock,
 } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
+import { FamilyLawClassification } from "#/api/clients/rcw/model/familyLawClassification.zod.gen.js";
 
 faker.seed(12345);
 
@@ -37,7 +38,10 @@ const CLIENT_DETAILS = {
     modifiedAt: `${faker.date.past().toISOString().slice(0, 19)}Z`,
     niNumber: `AA${faker.string.numeric(6)}C`,
   },
-  scopingQuestions: { priorLegalAid: PriorLegalAid.enum.no },
+  scopingQuestions: {
+    priorLegalAid: PriorLegalAid.enum.no,
+    familyLawClassification: FamilyLawClassification.enum.private,
+  },
 };
 
 const DECLARATION = {
