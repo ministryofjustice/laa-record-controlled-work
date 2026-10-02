@@ -1,7 +1,5 @@
 import express, { type Application, type Request, type Router } from "express";
 import session from "express-session";
-import path from "node:path";
-import nunjucks from "nunjucks";
 
 import { addCsrfToLocals, csrf } from "#/app/middleware/csrf.middleware.js";
 import authRouter from "#/auth/auth.routes.js";
