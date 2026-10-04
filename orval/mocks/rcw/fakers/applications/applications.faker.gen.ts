@@ -79,6 +79,7 @@ export const getGetApplicationResponseMock = <
   ({
     id: faker.string.uuid(),
     applicationRefNumber: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    ufn: faker.string.alpha({ length: { min: 10, max: 20 } }),
     individualLegalAidNumber: faker.string.uuid(),
     providerFirmCode: faker.string.alpha({ length: { min: 10, max: 20 } }),
     providerOfficeCode: faker.string.alpha({ length: { min: 10, max: 20 } }),
@@ -138,10 +139,333 @@ export const getGetApplicationResponseMock = <
       },
       null,
     ]),
-    eligibility: faker.helpers.arrayElement([{ data: {}, result: {} }, null]),
+    eligibility: faker.helpers.arrayElement([
+      {
+        data: faker.helpers.arrayElement([
+          {
+            additional_properties: Array.from(
+              { length: faker.number.int({ min: 1, max: 10 }) },
+              (_, i) => i + 1,
+            ).map(() => ({
+              house_in_dispute: faker.datatype.boolean(),
+              house_value: faker.number.float({ fractionDigits: 2 }),
+              inline_owned_with_mortgage: faker.datatype.boolean(),
+              mortgage: faker.number.float({ fractionDigits: 2 }),
+              percentage_owned: faker.number.int(),
+            })),
+            additional_property_owned: faker.string.alpha({
+              length: { min: 10, max: 20 },
+            }),
+            adult_dependants: faker.datatype.boolean(),
+            adult_dependants_count: faker.number.int(),
+            aggregated_means: faker.datatype.boolean(),
+            api_response: {},
+            asylum_support: faker.datatype.boolean(),
+            bank_accounts: Array.from(
+              { length: faker.number.int({ min: 1, max: 10 }) },
+              (_, i) => i + 1,
+            ).map(() => ({
+              account_in_dispute: faker.datatype.boolean(),
+              amount: faker.number.float({ fractionDigits: 2 }),
+            })),
+            benefits: Array.from(
+              { length: faker.number.int({ min: 1, max: 10 }) },
+              (_, i) => i + 1,
+            ).map(() => ({
+              benefit_amount: faker.number.float({ fractionDigits: 2 }),
+              benefit_frequency: faker.string.alpha({
+                length: { min: 10, max: 20 },
+              }),
+              benefit_type: faker.string.alpha({
+                length: { min: 10, max: 20 },
+              }),
+            })),
+            child_dependants: faker.datatype.boolean(),
+            child_dependants_count: faker.number.int(),
+            childcare_payments_conditional_value: faker.number.float({
+              fractionDigits: 2,
+            }),
+            childcare_payments_frequency: faker.string.alpha({
+              length: { min: 10, max: 20 },
+            }),
+            childcare_payments_relevant: faker.datatype.boolean(),
+            childcare_payments_value: faker.number.float({ fractionDigits: 2 }),
+            client_age: faker.string.alpha({ length: { min: 10, max: 20 } }),
+            combined_frequency: faker.string.alpha({
+              length: { min: 10, max: 20 },
+            }),
+            controlled_legal_representation: faker.datatype.boolean(),
+            dependant_incomes: Array.from(
+              { length: faker.number.int({ min: 1, max: 10 }) },
+              (_, i) => i + 1,
+            ).map(() => ({
+              amount: faker.number.float({ fractionDigits: 2 }),
+              frequency: faker.string.alpha({ length: { min: 10, max: 20 } }),
+            })),
+            dependants_get_income: faker.datatype.boolean(),
+            domestic_abuse_applicant: faker.datatype.boolean(),
+            early_result: {
+              result: faker.string.alpha({ length: { min: 10, max: 20 } }),
+              gross_income_excess: faker.number.float({ fractionDigits: 2 }),
+              type: faker.string.alpha({ length: { min: 10, max: 20 } }),
+            },
+            employment_status: faker.string.alpha({
+              length: { min: 10, max: 20 },
+            }),
+            feature_flags: {
+              [faker.string.alphanumeric(5)]: faker.datatype.boolean(),
+            },
+            friends_or_family_conditional_value: faker.number.float({
+              fractionDigits: 2,
+            }),
+            friends_or_family_frequency: faker.string.alpha({
+              length: { min: 10, max: 20 },
+            }),
+            friends_or_family_relevant: faker.datatype.boolean(),
+            house_in_dispute: faker.datatype.boolean(),
+            house_value: faker.number.float({ fractionDigits: 2 }),
+            housing_benefit_frequency: faker.string.alpha({
+              length: { min: 10, max: 20 },
+            }),
+            housing_benefit_relevant: faker.datatype.boolean(),
+            housing_benefit_value: faker.number.float({ fractionDigits: 2 }),
+            housing_loan_payments: faker.number.float({ fractionDigits: 2 }),
+            housing_payments: faker.number.float({ fractionDigits: 2 }),
+            housing_payments_frequency: faker.string.alpha({
+              length: { min: 10, max: 20 },
+            }),
+            housing_payments_loan_frequency: faker.string.alpha({
+              length: { min: 10, max: 20 },
+            }),
+            immigration_or_asylum: faker.datatype.boolean(),
+            immigration_or_asylum_type: faker.string.alpha({
+              length: { min: 10, max: 20 },
+            }),
+            immigration_or_asylum_type_upper_tribunal: faker.string.alpha({
+              length: { min: 10, max: 20 },
+            }),
+            incomes: Array.from(
+              { length: faker.number.int({ min: 1, max: 10 }) },
+              (_, i) => i + 1,
+            ).map(() => ({
+              gross_income: faker.number.float({ fractionDigits: 2 }),
+              income_frequency: faker.string.alpha({
+                length: { min: 10, max: 20 },
+              }),
+              income_tax: faker.number.float({ fractionDigits: 2 }),
+              income_type: faker.string.alpha({ length: { min: 10, max: 20 } }),
+              national_insurance: faker.number.float({ fractionDigits: 2 }),
+            })),
+            investments: faker.number.float({ fractionDigits: 2 }),
+            investments_in_dispute: faker.datatype.boolean(),
+            investments_relevant: faker.datatype.boolean(),
+            legal_aid_payments_conditional_value: faker.number.float({
+              fractionDigits: 2,
+            }),
+            legal_aid_payments_frequency: faker.string.alpha({
+              length: { min: 10, max: 20 },
+            }),
+            legal_aid_payments_relevant: faker.datatype.boolean(),
+            legal_aid_payments_value: faker.number.float({ fractionDigits: 2 }),
+            level_of_help: faker.string.alpha({ length: { min: 10, max: 20 } }),
+            maintenance_conditional_value: faker.number.float({
+              fractionDigits: 2,
+            }),
+            maintenance_frequency: faker.string.alpha({
+              length: { min: 10, max: 20 },
+            }),
+            maintenance_payments_conditional_value: faker.number.float({
+              fractionDigits: 2,
+            }),
+            maintenance_payments_frequency: faker.string.alpha({
+              length: { min: 10, max: 20 },
+            }),
+            maintenance_payments_relevant: faker.datatype.boolean(),
+            maintenance_payments_value: faker.number.float({
+              fractionDigits: 2,
+            }),
+            maintenance_relevant: faker.datatype.boolean(),
+            mortgage: faker.number.float({ fractionDigits: 2 }),
+            other_conditional_value: faker.number.float({ fractionDigits: 2 }),
+            other_relevant: faker.datatype.boolean(),
+            partner: faker.datatype.boolean(),
+            partner_additional_properties: Array.from(
+              { length: faker.number.int({ min: 1, max: 10 }) },
+              (_, i) => i + 1,
+            ).map(() => ({
+              house_in_dispute: faker.datatype.boolean(),
+              house_value: faker.number.float({ fractionDigits: 2 }),
+              inline_owned_with_mortgage: faker.datatype.boolean(),
+              mortgage: faker.number.float({ fractionDigits: 2 }),
+              percentage_owned: faker.number.int(),
+            })),
+            partner_additional_property_owned: faker.string.alpha({
+              length: { min: 10, max: 20 },
+            }),
+            partner_bank_accounts: Array.from(
+              { length: faker.number.int({ min: 1, max: 10 }) },
+              (_, i) => i + 1,
+            ).map(() => ({
+              account_in_dispute: faker.datatype.boolean(),
+              amount: faker.number.float({ fractionDigits: 2 }),
+            })),
+            partner_benefits: Array.from(
+              { length: faker.number.int({ min: 1, max: 10 }) },
+              (_, i) => i + 1,
+            ).map(() => ({
+              benefit_amount: faker.number.float({ fractionDigits: 2 }),
+              benefit_frequency: faker.string.alpha({
+                length: { min: 10, max: 20 },
+              }),
+              benefit_type: faker.string.alpha({
+                length: { min: 10, max: 20 },
+              }),
+            })),
+            partner_childcare_payments_conditional_value: faker.number.float({
+              fractionDigits: 2,
+            }),
+            partner_childcare_payments_frequency: faker.string.alpha({
+              length: { min: 10, max: 20 },
+            }),
+            partner_childcare_payments_relevant: faker.datatype.boolean(),
+            partner_childcare_payments_value: faker.number.float({
+              fractionDigits: 2,
+            }),
+            partner_employment_status: faker.string.alpha({
+              length: { min: 10, max: 20 },
+            }),
+            partner_friends_or_family_conditional_value: faker.number.float({
+              fractionDigits: 2,
+            }),
+            partner_friends_or_family_frequency: faker.string.alpha({
+              length: { min: 10, max: 20 },
+            }),
+            partner_friends_or_family_relevant: faker.datatype.boolean(),
+            partner_incomes: Array.from(
+              { length: faker.number.int({ min: 1, max: 10 }) },
+              (_, i) => i + 1,
+            ).map(() => ({
+              gross_income: faker.number.float({ fractionDigits: 2 }),
+              income_frequency: faker.string.alpha({
+                length: { min: 10, max: 20 },
+              }),
+              income_tax: faker.number.float({ fractionDigits: 2 }),
+              income_type: faker.string.alpha({ length: { min: 10, max: 20 } }),
+              national_insurance: faker.number.float({ fractionDigits: 2 }),
+            })),
+            partner_investments: faker.number.float({ fractionDigits: 2 }),
+            partner_investments_relevant: faker.datatype.boolean(),
+            partner_legal_aid_payments_conditional_value: faker.number.float({
+              fractionDigits: 2,
+            }),
+            partner_legal_aid_payments_frequency: faker.string.alpha({
+              length: { min: 10, max: 20 },
+            }),
+            partner_legal_aid_payments_relevant: faker.datatype.boolean(),
+            partner_legal_aid_payments_value: faker.number.float({
+              fractionDigits: 2,
+            }),
+            partner_maintenance_conditional_value: faker.number.float({
+              fractionDigits: 2,
+            }),
+            partner_maintenance_frequency: faker.string.alpha({
+              length: { min: 10, max: 20 },
+            }),
+            partner_maintenance_payments_conditional_value: faker.number.float({
+              fractionDigits: 2,
+            }),
+            partner_maintenance_payments_frequency: faker.string.alpha({
+              length: { min: 10, max: 20 },
+            }),
+            partner_maintenance_payments_relevant: faker.datatype.boolean(),
+            partner_maintenance_payments_value: faker.number.float({
+              fractionDigits: 2,
+            }),
+            partner_maintenance_relevant: faker.datatype.boolean(),
+            partner_other_conditional_value: faker.number.float({
+              fractionDigits: 2,
+            }),
+            partner_other_relevant: faker.datatype.boolean(),
+            partner_over_60: faker.datatype.boolean(),
+            partner_pension_conditional_value: faker.number.float({
+              fractionDigits: 2,
+            }),
+            partner_pension_frequency: faker.string.alpha({
+              length: { min: 10, max: 20 },
+            }),
+            partner_pension_relevant: faker.datatype.boolean(),
+            partner_property_or_lodger_conditional_value: faker.number.float({
+              fractionDigits: 2,
+            }),
+            partner_property_or_lodger_frequency: faker.string.alpha({
+              length: { min: 10, max: 20 },
+            }),
+            partner_property_or_lodger_relevant: faker.datatype.boolean(),
+            partner_receives_benefits: faker.datatype.boolean(),
+            partner_student_finance_conditional_value: faker.number.float({
+              fractionDigits: 2,
+            }),
+            partner_student_finance_relevant: faker.datatype.boolean(),
+            partner_valuables: faker.number.float({ fractionDigits: 2 }),
+            partner_valuables_relevant: faker.datatype.boolean(),
+            passporting: faker.datatype.boolean(),
+            pending: {},
+            pension_conditional_value: faker.number.float({
+              fractionDigits: 2,
+            }),
+            pension_frequency: faker.string.alpha({
+              length: { min: 10, max: 20 },
+            }),
+            pension_relevant: faker.datatype.boolean(),
+            percentage_owned: faker.number.int(),
+            property_landlord: faker.datatype.boolean(),
+            property_or_lodger_conditional_value: faker.number.float({
+              fractionDigits: 2,
+            }),
+            property_or_lodger_frequency: faker.string.alpha({
+              length: { min: 10, max: 20 },
+            }),
+            property_or_lodger_relevant: faker.datatype.boolean(),
+            property_owned: faker.string.alpha({
+              length: { min: 10, max: 20 },
+            }),
+            receives_benefits: faker.datatype.boolean(),
+            regular_income: faker.datatype.boolean(),
+            rent: faker.number.float({ fractionDigits: 2 }),
+            shared_ownership_mortgage: faker.number.float({
+              fractionDigits: 2,
+            }),
+            student_finance_conditional_value: faker.number.float({
+              fractionDigits: 2,
+            }),
+            student_finance_relevant: faker.datatype.boolean(),
+            under_eighteen_assets: faker.datatype.boolean(),
+            valuables: faker.number.float({ fractionDigits: 2 }),
+            valuables_in_dispute: faker.datatype.boolean(),
+            valuables_relevant: faker.datatype.boolean(),
+            vehicle_owned: faker.datatype.boolean(),
+            vehicles: Array.from(
+              { length: faker.number.int({ min: 1, max: 10 }) },
+              (_, i) => i + 1,
+            ).map(() => ({
+              vehicle_finance: faker.number.float({ fractionDigits: 2 }),
+              vehicle_in_dispute: faker.datatype.boolean(),
+              vehicle_in_regular_use: faker.datatype.boolean(),
+              vehicle_over_3_years_ago: faker.datatype.boolean(),
+              vehicle_pcp: faker.datatype.boolean(),
+              vehicle_value: faker.number.float({ fractionDigits: 2 }),
+            })),
+          },
+          null,
+        ]),
+        result: {},
+      },
+      null,
+    ]),
     reasonForReapplication: faker.string.alpha({
       length: { min: 10, max: 20 },
     }),
+    ecfFlag: faker.datatype.boolean(),
     meansAssessmentRequired: faker.datatype.boolean(),
     typeOfNonMeans: faker.datatype.boolean(),
     contribution: faker.string.alpha({ length: { min: 10, max: 20 } }),
@@ -151,6 +475,10 @@ export const getGetApplicationResponseMock = <
           "no",
           "yesDifferentMatter",
           "yesSameMatter",
+        ] as const),
+        familyLawClassification: faker.helpers.arrayElement([
+          "public",
+          "private",
         ] as const),
       },
       null,
