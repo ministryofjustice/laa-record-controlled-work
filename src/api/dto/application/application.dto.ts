@@ -3,6 +3,7 @@ import type { CreateApplicationRequestBody } from "#/api/clients/rcw/model/creat
 import type { ScopingQuestions } from "#/api/clients/rcw/model/scopingQuestions.zod.gen.js";
 import type { AnswersOutput } from "#/journeys/create-application/data/answers.zod.js";
 
+import { FamilyLawClassification } from "#/api/clients/rcw/model/familyLawClassification.zod.gen.js";
 import { PriorLegalAid } from "#/api/clients/rcw/model/priorLegalAid.zod.gen.js";
 import { AnswerKey } from "#/journeys/AnswerKey.enum.js";
 import {
@@ -110,6 +111,7 @@ export class ApplicationDto {
       providerOfficeCode,
       reasonForReapplication: answers.reasonForYes,
       scopingQuestions: {
+        familyLawClassification: FamilyLawClassification.enum.public,
         priorLegalAid: answers.legalAidBefore,
       },
     });

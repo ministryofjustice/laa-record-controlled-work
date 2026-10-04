@@ -48,6 +48,7 @@ describe("fromAnswers method", () => {
       providerOfficeCode,
       reasonForReapplication: "here is a reason",
       scopingQuestions: {
+        familyLawClassification: "public",
         priorLegalAid: "yesSameMatter",
       },
     };
@@ -130,6 +131,7 @@ describe("toAnswers method", () => {
     declaration: null,
     evidence: null,
     eligibility: null,
+    ecfFlag: null,
     reasonForReapplication: null,
     meansAssessmentRequired: null,
     typeOfNonMeans: null,
