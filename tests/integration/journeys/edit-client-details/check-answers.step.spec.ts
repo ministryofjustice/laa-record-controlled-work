@@ -73,6 +73,10 @@ describe("Edit client details check answers step", () => {
   const getApplicationStub = sinon
     .stub()
     .resolves({ status: 200, data: ukApplication });
+  const getApplication = async (id: string, options?: RequestInit) => ({
+    ...(await getApplicationStub(id, options)),
+    headers: new Headers({ etag: '"1"' }),
+  });
   const updateApplicationStatusStub = sinon
     .stub()
     .resolves({ status: 204, data: undefined });
@@ -84,7 +88,7 @@ describe("Edit client details check answers step", () => {
       additionalFunctions: [editApplicationTransformersRegistry],
       disableReachabilityChecks: false,
       dependencies: {
-        getApplication: getApplicationStub,
+        getApplication,
         updateApplicationStatus: updateApplicationStatusStub,
       },
     },

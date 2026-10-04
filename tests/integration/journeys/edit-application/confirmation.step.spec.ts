@@ -19,6 +19,10 @@ describe("Confirmation step", () => {
   const getApplicationStub = sinon
     .stub()
     .resolves({ status: 200, data: mockData });
+  const getApplication = async (id: string, options?: RequestInit) => ({
+    ...(await getApplicationStub(id, options)),
+    headers: new Headers({ etag: '"1"' }),
+  });
   const updateApplicationStatusStub = sinon.stub().resolves({ status: 204 });
 
   const client = createForgeTestClient(
@@ -27,7 +31,7 @@ describe("Confirmation step", () => {
     {
       additionalFunctions: [editApplicationTransformersRegistry],
       dependencies: {
-        getApplication: getApplicationStub,
+        getApplication,
         updateApplicationStatus: updateApplicationStatusStub,
       },
     },

@@ -32,6 +32,10 @@ describe("Task list step", () => {
   const getApplicationStub = sinon
     .stub()
     .resolves({ status: 200, data: mockData });
+  const getApplication = async (id: string, options?: RequestInit) => ({
+    ...(await getApplicationStub(id, options)),
+    headers: new Headers({ etag: '"1"' }),
+  });
   const updateApplicationStatusStub = sinon
     .stub()
     .resolves({ status: 204, data: undefined });
@@ -42,7 +46,7 @@ describe("Task list step", () => {
     {
       additionalFunctions: [editApplicationTransformersRegistry],
       dependencies: {
-        getApplication: getApplicationStub,
+        getApplication,
         updateApplicationStatus: updateApplicationStatusStub,
       },
     },
@@ -428,7 +432,7 @@ describe("Task list step", () => {
       expect(updateApplicationStatusStub.firstCall.args[0]).to.equal(uuid);
       expect(updateApplicationStatusStub.firstCall.args[1]).to.deep.equal({
         applicationState: "COMPLETED",
-        eTag: 0,
+        eTag: 1,
       });
     });
 
