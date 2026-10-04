@@ -51,7 +51,11 @@ describe("loadApplication", () => {
   it("sets application in context from getApplication response", async () => {
     const mockApplication = getGetApplicationResponseMock();
 
-    getApplicationStub.resolves({ status: 200, data: mockApplication });
+    getApplicationStub.resolves({
+      status: 200,
+      data: mockApplication,
+      headers: new Headers({ etag: '"00042"' }),
+    });
 
     await loadApplication(deps)(context);
 
@@ -59,6 +63,47 @@ describe("loadApplication", () => {
     expect(
       setData.calledWith(CONTEXT_DATA_KEYS.application, mockApplication),
     ).to.equal(true);
+    expect(
+      setData.calledWith(CONTEXT_DATA_KEYS.applicationETag, '"00042"'),
+    ).to.equal(true);
+  });
+
+  it("rejects a response with an invalid ETag before storing application data", async () => {
+    getApplicationStub.resolves({
+      status: 200,
+      data: getGetApplicationResponseMock(),
+      headers: new Headers({ etag: 'W/"42"' }),
+    });
+    const errorStub = sinon.stub(logger, "error");
+
+    try {
+      await loadApplication(deps)(context);
+      expect.fail("should have thrown");
+    } catch (error) {
+      expect(error).to.be.instanceOf(ApiResponseError);
+    }
+
+    expect(setData.notCalled).to.equal(true);
+    expect(errorStub.calledOnce).to.equal(true);
+  });
+
+  it("does not log a failed GET response body", async () => {
+    const responseBody = { clientDetails: { firstName: "Synthetic value" } };
+    getApplicationStub.resolves({
+      status: 500,
+      data: responseBody,
+      headers: new Headers(),
+    });
+    const errorStub = sinon.stub(logger, "error");
+
+    try {
+      await loadApplication(deps)(context);
+      expect.fail("should have thrown");
+    } catch (error) {
+      expect(error).to.be.instanceOf(ApiResponseError);
+    }
+
+    expect(errorStub.args.flat()).not.to.include(responseBody);
   });
 
   it("throws ApiResponseError when getApplication responds with non-200", async () => {
@@ -80,7 +125,7 @@ describe("loadApplication", () => {
   it("throws ApiResponseError when getApplication rejects", async () => {
     const cause = new Error("network error");
     getApplicationStub.rejects(cause);
-    sinon.stub(logger, "error");
+    const errorStub = sinon.stub(logger, "error");
 
     try {
       await loadApplication(deps)(context);
@@ -89,6 +134,8 @@ describe("loadApplication", () => {
       expect(error).to.be.instanceOf(ApiResponseError);
       expect((error as ApiResponseError).cause).to.equal(cause);
     }
+
+    expect(errorStub.args.flat()).not.to.include(cause);
   });
 
   it("throws ApiResponseError when applicationID param is missing", async () => {

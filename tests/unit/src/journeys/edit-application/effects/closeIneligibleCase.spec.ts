@@ -11,18 +11,20 @@ import type {
 
 describe("closeIneligibleCase", () => {
   let updateApplicationStatus: sinon.SinonStub;
+  let getData: sinon.SinonStub;
   let context: EditApplicationContext;
   let deps: EditApplicationEffectsDeps;
 
   beforeEach(() => {
     sinon.stub(config.api, "useMockAccessToken").value(true);
     updateApplicationStatus = sinon.stub();
+    getData = sinon.stub().returns('"3"');
     deps = { updateApplicationStatus } as unknown as EditApplicationEffectsDeps;
     context = {
       getPostData: sinon.stub().returns("close"),
       getRequestParam: sinon.stub().returns("application-id"),
       getSession: sinon.stub().returns({ id: "session-id" }),
-      getData: sinon.stub().returns(3),
+      getData,
     } as unknown as EditApplicationContext;
   });
 
@@ -45,6 +47,10 @@ describe("closeIneligibleCase", () => {
     await closeIneligibleCase(deps)(context);
 
     expect(updateApplicationStatus.calledOnce).to.equal(true);
+    expect(updateApplicationStatus.firstCall.args[1]).to.deep.equal({
+      applicationState: "COMPLETED",
+      eTag: 3,
+    });
     expect(
       distributionStub.calledOnceWithMatch(
         "api_response_time",
@@ -79,6 +85,19 @@ describe("closeIneligibleCase", () => {
         },
       ),
     ).to.equal(true);
+  });
+
+  it("does not call the API when the version is not a safe integer", async () => {
+    getData.returns('"9007199254740992"');
+
+    try {
+      await closeIneligibleCase(deps)(context);
+      expect.fail("expected unsafe version to be rejected");
+    } catch (error) {
+      expect(error).to.be.instanceOf(Error);
+    }
+
+    expect(updateApplicationStatus.notCalled).to.equal(true);
   });
 
   it("rethrows a rejected API operation and records one metric without status", async () => {

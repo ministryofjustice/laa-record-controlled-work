@@ -8,6 +8,7 @@ import {
   CONTEXT_DATA_KEYS,
   PARAMS_KEYS,
 } from "#/journeys/journey.constants.js";
+import { parseSafeApplicationETag } from "#/lib/applicationETag.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import * as metrics from "#/lib/metrics.js";
 
@@ -23,6 +24,9 @@ export const closeIneligibleCase =
       throw new Error("applicationID parameter is required");
     }
 
+    const eTag = parseSafeApplicationETag(
+      context.getData(CONTEXT_DATA_KEYS.applicationETag),
+    );
     const session = context.getSession();
     const options = await getRcwApiDefaultOptions({
       homeAccountId: session?.msal?.homeAccountId,
@@ -31,7 +35,7 @@ export const closeIneligibleCase =
 
     const body = {
       applicationState: "COMPLETED" as const,
-      eTag: context.getData<number>(CONTEXT_DATA_KEYS.applicationETag),
+      eTag,
     };
     const response = await metrics.time(
       "updateApplicationStatus",

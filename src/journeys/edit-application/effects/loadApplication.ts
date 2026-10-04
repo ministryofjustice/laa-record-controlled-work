@@ -14,11 +14,10 @@ import {
   CONTEXT_DATA_KEYS,
   PARAMS_KEYS,
 } from "#/journeys/journey.constants.js";
+import { parseApplicationETag } from "#/lib/applicationETag.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import * as metrics from "#/lib/metrics.js";
 import { logger } from "#/logger.js";
-
-const DEFAULT_ETAG = 0;
 
 export const loadApplication =
   (deps: EditApplicationEffectsDeps) =>
@@ -42,9 +41,7 @@ export const loadApplication =
         async () => await deps.getApplication(applicationID, opts),
       );
     } catch (error) {
-      logger.error("Error fetching application", error, {
-        api: "getApplication",
-      });
+      logger.error("Error fetching application", { api: "getApplication" });
       throw ApiResponseError.from(error);
     }
 
@@ -53,7 +50,6 @@ export const loadApplication =
         "getApplication did not return 200",
         {
           authHeaders: getAuthDebugHeaders(response.headers),
-          data: response.data,
           status: response.status,
         },
         {
@@ -66,20 +62,31 @@ export const loadApplication =
     const result = Application.safeParse(response.data);
 
     if (!result.success) {
-      logger.error(
-        "getApplication response data failed validation",
-        result.error,
-      );
+      const issues = result.error.issues.map(({ code, path }) => ({
+        code,
+        path,
+      }));
+      logger.error("getApplication response data failed validation", {
+        issues,
+      });
       throw ApiValidationError.from(result.error);
     }
 
     const application: Application = result.data;
-    context.setData(CONTEXT_DATA_KEYS.application, application);
-
     const headers = response.headers as Headers | undefined;
     const eTag = headers?.get("etag");
-    context.setData(
-      CONTEXT_DATA_KEYS.applicationETag,
-      eTag ? Number.parseInt(eTag, 10) : DEFAULT_ETAG,
-    );
+    let applicationETag: string;
+    try {
+      applicationETag = parseApplicationETag(eTag);
+    } catch {
+      logger.error("getApplication returned an invalid ETag", {
+        api: "getApplication",
+        hasETag: typeof eTag === "string",
+        status: response.status,
+      });
+      throw new ApiResponseError();
+    }
+
+    context.setData(CONTEXT_DATA_KEYS.application, application);
+    context.setData(CONTEXT_DATA_KEYS.applicationETag, applicationETag);
   };
