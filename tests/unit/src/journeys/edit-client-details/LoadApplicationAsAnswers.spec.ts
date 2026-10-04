@@ -115,4 +115,47 @@ describe("loadApplicationAsAnswers", () => {
       [`${journeyCode}:application-2`]: answers,
     });
   });
+
+  it("loads known client answers without inventing missing legacy choices", () => {
+    const session: { journeyDrafts: Record<string, Record<string, unknown>> } = {
+      journeyDrafts: {},
+    };
+    const loadedAnswers: Record<string, unknown> = {};
+    const legacyApplication = {
+      clientDetails: {
+        firstName: "Jane",
+        lastName: "Bloggs",
+        dateOfBirth: "1990-01-01",
+        niNumber: null,
+        hasFixedAddress: false,
+      },
+      ecfFlag: null,
+      reasonForReapplication: null,
+      scopingQuestions: null,
+    } as Application;
+
+    getSession.returns(session);
+    getData.withArgs(CONTEXT_DATA_KEYS.application).returns(legacyApplication);
+    getAllAnswers.returns(loadedAnswers);
+    setAnswer.callsFake((key: string, value: unknown) => {
+      loadedAnswers[key] = value;
+    });
+    toAnswers.restore();
+
+    loadApplicationAsAnswers()(context, journeyCode);
+
+    const draft = session.journeyDrafts[`${journeyCode}:application-1`];
+    expect(draft).to.include({
+      firstName: "Jane",
+      lastName: "Bloggs",
+      dateOfBirth: "1990-01-01",
+      hasNINumber: "no",
+      haveAHomeAddress: "no",
+    });
+    expect(draft).to.not.have.any.keys(
+      "ecf",
+      "legalAidBefore",
+      "legalAidLast6Months",
+    );
+  });
 });

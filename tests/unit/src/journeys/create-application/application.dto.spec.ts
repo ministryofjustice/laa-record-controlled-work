@@ -248,4 +248,58 @@ describe("toAnswers method", () => {
       "osCountry",
     );
   });
+
+  it("leaves prior legal aid unanswered when the API omits the choice", () => {
+    const result = ApplicationDto.toAnswers({
+      ...application,
+      scopingQuestions: { familyLawClassification: "public" },
+    });
+
+    expect(result).to.include({
+      firstName: "Jane",
+      lastName: "Bloggs",
+      dateOfBirth: "1990-01-01",
+    });
+    expect(result).to.not.have.any.keys(
+      "legalAidBefore",
+      "legalAidLast6Months",
+    );
+  });
+
+  it("loads known client and address answers when scoping and ECF are null", () => {
+    const result = ApplicationDto.toAnswers({
+      ...application,
+      ecfFlag: null,
+      scopingQuestions: null,
+    });
+
+    expect(result).to.include({
+      firstName: "Jane",
+      lastName: "Bloggs",
+      dateOfBirth: "1990-01-01",
+      haveAHomeAddress: "yes",
+      ukAddressLine1: "123 Test Street",
+      ukTownOrCity: "Manchester",
+      ukCountry: "United Kingdom",
+    });
+    expect(result).to.not.have.any.keys(
+      "ecf",
+      "legalAidBefore",
+      "legalAidLast6Months",
+    );
+  });
+
+  it("maps known ECF flags to yes and no answers", () => {
+    const yesResult = ApplicationDto.toAnswers({
+      ...application,
+      ecfFlag: true,
+    });
+    const noResult = ApplicationDto.toAnswers({
+      ...application,
+      ecfFlag: false,
+    });
+
+    expect(yesResult.ecf).to.equal("yes");
+    expect(noResult.ecf).to.equal("no");
+  });
 });
