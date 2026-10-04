@@ -60,7 +60,6 @@ export const loadApplication =
     }
 
     const result = Application.safeParse(response.data);
-
     if (!result.success) {
       const issues = result.error.issues.map(({ code, path }) => ({
         code,
