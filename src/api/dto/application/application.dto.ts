@@ -36,6 +36,14 @@ type ApplicationAddress = NonNullable<
   ApplicationSchema["clientDetails"]["address"]
 >;
 
+type ApplicationAnswers = Omit<
+  AnswersOutput,
+  "ecf" | "legalAidBefore" | "legalAidLast6Months"
+> &
+  Partial<
+    Pick<AnswersOutput, "ecf" | "legalAidBefore" | "legalAidLast6Months">
+  >;
+
 interface OverseasAddress {
   addressLine1: string;
   addressLine2?: string;
@@ -154,20 +162,17 @@ export class ApplicationDto {
   /**
    * Creates an answers output instance from the provided application.
    * @param application - The application from which to create the answers output instance.
-   * @returns AnswersOutput instance.
+   * @returns Known answers from the application.
    */
-  public static toAnswers(application: ApplicationSchema): AnswersOutput {
+  public static toAnswers(application: ApplicationSchema): ApplicationAnswers {
     const addressAnswers = application.clientDetails.hasFixedAddress
       ? this.getAnswersFromAddress(application)
       : {};
-    const priorLegalAid = PriorLegalAid.parse(
-      application.scopingQuestions?.priorLegalAid,
-    );
 
     return {
       ...addressAnswers,
+      ...this.getAvailableChoiceAnswers(application),
       [AnswerKey.dateOfBirth]: application.clientDetails.dateOfBirth,
-      [AnswerKey.ecf]: "no",
       [AnswerKey.firstName]: application.clientDetails.firstName,
       [AnswerKey.hasNINumber]: application.clientDetails.niNumber
         ? "yes"
@@ -176,12 +181,6 @@ export class ApplicationDto {
         ? "yes"
         : "no",
       [AnswerKey.lastName]: application.clientDetails.lastName,
-      [AnswerKey.legalAidBefore]: priorLegalAid,
-      [AnswerKey.legalAidLast6Months]:
-        priorLegalAid === PriorLegalAid.enum.yesSameMatter &&
-        application.reasonForReapplication
-          ? "yes"
-          : "no",
       [AnswerKey.niNumber]: application.clientDetails.niNumber ?? "",
       [AnswerKey.reasonForYes]: application.reasonForReapplication ?? "",
     };
@@ -223,6 +222,37 @@ export class ApplicationDto {
       [AnswerKey.ukPostcode]: address.postCode ?? undefined,
       [AnswerKey.ukTownOrCity]: address.townOrCity ?? undefined,
     };
+  }
+
+  /**
+   * Maps available choice answers from the API response.
+   * @param application - Application response to map.
+   * @returns Available ECF and prior legal aid answers.
+   */
+  private static getAvailableChoiceAnswers(
+    application: ApplicationSchema,
+  ): Partial<
+    Pick<ApplicationAnswers, "ecf" | "legalAidBefore" | "legalAidLast6Months">
+  > {
+    const priorLegalAid = application.scopingQuestions?.priorLegalAid;
+    const availableAnswers: Partial<
+      Pick<ApplicationAnswers, "ecf" | "legalAidBefore" | "legalAidLast6Months">
+    > = {};
+
+    if (priorLegalAid !== undefined) {
+      availableAnswers[AnswerKey.legalAidBefore] = priorLegalAid;
+      availableAnswers[AnswerKey.legalAidLast6Months] =
+        priorLegalAid === PriorLegalAid.enum.yesSameMatter &&
+        application.reasonForReapplication
+          ? "yes"
+          : "no";
+    }
+
+    if (application.ecfFlag !== null) {
+      availableAnswers[AnswerKey.ecf] = application.ecfFlag ? "yes" : "no";
+    }
+
+    return availableAnswers;
   }
 
   /**

@@ -116,12 +116,12 @@ describe("loadApplicationAsAnswers", () => {
     });
   });
 
-  it("loads known client answers without inventing missing legacy choices", () => {
+  it("loads known client answers while leaving unavailable choices unanswered", () => {
     const session: { journeyDrafts: Record<string, Record<string, unknown>> } = {
       journeyDrafts: {},
     };
     const loadedAnswers: Record<string, unknown> = {};
-    const legacyApplication = {
+    const applicationResponse = {
       clientDetails: {
         firstName: "Jane",
         lastName: "Bloggs",
@@ -135,7 +135,7 @@ describe("loadApplicationAsAnswers", () => {
     } as Application;
 
     getSession.returns(session);
-    getData.withArgs(CONTEXT_DATA_KEYS.application).returns(legacyApplication);
+    getData.withArgs(CONTEXT_DATA_KEYS.application).returns(applicationResponse);
     getAllAnswers.returns(loadedAnswers);
     setAnswer.callsFake((key: string, value: unknown) => {
       loadedAnswers[key] = value;
