@@ -8,8 +8,6 @@ import type { Application } from "#/api/clients/rcw/model/application.zod.gen.js
 
 import type { Applications } from "#/api/clients/rcw/model/applications.zod.gen.js";
 
-import type { BadGatewayResponse } from "#/api/clients/rcw/model/badGatewayResponse.zod.gen.js";
-
 import type { BadRequestResponse } from "#/api/clients/rcw/model/badRequestResponse.zod.gen.js";
 
 import type { ConflictResponse } from "#/api/clients/rcw/model/conflictResponse.zod.gen.js";
@@ -24,6 +22,11 @@ import type { GetApplicationsParams } from "#/api/clients/rcw/model/getApplicati
 
 import type { InternalServerErrorResponse } from "#/api/clients/rcw/model/internalServerErrorResponse.zod.gen.js";
 
+import type {
+  InternalServerErrorResponse as BadGatewayResponse,
+  InternalServerErrorResponse as ServiceUnavailableResponse,
+} from "#/api/clients/rcw/model/internalServerErrorResponse.zod.gen.js";
+
 import type { NotFoundResponse } from "#/api/clients/rcw/model/notFoundResponse.zod.gen.js";
 
 import type { PayloadTooLargeResponse } from "#/api/clients/rcw/model/payloadTooLargeResponse.zod.gen.js";
@@ -31,8 +34,6 @@ import type { PayloadTooLargeResponse } from "#/api/clients/rcw/model/payloadToo
 import type { PreconditionFailedResponse } from "#/api/clients/rcw/model/preconditionFailedResponse.zod.gen.js";
 
 import type { PreconditionRequiredResponse } from "#/api/clients/rcw/model/preconditionRequiredResponse.zod.gen.js";
-
-import type { ServiceUnavailableResponse } from "#/api/clients/rcw/model/serviceUnavailableResponse.zod.gen.js";
 
 import type { UnauthorizedResponse } from "#/api/clients/rcw/model/unauthorizedResponse.zod.gen.js";
 
