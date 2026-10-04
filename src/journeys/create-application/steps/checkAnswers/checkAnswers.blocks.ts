@@ -26,6 +26,10 @@ const answerLabelT = fixedT(
   "journeys.createApplication.checkAnswers.answerLabels",
 );
 
+interface SummaryListOptions {
+  showIncomplete?: boolean;
+}
+
 interface SummaryRow {
   actions: {
     items: Array<{
@@ -51,24 +55,28 @@ interface SummaryRowArgs {
 
 /**
  * Creates the check-answers summary list.
+ * @param options Summary list formatting options.
  *
  * @returns The check-answers summary list.
  */
-export function summaryList(): GovUKSummaryList {
+export function summaryList(
+  options: SummaryListOptions = {},
+): GovUKSummaryList {
+  const showIncomplete = options.showIncomplete ?? false;
   const ecf = summaryRow({
     href: "ecf?returnTo=check-answers",
     label: answerLabelT("ecf"),
-    value: { text: formatEcfLabel() },
+    value: { text: formatEcfLabel(showIncomplete) },
   });
   const legalAidBefore = summaryRow({
     href: "legal-aid-before?returnTo=check-answers",
     label: answerLabelT("legalAidBefore"),
-    value: { text: formatLegalAidBeforeLabel() },
+    value: { text: formatLegalAidBeforeLabel(showIncomplete) },
   });
   const legalAidLast6Months = summaryRow({
     href: "legal-aid-last-6-months?returnTo=check-answers",
     label: answerLabelT("legalAidLast6Months"),
-    value: { text: formatLegalAidLast6MonthsLabel() },
+    value: { text: formatLegalAidLast6MonthsLabel(showIncomplete) },
     visibleWhen: Answer(AnswerKey.legalAidBefore).match(
       Condition.Equals(PriorLegalAid.enum.yesSameMatter),
     ),
@@ -145,7 +153,7 @@ export function summaryList(): GovUKSummaryList {
 function summaryRow(args: SummaryRowArgs): SummaryRow {
   const { href, label, value, visibleWhen } = args;
 
-  return {
+  const row: SummaryRow = {
     actions: {
       items: [
         {
@@ -159,6 +167,11 @@ function summaryRow(args: SummaryRowArgs): SummaryRow {
       text: label,
     },
     value,
-    ...(visibleWhen === undefined ? {} : { visibleWhen }),
   };
+
+  if (visibleWhen !== undefined) {
+    row.visibleWhen = visibleWhen;
+  }
+
+  return row;
 }

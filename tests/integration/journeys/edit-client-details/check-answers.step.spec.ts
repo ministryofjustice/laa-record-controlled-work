@@ -448,6 +448,53 @@ describe("Edit client details check answers step", () => {
       expect(rows[9].key.text).to.equal("Address");
     });
 
+    it("shows unanswered choices as incomplete with links to their questions", async () => {
+      const result = await getCheckAnswers({
+        ...ukApplication,
+        ecfFlag: null,
+        scopingQuestions: { familyLawClassification: "public" },
+      });
+      const [incompleteSummaryList] = result.getBlocksByVariant(
+        "govukSummaryList",
+      );
+      const rows = incompleteSummaryList.properties.rows as SummaryRow[];
+      const ecfRow = rows.find((row) => row.key.text === "ECF");
+      const priorLegalAidRow = rows.find(
+        (row) => row.key.text === "Accessed legal aid before",
+      );
+
+      expect(ecfRow?.value.text).to.equal("Incomplete");
+      expect(ecfRow?.actions?.items[0].href).to.equal(
+        "ecf?returnTo=check-answers",
+      );
+      expect(priorLegalAidRow?.value.text).to.equal("Incomplete");
+      expect(priorLegalAidRow?.actions?.items[0].href).to.equal(
+        "legal-aid-before?returnTo=check-answers",
+      );
+    });
+
+    it("shows invalid choice values as incomplete", async () => {
+      getApplicationStub.resolves({ status: 200, data: ukApplication });
+      const session = {
+        journeyDrafts: {
+          [draftKey]: {
+            ...ApplicationDto.toAnswers(ukApplication),
+            ecf: "unknown",
+            legalAidBefore: "unknown",
+          },
+        },
+      };
+
+      const rows = await getCheckAnswersRows(session);
+      const ecfRow = rows.find((row) => row.key.text === "ECF");
+      const priorLegalAidRow = rows.find(
+        (row) => row.key.text === "Accessed legal aid before",
+      );
+
+      expect(ecfRow?.value.text).to.equal("Incomplete");
+      expect(priorLegalAidRow?.value.text).to.equal("Incomplete");
+    });
+
     it("links the home address row to the home address question", () => {
       const rows = summaryList.properties.rows as Array<{
         actions?: { items: Array<{ href: string }> };

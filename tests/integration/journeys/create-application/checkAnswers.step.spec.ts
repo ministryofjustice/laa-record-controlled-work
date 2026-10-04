@@ -97,6 +97,31 @@ describe("Check answers step", () => {
       expect(rows[9].key.text).to.equal("Address");
     });
 
+    it("keeps the create summary's no fallback for missing choices", async () => {
+      const result = await client.get("/cases/new/check-answers", {
+        session: createSession({
+          ecf: undefined,
+          legalAidBefore: undefined,
+        }),
+      });
+
+      expect(result.type).to.equal("render");
+      const [missingAnswerSummaryList] = (
+        result as TestRenderResult
+      ).getBlocksByVariant("govukSummaryList");
+      const rows = missingAnswerSummaryList.properties.rows as Array<{
+        key: { text: string };
+        value: { text: string };
+      }>;
+      const ecfRow = rows.find((row) => row.key.text === "ECF");
+      const priorLegalAidRow = rows.find(
+        (row) => row.key.text === "Accessed legal aid before",
+      );
+
+      expect(ecfRow?.value.text).to.equal("No");
+      expect(priorLegalAidRow?.value.text).to.equal("No");
+    });
+
     it("links the home address row to the home address question", () => {
       const rows = summaryList.properties.rows as Array<{
         actions?: { items: Array<{ href: string }> };

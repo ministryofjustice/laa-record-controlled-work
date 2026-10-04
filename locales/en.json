@@ -6,7 +6,8 @@
     "signOut": "Sign out",
     "yes": "Yes",
     "no": "No",
-    "change": "Change"
+    "change": "Change",
+    "incomplete": "Incomplete"
   },
   "components": {
     "phaseBanner": {

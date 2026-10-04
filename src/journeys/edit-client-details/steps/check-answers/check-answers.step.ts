@@ -22,7 +22,11 @@ export const checkAnswersStep = (
   journeyCode: string,
 ): ReturnType<typeof step> =>
   step({
-    blocks: [heading(CHECK_ANSWERS), summaryList(), submitButton()],
+    blocks: [
+      heading(CHECK_ANSWERS),
+      summaryList({ showIncomplete: true }),
+      submitButton(),
+    ],
     code: "check-answers",
     onAccess: [
       access({

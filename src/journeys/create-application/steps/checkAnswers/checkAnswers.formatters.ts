@@ -62,22 +62,28 @@ export function formatDateOfBirth(): ResolvableString {
 
 /**
  * Formats the ECF answer label.
+ * @param showIncomplete Whether unknown answers are incomplete.
  * @returns The ECF answer label.
  */
-export function formatEcfLabel(): ResolvableString {
+export function formatEcfLabel(showIncomplete = false): ResolvableString {
   const yes = t("common.yes");
   const no = t("common.no");
+  const unanswered = showIncomplete ? t("common.incomplete") : no;
 
   return match(Answer(AnswerKey.ecf))
     .branch(Condition.Equals("yes"), yes)
-    .otherwise(no);
+    .branch(Condition.Equals("no"), no)
+    .otherwise(unanswered);
 }
 
 /**
  * Formats the previous legal aid answer label.
+ * @param showIncomplete Whether unknown answers are incomplete.
  * @returns The previous legal aid answer label.
  */
-export function formatLegalAidBeforeLabel(): ResolvableString {
+export function formatLegalAidBeforeLabel(
+  showIncomplete = false,
+): ResolvableString {
   const same = t(
     "journeys.createApplication.legalAidBefore.radioButton.yesSameMatter",
   );
@@ -85,24 +91,31 @@ export function formatLegalAidBeforeLabel(): ResolvableString {
     "journeys.createApplication.legalAidBefore.radioButton.yesDifferentMatter",
   );
   const no = t("common.no");
+  const unanswered = showIncomplete ? t("common.incomplete") : no;
 
   return match(Answer(AnswerKey.legalAidBefore))
     .branch(Condition.Equals(PriorLegalAid.enum.yesSameMatter), same)
     .branch(Condition.Equals(PriorLegalAid.enum.yesDifferentMatter), different)
-    .otherwise(no);
+    .branch(Condition.Equals(PriorLegalAid.enum.no), no)
+    .otherwise(unanswered);
 }
 
 /**
  * Formats the recent legal aid answer label.
+ * @param showIncomplete Whether unknown answers are incomplete.
  * @returns The recent legal aid answer label.
  */
-export function formatLegalAidLast6MonthsLabel(): ResolvableString {
+export function formatLegalAidLast6MonthsLabel(
+  showIncomplete = false,
+): ResolvableString {
   const yes = t("common.yes");
   const no = t("common.no");
+  const unanswered = showIncomplete ? t("common.incomplete") : no;
 
   return match(Answer(AnswerKey.legalAidLast6Months))
     .branch(Condition.Equals("yes"), yes)
-    .otherwise(no);
+    .branch(Condition.Equals("no"), no)
+    .otherwise(unanswered);
 }
 
 /**
