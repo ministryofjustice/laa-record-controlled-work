@@ -8,6 +8,8 @@ import type { Application } from "#/api/clients/rcw/model/application.zod.gen.js
 
 import type { Applications } from "#/api/clients/rcw/model/applications.zod.gen.js";
 
+import type { BadGatewayResponse } from "#/api/clients/rcw/model/badGatewayResponse.zod.gen.js";
+
 import type { BadRequestResponse } from "#/api/clients/rcw/model/badRequestResponse.zod.gen.js";
 
 import type { ConflictResponse } from "#/api/clients/rcw/model/conflictResponse.zod.gen.js";
@@ -23,6 +25,8 @@ import type { GetApplicationsParams } from "#/api/clients/rcw/model/getApplicati
 import type { InternalServerErrorResponse } from "#/api/clients/rcw/model/internalServerErrorResponse.zod.gen.js";
 
 import type { NotFoundResponse } from "#/api/clients/rcw/model/notFoundResponse.zod.gen.js";
+
+import type { ServiceUnavailableResponse } from "#/api/clients/rcw/model/serviceUnavailableResponse.zod.gen.js";
 
 import type { UnauthorizedResponse } from "#/api/clients/rcw/model/unauthorizedResponse.zod.gen.js";
 
@@ -61,6 +65,16 @@ export type getApplicationsResponse500 = {
   status: 500;
 };
 
+export type getApplicationsResponse502 = {
+  data: BadGatewayResponse;
+  status: 502;
+};
+
+export type getApplicationsResponse503 = {
+  data: ServiceUnavailableResponse;
+  status: 503;
+};
+
 export type getApplicationsResponseSuccess = getApplicationsResponse200 & {
   headers: Headers;
 };
@@ -69,6 +83,8 @@ export type getApplicationsResponseError = (
   | getApplicationsResponse401
   | getApplicationsResponse403
   | getApplicationsResponse500
+  | getApplicationsResponse502
+  | getApplicationsResponse503
 ) & {
   headers: Headers;
 };

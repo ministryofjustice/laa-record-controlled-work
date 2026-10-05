@@ -17,6 +17,7 @@ export const applicationClientDetailsAddressOneCountryMax = 2;
 export const Application = zod.object({
   id: zod.uuid(),
   applicationRefNumber: zod.string().nullish(),
+  ufn: zod.string().nullish(),
   individualLegalAidNumber: zod.uuid(),
   providerFirmCode: zod.string(),
   providerOfficeCode: zod.string(),
@@ -80,7 +81,293 @@ export const Application = zod.object({
   ]),
   eligibility: zod.union([
     zod.object({
-      data: zod.looseObject({}).nullable(),
+      data: zod.union([
+        zod
+          .object({
+            additional_properties: zod
+              .array(
+                zod
+                  .object({
+                    house_in_dispute: zod.boolean().nullish(),
+                    house_value: zod.number().nullish(),
+                    inline_owned_with_mortgage: zod.boolean().nullish(),
+                    mortgage: zod.number().nullish(),
+                    percentage_owned: zod.int().nullish(),
+                  })
+                  .describe(
+                    "Sources: additional_property_details (AdditionalPropertyDetailsForm) / partner_additional_property_details (PartnerAdditionalPropertyDetailsForm).",
+                  ),
+              )
+              .nullish(),
+            additional_property_owned: zod.string().nullish(),
+            adult_dependants: zod.boolean().nullish(),
+            adult_dependants_count: zod.int().nullish(),
+            aggregated_means: zod.boolean().nullish(),
+            api_response: zod
+              .record(zod.string(), zod.unknown())
+              .nullish()
+              .describe(
+                "Last CFE API response payload cached for result rendering/logging.",
+              ),
+            asylum_support: zod.boolean().nullish(),
+            bank_accounts: zod
+              .array(
+                zod
+                  .object({
+                    account_in_dispute: zod.boolean().nullish(),
+                    amount: zod.number().nullish(),
+                  })
+                  .describe(
+                    "Sources: assets (ClientAssetsForm) / partner_assets (PartnerAssetsForm).",
+                  ),
+              )
+              .nullish(),
+            benefits: zod
+              .array(
+                zod
+                  .object({
+                    benefit_amount: zod.number().nullish(),
+                    benefit_frequency: zod.string().nullish(),
+                    benefit_type: zod.string().nullish(),
+                  })
+                  .describe(
+                    "Sources: benefit_details (BenefitDetailsForm) / partner_benefit_details (PartnerBenefitDetailsForm).",
+                  ),
+              )
+              .nullish(),
+            child_dependants: zod.boolean().nullish(),
+            child_dependants_count: zod.int().nullish(),
+            childcare_payments_conditional_value: zod.number().nullish(),
+            childcare_payments_frequency: zod.string().nullish(),
+            childcare_payments_relevant: zod.boolean().nullish(),
+            childcare_payments_value: zod.number().nullish(),
+            client_age: zod.string().nullish(),
+            combined_frequency: zod.string().nullish(),
+            controlled_legal_representation: zod.boolean().nullish(),
+            dependant_incomes: zod
+              .array(
+                zod
+                  .object({
+                    amount: zod.number().nullish(),
+                    frequency: zod.string().nullish(),
+                  })
+                  .describe(
+                    "Sources: dependant_income_details (DependantIncomeDetailsForm).",
+                  ),
+              )
+              .nullish(),
+            dependants_get_income: zod.boolean().nullish(),
+            domestic_abuse_applicant: zod.boolean().nullish(),
+            early_result: zod
+              .object({
+                result: zod.string().nullish(),
+                gross_income_excess: zod.number().nullish(),
+                type: zod.string().nullish(),
+              })
+              .nullish()
+              .describe(
+                "Early gross-income check outcome cached before full result calculation.",
+              ),
+            employment_status: zod.string().nullish(),
+            feature_flags: zod
+              .record(zod.string(), zod.boolean())
+              .nullish()
+              .describe("Feature-flag values snapshotted at journey start."),
+            friends_or_family_conditional_value: zod.number().nullish(),
+            friends_or_family_frequency: zod.string().nullish(),
+            friends_or_family_relevant: zod.boolean().nullish(),
+            house_in_dispute: zod.boolean().nullish(),
+            house_value: zod.number().nullish(),
+            housing_benefit_frequency: zod.string().nullish(),
+            housing_benefit_relevant: zod.boolean().nullish(),
+            housing_benefit_value: zod.number().nullish(),
+            housing_loan_payments: zod.number().nullish(),
+            housing_payments: zod.number().nullish(),
+            housing_payments_frequency: zod.string().nullish(),
+            housing_payments_loan_frequency: zod.string().nullish(),
+            immigration_or_asylum: zod.boolean().nullish(),
+            immigration_or_asylum_type: zod.string().nullish(),
+            immigration_or_asylum_type_upper_tribunal: zod.string().nullish(),
+            incomes: zod
+              .array(
+                zod
+                  .object({
+                    gross_income: zod.number().nullish(),
+                    income_frequency: zod.string().nullish(),
+                    income_tax: zod.number().nullish(),
+                    income_type: zod.string().nullish(),
+                    national_insurance: zod.number().nullish(),
+                  })
+                  .describe(
+                    "Sources: income (IncomeForm) / partner_income (PartnerIncomeForm).",
+                  ),
+              )
+              .nullish(),
+            investments: zod.number().nullish(),
+            investments_in_dispute: zod.boolean().nullish(),
+            investments_relevant: zod.boolean().nullish(),
+            legal_aid_payments_conditional_value: zod.number().nullish(),
+            legal_aid_payments_frequency: zod.string().nullish(),
+            legal_aid_payments_relevant: zod.boolean().nullish(),
+            legal_aid_payments_value: zod.number().nullish(),
+            level_of_help: zod.string().nullish(),
+            maintenance_conditional_value: zod.number().nullish(),
+            maintenance_frequency: zod.string().nullish(),
+            maintenance_payments_conditional_value: zod.number().nullish(),
+            maintenance_payments_frequency: zod.string().nullish(),
+            maintenance_payments_relevant: zod.boolean().nullish(),
+            maintenance_payments_value: zod.number().nullish(),
+            maintenance_relevant: zod.boolean().nullish(),
+            mortgage: zod.number().nullish(),
+            other_conditional_value: zod.number().nullish(),
+            other_relevant: zod.boolean().nullish(),
+            partner: zod.boolean().nullish(),
+            partner_additional_properties: zod
+              .array(
+                zod
+                  .object({
+                    house_in_dispute: zod.boolean().nullish(),
+                    house_value: zod.number().nullish(),
+                    inline_owned_with_mortgage: zod.boolean().nullish(),
+                    mortgage: zod.number().nullish(),
+                    percentage_owned: zod.int().nullish(),
+                  })
+                  .describe(
+                    "Sources: additional_property_details (AdditionalPropertyDetailsForm) / partner_additional_property_details (PartnerAdditionalPropertyDetailsForm).",
+                  ),
+              )
+              .nullish(),
+            partner_additional_property_owned: zod.string().nullish(),
+            partner_bank_accounts: zod
+              .array(
+                zod
+                  .object({
+                    account_in_dispute: zod.boolean().nullish(),
+                    amount: zod.number().nullish(),
+                  })
+                  .describe(
+                    "Sources: assets (ClientAssetsForm) / partner_assets (PartnerAssetsForm).",
+                  ),
+              )
+              .nullish(),
+            partner_benefits: zod
+              .array(
+                zod
+                  .object({
+                    benefit_amount: zod.number().nullish(),
+                    benefit_frequency: zod.string().nullish(),
+                    benefit_type: zod.string().nullish(),
+                  })
+                  .describe(
+                    "Sources: benefit_details (BenefitDetailsForm) / partner_benefit_details (PartnerBenefitDetailsForm).",
+                  ),
+              )
+              .nullish(),
+            partner_childcare_payments_conditional_value: zod
+              .number()
+              .nullish(),
+            partner_childcare_payments_frequency: zod.string().nullish(),
+            partner_childcare_payments_relevant: zod.boolean().nullish(),
+            partner_childcare_payments_value: zod.number().nullish(),
+            partner_employment_status: zod.string().nullish(),
+            partner_friends_or_family_conditional_value: zod.number().nullish(),
+            partner_friends_or_family_frequency: zod.string().nullish(),
+            partner_friends_or_family_relevant: zod.boolean().nullish(),
+            partner_incomes: zod
+              .array(
+                zod
+                  .object({
+                    gross_income: zod.number().nullish(),
+                    income_frequency: zod.string().nullish(),
+                    income_tax: zod.number().nullish(),
+                    income_type: zod.string().nullish(),
+                    national_insurance: zod.number().nullish(),
+                  })
+                  .describe(
+                    "Sources: income (IncomeForm) / partner_income (PartnerIncomeForm).",
+                  ),
+              )
+              .nullish(),
+            partner_investments: zod.number().nullish(),
+            partner_investments_relevant: zod.boolean().nullish(),
+            partner_legal_aid_payments_conditional_value: zod
+              .number()
+              .nullish(),
+            partner_legal_aid_payments_frequency: zod.string().nullish(),
+            partner_legal_aid_payments_relevant: zod.boolean().nullish(),
+            partner_legal_aid_payments_value: zod.number().nullish(),
+            partner_maintenance_conditional_value: zod.number().nullish(),
+            partner_maintenance_frequency: zod.string().nullish(),
+            partner_maintenance_payments_conditional_value: zod
+              .number()
+              .nullish(),
+            partner_maintenance_payments_frequency: zod.string().nullish(),
+            partner_maintenance_payments_relevant: zod.boolean().nullish(),
+            partner_maintenance_payments_value: zod.number().nullish(),
+            partner_maintenance_relevant: zod.boolean().nullish(),
+            partner_other_conditional_value: zod.number().nullish(),
+            partner_other_relevant: zod.boolean().nullish(),
+            partner_over_60: zod.boolean().nullish(),
+            partner_pension_conditional_value: zod.number().nullish(),
+            partner_pension_frequency: zod.string().nullish(),
+            partner_pension_relevant: zod.boolean().nullish(),
+            partner_property_or_lodger_conditional_value: zod
+              .number()
+              .nullish(),
+            partner_property_or_lodger_frequency: zod.string().nullish(),
+            partner_property_or_lodger_relevant: zod.boolean().nullish(),
+            partner_receives_benefits: zod.boolean().nullish(),
+            partner_student_finance_conditional_value: zod.number().nullish(),
+            partner_student_finance_relevant: zod.boolean().nullish(),
+            partner_valuables: zod.number().nullish(),
+            partner_valuables_relevant: zod.boolean().nullish(),
+            passporting: zod.boolean().nullish(),
+            pending: zod
+              .record(zod.string(), zod.unknown())
+              .nullish()
+              .describe(
+                "Temporary working copy used during check-answers edit loops.",
+              ),
+            pension_conditional_value: zod.number().nullish(),
+            pension_frequency: zod.string().nullish(),
+            pension_relevant: zod.boolean().nullish(),
+            percentage_owned: zod.int().nullish(),
+            property_landlord: zod.boolean().nullish(),
+            property_or_lodger_conditional_value: zod.number().nullish(),
+            property_or_lodger_frequency: zod.string().nullish(),
+            property_or_lodger_relevant: zod.boolean().nullish(),
+            property_owned: zod.string().nullish(),
+            receives_benefits: zod.boolean().nullish(),
+            regular_income: zod.boolean().nullish(),
+            rent: zod.number().nullish(),
+            shared_ownership_mortgage: zod.number().nullish(),
+            student_finance_conditional_value: zod.number().nullish(),
+            student_finance_relevant: zod.boolean().nullish(),
+            under_eighteen_assets: zod.boolean().nullish(),
+            valuables: zod.number().nullish(),
+            valuables_in_dispute: zod.boolean().nullish(),
+            valuables_relevant: zod.boolean().nullish(),
+            vehicle_owned: zod.boolean().nullish(),
+            vehicles: zod
+              .array(
+                zod
+                  .object({
+                    vehicle_finance: zod.number().nullish(),
+                    vehicle_in_dispute: zod.boolean().nullish(),
+                    vehicle_in_regular_use: zod.boolean().nullish(),
+                    vehicle_over_3_years_ago: zod.boolean().nullish(),
+                    vehicle_pcp: zod.boolean().nullish(),
+                    vehicle_value: zod.number().nullish(),
+                  })
+                  .describe("Sources: vehicles_details (VehiclesDetailsForm)."),
+              )
+              .nullish(),
+          })
+          .describe(
+            "The means assessment question and answer data, matching the CCQ session_data schema.",
+          ),
+        zod.null(),
+      ]),
       result: zod.looseObject({}).nullable(),
     }),
     zod.null(),
@@ -92,6 +379,9 @@ export const Application = zod.object({
   scopingQuestions: zod.union([
     zod.object({
       priorLegalAid: zod.enum(["no", "yesDifferentMatter", "yesSameMatter"]),
+      familyLawClassification: zod
+        .union([zod.enum(["public", "private"]), zod.null()])
+        .optional(),
     }),
     zod.null(),
   ]),
