@@ -27,6 +27,17 @@ Entered answers come from `eligibility.data`; saved calculations come from `elig
 
 Expected mapper states use synthetic fixtures: `meansAssessmentRequired: false` returns no section even if stored answers/results say passported and eligible; a supported `eligible` or `contribution_required` result with a valid calculated category is ready, while missing, malformed, unknown, or overall-ineligible results are unavailable. An eligible result with no calculation categories is ready only when saved answers indicate passporting, asylum support with immigration/asylum, or the controlled-work under-18 no-means-test route (`passporting`, `immigration_or_asylum`, `asylum_support`, `client_age`, `controlled_legal_representation`, `aggregated_means`, `regular_income`, and `under_eighteen_assets`); its categories remain `not_calculated`. Zero and pence values are copied unchanged, and ordinary assessments with no calculated categories are unavailable.
 
+## Means assessment modules
+
+- `meansAssessment.mapper.ts` assembles the section and handles explicit omission.
+- `answers/*.questions.ts` declare ordered questions, selectors, labels and domain-local relevance.
+- `answers/answers.mapper.ts` maps saved answers into translated summaries.
+- `answers/answers.formatter.ts` formats saved values as plain text.
+- `calculations/calculations.mapper.ts` parses and maps saved calculation results independently of answer summaries.
+- `calculations/calculations.zod.ts` defines calculation and exemption schemas with their inferred result types.
+- Answer types live in `answers/answers.types.ts`; calculation types live in `calculations/calculations.types.ts`.
+- Only section composition remains at the section root. Unit tests mirror module names and assert exported behaviour.
+
 ## Tests
 
 Export tests live under `tests/unit/src/export/`, `tests/integration/export/`, and `tests/ui/tests/export.spec.ts`.

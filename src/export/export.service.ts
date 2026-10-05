@@ -1,4 +1,3 @@
-import type { Application } from "#/api/clients/rcw/model/application.zod.gen.js";
 import type { getApplicationResponse } from "#/api/clients/rcw/schema/applications/applications.gen.js";
 import type {
   LoadApplicationForExportDeps,

@@ -1,5 +1,15 @@
 import type { EligibilityData } from "#/api/clients/rcw/model/eligibilityData.zod.gen.js";
 
+export interface MeansAssessmentAnswerSummary {
+  heading: string;
+  rows: MeansAssessmentAnswerSummaryRow[];
+}
+
+export interface MeansAssessmentAnswerSummaryRow {
+  key: string;
+  value: string;
+}
+
 export type Question<TAnswerContext> = QuestionFormat<TAnswerContext> &
   QuestionMetadata<TAnswerContext>;
 
