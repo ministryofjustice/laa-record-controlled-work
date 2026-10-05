@@ -21,7 +21,7 @@ import {
   GovUKValidations,
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
-import { AnswerKey as A } from "#/journeys/AnswerKey.js";
+import { AnswerKey as A } from "#/journeys/declaration/declaration.answers.js";
 import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
 import { H1, H2 } from "#/lib/constants/headings.js";
 import { t, tt } from "#/lib/i18n.js";
