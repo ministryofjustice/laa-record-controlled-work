@@ -5,6 +5,7 @@ import { Answers } from "#/journeys/create-application/data/answers.zod.js";
 describe("Answers schema", () => {
   const baseAnswers = {
     ecf: "yes",
+    familyLawClassification: "public",
     legalAidBefore: "yesSameMatter",
     legalAidLast6Months: "yes",
     reasonForYes: "here is a reason",

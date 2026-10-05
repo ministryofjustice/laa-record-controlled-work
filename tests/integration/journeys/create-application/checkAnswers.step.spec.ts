@@ -34,6 +34,7 @@ describe("Check answers step", () => {
     journeyDrafts: {
       createApplication: {
         ecf: "no",
+        familyLawClassification: "private",
         legalAidBefore: "yesSameMatter",
         legalAidLast6Months: "yes",
         reasonForHelp: "Some reason for help",
@@ -80,21 +81,23 @@ describe("Check answers step", () => {
         key: { text: string };
         value: { text: string };
       }>;
-      expect(rows.length).to.equal(10);
+      expect(rows.length).to.equal(11);
       expect(rows[0].key.text).to.equal("ECF");
-      expect(rows[1].key.text).to.equal("Accessed legal aid before");
-      expect(rows[1].value.text).to.equal(
+      expect(rows[1].key.text).to.equal("Type of family law");
+      expect(rows[1].value.text).to.equal("Private");
+      expect(rows[2].key.text).to.equal("Accessed legal aid before");
+      expect(rows[2].value.text).to.equal(
         "Yes, about the same matter",
       );
-      expect(rows[2].key.text).to.equal("Did your client get legal help for this matter in the last 6 months?");
-      expect(rows[3].key.text).to.equal("Reason for new application for same matter");
-      expect(rows[4].key.text).to.equal("First name");
-      expect(rows[5].key.text).to.equal("Last name");
-      expect(rows[6].key.text).to.equal("Date of birth");
-      expect(rows[7].key.text).to.equal("National Insurance number");
-      expect(rows[8].key.text).to.equal("Has a home address");
-      expect(rows[8].value.text).to.equal("Yes");
-      expect(rows[9].key.text).to.equal("Address");
+      expect(rows[3].key.text).to.equal("Did your client get legal help for this matter in the last 6 months?");
+      expect(rows[4].key.text).to.equal("Reason for new application for same matter");
+      expect(rows[5].key.text).to.equal("First name");
+      expect(rows[6].key.text).to.equal("Last name");
+      expect(rows[7].key.text).to.equal("Date of birth");
+      expect(rows[8].key.text).to.equal("National Insurance number");
+      expect(rows[9].key.text).to.equal("Has a home address");
+      expect(rows[9].value.text).to.equal("Yes");
+      expect(rows[10].key.text).to.equal("Address");
     });
 
     it("links the home address row to the home address question", () => {
