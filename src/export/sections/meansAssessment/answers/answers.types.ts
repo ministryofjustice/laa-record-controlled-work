@@ -3,12 +3,12 @@ import type { EligibilityData } from "#/api/clients/rcw/model/eligibilityData.zo
 export type Question<TAnswerContext> = QuestionFormat<TAnswerContext> &
   QuestionMetadata<TAnswerContext>;
 
-export interface QuestionSection<TAnswerContext = EligibilityData> {
+export interface QuestionSection<TAnswerContext> {
   /** Each context produces one section containing all questions. */
   answerContexts: (answers: EligibilityData) => readonly TAnswerContext[];
   heading: string;
+  isRelevant?: (answers: EligibilityData) => boolean;
   questions: ReadonlyArray<Question<TAnswerContext>>;
-  relevant?: (answers: EligibilityData) => boolean;
 }
 
 type AnswerSelector<TAnswerContext, TValue> = (
@@ -39,15 +39,13 @@ type QuestionFormat<TAnswerContext> =
   | TextQuestionFormat<TAnswerContext>;
 
 interface QuestionMetadata<TAnswerContext> {
+  isRelevant?: (
+    answers: EligibilityData,
+    answerContext: TAnswerContext,
+    index: number,
+  ) => boolean;
   label: string;
-  relevant?: QuestionRelevancePredicate<TAnswerContext>;
 }
-
-type QuestionRelevancePredicate<TAnswerContext> = (
-  answers: EligibilityData,
-  answerContext: TAnswerContext,
-  index: number,
-) => boolean;
 
 interface TextQuestionFormat<TAnswerContext> {
   kind: "text";
