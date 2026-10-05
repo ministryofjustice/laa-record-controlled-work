@@ -6,6 +6,7 @@ const currency = new Intl.NumberFormat("en-GB", {
   currency: "GBP",
   style: "currency",
 });
+
 const meansAssessment = {
   t: fixedT("pages.export.meansAssessment"),
 };
