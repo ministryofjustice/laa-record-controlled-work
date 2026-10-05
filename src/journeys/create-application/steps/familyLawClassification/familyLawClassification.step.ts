@@ -14,6 +14,7 @@ import {
   continueButton,
 } from "#/journeys/shared.blocks.js";
 import { StepCode } from "#/journeys/StepCode.enum.js";
+import { redirectToCheckAnswers } from "#/journeys/shared.hook.js";
 
 const TITLE = t("journeys.createApplication.familyLawClassification.title");
 
@@ -47,7 +48,7 @@ function saveFamilyLawClassification(journeyCode: string): SubmitHook {
   return submit({
     onValid: {
       effects: [CreateApplicationEffects.saveDraftAnswers(journeyCode)],
-      next: [redirect({ goto: "legal-aid-before" })],
+      next: [redirectToCheckAnswers, redirectToLegalAidBefore],
     },
     validate: true,
   });
@@ -67,3 +68,7 @@ function saveFamilyLawClassification(journeyCode: string): SubmitHook {
 //     Condition.Equals("public"),
 //   ),
 // });
+
+const redirectToLegalAidBefore = redirect({
+  goto: "legal-aid-before",
+});
