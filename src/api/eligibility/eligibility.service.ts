@@ -13,14 +13,13 @@ import {
   LoadEligibilityAssessmentError,
   SaveEligibilityAssessmentError,
 } from "#/api/eligibility/eligibility.errors.js";
+import { ClientAgeRange } from "#/api/eligibility/eligibility.types.js";
 import { getAuthDebugHeaders } from "#/auth/auth.debug.js";
 import { NotAuthenticatedError } from "#/auth/auth.errors.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { type Either, failure, success } from "#/lib/either.js";
 import * as metrics from "#/lib/metrics.js";
 import { logger } from "#/logger.js";
-
-type ClientAgeRange = "over_60" | "standard" | "under_18";
 
 const AGE_ADJUSTMENT = 1;
 const NO_AGE_ADJUSTMENT = 0;
@@ -197,14 +196,14 @@ function deriveClientAgeRange(dateOfBirth: string): ClientAgeRange {
     (birthdayHasPassed ? NO_AGE_ADJUSTMENT : AGE_ADJUSTMENT);
 
   if (age < EIGHTEEN_YEARS) {
-    return "under_18";
+    return ClientAgeRange.Under18;
   }
 
   if (age < SIXTY_YEARS) {
-    return "standard";
+    return ClientAgeRange.Standard;
   }
 
-  return "over_60";
+  return ClientAgeRange.Over60;
 }
 
 /**

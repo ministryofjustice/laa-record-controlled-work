@@ -1,6 +1,8 @@
 import type { EligibilityData } from "#/api/clients/rcw/model/eligibilityData.zod.gen.js";
 import type { QuestionSection } from "#/export/sections/meansAssessment/answers/answers.types.js";
 
+import { ClientAgeRange } from "#/api/eligibility/eligibility.types.js";
+
 export const clientQuestionSections: Array<QuestionSection<EligibilityData>> = [
   {
     answerContexts: (answers: EligibilityData) => [answers],
@@ -41,7 +43,7 @@ export const clientQuestionSections: Array<QuestionSection<EligibilityData>> = [
  * @returns Whether applicant answers are relevant for presentation.
  */
 function isMeansTested(answers: EligibilityData): boolean {
-  const underEighteen = answers.client_age === "under_18";
+  const underEighteen = answers.client_age === ClientAgeRange.Under18;
   const controlledClr =
     underEighteen &&
     answers.level_of_help === "controlled" &&

@@ -1,3 +1,4 @@
+import type { EligibilityData } from "#/api/clients/rcw/model/eligibilityData.zod.gen.js";
 import type {
   MeansAssessmentCalculations,
   MeansAssessmentCategory,
@@ -6,6 +7,7 @@ import type {
   MeansAssessmentOutcome,
 } from "#/export/sections/meansAssessment/calculations/calculations.types.js";
 
+import { ClientAgeRange } from "#/api/eligibility/eligibility.types.js";
 import {
   MeansAssessmentStatus,
   MeansAssessmentTotalField,
@@ -14,7 +16,6 @@ import {
   type CfeCategory,
   cfeResultSchema,
   type CfeResultSummary,
-  exemptionAnswersSchema,
 } from "#/export/sections/meansAssessment/calculations/calculations.zod.js";
 
 const CFE_MAX_VALUE = 999_999_999_999;
@@ -27,8 +28,8 @@ const NO_CFE_PROCEEDING_TYPES = 0;
  * @returns Ready calculations, or an unavailable state for unsupported results.
  */
 export function toMeansAssessmentCalculations(
-  result: unknown,
-  data: unknown,
+  result: null | Record<string, unknown> | undefined,
+  data: EligibilityData | null | undefined,
 ): MeansAssessmentCalculations {
   const resultSummary = parseCfeResultSummary(result);
   if (resultSummary === null) {
@@ -75,30 +76,40 @@ export function toMeansAssessmentCalculations(
  * @param data Saved CCQ answers.
  * @returns Whether the answers describe a no-means-test or passporting route.
  */
-function isMeansAssessmentExemptOrPassported(data: unknown): boolean {
-  const parsed = exemptionAnswersSchema.safeParse(data);
-  if (!parsed.success) {
+function isMeansAssessmentExemptOrPassported(
+  data: EligibilityData | null | undefined,
+): boolean {
+  if (data === null || data === undefined) {
     return false;
   }
+  const {
+    // eslint-disable-next-line @typescript-eslint/naming-convention -- API field names
+    aggregated_means,
+    // eslint-disable-next-line @typescript-eslint/naming-convention -- API field names
+    asylum_support,
+    // eslint-disable-next-line @typescript-eslint/naming-convention -- API field names
+    client_age,
+    // eslint-disable-next-line @typescript-eslint/naming-convention -- API field names
+    controlled_legal_representation,
+    // eslint-disable-next-line @typescript-eslint/naming-convention -- API field names
+    immigration_or_asylum,
+    passporting,
+    // eslint-disable-next-line @typescript-eslint/naming-convention -- API field names
+    regular_income,
+    // eslint-disable-next-line @typescript-eslint/naming-convention -- API field names
+    under_eighteen_assets,
+  } = data;
 
-  const answers = parsed.data;
-
-  const isPassported = answers.passporting === true;
-
-  const hasAsylumSupportExemption =
-    answers.immigration_or_asylum === true && answers.asylum_support === true;
+  const hasAsylumSupportExemption = immigration_or_asylum && asylum_support;
 
   const hasNoUnderEighteenIncomeOrAssets =
-    answers.aggregated_means === false &&
-    answers.regular_income === false &&
-    answers.under_eighteen_assets === false;
+    !aggregated_means && !regular_income && !under_eighteen_assets;
 
   const hasUnderEighteenExemption =
-    answers.client_age === "under_18" &&
-    (answers.controlled_legal_representation === true ||
-      hasNoUnderEighteenIncomeOrAssets);
+    client_age === ClientAgeRange.Under18 &&
+    (controlled_legal_representation ?? hasNoUnderEighteenIncomeOrAssets);
 
-  return isPassported || hasAsylumSupportExemption || hasUnderEighteenExemption;
+  return passporting ?? hasAsylumSupportExemption ?? hasUnderEighteenExemption;
 }
 
 /**
@@ -106,7 +117,9 @@ function isMeansAssessmentExemptOrPassported(data: unknown): boolean {
  * @param result Saved CFE result.
  * @returns The result summary, or null when unavailable or incompatible.
  */
-function parseCfeResultSummary(result: unknown): CfeResultSummary | null {
+function parseCfeResultSummary(
+  result: null | Record<string, unknown> | undefined,
+): CfeResultSummary | null {
   const parsed = cfeResultSchema.safeParse(result);
   if (!parsed.success) {
     return null;
