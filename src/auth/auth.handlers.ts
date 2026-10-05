@@ -6,6 +6,7 @@ import {
   MissingAuthCodeRequestError,
   StateMismatchError,
 } from "#/auth/auth.errors.js";
+import { getValidatedReturnTo } from "#/auth/auth.redirect.js";
 import {
   isAllowedRelayTarget,
   parseRelayState,
@@ -31,7 +32,7 @@ const EMPTY_STRING_LENGTH = 0;
 interface ValidatedCallbackState {
   authCodeRequest: NonNullable<Request["session"]["authCodeRequest"]>;
   data: { code: string; state: string };
-  returnTo: string | undefined;
+  returnTo: string;
 }
 
 /**
@@ -84,7 +85,7 @@ export async function authCodeCallback(
         homeAccountId,
       },
     });
-    res.redirect(returnTo ?? "/");
+    res.redirect(returnTo);
   } catch (error) {
     next(error);
   }
@@ -101,14 +102,15 @@ export async function signIn(
   res: Response,
   next: NextFunction,
 ): Promise<void> {
-  const returnToOverride = parseSafeReturnToOverride(req);
-  if (returnToOverride !== undefined) {
-    req.session.returnTo = returnToOverride;
-  }
+  const returnTo =
+    req.query.returnTo === undefined
+      ? getValidatedReturnTo(req.session.returnTo)
+      : getValidatedReturnTo(req.query.returnTo);
+  req.session.returnTo = returnTo;
 
   try {
     const entra = EntraService.create({ sessionId: req.sessionID });
-    const result = await entra.initiateAuthCodeFlow(req.session.returnTo, {
+    const result = await entra.initiateAuthCodeFlow(returnTo, {
       callbackHostname: req.hostname,
     });
     if (result.error) {
@@ -204,7 +206,7 @@ function getValidatedCallbackState(
   }
 
   // verify that session contains correct flow state
-  const { authCodeRequest, authState, returnTo } = req.session;
+  const { authCodeRequest, authState } = req.session;
   if (authCodeRequest === undefined) {
     res.status(BAD_REQUEST).send(new MissingAuthCodeRequestError().message);
     return undefined;
@@ -218,7 +220,7 @@ function getValidatedCallbackState(
   return {
     authCodeRequest,
     data: parsed.data,
-    returnTo,
+    returnTo: getValidatedReturnTo(req.session.returnTo),
   };
 }
 
@@ -261,28 +263,6 @@ function handleRelay(
   res.set("Cache-Control", "no-store");
   res.redirect(targetUrl.toString());
   return true;
-}
-
-/**
- * Validates that a redirect target is a same-origin app-relative path.
- * @param path - Candidate redirect path.
- * @returns `true` when the path is safe for local redirect usage.
- */
-function isRelativePath(path: string): boolean {
-  return path.startsWith("/") && !path.startsWith("//");
-}
-
-/**
- * Extracts a safe app-relative `returnTo` path from the signin query string.
- * @param req - The Express request.
- * @returns A validated relative path when present, otherwise `undefined`.
- */
-function parseSafeReturnToOverride(req: Request): string | undefined {
-  const { returnTo } = req.query;
-  if (typeof returnTo !== "string") return undefined;
-
-  const normalizedReturnTo = returnTo.trim();
-  return isRelativePath(normalizedReturnTo) ? normalizedReturnTo : undefined;
 }
 
 /**
