@@ -1,7 +1,11 @@
+import type { EligibilityData } from "#/api/clients/rcw/model/eligibilityData.zod.gen.js";
 import type {
-  getApplication,
-  updateApplicationMeans,
-} from "#/api/clients/rcw/schema/applications/applications.gen.js";
+  EligibilityAssessment,
+  LoadEligibilityAssessmentDeps,
+  LoadEligibilityAssessmentParams,
+  SaveEligibilityAssessmentDeps,
+  SaveEligibilityAssessmentParams,
+} from "#/api/eligibility/eligibility.types.js";
 
 import { getRcwApiDefaultOptions } from "#/api/clients/getRcwApiDefaultOptions.js";
 import { Application } from "#/api/clients/rcw/model/application.zod.gen.js";
@@ -15,34 +19,6 @@ import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { type Either, failure, success } from "#/lib/either.js";
 import * as metrics from "#/lib/metrics.js";
 import { logger } from "#/logger.js";
-
-export interface EligibilityAssessment {
-  data: Record<string, unknown>;
-  result?: Record<string, unknown>;
-}
-
-export interface LoadEligibilityAssessmentDeps {
-  getApplication: typeof getApplication;
-}
-
-export interface LoadEligibilityAssessmentParams {
-  applicationId: string;
-  correlationId?: string;
-  homeAccountId: string | undefined;
-  sessionId: string | undefined;
-}
-
-export interface SaveEligibilityAssessmentDeps {
-  updateApplicationMeans: typeof updateApplicationMeans;
-}
-
-export interface SaveEligibilityAssessmentParams {
-  applicationId: string;
-  correlationId?: string;
-  eligibilityAssessment: Record<string, unknown>;
-  homeAccountId: string | undefined;
-  sessionId: string | undefined;
-}
 
 type ClientAgeRange = "over_60" | "standard" | "under_18";
 
@@ -124,12 +100,15 @@ export async function loadEligibilityAssessment(
     parsed.data.clientDetails.dateOfBirth,
   );
 
-  const { data, result } = parsed.data.eligibility ?? {};
-  if (!isRecord(data) || !isRecord(result)) {
+  const { eligibility } = parsed.data;
+  if (!eligibility?.data || !eligibility.result) {
     return success({ data: { client_age: clientAgeRange } });
   }
 
-  return success({ data: { ...data, client_age: clientAgeRange }, result });
+  return success({
+    data: { ...eligibility.data, client_age: clientAgeRange },
+    result: eligibility.result,
+  });
 }
 
 /**
@@ -242,9 +221,10 @@ function isRecord(value: unknown): value is Record<string, unknown> {
  * @param eligibilityAssessment - Full CCQ session data (Q&A answers plus the CFE response).
  * @returns `data` (Q&A content) and `result` (the CFE response held under `api_response`).
  */
-function splitEligibilityAssessment(
-  eligibilityAssessment: Record<string, unknown>,
-): { data: Record<string, unknown>; result: Record<string, unknown> } {
+function splitEligibilityAssessment(eligibilityAssessment: EligibilityData): {
+  data: Record<string, unknown>;
+  result: Record<string, unknown>;
+} {
   const { api_response: apiResponse, ...data } = eligibilityAssessment;
   return {
     data,
