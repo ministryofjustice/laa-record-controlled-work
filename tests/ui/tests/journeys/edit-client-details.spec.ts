@@ -29,8 +29,6 @@ test("Edit Application - Client details journey", async ({
     }),
   ).toBeVisible();
 
-  console.log(clientDetailsApplication.scopingQuestions);
-
   // Check that all answers are displayed correctly
   const summaryList = page.locator(".govuk-summary-list");
   const rows = summaryList.locator(".govuk-summary-list__row");
