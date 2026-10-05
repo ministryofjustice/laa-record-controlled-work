@@ -373,15 +373,16 @@ export const Application = zod.object({
     zod.null(),
   ]),
   reasonForReapplication: zod.string().nullish(),
+  ecfFlag: zod.boolean().nullable(),
   meansAssessmentRequired: zod.boolean().nullish(),
   typeOfNonMeans: zod.boolean().nullish(),
   contribution: zod.string().nullish(),
   scopingQuestions: zod.union([
     zod.object({
-      priorLegalAid: zod.enum(["no", "yesDifferentMatter", "yesSameMatter"]),
-      familyLawClassification: zod
-        .union([zod.enum(["public", "private"]), zod.null()])
+      priorLegalAid: zod
+        .enum(["no", "yesDifferentMatter", "yesSameMatter"])
         .optional(),
+      familyLawClassification: zod.enum(["public", "private"]).optional(),
     }),
     zod.null(),
   ]),
