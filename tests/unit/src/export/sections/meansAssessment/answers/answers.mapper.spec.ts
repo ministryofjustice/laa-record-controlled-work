@@ -40,7 +40,7 @@ function application(overrides: Partial<Application> = {}): Application {
 describe("question section summaries", () => {
   before(initializeI18nextSync);
 
-  const section: QuestionSection = {
+  const section: QuestionSection<EligibilityData> = {
     answerContexts: (answers) => [answers],
     heading: "client.heading",
     questions: [
@@ -103,7 +103,7 @@ describe("question section summaries", () => {
       toQuestionSectionSummaries(ANSWERS, [
         {
           ...section,
-          relevant: () => false,
+          isRelevant: () => false,
         },
       ]),
     ).to.deep.equal([]);
@@ -114,13 +114,13 @@ describe("question section summaries", () => {
       toQuestionSectionSummaries(ANSWERS, [
         {
           ...section,
-          relevant: () => true,
+          isRelevant: () => true,
           questions: [
-            { ...section.questions[0], relevant: () => true },
+            { ...section.questions[0], isRelevant: () => true },
             {
               kind: "boolean",
               label: "client.partner",
-              relevant: () => false,
+              isRelevant: () => false,
               select: () => false,
             },
           ],

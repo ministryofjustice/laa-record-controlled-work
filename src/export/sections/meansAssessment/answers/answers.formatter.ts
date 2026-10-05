@@ -6,6 +6,9 @@ const currency = new Intl.NumberFormat("en-GB", {
   currency: "GBP",
   style: "currency",
 });
+const meansAssessment = {
+  t: fixedT("pages.export.meansAssessment"),
+};
 
 /**
  * Formats a declared saved answer as translated plain text.
@@ -19,6 +22,8 @@ export function formatAnswer<TAnswerContext>(
   answerContext: TAnswerContext,
   index: number,
 ): string {
+  // We use generic question type narrowing so that
+  // the value returned by `question.select` is correctly typed for each question kind.
   switch (question.kind) {
     case "boolean": {
       const value = question.select(answerContext, index);
@@ -27,7 +32,7 @@ export function formatAnswer<TAnswerContext>(
     case "choice":
     case "frequency": {
       const value = question.select(answerContext, index);
-      return fixedT("pages.export.meansAssessment")(question.choices[value]);
+      return meansAssessment.t(question.choices[value]);
     }
     case "gbp": {
       const value = question.select(answerContext, index);

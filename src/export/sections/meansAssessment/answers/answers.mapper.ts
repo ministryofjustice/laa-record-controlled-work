@@ -29,7 +29,10 @@ export function toMeansAssessmentAnswerSummaries(
     return [];
   }
 
-  return toQuestionSectionSummaries(answers, clientQuestionSections);
+  return toQuestionSectionSummaries<EligibilityData>(
+    answers,
+    clientQuestionSections,
+  );
 }
 
 /**
@@ -46,17 +49,23 @@ export function toQuestionSectionSummaries<TAnswerContext>(
   const summaries: MeansAssessmentAnswerSummary[] = [];
 
   for (const section of sections) {
-    if (!isSectionRelevant(section, answers)) {
+    if (section.isRelevant?.(answers) === false) {
       continue;
     }
 
-    const answerContexts = section.answerContexts(answers);
+    const answerContexts: readonly TAnswerContext[] =
+      section.answerContexts(answers);
 
     // One context can feed several questions; repeated contexts give each
     // question multiple answers. Preserve each context index for numbering.
     for (const [index, answerContext] of answerContexts.entries()) {
       summaries.push(
-        summarizeAnswerContext(section, answers, answerContext, index),
+        summarizeAnswerContext<TAnswerContext>(
+          section,
+          answers,
+          answerContext,
+          index,
+        ),
       );
     }
   }
@@ -82,36 +91,6 @@ function formatQuestion<TAnswerContext>(
 }
 
 /**
- * Checks whether a question applies to an answer context.
- * @param question Question definition to check.
- * @param answers Complete saved assessment answers.
- * @param answerContext Saved data used by the question.
- * @param index The unchanged answer-context index.
- * @returns Whether the question should appear in the summary.
- */
-function isQuestionRelevant<TAnswerContext>(
-  question: Question<TAnswerContext>,
-  answers: EligibilityData,
-  answerContext: TAnswerContext,
-  index: number,
-): boolean {
-  return question.relevant?.(answers, answerContext, index) ?? true;
-}
-
-/**
- * Checks whether a section applies to saved assessment answers.
- * @param section Question section to check.
- * @param answers Complete saved assessment answers.
- * @returns Whether the section should be included.
- */
-function isSectionRelevant<TAnswerContext>(
-  section: QuestionSection<TAnswerContext>,
-  answers: EligibilityData,
-): boolean {
-  return section.relevant?.(answers) ?? true;
-}
-
-/**
  * Creates a section summary for one answer context.
  * @param section Section containing the questions.
  * @param answers Complete saved assessment answers.
@@ -128,11 +107,11 @@ function summarizeAnswerContext<TAnswerContext>(
   const rows: MeansAssessmentAnswerSummaryRow[] = [];
 
   for (const question of section.questions) {
-    if (!isQuestionRelevant(question, answers, answerContext, index)) {
+    if (question.isRelevant?.(answers, answerContext, index) === false) {
       continue;
     }
 
-    rows.push(formatQuestion(question, answerContext, index));
+    rows.push(formatQuestion<TAnswerContext>(question, answerContext, index));
   }
 
   return {
