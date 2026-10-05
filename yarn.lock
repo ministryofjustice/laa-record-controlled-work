@@ -5273,7 +5273,7 @@ __metadata:
     helmet: "npm:^8.3.0"
     i18next: "npm:^26.4.2"
     knip: "npm:^6.38.0"
-    mocha: "npm:^12.0.0"
+    mocha: "npm:^12.0.2"
     moment: "npm:^2.31.0"
     morgan: "npm:~1.12.1"
     msw: "npm:^2.15.0"
@@ -5563,7 +5563,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mocha@npm:^12.0.0":
+"mocha@npm:^12.0.2":
   version: 12.0.2
   resolution: "mocha@npm:12.0.2"
   dependencies:
