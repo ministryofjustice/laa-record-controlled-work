@@ -27,6 +27,12 @@ export const PutEligibilityRequestBody = z.object({
   eligibility_assessment: z.looseObject({}),
 });
 
+export enum ClientAgeRange {
+  Over60 = "over_60",
+  Standard = "standard",
+  Under18 = "under_18",
+}
+
 export type PutEligibilityRequestBody = z.infer<
   typeof PutEligibilityRequestBody
 >;
