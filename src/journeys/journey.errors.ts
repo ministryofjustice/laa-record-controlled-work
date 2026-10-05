@@ -55,3 +55,30 @@ export class NoAvailableOfficesError extends DomainError {
     super("No Available Offices", cause);
   }
 }
+
+export class UndefinedAnswerError extends DomainError {
+  public readonly name = "UndefinedAnswerError";
+
+  constructor(key: string, cause?: unknown) {
+    super(`No answer value found for key "${key}"`, cause);
+  }
+}
+
+export class UndefinedJourneyError extends DomainError {
+  public readonly name = "UndefinedJourneyError";
+
+  constructor(journeyCode: string, cause?: unknown) {
+    super(
+      `No Journey Draft value found for journeyCode "${journeyCode}"`,
+      cause,
+    );
+  }
+}
+
+export class UndefinedParamError extends DomainError {
+  public readonly name = "UndefinedParamError";
+
+  constructor(key: string, cause?: unknown) {
+    super(`No URL param value found for key "${key}"`, cause);
+  }
+}

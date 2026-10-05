@@ -14,6 +14,7 @@ import {
   InvalidEvidenceError,
   InvalidSessionError,
 } from "#/journeys/journey.errors.js";
+import { getJourneyDraftKey } from "#/journeys/journeyDraftKey.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import * as metrics from "#/lib/metrics.js";
 import { logger } from "#/logger.js";
@@ -36,7 +37,8 @@ export const updateEvidence =
         throw new Error("applicationID parameter is required");
       }
 
-      const journeyAnswers = session.journeyDrafts?.[journeyCode];
+      const draftKey = getJourneyDraftKey(context, journeyCode);
+      const journeyAnswers = session.journeyDrafts?.[draftKey];
       if (!journeyAnswers) {
         return;
       }

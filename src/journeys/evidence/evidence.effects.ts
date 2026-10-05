@@ -2,12 +2,10 @@ import { EffectRegistry } from "@ministryofjustice/hmpps-forge/core/authoring";
 
 import type { EvidenceEffectsDeps } from "#/journeys/evidence/evidence.types.js";
 
-import {
-  clearAllDraftAnswers,
-  clearFieldAnswers,
-  loadDraftAnswers,
-  saveDraftAnswers,
-} from "#/journeys/effects.js";
+import { clearAllDraftAnswers } from "#/journeys/effects/clearAllDraftAnswers.js";
+import { clearFieldAnswers } from "#/journeys/effects/clearFieldAnswers.js";
+import { loadDraftAnswers } from "#/journeys/effects/loadDraftAnswers.js";
+import { saveDraftAnswers } from "#/journeys/effects/saveDraftAnswers.js";
 import { updateEvidence } from "#/journeys/evidence/effects/updateEvidence.js";
 
 export const evidenceEffectsRegistry =

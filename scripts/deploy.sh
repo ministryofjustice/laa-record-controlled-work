@@ -21,6 +21,7 @@ deploy_branch() {
                 --values ./deploy/laa-record-controlled-work/values/"$ENVIRONMENT".yaml \
                 --set rcw.image.repository="$REGISTRY/$REPOSITORY" \
                 --set rcw.image.tag="$IMAGE_TAG" \
+                --set-string rcw.env.SENTRY_RELEASE="$GITHUB_SHA" \
                 --set ccq.image.repository="$REGISTRY/$CCQ_ECR_REPOSITORY" \
                 --set ccq.image.tag="$CCQ_IMAGE_TAG" \
                 --set-string ccq.env.HOST_SERVICE_URL="http://$BRANCH_RELEASE_NAME-laa-record-controlled-work-rcw:3000" \
@@ -37,6 +38,7 @@ deploy_main() {
                           --values ./deploy/laa-record-controlled-work/values/"$ENVIRONMENT".yaml \
                           --set rcw.image.repository="$REGISTRY/$REPOSITORY" \
                           --set rcw.image.tag="$IMAGE_TAG" \
+                          --set-string rcw.env.SENTRY_RELEASE="$GITHUB_SHA" \
                           --set ccq.image.repository="$REGISTRY/$CCQ_ECR_REPOSITORY" \
                           --set ccq.image.tag="$CCQ_IMAGE_TAG" \
                           --set nginx.image.repository="$REGISTRY/$NGINX_ECR_REPOSITORY" \

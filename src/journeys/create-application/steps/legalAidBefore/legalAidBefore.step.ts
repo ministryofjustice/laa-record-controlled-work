@@ -11,6 +11,7 @@ import {
   type SubmitHook,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
+import { PriorLegalAid } from "#/api/clients/rcw/model/priorLegalAid.zod.gen.js";
 import { AnswerKey } from "#/journeys/AnswerKey.enum.js";
 import { CreateApplicationEffects } from "#/journeys/create-application/create-application.effects.js";
 import { legalAidBeforeRadioInput } from "#/journeys/create-application/steps/legalAidBefore/legalAidBefore.blocks.js";
@@ -83,7 +84,9 @@ const saveNotSameMatterAndClearPriorLegalAidData = (
     },
     validate: true,
     when: not(
-      Answer(AnswerKey.legalAidBefore).match(Condition.Equals("yesSameMatter")),
+      Answer(AnswerKey.legalAidBefore).match(
+        Condition.Equals(PriorLegalAid.enum.yesSameMatter),
+      ),
     ),
   });
 
@@ -100,14 +103,16 @@ const redirectToLegalAidLast6MonthsWithCheckQuery = redirect({
   goto: `${StepCode.LEGAL_AID_LAST_6_MONTHS}?returnTo=check-answers`,
   when: and(
     hasCheckAnswersInQuery,
-    Answer(AnswerKey.legalAidBefore).match(Condition.Equals("yesSameMatter")),
+    Answer(AnswerKey.legalAidBefore).match(
+      Condition.Equals(PriorLegalAid.enum.yesSameMatter),
+    ),
   ),
 });
 
 const redirectToLegalAidLast6Months = redirect({
   goto: StepCode.LEGAL_AID_LAST_6_MONTHS,
   when: Answer(AnswerKey.legalAidBefore).match(
-    Condition.Equals("yesSameMatter"),
+    Condition.Equals(PriorLegalAid.enum.yesSameMatter),
   ),
 });
 

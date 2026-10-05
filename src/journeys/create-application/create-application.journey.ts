@@ -4,8 +4,9 @@ import { CreateApplicationEffects } from "#/journeys/create-application/create-a
 import { checkAnswersStep } from "#/journeys/create-application/steps/checkAnswers/checkAnswers.step.js";
 import { clientDetailsStep } from "#/journeys/create-application/steps/clientDetails/clientDetails.step.js";
 import { declarationStep } from "#/journeys/create-application/steps/declaration/declaration.step.js";
-import { enterAddressManuallyStep } from "#/journeys/create-application/steps/enter-address-manually.step.js";
 import { enterOverseasAddressStep } from "#/journeys/create-application/steps/enter-overseas-address.step.js";
+import { enterAddressManuallyStep } from "#/journeys/create-application/steps/enterAddressManually/enterAddressManually.step.js";
+import { familyLawClassificationStep } from "#/journeys/create-application/steps/familyLawClassification/familyLawClassification.step.js";
 import { haveAHomeAddressStep } from "#/journeys/create-application/steps/haveAHomeAddress/haveAHomeAddress.step.js";
 import { legalAidLast6MonthsStep } from "#/journeys/create-application/steps/legalAidLast6Months/legalAidLast6Months.step.js";
 import { JourneyCode } from "#/journeys/JourneyCode.enum.js";
@@ -29,6 +30,7 @@ export const createApplicationJourney = journey({
   reachability: { disableReachabilityChecks: false },
   steps: [
     declarationStep(),
+    familyLawClassificationStep(JourneyCode.CREATE_APPLICATION),
     ecfStep(JourneyCode.CREATE_APPLICATION),
     ineligibleStep(JourneyCode.CREATE_APPLICATION),
     legalAidBeforeStep(JourneyCode.CREATE_APPLICATION),

@@ -51,6 +51,9 @@ export function getBlockWithContent(
       case "govukButtonGroup":
         blockContent = JSON.stringify(block);
         break;
+      case "govukTextInput":
+        blockContent = (block.properties.label as { text: string }).text;
+        break;
       default:
         throw new Error(`Unsupported variant: ${variant}`);
     }

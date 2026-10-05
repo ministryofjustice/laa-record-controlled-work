@@ -10,12 +10,14 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 import { GovUKSummaryList } from "@ministryofjustice/hmpps-forge/govuk-components";
 
+import { PriorLegalAid } from "#/api/clients/rcw/model/priorLegalAid.zod.gen.js";
 import { AnswerKey } from "#/journeys/AnswerKey.enum.js";
 import {
   formatAddressValue,
   formatChangeAddressRedirect,
   formatDateOfBirth,
   formatEcfLabel,
+  formatFamilyLawClassificationLabel,
   formatLegalAidBeforeLabel,
   formatLegalAidLast6MonthsLabel,
 } from "#/journeys/create-application/steps/checkAnswers/checkAnswers.formatters.js";
@@ -59,6 +61,11 @@ export function summaryList(): GovUKSummaryList {
     label: answerLabelT("ecf"),
     value: { text: formatEcfLabel() },
   });
+  const familyLawClassification = summaryRow({
+    href: "family-type-of-case?returnTo=check-answers",
+    label: answerLabelT("familyLawClassification"),
+    value: { text: formatFamilyLawClassificationLabel() },
+  });
   const legalAidBefore = summaryRow({
     href: "legal-aid-before?returnTo=check-answers",
     label: answerLabelT("legalAidBefore"),
@@ -69,7 +76,7 @@ export function summaryList(): GovUKSummaryList {
     label: answerLabelT("legalAidLast6Months"),
     value: { text: formatLegalAidLast6MonthsLabel() },
     visibleWhen: Answer(AnswerKey.legalAidBefore).match(
-      Condition.Equals("yesSameMatter"),
+      Condition.Equals(PriorLegalAid.enum.yesSameMatter),
     ),
   });
   const reasonForYes = summaryRow({
@@ -122,6 +129,7 @@ export function summaryList(): GovUKSummaryList {
   return GovUKSummaryList({
     rows: [
       ecf,
+      familyLawClassification,
       legalAidBefore,
       legalAidLast6Months,
       reasonForYes,

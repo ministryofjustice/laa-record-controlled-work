@@ -9,6 +9,7 @@ import type { Office } from "#/journeys/select-office/select-office.types.js";
 
 interface KnownClaims {
   idTokenClaims?: {
+    APP_ROLES?: string;
     LAA_ACCOUNTS?: string | string[];
   };
 }

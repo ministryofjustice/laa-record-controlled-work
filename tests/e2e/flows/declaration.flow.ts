@@ -19,5 +19,16 @@ export const completeDeclaration = async (
   await page.getByLabel("Month").fill("01");
   await page.getByLabel("Year").fill("1990");
   await page.getByRole("button", { name: "Continue" }).click();
+  await expect(page).toHaveURL(`/cases/${applicationId}/declaration/ufn`);
+
+  await page
+    .getByLabel("What is the unique file number (UFN) for this case?")
+    .fill("123456/789");
+  await page.getByRole("button", { name: "Continue" }).click();
+  await expect(page).toHaveURL(
+    `/cases/${applicationId}/declaration/check-answers`,
+  );
+
+  await page.getByRole("button", { name: "Save and continue" }).click();
   await expect(page).toHaveURL(`/cases/${applicationId}/task-list`);
 };

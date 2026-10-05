@@ -1,9 +1,11 @@
 import { expect } from "chai";
 import { ApplicationDto } from "#/api/dto/application/application.dto.js";
 import type { Application } from "#/api/clients/rcw/model/application.zod.gen.js";
+import type { Answers } from "#/journeys/create-application/data/answers.zod.js";
 
-const answers = {
+const answers: Answers = {
   ecf: "yes",
+  familyLawClassification: "public",
   legalAidBefore: "yesSameMatter",
   legalAidLast6Months: "yes",
   reasonForYes: "here is a reason",
@@ -48,6 +50,7 @@ describe("fromAnswers method", () => {
       reasonForReapplication: "here is a reason",
       scopingQuestions: {
         priorLegalAid: "yesSameMatter",
+        familyLawClassification: "public",
       },
     };
 
@@ -133,7 +136,10 @@ describe("toAnswers method", () => {
     meansAssessmentRequired: null,
     typeOfNonMeans: null,
     contribution: null,
-    scopingQuestions: { priorLegalAid: "yesSameMatter" },
+    scopingQuestions: {
+      priorLegalAid: "yesSameMatter",
+      familyLawClassification: "public",
+    },
     applicationType: "new",
     createdAt: "2025-01-01T00:00:00Z",
     createdBy: "test-user",

@@ -22,7 +22,25 @@
       "client": "Client",
       "logoAlt": "Legal Aid Agency logo",
       "notProvided": "Not provided",
-      "referenceNumber": "Reference number"
+      "referenceNumber": "Reference number",
+      "clientAndCaseDetails": {
+        "heading": "Client and case details",
+        "ecf": "ECF",
+        "typeOfFamilyLaw": "Type of family law",
+        "transitionalEuArrangements": "Transitional EU arrangements or an international maintenance agreement?",
+        "protectThemselfOrChildren": "Legal aid to protect themself or their children?",
+        "evidenceCaseIsInScope": "Evidence case is in scope",
+        "confirmMerits": "Confirm merits",
+        "accessedLegalAidBefore": "Accessed legal aid before",
+        "sameMatterWithin6Months": "For the same matter within 6 months",
+        "reasonForReapplication": "Reason for reapplication",
+        "firstName": "First name",
+        "lastName": "Last name",
+        "dateOfBirth": "Date of birth",
+        "niNumber": "National Insurance number",
+        "address": "Address",
+        "noFixedAddress": "No fixed address"
+      }
     },
     "error": {
       "404": {
@@ -43,6 +61,13 @@
         "contactMethods": [
           "telephone: 0300 200 2020",
           "webchat on <a href=\"https://legalaidlearning.justice.gov.uk/totara/dashboard/index.php?id=34\" target=\"_blank\">our training website</a>"
+        ]
+      },
+      "noAssignedOffice": {
+        "title": "Service not accessible",
+        "body": [
+          "Your Legal Aid Services user account must be assigned to an office with an active Controlled Work contract in order to use this service.",
+          "Contact your LAA Liaison or a Legal Aid Services administrator within your firm for more information."
         ]
       }
     },
@@ -121,6 +146,16 @@
           "Send completed forms to: <a href=\"mailto:contactECC@justice.gov.uk\">contactECC@justice.gov.uk</a>"
         ],
         "button": "Return to case list"
+      },
+      "familyLawClassification": {
+        "title": "What type of family law is it?",
+        "radioButton": {
+          "private": "Private",
+          "public": "Public"
+        },
+        "validation": {
+          "required": "Please select an option"
+        }
       },
       "legalAidBefore": {
         "title": "Has your client accessed legal aid before?",
@@ -252,6 +287,7 @@
         "title": "Check your answers",
         "answerLabels": {
           "ecf": "ECF",
+          "familyLawClassification": "Type of family law",
           "legalAidBefore": "Accessed legal aid before",
           "legalAidLast6Months": "Did your client get legal help for this matter in the last 6 months?",
           "legalAidLast6MonthsReasonForYes": "Reason for new application for same matter",
@@ -475,6 +511,21 @@
           "have their legal aid stopped and have to pay back the costs"
         ],
         "confirmButton": "Confirm and continue"
+      },
+      "ufn": {
+        "title": "What is the unique file number (UFN) for this case?",
+        "hint": "For example, 160726/001",
+        "validation": {
+          "required": "You must enter a valid UFN",
+          "format": "You must enter a valid UFN in the following format 123456/123 as it matches on SABC."
+        }
+      },
+      "checkAnswers": {
+        "title": "Check your answers",
+        "answerLabels": {
+          "dateOfSignature": "Date of signature",
+          "ufn": "UFN"
+        }
       }
     },
     "editApplication": {

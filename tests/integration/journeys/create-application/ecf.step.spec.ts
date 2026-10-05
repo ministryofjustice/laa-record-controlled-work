@@ -63,7 +63,7 @@ describe("ECF step", () => {
       expect(redirectResult.url).to.equal("/cases/new/ecf-dropout");
     });
 
-    it("should redirect to legal aid before step if ECF is not required", async () => {
+    it("should redirect to family law type step if ECF is not required", async () => {
       const result = await client.post("/cases/new/ecf", {
         body: {
           ecf: "no",
@@ -71,7 +71,7 @@ describe("ECF step", () => {
       });
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
-      expect(redirectResult.url).to.equal("/cases/new/legal-aid-before");
+      expect(redirectResult.url).to.equal("/cases/new/family-type-of-case");
     });
 
     it("should return to check answers when edited from check answers", async () => {

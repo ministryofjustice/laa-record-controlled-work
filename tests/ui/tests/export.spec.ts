@@ -34,6 +34,64 @@ test("export page renders the application header", async ({
   ).toBeVisible();
 });
 
+test("export page renders the client details section", async ({
+  withSelectedOffice: page,
+}) => {
+  const response = await page.goto(`/cases/${completeApplication.id}/export`);
+  const clientDetails = completeApplication.clientDetails;
+  expect(response?.ok()).toBe(true);
+  await expect(
+    page.getByRole("heading", { level: 2, name: "Client and case details" }),
+  ).toBeVisible();
+
+  const rows = page.locator(".govuk-summary-list__row");
+
+  for (const label of [
+    "ECF",
+    "Type of family law",
+    "Transitional EU arrangements or an international maintenance agreement?",
+    "Legal aid to protect themself or their children",
+    "Evidence case is in scope",
+    "Confirm merits",
+    "Accessed legal aid before",
+    "First name",
+    "Last name",
+    "Date of birth",
+    "National Insurance number",
+    "Address",
+  ]) {
+    await expect(rows.filter({ hasText: label })).toBeVisible();
+  }
+
+  await expect(rows.filter({ hasText: "ECF" })).toContainText("No");
+  await expect(rows.filter({ hasText: "First name" })).toContainText(
+    clientDetails.firstName,
+  );
+  await expect(rows.filter({ hasText: "Last name" })).toContainText(
+    clientDetails.lastName,
+  );
+  await expect(rows.filter({ hasText: "Date of birth" })).toContainText(
+    new Intl.DateTimeFormat("en-GB", {
+      day: "numeric",
+      month: "long",
+      timeZone: "UTC",
+      year: "numeric",
+    }).format(new Date(clientDetails.dateOfBirth)),
+  );
+  await expect(rows.filter({ hasText: "National Insurance number" })).toContainText(
+    clientDetails.niNumber!,
+  );
+  for (const addressLine of [
+    clientDetails.address!.addressLine1,
+    clientDetails.address!.addressLine2,
+    clientDetails.address!.townOrCity,
+    clientDetails.address!.county,
+    clientDetails.address!.postCode,
+  ]) {
+    await expect(rows.filter({ hasText: "Address" })).toContainText(addressLine!);
+  }
+});
+
 test("export page loads assets without CSP violations", async ({
   withSelectedOffice: page,
 }) => {

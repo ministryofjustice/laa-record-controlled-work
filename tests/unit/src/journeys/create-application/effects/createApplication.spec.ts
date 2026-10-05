@@ -1,4 +1,3 @@
-import type { EffectFunctionContext } from "@ministryofjustice/hmpps-forge/core";
 import { expect } from "chai";
 import { describe, it } from "mocha";
 import sinon from "sinon";
@@ -9,7 +8,10 @@ import {
 } from "#/api/clients/api.errors.js";
 import config from "#/config.js";
 import { createApplication } from "#/journeys/create-application/effects/createApplication.js";
-import type { CreateApplicationEffectsDeps } from "#/journeys/create-application/create-application.types.js";
+import type {
+  CreateApplicationContext,
+  CreateApplicationEffectsDeps,
+} from "#/journeys/create-application/create-application.types.js";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import { logger } from "#/logger.js";
 import { getCreateApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
@@ -18,11 +20,15 @@ describe("CreateApplicationEffect", () => {
   const journeyCode = "testJourney";
   const applicationId = "123e4567-e89b-12d3-a456-426614174000";
 
-  let context: EffectFunctionContext;
+  let context: CreateApplicationContext;
   let createApplicationStub: sinon.SinonStub;
   let deps: CreateApplicationEffectsDeps;
   let getSession: sinon.SinonStub;
   let setData: sinon.SinonStub;
+  let session: {
+    journeyDrafts: Record<string, unknown>;
+    selectedOffice?: { address: string; code: string };
+  };
 
   beforeEach(() => {
     sinon.stub(config.api, "useMockAccessToken").value(true);
@@ -31,13 +37,14 @@ describe("CreateApplicationEffect", () => {
       createApplication: createApplicationStub,
     } as unknown as CreateApplicationEffectsDeps;
     setData = sinon.stub();
-    getSession = sinon.stub().returns({
+    session = {
       journeyDrafts: {
         [journeyCode]: {
           ukAddressLine1: "123 Test Street",
           ukCountry: "United Kingdom",
           dateOfBirth: "1990-01-01",
           ecf: "no",
+          familyLawClassification: "public",
           firstName: "Jane",
           hasNINumber: "yes",
           haveAHomeAddress: "yes",
@@ -49,18 +56,20 @@ describe("CreateApplicationEffect", () => {
           reasonForYes: "here is a reason",
           ukTownOrCity: "Manchester",
         },
+        anotherJourney: { keep: "yes" },
       },
       selectedOffice: {
         address: "123 Test Street, Manchester, A12 3BC",
         code: "22439e72-68d3-4770-b435-c352d883d21e",
       },
-    });
+    };
+    getSession = sinon.stub().returns(session);
 
     context = {
       getRequestHeader: sinon.stub().returns("test-correlation-id"),
       getSession,
       setData,
-    } as unknown as EffectFunctionContext;
+    } as unknown as CreateApplicationContext;
   });
 
   afterEach(() => {
@@ -83,6 +92,9 @@ describe("CreateApplicationEffect", () => {
         applicationId,
       ),
     ).to.equal(true);
+
+    expect(session.journeyDrafts[journeyCode]).to.be.undefined;
+    expect(session.journeyDrafts.anotherJourney).to.deep.equal({ keep: "yes" });
   });
 
   it("returns an ApiResponseError when createApplication responds with non-201", async () => {
@@ -95,9 +107,12 @@ describe("CreateApplicationEffect", () => {
 
     try {
       await createApplication(deps)(context, journeyCode);
+      expect.fail("should have thrown");
     } catch (error) {
       expect(error).to.be.instanceOf(ApiResponseError);
     }
+
+    expect(session.journeyDrafts[journeyCode]).to.exist;
   });
 
   it("returns an ApiResponseError when createApplication rejects", async () => {
@@ -107,11 +122,14 @@ describe("CreateApplicationEffect", () => {
 
     try {
       await createApplication(deps)(context, journeyCode);
+      expect.fail("should have thrown");
     } catch (error) {
       expect(error).to.be.instanceOf(ApiResponseError);
       const apiError = error as ApiResponseError;
       expect(apiError.cause).to.equal(cause);
     }
+
+    expect(session.journeyDrafts[journeyCode]).to.exist;
   });
 
   it("returns an ApiValidationError when createApplication returns no application id", async () => {
@@ -123,9 +141,12 @@ describe("CreateApplicationEffect", () => {
 
     try {
       await createApplication(deps)(context, journeyCode);
+      expect.fail("should have thrown");
     } catch (error) {
       expect(error).to.be.instanceOf(ApiValidationError);
     }
+
+    expect(session.journeyDrafts[journeyCode]).to.exist;
   });
 
   it("returns an ApiResponseError with ApiValidationError cause when selected office is missing", async () => {
@@ -136,6 +157,7 @@ describe("CreateApplicationEffect", () => {
           ukCountry: "United Kingdom",
           dateOfBirth: "1990-01-01",
           ecf: "no",
+          familyLawClassification: "public",
           firstName: "Jane",
           hasNINumber: "yes",
           haveAHomeAddress: "yes",

@@ -30,10 +30,11 @@ describe("Check answers step", () => {
     },
   );
   
-  const session = {
+  const createSession = (answerOverrides: Record<string, unknown> = {}) => ({
     journeyDrafts: {
       createApplication: {
         ecf: "no",
+        familyLawClassification: "private",
         legalAidBefore: "yesSameMatter",
         legalAidLast6Months: "yes",
         reasonForHelp: "Some reason for help",
@@ -47,13 +48,14 @@ describe("Check answers step", () => {
         ukTownOrCity: "Testville",
         ukPostcode: "TE5 7ST",
         ukCountry: "United Kingdom",
+        ...answerOverrides,
       },
     },
     selectedOffice: {
       address: "123 Test Street, Testville, TE5 7ST",
       code: "22439e72-68d3-4770-b435-c352d883d21e",
     },
-  };
+  });
 
   describe("GET /cases/new/check-answers", () => {
     let renderResult: TestRenderResult;
@@ -62,7 +64,7 @@ describe("Check answers step", () => {
 
     before(async () => {
       const result = await client.get("/cases/new/check-answers", {
-        session,
+        session: createSession(),
       });
       expect(result.type).to.equal("render");
       renderResult = result as TestRenderResult;
@@ -79,21 +81,23 @@ describe("Check answers step", () => {
         key: { text: string };
         value: { text: string };
       }>;
-      expect(rows.length).to.equal(10);
+      expect(rows.length).to.equal(11);
       expect(rows[0].key.text).to.equal("ECF");
-      expect(rows[1].key.text).to.equal("Accessed legal aid before");
-      expect(rows[1].value.text).to.equal(
+      expect(rows[1].key.text).to.equal("Type of family law");
+      expect(rows[1].value.text).to.equal("Private");
+      expect(rows[2].key.text).to.equal("Accessed legal aid before");
+      expect(rows[2].value.text).to.equal(
         "Yes, about the same matter",
       );
-      expect(rows[2].key.text).to.equal("Did your client get legal help for this matter in the last 6 months?");
-      expect(rows[3].key.text).to.equal("Reason for new application for same matter");
-      expect(rows[4].key.text).to.equal("First name");
-      expect(rows[5].key.text).to.equal("Last name");
-      expect(rows[6].key.text).to.equal("Date of birth");
-      expect(rows[7].key.text).to.equal("National Insurance number");
-      expect(rows[8].key.text).to.equal("Has a home address");
-      expect(rows[8].value.text).to.equal("Yes");
-      expect(rows[9].key.text).to.equal("Address");
+      expect(rows[3].key.text).to.equal("Did your client get legal help for this matter in the last 6 months?");
+      expect(rows[4].key.text).to.equal("Reason for new application for same matter");
+      expect(rows[5].key.text).to.equal("First name");
+      expect(rows[6].key.text).to.equal("Last name");
+      expect(rows[7].key.text).to.equal("Date of birth");
+      expect(rows[8].key.text).to.equal("National Insurance number");
+      expect(rows[9].key.text).to.equal("Has a home address");
+      expect(rows[9].value.text).to.equal("Yes");
+      expect(rows[10].key.text).to.equal("Address");
     });
 
     it("links the home address row to the home address question", () => {
@@ -124,20 +128,14 @@ describe("Check answers step", () => {
 
     it("links the address row to the overseas address step for an overseas address", async () => {
       const result = await client.get("/cases/new/check-answers", {
-        session: {
-          ...session,
-          journeyDrafts: {
-            createApplication: {
-              ...session.journeyDrafts.createApplication,
-              ukAddressLine1: undefined,
-              ukCountry: undefined,
-              ukTownOrCity: undefined,
-              ukPostcode: undefined,
-              osAddressLine1: "10 Some Other Street",
-              osCountry: "Australia",
-            },
-          },
-        },
+        session: createSession({
+          ukAddressLine1: undefined,
+          ukCountry: undefined,
+          ukTownOrCity: undefined,
+          ukPostcode: undefined,
+          osAddressLine1: "10 Some Other Street",
+          osCountry: "Australia",
+        }),
       });
 
       expect(result.type).to.equal("render");
@@ -168,16 +166,10 @@ describe("Check answers step", () => {
 
     it("renders no when hasNINumber is 'no'", async () => {
       const result = await client.get("/cases/new/check-answers", {
-        session: {
-          ...session,
-          journeyDrafts: {
-            createApplication: {
-              ...session.journeyDrafts.createApplication,
-              hasNINumber: "no",
-              niNumber: undefined,
-            },
-          },
-        },
+        session: createSession({
+          hasNINumber: "no",
+          niNumber: undefined,
+        }),
       });
 
       expect(result.type).to.equal("render");
@@ -224,19 +216,13 @@ describe("Check answers step", () => {
 
     it("renders no fixed address row when client has no fixed address", async () => {
       const result = await client.get("/cases/new/check-answers", {
-        session: {
-          ...session,
-          journeyDrafts: {
-            createApplication: {
-              ...session.journeyDrafts.createApplication,
-              haveAHomeAddress: "no",
-              ukAddressLine1: undefined,
-              ukCountry: undefined,
-              ukTownOrCity: undefined,
-              ukPostcode: undefined,
-            },
-          },
-        },
+        session: createSession({
+          haveAHomeAddress: "no",
+          ukAddressLine1: undefined,
+          ukCountry: undefined,
+          ukTownOrCity: undefined,
+          ukPostcode: undefined,
+        }),
       });
 
       expect(result.type).to.equal("render");
@@ -275,28 +261,37 @@ describe("Check answers step", () => {
 
     it("redirects to the confirmation step", async () => {
       const result = await client.post("/cases/new/check-answers", {
-        session,
+        session: createSession(),
       });
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
       expect(redirectResult.url).to.equal(`/cases/${uuid}/task-list`);
     });
 
+    it("starts a fresh application journey after successful creation", async () => {
+      const testSession = createSession();
+
+      const postResult = await client.post("/cases/new/check-answers", {
+        session: testSession,
+      });
+      expect(postResult.type).to.equal("redirect");
+
+      const getResult = await client.get("/cases/new/provider-declaration", {
+        session: testSession,
+      });
+      expect(getResult.type).to.equal("render");
+      expect(testSession.journeyDrafts.createApplication).to.be.undefined;
+    });
+
     it("submits no address when client has no fixed address", async () => {
       const result = await client.post("/cases/new/check-answers", {
-        session: {
-          ...session,
-          journeyDrafts: {
-            createApplication: {
-              ...session.journeyDrafts.createApplication,
-              haveAHomeAddress: "no",
-              ukAddressLine1: undefined,
-              ukCountry: undefined,
-              ukTownOrCity: undefined,
-              ukPostcode: undefined,
-            },
-          },
-        },
+        session: createSession({
+          haveAHomeAddress: "no",
+          ukAddressLine1: undefined,
+          ukCountry: undefined,
+          ukTownOrCity: undefined,
+          ukPostcode: undefined,
+        }),
       });
 
       expect(result.type).to.equal("redirect");

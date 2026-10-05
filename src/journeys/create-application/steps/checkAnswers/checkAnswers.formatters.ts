@@ -8,6 +8,7 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 import { NunjucksGenerators } from "@ministryofjustice/hmpps-forge/express-nunjucks";
 
+import { PriorLegalAid } from "#/api/clients/rcw/model/priorLegalAid.zod.gen.js";
 import { AnswerKey } from "#/journeys/AnswerKey.enum.js";
 import { UK_ADDRESS_FIELDS } from "#/journeys/journey.constants.js";
 import { t } from "#/lib/i18n.js";
@@ -73,6 +74,23 @@ export function formatEcfLabel(): ResolvableString {
 }
 
 /**
+ * Formats the family law classification answer label.
+ * @returns The family law classification answer label.
+ */
+export function formatFamilyLawClassificationLabel(): ResolvableString {
+  const publicLaw = t(
+    "journeys.createApplication.familyLawClassification.radioButton.public",
+  );
+  const privateLaw = t(
+    "journeys.createApplication.familyLawClassification.radioButton.private",
+  );
+
+  return match(Answer(AnswerKey.familyLawClassification))
+    .branch(Condition.Equals("public"), publicLaw)
+    .otherwise(privateLaw);
+}
+
+/**
  * Formats the previous legal aid answer label.
  * @returns The previous legal aid answer label.
  */
@@ -86,8 +104,8 @@ export function formatLegalAidBeforeLabel(): ResolvableString {
   const no = t("common.no");
 
   return match(Answer(AnswerKey.legalAidBefore))
-    .branch(Condition.Equals("yesSameMatter"), same)
-    .branch(Condition.Equals("yesDifferentMatter"), different)
+    .branch(Condition.Equals(PriorLegalAid.enum.yesSameMatter), same)
+    .branch(Condition.Equals(PriorLegalAid.enum.yesDifferentMatter), different)
     .otherwise(no);
 }
 

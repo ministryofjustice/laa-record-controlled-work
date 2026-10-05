@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { describe, it } from "mocha";
 import sinon from "sinon";
-import { clearAllDraftAnswers } from "#/journeys/effects.js";
+import { clearAllDraftAnswers } from "#/journeys/effects/clearAllDraftAnswers.js";
 import { type EffectFunctionContext } from "@ministryofjustice/hmpps-forge/core/authoring";
 import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
 
@@ -39,9 +39,9 @@ describe("ClearAllDraftAnswers", () => {
 
     const drafts = session.journeyDrafts as Record<string, unknown>;
     expect(drafts.testJourney).to.be.undefined;
-    expect(clearAnswer.calledTwice).to.equal(true);
-    expect(clearAnswer.firstCall.args[0]).to.equal("ecf");
-    expect(clearAnswer.secondCall.args[0]).to.equal("means");
+    expect(clearAnswer.callCount).to.equal(2);
+    expect(clearAnswer.calledWithExactly("ecf")).to.equal(true);
+    expect(clearAnswer.calledWithExactly("means")).to.equal(true);
   });
 
   it("preserves drafts for other journeys", () => {
@@ -81,5 +81,19 @@ describe("ClearAllDraftAnswers", () => {
     expect(drafts["editClientDetails:application-2"]).to.deep.equal({
       ecf: "no",
     });
+  });
+
+  it("clears only the current application's evidence draft", () => {
+    getRequestParam.withArgs(PARAMS_KEYS.applicationID).returns("application-1");
+    session.journeyDrafts = {
+      "evidence:application-1": { ecf: "yes" },
+      "evidence:application-2": { ecf: "no" },
+    };
+
+    clearAllDraftAnswers()(context, "evidence");
+
+    const drafts = session.journeyDrafts as Record<string, unknown>;
+    expect(drafts["evidence:application-1"]).to.be.undefined;
+    expect(drafts["evidence:application-2"]).to.deep.equal({ ecf: "no" });
   });
 });

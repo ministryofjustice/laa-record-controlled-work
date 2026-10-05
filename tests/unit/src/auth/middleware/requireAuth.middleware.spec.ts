@@ -11,6 +11,7 @@ import { requireAuth } from "#/auth/middleware/requireAuth.middleware.js";
 import config from "#/config.js";
 import type { Office } from "#/journeys/select-office/select-office.types.js";
 import { failure, success } from "#/lib/either.js";
+import { HTTP_STATUS } from "#/lib/constants/http.js";
 
 const SESSION_ID = "session-id";
 const HOME_ACCOUNT_ID = "uid.tenant";
@@ -134,6 +135,22 @@ describe("requireAuth", () => {
     expect(next.called).to.be.false;
   });
 
+  it("renders a 403 Forbidden error page when the user has no assigned offices", async () => {
+    const { req, res, next, status, render } = createMocks({
+      account: createAccount({
+        exp: getNowInSeconds() + 600,
+        offices: [],
+      }),
+    });
+
+    await requireAuth()(req, res, next);
+
+    expect(status.calledOnceWithExactly(HTTP_STATUS.FORBIDDEN)).to.be.true;
+    expect(render.calledOnceWithExactly("main/error-no-assigned-office")).to.be
+      .true;
+    expect(next.called).to.be.false;
+  });
+
   it("allows an authenticated user without a selected office to access /select-office", async () => {
     const { req, res, next, redirect, session } = createMocks({
       account: createAccount({ exp: getNowInSeconds() + 600 }),
@@ -195,26 +212,6 @@ describe("requireAuth", () => {
     expect(redirect.called).to.be.false;
     expect(next.calledOnceWithExactly()).to.be.true;
   });
-
-  it("passes an AuthenticationError to next when LAA_ACCOUNTS has an invalid shape", async () => {
-    const { req, res, next, redirect } = createMocks({
-      account: createAccount({
-        exp: getNowInSeconds() + 600,
-        offices: 123 as unknown as string[],
-      }),
-      selectedOffice: createOffice("OFFICE-1"),
-    });
-
-    await requireAuth()(req, res, next);
-
-    expect(redirect.called).to.be.false;
-    expect(next.calledOnce).to.be.true;
-    const [error] = next.firstCall.args;
-    expect(error).to.be.instanceOf(Error);
-    expect((error as Error).message).to.equal(
-      "Invalid LAA_ACCOUNTS claim, expected string or string[]",
-    );
-  });
 });
 
 function createOffice(code: string): Office {
@@ -255,10 +252,12 @@ function createMocks({
   url?: string;
 }): {
   next: sinon.SinonStub;
+  render: sinon.SinonStub;
   redirect: sinon.SinonStub;
   req: Request;
   res: Response;
   session: Request["session"];
+  status: sinon.SinonStub;
 } {
   const session = {
     account,
@@ -274,13 +273,18 @@ function createMocks({
   } as Request;
 
   const redirect = sinon.stub();
+  const render = sinon.stub();
+  const status = sinon.stub();
   const res = {
     locals: {},
     redirect,
+    render,
+    status,
   } as unknown as Response;
+  status.returns(res);
 
   const next = sinon.stub();
-  return { next, redirect, req, res, session };
+  return { next, redirect, render, req, res, session, status };
 }
 
 function getNowInSeconds(): number {

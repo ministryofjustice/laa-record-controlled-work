@@ -1,7 +1,9 @@
 import type { Application as ApplicationSchema } from "#/api/clients/rcw/model/application.zod.gen.js";
 import type { CreateApplicationRequestBody } from "#/api/clients/rcw/model/createApplicationRequestBody.zod.gen.js";
+import type { ScopingQuestions } from "#/api/clients/rcw/model/scopingQuestions.zod.gen.js";
 import type { AnswersOutput } from "#/journeys/create-application/data/answers.zod.js";
 
+import { PriorLegalAid } from "#/api/clients/rcw/model/priorLegalAid.zod.gen.js";
 import { AnswerKey } from "#/journeys/AnswerKey.enum.js";
 import {
   mapCountryNameToIsoCode,
@@ -25,7 +27,7 @@ interface Application {
   postcode?: string;
   providerOfficeCode: string;
   reasonForReapplication?: string;
-  scopingQuestions: Record<string, unknown>;
+  scopingQuestions: ScopingQuestions;
   townOrCity?: string;
 }
 
@@ -71,7 +73,7 @@ export class ApplicationDto {
   public postCode?: string;
   public providerOfficeCode = "";
   public reasonForReapplication?: string;
-  public scopingQuestions: Record<string, unknown> = {};
+  public scopingQuestions!: ScopingQuestions;
   public townOrCity?: string;
 
   /**
@@ -108,6 +110,7 @@ export class ApplicationDto {
       providerOfficeCode,
       reasonForReapplication: answers.reasonForYes,
       scopingQuestions: {
+        familyLawClassification: answers.familyLawClassification,
         priorLegalAid: answers.legalAidBefore,
       },
     });
@@ -152,16 +155,21 @@ export class ApplicationDto {
    * @param application - The application from which to create the answers output instance.
    * @returns AnswersOutput instance.
    */
+  // eslint-disable-next-line complexity -- Got a lot of checks to do here.
   public static toAnswers(application: ApplicationSchema): AnswersOutput {
     const addressAnswers = application.clientDetails.hasFixedAddress
       ? this.getAnswersFromAddress(application)
       : {};
-    const priorLegalAid = this.getPriorLegalAid(application);
+    const priorLegalAid = PriorLegalAid.parse(
+      application.scopingQuestions?.priorLegalAid,
+    );
 
     return {
       ...addressAnswers,
       [AnswerKey.dateOfBirth]: application.clientDetails.dateOfBirth,
       [AnswerKey.ecf]: "no",
+      [AnswerKey.familyLawClassification]:
+        application.scopingQuestions?.familyLawClassification ?? "public",
       [AnswerKey.firstName]: application.clientDetails.firstName,
       [AnswerKey.hasNINumber]: application.clientDetails.niNumber
         ? "yes"
@@ -172,7 +180,7 @@ export class ApplicationDto {
       [AnswerKey.lastName]: application.clientDetails.lastName,
       [AnswerKey.legalAidBefore]: priorLegalAid,
       [AnswerKey.legalAidLast6Months]:
-        application.scopingQuestions?.priorLegalAid === "yesSameMatter" &&
+        priorLegalAid === PriorLegalAid.enum.yesSameMatter &&
         application.reasonForReapplication
           ? "yes"
           : "no",
@@ -236,17 +244,6 @@ export class ApplicationDto {
       addressLine4: answers[AnswerKey.osAddressLine4],
       country: countryName ? mapCountryNameToIsoCode(countryName) : "",
     };
-  }
-
-  /**
-   * Extract the prior legal aid answer from the application.
-   * @param application - The application from which to extract the answer.
-   * @returns The prior legal aid answer or an empty string.
-   */
-  private static getPriorLegalAid(application: ApplicationSchema): string {
-    const priorLegalAid = application.scopingQuestions?.priorLegalAid;
-
-    return typeof priorLegalAid === "string" ? priorLegalAid : "";
   }
 
   /**

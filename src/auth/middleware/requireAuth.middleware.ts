@@ -5,6 +5,7 @@ import { destroySessionAuth } from "#/auth/domain/destroySessionAuth.js";
 import { destroySessionOffice } from "#/auth/domain/destroySessionOffice.js";
 import { getOfficeClaimsFromSession } from "#/auth/domain/getOfficeClaimsFromSession.js";
 import { updateSessionAuth } from "#/auth/domain/updateSessionAuth.js";
+import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
 
 /**
@@ -37,6 +38,7 @@ export function requireAuth(): RequestHandler {
       const { id: sessionId } = session;
       const { homeAccountId, idToken } = session.account ?? {};
       const { exp } = session.account?.idTokenClaims ?? {};
+      const allowedOffices = getOfficeClaimsFromSession(session);
 
       logger.info("requireAuth(): Checking user auth");
 
@@ -68,6 +70,15 @@ export function requireAuth(): RequestHandler {
         updateSessionAuth(session, result.value);
       }
 
+      // If the user does not have offices available, then they will be unable to access the service.
+      if (allowedOffices === undefined) {
+        logger.info("requireAuth(): User has no assigned office");
+        res
+          .status(HTTP_STATUS.FORBIDDEN)
+          .render("main/error-no-assigned-office");
+        return;
+      }
+
       // Only check selected office if not on the office selection page.
       const officePathRegex = /^\/select-office(\/.*)?$/;
 
@@ -82,8 +93,6 @@ export function requireAuth(): RequestHandler {
         }
 
         // Does the selected office match the user's allowed offices? If not, redirect to the office selection page.
-        const allowedOffices = getOfficeClaimsFromSession(session);
-
         if (!allowedOffices.includes(session.selectedOffice.code)) {
           logger.warn("requireAuth(): Office is not in claims");
           destroySessionOffice(session);

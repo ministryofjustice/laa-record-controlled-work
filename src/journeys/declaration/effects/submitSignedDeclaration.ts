@@ -3,13 +3,13 @@ import type { updateApplicationDeclarationResponse } from "#/api/clients/rcw/sch
 import { ApiResponseError } from "#/api/clients/api.errors.js";
 import { getRcwApiDefaultOptions } from "#/api/clients/getRcwApiDefaultOptions.js";
 import { getAuthDebugHeaders } from "#/auth/auth.debug.js";
-import { AnswerKey as A } from "#/journeys/AnswerKey.js";
+import { AnswerKey as A } from "#/journeys/declaration/declaration.answers.js";
+import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
 import {
   UndefinedAnswerError,
   UndefinedParamError,
-  UndefinedSessionError,
-} from "#/journeys/errors.js";
-import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
+} from "#/journeys/journey.errors.js";
+import { getSessionDataOrThrow } from "#/journeys/shared.helper.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import * as metrics from "#/lib/metrics.js";
 import { logger } from "#/logger.js";
@@ -26,18 +26,13 @@ import type {
  */
 export const submitSignedDeclaration =
   (deps: DeclarationDeps) => async (context: DeclarationContext) => {
-    const session = context.getSession();
+    const session = getSessionDataOrThrow(context);
     const applicationId = context.getRequestParam(PARAMS_KEYS.applicationID);
     const confirmed = context.getAnswer(A.DECLARATION_SIGNED_CONFIRM);
     const date = context.getAnswer(A.DECLARATION_SIGNED_DATE);
     const correlationId = context
       .getRequestHeader("x-correlation-id")
       ?.toString();
-
-    if (session === undefined) {
-      logger.error("Missing session");
-      throw new UndefinedSessionError();
-    }
 
     if (applicationId === undefined) {
       logger.error("Missing applicationId in request parameters");
