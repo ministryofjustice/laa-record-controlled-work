@@ -100,14 +100,14 @@ export async function loadEligibilityAssessment(
     parsed.data.clientDetails.dateOfBirth,
   );
 
-  const { eligibility } = parsed.data;
-  if (!eligibility?.data || !eligibility.result) {
+  const { data, result } = parsed.data.eligibility ?? {};
+  if (!data || !result) {
     return success({ data: { client_age: clientAgeRange } });
   }
 
   return success({
-    data: { ...eligibility.data, client_age: clientAgeRange },
-    result: eligibility.result,
+    data: { ...data, client_age: clientAgeRange },
+    result,
   });
 }
 
@@ -222,7 +222,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
  * @returns `data` (Q&A content) and `result` (the CFE response held under `api_response`).
  */
 function splitEligibilityAssessment(eligibilityAssessment: EligibilityData): {
-  data: Record<string, unknown>;
+  data: Omit<EligibilityData, "api_response">;
   result: Record<string, unknown>;
 } {
   const { api_response: apiResponse, ...data } = eligibilityAssessment;
