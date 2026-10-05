@@ -2,7 +2,6 @@ import type { getApplication } from "#/api/clients/rcw/schema/applications/appli
 import type { ClientAndCaseDetailsSection } from "#/export/sections/clientAndCaseDetails/clientAndCaseDetails.types.js";
 import type { MeansAssessmentSection } from "#/export/sections/meansAssessment/meansAssessment.types.js";
 
-
 export interface ExportApplicationViewModel {
   applicationRefNumber: null | string;
   clientAndCaseDetails: ClientAndCaseDetailsSection;
