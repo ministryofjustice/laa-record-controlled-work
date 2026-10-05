@@ -13,8 +13,8 @@ import {
   clientDetailsCaption,
   continueButton,
 } from "#/journeys/shared.blocks.js";
-import { StepCode } from "#/journeys/StepCode.enum.js";
 import { redirectToCheckAnswers } from "#/journeys/shared.hook.js";
+import { StepCode } from "#/journeys/StepCode.enum.js";
 
 const TITLE = t("journeys.createApplication.familyLawClassification.title");
 
