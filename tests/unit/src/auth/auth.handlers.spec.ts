@@ -1403,6 +1403,38 @@ describe("Auth Handlers", () => {
       expect(next.called).to.be.false;
     });
 
+    it("redirects to / when the saved callback destination is an auth path", async () => {
+      const next = sinon.stub();
+      const req = {
+        query: QUERY_PARAMS,
+        session: {
+          authCodeRequest: {
+            code: "",
+            codeVerifier: "verifier",
+            redirectUri: "http://localhost/auth/code/callback",
+            scopes: ["scope.read"],
+          },
+          authState: QUERY_PARAMS.state,
+          regenerate: (callback: (error?: Error | null) => void): void =>
+            callback(),
+          returnTo: "/AUTH/code/callback",
+        },
+        sessionID: "old-session-id",
+      } as unknown as Request;
+      const res = {
+        redirect: sinon.stub(),
+        send: sinon.stub().returnsThis(),
+        set: sinon.stub().returnsThis(),
+        status: sinon.stub().returnsThis(),
+      } as unknown as Response;
+
+      await authCodeCallback(req, res, next);
+
+      expect((res.redirect as sinon.SinonStub).calledOnceWithExactly("/"))
+        .to.be.true;
+      expect(next.called).to.be.false;
+    });
+
     describe("session guards", () => {
       let app: express.Application;
 
