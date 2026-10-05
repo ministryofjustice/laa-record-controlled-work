@@ -8,12 +8,12 @@ const CFE_OUTCOMES = [
   "ineligible",
 ] as const;
 
-export const cfeProceedingTypeSchema = zod.looseObject({
+const cfeProceedingTypeSchema = zod.looseObject({
   result: zod.enum(CFE_OUTCOMES),
   upper_threshold: zod.number(),
 });
 
-export const cfeCategorySchema = zod.looseObject({
+const cfeCategorySchema = zod.looseObject({
   combined_assessed_capital: zod.number().nullish(),
   combined_total_disposable_income: zod.number().nullish(),
   combined_total_gross_income: zod.number().nullish(),
