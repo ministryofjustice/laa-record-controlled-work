@@ -10,6 +10,7 @@ import {
 import sinon from "sinon";
 import { EntraService } from "#/auth/entra.service.js";
 import { authCodeCallback, signIn } from "#/auth/auth.handlers.js";
+import { getValidatedReturnTo } from "#/auth/auth.redirect.js";
 import { createRelayState } from "#/auth/auth.relay.js";
 import config from "#/config.js";
 import { failure, success } from "#/lib/either.js";
@@ -19,6 +20,16 @@ import { TokenAcquisitionError } from "#/auth/auth.errors.js";
 import { createMockApp } from "../../utils.js";
 
 const AUTH_CODE_URL = "https://login.microsoftonline.com/auth";
+const TRUSTED_APP_ORIGIN = new URL("https://rcw.invalid");
+
+function expectAllowedLocalLocation(location: unknown): void {
+  expect(location).to.be.a("string");
+
+  const localLocation = location as string;
+  const resolvedLocation = new URL(localLocation, TRUSTED_APP_ORIGIN);
+  expect(resolvedLocation.origin).to.equal(TRUSTED_APP_ORIGIN.origin);
+  expect(getValidatedReturnTo(localLocation)).to.equal(localLocation);
+}
 
 describe("Auth Handlers", () => {
   let authServiceStub: {
@@ -219,6 +230,7 @@ describe("Auth Handlers", () => {
 
       expect(res.status).to.equal(FOUND);
       expect(res.headers.location).to.equal("/");
+      expectAllowedLocalLocation(res.headers.location);
     });
 
     it("stores account and msal homeAccountId in session without token fields", async () => {
@@ -228,6 +240,7 @@ describe("Auth Handlers", () => {
         .get("/auth/code/callback")
         .query(QUERY_PARAMS);
       expect(callbackResponse.status).to.equal(FOUND);
+      expectAllowedLocalLocation(callbackResponse.headers.location);
 
       const sessionResponse = await agent.get("/test/session");
       expect(sessionResponse.status).to.equal(200);
@@ -300,6 +313,7 @@ describe("Auth Handlers", () => {
       const next = sinon.stub();
       const createStub = EntraService.create as unknown as sinon.SinonStub;
       createStub.resetHistory();
+      const returnTo = "/cases/123?status=open#details";
 
       const req = {
         hostname: "localhost",
@@ -316,7 +330,7 @@ describe("Auth Handlers", () => {
             req.sessionID = "new-session-id";
             callback();
           },
-          returnTo: "/",
+          returnTo,
         },
         sessionID: "old-session-id",
       } as unknown as Request;
@@ -332,8 +346,9 @@ describe("Auth Handlers", () => {
 
       expect(createStub.calledOnceWithExactly({ sessionId: "new-session-id" }))
         .to.be.true;
-      expect((res.redirect as sinon.SinonStub).calledOnceWithExactly("/")).to.be
-        .true;
+      const redirect = res.redirect as sinon.SinonStub;
+      expect(redirect.calledOnceWithExactly(returnTo)).to.be.true;
+      expectAllowedLocalLocation(redirect.firstCall.args[0]);
       expect(next.called).to.be.false;
     });
 
@@ -364,8 +379,9 @@ describe("Auth Handlers", () => {
 
       await authCodeCallback(req, res, next);
 
-      expect((res.redirect as sinon.SinonStub).calledOnceWithExactly("/"))
-        .to.be.true;
+      const redirect = res.redirect as sinon.SinonStub;
+      expect(redirect.calledOnceWithExactly("/")).to.be.true;
+      expectAllowedLocalLocation(redirect.firstCall.args[0]);
       expect(next.called).to.be.false;
     });
 
@@ -411,6 +427,11 @@ describe("Auth Handlers", () => {
           .query({ code: "auth-code", state });
 
         expect(res.status).to.equal(FOUND);
+        const relayLocation = new URL(res.headers.location);
+        expect(relayLocation.origin).to.equal(
+          new URL(VALID_EPHEMERAL_TARGET).origin,
+        );
+        expect(relayLocation.pathname).to.equal("/auth/code/callback");
         expect(res.headers.location).to.include(
           `${VALID_EPHEMERAL_TARGET}/auth/code/callback`,
         );
@@ -468,6 +489,7 @@ describe("Auth Handlers", () => {
         expect(authServiceStub.exchangeAuthCode.calledOnce).to.be.true;
         expect(res.status).to.equal(FOUND);
         expect(res.headers.location).to.equal("/");
+        expectAllowedLocalLocation(res.headers.location);
       });
 
       it("processes the callback normally when state has no relay target", async () => {
@@ -478,6 +500,7 @@ describe("Auth Handlers", () => {
         expect(authServiceStub.exchangeAuthCode.calledOnce).to.be.true;
         expect(res.status).to.equal(FOUND);
         expect(res.headers.location).to.equal("/");
+        expectAllowedLocalLocation(res.headers.location);
       });
     });
   });
@@ -488,6 +511,7 @@ describe("Auth Handlers", () => {
 
       expect(res.status).to.equal(FOUND);
       expect(res.headers.location).to.equal("/");
+      expectAllowedLocalLocation(res.headers.location);
     });
 
     it("destroys the session and clears the cookie before redirecting", async () => {
@@ -497,6 +521,7 @@ describe("Auth Handlers", () => {
       const res = await agent.get("/auth/signout");
 
       expect(res.status).to.equal(FOUND);
+      expectAllowedLocalLocation(res.headers.location);
       const rawCookies = res.headers["set-cookie"];
       const cookies: string[] = Array.isArray(rawCookies)
         ? rawCookies
@@ -516,6 +541,7 @@ describe("Auth Handlers", () => {
       const res = await agent.get("/auth/signout");
 
       expect(res.status).to.equal(FOUND);
+      expectAllowedLocalLocation(res.headers.location);
       expect(del.calledOnce).to.be.true;
       const [key] = del.firstCall.args as [string];
       expect(key.startsWith("msal:")).to.be.true;
