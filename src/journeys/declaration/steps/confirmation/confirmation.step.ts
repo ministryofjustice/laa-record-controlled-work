@@ -28,6 +28,7 @@ export const confirmStep = (): ReturnType<typeof step> =>
       confirmWarning(),
       confirmButtonGroup(),
     ],
+    code: "declaration-confirm",
     onSubmission: [
       submit({
         onAlways: {
@@ -40,7 +41,7 @@ export const confirmStep = (): ReturnType<typeof step> =>
         when: Post("action").match(Condition.Equals("continue")),
       }),
       submit({
-        onValid: {
+        onAlways: {
           next: [
             redirect({
               goto: Format(
