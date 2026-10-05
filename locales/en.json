@@ -34,6 +34,26 @@
           },
           "partner": "Does your client have a partner?",
           "passporting": "Does your client receive a passporting benefit?"
+        },
+        "dependants": {
+          "heading": "Dependants",
+          "childDependants": "Does your client have any child dependants?",
+          "childDependantsCount": "How many child dependants are there?",
+          "adultDependants": "Does your client have any adult dependants?",
+          "adultDependantsCount": "How many adult dependants are there?",
+          "getIncome": "Do any of the dependants aged 16 or over get regular income?",
+          "income": {
+            "heading": "Dependant {index} income",
+            "frequency": "When does the dependant normally get this income?",
+            "amount": "Income",
+            "frequencies": {
+              "everyWeek": "Every week",
+              "everyTwoWeeks": "Every 2 weeks",
+              "everyFourWeeks": "Every 4 weeks",
+              "monthly": "Monthly",
+              "threeMonths": "Total in last 3 months"
+            }
+          }
         }
       },
       "clientAndCaseDetails": {
