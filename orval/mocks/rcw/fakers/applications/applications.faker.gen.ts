@@ -476,9 +476,9 @@ export const getGetApplicationResponseMock = <
           "yesSameMatter",
         ] as const),
         familyLawClassification: faker.helpers.arrayElement([
-          "public",
-          "private",
-        ] as const),
+          faker.helpers.arrayElement(["public", "private"] as const),
+          null,
+        ]),
       },
       null,
     ]),

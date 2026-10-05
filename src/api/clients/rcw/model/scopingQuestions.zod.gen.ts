@@ -8,7 +8,9 @@ import * as zod from "zod";
 
 export const ScopingQuestions = zod.object({
   priorLegalAid: zod.enum(["no", "yesDifferentMatter", "yesSameMatter"]),
-  familyLawClassification: zod.enum(["public", "private"]).optional(),
+  familyLawClassification: zod
+    .union([zod.enum(["public", "private"]), zod.null()])
+    .optional(),
 });
 
 export type ScopingQuestions = zod.input<typeof ScopingQuestions>;

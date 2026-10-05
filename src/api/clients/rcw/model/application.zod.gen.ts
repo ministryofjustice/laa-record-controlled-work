@@ -379,7 +379,9 @@ export const Application = zod.object({
   scopingQuestions: zod.union([
     zod.object({
       priorLegalAid: zod.enum(["no", "yesDifferentMatter", "yesSameMatter"]),
-      familyLawClassification: zod.enum(["public", "private"]).optional(),
+      familyLawClassification: zod
+        .union([zod.enum(["public", "private"]), zod.null()])
+        .optional(),
     }),
     zod.null(),
   ]),
