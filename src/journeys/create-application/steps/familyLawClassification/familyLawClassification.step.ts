@@ -20,6 +20,7 @@ const TITLE = t("journeys.createApplication.familyLawClassification.title");
 /**
  * Renders the Family Law Classification question step.
  * @param journeyCode - The journey code for saving draft answers
+ * @returns {StepDefinition} The step definition for the Family Law Classification question step.
  */
 export function familyLawClassificationStep(
   journeyCode: string,

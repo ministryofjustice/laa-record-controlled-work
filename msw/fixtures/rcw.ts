@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers -- super magic faker values */
 import { faker } from "@faker-js/faker";
 
+import { FamilyLawClassification } from "#/api/clients/rcw/model/familyLawClassification.zod.gen.js";
 import { PriorLegalAid } from "#/api/clients/rcw/model/priorLegalAid.zod.gen.js";
 import {
   getCreateApplicationResponseMock,
   getGetApplicationResponseMock,
   getGetApplicationsResponseMock,
 } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
-import { FamilyLawClassification } from "#/api/clients/rcw/model/familyLawClassification.zod.gen.js";
 
 faker.seed(12345);
 
@@ -39,8 +39,8 @@ const CLIENT_DETAILS = {
     niNumber: `AA${faker.string.numeric(6)}C`,
   },
   scopingQuestions: {
-    priorLegalAid: PriorLegalAid.enum.no,
     familyLawClassification: FamilyLawClassification.enum.private,
+    priorLegalAid: PriorLegalAid.enum.no,
   },
 };
 
