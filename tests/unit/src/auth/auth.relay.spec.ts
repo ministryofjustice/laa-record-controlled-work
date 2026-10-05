@@ -110,6 +110,22 @@ describe("authRelay", () => {
       ).to.be.true;
     });
 
+    const hostname = new URL(VALID_TARGET).hostname;
+    for (const target of [
+      `${VALID_TARGET}:443`,
+      `${VALID_TARGET}:8443`,
+      `https://user:password@${hostname}`,
+      `${VALID_TARGET}/`,
+      `${VALID_TARGET}/path`,
+      `${VALID_TARGET}?next=/callback`,
+      `${VALID_TARGET}#callback`,
+      `https://${hostname.toUpperCase()}`,
+    ]) {
+      it(`rejects a relay target that is not a bare HTTPS origin: ${target}`, () => {
+        expect(isAllowedRelayTarget(target)).to.be.false;
+      });
+    }
+
     it("rejects an arbitrary external domain", () => {
       expect(isAllowedRelayTarget("https://external.com")).to.be.false;
     });

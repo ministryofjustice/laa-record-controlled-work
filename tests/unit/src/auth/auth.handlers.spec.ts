@@ -9,7 +9,7 @@ import {
 } from "#/lib/constants/http.js";
 import sinon from "sinon";
 import { EntraService } from "#/auth/entra.service.js";
-import { authCodeCallback } from "#/auth/auth.handlers.js";
+import { authCodeCallback, signIn } from "#/auth/auth.handlers.js";
 import { createRelayState } from "#/auth/auth.relay.js";
 import config from "#/config.js";
 import { failure, success } from "#/lib/either.js";
@@ -88,15 +88,113 @@ describe("Auth Handlers", () => {
         .be.true;
     });
 
-    it("ignores returnTo query parameter when it is not a safe app-relative path", async () => {
+    it("uses / when returnTo is not a safe app-relative path", async () => {
       const res = await request(mockApp)
         .get("/auth/signin")
         .query({ returnTo: "https://example.com/evil" });
 
       expect(res.status).to.equal(FOUND);
       expect(res.headers.location).to.equal(AUTH_CODE_URL);
-      expect(authServiceStub.initiateAuthCodeFlow.calledOnceWith(undefined)).to
-        .be.true;
+      expect(authServiceStub.initiateAuthCodeFlow.calledOnceWith("/")).to.be
+        .true;
+    });
+
+    for (const returnTo of [
+      "/auth",
+      "/auth/code/callback",
+      "/AUTH/signin",
+      "/%61uth/code/callback",
+      "/cases/%2e%2e/auth/code/callback",
+      "/%2fauth/code/callback",
+      "/%5cauth/code/callback",
+      "/cases/%252f%252fauth",
+      "/cases/%ZZ",
+      "/cases/%00",
+      "/\\external.invalid",
+    ]) {
+      it(`uses / for unsafe returnTo ${returnTo}`, async () => {
+        await request(mockApp).get("/auth/signin").query({ returnTo });
+
+        expect(
+          authServiceStub.initiateAuthCodeFlow.calledOnceWithExactly("/", {
+            callbackHostname: "127.0.0.1",
+          }),
+        ).to.be.true;
+      });
+    }
+
+    it("preserves authentication-like prefixes and escaped query values", async () => {
+      const returnTo = "/authentication?next=%2Fauth#summary";
+
+      await request(mockApp).get("/auth/signin").query({ returnTo });
+
+      expect(
+        authServiceStub.initiateAuthCodeFlow.calledOnceWith(returnTo),
+      ).to.be.true;
+    });
+
+    it("uses / for repeated returnTo query values", async () => {
+      await request(mockApp).get(
+        "/auth/signin?returnTo=%2Fcases&returnTo=%2Fauth",
+      );
+
+      expect(
+        authServiceStub.initiateAuthCodeFlow.calledOnceWith("/", {
+          callbackHostname: "127.0.0.1",
+        }),
+      ).to.be.true;
+    });
+
+    it("uses the validated saved destination when returnTo is absent", async () => {
+      const req = {
+        hostname: "localhost",
+        query: {},
+        session: {
+          returnTo: "/authentication",
+          save: (callback: (error?: Error) => void): void => callback(),
+        },
+        sessionID: "session-id",
+      } as unknown as Request;
+      const res = {
+        redirect: sinon.stub(),
+        status: sinon.stub().returnsThis(),
+        send: sinon.stub().returnsThis(),
+      } as unknown as Response;
+      const next = sinon.stub();
+
+      await signIn(req, res, next);
+
+      expect(
+        authServiceStub.initiateAuthCodeFlow.calledOnceWith(
+          "/authentication",
+        ),
+      ).to.be.true;
+    });
+
+    it("replaces a poisoned saved destination with /", async () => {
+      const req = {
+        hostname: "localhost",
+        query: {},
+        session: {
+          returnTo: "https://attacker.example/collect",
+          save: (callback: (error?: Error) => void): void => callback(),
+        },
+        sessionID: "session-id",
+      } as unknown as Request;
+      const res = {
+        redirect: sinon.stub(),
+        status: sinon.stub().returnsThis(),
+        send: sinon.stub().returnsThis(),
+      } as unknown as Response;
+      const next = sinon.stub();
+
+      await signIn(req, res, next);
+
+      expect(
+        authServiceStub.initiateAuthCodeFlow.calledOnceWith("/", {
+          callbackHostname: "localhost",
+        }),
+      ).to.be.true;
     });
 
     it("calls next(error) when initiateAuthCodeFlow() fails", async () => {
@@ -236,6 +334,38 @@ describe("Auth Handlers", () => {
         .to.be.true;
       expect((res.redirect as sinon.SinonStub).calledOnceWithExactly("/")).to.be
         .true;
+      expect(next.called).to.be.false;
+    });
+
+    it("redirects to / when the saved callback destination is an auth path", async () => {
+      const next = sinon.stub();
+      const req = {
+        query: QUERY_PARAMS,
+        session: {
+          authCodeRequest: {
+            code: "",
+            codeVerifier: "verifier",
+            redirectUri: "http://localhost/auth/code/callback",
+            scopes: ["scope.read"],
+          },
+          authState: QUERY_PARAMS.state,
+          regenerate: (callback: (error?: Error | null) => void): void =>
+            callback(),
+          returnTo: "/AUTH/code/callback",
+        },
+        sessionID: "old-session-id",
+      } as unknown as Request;
+      const res = {
+        redirect: sinon.stub(),
+        send: sinon.stub().returnsThis(),
+        set: sinon.stub().returnsThis(),
+        status: sinon.stub().returnsThis(),
+      } as unknown as Response;
+
+      await authCodeCallback(req, res, next);
+
+      expect((res.redirect as sinon.SinonStub).calledOnceWithExactly("/"))
+        .to.be.true;
       expect(next.called).to.be.false;
     });
 

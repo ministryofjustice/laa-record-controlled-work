@@ -159,6 +159,32 @@ describe("EntraService", () => {
       expect(result.value.returnTo).to.equal("/");
     });
 
+    for (const returnTo of [
+      "/auth",
+      "/AUTH/code/callback",
+      "/%61uth/code/callback",
+      "/cases/%2e%2e/auth/code/callback",
+      "/cases/%252f%252fauth",
+      "/cases/%ZZ",
+    ]) {
+      it(`falls back to / for unsafe returnTo ${returnTo}`, async () => {
+        const result = (await service.initiateAuthCodeFlow(
+          returnTo,
+        )) as Success<AuthCodeFlowState>;
+
+        expect(result.value.returnTo).to.equal("/");
+      });
+    }
+
+    it("preserves an authentication-like prefix and escaped query data", async () => {
+      const returnTo = "/authentication?next=%2Fauth#summary";
+      const result = (await service.initiateAuthCodeFlow(
+        returnTo,
+      )) as Success<AuthCodeFlowState>;
+
+      expect(result.value.returnTo).to.equal(returnTo);
+    });
+
     it("returns a MsalError failure when MSAL throws", async () => {
       (msalStub.getAuthCodeUrl as sinon.SinonStub).rejects(
         new Error("MSAL failure"),
