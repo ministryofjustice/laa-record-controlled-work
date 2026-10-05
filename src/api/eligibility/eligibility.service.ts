@@ -27,6 +27,7 @@ export interface LoadEligibilityAssessmentDeps {
 
 export interface LoadEligibilityAssessmentParams {
   applicationId: string;
+  correlationId?: string;
   homeAccountId: string | undefined;
   sessionId: string | undefined;
 }
@@ -37,6 +38,7 @@ export interface SaveEligibilityAssessmentDeps {
 
 export interface SaveEligibilityAssessmentParams {
   applicationId: string;
+  correlationId?: string;
   eligibilityAssessment: Record<string, unknown>;
   homeAccountId: string | undefined;
   sessionId: string | undefined;
@@ -66,12 +68,12 @@ export async function loadEligibilityAssessment(
     EligibilityAssessment
   >
 > {
-  const { applicationId, homeAccountId, sessionId } = params;
+  const { applicationId, correlationId, homeAccountId, sessionId } = params;
 
   let response;
   try {
     const opts = await getRcwApiDefaultOptions({
-      correlationId: undefined,
+      correlationId,
       homeAccountId,
       sessionId,
     });
@@ -142,15 +144,20 @@ export async function saveEligibilityAssessment(
 ): Promise<
   Either<NotAuthenticatedError | SaveEligibilityAssessmentError, void>
 > {
-  const { applicationId, eligibilityAssessment, homeAccountId, sessionId } =
-    params;
+  const {
+    applicationId,
+    correlationId,
+    eligibilityAssessment,
+    homeAccountId,
+    sessionId,
+  } = params;
 
   const { data, result } = splitEligibilityAssessment(eligibilityAssessment);
 
   let response;
   try {
     const opts = await getRcwApiDefaultOptions({
-      correlationId: undefined,
+      correlationId,
       homeAccountId,
       sessionId,
     });

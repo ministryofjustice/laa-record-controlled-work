@@ -23,6 +23,7 @@ describe("loadApplication", () => {
   let deps: EditApplicationEffectsDeps;
   let getSession: sinon.SinonStub;
   let getRequestParam: sinon.SinonStub;
+  let getRequestHeader: sinon.SinonStub;
   let setData: sinon.SinonStub;
 
   beforeEach(() => {
@@ -38,10 +39,12 @@ describe("loadApplication", () => {
       msal: { homeAccountId: "home-account-id" },
     });
     getRequestParam = sinon.stub().returns(applicationId);
+    getRequestHeader = sinon.stub().returns("test-correlation-id"),
 
     context = {
       getSession,
       getRequestParam,
+      getRequestHeader,
       setData,
     } as unknown as EditApplicationContext;
   });

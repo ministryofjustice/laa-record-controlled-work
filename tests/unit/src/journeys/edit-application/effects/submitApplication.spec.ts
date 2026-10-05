@@ -22,6 +22,7 @@ describe("submitApplication", () => {
   let deps: EditApplicationEffectsDeps;
   let getSession: sinon.SinonStub;
   let getData: sinon.SinonStub;
+  let getRequestHeader: sinon.SinonStub;
 
   beforeEach(() => {
     sinon.stub(config.api, "useMockAccessToken").value(true);
@@ -36,9 +37,12 @@ describe("submitApplication", () => {
       msal: { homeAccountId: "home-account-id" },
     });
 
+    getRequestHeader = sinon.stub().returns("test-correlation-id"),
+
     context = {
       getSession,
       getData,
+      getRequestHeader,
     } as unknown as EditApplicationContext;
   });
 
@@ -59,7 +63,12 @@ describe("submitApplication", () => {
       updateApplicationStatusStub.calledOnceWith(
         applicationId,
         applicationState,
-        { headers: { Authorization: "Bearer test-access-token" } },
+        {
+          headers: {
+            Authorization: "Bearer test-access-token",
+            "X-Correlation-Id": "test-correlation-id",
+          },
+        }
       ),
     ).to.equal(true);
   });

@@ -33,7 +33,7 @@ export async function loadApplicationForExport(
 
   try {
     const options = await getRcwApiDefaultOptions({
-      correlationId: undefined,
+      correlationId: params.correlationId,
       homeAccountId: params.homeAccountId,
       sessionId: params.sessionId,
     });

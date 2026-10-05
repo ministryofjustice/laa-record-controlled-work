@@ -49,8 +49,12 @@ export const updateEvidence =
       const updateEvidenceReq: UpdateEvidenceRequestBody =
         mapEvidenceToEvidenceRequest(journeyAnswers);
 
+      const correlationId = context
+        .getRequestHeader("x-correlation-id")
+        ?.toString();
+
       const opts = await getRcwApiDefaultOptions({
-        correlationId: undefined,
+        correlationId,
         homeAccountId: session.msal?.homeAccountId,
         sessionId: session.id,
       });

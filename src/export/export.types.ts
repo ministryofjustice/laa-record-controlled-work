@@ -14,6 +14,7 @@ export interface LoadApplicationForExportDeps {
 
 export interface LoadApplicationForExportParams {
   applicationId: string;
+  correlationId?: string;
   homeAccountId: string | undefined;
   selectedOfficeCode: string | undefined;
   sessionId: string | undefined;

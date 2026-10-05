@@ -27,14 +27,16 @@ export const loadApplication =
     try {
       const session = context.getSession();
       const applicationID = context.getRequestParam(PARAMS_KEYS.applicationID);
-
+      const correlationId = context
+        .getRequestHeader("x-correlation-id")
+        ?.toString();
       if (!applicationID) {
         logger.error("applicationID parameter is missing");
         throw new Error("applicationID parameter is required");
       }
 
       const opts = await getRcwApiDefaultOptions({
-        correlationId: undefined,
+        correlationId,
         homeAccountId: session?.msal?.homeAccountId,
         sessionId: session?.id,
       });

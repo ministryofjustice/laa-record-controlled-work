@@ -4,7 +4,7 @@ import config from "#/config.js";
 import { logger } from "#/logger.js";
 
 export interface RcwApiAuthParams {
-  correlationId: string | undefined;
+  correlationId?: string;
   homeAccountId: string | undefined;
   sessionId: string | undefined;
 }
