@@ -25,7 +25,7 @@ const formattedDateOfBirth = new Intl.DateTimeFormat("en-GB", {
   year: "numeric",
 }).format(new Date(dateOfBirth));
 const firstName = faker.person.firstName();
-const lastName = faker.person.lastName();
+const lastName = "Smith";
 const typeOfFamilyLaw = faker.lorem.words(3);
 const confirmMerits = faker.lorem.sentence();
 const evidenceCaseIsInScope = faker.lorem.sentence();
