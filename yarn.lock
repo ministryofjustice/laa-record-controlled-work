@@ -315,7 +315,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@eslint-community/eslint-plugin-eslint-comments@npm:^4.0.0":
+"@eslint-community/eslint-plugin-eslint-comments@npm:^4.7.0":
   version: 4.8.1
   resolution: "@eslint-community/eslint-plugin-eslint-comments@npm:4.8.1"
   dependencies:
@@ -3818,19 +3818,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-config-love@npm:^155.0.0":
-  version: 155.0.0
-  resolution: "eslint-config-love@npm:155.0.0"
+"eslint-config-love@npm:^156.0.0":
+  version: 156.0.0
+  resolution: "eslint-config-love@npm:156.0.0"
   dependencies:
-    "@eslint-community/eslint-plugin-eslint-comments": "npm:^4.0.0"
+    "@eslint-community/eslint-plugin-eslint-comments": "npm:^4.7.0"
     "@typescript-eslint/utils": "npm:^8.58.1"
     eslint-plugin-n: "npm:^18.0.1"
-    eslint-plugin-promise: "npm:^7.2.0"
+    eslint-plugin-promise: "npm:^7.3.0"
     typescript-eslint: "npm:^8.58.1"
   peerDependencies:
-    eslint: ^9.35.0
+    eslint: ^10.0.0
     typescript: "*"
-  checksum: 10c0/5009f659394e13ff9a074bc228635dbc815ea699c6b58347e320f2228b24c772adfd8bfe5aee7534c7aa6c83db6759795573e6024e80605124ec970f66b57920
+  checksum: 10c0/e5d782161c600bf5be111139cb5ac6a5aa68966e86e168d0e76396f7924bb0544b83c106eadfb86969c9c2816b87cabcce53b05e9c59e732f3ffd9760161b0c0
   languageName: node
   linkType: hard
 
@@ -3982,7 +3982,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-promise@npm:^7.2.0":
+"eslint-plugin-promise@npm:^7.3.0":
   version: 7.3.0
   resolution: "eslint-plugin-promise@npm:7.3.0"
   dependencies:
@@ -5291,7 +5291,7 @@ __metadata:
     esbuild-plugin-copy: "npm:^2.1.1"
     esbuild-sass-plugin: "npm:^3.7.0"
     eslint: "npm:^10.11.0"
-    eslint-config-love: "npm:^155.0.0"
+    eslint-config-love: "npm:^156.0.0"
     eslint-config-prettier: "npm:^10.1.8"
     eslint-plugin-jsdoc: "npm:^64.5.4"
     eslint-plugin-jsonc: "npm:^3.4.2"
