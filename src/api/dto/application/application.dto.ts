@@ -169,10 +169,7 @@ export class ApplicationDto {
       [AnswerKey.dateOfBirth]: application.clientDetails.dateOfBirth,
       [AnswerKey.ecf]: "no",
       [AnswerKey.familyLawClassification]:
-        typeof application.scopingQuestions?.familyLawClassification ===
-        "string"
-          ? application.scopingQuestions.familyLawClassification
-          : "",
+        application.scopingQuestions?.familyLawClassification ?? "public",
       [AnswerKey.firstName]: application.clientDetails.firstName,
       [AnswerKey.hasNINumber]: application.clientDetails.niNumber
         ? "yes"

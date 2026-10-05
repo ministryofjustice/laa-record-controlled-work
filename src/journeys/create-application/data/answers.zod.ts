@@ -1,12 +1,13 @@
 import { z as zod } from "zod";
 
 import { PriorLegalAid } from "#/api/clients/rcw/model/priorLegalAid.zod.gen.js";
+import { FamilyLawClassification } from "#/api/clients/rcw/model/familyLawClassification.zod.gen.js";
 
 export const Answers = zod
   .object({
     dateOfBirth: zod.string(),
     ecf: zod.string(),
-    familyLawClassification: zod.string(),
+    familyLawClassification: FamilyLawClassification,
     firstName: zod.string(),
     hasNINumber: zod.string(),
     haveAHomeAddress: zod.string(),

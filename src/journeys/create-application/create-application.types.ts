@@ -8,6 +8,7 @@ import type { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 export interface CreateApplicationAnswers extends Record<string, unknown> {
   [AnswerKey.dateOfBirth]?: string;
   [AnswerKey.ecf]?: string;
+  [AnswerKey.familyLawClassification]?: string;
   [AnswerKey.firstName]?: string;
   [AnswerKey.hasNINumber]?: string;
   [AnswerKey.haveAHomeAddress]?: string;

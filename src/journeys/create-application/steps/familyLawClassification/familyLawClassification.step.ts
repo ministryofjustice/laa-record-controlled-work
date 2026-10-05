@@ -1,6 +1,4 @@
 import {
-  Answer,
-  Condition,
   redirect,
   step,
   type StepDefinition,
@@ -9,7 +7,6 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 import { t } from "i18next";
 
-import { AnswerKey } from "#/journeys/AnswerKey.enum.js";
 import { CreateApplicationEffects } from "#/journeys/create-application/create-application.effects.js";
 import { familyLawQuestion } from "#/journeys/create-application/steps/familyLawClassification/familyLawClassification.blocks.js";
 import {
