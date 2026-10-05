@@ -16,7 +16,7 @@ ignore:
         reason: >
           No fixed Zod release is available. Reassess this advisory when the
           seven-day exception expires.
-        expires: "2026-10-12T12:03:16.000Z"
+        expires: "2026-10-12T08:00:00.000Z"
   SNYK-JS-FOLLOWREDIRECTS-16032162:
     - "*":
         reason: >
