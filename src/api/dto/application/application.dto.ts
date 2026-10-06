@@ -181,13 +181,15 @@ export class ApplicationDto {
     const priorLegalAid = PriorLegalAid.parse(
       application.scopingQuestions?.priorLegalAid,
     );
+    const scopingQuestions = this.getAnswersFromScopingQuestions(
+      application.scopingQuestions
+    );
 
     return {
       ...addressAnswers,
+      ...scopingQuestions,
       [AnswerKey.dateOfBirth]: application.clientDetails.dateOfBirth,
       [AnswerKey.ecf]: "no",
-      [AnswerKey.familyLawClassification]:
-        application.scopingQuestions?.familyLawClassification ?? "public",
       [AnswerKey.firstName]: application.clientDetails.firstName,
       [AnswerKey.hasNINumber]: application.clientDetails.niNumber
         ? "yes"
@@ -202,13 +204,36 @@ export class ApplicationDto {
         application.reasonForReapplication
           ? "yes"
           : "no",
-      [AnswerKey.needsAdviceOnEUOrInternationalMaintenance]: application
-        .scopingQuestions?.needsAdviceOnEUOrInternationalMaintenance
-        ? "yes"
-        : "no",
       [AnswerKey.niNumber]: application.clientDetails.niNumber ?? "",
       [AnswerKey.reasonForYes]: application.reasonForReapplication ?? "",
     };
+  }
+
+  
+  private static getAnswersFromScopingQuestions(
+    scopingQuestions: ScopingQuestions | null,
+  ): Partial<AnswersOutput> {
+    if (!scopingQuestions) {
+      return {};
+    }
+
+    const scopingAnswers: Partial<AnswersOutput> = {
+      [AnswerKey.legalAidBefore]: PriorLegalAid.parse(
+        scopingQuestions.priorLegalAid,
+      )
+    };
+
+    if (scopingQuestions.familyLawClassification) {
+      scopingAnswers[AnswerKey.familyLawClassification] =
+        scopingQuestions.familyLawClassification;
+    }
+
+    if (scopingQuestions.familyLawClassification === "private") {
+      scopingAnswers[AnswerKey.needsAdviceOnEUOrInternationalMaintenance] =
+        scopingQuestions.needsAdviceOnEUOrInternationalMaintenance ? "yes" : "no";
+    }
+
+    return scopingAnswers;
   }
 
   /**

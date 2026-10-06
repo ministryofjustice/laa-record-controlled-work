@@ -96,6 +96,40 @@ describe("fromAnswers method", () => {
       country: "GB",
     });
   });
+
+  it("correctly maps scoping questions for private family law classification", () => {
+    const providerOfficeCode = "22439e72-68d3-4770-b435-c352d883d21e";
+    const result = ApplicationDto.fromAnswers(
+      {
+        ...answers,
+        familyLawClassification: "private",
+        needsAdviceOnEUOrInternationalMaintenance: "yes",
+      },
+      providerOfficeCode,
+    ).toRcwApi();
+
+    expect(result.scopingQuestions).to.deep.equal({
+      priorLegalAid: "yesSameMatter",
+      familyLawClassification: "private",
+      needsAdviceOnEUOrInternationalMaintenance: true,
+    });
+  });
+
+  it("correctly maps scoping questions for public family law classification", () => {
+    const providerOfficeCode = "22439e72-68d3-4770-b435-c352d883d21e";
+    const result = ApplicationDto.fromAnswers(
+      {
+        ...answers,
+        familyLawClassification: "public",
+      },
+      providerOfficeCode,
+    ).toRcwApi();
+
+    expect(result.scopingQuestions).to.deep.equal({
+      priorLegalAid: "yesSameMatter",
+      familyLawClassification: "public",
+    });
+  });
 });
 
 describe("toAnswers method", () => {
@@ -248,6 +282,44 @@ describe("toAnswers method", () => {
       "osAddressLine3",
       "osAddressLine4",
       "osCountry",
+    );
+  });
+
+  it("maps scoping questions correctly for private family law classification", () => {
+    const result = ApplicationDto.toAnswers({
+      ...application,
+      scopingQuestions: {
+        priorLegalAid: "yesSameMatter",
+        familyLawClassification: "private",
+        needsAdviceOnEUOrInternationalMaintenance: true,
+      },
+    });
+
+    expect(result).to.include({
+      legalAidBefore: "yesSameMatter",
+      familyLawClassification: "private",
+      needsAdviceOnEUOrInternationalMaintenance: "yes",
+    });
+  });
+
+  it("maps scoping questions correctly for public family law classification", () => {
+    const result = ApplicationDto.toAnswers({
+      ...application,
+      scopingQuestions: {
+        priorLegalAid: "no",
+        familyLawClassification: "public",
+      },
+    });
+
+    console.log(result);
+
+    expect(result).to.include({
+      legalAidBefore: "no",
+      familyLawClassification: "public",
+    });
+
+    expect(result).to.not.have.any.keys(
+      "needsAdviceOnEUOrInternationalMaintenance",
     );
   });
 });
