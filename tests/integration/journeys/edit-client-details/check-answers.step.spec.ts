@@ -48,7 +48,7 @@ describe("Edit client details check answers step", () => {
       },
     },
     reasonForReapplication: "Some reason for help",
-    scopingQuestions: { priorLegalAid: "yesSameMatter", familyLawClassification: "public" },
+    scopingQuestions: { priorLegalAid: "yesSameMatter", familyLawClassification: "private", needsAdviceOnEUOrInternationalMaintenance: false },
   });
   const overseasApplication: Application = getGetApplicationResponseMock({
     ...ukApplication,
@@ -419,10 +419,12 @@ describe("Edit client details check answers step", () => {
         value: { text: string };
       }>;
 
-      expect(rows.length).to.equal(11);
+      expect(rows.length).to.equal(12);
       expect(rows[0].key.text).to.equal("ECF");
       expect(rows[1].key.text).to.equal("Type of family law");
       expect(rows[1].value.text).to.equal("Public");
+      expect(rows[2].key.text).to.equal("Transitional EU arrangements or an international maintenance agreement");
+      expect(rows[2].value.text).to.equal("No");
       expect(rows[2].key.text).to.equal("Accessed legal aid before");
       expect(rows[2].value.text).to.equal("Yes, about the same matter");
       expect(rows[3].key.text).to.equal(

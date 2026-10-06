@@ -91,6 +91,19 @@ export function formatFamilyLawClassificationLabel(): ResolvableString {
 }
 
 /**
+ * Formats the Family Private Non-Means answer label.
+ * @returns The Family Private Non-Means answer label.
+ */
+export function formatFamilyPrivateNonMeansLabel(): ResolvableString {
+  const yes = t("common.yes");
+  const no = t("common.no");
+
+  return match(Answer(AnswerKey.needsAdviceOnEUOrInternationalMaintenance))
+    .branch(Condition.Equals("yes"), yes)
+    .otherwise(no);
+}
+
+/**
  * Formats the previous legal aid answer label.
  * @returns The previous legal aid answer label.
  */

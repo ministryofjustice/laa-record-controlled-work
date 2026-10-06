@@ -39,6 +39,8 @@ test("Edit Application - Client details journey", async ({
       "No",
       // Type of family law
       "Private",
+      // Transitional EU arrangements or an international maintenance agreement
+      "No",
       // Accessed legal aid before
       "No",
       // First name

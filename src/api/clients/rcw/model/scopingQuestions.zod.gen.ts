@@ -11,6 +11,7 @@ export const ScopingQuestions = zod.object({
   familyLawClassification: zod
     .union([zod.enum(["public", "private"]), zod.null()])
     .optional(),
+  needsAdviceOnEUOrInternationalMaintenance: zod.boolean().nullish(),
 });
 
 export type ScopingQuestions = zod.input<typeof ScopingQuestions>;

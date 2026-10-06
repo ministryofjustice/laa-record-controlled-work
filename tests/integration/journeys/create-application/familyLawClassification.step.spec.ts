@@ -1,4 +1,5 @@
 import {
+  TestRedirectResult,
   TestRenderResult,
 } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
@@ -51,18 +52,18 @@ describe("Family law classification step", () => {
       ).to.deep.equal("Please select an option");
     });
 
-    // TODO: uncomment when steps are added
+    it("should redirect to family private non means step if private", async () => {
+      const result = await client.post("/cases/new/family-type-of-case", {
+        body: {
+          familyLawClassification: "private",
+        },
+      });
+      expect(result.type).to.equal("redirect");
+      const redirectResult = result as TestRedirectResult;
+      expect(redirectResult.url).to.equal("/cases/new/family-private-non-means-question");
+    });
 
-    // it("should redirect to family private non means step if private", async () => {
-    //   const result = await client.post("/cases/new/family-type-of-case", {
-    //     body: {
-    //       familyLawClassification: "private",
-    //     },
-    //   });
-    //   expect(result.type).to.equal("redirect");
-    //   const redirectResult = result as TestRedirectResult;
-    //   expect(redirectResult.url).to.equal("/cases/new/family-private-non-means-question");
-    // });
+    // TODO: uncomment when steps are added
 
     // it("should redirect to family public written notice step if public", async () => {
     //   const result = await client.post("/cases/new/family-type-of-case", {

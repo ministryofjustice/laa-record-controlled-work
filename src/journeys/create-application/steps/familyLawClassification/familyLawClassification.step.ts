@@ -1,4 +1,6 @@
 import {
+  Answer,
+  Condition,
   redirect,
   step,
   type StepDefinition,
@@ -7,6 +9,7 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 import { t } from "i18next";
 
+import { AnswerKey } from "#/journeys/AnswerKey.enum.js";
 import { CreateApplicationEffects } from "#/journeys/create-application/create-application.effects.js";
 import { familyLawQuestion } from "#/journeys/create-application/steps/familyLawClassification/familyLawClassification.blocks.js";
 import {
@@ -48,19 +51,22 @@ function saveFamilyLawClassification(journeyCode: string): SubmitHook {
   return submit({
     onValid: {
       effects: [CreateApplicationEffects.saveDraftAnswers(journeyCode)],
-      next: [redirectToCheckAnswers, redirectToLegalAidBefore],
+      next: [
+        redirectToCheckAnswers,
+        redirectToEUOrInternational,
+        redirectToLegalAidBefore,
+      ],
     },
     validate: true,
   });
 }
 
-// TODO: Add these in when the corresponding steps are implemented
-// const redirectToEUOrInternational = redirect({
-//   goto: "family-private-non-means-question",
-//   when: Answer(AnswerKey.familyLawClassification).match(
-//     Condition.Equals("private"),
-//   ),
-// });
+const redirectToEUOrInternational = redirect({
+  goto: StepCode.FAMILY_PRIVATE_NON_MEANS,
+  when: Answer(AnswerKey.familyLawClassification).match(
+    Condition.Equals("private"),
+  ),
+});
 
 // const redirectToCareProceedingsInitiated = redirect({
 //   goto: "family-public-written-notice",
@@ -70,5 +76,5 @@ function saveFamilyLawClassification(journeyCode: string): SubmitHook {
 // });
 
 const redirectToLegalAidBefore = redirect({
-  goto: "legal-aid-before",
+  goto: StepCode.LEGAL_AID_BEFORE,
 });

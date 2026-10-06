@@ -96,6 +96,8 @@ export class ApplicationDto {
 
     const address = hasFixedAddress ? this.getAddressFromAnswers(answers) : {};
 
+    const scopingQuestions = this.getScopingQuestionsFromAnswers(answers);
+
     return new ApplicationDto({
       ...address,
       dateOfBirth: answers.dateOfBirth,
@@ -106,11 +108,30 @@ export class ApplicationDto {
       niNumber: answers.niNumber,
       providerOfficeCode,
       reasonForReapplication: answers.reasonForYes,
-      scopingQuestions: {
-        familyLawClassification: answers.familyLawClassification,
-        priorLegalAid: answers.legalAidBefore,
-      },
+      scopingQuestions,
     });
+  }
+
+  /**
+   * Extracts the scoping questions from the provided answers.
+   * Ensures that only relevant scoping questions are included based on the family law classification.
+   * @param answers - The answers from which to extract the scoping questions.
+   * @returns ScopingQuestions instance containing the extracted scoping questions.
+   */
+  public static getScopingQuestionsFromAnswers(
+    answers: AnswersOutput,
+  ): ScopingQuestions {
+    const scopingQuestions: ScopingQuestions = {
+      familyLawClassification: answers.familyLawClassification,
+      priorLegalAid: answers.legalAidBefore,
+    };
+
+    if (answers.familyLawClassification === "private") {
+      scopingQuestions.needsAdviceOnEUOrInternationalMaintenance =
+        answers.needsAdviceOnEUOrInternationalMaintenance === "yes";
+    }
+
+    return scopingQuestions;
   }
 
   /**
@@ -181,6 +202,10 @@ export class ApplicationDto {
         application.reasonForReapplication
           ? "yes"
           : "no",
+      [AnswerKey.needsAdviceOnEUOrInternationalMaintenance]: application
+        .scopingQuestions?.needsAdviceOnEUOrInternationalMaintenance
+        ? "yes"
+        : "no",
       [AnswerKey.niNumber]: application.clientDetails.niNumber ?? "",
       [AnswerKey.reasonForYes]: application.reasonForReapplication ?? "",
     };
