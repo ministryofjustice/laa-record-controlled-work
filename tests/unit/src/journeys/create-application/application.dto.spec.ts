@@ -44,7 +44,6 @@ describe("fromAnswers method", () => {
           country: "GB",
         },
       },
-      legalAidBefore: "yesSameMatter",
       legalAidLast6Months: true,
       providerOfficeCode,
       reasonForReapplication: "here is a reason",

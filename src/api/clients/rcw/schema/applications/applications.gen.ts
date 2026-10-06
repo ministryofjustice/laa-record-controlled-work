@@ -26,9 +26,17 @@ import type { InternalServerErrorResponse } from "#/api/clients/rcw/model/intern
 
 import type { NotFoundResponse } from "#/api/clients/rcw/model/notFoundResponse.zod.gen.js";
 
+import type { PayloadTooLargeResponse } from "#/api/clients/rcw/model/payloadTooLargeResponse.zod.gen.js";
+
+import type { PreconditionFailedResponse } from "#/api/clients/rcw/model/preconditionFailedResponse.zod.gen.js";
+
+import type { PreconditionRequiredResponse } from "#/api/clients/rcw/model/preconditionRequiredResponse.zod.gen.js";
+
 import type { ServiceUnavailableResponse } from "#/api/clients/rcw/model/serviceUnavailableResponse.zod.gen.js";
 
 import type { UnauthorizedResponse } from "#/api/clients/rcw/model/unauthorizedResponse.zod.gen.js";
+
+import type { UpdateApplicationDetailsRequestBody } from "#/api/clients/rcw/model/updateApplicationDetailsRequestBody.zod.gen.js";
 
 import type { UpdateApplicationStatusRequestBody } from "#/api/clients/rcw/model/updateApplicationStatusRequestBody.zod.gen.js";
 
@@ -253,6 +261,11 @@ export type getApplicationResponse500 = {
   status: 500;
 };
 
+export type getApplicationResponse502 = {
+  data: BadGatewayResponse;
+  status: 502;
+};
+
 export type getApplicationResponseSuccess = getApplicationResponse200 & {
   headers: Headers;
 };
@@ -261,6 +274,7 @@ export type getApplicationResponseError = (
   | getApplicationResponse403
   | getApplicationResponse404
   | getApplicationResponse500
+  | getApplicationResponse502
 ) & {
   headers: Headers;
 };
@@ -292,6 +306,146 @@ export const getApplication = async (
     status: res.status,
     headers: res.headers,
   } as getApplicationResponse;
+};
+
+export type updateApplicationDetailsResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type updateApplicationDetailsResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type updateApplicationDetailsResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type updateApplicationDetailsResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type updateApplicationDetailsResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
+
+export type updateApplicationDetailsResponse409 = {
+  data: ConflictResponse;
+  status: 409;
+};
+
+export type updateApplicationDetailsResponse412 = {
+  data: PreconditionFailedResponse;
+  status: 412;
+};
+
+export type updateApplicationDetailsResponse413 = {
+  data: PayloadTooLargeResponse;
+  status: 413;
+};
+
+export type updateApplicationDetailsResponse428 = {
+  data: PreconditionRequiredResponse;
+  status: 428;
+};
+
+export type updateApplicationDetailsResponse500 = {
+  data: InternalServerErrorResponse;
+  status: 500;
+};
+
+export type updateApplicationDetailsResponse502 = {
+  data: BadGatewayResponse;
+  status: 502;
+};
+
+export type updateApplicationDetailsResponse503 = {
+  data: ServiceUnavailableResponse;
+  status: 503;
+};
+
+export type updateApplicationDetailsResponseSuccess =
+  updateApplicationDetailsResponse204 & {
+    headers: Headers;
+  };
+export type updateApplicationDetailsResponseError = (
+  | updateApplicationDetailsResponse400
+  | updateApplicationDetailsResponse401
+  | updateApplicationDetailsResponse403
+  | updateApplicationDetailsResponse404
+  | updateApplicationDetailsResponse409
+  | updateApplicationDetailsResponse412
+  | updateApplicationDetailsResponse413
+  | updateApplicationDetailsResponse428
+  | updateApplicationDetailsResponse500
+  | updateApplicationDetailsResponse502
+  | updateApplicationDetailsResponse503
+) & {
+  headers: Headers;
+};
+
+export type updateApplicationDetailsResponse =
+  | updateApplicationDetailsResponseSuccess
+  | updateApplicationDetailsResponseError;
+
+export const getUpdateApplicationDetailsUrl = (id: string) => {
+  return `${config.api.rcw.baseUrl}/api/v1/applications/${id}/details`;
+};
+
+/**
+ * Replaces the complete editable details snapshot. The If-Match value must be a strong quoted integer validator returned by GET. A missing If-Match returns 428; a malformed, weak, or wildcard value returns 400; a stale version returns 412 with reason APPLICATION_VERSION_CONFLICT. A completed application returns 409 with reason APPLICATION_COMPLETED; an unclassified downstream 409 remains 409. For the applicable priorLegalAid branch, legalAidLast6Months true requires a nonblank reasonForReapplication. When legalAidLast6Months is false, or another priorLegalAid branch applies, reasonForReapplication must be null. hasFixedAddress true requires an address object; false requires address null. Explicit null clears nullable values; omitted properties are invalid. Empty strings remain values and are not clear operations. Request bodies are limited to 65,536 bytes by default; oversized bodies return 413.
+ * @summary Update an application's client and case details
+ */
+export const updateApplicationDetails = async (
+  id: string,
+  updateApplicationDetailsRequestBody: UpdateApplicationDetailsRequestBody,
+  options?: RequestInit,
+): Promise<updateApplicationDetailsResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<
+      string | readonly string[] | undefined
+    >(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await fetch(getUpdateApplicationDetailsUrl(id), {
+    ...options,
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(updateApplicationDetailsRequestBody),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: updateApplicationDetailsResponse["data"] = body
+    ? JSON.parse(body)
+    : undefined;
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as updateApplicationDetailsResponse;
 };
 
 export type updateApplicationEvidenceResponse204 = {

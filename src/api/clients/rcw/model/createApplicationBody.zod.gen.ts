@@ -15,7 +15,7 @@ export const createApplicationBodyClientDetailsNiNumberRegExp = new RegExp(
 export const createApplicationBodyClientDetailsAddressCountryMax = 2;
 
 export const CreateApplicationBody = zod.object({
-  legalAidBefore: zod.string(),
+  legalAidBefore: zod.string().optional(),
   legalAidLast6Months: zod.boolean().optional(),
   reasonForReapplication: zod.string().optional(),
   providerOfficeCode: zod.string(),
