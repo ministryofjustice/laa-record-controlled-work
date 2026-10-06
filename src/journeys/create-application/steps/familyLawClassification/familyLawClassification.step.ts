@@ -39,6 +39,7 @@ export function familyLawClassificationStep(
     onSubmission: [
       saveFamilyLawClassificationPrivate(journeyCode),
       saveFamilyLawClassificationPublic(journeyCode),
+      submitInvalid,
     ],
     path: StepCode.FAMILY_TYPE_OF_CASE,
     title: TITLE,
@@ -98,6 +99,11 @@ function saveFamilyLawClassificationPublic(journeyCode: string): SubmitHook {
   });
 }
 
+const submitInvalid = submit({
+  onInvalid: {},
+  validate: true,
+});
+
 const redirectToEUOrInternational = redirect({
   goto: StepCode.FAMILY_PRIVATE_NON_MEANS,
   when: Answer(AnswerKey.familyLawClassification).match(
@@ -106,7 +112,7 @@ const redirectToEUOrInternational = redirect({
 });
 
 const redirectToFamilyPrivateNonMeansWithCheckQuery = redirect({
-  goto: StepCode.FAMILY_PRIVATE_NON_MEANS + "?returnTo=check-answers",
+  goto: `${StepCode.FAMILY_PRIVATE_NON_MEANS}?returnTo=check-answers`,
   when: and(
     hasCheckAnswersInQuery,
     Answer(AnswerKey.familyLawClassification).match(

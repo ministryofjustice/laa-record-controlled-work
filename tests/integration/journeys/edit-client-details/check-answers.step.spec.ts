@@ -422,7 +422,7 @@ describe("Edit client details check answers step", () => {
       expect(rows.length).to.equal(12);
       expect(rows[0].key.text).to.equal("ECF");
       expect(rows[1].key.text).to.equal("Type of family law");
-      expect(rows[1].value.text).to.equal("Public");
+      expect(rows[1].value.text).to.equal("Private");
       expect(rows[2].key.text).to.equal("Transitional EU arrangements or an international maintenance agreement");
       expect(rows[2].value.text).to.equal("No");
       expect(rows[2].key.text).to.equal("Accessed legal aid before");
