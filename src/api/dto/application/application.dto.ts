@@ -181,13 +181,14 @@ export class ApplicationDto {
     const priorLegalAid = PriorLegalAid.parse(
       application.scopingQuestions?.priorLegalAid,
     );
-    const scopingQuestions = this.getAnswersFromScopingQuestions(
+    const scopingAnswers = this.getAnswersFromScopingQuestions(
       application.scopingQuestions
     );
 
     return {
       ...addressAnswers,
-      ...scopingQuestions,
+      ...scopingAnswers,
+      [AnswerKey.familyLawClassification]: application.scopingQuestions?.familyLawClassification ?? "public",
       [AnswerKey.dateOfBirth]: application.clientDetails.dateOfBirth,
       [AnswerKey.ecf]: "no",
       [AnswerKey.firstName]: application.clientDetails.firstName,
@@ -217,16 +218,7 @@ export class ApplicationDto {
       return {};
     }
 
-    const scopingAnswers: Partial<AnswersOutput> = {
-      [AnswerKey.legalAidBefore]: PriorLegalAid.parse(
-        scopingQuestions.priorLegalAid,
-      )
-    };
-
-    if (scopingQuestions.familyLawClassification) {
-      scopingAnswers[AnswerKey.familyLawClassification] =
-        scopingQuestions.familyLawClassification;
-    }
+    const scopingAnswers: Partial<AnswersOutput> = {};
 
     if (scopingQuestions.familyLawClassification === "private") {
       scopingAnswers[AnswerKey.needsAdviceOnEUOrInternationalMaintenance] =
