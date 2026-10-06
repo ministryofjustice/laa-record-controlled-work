@@ -19,6 +19,10 @@ const relayStateSchema = z.object({
 });
 
 export type RelayState = z.infer<typeof relayStateSchema>;
+export type RelayStateDecodeResult =
+  | { kind: "invalid" }
+  | { kind: "plain" }
+  | { kind: "valid"; state: RelayState };
 
 /**
  * Creates a base64-encoded relay state string for use as the OAuth `state` parameter.
@@ -50,6 +54,34 @@ export function createRelayState(
 }
 
 /**
+ * Decodes an OAuth state string without treating plain state as malformed relay data.
+ * @param stateString - The raw OAuth state value.
+ * @returns Whether the state is plain, invalid relay data, or a valid relay shape.
+ */
+export function decodeRelayState(stateString: string): RelayStateDecodeResult {
+  let decoded: unknown;
+  try {
+    decoded = JSON.parse(Buffer.from(stateString, "base64").toString("utf8"));
+  } catch {
+    return { kind: "plain" };
+  }
+
+  if (
+    typeof decoded !== "object" ||
+    decoded === null ||
+    (!Object.hasOwn(decoded, "target") && !Object.hasOwn(decoded, "signature"))
+  ) {
+    return { kind: "plain" };
+  }
+
+  const parsed = relayStateSchema.safeParse(decoded);
+  if (!parsed.success || !Number.isSafeInteger(parsed.data.expiresAt)) {
+    return { kind: "invalid" };
+  }
+  return { kind: "valid", state: parsed.data };
+}
+
+/**
  * Returns `true` if the given URL is a permitted relay target.
  *
  * A valid target must use HTTPS and its hostname must match the ALLOWED_RELAY_HOSTNAME_PATTERN.
@@ -72,26 +104,6 @@ export function isAllowedRelayTarget(target: string): boolean {
 }
 
 /**
- * Identifies decoded state objects that claim relay fields but fail validation.
- * @param stateString - The raw OAuth state value.
- * @returns True when decoded JSON contains a relay target or signature.
- */
-export function isRelayStateCandidate(stateString: string): boolean {
-  try {
-    const decoded = JSON.parse(
-      Buffer.from(stateString, "base64").toString("utf8"),
-    ) as unknown;
-    return (
-      typeof decoded === "object" &&
-      decoded !== null &&
-      (Object.hasOwn(decoded, "target") || Object.hasOwn(decoded, "signature"))
-    );
-  } catch {
-    return false;
-  }
-}
-
-/**
  * Attempts to parse a base64-encoded OAuth state string as a relay state.
  *
  * Returns `null` for any plain (non-relay) state values, invalid base64, non-JSON content,
@@ -102,18 +114,8 @@ export function isRelayStateCandidate(stateString: string): boolean {
  * @returns The decoded `RelayState` if the string is a valid relay state, or `null`.
  */
 export function parseRelayState(stateString: string): null | RelayState {
-  try {
-    const decoded = JSON.parse(
-      Buffer.from(stateString, "base64").toString("utf8"),
-    ) as unknown;
-
-    const { data } = relayStateSchema.safeParse(decoded);
-    return data !== undefined && Number.isSafeInteger(data.expiresAt)
-      ? data
-      : null;
-  } catch {
-    return null;
-  }
+  const decoded = decodeRelayState(stateString);
+  return decoded.kind === "valid" ? decoded.state : null;
 }
 
 /**

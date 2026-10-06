@@ -3,7 +3,7 @@ import { expect } from "chai";
 
 import {
   createRelayState,
-  isRelayStateCandidate,
+  decodeRelayState,
   isAllowedRelayTarget,
   parseRelayState,
   verifyRelayState,
@@ -26,6 +26,11 @@ describe("authRelay", () => {
       expect(parsed!.target).to.equal(VALID_TARGET);
       expect(parsed!.expiresAt).to.equal(EXPIRES_AT);
       expect(parsed!.signature).to.be.a("string").with.length.greaterThan(0);
+    });
+
+    it("classifies a well-formed relay state as valid", () => {
+      const state = createRelayState(NONCE, VALID_TARGET, EXPIRES_AT, SECRET);
+      expect(decodeRelayState(state).kind).to.equal("valid");
     });
 
     it("is decodable by MSAL CryptoProvider.base64Decode without error", () => {
@@ -70,14 +75,23 @@ describe("authRelay", () => {
         JSON.stringify({ nonce: NONCE, signature: "signature", target: VALID_TARGET }),
       ).toString("base64");
       expect(parseRelayState(state)).to.be.null;
-      expect(isRelayStateCandidate(state)).to.be.true;
+    });
+  });
+
+  describe("decodeRelayState", () => {
+    it("classifies malformed relay data as invalid", () => {
+      const state = Buffer.from(
+        JSON.stringify({ nonce: NONCE, signature: "signature", target: VALID_TARGET }),
+      ).toString("base64");
+
+      expect(decodeRelayState(state)).to.deep.equal({ kind: "invalid" });
     });
 
-    it("does not classify a plain OAuth state as a relay candidate", () => {
+    it("classifies a plain OAuth state as plain", () => {
       const state = Buffer.from(JSON.stringify({ nonce: NONCE })).toString(
         "base64",
       );
-      expect(isRelayStateCandidate(state)).to.be.false;
+      expect(decodeRelayState(state)).to.deep.equal({ kind: "plain" });
     });
   });
 

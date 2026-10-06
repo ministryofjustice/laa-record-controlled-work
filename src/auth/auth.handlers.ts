@@ -12,9 +12,8 @@ import {
 } from "#/auth/auth.flow-store.js";
 import { getValidatedReturnTo } from "#/auth/auth.redirect.js";
 import {
+  decodeRelayState,
   isAllowedRelayTarget,
-  isRelayStateCandidate,
-  parseRelayState,
   verifyRelayState,
 } from "#/auth/auth.relay.js";
 import {
@@ -272,13 +271,14 @@ function getValidatedCallbackData(
  *          the callback should be processed locally.
  */
 function handleRelay(data: CallbackData, req: Request, res: Response): boolean {
-  const relayState = parseRelayState(data.state);
-  if (relayState === null) {
-    if (!isRelayStateCandidate(data.state)) return false;
+  const decoded = decodeRelayState(data.state);
+  if (decoded.kind === "plain") return false;
+  if (decoded.kind === "invalid") {
     res.status(BAD_REQUEST).send("Invalid relay target");
     return true;
   }
 
+  const relayState = decoded.state;
   const { target } = relayState;
   if (
     !verifyRelayState(relayState, config.session.secret) ||
