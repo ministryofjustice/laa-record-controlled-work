@@ -1,6 +1,6 @@
 import type session from "express-session";
 
-import type { AuthFlowStore } from "#/auth/auth.flow-store.js";
+import type { AuthFlowStore } from "#/auth/flow-store/flow-store.types.js";
 
 export interface ExpressLocaleLoader {
   t: (key: string, options?: Record<string, unknown>) => string;

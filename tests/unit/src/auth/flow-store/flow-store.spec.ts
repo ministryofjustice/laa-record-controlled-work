@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import sinon from "sinon";
 
-import { createAuthFlowStore } from "#/auth/auth.flow-store.js";
+import { createAuthFlowStore } from "#/auth/flow-store/flow-store.js";
 import config from "#/config.js";
 import { SESSION_ID } from "#tests/unit/src/auth/flow-store/fixtures.js";
 
