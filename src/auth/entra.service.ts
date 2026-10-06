@@ -38,6 +38,14 @@ interface EntraServiceConfig {
 
 interface InitiateAuthCodeFlowOptions {
   callbackHostname?: string;
+  expiresAt?: number;
+}
+
+interface PreparedAuthCodeFlowState extends Omit<
+  AuthCodeFlowState,
+  "authCodeUrl"
+> {
+  authCodeUrlRequest: AuthorizationUrlRequest;
 }
 
 const EMPTY_STRING_LENGTH = 0;
@@ -196,6 +204,7 @@ export class EntraService {
       pkceCodes,
       returnTo,
       options.callbackHostname,
+      options.expiresAt,
     );
     try {
       const authCodeUrl = await this.msalClient.getAuthCodeUrl(
@@ -248,19 +257,21 @@ export class EntraService {
    * @param pkceCodes - The PKCE code verifier, challenge, and challenge method.
    * @param returnTo - The post-authentication redirect path to validate.
    * @param callbackHostname - Optional current request hostname used for relay-state targeting.
+   * @param expiresAt - Fixed reservation deadline for signed relay state.
    * @returns The auth flow state (excluding the auth code URL, which requires an MSAL call).
    */
   private prepareFlowState(
     pkceCodes: PKCECodes,
     returnTo?: string,
     callbackHostname?: string,
-  ): Omit<AuthCodeFlowState, "authCodeUrl"> {
+    expiresAt?: number,
+  ): PreparedAuthCodeFlowState {
     const { challenge, challengeMethod, verifier } = pkceCodes;
 
     const validReturnTo = getValidatedReturnTo(returnTo);
 
     // Cryptographically random nonce used as the OAuth state parameter for CSRF protection.
-    // Validated against session.authState on callback before any token exchange.
+    // Validated against the consumed flow record before token exchange.
     // Encoded as base64(JSON) so MSAL's parseRequestState can parse it without throwing invalid_state.
     const nonce = randomUUID();
     const redirectHostname = new URL(authRequestDefaults.redirectUri).hostname;
@@ -272,13 +283,20 @@ export class EntraService {
       normalizedCallbackHostname !== undefined &&
       normalizedCallbackHostname !== redirectHostname;
 
-    const authState = isRelay
-      ? createRelayState(
-          nonce,
-          `https://${normalizedCallbackHostname}`,
-          config.session.secret,
-        )
-      : this.cryptoProvider.base64Encode(JSON.stringify({ nonce }));
+    let authState: string;
+    if (isRelay) {
+      if (expiresAt === undefined) {
+        throw new TypeError("Relay auth flow requires a reservation expiry");
+      }
+      authState = createRelayState(
+        nonce,
+        `https://${normalizedCallbackHostname}`,
+        expiresAt,
+        config.session.secret,
+      );
+    } else {
+      authState = this.cryptoProvider.base64Encode(JSON.stringify({ nonce }));
+    }
 
     return {
       authCodeRequest: {
@@ -299,7 +317,6 @@ export class EntraService {
       } satisfies AuthorizationUrlRequest,
 
       authState,
-      pkceCodes,
       returnTo: validReturnTo,
     };
   }
