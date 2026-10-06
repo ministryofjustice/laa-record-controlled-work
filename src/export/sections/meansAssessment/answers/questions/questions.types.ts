@@ -4,6 +4,7 @@ export interface AnswerSelection {
   employmentStatus: (answers: EligibilityData) => null | string | undefined;
   isPresent: (answers: EligibilityData) => boolean;
   otherIncome: OtherIncomeSelectorsByCategory;
+  payments: PaymentAnswerSelectorsByType;
   receivesBenefits: (answers: EligibilityData) => boolean | null | undefined;
 }
 
@@ -22,6 +23,18 @@ export interface OtherIncomeSelectorsByCategory {
   pension: OtherIncomeCategorySelectors;
   propertyOrLodger: OtherIncomeCategorySelectors;
   studentFinance: OtherIncomeCategorySelectors;
+}
+
+export interface PaymentAnswerSelectors {
+  amount: (answers: EligibilityData) => null | number | undefined;
+  frequency: (answers: EligibilityData) => null | string | undefined;
+  relevant: (answers: EligibilityData) => boolean | null | undefined;
+}
+
+export interface PaymentAnswerSelectorsByType {
+  childcare: PaymentAnswerSelectors;
+  legalAid: PaymentAnswerSelectors;
+  maintenance: PaymentAnswerSelectors;
 }
 
 export type SavedBenefit = NonNullable<EligibilityData["benefits"]>[number];
