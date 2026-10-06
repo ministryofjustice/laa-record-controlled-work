@@ -311,8 +311,6 @@ describe("toAnswers method", () => {
       },
     });
 
-    console.log(result);
-
     expect(result).to.include({
       legalAidBefore: "no",
       familyLawClassification: "public",
