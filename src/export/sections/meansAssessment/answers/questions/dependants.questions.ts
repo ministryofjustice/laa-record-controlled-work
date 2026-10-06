@@ -1,18 +1,11 @@
 import type { EligibilityData } from "#/api/clients/rcw/model/eligibilityData.zod.gen.js";
 import type { QuestionSection } from "#/export/sections/meansAssessment/answers/answers.types.js";
 
+import { incomeFrequencies } from "#/export/sections/meansAssessment/answers/questions/frequencies.js";
 import {
   hasDependants,
   isIncomeAssessmentRelevant,
 } from "#/export/sections/meansAssessment/answers/questions/question.helpers.js";
-
-const incomeFrequencies = {
-  every_four_weeks: "dependants.income.frequencies.everyFourWeeks",
-  every_two_weeks: "dependants.income.frequencies.everyTwoWeeks",
-  every_week: "dependants.income.frequencies.everyWeek",
-  monthly: "dependants.income.frequencies.monthly",
-  three_months: "dependants.income.frequencies.threeMonths",
-};
 
 export const dependantQuestionSections: Array<
   QuestionSection<EligibilityData>

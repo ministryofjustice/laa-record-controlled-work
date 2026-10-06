@@ -27,9 +27,12 @@ const ANSWERS = {
   partner_maintenance_payments_relevant: false,
   passporting: false,
   pension_relevant: false,
+  property_owned: "none",
   property_or_lodger_relevant: false,
   receives_benefits: false,
   student_finance_relevant: false,
+  housing_payments: 0,
+  housing_benefit_relevant: false,
 } satisfies EligibilityData;
 
 const SUMMARIES = [
@@ -101,6 +104,25 @@ const SUMMARIES = [
       },
       {
         key: "Does your client make payments towards legal aid for a criminal case?",
+        value: "No",
+      },
+    ],
+  },
+  {
+    heading: "Home client usually lives in",
+    rows: [
+      {
+        key: "Does your client own the home the client usually lives in?",
+        value: "No",
+      },
+    ],
+  },
+  {
+    heading: "Housing costs",
+    rows: [
+      { key: "Housing payments", value: "£0.00" },
+      {
+        key: "Is Housing Benefit claimed at the home the client lives in?",
         value: "No",
       },
     ],
@@ -211,6 +233,7 @@ describe("saved means answers", () => {
           },
         ],
       },
+      SUMMARIES[SUMMARIES.length - 2],
     ]);
     expect(section?.calculations).to.deep.equal({
       capital: { status: "not_calculated" },

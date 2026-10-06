@@ -12,15 +12,8 @@ import {
   client,
   partner,
 } from "#/export/sections/meansAssessment/answers/answers.selections.js";
+import { paymentFrequencies } from "#/export/sections/meansAssessment/answers/questions/frequencies.js";
 import { isIncomeAssessmentRelevant } from "#/export/sections/meansAssessment/answers/questions/question.helpers.js";
-
-const paymentFrequencies = {
-  every_four_weeks: "outgoings.frequencies.everyFourWeeks",
-  every_two_weeks: "outgoings.frequencies.everyTwoWeeks",
-  every_week: "outgoings.frequencies.everyWeek",
-  monthly: "outgoings.frequencies.monthly",
-  total: "outgoings.frequencies.total",
-};
 
 interface OutgoingsLabels {
   childcare: string;
