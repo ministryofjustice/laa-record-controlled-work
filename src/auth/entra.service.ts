@@ -206,11 +206,11 @@ export class EntraService {
       options.callbackHostname,
       options.expiresAt,
     );
+    const { authCodeUrlRequest, ...authCodeFlowState } = prepared;
     try {
-      const authCodeUrl = await this.msalClient.getAuthCodeUrl(
-        prepared.authCodeUrlRequest,
-      );
-      return success({ authCodeUrl, ...prepared });
+      const authCodeUrl =
+        await this.msalClient.getAuthCodeUrl(authCodeUrlRequest);
+      return success({ authCodeUrl, ...authCodeFlowState });
     } catch (error) {
       logger.error("Failed to generate Entra auth code URL", error);
       return failure(MsalError.from(error));
