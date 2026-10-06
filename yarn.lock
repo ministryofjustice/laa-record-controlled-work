@@ -631,7 +631,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@j178/prek@npm:^0.5.3":
+"@j178/prek@npm:^0.5.4":
   version: 0.5.4
   resolution: "@j178/prek@npm:0.5.4"
   dependencies:
@@ -5225,7 +5225,7 @@ __metadata:
     "@axe-core/playwright": "npm:^4.13.0"
     "@azure/msal-node": "npm:^6.0.1"
     "@faker-js/faker": "npm:^10.6.0"
-    "@j178/prek": "npm:^0.5.3"
+    "@j178/prek": "npm:^0.5.4"
     "@ministryofjustice/frontend": "npm:11.1.0"
     "@ministryofjustice/hmpps-forge": "npm:^0.4.4"
     "@playwright/test": "npm:^1.63.0"
