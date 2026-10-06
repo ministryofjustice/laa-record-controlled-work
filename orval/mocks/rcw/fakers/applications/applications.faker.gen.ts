@@ -465,6 +465,7 @@ export const getGetApplicationResponseMock = <
     reasonForReapplication: faker.string.alpha({
       length: { min: 10, max: 20 },
     }),
+    ecfFlag: faker.datatype.boolean(),
     meansAssessmentRequired: faker.datatype.boolean(),
     typeOfNonMeans: faker.datatype.boolean(),
     contribution: faker.string.alpha({ length: { min: 10, max: 20 } }),
@@ -476,9 +477,9 @@ export const getGetApplicationResponseMock = <
           "yesSameMatter",
         ] as const),
         familyLawClassification: faker.helpers.arrayElement([
-          faker.helpers.arrayElement(["public", "private"] as const),
-          null,
-        ]),
+          "public",
+          "private",
+        ] as const),
       },
       null,
     ]),
