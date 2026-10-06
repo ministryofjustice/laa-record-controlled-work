@@ -9,6 +9,7 @@ export const FLOW: AuthFlow = {
   authCodeRequest: {
     code: "",
     codeVerifier: "verifier",
+    nonce: "flow-nonce",
     redirectUri: "http://localhost/auth/code/callback",
     scopes: ["scope.read"],
   },

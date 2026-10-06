@@ -163,6 +163,17 @@ export class EntraService {
     code: string,
     authCodeRequest: AuthorizationCodeRequest,
   ): Promise<Either<TokenAcquisitionError, TokenExchangeResult>> {
+    if (
+      typeof authCodeRequest.nonce !== "string" ||
+      authCodeRequest.nonce.length === EMPTY_STRING_LENGTH
+    ) {
+      return failure(
+        new TokenAcquisitionError(
+          new Error("The auth code request has no expected OIDC nonce"),
+        ),
+      );
+    }
+
     const tokenRequest = { ...authCodeRequest, code };
 
     try {
@@ -270,10 +281,9 @@ export class EntraService {
 
     const validReturnTo = getValidatedReturnTo(returnTo);
 
-    // Cryptographically random nonce used as the OAuth state parameter for CSRF protection.
-    // Validated against the consumed flow record before token exchange.
     // Encoded as base64(JSON) so MSAL's parseRequestState can parse it without throwing invalid_state.
-    const nonce = randomUUID();
+    const stateNonce = randomUUID();
+    const oidcNonce = randomUUID();
     const redirectHostname = new URL(authRequestDefaults.redirectUri).hostname;
     const normalizedCallbackHostname =
       callbackHostname === undefined
@@ -289,19 +299,22 @@ export class EntraService {
         throw new TypeError("Relay auth flow requires a reservation expiry");
       }
       authState = createRelayState(
-        nonce,
+        stateNonce,
         `https://${normalizedCallbackHostname}`,
         expiresAt,
         config.session.secret,
       );
     } else {
-      authState = this.cryptoProvider.base64Encode(JSON.stringify({ nonce }));
+      authState = this.cryptoProvider.base64Encode(
+        JSON.stringify({ nonce: stateNonce }),
+      );
     }
 
     return {
       authCodeRequest: {
         code: "",
         codeVerifier: verifier,
+        nonce: oidcNonce,
         redirectUri: config.entra.redirectUri,
         scopes: authRequestDefaults.scopes,
       } satisfies AuthorizationCodeRequest,
@@ -309,6 +322,7 @@ export class EntraService {
       authCodeUrlRequest: {
         codeChallenge: challenge,
         codeChallengeMethod: challengeMethod,
+        nonce: oidcNonce,
         prompt: authRequestDefaults.prompt,
         redirectUri: config.entra.redirectUri,
         responseMode: authRequestDefaults.responseMode,
