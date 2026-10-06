@@ -368,7 +368,8 @@ async function prepareSignInFlow(
   if (reservation.error) throw reservation.error;
 
   const { expiresAt, reservationId } = reservation.value;
-  const previousPending = req.session.authFlowPending;
+  const { session } = req;
+  const previousPending = session.authFlowPending;
   try {
     const entra = EntraService.create({ sessionId: req.sessionID });
     const result = await entra.initiateAuthCodeFlow(returnTo, {
@@ -386,7 +387,7 @@ async function prepareSignInFlow(
     if (published.error) throw published.error;
     if (!published.value) throw new Error("Auth flow was superseded");
 
-    Object.assign(req.session, { authFlowPending: reservationId });
+    session.authFlowPending = reservationId;
     await saveSession(req);
 
     const authorized = await flowStore.authorizeRedirect(
@@ -398,7 +399,7 @@ async function prepareSignInFlow(
 
     return authCodeUrl;
   } catch (error) {
-    Object.assign(req.session, { authFlowPending: previousPending });
+    session.authFlowPending = previousPending;
     await flowStore.abandon(req.sessionID, reservationId);
     throw error;
   }
