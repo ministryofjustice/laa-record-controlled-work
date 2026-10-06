@@ -42,16 +42,19 @@ export interface AuthFlowStore {
   reserve: (sessionId: string) => StoreResult<AuthFlowReservation>;
 }
 
-interface AuthFlowRecord extends AuthFlowReservation {
-  authCodeRequest?: AuthorizationCodeRequest;
-  authState?: string;
-  returnTo?: string;
-  status: "pending" | "ready";
-}
+type AuthFlowRecord = PendingAuthFlowRecord | ReadyAuthFlowRecord;
 
 interface AuthFlowStoreOptions {
   now?: () => number;
   redisClient?: RedisClientType;
+}
+
+interface PendingAuthFlowRecord extends AuthFlowReservation {
+  status: "pending";
+}
+
+interface ReadyAuthFlowRecord extends AuthFlow, AuthFlowReservation {
+  status: "ready";
 }
 
 type StoreResult<Value> = Either<Error, Value> | Promise<Either<Error, Value>>;
@@ -66,14 +69,21 @@ const authCodeRequestSchema = z
   .loose()
   .transform((request) => request as AuthorizationCodeRequest);
 
-const authFlowRecordSchema = z.object({
-  authCodeRequest: authCodeRequestSchema.optional(),
-  authState: z.string().optional(),
-  expiresAt: z.number().int(),
-  reservationId: z.string(),
-  returnTo: z.string().optional(),
-  status: z.enum(["pending", "ready"]),
-});
+const authFlowRecordSchema = z.discriminatedUnion("status", [
+  z.object({
+    expiresAt: z.number().int(),
+    reservationId: z.string(),
+    status: z.literal("pending"),
+  }),
+  z.object({
+    authCodeRequest: authCodeRequestSchema,
+    authState: z.string(),
+    expiresAt: z.number().int(),
+    reservationId: z.string(),
+    returnTo: z.string(),
+    status: z.literal("ready"),
+  }),
+]);
 
 const RESERVE_SCRIPT = `
 local time = redis.call("TIME")
@@ -163,7 +173,7 @@ const createMemoryAuthFlowStore = (now: () => number): AuthFlowStore => {
       const current = flows.get(sessionId);
       if (
         current?.reservationId !== reservationId ||
-        current?.status !== "ready"
+        current.status !== "ready"
       ) {
         return success(false);
       }
@@ -189,7 +199,7 @@ const createMemoryAuthFlowStore = (now: () => number): AuthFlowStore => {
       const current = flows.get(sessionId);
       if (
         current?.reservationId !== reservationId ||
-        current?.status !== "pending"
+        current.status !== "pending"
       ) {
         return success(false);
       }
@@ -317,20 +327,11 @@ const getAuthFlowKey = (sessionId: string): string => {
   return `${AUTH_FLOW_KEY_PREFIX}${sessionHash}`;
 };
 
-const toAuthFlow = (record: AuthFlowRecord): AuthFlow => {
-  if (
-    record.authCodeRequest === undefined ||
-    record.authState === undefined ||
-    record.returnTo === undefined
-  ) {
-    throw new Error("Invalid auth flow record");
-  }
-  return {
-    authCodeRequest: record.authCodeRequest,
-    authState: record.authState,
-    returnTo: record.returnTo,
-  };
-};
+const toAuthFlow = (record: ReadyAuthFlowRecord): AuthFlow => ({
+  authCodeRequest: record.authCodeRequest,
+  authState: record.authState,
+  returnTo: record.returnTo,
+});
 
 const parseConsumedFlow = (result: unknown): AuthFlow | undefined => {
   if (typeof result !== "string") return undefined;
