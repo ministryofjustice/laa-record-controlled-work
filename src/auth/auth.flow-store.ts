@@ -211,9 +211,15 @@ const createMemoryAuthFlowStore = (now: () => number): AuthFlowStore => {
       return success(true);
     },
     reserve: (sessionId) => {
+      const reservationTime = now();
+      for (const [flowSessionId, flowRecord] of flows) {
+        if (flowRecord.expiresAt <= reservationTime) {
+          flows.delete(flowSessionId);
+        }
+      }
       const reservation = {
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- intuitive
-        expiresAt: now() + 10 * MINUTE,
+        expiresAt: reservationTime + 10 * MINUTE,
         reservationId: randomUUID(),
       };
       flows.set(sessionId, { ...reservation, status: "pending" });
