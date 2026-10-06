@@ -15,7 +15,7 @@ import sinon from "sinon";
 import {
   createAuthFlowStore,
   getAuthFlowStore,
-} from "#/auth/auth.flow-store.js";
+} from "#/auth/flow-store/flow-store.js";
 import type { AuthCodeFlowState } from "#/auth/auth.types.js";
 import { EntraService } from "#/auth/entra.service.js";
 import { authCodeCallback, signIn } from "#/auth/auth.handlers.js";

@@ -1,6 +1,6 @@
 import { expect } from "chai";
 
-import { createAuthFlowStore } from "#/auth/auth.flow-store.js";
+import { createAuthFlowStore } from "#/auth/flow-store/flow-store.js";
 import { EXPIRY_MS, FLOW, getValue, SESSION_ID } from "#tests/unit/src/auth/flow-store/fixtures.js";
 
 describe("Memory auth flow expiry", () => {

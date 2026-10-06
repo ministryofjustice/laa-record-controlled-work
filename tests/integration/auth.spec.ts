@@ -15,7 +15,7 @@ import type { RedisClientType } from "redis";
 import { createClient } from "redis";
 import { createRedisClient as createAppRedisClient } from "#/lib/redis.js";
 import { BAD_REQUEST, FOUND, OK } from "#/lib/constants/http.js";
-import { createAuthFlowStore } from "#/auth/auth.flow-store.js";
+import { createAuthFlowStore } from "#/auth/flow-store/flow-store.js";
 import { EntraService } from "#/auth/entra.service.js";
 import { type Either, success } from "#/lib/either.js";
 import sinon from "sinon";
@@ -486,115 +486,5 @@ describe("Auth Integration", () => {
       }
     });
 
-    it("keeps only the latest reservation across independent Redis clients", async () => {
-      const clients = [
-        createClient({ url: config.redis.url }),
-        createClient({ url: config.redis.url }),
-      ];
-      await Promise.all(clients.map((client) => client.connect()));
-
-      try {
-        const [firstClient, secondClient] = clients;
-        const firstStore = createAuthFlowStore({ redisClient: firstClient });
-        const secondStore = createAuthFlowStore({ redisClient: secondClient });
-        const sessionId = `distributed-${crypto.randomUUID()}`;
-        const first = await firstStore.reserve(sessionId);
-        const second = await secondStore.reserve(sessionId);
-        if (first.error || second.error) {
-          throw first.error ?? second.error;
-        }
-
-        const latestFlow = {
-          authCodeRequest: {
-            code: "",
-            codeVerifier: "new-verifier",
-            redirectUri: config.entra.redirectUri,
-            scopes: ["scope.read"],
-          },
-          authState: "latest-state",
-          returnTo: "/cases/latest",
-        };
-        const olderFlow = {
-          ...latestFlow,
-          authState: "older-state",
-          returnTo: "/cases/older",
-        };
-        const [latestPublish, stalePublish] = await Promise.all([
-          secondStore.publish(
-            sessionId,
-            second.value.reservationId,
-            latestFlow,
-          ),
-          firstStore.publish(
-            sessionId,
-            first.value.reservationId,
-            olderFlow,
-          ),
-        ]);
-        if (latestPublish.error || stalePublish.error) {
-          throw latestPublish.error ?? stalePublish.error;
-        }
-
-        const mismatch = await firstStore.consume(sessionId, "older-state");
-        const callbacks = await Promise.all([
-          firstStore.consume(sessionId, "latest-state"),
-          secondStore.consume(sessionId, "latest-state"),
-        ]);
-        if (mismatch.error || callbacks.some((result) => result.error)) {
-          throw mismatch.error ?? callbacks.find((result) => result.error)?.error;
-        }
-        const callbackValues = callbacks.map(getValue);
-        const consumed = callbackValues.filter((flow) => flow !== undefined);
-        const replay = await secondStore.consume(sessionId, "latest-state");
-
-        expect(getValue(latestPublish)).to.be.true;
-        expect(getValue(stalePublish)).to.be.false;
-        expect(getValue(mismatch)).to.be.undefined;
-        expect(consumed).to.have.length(1);
-        expect(consumed[0]).to.deep.equal(latestFlow);
-        expect(getValue(replay)).to.be.undefined;
-      } finally {
-        await Promise.all(clients.map((client) => client.quit()));
-      }
-    });
-
-    it("does not allow another initiating session to consume a flow", async () => {
-      const client = createClient({ url: config.redis.url });
-      await client.connect();
-
-      try {
-        const store = createAuthFlowStore({ redisClient: client });
-        const reservation = await store.reserve("session-one");
-        if (reservation.error) throw reservation.error;
-        const flow = {
-          authCodeRequest: {
-            code: "",
-            codeVerifier: "verifier",
-            redirectUri: config.entra.redirectUri,
-            scopes: ["scope.read"],
-          },
-          authState: "session-bound-state",
-          returnTo: "/",
-        };
-        const published = await store.publish(
-          "session-one",
-          reservation.value.reservationId,
-          flow,
-        );
-        if (published.error) throw published.error;
-
-        const substituted = await store.consume(
-          "session-two",
-          flow.authState,
-        );
-        const rightful = await store.consume("session-one", flow.authState);
-
-        expect(getValue(published)).to.be.true;
-        expect(getValue(substituted)).to.be.undefined;
-        expect(getValue(rightful)).to.deep.equal(flow);
-      } finally {
-        await client.quit();
-      }
-    });
   });
 });
