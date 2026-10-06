@@ -59,6 +59,7 @@ describe("updateEvidence", () => {
   let deps: EvidenceEffectsDeps;
   let getSession: sinon.SinonStub;
   let getRequestParam: sinon.SinonStub;
+  let getRequestHeader: sinon.SinonStub;
 
   beforeEach(() => {
     sinon.stub(config.api, "useMockAccessToken").value(true);
@@ -69,8 +70,9 @@ describe("updateEvidence", () => {
       journeyDrafts: { [`${journeyCode}:${applicationId}`]: incomeAnswers },
     });
     getRequestParam = sinon.stub().returns(applicationId);
+    getRequestHeader = sinon.stub().returns("test-correlation-id"),
 
-    context = { getSession, getRequestParam, setData: sinon.stub() } as unknown as EvidenceContext;
+    context = { getSession, getRequestParam, getRequestHeader, setData: sinon.stub() } as unknown as EvidenceContext;
   });
 
   afterEach(() => sinon.restore());

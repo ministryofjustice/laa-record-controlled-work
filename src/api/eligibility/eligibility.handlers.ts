@@ -31,6 +31,7 @@ export const createGetEligibilityHandler =
     const { applicationId } = parsedParams.data;
     const result = await loadEligibilityAssessment(deps, {
       applicationId,
+      correlationId: req.get("x-correlation-id"),
       homeAccountId: req.session.msal?.homeAccountId,
       sessionId: req.sessionID,
     });
@@ -72,6 +73,7 @@ export const createPutEligibilityHandler =
     const { applicationId } = parsedParams.data;
     const result = await saveEligibilityAssessment(deps, {
       applicationId,
+      correlationId: req.get("x-correlation-id"),
       eligibilityAssessment,
       homeAccountId: req.session.msal?.homeAccountId,
       sessionId: req.sessionID,

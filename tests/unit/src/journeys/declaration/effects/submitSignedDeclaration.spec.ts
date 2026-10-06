@@ -40,6 +40,7 @@ describe("submitSignedDeclaration", () => {
             return undefined;
         }
       }),
+      getRequestHeader: sinon.stub().returns("test-correlation-id"),
       getRequestParam: sinon.stub().returns(applicationId),
       getSession: sinon.stub().returns({}),
       setData: sinon.stub(),

@@ -21,6 +21,7 @@ describe("closeIneligibleCase", () => {
     context = {
       getPostData: sinon.stub().returns("close"),
       getRequestParam: sinon.stub().returns("application-id"),
+      getRequestHeader: sinon.stub().returns("test-correlation-id"),
       getSession: sinon.stub().returns({ id: "session-id" }),
       getData: sinon.stub().returns(3),
     } as unknown as EditApplicationContext;

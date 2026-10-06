@@ -27,13 +27,16 @@ export const loadApplication =
     try {
       const session = context.getSession();
       const applicationID = context.getRequestParam(PARAMS_KEYS.applicationID);
-
+      const correlationId = context
+        .getRequestHeader("x-correlation-id")
+        ?.toString();
       if (!applicationID) {
         logger.error("applicationID parameter is missing");
         throw new Error("applicationID parameter is required");
       }
 
       const opts = await getRcwApiDefaultOptions({
+        correlationId,
         homeAccountId: session?.msal?.homeAccountId,
         sessionId: session?.id,
       });
@@ -75,11 +78,23 @@ export const loadApplication =
 
     const application: Application = result.data;
     context.setData(CONTEXT_DATA_KEYS.application, application);
-
-    const headers = response.headers as Headers | undefined;
-    const eTag = headers?.get("etag");
     context.setData(
       CONTEXT_DATA_KEYS.applicationETag,
-      eTag ? Number.parseInt(eTag, 10) : DEFAULT_ETAG,
+      getApplicationETag(response.headers as Headers | undefined),
     );
   };
+
+/**
+ * Retrieves the ETag value from the API response headers.
+ * @param headers - The headers from the API response.
+ * @returns The ETag value as a number, or the default ETag if not present.
+ */
+function getApplicationETag(headers: Headers | undefined): number {
+  const eTag = headers?.get("etag");
+
+  if (!eTag) {
+    return DEFAULT_ETAG;
+  }
+
+  return Number.parseInt(eTag, 10);
+}

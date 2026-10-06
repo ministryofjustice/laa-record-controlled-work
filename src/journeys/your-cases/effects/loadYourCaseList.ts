@@ -21,9 +21,13 @@ export const loadYourCaseList =
   (deps: YourCasesEffectsDeps) =>
   async (context: CaseListContext, status: ApplicationStatus) => {
     let response;
+    const correlationId = context
+      .getRequestHeader("x-correlation-id")
+      ?.toString();
     try {
       const session = context.getSession();
       const opts = await getRcwApiDefaultOptions({
+        correlationId,
         homeAccountId: session?.msal?.homeAccountId,
         sessionId: session?.id,
       });
