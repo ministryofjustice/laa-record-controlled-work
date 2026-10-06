@@ -46,8 +46,9 @@ describe("closeIneligibleCase", () => {
     await closeIneligibleCase(deps)(context);
 
     expect(updateApplicationStatus.calledOnce).to.equal(true);
+    expect(distributionStub.calledOnce).to.equal(true);
     expect(
-      distributionStub.calledOnceWithMatch(
+      distributionStub.calledWithMatch(
         "api_response_time",
         sinon.match.number,
         {
@@ -70,8 +71,9 @@ describe("closeIneligibleCase", () => {
         "updateApplicationStatus did not return 204",
       );
     }
+    expect(distributionStub.calledOnce).to.equal(true);
     expect(
-      distributionStub.calledOnceWithMatch(
+      distributionStub.calledWithMatch(
         "api_response_time",
         sinon.match.number,
         {
@@ -93,8 +95,9 @@ describe("closeIneligibleCase", () => {
     } catch (error) {
       expect(error).to.equal(cause);
     }
+    expect(distributionStub.calledOnce).to.equal(true);
     expect(
-      distributionStub.calledOnceWithMatch(
+      distributionStub.calledWithMatch(
         "api_response_time",
         sinon.match.number,
         {
