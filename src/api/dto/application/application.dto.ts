@@ -21,7 +21,6 @@ interface Application {
   firstName: string;
   hasFixedAddress: boolean;
   lastName: string;
-  legalAidBefore: string;
   legalAidLast6Months?: boolean;
   niNumber?: string;
   postcode?: string;
@@ -67,7 +66,6 @@ export class ApplicationDto {
   public firstName = "";
   public hasFixedAddress = false;
   public lastName = "";
-  public legalAidBefore = "";
   public legalAidLast6Months?: boolean;
   public niNumber?: string;
   public postCode?: string;
@@ -104,7 +102,6 @@ export class ApplicationDto {
       firstName: answers.firstName,
       hasFixedAddress,
       lastName: answers.lastName,
-      legalAidBefore: answers.legalAidBefore,
       legalAidLast6Months: answers.legalAidLast6Months === "yes",
       niNumber: answers.niNumber,
       providerOfficeCode,
@@ -292,7 +289,6 @@ export class ApplicationDto {
 
     return {
       clientDetails,
-      legalAidBefore: this.legalAidBefore,
       legalAidLast6Months: this.legalAidLast6Months,
       providerOfficeCode: this.providerOfficeCode,
       reasonForReapplication: this.reasonForReapplication,
