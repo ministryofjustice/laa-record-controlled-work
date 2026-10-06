@@ -14,6 +14,8 @@ const BASE_ANSWERS = {
   partner: false,
   passporting: false,
   property_owned: "none",
+  additional_property_owned: "none",
+  partner_additional_property_owned: "none",
   housing_payments: 0,
   housing_benefit_relevant: false,
 } satisfies EligibilityData;
@@ -94,6 +96,15 @@ describe("saved employment answers", () => {
       {
         heading: "Partner age",
         rows: [{ key: "Is the partner aged 60 or over?", value: "No" }],
+      },
+      {
+        heading: "Partner other property",
+        rows: [
+          {
+            key: "Does the partner own any other property, a holiday home or land?",
+            value: "No",
+          },
+        ],
       },
     ]);
   });
