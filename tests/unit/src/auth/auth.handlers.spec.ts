@@ -1514,23 +1514,25 @@ describe("Auth Handlers", () => {
           .get("/auth/code/callback")
           .set("Host", new URL(target).hostname)
           .query({ code: "auth-code", state: tamperedState });
-        const matching = await agent
-          .get("/auth/code/callback")
-          .set("Host", new URL(target).hostname)
-          .query({ code: "auth-code", state });
         const expiredState = createRelayState(
           "expired-nonce",
           target,
           Date.now() - 1,
           SESSION_SECRET,
         );
-        const expired = await request(app)
+        const expired = await agent
           .get("/auth/code/callback")
           .set("Host", new URL(target).hostname)
           .query({ code: "auth-code", state: expiredState });
+        const matching = await agent
+          .get("/auth/code/callback")
+          .set("Host", new URL(target).hostname)
+          .query({ code: "auth-code", state });
 
         expect(signin.status).to.equal(FOUND);
         expect(invalid.status).to.equal(BAD_REQUEST);
+        expect(invalid.text).to.equal("Invalid relay target");
+        expect(expired.text).to.equal("Invalid relay target");
         expect(matching.status).to.equal(FOUND);
         expect(expired.status).to.equal(BAD_REQUEST);
         expect(authServiceStub.exchangeAuthCode.calledOnce).to.be.true;
