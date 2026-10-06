@@ -120,8 +120,9 @@ describe("saveEligibilityAssessment", () => {
     });
 
     expect(result.error).to.be.instanceOf(SaveEligibilityAssessmentError);
+    expect(distributionStub.calledOnce).to.equal(true);
     expect(
-      distributionStub.calledOnceWithMatch(
+      distributionStub.calledWithMatch(
         "api_response_time",
         sinon.match.number,
         {
@@ -149,8 +150,9 @@ describe("saveEligibilityAssessment", () => {
     expect((result.error as SaveEligibilityAssessmentError).cause).to.equal(
       cause,
     );
+    expect(distributionStub.calledOnce).to.equal(true);
     expect(
-      distributionStub.calledOnceWithMatch(
+      distributionStub.calledWithMatch(
         "api_response_time",
         sinon.match.number,
         {
