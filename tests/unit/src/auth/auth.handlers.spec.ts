@@ -119,10 +119,6 @@ describe("Auth Handlers", () => {
 
       const res = await request(mockApp).get("/auth/signin");
 
-      console.error("\n\n\nDEBUG");
-      console.error(res.text);
-      console.error("\n\n\n");
-
       expect(res.status).to.equal(FORBIDDEN);
       expect(res.text).to.contain("Service not accessible");
       expect(res.text).to.contain(

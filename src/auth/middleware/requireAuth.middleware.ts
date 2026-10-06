@@ -112,10 +112,6 @@ export function requireAuth(): RequestHandler {
       logger.debug("requireAuth(): User is authenticated");
       next();
     } catch (error) {
-      console.error("\n\n\nDEBUG");
-      console.error({ error });
-      console.error("\n\n\n");
-
       if (
         error instanceof AuthError &&
         error.errorCode === EntraErrorCode.CUSTOM_AUTH_ERROR.valueOf()
