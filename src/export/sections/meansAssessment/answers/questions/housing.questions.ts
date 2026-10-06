@@ -14,24 +14,14 @@ import {
   isIncomeAssessmentRelevant,
   isMeansTested,
 } from "#/export/sections/meansAssessment/answers/questions/question.helpers.js";
-
-enum PropertyOwnership {
-  None = "none",
-  Outright = "outright",
-  SharedOwnership = "shared_ownership",
-  WithMortgage = "with_mortgage",
-}
+import {
+  PropertyOwnership,
+  propertyOwnershipChoices,
+} from "#/export/sections/meansAssessment/answers/questions/questions.types.js";
 
 type HousingFrequencySelector = (
   answers: EligibilityData,
 ) => null | string | undefined;
-
-const propertyOwnershipChoices = {
-  none: "housing.property.ownership.none",
-  outright: "housing.property.ownership.outright",
-  shared_ownership: "housing.property.ownership.sharedOwnership",
-  with_mortgage: "housing.property.ownership.withMortgage",
-};
 
 /**
  * Declares a saved frequency when CCQ persisted one.

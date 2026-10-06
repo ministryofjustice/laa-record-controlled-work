@@ -31,6 +31,7 @@ import {
   clientOutgoingsQuestionSections,
   partnerOutgoingsQuestionSections,
 } from "#/export/sections/meansAssessment/answers/questions/outgoings.questions.js";
+import { additionalPropertyQuestionSections } from "#/export/sections/meansAssessment/answers/questions/properties.questions.js";
 import { fixedT } from "#/lib/i18n.js";
 
 const DISPLAY_INDEX_OFFSET = 1;
@@ -65,6 +66,7 @@ export function toMeansAssessmentAnswerSummaries(
     ...clientOutgoingsQuestionSections,
     ...partnerOutgoingsQuestionSections,
     ...housingQuestionSections,
+    ...additionalPropertyQuestionSections,
   ]);
 }
 
