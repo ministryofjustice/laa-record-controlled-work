@@ -148,6 +148,29 @@
             "monthly": "Monthly",
             "threeMonths": "Total in last 3 months"
           }
+        },
+        "outgoings": {
+          "client": {
+            "heading": "Your client's outgoings and deductions",
+            "childcare": "Does your client pay for childcare?",
+            "maintenance": "Does your client pay maintenance to a former partner?",
+            "legalAid": "Does your client make payments towards legal aid for a criminal case?"
+          },
+          "partner": {
+            "heading": "The partner's outgoings and deductions",
+            "childcare": "Does the partner pay for childcare?",
+            "maintenance": "Does the partner pay maintenance to a former partner?",
+            "legalAid": "Does the partner make payments towards legal aid for a criminal case?"
+          },
+          "amount": "Amount",
+          "frequency": "Frequency",
+          "frequencies": {
+            "everyWeek": "Every week",
+            "everyTwoWeeks": "Every 2 weeks",
+            "everyFourWeeks": "Every 4 weeks",
+            "monthly": "Every month",
+            "total": "Total in last 3 months"
+          }
         }
       },
       "clientAndCaseDetails": {

@@ -26,6 +26,10 @@ import {
   clientOtherIncomeQuestionSections,
   partnerOtherIncomeQuestionSections,
 } from "#/export/sections/meansAssessment/answers/questions/otherIncome.questions.js";
+import {
+  clientOutgoingsQuestionSections,
+  partnerOutgoingsQuestionSections,
+} from "#/export/sections/meansAssessment/answers/questions/outgoings.questions.js";
 import { fixedT } from "#/lib/i18n.js";
 
 const DISPLAY_INDEX_OFFSET = 1;
@@ -57,6 +61,8 @@ export function toMeansAssessmentAnswerSummaries(
     ...partnerIncomeQuestionSections,
     ...partnerBenefitsQuestionSections,
     ...partnerOtherIncomeQuestionSections,
+    ...clientOutgoingsQuestionSections,
+    ...partnerOutgoingsQuestionSections,
   ]);
 }
 
