@@ -54,6 +54,100 @@
               "threeMonths": "Total in last 3 months"
             }
           }
+        },
+        "employment": {
+          "statuses": {
+            "inWork": "Employed or self-employed",
+            "unemployed": "Unemployed"
+          },
+          "client": {
+            "heading": "Client income",
+            "status": "What is your client's employment status?"
+          },
+          "partnerAge": {
+            "heading": "Partner age",
+            "label": "Is the partner aged 60 or over?"
+          },
+          "partner": {
+            "heading": "Partner income",
+            "status": "What is the partner's employment status?"
+          }
+        },
+        "income": {
+          "client": {
+            "entryHeading": "Client employment income {index}",
+            "frequency": "When does your client normally get this income?"
+          },
+          "partner": {
+            "entryHeading": "Partner employment income {index}",
+            "frequency": "When does your partner normally get this income?"
+          },
+          "incomeType": "Type of employment income",
+          "grossIncome": "Income before any deductions",
+          "incomeTax": "Income tax",
+          "nationalInsurance": "National Insurance",
+          "types": {
+            "employment": "A salary or wage",
+            "statutoryPay": "Statutory Sick Pay or Statutory Maternity Pay",
+            "selfEmployment": "Self-employment income"
+          },
+          "frequencies": {
+            "everyWeek": "Every week",
+            "everyTwoWeeks": "Every 2 weeks",
+            "everyFourWeeks": "Every 4 weeks",
+            "monthly": "Monthly",
+            "threeMonths": "Total in last 3 months"
+          }
+        },
+        "benefits": {
+          "client": {
+            "heading": "Client benefits",
+            "receivesBenefits": "Does your client get any non-passporting benefits?",
+            "entryHeading": "Client benefit {index} details"
+          },
+          "partner": {
+            "heading": "Partner benefits",
+            "receivesBenefits": "Does the partner get any benefits?",
+            "entryHeading": "Partner benefit {index} details"
+          },
+          "type": "Benefit name",
+          "amount": "Benefit amount",
+          "frequency": "Frequency",
+          "frequencies": {
+            "everyWeek": "Every week",
+            "everyTwoWeeks": "Every 2 weeks",
+            "everyFourWeeks": "Every 4 weeks",
+            "monthly": "Monthly"
+          }
+        },
+        "otherIncome": {
+          "client": {
+            "heading": "Client other income",
+            "friendsOrFamily": "Does your client get financial help from friends or family?",
+            "maintenance": "Does your client get maintenance from a former partner?",
+            "propertyOrLodger": "Does your client get income from a property or lodger?",
+            "pension": "Does your client get income from pensions?",
+            "studentFinance": "Does your client get income from student finance?",
+            "other": "Does your client get income from other sources?"
+          },
+          "partner": {
+            "heading": "Partner other income",
+            "friendsOrFamily": "Does the partner get financial help from friends or family?",
+            "maintenance": "Does the partner get maintenance from a former partner?",
+            "propertyOrLodger": "Does the partner get income from a property or lodger?",
+            "pension": "Does the partner get income from pensions?",
+            "studentFinance": "Does the partner get income from student finance?",
+            "other": "Does the partner get income from other sources?"
+          },
+          "amount": "Amount",
+          "frequency": "Frequency",
+          "frequencies": {
+            "everyWeek": "Every week",
+            "everyTwoWeeks": "Every 2 weeks",
+            "everyFourWeeks": "Every 4 weeks",
+            "monthly": "Monthly",
+            "threeMonths": "Total in last 3 months"
+          }
         }
       },
       "clientAndCaseDetails": {
