@@ -332,6 +332,86 @@ describe("Auth Handlers", () => {
       expect(authServiceStub.exchangeAuthCode.called).to.be.false;
     });
 
+    it("rejects a callback when a newer signin replaces an authorized HTTP flow", async () => {
+      const flowStore = createAuthFlowStore();
+      const app = createMockApp();
+      app.locals.authFlowStore = flowStore;
+      const agent = request.agent(app);
+      const established = await agent.get("/auth/signin");
+
+      const authorizeRedirect = flowStore.authorizeRedirect.bind(flowStore);
+      let markOlderAuthorized!: () => void;
+      let releaseOlderResponse!: () => void;
+      let olderAuthorization: Either<Error, boolean> | undefined;
+      const olderAuthorized = new Promise<void>((resolve) => {
+        markOlderAuthorized = resolve;
+      });
+      const responseGate = new Promise<void>((resolve) => {
+        releaseOlderResponse = resolve;
+      });
+      sinon.stub(flowStore, "authorizeRedirect").callsFake(
+        async (sessionId, reservationId) => {
+          const result = await authorizeRedirect(sessionId, reservationId);
+          if (olderAuthorization === undefined) {
+            olderAuthorization = result;
+            markOlderAuthorized();
+            await responseGate;
+          }
+          return result;
+        },
+      );
+
+      authServiceStub.initiateAuthCodeFlow.resetHistory();
+      authServiceStub.initiateAuthCodeFlow.onCall(0).resolves(
+        success({
+          authCodeUrl: "https://login.example/older",
+          authCodeRequest: {},
+          authState: "authorized-older-state",
+          returnTo: "/",
+        }),
+      );
+      authServiceStub.initiateAuthCodeFlow.onCall(1).resolves(
+        success({
+          authCodeUrl: "https://login.example/newer",
+          authCodeRequest: {},
+          authState: "authorized-newer-state",
+          returnTo: "/",
+        }),
+      );
+
+      const olderSignin = agent.get("/auth/signin").then((response) => response);
+      await olderAuthorized;
+      const newerSignin = await agent.get("/auth/signin");
+      releaseOlderResponse();
+      const olderResponse = await olderSignin;
+
+      const staleCallback = await agent.get("/auth/code/callback").query({
+        code: "older-code",
+        state: "authorized-older-state",
+      });
+      const currentCallback = await agent.get("/auth/code/callback").query({
+        code: "newer-code",
+        state: "authorized-newer-state",
+      });
+
+      expect(established.status).to.equal(FOUND);
+      expect(olderAuthorization?.error).to.be.undefined;
+      if (olderAuthorization?.error === undefined) {
+        expect(olderAuthorization.value).to.be.true;
+      }
+      expect(newerSignin.status).to.equal(FOUND);
+      expect(newerSignin.headers.location).to.equal(
+        "https://login.example/newer",
+      );
+      expect(olderResponse.status).to.equal(FOUND);
+      expect(olderResponse.headers.location).to.equal(
+        "https://login.example/older",
+      );
+      expect(staleCallback.status).to.equal(BAD_REQUEST);
+      expect(currentCallback.status).to.equal(FOUND);
+      expect(authServiceStub.exchangeAuthCode.calledOnce).to.be.true;
+    });
+
     it("preserves a newer HTTP flow when an older session save fails late", async () => {
       sinon.stub(config.redis, "enabled").value(false);
       const sessionStore = new session.MemoryStore();
