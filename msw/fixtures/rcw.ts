@@ -40,6 +40,7 @@ const CLIENT_DETAILS = {
   },
   scopingQuestions: {
     familyLawClassification: FamilyLawClassification.enum.private,
+    needsAdviceOnEUOrInternationalMaintenance: false,
     priorLegalAid: PriorLegalAid.enum.no,
   },
 };
