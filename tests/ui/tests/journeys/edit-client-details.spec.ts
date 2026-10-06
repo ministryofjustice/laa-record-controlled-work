@@ -32,7 +32,7 @@ test("Edit Application - Client details journey", async ({
   // Check that all answers are displayed correctly
   const summaryList = page.locator(".govuk-summary-list");
   const rows = summaryList.locator(".govuk-summary-list__row");
-  await expect(rows).toHaveCount(9);
+  await expect(rows).toHaveCount(10);
   await expect(rows.locator(".govuk-summary-list__value")).toContainText(
     [
       // ECF

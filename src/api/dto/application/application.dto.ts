@@ -113,28 +113,6 @@ export class ApplicationDto {
   }
 
   /**
-   * Extracts the scoping questions from the provided answers.
-   * Ensures that only relevant scoping questions are included based on the family law classification.
-   * @param answers - The answers from which to extract the scoping questions.
-   * @returns ScopingQuestions instance containing the extracted scoping questions.
-   */
-  public static getScopingQuestionsFromAnswers(
-    answers: AnswersOutput,
-  ): ScopingQuestions {
-    const scopingQuestions: ScopingQuestions = {
-      familyLawClassification: answers.familyLawClassification,
-      priorLegalAid: answers.legalAidBefore,
-    };
-
-    if (answers.familyLawClassification === "private") {
-      scopingQuestions.needsAdviceOnEUOrInternationalMaintenance =
-        answers.needsAdviceOnEUOrInternationalMaintenance === "yes";
-    }
-
-    return scopingQuestions;
-  }
-
-  /**
    * Set the address fields based off whether the address is UK or overseas.
    * @param answers - The answers from which to extract the address fields.
    * @returns Address object containing the address fields.
@@ -169,6 +147,28 @@ export class ApplicationDto {
   }
 
   /**
+   * Extracts the scoping questions from the provided answers.
+   * Ensures that only relevant scoping questions are included based on the family law classification.
+   * @param answers - The answers from which to extract the scoping questions.
+   * @returns ScopingQuestions instance containing the extracted scoping questions.
+   */
+  public static getScopingQuestionsFromAnswers(
+    answers: AnswersOutput,
+  ): ScopingQuestions {
+    const scopingQuestions: ScopingQuestions = {
+      familyLawClassification: answers.familyLawClassification,
+      priorLegalAid: answers.legalAidBefore,
+    };
+
+    if (answers.familyLawClassification === "private") {
+      scopingQuestions.needsAdviceOnEUOrInternationalMaintenance =
+        answers.needsAdviceOnEUOrInternationalMaintenance === "yes";
+    }
+
+    return scopingQuestions;
+  }
+
+  /**
    * Creates an answers output instance from the provided application.
    * @param application - The application from which to create the answers output instance.
    * @returns AnswersOutput instance.
@@ -182,15 +182,16 @@ export class ApplicationDto {
       application.scopingQuestions?.priorLegalAid,
     );
     const scopingAnswers = this.getAnswersFromScopingQuestions(
-      application.scopingQuestions
+      application.scopingQuestions,
     );
 
     return {
       ...addressAnswers,
       ...scopingAnswers,
-      [AnswerKey.familyLawClassification]: application.scopingQuestions?.familyLawClassification ?? "public",
       [AnswerKey.dateOfBirth]: application.clientDetails.dateOfBirth,
       [AnswerKey.ecf]: "no",
+      [AnswerKey.familyLawClassification]:
+        application.scopingQuestions?.familyLawClassification ?? "public",
       [AnswerKey.firstName]: application.clientDetails.firstName,
       [AnswerKey.hasNINumber]: application.clientDetails.niNumber
         ? "yes"
@@ -210,24 +211,6 @@ export class ApplicationDto {
     };
   }
 
-  
-  private static getAnswersFromScopingQuestions(
-    scopingQuestions: ScopingQuestions | null,
-  ): Partial<AnswersOutput> {
-    if (!scopingQuestions) {
-      return {};
-    }
-
-    const scopingAnswers: Partial<AnswersOutput> = {};
-
-    if (scopingQuestions.familyLawClassification === "private") {
-      scopingAnswers[AnswerKey.needsAdviceOnEUOrInternationalMaintenance] =
-        scopingQuestions.needsAdviceOnEUOrInternationalMaintenance ? "yes" : "no";
-    }
-
-    return scopingAnswers;
-  }
-
   /**
    * Extract answers from an overseas address.
    * @param address - The overseas address from which to extract the answers.
@@ -245,6 +228,30 @@ export class ApplicationDto {
       [AnswerKey.osAddressLine4]: address.addressLine4 ?? undefined,
       [AnswerKey.osCountry]: mapIsoCodeToCountryName(address.country),
     };
+  }
+
+  /**
+   * Extract answers from the scoping questions.
+   * @param scopingQuestions - The scoping questions from which to extract the answers.
+   * @returns Partial AnswersOutput object containing the scoping question fields.
+   */
+  private static getAnswersFromScopingQuestions(
+    scopingQuestions: null | ScopingQuestions,
+  ): Partial<AnswersOutput> {
+    if (!scopingQuestions) {
+      return {};
+    }
+
+    const scopingAnswers: Partial<AnswersOutput> = {};
+
+    if (scopingQuestions.familyLawClassification === "private") {
+      scopingAnswers[AnswerKey.needsAdviceOnEUOrInternationalMaintenance] =
+        scopingQuestions.needsAdviceOnEUOrInternationalMaintenance
+          ? "yes"
+          : "no";
+    }
+
+    return scopingAnswers;
   }
 
   /**

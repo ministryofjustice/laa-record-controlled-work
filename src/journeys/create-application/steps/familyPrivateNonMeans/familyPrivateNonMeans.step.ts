@@ -19,7 +19,6 @@ import {
 } from "#/journeys/shared.blocks.js";
 import { redirectToCheckAnswers } from "#/journeys/shared.hook.js";
 import { StepCode } from "#/journeys/StepCode.enum.js";
-import { AnswerKey } from "#/journeys/AnswerKey.enum.js";
 
 const TITLE = t("journeys.createApplication.familyPrivateNonMeans.title");
 
