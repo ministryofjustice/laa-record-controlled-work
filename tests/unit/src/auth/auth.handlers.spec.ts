@@ -16,6 +16,7 @@ import {
   createAuthFlowStore,
   getAuthFlowStore,
 } from "#/auth/auth.flow-store.js";
+import type { AuthCodeFlowState } from "#/auth/auth.types.js";
 import { EntraService } from "#/auth/entra.service.js";
 import { authCodeCallback, signIn } from "#/auth/auth.handlers.js";
 import { getValidatedReturnTo } from "#/auth/auth.redirect.js";
@@ -279,6 +280,56 @@ describe("Auth Handlers", () => {
       expect(
         authServiceStub.exchangeAuthCode.firstCall.args[0],
       ).to.equal("auth-code");
+    });
+
+    it("does not redirect when HTTP preparation reaches the flow deadline", async () => {
+      let now = 1_800_000_000_000;
+      const app = createMockApp();
+      app.locals.authFlowStore = createAuthFlowStore({ now: () => now });
+      const agent = request.agent(app);
+      const established = await agent.get("/auth/signin");
+
+      let resolvePreparation!: (value: AuthCodeFlowState) => void;
+      let markPreparationStarted!: () => void;
+      const preparationStarted = new Promise<void>((resolve) => {
+        markPreparationStarted = resolve;
+      });
+      const preparation = new Promise<AuthCodeFlowState>((resolve) => {
+        resolvePreparation = resolve;
+      });
+      authServiceStub.initiateAuthCodeFlow.onCall(1).callsFake(() => {
+        markPreparationStarted();
+        return preparation.then(success);
+      });
+
+      const signin = agent.get("/auth/signin").then((response) => response);
+      await preparationStarted;
+      now += 10 * MINUTE;
+      resolvePreparation(
+        {
+          authCodeUrl: "https://login.example/expired",
+          authCodeRequest: {
+            code: "",
+            codeVerifier: "verifier",
+            redirectUri: config.entra.redirectUri,
+            scopes: ["scope.read"],
+          },
+          authState: "expired-preparation-state",
+          returnTo: "/",
+        },
+      );
+
+      const signinResponse = await signin;
+      const callback = await agent.get("/auth/code/callback").query({
+        code: "auth-code",
+        state: "expired-preparation-state",
+      });
+
+      expect(established.status).to.equal(FOUND);
+      expect(signinResponse.status).to.equal(INTERNAL_SERVER_ERROR);
+      expect(signinResponse.headers.location).to.be.undefined;
+      expect(callback.status).to.equal(BAD_REQUEST);
+      expect(authServiceStub.exchangeAuthCode.called).to.be.false;
     });
 
     it("preserves a newer HTTP flow when an older session save fails late", async () => {
