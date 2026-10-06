@@ -223,38 +223,32 @@ const createMemoryAuthFlowStore = (now: () => number): AuthFlowStore => {
 };
 
 const createRedisAuthFlowStore = (client: RedisClientType): AuthFlowStore => ({
-  abandon: async (sessionId, reservationId) => {
-    const result = await runRedis({
+  abandon: (sessionId, reservationId): StoreResult<void> =>
+    runRedis({
       args: [reservationId],
       client,
       decode: () => undefined,
       script: ABANDON_SCRIPT,
       sessionId,
-    });
-    return result;
-  },
-  authorizeRedirect: async (sessionId, reservationId) => {
-    const result = await runRedis({
+    }),
+  authorizeRedirect: (sessionId, reservationId): StoreResult<boolean> =>
+    runRedis({
       args: [reservationId],
       client,
       decode: (value) => value === REDIS_SUCCESS,
       script: AUTHORIZE_SCRIPT,
       sessionId,
-    });
-    return result;
-  },
-  consume: async (sessionId, authState) => {
-    const result = await runRedis({
+    }),
+  consume: (sessionId, authState): StoreResult<AuthFlow | undefined> =>
+    runRedis({
       args: [authState],
       client,
       decode: parseConsumedFlow,
       script: CONSUME_SCRIPT,
       sessionId,
-    });
-    return result;
-  },
-  publish: async (sessionId, reservationId, flow) => {
-    const result = await runRedis({
+    }),
+  publish: (sessionId, reservationId, flow): StoreResult<boolean> =>
+    runRedis({
       args: [
         reservationId,
         flow.authState,
@@ -265,12 +259,10 @@ const createRedisAuthFlowStore = (client: RedisClientType): AuthFlowStore => ({
       decode: (value) => value === REDIS_SUCCESS,
       script: PUBLISH_SCRIPT,
       sessionId,
-    });
-    return result;
-  },
-  reserve: async (sessionId) => {
+    }),
+  reserve: (sessionId): StoreResult<AuthFlowReservation> => {
     const reservationId = randomUUID();
-    const result = await runRedis({
+    return runRedis({
       // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- intuitive
       args: [reservationId, String(10 * MINUTE)],
       client,
@@ -287,7 +279,6 @@ const createRedisAuthFlowStore = (client: RedisClientType): AuthFlowStore => ({
       script: RESERVE_SCRIPT,
       sessionId,
     });
-    return result;
   },
 });
 
