@@ -27,6 +27,7 @@ const BASE_ANSWERS = {
   partner: false,
   passporting: false,
   property_owned: "none",
+  additional_property_owned: "none",
   housing_payments: 0,
   housing_benefit_relevant: false,
   pension_relevant: false,
@@ -107,10 +108,7 @@ describe("saved dependant answers", () => {
           { key: "How many child dependants are there?", value: "2" },
           { key: "Does your client have any adult dependants?", value: "Yes" },
           { key: "How many adult dependants are there?", value: "1" },
-          {
-            key: "Do any of the dependants aged 16 or over get regular income?",
-            value: "Yes",
-          },
+          { key: "Do any of the dependants aged 16 or over get regular income?", value: "Yes" },
         ],
       },
       {
@@ -242,6 +240,10 @@ describe("saved dependant answers", () => {
             value: "No",
           },
         ],
+      },
+      {
+        heading: "Client other property",
+        rows: [{ key: "Does your client own any other property, a holiday home or land?", value: "No" }],
       },
     ]);
   });
