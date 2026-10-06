@@ -69,6 +69,7 @@ async function storeFlow(
       authCodeRequest: {
         code: "",
         codeVerifier: "verifier",
+        nonce: "flow-nonce",
         redirectUri: "http://localhost/auth/code/callback",
         scopes: ["scope.read"],
       },
@@ -943,7 +944,7 @@ describe("Auth Handlers", () => {
       expect(res.headers["content-type"]).to.match(/^text\/plain/);
     });
 
-    it("responds with 401 when token exchange fails", async () => {
+    it("does not authenticate or restore state when token exchange fails", async () => {
       const error = new TokenAcquisitionError();
       authServiceStub.exchangeAuthCode.resolves(failure(error));
 
@@ -954,6 +955,9 @@ describe("Auth Handlers", () => {
       expect(res.status).to.equal(UNAUTHORIZED);
       expect(res.text).to.equal("Token acquisition failed");
       expect(res.headers["content-type"]).to.match(/^text\/plain/);
+      const sessionResponse = await agent.get("/test/session");
+      expect(sessionResponse.body.isAuthenticated).to.not.equal(true);
+      expect(sessionResponse.body).to.not.have.property("msal");
       const replay = await agent
         .get("/auth/code/callback")
         .query(QUERY_PARAMS);
