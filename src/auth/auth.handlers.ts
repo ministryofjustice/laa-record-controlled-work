@@ -3,6 +3,8 @@ import type { NextFunction, Request, Response } from "express";
 import { AuthError } from "@azure/msal-node";
 import { promisify } from "node:util";
 
+import type { Either } from "#/lib/either.js";
+
 import {
   type AuthFlow,
   type AuthFlowStore,
@@ -56,8 +58,25 @@ export async function authCodeCallback(
 
     if (handleRelay(callbackData, req, res)) return;
 
-    const flow = await consumeCallbackFlow(req, callbackData.state, res);
-    if (flow === undefined) return;
+    let consumed: Either<Error, AuthFlow | undefined>;
+    try {
+      consumed = await getRequestAuthFlowStore(req).consume(
+        req.sessionID,
+        callbackData.state,
+      );
+    } catch {
+      res.status(INTERNAL_SERVER_ERROR).send("Unable to complete sign-in");
+      return;
+    }
+    if (consumed.error) {
+      res.status(INTERNAL_SERVER_ERROR).send("Unable to complete sign-in");
+      return;
+    }
+    if (consumed.value === undefined) {
+      res.status(BAD_REQUEST).send("Invalid or expired sign-in flow");
+      return;
+    }
+    const flow = consumed.value;
     if ("error" in callbackData) {
       res.status(BAD_REQUEST).type("text/plain").send("Entra sign-in failed");
       return;
@@ -175,37 +194,6 @@ async function completeAuthCodeCallback(
   if (!(await persistAuthenticatedSession(req, res))) return;
 
   res.redirect(getValidatedReturnTo(flow.returnTo));
-}
-
-/**
- * Returns a matching unexpired flow, responding generically on store failure.
- * @param req - The callback request.
- * @param authState - The callback state value.
- * @param res - The callback response.
- * @returns The consumed flow, or undefined after responding.
- */
-async function consumeCallbackFlow(
-  req: Request,
-  authState: string,
-  res: Response,
-): Promise<AuthFlow | undefined> {
-  try {
-    const consumed = await getRequestAuthFlowStore(req).consume(
-      req.sessionID,
-      authState,
-    );
-    if (consumed.error) {
-      res.status(INTERNAL_SERVER_ERROR).send("Unable to complete sign-in");
-      return;
-    }
-    if (consumed.value === undefined) {
-      res.status(BAD_REQUEST).send("Invalid or expired sign-in flow");
-      return;
-    }
-    return consumed.value;
-  } catch {
-    res.status(INTERNAL_SERVER_ERROR).send("Unable to complete sign-in");
-  }
 }
 
 /**
