@@ -24,6 +24,14 @@
       "notProvided": "Not provided",
       "referenceNumber": "Reference number",
       "meansAssessment": {
+        "frequencies": {
+          "everyWeek": "Every week",
+          "everyTwoWeeks": "Every 2 weeks",
+          "everyFourWeeks": "Every 4 weeks",
+          "monthly": "Monthly",
+          "everyMonth": "Every month",
+          "threeMonths": "Total in last 3 months"
+        },
         "client": {
           "heading": "Client details",
           "age": {
@@ -45,14 +53,7 @@
           "income": {
             "heading": "Dependant {index} income",
             "frequency": "When does the dependant normally get this income?",
-            "amount": "Income",
-            "frequencies": {
-              "everyWeek": "Every week",
-              "everyTwoWeeks": "Every 2 weeks",
-              "everyFourWeeks": "Every 4 weeks",
-              "monthly": "Monthly",
-              "threeMonths": "Total in last 3 months"
-            }
+            "amount": "Income"
           }
         },
         "employment": {
@@ -90,13 +91,6 @@
             "employment": "A salary or wage",
             "statutoryPay": "Statutory Sick Pay or Statutory Maternity Pay",
             "selfEmployment": "Self-employment income"
-          },
-          "frequencies": {
-            "everyWeek": "Every week",
-            "everyTwoWeeks": "Every 2 weeks",
-            "everyFourWeeks": "Every 4 weeks",
-            "monthly": "Monthly",
-            "threeMonths": "Total in last 3 months"
           }
         },
         "benefits": {
@@ -112,13 +106,7 @@
           },
           "type": "Benefit name",
           "amount": "Benefit amount",
-          "frequency": "Frequency",
-          "frequencies": {
-            "everyWeek": "Every week",
-            "everyTwoWeeks": "Every 2 weeks",
-            "everyFourWeeks": "Every 4 weeks",
-            "monthly": "Monthly"
-          }
+          "frequency": "Frequency"
         },
         "otherIncome": {
           "client": {
@@ -140,14 +128,7 @@
             "other": "Does the partner get income from other sources?"
           },
           "amount": "Amount",
-          "frequency": "Frequency",
-          "frequencies": {
-            "everyWeek": "Every week",
-            "everyTwoWeeks": "Every 2 weeks",
-            "everyFourWeeks": "Every 4 weeks",
-            "monthly": "Monthly",
-            "threeMonths": "Total in last 3 months"
-          }
+          "frequency": "Frequency"
         },
         "outgoings": {
           "client": {
@@ -163,13 +144,36 @@
             "legalAid": "Does the partner make payments towards legal aid for a criminal case?"
           },
           "amount": "Amount",
-          "frequency": "Frequency",
-          "frequencies": {
-            "everyWeek": "Every week",
-            "everyTwoWeeks": "Every 2 weeks",
-            "everyFourWeeks": "Every 4 weeks",
-            "monthly": "Every month",
-            "total": "Total in last 3 months"
+          "frequency": "Frequency"
+        },
+        "housing": {
+          "property": {
+            "heading": "Home client usually lives in",
+            "clientOwned": "Does your client own the home the client usually lives in?",
+            "partnerOwned": "Does your client or their partner own the home the client lives in?",
+            "landlordOnlyOtherOwner": "Is the landlord the only other joint-owner?",
+            "ownership": {
+              "none": "No",
+              "outright": "Yes, owned outright",
+              "sharedOwnership": "Yes, through a shared ownership scheme",
+              "withMortgage": "Yes, with a mortgage or loan"
+            }
+          },
+          "costs": {
+            "heading": "Housing costs",
+            "housingPayments": "Housing payments",
+            "mortgagePayments": "What are the mortgage or loan payments for the home the client usually lives in?",
+            "rent": "Rent",
+            "sharedOwnershipMortgage": "Mortgage",
+            "housingBenefitQuestion": "Is Housing Benefit claimed at the home the client lives in?",
+            "housingBenefit": "Housing Benefit",
+            "frequency": "Frequency"
+          },
+          "propertyEntry": {
+            "heading": "Home client lives in equity",
+            "houseValue": "Estimated value",
+            "mortgage": "Outstanding mortgage",
+            "percentageOwned": "Percentage share owned"
           }
         }
       },
