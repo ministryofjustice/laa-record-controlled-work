@@ -122,6 +122,7 @@ describe("EntraService", () => {
         (await service.initiateAuthCodeFlow()) as Success<AuthCodeFlowState>;
       expect(result.error).to.be.undefined;
       expect(result.value.authCodeUrl).to.equal(AUTH_CODE_URL);
+      expect(result.value).to.not.have.property("authCodeUrlRequest");
     });
 
     it("returns a random authState and passes it as the state parameter", async () => {
