@@ -26,6 +26,11 @@ const SENSITIVE_FIELD_NAMES = new Set([
   "req.headers.cookie",
   "secret",
   "token",
+  "address",
+  "dateOfBirth",
+  "firstName",
+  "lastName",
+  "niNumber",
 ]);
 
 export class AppLogger {
