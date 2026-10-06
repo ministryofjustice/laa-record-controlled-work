@@ -11,22 +11,30 @@ import { INTERNAL_SERVER_ERROR } from "#/lib/constants/http.js";
  * @param options - optional config
  * @param options.router - router to mount instead of the default auth router
  * @param options.mountPath - path to mount `router` at (default "/auth")
+ * @param options.sessionStore - session store for testing persistence behavior
  * @param options.useCsrf - whether to apply CSRF protection; match production for the mounted router (default true)
  * @returns a sandbox express app
  */
 export function createMockApp({
   mountPath = "/auth",
   router = authRouter,
+  sessionStore,
   useCsrf = true,
 }: {
   mountPath?: string;
   router?: Router;
+  sessionStore?: session.Store;
   useCsrf?: boolean;
 } = {}): Application {
   const app = express();
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
-  app.use(session(config.session));
+  app.use(
+    session({
+      ...config.session,
+      ...(sessionStore === undefined ? {} : { store: sessionStore }),
+    }),
+  );
 
   if (useCsrf) {
     app.use(csrf);

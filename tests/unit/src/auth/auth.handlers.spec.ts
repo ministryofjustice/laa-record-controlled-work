@@ -1,5 +1,6 @@
 import express from "express";
 import type { NextFunction, Request, Response } from "express";
+import session from "express-session";
 import request from "supertest";
 import { AuthError } from "@azure/msal-node";
 import { randomUUID } from "node:crypto";
@@ -11,11 +12,15 @@ import {
   UNAUTHORIZED,
 } from "#/lib/constants/http.js";
 import sinon from "sinon";
-import { getAuthFlowStore } from "#/auth/auth.flow-store.js";
+import {
+  createAuthFlowStore,
+  getAuthFlowStore,
+} from "#/auth/auth.flow-store.js";
 import { EntraService } from "#/auth/entra.service.js";
 import { authCodeCallback, signIn } from "#/auth/auth.handlers.js";
 import { getValidatedReturnTo } from "#/auth/auth.redirect.js";
 import { createRelayState } from "#/auth/auth.relay.js";
+import { getMsalCacheKey } from "#/auth/msal.cache-key.js";
 import config from "#/config.js";
 import { type Either, failure, success } from "#/lib/either.js";
 import * as redis from "#/lib/redis.js";
@@ -23,6 +28,7 @@ import { expect } from "chai";
 import { TokenAcquisitionError } from "#/auth/auth.errors.js";
 import { MINUTE } from "#/lib/constants/time.js";
 import { createMockApp } from "../../utils.js";
+import { requireAuth } from "#/auth/middleware/requireAuth.middleware.js";
 
 const AUTH_CODE_URL = "https://login.microsoftonline.com/auth";
 const TRUSTED_APP_ORIGIN = new URL("https://rcw.invalid");
@@ -31,6 +37,11 @@ const RELAY_EXPIRY = Date.now() + 10 * MINUTE;
 
 type RequestAgent = ReturnType<typeof request.agent>;
 
+function getSetCookieHeaders(value: string | string[] | undefined): string[] {
+  if (value === undefined) return [];
+  return Array.isArray(value) ? value : [value];
+}
+
 function getValue<Err, Value>(result: Either<Err, Value>): Value {
   if ("error" in result) throw result.error;
   return result.value;
@@ -38,7 +49,7 @@ function getValue<Err, Value>(result: Either<Err, Value>): Value {
 
 async function startSignIn(agent: RequestAgent): Promise<void> {
   const response = await agent.get("/auth/signin");
-  expect(response.status).to.equal(FOUND);
+  expect(response.status, response.text).to.equal(FOUND);
 }
 
 async function storeFlow(
@@ -123,6 +134,10 @@ describe("Auth Handlers", () => {
     sinon.restore();
   });
 
+  function createHandlerRequest(request: object): Request {
+    return Object.assign(request, { app: mockApp }) as unknown as Request;
+  }
+
   describe("signin()", () => {
     it("does not redirect a superseded sign-in when preparations finish out of order", async () => {
       let resolveOlder!: (value: ReturnType<typeof success>) => void;
@@ -145,14 +160,14 @@ describe("Auth Handlers", () => {
         .returns(newerPreparation);
 
       const makeRequest = (): Request =>
-        ({
+        createHandlerRequest({
           hostname: "localhost",
           query: {},
           session: {
             save: (callback: (error?: Error) => void): void => callback(),
           },
           sessionID: "overlapping-session",
-        }) as unknown as Request;
+        });
       const olderResponse = {
         redirect: sinon.stub(),
         send: sinon.stub().returnsThis(),
@@ -195,7 +210,162 @@ describe("Auth Handlers", () => {
       expect((olderResponse.redirect as sinon.SinonStub).called).to.be.false;
     });
 
-    it("does not redirect an older sign-in when its session save finishes late", async () => {
+    it("keeps the newer flow when HTTP sign-ins finish preparation in reverse order", async () => {
+      const agent = request.agent(mockApp);
+      const established = await agent.get("/auth/signin");
+      expect(established.status).to.equal(FOUND);
+      expect(established.headers["set-cookie"]).to.exist;
+
+      let resolveOlder!: (value: ReturnType<typeof success>) => void;
+      let resolveNewer!: (value: ReturnType<typeof success>) => void;
+      let markBothStarted!: () => void;
+      let started = 0;
+      const bothStarted = new Promise<void>((resolve) => {
+        markBothStarted = resolve;
+      });
+      authServiceStub.initiateAuthCodeFlow.resetHistory();
+      authServiceStub.initiateAuthCodeFlow.onCall(0).returns(
+        new Promise<ReturnType<typeof success>>((resolve) => {
+          resolveOlder = resolve;
+          started += 1;
+          if (started === 2) markBothStarted();
+        }),
+      );
+      authServiceStub.initiateAuthCodeFlow.onCall(1).returns(
+        new Promise<ReturnType<typeof success>>((resolve) => {
+          resolveNewer = resolve;
+          started += 1;
+          if (started === 2) markBothStarted();
+        }),
+      );
+
+      const olderResponse = agent.get("/auth/signin").then((response) => response);
+      const newerResponse = agent.get("/auth/signin").then((response) => response);
+      await bothStarted;
+      resolveNewer(
+        success({
+          authCodeUrl: "https://login.example/newer",
+          authCodeRequest: {},
+          authState: "http-newer-state",
+          returnTo: "/",
+        }),
+      );
+      const newer = await newerResponse;
+      resolveOlder(
+        success({
+          authCodeUrl: "https://login.example/older",
+          authCodeRequest: {},
+          authState: "http-older-state",
+          returnTo: "/",
+        }),
+      );
+      const older = await olderResponse;
+
+      expect(newer.status).to.equal(FOUND);
+      expect(newer.headers.location).to.equal("https://login.example/newer");
+      expect(older.status).to.equal(INTERNAL_SERVER_ERROR);
+      expect(older.headers.location).to.be.undefined;
+
+      const staleCallback = await agent
+        .get("/auth/code/callback")
+        .query({ code: "auth-code", state: "http-older-state" });
+      const currentCallback = await agent
+        .get("/auth/code/callback")
+        .query({ code: "auth-code", state: "http-newer-state" });
+
+      expect(staleCallback.status).to.equal(BAD_REQUEST);
+      expect(currentCallback.status).to.equal(FOUND);
+      expect(authServiceStub.exchangeAuthCode.calledOnce).to.be.true;
+      expect(
+        authServiceStub.exchangeAuthCode.firstCall.args[0],
+      ).to.equal("auth-code");
+    });
+
+    it("preserves a newer HTTP flow when an older session save fails late", async () => {
+      sinon.stub(config.redis, "enabled").value(false);
+      const sessionStore = new session.MemoryStore();
+      const originalSet = sessionStore.set.bind(sessionStore);
+      let holdOlderSave = false;
+      let markOlderSaveStarted!: () => void;
+      let releaseOlderSave!: () => void;
+      let markOlderPreparationStarted!: () => void;
+      let resolveOlderPreparation!: (value: ReturnType<typeof success>) => void;
+      const olderSaveStarted = new Promise<void>((resolve) => {
+        markOlderSaveStarted = resolve;
+      });
+      const olderPreparationStarted = new Promise<void>((resolve) => {
+        markOlderPreparationStarted = resolve;
+      });
+      const olderPreparation = new Promise<ReturnType<typeof success>>(
+        (resolve) => {
+          resolveOlderPreparation = resolve;
+        },
+      );
+      sinon.stub(sessionStore, "set").callsFake(
+        (sessionId, sessionData, callback) => {
+          if (holdOlderSave && sessionData.authFlowPending !== undefined) {
+            holdOlderSave = false;
+            markOlderSaveStarted();
+            releaseOlderSave = () =>
+              callback?.(new Error("stale session save failed"));
+            return;
+          }
+          originalSet(sessionId, sessionData, callback);
+        },
+      );
+      const flowStore = createAuthFlowStore();
+      const app = createMockApp({ sessionStore });
+      app.locals.authFlowStore = flowStore;
+      authServiceStub.initiateAuthCodeFlow.onCall(1).callsFake(() => {
+        markOlderPreparationStarted();
+        return olderPreparation;
+      });
+      authServiceStub.initiateAuthCodeFlow.onCall(2).resolves(
+        success({
+          authCodeUrl: "https://login.example/newer",
+          authCodeRequest: {},
+          authState: "newer-http-save-state",
+          returnTo: "/",
+        }),
+      );
+
+      const agent = request.agent(app);
+      const established = await agent.get("/auth/signin");
+      expect(established.status).to.equal(FOUND);
+      holdOlderSave = true;
+      const olderRequest = agent
+        .get("/auth/signin")
+        .then((response) => response);
+      await olderPreparationStarted;
+      resolveOlderPreparation(
+        success({
+          authCodeUrl: "https://login.example/older",
+          authCodeRequest: {},
+          authState: "older-http-save-state",
+          returnTo: "/",
+        }),
+      );
+      await olderSaveStarted;
+
+      const newer = await agent.get("/auth/signin");
+      releaseOlderSave();
+      const older = await olderRequest;
+      const staleCallback = await agent
+        .get("/auth/code/callback")
+        .query({ code: "old-code", state: "older-http-save-state" });
+      const newerCallback = await agent
+        .get("/auth/code/callback")
+        .query({ code: "new-code", state: "newer-http-save-state" });
+
+      expect(newer.status).to.equal(FOUND);
+      expect(newer.headers.location).to.equal("https://login.example/newer");
+      expect(older.status).to.equal(INTERNAL_SERVER_ERROR);
+      expect(staleCallback.status).to.equal(BAD_REQUEST);
+      expect(newerCallback.status).to.equal(FOUND);
+      expect(authServiceStub.exchangeAuthCode.calledOnce).to.be.true;
+    });
+
+    it("preserves a newer flow when an older session save fails late", async () => {
       const sessionId = randomUUID();
       let releaseOlderSave!: () => void;
       let markOlderSaveStarted!: () => void;
@@ -225,15 +395,15 @@ describe("Auth Handlers", () => {
       const makeRequest = (
         save: (callback: (error?: Error | null) => void) => void,
       ): Request =>
-        ({
+        createHandlerRequest({
           hostname: "localhost",
           query: {},
           session: { save },
           sessionID: sessionId,
-        }) as unknown as Request;
+        });
       const olderRequest = makeRequest((callback) => {
         markOlderSaveStarted();
-        releaseOlderSave = () => callback();
+        releaseOlderSave = () => callback(new Error("stale session save failed"));
       });
       const newerRequest = makeRequest((callback) => callback());
       const olderRedirect = sinon.stub();
@@ -265,6 +435,62 @@ describe("Auth Handlers", () => {
         "https://login.example/newer",
       )).to.be.true;
       expect(olderRedirect.called).to.be.false;
+      expect(
+        getValue(
+          await getAuthFlowStore().consume(sessionId, "newer-save-state"),
+        )?.authState,
+      ).to.equal("newer-save-state");
+    });
+
+    it("does not authorize a signin when its session save reaches the flow deadline", async () => {
+      let now = 1_800_000_000_000;
+      const expiresAt = now + 10 * MINUTE;
+      const flowStore = getAuthFlowStore();
+      sinon.stub(flowStore, "reserve").returns(
+        success({ expiresAt, reservationId: "save-delay-reservation" }),
+      );
+      sinon.stub(flowStore, "publish").returns(success(true));
+      const authorize = sinon
+        .stub(flowStore, "authorizeRedirect")
+        .callsFake(() => success(now < expiresAt));
+      sinon.stub(flowStore, "abandon").returns(success(undefined));
+      let markSaveStarted!: () => void;
+      let releaseSave!: () => void;
+      const saveStarted = new Promise<void>((resolve) => {
+        markSaveStarted = resolve;
+      });
+      const saveGate = new Promise<void>((resolve) => {
+        releaseSave = resolve;
+      });
+      const req = createHandlerRequest({
+        hostname: "localhost",
+        query: {},
+        session: {
+          save: (callback: (error?: Error | null) => void): void => {
+            markSaveStarted();
+            void saveGate.then(() => {
+              now = expiresAt;
+              callback();
+            });
+          },
+        },
+        sessionID: "signin-save-expiry",
+      });
+      const redirect = sinon.stub();
+      const status = sinon.stub().returnsThis();
+      const send = sinon.stub().returnsThis();
+      const res = { redirect, send, status } as unknown as Response;
+
+      const signin = signIn(req, res, sinon.stub() as unknown as NextFunction);
+      await saveStarted;
+      releaseSave();
+      await signin;
+
+      expect(authorize.calledOnce).to.be.true;
+      expect(now).to.equal(expiresAt);
+      expect(status.calledOnceWithExactly(INTERNAL_SERVER_ERROR)).to.be.true;
+      expect(send.calledOnceWithExactly("Unable to start sign-in")).to.be.true;
+      expect(redirect.called).to.be.false;
     });
 
     it("redirects to the auth code URL returned by initiateAuthCodeFlow()", async () => {
@@ -347,7 +573,7 @@ describe("Auth Handlers", () => {
     });
 
     it("uses the validated saved destination when returnTo is absent", async () => {
-      const req = {
+      const req = createHandlerRequest({
         hostname: "localhost",
         query: {},
         session: {
@@ -355,7 +581,7 @@ describe("Auth Handlers", () => {
           save: (callback: (error?: Error) => void): void => callback(),
         },
         sessionID: "session-id",
-      } as unknown as Request;
+      });
       const res = {
         redirect: sinon.stub(),
         status: sinon.stub().returnsThis(),
@@ -373,7 +599,7 @@ describe("Auth Handlers", () => {
     });
 
     it("replaces a poisoned saved destination with /", async () => {
-      const req = {
+      const req = createHandlerRequest({
         hostname: "localhost",
         query: {},
         session: {
@@ -381,7 +607,7 @@ describe("Auth Handlers", () => {
           save: (callback: (error?: Error) => void): void => callback(),
         },
         sessionID: "session-id",
-      } as unknown as Request;
+      });
       const res = {
         redirect: sinon.stub(),
         status: sinon.stub().returnsThis(),
@@ -429,7 +655,7 @@ describe("Auth Handlers", () => {
 
     it("does not redirect or retain a flow when initiating-session save fails", async () => {
       const sessionId = randomUUID();
-      const req = {
+      const req = createHandlerRequest({
         hostname: "localhost",
         query: {},
         session: {
@@ -437,7 +663,7 @@ describe("Auth Handlers", () => {
             callback(new Error("session save failed")),
         },
         sessionID: sessionId,
-      } as unknown as Request;
+      });
       const redirect = sinon.stub();
       const status = sinon.stub().returnsThis();
       const res = {
@@ -601,14 +827,14 @@ describe("Auth Handlers", () => {
       const sessionId = randomUUID();
       await storeFlow(sessionId, CALLBACK_STATE);
       const next = sinon.stub();
-      const req = {
+      const req = createHandlerRequest({
         query: QUERY_PARAMS,
         sessionID: sessionId,
         session: {
           regenerate: (callback: (error?: Error | null) => void): void =>
             callback(new Error("session rotation failed")),
         },
-      } as unknown as Request;
+          });
       const res = {
         redirect: sinon.stub(),
         send: sinon.stub().returnsThis(),
@@ -653,7 +879,7 @@ describe("Auth Handlers", () => {
         }),
       );
       const callbackRedirect = sinon.stub();
-      const callbackReq = {
+      const callbackReq = createHandlerRequest({
         hostname: "localhost",
         query: QUERY_PARAMS,
         sessionID: sessionId,
@@ -668,7 +894,7 @@ describe("Auth Handlers", () => {
           },
           save: (callback: (error?: Error | null) => void): void => callback(),
         },
-      } as unknown as Request;
+      });
       const callbackRes = {
         clearCookie: sinon.stub(),
         redirect: callbackRedirect,
@@ -684,7 +910,7 @@ describe("Auth Handlers", () => {
       await exchangeStarted;
 
       const signinRedirect = sinon.stub();
-      const signinReq = {
+      const signinReq = createHandlerRequest({
         hostname: "localhost",
         query: {},
         sessionID: sessionId,
@@ -692,7 +918,7 @@ describe("Auth Handlers", () => {
           save: (saveCallback: (error?: Error | null) => void): void =>
             saveCallback(),
         },
-      } as unknown as Request;
+      });
       await signIn(
         signinReq,
         {
@@ -754,7 +980,7 @@ describe("Auth Handlers", () => {
       const status = sinon.stub().returnsThis();
       const redirect = sinon.stub();
       const clearCookie = sinon.stub();
-      const req = {
+      const req = createHandlerRequest({
         query: QUERY_PARAMS,
         sessionID: sessionId,
         session: {
@@ -772,7 +998,7 @@ describe("Auth Handlers", () => {
             callback();
           },
         },
-      } as unknown as Request;
+      });
       const res = {
         clearCookie,
         redirect,
@@ -800,6 +1026,177 @@ describe("Auth Handlers", () => {
       expect(replay.value).to.be.undefined;
     });
 
+    for (const cleanupFailure of ["destroy", "msal-cache"] as const) {
+      it(`does not persist failed authentication when ${cleanupFailure} cleanup fails`, async () => {
+        const sessionStore = new session.MemoryStore();
+        const redisWasEnabled = config.redis.enabled;
+        config.redis.enabled = false;
+        const flowStore = createAuthFlowStore();
+        config.redis.enabled = redisWasEnabled;
+        const originalSet = sessionStore.set.bind(sessionStore);
+        const originalDestroy = sessionStore.destroy.bind(sessionStore);
+        let failAuthenticatedSave = false;
+        let failedSessionId: string | undefined;
+        let authenticatedSaveAttempts = 0;
+        sinon.stub(sessionStore, "set").callsFake(
+          (sessionId, sessionData, callback) => {
+            if (failAuthenticatedSave && sessionData.isAuthenticated) {
+              authenticatedSaveAttempts += 1;
+              failedSessionId = sessionId;
+              callback?.(new Error("session save failed"));
+              return;
+            }
+            originalSet(sessionId, sessionData, callback);
+          },
+        );
+        const destroy = sinon.stub(sessionStore, "destroy").callsFake(
+          (sessionId, callback) => {
+            if (
+              cleanupFailure === "destroy" &&
+              sessionId === failedSessionId
+            ) {
+              callback?.(new Error("session destroy failed"));
+              return;
+            }
+            originalDestroy(sessionId, callback);
+          },
+        );
+        const app = createMockApp({ sessionStore });
+        app.locals.authFlowStore = flowStore;
+        app.get("/test/protected", requireAuth(), (_req, res) => {
+          res.sendStatus(200);
+        });
+
+        const redisEnabled = sinon.stub(config.redis, "enabled").value(false);
+        const deleteCache = sinon.stub(redis.getRedisClient(), "del");
+        if (cleanupFailure === "msal-cache") {
+          deleteCache.rejects(new Error("MSAL cache deletion failed"));
+        } else {
+          deleteCache.resolves(1);
+        }
+
+        const unrelatedAgent = request.agent(app);
+        await startSignIn(unrelatedAgent);
+        const unrelatedCallback = await unrelatedAgent
+          .get("/auth/code/callback")
+          .query({ code: "unrelated-code", state: CALLBACK_STATE });
+        expect(unrelatedCallback.status).to.equal(FOUND);
+
+        authServiceStub.initiateAuthCodeFlow.onCall(1).resolves(
+          success({
+            authCodeUrl: "https://login.example/older",
+            authCodeRequest: {},
+            authState: "older-state",
+            returnTo: "/",
+          }),
+        );
+        authServiceStub.initiateAuthCodeFlow.onCall(2).resolves(
+          success({
+            authCodeUrl: "https://login.example/newer",
+            authCodeRequest: {},
+            authState: "newer-state",
+            returnTo: "/",
+          }),
+        );
+        let markExchangeStarted!: () => void;
+        let resolveExchange!: (result: ReturnType<typeof success>) => void;
+        const exchangeStarted = new Promise<void>((resolve) => {
+          markExchangeStarted = resolve;
+        });
+        const delayedExchange = new Promise<ReturnType<typeof success>>(
+          (resolve) => {
+            resolveExchange = resolve;
+          },
+        );
+        authServiceStub.exchangeAuthCode.onCall(1).callsFake(() => {
+          markExchangeStarted();
+          return delayedExchange;
+        });
+
+        const agent = request.agent(app);
+        const signin = await agent.get("/auth/signin");
+        const initialCookie = getSetCookieHeaders(
+          signin.headers["set-cookie"],
+        )
+          .find((cookie) => cookie.startsWith(`${config.session.name}=`))!
+          .split(";", 1)[0];
+        failAuthenticatedSave = true;
+        const callbackPromise = agent
+          .get("/auth/code/callback")
+          .query({ code: "older-code", state: "older-state" })
+          .then((response) => response);
+        await exchangeStarted;
+
+        const newerSignin = await agent.get("/auth/signin");
+        const newerCookie =
+          getSetCookieHeaders(newerSignin.headers["set-cookie"])
+            .find((cookie) => cookie.startsWith(`${config.session.name}=`))
+            ?.split(";", 1)[0] ?? initialCookie;
+        expect(newerSignin.status).to.equal(FOUND);
+        redisEnabled.value(true);
+        resolveExchange(
+          success({
+            accessToken: "access-token",
+            account: {
+              environment: "login.microsoftonline.com",
+              homeAccountId: "target-account",
+              localAccountId: "target-id",
+              tenantId: "target-tenant",
+              username: "target-user",
+            },
+            idToken: "id-token",
+          }),
+        );
+        const failedCallback = await callbackPromise;
+        failAuthenticatedSave = false;
+        const persistedFailedSession = await new Promise<unknown>(
+          (resolve, reject) => {
+            sessionStore.get(failedSessionId!, (error, value) => {
+              if (error) reject(error);
+              else resolve(value);
+            });
+          },
+        );
+
+        expect(failedCallback.status).to.equal(INTERNAL_SERVER_ERROR);
+        expect(failedCallback.headers.location).to.be.undefined;
+        expect(
+          getSetCookieHeaders(failedCallback.headers["set-cookie"]).some(
+            (cookie) =>
+              cookie.startsWith(`${config.session.name}=;`) &&
+              /expires=|max-age=0/i.test(cookie),
+          ),
+        ).to.be.true;
+        expect(failedSessionId).to.be.a("string");
+        expect(authenticatedSaveAttempts).to.equal(1);
+        expect(persistedFailedSession).to.be.undefined;
+        expect(destroy.calledWith(failedSessionId)).to.be.true;
+        expect(deleteCache.calledOnce).to.be.true;
+        expect(deleteCache.firstCall.args[0]).to.equal(
+          getMsalCacheKey(failedSessionId!),
+        );
+
+        const replay = await request(app)
+          .get("/auth/code/callback")
+          .set("Cookie", initialCookie)
+          .query({ code: "older-code", state: "older-state" });
+        const protectedAccess = await agent.get("/test/protected");
+        const newerCallback = await request(app)
+          .get("/auth/code/callback")
+          .set("Cookie", newerCookie)
+          .query({ code: "newer-code", state: "newer-state" });
+
+        expect(replay.status).to.equal(BAD_REQUEST);
+        expect(protectedAccess.status).to.equal(FOUND);
+        expect(protectedAccess.headers.location).to.equal("/auth/signin");
+        expect(newerCallback.status).to.equal(FOUND);
+        expect(authServiceStub.exchangeAuthCode.calledThrice).to.be.true;
+        expect(
+          (await unrelatedAgent.get("/test/session")).body.isAuthenticated,
+        ).to.be.true;
+      });
+    }
+
     it("uses the rotated session ID when creating the MSAL client for code exchange", async () => {
       const next = sinon.stub();
       const createStub = EntraService.create as unknown as sinon.SinonStub;
@@ -808,7 +1205,7 @@ describe("Auth Handlers", () => {
       const sessionId = randomUUID();
       await storeFlow(sessionId, CALLBACK_STATE, returnTo);
 
-      const req = {
+      const req = createHandlerRequest({
         hostname: "localhost",
         query: QUERY_PARAMS,
         session: {
@@ -824,7 +1221,7 @@ describe("Auth Handlers", () => {
             callback(),
         },
         sessionID: sessionId,
-      } as unknown as Request;
+      });
 
       const res = {
         redirect: sinon.stub(),
@@ -847,7 +1244,7 @@ describe("Auth Handlers", () => {
       const next = sinon.stub();
       const sessionId = randomUUID();
       await storeFlow(sessionId, CALLBACK_STATE, "/AUTH/code/callback");
-      const req = {
+      const req = createHandlerRequest({
         query: QUERY_PARAMS,
         session: {
           regenerate: (callback: (error?: Error | null) => void): void =>
@@ -856,7 +1253,7 @@ describe("Auth Handlers", () => {
             callback(),
         },
         sessionID: sessionId,
-      } as unknown as Request;
+      });
       const res = {
         redirect: sinon.stub(),
         send: sinon.stub().returnsThis(),
@@ -1014,7 +1411,7 @@ describe("Auth Handlers", () => {
         expect(authServiceStub.exchangeAuthCode.called).to.be.false;
 
         const originRedirect = sinon.stub();
-        const originReq = {
+        const originReq = createHandlerRequest({
           hostname: new URL(VALID_EPHEMERAL_TARGET).hostname,
           query: callbackQuery,
           sessionID: originSessionId,
@@ -1023,7 +1420,7 @@ describe("Auth Handlers", () => {
               callback(),
             save: (callback: (error?: Error | null) => void): void => callback(),
           },
-        } as unknown as Request;
+        });
         const originRes = {
           clearCookie: sinon.stub(),
           redirect: originRedirect,
@@ -1039,6 +1436,160 @@ describe("Auth Handlers", () => {
 
         expect(originRedirect.calledOnceWithExactly("/")).to.be.true;
         expect(authServiceStub.exchangeAuthCode.calledOnce).to.be.true;
+      });
+
+      it("forwards callbacks between independent HTTP apps and consumes only at origin", async () => {
+        const origin = createMockApp();
+        const intermediary = createMockApp();
+        origin.locals.authFlowStore = createAuthFlowStore();
+        intermediary.locals.authFlowStore = createAuthFlowStore();
+        const target = "https://mem-257-xyz-laa-record-controlled-work-uat.cloud-platform.service.justice.gov.uk";
+        const targetHost = new URL(target).hostname;
+        const state = createRelayState(
+          "two-hop-http-nonce",
+          target,
+          Date.now() + MINUTE,
+          SESSION_SECRET,
+        );
+        authServiceStub.initiateAuthCodeFlow.resolves(
+          success({
+            authCodeUrl: "https://login.example/authorize",
+            authCodeRequest: {},
+            authState: state,
+            returnTo: "/cases/123",
+          }),
+        );
+
+        const originAgent = request.agent(origin);
+        const signin = await originAgent.get("/auth/signin");
+        const intermediaryCallback = await request(intermediary)
+          .get("/auth/code/callback")
+          .set("Host", "laa-record-controlled-work-uat.cloud-platform.service.justice.gov.uk")
+          .query({ code: "auth-code", state });
+        const originCallback = await originAgent
+          .get("/auth/code/callback")
+          .set("Host", targetHost)
+          .query({ code: "auth-code", state });
+        const replay = await request(origin)
+          .get("/auth/code/callback")
+          .set("Host", targetHost)
+          .set("Cookie", getSetCookieHeaders(signin.headers["set-cookie"])[0].split(";", 1)[0])
+          .query({ code: "auth-code", state });
+
+        expect(signin.status).to.equal(FOUND);
+        expect(intermediaryCallback.status).to.equal(FOUND);
+        const forwarded = new URL(intermediaryCallback.headers.location);
+        expect(forwarded.origin).to.equal(target);
+        expect([...forwarded.searchParams.keys()].sort()).to.deep.equal([
+          "code",
+          "state",
+        ]);
+        expect(originCallback.status).to.equal(FOUND);
+        expect(originCallback.headers.location).to.equal("/cases/123");
+        expect(replay.status).to.equal(BAD_REQUEST);
+        expect(authServiceStub.exchangeAuthCode.calledOnce).to.be.true;
+      });
+
+      it("rejects tampered and expired relay deadlines without consuming origin state", async () => {
+        const app = createMockApp();
+        const target = "https://mem-257-xyz-laa-record-controlled-work-uat.cloud-platform.service.justice.gov.uk";
+        const expiry = Date.now() + MINUTE;
+        const state = createRelayState("deadline-nonce", target, expiry, SESSION_SECRET);
+        authServiceStub.initiateAuthCodeFlow.resolves(
+          success({
+            authCodeUrl: "https://login.example/authorize",
+            authCodeRequest: {},
+            authState: state,
+            returnTo: "/",
+          }),
+        );
+        const agent = request.agent(app);
+        const signin = await agent.get("/auth/signin");
+        const tampered = JSON.parse(
+          Buffer.from(state, "base64").toString("utf8"),
+        ) as { expiresAt: number; nonce: string; signature: string; target: string };
+        tampered.expiresAt += 1;
+        const tamperedState = Buffer.from(JSON.stringify(tampered)).toString("base64");
+        const invalid = await agent
+          .get("/auth/code/callback")
+          .set("Host", new URL(target).hostname)
+          .query({ code: "auth-code", state: tamperedState });
+        const matching = await agent
+          .get("/auth/code/callback")
+          .set("Host", new URL(target).hostname)
+          .query({ code: "auth-code", state });
+        const expiredState = createRelayState(
+          "expired-nonce",
+          target,
+          Date.now() - 1,
+          SESSION_SECRET,
+        );
+        const expired = await request(app)
+          .get("/auth/code/callback")
+          .set("Host", new URL(target).hostname)
+          .query({ code: "auth-code", state: expiredState });
+
+        expect(signin.status).to.equal(FOUND);
+        expect(invalid.status).to.equal(BAD_REQUEST);
+        expect(matching.status).to.equal(FOUND);
+        expect(expired.status).to.equal(BAD_REQUEST);
+        expect(authServiceStub.exchangeAuthCode.calledOnce).to.be.true;
+      });
+
+      it("forwards provider errors between independent HTTP apps without exchanging a code", async () => {
+        const origin = createMockApp();
+        const intermediary = createMockApp();
+        origin.locals.authFlowStore = createAuthFlowStore();
+        intermediary.locals.authFlowStore = createAuthFlowStore();
+        const target = "https://mem-257-xyz-laa-record-controlled-work-uat.cloud-platform.service.justice.gov.uk";
+        const state = createRelayState(
+          "two-hop-error-http",
+          target,
+          Date.now() + MINUTE,
+          SESSION_SECRET,
+        );
+        authServiceStub.initiateAuthCodeFlow.resolves(
+          success({
+            authCodeUrl: "https://login.example/authorize",
+            authCodeRequest: {},
+            authState: state,
+            returnTo: "/",
+          }),
+        );
+        const originAgent = request.agent(origin);
+        await originAgent.get("/auth/signin");
+
+        const intermediaryResponse = await request(intermediary)
+          .get("/auth/code/callback")
+          .set("Host", "laa-record-controlled-work-uat.cloud-platform.service.justice.gov.uk")
+          .query({
+            error: "access_denied",
+            error_description: "do not forward this provider detail",
+            state,
+          });
+        const forwarded = new URL(intermediaryResponse.headers.location);
+        const originResponse = await originAgent
+          .get("/auth/code/callback")
+          .set("Host", new URL(target).hostname)
+          .query({
+            error: forwarded.searchParams.get("error"),
+            state: forwarded.searchParams.get("state"),
+          });
+        const replay = await originAgent
+          .get("/auth/code/callback")
+          .set("Host", new URL(target).hostname)
+          .query({ error: "access_denied", state });
+
+        expect(intermediaryResponse.status).to.equal(FOUND);
+        expect([...forwarded.searchParams.keys()].sort()).to.deep.equal([
+          "error",
+          "state",
+        ]);
+        expect(forwarded.searchParams.has("error_description")).to.be.false;
+        expect(originResponse.status).to.equal(BAD_REQUEST);
+        expect(originResponse.text).to.equal("Entra sign-in failed");
+        expect(replay.status).to.equal(BAD_REQUEST);
+        expect(authServiceStub.exchangeAuthCode.called).to.be.false;
       });
 
       it("forwards provider errors without descriptions and consumes them only at origin", async () => {
@@ -1093,11 +1644,11 @@ describe("Auth Handlers", () => {
           type: sinon.stub().returnsThis(),
         } as unknown as Response;
         await authCodeCallback(
-          {
+          createHandlerRequest({
             hostname: new URL(VALID_EPHEMERAL_TARGET).hostname,
             query: callbackQuery,
             sessionID: originSessionId,
-          } as unknown as Request,
+          }),
           originRes,
           sinon.stub() as unknown as NextFunction,
         );
@@ -1154,7 +1705,7 @@ describe("Auth Handlers", () => {
         const sessionId = randomUUID();
         await storeFlow(sessionId, state);
 
-        const req = {
+        const req = createHandlerRequest({
           hostname: ephemeralHost,
           query: { code: "auth-code", state },
           session: {
@@ -1163,7 +1714,7 @@ describe("Auth Handlers", () => {
             save: (callback: (error?: Error | null) => void): void => callback(),
           },
           sessionID: sessionId,
-        } as unknown as Request;
+        });
         const res = {
           clearCookie: sinon.stub(),
           redirect: sinon.stub(),
