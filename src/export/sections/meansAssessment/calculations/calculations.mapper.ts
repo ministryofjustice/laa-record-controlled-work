@@ -19,6 +19,7 @@ import {
 } from "#/export/sections/meansAssessment/calculations/calculations.zod.js";
 
 const CFE_MAX_VALUE = 999_999_999_999;
+const MINIMUM_ASSESSED_CAPITAL = 0;
 const NO_CFE_PROCEEDING_TYPES = 0;
 
 /**
@@ -107,9 +108,16 @@ function isMeansAssessmentExemptOrPassported(
 
   const hasUnderEighteenExemption =
     client_age === ClientAgeRange.Under18 &&
-    (controlled_legal_representation ?? hasNoUnderEighteenIncomeOrAssets);
+    [
+      controlled_legal_representation,
+      hasNoUnderEighteenIncomeOrAssets,
+    ].includes(true);
 
-  return passporting ?? hasAsylumSupportExemption ?? hasUnderEighteenExemption;
+  return [
+    hasAsylumSupportExemption,
+    hasUnderEighteenExemption,
+    passporting,
+  ].includes(true);
 }
 
 /**
@@ -185,6 +193,10 @@ function toCategory(
   }
 
   const [firstProceedingType] = proceedingTypes;
+  if (firstProceedingType.result === "not_calculated") {
+    return { status: MeansAssessmentStatus.NotCalculated };
+  }
+
   const total = category[totalKey];
   if (total === null || total === undefined) {
     return null;
@@ -197,7 +209,10 @@ function toCategory(
     noUpperThreshold: upperThreshold === CFE_MAX_VALUE,
     outcome,
     status: MeansAssessmentStatus.Calculated,
-    total,
+    total:
+      totalKey === MeansAssessmentTotalField.CombinedAssessedCapital
+        ? Math.max(total, MINIMUM_ASSESSED_CAPITAL)
+        : total,
     upperThreshold,
   };
 }

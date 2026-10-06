@@ -132,12 +132,71 @@ describe("toMeansAssessmentSection", () => {
     }
   });
 
+  it("keeps explicitly uncalculated proceeding categories available", () => {
+    const result = {
+      result_summary: {
+        capital: {
+          proceeding_types: [
+            { result: "not_calculated", upper_threshold: 0 },
+          ],
+        },
+        gross_income: {
+          combined_total_gross_income: 500,
+          proceeding_types: [{ result: "eligible", upper_threshold: 1_000 }],
+        },
+        overall_result: { result: "eligible" },
+      },
+    };
+
+    const calculations = mapSection(result)?.calculations;
+
+    expect(calculations?.status).to.equal("ready");
+    if (calculations?.status === "ready") {
+      expect(calculations.capital).to.deep.equal({ status: "not_calculated" });
+    }
+  });
+
+  it("floors negative assessed capital at zero", () => {
+    const result = {
+      result_summary: {
+        capital: {
+          combined_assessed_capital: -250,
+          proceeding_types: [{ result: "eligible", upper_threshold: 1_000 }],
+        },
+        gross_income: {
+          combined_total_gross_income: 500,
+          proceeding_types: [{ result: "eligible", upper_threshold: 1_000 }],
+        },
+        overall_result: { result: "eligible" },
+      },
+    };
+
+    const calculations = mapSection(result)?.calculations;
+
+    expect(calculations?.status).to.equal("ready");
+    if (calculations?.status === "ready") {
+      expect(calculations.capital).to.have.property("total", 0);
+    }
+  });
+
   for (const data of [
     { passporting: true },
     { asylum_support: true, immigration_or_asylum: true },
     {
+      passporting: false,
+      asylum_support: true,
+      immigration_or_asylum: true,
+    },
+    {
       aggregated_means: false,
       client_age: "under_18",
+      under_eighteen_assets: false,
+      regular_income: false,
+    },
+    {
+      aggregated_means: false,
+      client_age: "under_18",
+      controlled_legal_representation: false,
       under_eighteen_assets: false,
       regular_income: false,
     },

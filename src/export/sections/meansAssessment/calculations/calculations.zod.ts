@@ -6,6 +6,7 @@ const CFE_OUTCOMES = [
   "eligible",
   "contribution_required",
   "ineligible",
+  "not_calculated",
 ] as const;
 
 const cfeProceedingTypeSchema = zod.looseObject({
