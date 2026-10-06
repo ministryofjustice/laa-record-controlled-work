@@ -395,10 +395,13 @@ describe("Auth Handlers", () => {
       });
 
       expect(established.status).to.equal(FOUND);
-      expect(olderAuthorization?.error).to.be.undefined;
-      if (olderAuthorization?.error === undefined) {
-        expect(olderAuthorization.value).to.be.true;
+      if (
+        olderAuthorization === undefined ||
+        !("value" in olderAuthorization)
+      ) {
+        throw new Error("Older signin authorization did not succeed");
       }
+      expect(olderAuthorization.value).to.be.true;
       expect(newerSignin.status).to.equal(FOUND);
       expect(newerSignin.headers.location).to.equal(
         "https://login.example/newer",
