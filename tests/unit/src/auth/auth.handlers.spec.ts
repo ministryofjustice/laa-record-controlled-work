@@ -1427,6 +1427,23 @@ describe("Auth Handlers", () => {
         expect(res.status).to.equal(BAD_REQUEST);
         expect(res.text).to.equal("Invalid or expired sign-in flow");
       });
+
+      it("responds generically when the flow store returns an error", async () => {
+        const app = createMockApp();
+        const flowStore = createAuthFlowStore();
+        sinon
+          .stub(flowStore, "consume")
+          .returns(failure(new Error("Redis unavailable")));
+        app.locals.authFlowStore = flowStore;
+
+        const response = await request(app)
+          .get("/auth/code/callback")
+          .query(QUERY_PARAMS);
+
+        expect(response.status).to.equal(INTERNAL_SERVER_ERROR);
+        expect(response.text).to.equal("Unable to complete sign-in");
+        expect(authServiceStub.exchangeAuthCode.called).to.be.false;
+      });
     });
 
     describe("relay behavior", () => {
