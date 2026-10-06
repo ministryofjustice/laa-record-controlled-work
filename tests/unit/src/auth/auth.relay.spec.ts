@@ -3,6 +3,7 @@ import { expect } from "chai";
 
 import {
   createRelayState,
+  isRelayStateCandidate,
   isAllowedRelayTarget,
   parseRelayState,
   verifyRelayState,
@@ -10,29 +11,32 @@ import {
 
 const SECRET = "test-session-secret";
 const NONCE = "550e8400-e29b-41d4-a716-446655440000";
+const EXPIRES_AT = 2_000_000_000_000;
 const VALID_TARGET =
   "https://el-257-deploy-laa-record-controlled-work-uat.cloud-platform.service.justice.gov.uk";
 
 describe("authRelay", () => {
   describe("createRelayState / parseRelayState roundtrip", () => {
     it("produces a base64-encoded string that parseRelayState can decode", () => {
-      const state = createRelayState(NONCE, VALID_TARGET, SECRET);
+      const state = createRelayState(NONCE, VALID_TARGET, EXPIRES_AT, SECRET);
       const parsed = parseRelayState(state);
 
       expect(parsed).to.not.be.null;
       expect(parsed!.nonce).to.equal(NONCE);
       expect(parsed!.target).to.equal(VALID_TARGET);
+      expect(parsed!.expiresAt).to.equal(EXPIRES_AT);
       expect(parsed!.signature).to.be.a("string").with.length.greaterThan(0);
     });
 
     it("is decodable by MSAL CryptoProvider.base64Decode without error", () => {
-      const state = createRelayState(NONCE, VALID_TARGET, SECRET);
+      const state = createRelayState(NONCE, VALID_TARGET, EXPIRES_AT, SECRET);
       const crypto = new CryptoProvider();
       const decoded = crypto.base64Decode(state);
       const parsed = JSON.parse(decoded) as Record<string, unknown>;
 
       expect(parsed).to.have.property("nonce", NONCE);
       expect(parsed).to.have.property("target", VALID_TARGET);
+      expect(parsed).to.have.property("expiresAt", EXPIRES_AT);
       expect(parsed).to.have.property("signature");
     });
   });
@@ -60,37 +64,53 @@ describe("authRelay", () => {
       ).toString("base64");
       expect(parseRelayState(state)).to.be.null;
     });
+
+    it("returns null when expiresAt is missing", () => {
+      const state = Buffer.from(
+        JSON.stringify({ nonce: NONCE, signature: "signature", target: VALID_TARGET }),
+      ).toString("base64");
+      expect(parseRelayState(state)).to.be.null;
+      expect(isRelayStateCandidate(state)).to.be.true;
+    });
+
+    it("does not classify a plain OAuth state as a relay candidate", () => {
+      const state = Buffer.from(JSON.stringify({ nonce: NONCE })).toString(
+        "base64",
+      );
+      expect(isRelayStateCandidate(state)).to.be.false;
+    });
   });
 
   describe("verifyRelaySignature", () => {
     it("returns true for a valid signature", () => {
-      const state = createRelayState(NONCE, VALID_TARGET, SECRET);
+      const state = createRelayState(NONCE, VALID_TARGET, EXPIRES_AT, SECRET);
       const parsed = parseRelayState(state)!;
-      expect(verifyRelayState(parsed, SECRET)).to.be.true;
+      expect(verifyRelayState(parsed, SECRET, EXPIRES_AT - 1)).to.be.true;
+      expect(verifyRelayState(parsed, SECRET, EXPIRES_AT)).to.be.false;
     });
 
     it("returns false when the signature has been tampered with", () => {
-      const state = createRelayState(NONCE, VALID_TARGET, SECRET);
+      const state = createRelayState(NONCE, VALID_TARGET, EXPIRES_AT, SECRET);
       const parsed = parseRelayState(state)!;
       parsed.signature = "0".repeat(parsed.signature.length);
       expect(verifyRelayState(parsed, SECRET)).to.be.false;
     });
 
     it("returns false when the target has been tampered with", () => {
-      const state = createRelayState(NONCE, VALID_TARGET, SECRET);
+      const state = createRelayState(NONCE, VALID_TARGET, EXPIRES_AT, SECRET);
       const parsed = parseRelayState(state)!;
       parsed.target = "https://external.com";
       expect(verifyRelayState(parsed, SECRET)).to.be.false;
     });
 
     it("returns false when a different secret is used", () => {
-      const state = createRelayState(NONCE, VALID_TARGET, SECRET);
+      const state = createRelayState(NONCE, VALID_TARGET, EXPIRES_AT, SECRET);
       const parsed = parseRelayState(state)!;
       expect(verifyRelayState(parsed, "wrong-secret")).to.be.false;
     });
 
     it("returns false when the signature length differs", () => {
-      const state = createRelayState(NONCE, VALID_TARGET, SECRET);
+      const state = createRelayState(NONCE, VALID_TARGET, EXPIRES_AT, SECRET);
       const parsed = parseRelayState(state)!;
       parsed.signature = "short";
       expect(verifyRelayState(parsed, SECRET)).to.be.false;

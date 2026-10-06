@@ -1,0 +1,368 @@
+import type { AuthorizationCodeRequest } from "@azure/msal-node";
+import type { RedisClientType } from "redis";
+
+import { createHash, randomUUID } from "node:crypto";
+import { z } from "zod";
+
+import config from "#/config.js";
+import { MINUTE } from "#/lib/constants/time.js";
+import { type Either, failure, success } from "#/lib/either.js";
+import { getRedisClient } from "#/lib/redis.js";
+
+const AUTH_FLOW_KEY_PREFIX = "auth-flow:v1:";
+const MEMORY_ENVIRONMENTS = new Set(["development", "docker", "test"]);
+const REDIS_SUCCESS = 1;
+
+export interface AuthFlow {
+  authCodeRequest: AuthorizationCodeRequest;
+  authState: string;
+  returnTo: string;
+}
+
+export interface AuthFlowReservation {
+  expiresAt: number;
+  reservationId: string;
+}
+
+export interface AuthFlowStore {
+  abandon: (sessionId: string, reservationId: string) => StoreResult<void>;
+  authorizeRedirect: (
+    sessionId: string,
+    reservationId: string,
+  ) => StoreResult<boolean>;
+  consume: (
+    sessionId: string,
+    authState: string,
+  ) => StoreResult<AuthFlow | undefined>;
+  publish: (
+    sessionId: string,
+    reservationId: string,
+    flow: AuthFlow,
+  ) => StoreResult<boolean>;
+  reserve: (sessionId: string) => StoreResult<AuthFlowReservation>;
+}
+
+interface AuthFlowRecord extends AuthFlowReservation {
+  authCodeRequest?: AuthorizationCodeRequest;
+  authState?: string;
+  returnTo?: string;
+  status: "pending" | "ready";
+}
+
+interface AuthFlowStoreOptions {
+  now?: () => number;
+  redisClient?: RedisClientType;
+}
+
+type StoreResult<Value> = Either<Error, Value> | Promise<Either<Error, Value>>;
+
+const authCodeRequestSchema = z
+  .object({
+    code: z.string(),
+    codeVerifier: z.string(),
+    redirectUri: z.string(),
+    scopes: z.array(z.string()),
+  })
+  .loose()
+  .transform((request) => request as AuthorizationCodeRequest);
+
+const authFlowRecordSchema = z.object({
+  authCodeRequest: authCodeRequestSchema.optional(),
+  authState: z.string().optional(),
+  expiresAt: z.number().int(),
+  reservationId: z.string(),
+  returnTo: z.string().optional(),
+  status: z.enum(["pending", "ready"]),
+});
+
+const RESERVE_SCRIPT = `
+local time = redis.call("TIME")
+local now = tonumber(time[1]) * 1000 + math.floor(tonumber(time[2]) / 1000)
+local expiresAt = now + tonumber(ARGV[2])
+local record = cjson.encode({
+  reservationId = ARGV[1],
+  expiresAt = expiresAt,
+  status = "pending"
+})
+redis.call("SET", KEYS[1], record, "PXAT", expiresAt)
+return tostring(expiresAt)
+`;
+
+const PUBLISH_SCRIPT = `
+local recordText = redis.call("GET", KEYS[1])
+if not recordText then return 0 end
+local ok, record = pcall(cjson.decode, recordText)
+if not ok then return redis.error_reply("Invalid auth flow record") end
+if record.reservationId ~= ARGV[1] or record.status ~= "pending" then return 0 end
+local time = redis.call("TIME")
+local now = tonumber(time[1]) * 1000 + math.floor(tonumber(time[2]) / 1000)
+if now >= tonumber(record.expiresAt) then
+  redis.call("DEL", KEYS[1])
+  return 0
+end
+record.status = "ready"
+record.authState = ARGV[2]
+record.authCodeRequest = cjson.decode(ARGV[3])
+record.returnTo = ARGV[4]
+redis.call("SET", KEYS[1], cjson.encode(record), "PXAT", record.expiresAt)
+return 1
+`;
+
+const AUTHORIZE_SCRIPT = `
+local recordText = redis.call("GET", KEYS[1])
+if not recordText then return 0 end
+local ok, record = pcall(cjson.decode, recordText)
+if not ok then return redis.error_reply("Invalid auth flow record") end
+if record.reservationId ~= ARGV[1] or record.status ~= "ready" then return 0 end
+local time = redis.call("TIME")
+local now = tonumber(time[1]) * 1000 + math.floor(tonumber(time[2]) / 1000)
+if now >= tonumber(record.expiresAt) then
+  redis.call("DEL", KEYS[1])
+  return 0
+end
+return 1
+`;
+
+const CONSUME_SCRIPT = `
+local recordText = redis.call("GET", KEYS[1])
+if not recordText then return false end
+local ok, record = pcall(cjson.decode, recordText)
+if not ok then return redis.error_reply("Invalid auth flow record") end
+if record.status ~= "ready" or record.authState ~= ARGV[1] then return false end
+local time = redis.call("TIME")
+local now = tonumber(time[1]) * 1000 + math.floor(tonumber(time[2]) / 1000)
+if now >= tonumber(record.expiresAt) then
+  redis.call("DEL", KEYS[1])
+  return false
+end
+redis.call("DEL", KEYS[1])
+return recordText
+`;
+
+const ABANDON_SCRIPT = `
+local recordText = redis.call("GET", KEYS[1])
+if not recordText then return 0 end
+local ok, record = pcall(cjson.decode, recordText)
+if not ok then return redis.error_reply("Invalid auth flow record") end
+if record.reservationId ~= ARGV[1] then return 0 end
+redis.call("DEL", KEYS[1])
+return 1
+`;
+
+const createMemoryAuthFlowStore = (now: () => number): AuthFlowStore => {
+  const flows = new Map<string, AuthFlowRecord>();
+
+  return {
+    abandon: (sessionId, reservationId) => {
+      if (flows.get(sessionId)?.reservationId === reservationId) {
+        flows.delete(sessionId);
+      }
+      return success(undefined);
+    },
+    authorizeRedirect: (sessionId, reservationId) => {
+      const current = flows.get(sessionId);
+      if (
+        current?.reservationId !== reservationId ||
+        current?.status !== "ready"
+      ) {
+        return success(false);
+      }
+      if (now() >= current.expiresAt) {
+        flows.delete(sessionId);
+        return success(false);
+      }
+      return success(true);
+    },
+    consume: (sessionId, authState) => {
+      const current = flows.get(sessionId);
+      if (current?.status !== "ready" || current.authState !== authState) {
+        return success(undefined);
+      }
+      if (now() >= current.expiresAt) {
+        flows.delete(sessionId);
+        return success(undefined);
+      }
+      flows.delete(sessionId);
+      return success(toAuthFlow(current));
+    },
+    publish: (sessionId, reservationId, flow) => {
+      const current = flows.get(sessionId);
+      if (
+        current?.reservationId !== reservationId ||
+        current?.status !== "pending"
+      ) {
+        return success(false);
+      }
+      if (now() >= current.expiresAt) {
+        flows.delete(sessionId);
+        return success(false);
+      }
+      flows.set(sessionId, { ...current, ...flow, status: "ready" });
+      return success(true);
+    },
+    reserve: (sessionId) => {
+      const reservation = {
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- intuitive
+        expiresAt: now() + 10 * MINUTE,
+        reservationId: randomUUID(),
+      };
+      flows.set(sessionId, { ...reservation, status: "pending" });
+      return success(reservation);
+    },
+  };
+};
+
+const createRedisAuthFlowStore = (client: RedisClientType): AuthFlowStore => ({
+  abandon: async (sessionId, reservationId) => {
+    const result = await runRedis({
+      args: [reservationId],
+      client,
+      decode: () => undefined,
+      script: ABANDON_SCRIPT,
+      sessionId,
+    });
+    return result;
+  },
+  authorizeRedirect: async (sessionId, reservationId) => {
+    const result = await runRedis({
+      args: [reservationId],
+      client,
+      decode: (value) => value === REDIS_SUCCESS,
+      script: AUTHORIZE_SCRIPT,
+      sessionId,
+    });
+    return result;
+  },
+  consume: async (sessionId, authState) => {
+    const result = await runRedis({
+      args: [authState],
+      client,
+      decode: parseConsumedFlow,
+      script: CONSUME_SCRIPT,
+      sessionId,
+    });
+    return result;
+  },
+  publish: async (sessionId, reservationId, flow) => {
+    const result = await runRedis({
+      args: [
+        reservationId,
+        flow.authState,
+        JSON.stringify(flow.authCodeRequest),
+        flow.returnTo,
+      ],
+      client,
+      decode: (value) => value === REDIS_SUCCESS,
+      script: PUBLISH_SCRIPT,
+      sessionId,
+    });
+    return result;
+  },
+  reserve: async (sessionId) => {
+    const reservationId = randomUUID();
+    const result = await runRedis({
+      // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- intuitive
+      args: [reservationId, String(10 * MINUTE)],
+      client,
+      decode: (value) => {
+        if (typeof value !== "string" && typeof value !== "number") {
+          throw new Error("Auth flow reservation failed");
+        }
+        const expiresAt = Number(value);
+        if (!Number.isSafeInteger(expiresAt)) {
+          throw new Error("Auth flow reservation failed");
+        }
+        return { expiresAt, reservationId };
+      },
+      script: RESERVE_SCRIPT,
+      sessionId,
+    });
+    return result;
+  },
+});
+
+/**
+ * Creates Redis storage or permitted local in-memory storage.
+ * @param options - Optional clock and Redis-client overrides.
+ * @returns A flow store for the configured environment.
+ */
+export function createAuthFlowStore(
+  options: AuthFlowStoreOptions = {},
+): AuthFlowStore {
+  if (config.redis.enabled) {
+    return createRedisAuthFlowStore(options.redisClient ?? getRedisClient());
+  }
+  if (!MEMORY_ENVIRONMENTS.has(config.app.environment)) {
+    throw new Error("Redis is required for authentication flow storage");
+  }
+  return createMemoryAuthFlowStore(options.now ?? Date.now);
+}
+
+let authFlowStore: AuthFlowStore | undefined;
+
+/**
+ * Returns the process-wide auth-flow store instance.
+ * @returns The cached flow-store instance.
+ */
+export function getAuthFlowStore(): AuthFlowStore {
+  authFlowStore ??= createAuthFlowStore();
+  return authFlowStore;
+}
+
+const asError = (error: unknown): Error =>
+  error instanceof Error ? error : new Error("Auth flow store failed");
+
+const getAuthFlowKey = (sessionId: string): string => {
+  const sessionHash = createHash("sha256").update(sessionId).digest("hex");
+  return `${AUTH_FLOW_KEY_PREFIX}${sessionHash}`;
+};
+
+const toAuthFlow = (record: AuthFlowRecord): AuthFlow => {
+  if (
+    record.authCodeRequest === undefined ||
+    record.authState === undefined ||
+    record.returnTo === undefined
+  ) {
+    throw new Error("Invalid auth flow record");
+  }
+  return {
+    authCodeRequest: record.authCodeRequest,
+    authState: record.authState,
+    returnTo: record.returnTo,
+  };
+};
+
+const parseConsumedFlow = (result: unknown): AuthFlow | undefined => {
+  if (typeof result !== "string") return undefined;
+  const parsed = authFlowRecordSchema.safeParse(JSON.parse(result));
+  if (!parsed.success || parsed.data.status !== "ready") {
+    throw new Error("Invalid auth flow record");
+  }
+  return toAuthFlow(parsed.data);
+};
+
+interface RedisOperation<Value> {
+  args: string[];
+  client: RedisClientType;
+  decode: (result: unknown) => Value;
+  script: string;
+  sessionId: string;
+}
+
+const runRedis = async <Value>({
+  args,
+  client,
+  decode,
+  script,
+  sessionId,
+}: RedisOperation<Value>): Promise<Either<Error, Value>> => {
+  try {
+    const result = await client.eval(script, {
+      arguments: args,
+      keys: [getAuthFlowKey(sessionId)],
+    });
+    return success(decode(result));
+  } catch (error) {
+    return failure(asError(error));
+  }
+};

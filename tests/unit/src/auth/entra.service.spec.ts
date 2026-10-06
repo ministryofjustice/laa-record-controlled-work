@@ -22,6 +22,7 @@ import {
   TokenAcquisitionError,
   TokenRefreshError,
 } from "#/auth/auth.errors.js";
+import { MINUTE } from "#/lib/constants/time.js";
 
 describe("EntraService", () => {
   let msalStub: Partial<ConfidentialClientApplication>;
@@ -43,6 +44,7 @@ describe("EntraService", () => {
   };
   const DOWNSTREAM_SCOPES = ["api://rcw/Applications.Read"];
   const TOKEN_EXPIRY = new Date(Date.now() + 3600 * 1000);
+  const FLOW_EXPIRY = Date.now() + 10 * MINUTE;
   const SESSION_SECRET = process.env.SESSION_SECRET as string;
   const REDIRECT_URI_HOSTNAME = new URL(authRequestDefaults.redirectUri)
     .hostname;
@@ -228,6 +230,7 @@ describe("EntraService", () => {
       const result =
         (await ephemeralService.initiateAuthCodeFlow(undefined, {
           callbackHostname: EPHEMERAL_HOSTNAME,
+          expiresAt: FLOW_EXPIRY,
         })) as Success<AuthCodeFlowState>;
       const parsed = parseRelayState(result.value.authState);
       expect(parsed).to.not.be.null;
