@@ -3,7 +3,11 @@ import type { NextFunction, Request, Response } from "express";
 import { AuthError } from "@azure/msal-node";
 import { promisify } from "node:util";
 
-import { type AuthFlow, getAuthFlowStore } from "#/auth/auth.flow-store.js";
+import {
+  type AuthFlow,
+  type AuthFlowStore,
+  getAuthFlowStore,
+} from "#/auth/auth.flow-store.js";
 import { getValidatedReturnTo } from "#/auth/auth.redirect.js";
 import {
   isAllowedRelayTarget,
@@ -52,11 +56,7 @@ export async function authCodeCallback(
 
     if (handleRelay(callbackData, req, res)) return;
 
-    const flow = await consumeCallbackFlow(
-      req.sessionID,
-      callbackData.state,
-      res,
-    );
+    const flow = await consumeCallbackFlow(req, callbackData.state, res);
     if (flow === undefined) return;
     if ("error" in callbackData) {
       res.status(BAD_REQUEST).type("text/plain").send("Entra sign-in failed");
@@ -179,18 +179,21 @@ async function completeAuthCodeCallback(
 
 /**
  * Returns a matching unexpired flow, responding generically on store failure.
- * @param sessionId - The callback's initiating session ID.
+ * @param req - The callback request.
  * @param authState - The callback state value.
  * @param res - The callback response.
  * @returns The consumed flow, or undefined after responding.
  */
 async function consumeCallbackFlow(
-  sessionId: string,
+  req: Request,
   authState: string,
   res: Response,
 ): Promise<AuthFlow | undefined> {
   try {
-    const consumed = await getAuthFlowStore().consume(sessionId, authState);
+    const consumed = await getRequestAuthFlowStore(req).consume(
+      req.sessionID,
+      authState,
+    );
     if (consumed.error) {
       res.status(INTERNAL_SERVER_ERROR).send("Unable to complete sign-in");
       return;
@@ -227,6 +230,17 @@ async function destroySession(req: Request): Promise<void> {
     },
   );
   await destroy();
+}
+
+/**
+ * Returns the app-scoped flow store, or the production singleton by default.
+ * @param req - The request whose app may provide a store.
+ * @returns The app store when supplied, otherwise the default store.
+ */
+function getRequestAuthFlowStore(req: Request): AuthFlowStore {
+  const store: unknown = req.app.locals.authFlowStore;
+  if (isAuthFlowStore(store)) return store;
+  return getAuthFlowStore();
 }
 
 /**
@@ -304,6 +318,23 @@ function handleRelay(data: CallbackData, req: Request, res: Response): boolean {
 }
 
 /**
+ * Checks that an app-local value implements the flow-store contract.
+ * @param value - The value to check.
+ * @returns True when all flow-store operations are functions.
+ */
+function isAuthFlowStore(value: unknown): value is AuthFlowStore {
+  if (typeof value !== "object" || value === null) return false;
+
+  return [
+    "abandon",
+    "authorizeRedirect",
+    "consume",
+    "publish",
+    "reserve",
+  ].every((operation) => typeof Reflect.get(value, operation) === "function");
+}
+
+/**
  * Saves authenticated state or destroys the failed session and cache partition.
  * @param req - The authenticated callback request.
  * @param res - The callback response.
@@ -344,7 +375,7 @@ async function prepareSignInFlow(
   req: Request,
   returnTo: string,
 ): Promise<string> {
-  const flowStore = getAuthFlowStore();
+  const flowStore = getRequestAuthFlowStore(req);
   const reservation = await flowStore.reserve(req.sessionID);
   if (reservation.error) throw reservation.error;
 
