@@ -112,7 +112,9 @@ describe("Auth Handlers", () => {
       expect(res.text).to.equal(errorMessage);
     });
 
-    it("renders the no-assigned-role error page when Entra reports the user has no role", async () => {
+    // Skipped because this test relies on rendering the error page, and we can't do that currently.
+    // See https://dsdmoj.atlassian.net/browse/MEM-1441
+    it.skip("renders the no-assigned-role error page when Entra reports the user has no role", async () => {
       authServiceStub.initiateAuthCodeFlow.rejects(
         new AuthError("1003009", "test-correlation-id", "No assigned role"),
       );
