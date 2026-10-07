@@ -90,38 +90,17 @@ jobs:
         run: yarn npm audit
 
   snyk:
-    name: Snyk Security Scan
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-        with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
-
-      - name: Build local Docker image
-        working-directory: ${{ github.workspace }}
-        run: |
-          docker build -t laa-record-controlled-work ./
-          docker save laa-record-controlled-work -o image.tar
-
-      - name: Obtain Snyk OAuth token
-        id: snyk_auth
-        uses: ministryofjustice/laa-reusable-github-actions/.github/actions/snyk-auth@6db001458db30ae747d9eb8eb25707ce52b359bc
-        with:
-          client_id: ${{ secrets.SNYK_CLIENT_ID }}
-          client_secret: ${{ secrets.SNYK_CLIENT_SECRET }}
-
-      - name: Run Snyk to scan Docker image from tarball
-        uses: snyk/actions/docker@b075801f26076be9bb50521154cafab73f44da0c # master
-        with:
-          image: image.tar
-          args: --docker --severity-threshold=high --policy-path=.snyk
-        env:
-          SNYK_OAUTH_TOKEN: ${{ steps.snyk_auth.outputs.token }}
-
-  snyk-infra:
     name: Snyk
-    uses: ./.github/workflows/snyk-infra.yml
+    needs: build-image
+    permissions:
+      actions: read
+      contents: read
+      id-token: write
+      security-events: write
+    uses: ./.github/workflows/snyk.yml
+    with:
+      source_sha: ${{ github.event.pull_request.head.sha || github.sha }}
+      image_uri: ${{ needs.build-image.outputs.image_uri }}
     secrets: inherit
 
   mocha-tests:
@@ -148,6 +127,9 @@ jobs:
   build-image:
     name: Build Docker Image
     runs-on: ubuntu-latest
+    outputs:
+      image_digest: ${{ steps.build-and-push.outputs.image_digest }}
+      image_uri: ${{ steps.build-and-push.outputs.image_uri }}
     permissions:
       id-token: write
       contents: read
@@ -178,6 +160,7 @@ jobs:
             ${{ runner.os }}-buildx-
 
       - name: Build and push image with local action
+        id: build-and-push
         uses: ./.github/actions/build_and_push
         with:
           image_registry: ${{ secrets.ECR_REGISTRY_URL }}
@@ -194,7 +177,6 @@ jobs:
       - code-linting
       - code-security-audit
       - snyk
-      - snyk-infra
       - mocha-tests
       - playwright
       - e2e
@@ -213,7 +195,7 @@ jobs:
             :red_circle: *CI failed for RCW `main` branch*
 
             Jobs monitored: 
-            `code-linting`, `code-security-audit`, `snyk`, `snyk-infra`, `mocha-unit-tests`, `playwright`, `build-image`
+            `code-linting`, `code-security-audit`, `snyk`, `mocha-unit-tests`, `playwright`, `build-image`
             
             Run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/attempts/${{ github.run_attempt }}
 
@@ -236,7 +218,6 @@ jobs:
       - mocha-tests
       - playwright
       - e2e
-      - snyk-infra
     secrets: inherit
 
   deploy-staging:
