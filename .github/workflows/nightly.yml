@@ -85,6 +85,30 @@ jobs:
     with:
       source_sha: ${{ github.sha }}
       scan_mode: absolute
+      fail_on_findings: true
       image_digest: ${{ needs.resolve-main-image.outputs.image_digest }}
       image_repo: ${{ vars.ECR_REPOSITORY }}
     secrets: inherit
+
+  notify-nightly-snyk-failure:
+    name: Notify Nightly Snyk Failure
+    if: ${{ always() && github.ref == 'refs/heads/main' && contains(needs.*.result, 'failure') }}
+    runs-on: ubuntu-latest
+    environment: uat
+    needs:
+      - resolve-main-image
+      - snyk
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Notify Slack on nightly Snyk failure
+        uses: ./.github/actions/notify-slack
+        with:
+          slack-bot-token: ${{ secrets.SLACK_ALERTS_BOT_TOKEN }}
+          slack-channel-id: ${{ vars.SLACK_ALERTS_CHANNEL_ID }}
+          slack-mention: ${{ vars.SLACK_ALERTS_MENTION }}
+          message: |
+            :red_circle: *Nightly Snyk scan failed for RCW `main` branch*
+
+            Run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/attempts/${{ github.run_attempt }}

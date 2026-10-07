@@ -6,6 +6,7 @@ image_uri=${IMAGE_URI:-}
 image_reference=${IMAGE_REFERENCE:-}
 scan_mode=${SCAN_MODE:-absolute}
 report_to_snyk=${REPORT_TO_SNYK:-false}
+findings_are_errors=${FAIL_ON_FINDINGS:-false}
 report_dir=${SNYK_REPORT_DIR:-sarif}
 render_dir=${SNYK_RENDER_DIR:-rendered-templates}
 summary_path=${GITHUB_STEP_SUMMARY:-}
@@ -38,6 +39,11 @@ fi
 
 if [[ "$report_to_snyk" != "true" && "$report_to_snyk" != "false" ]]; then
   echo "::error::REPORT_TO_SNYK must be true or false"
+  exit 1
+fi
+
+if [[ "$findings_are_errors" != "true" && "$findings_are_errors" != "false" ]]; then
+  echo "::error::FAIL_ON_FINDINGS must be true or false"
   exit 1
 fi
 
@@ -100,11 +106,6 @@ fi
 run_scan() {
   local name=$1
   shift
-  local fail_on_findings=false
-  if [[ "${1:-}" == "--fail-on-findings" ]]; then
-    fail_on_findings=true
-    shift
-  fi
   local exit_code
 
   echo "::group::Snyk $name"
@@ -118,7 +119,7 @@ run_scan() {
   case "$exit_code" in
     0) record_status "$name" passed ;;
     1)
-      if [[ "$fail_on_findings" == "true" ]]; then
+      if [[ "$findings_are_errors" == "true" ]]; then
         echo "::error::Snyk $name found high-severity findings"
         overall_status=1
       else
@@ -165,7 +166,7 @@ run_delta_scan() {
 }
 
 if [[ "$scan_mode" == "monitor" ]]; then
-  run_scan "Open Source monitoring" --fail-on-findings snyk monitor \
+  run_scan "Open Source monitoring" snyk monitor \
     --org="$SNYK_ORG_ID" --dev \
     --project-name=laa-record-controlled-work-open-source \
     --target-reference=main "${policy_args[@]}"
@@ -173,7 +174,7 @@ else
   if [[ "$scan_mode" == "delta" ]]; then
     run_delta_scan
   else
-    run_scan "Open Source" --fail-on-findings snyk test --all-projects --dev \
+    run_scan "Open Source" snyk test --all-projects --dev \
       --severity-threshold=high \
       --sarif-file-output="$report_dir/snyk-open-source.sarif" "${policy_args[@]}"
   fi
@@ -189,14 +190,13 @@ else
       --target-reference=main "${policy_args[@]}"
   fi
 
+  code_args=(--severity-threshold=high)
   if [[ "$report_to_snyk" == "true" ]]; then
-    run_scan "Code" snyk code test --severity-threshold=high --report \
-      --project-name=laa-record-controlled-work-code --target-reference=main \
-      --sarif-file-output="$report_dir/snyk-code.sarif"
-  else
-    run_scan "Code" snyk code test --severity-threshold=high \
-      --sarif-file-output="$report_dir/snyk-code.sarif"
+    code_args+=(--report \
+      --project-name=laa-record-controlled-work-code --target-reference=main)
   fi
+  code_args+=(--sarif-file-output="$report_dir/snyk-code.sarif")
+  run_scan "Code" snyk code test "${code_args[@]}"
 
   render_status=passed
   for environment in uat staging production; do
@@ -216,14 +216,13 @@ else
     printf '| Helm rendering | %s |\n' "$render_status" >> "$summary_path"
   fi
 
+  iac_args=("$render_dir" --severity-threshold=high)
   if [[ "$report_to_snyk" == "true" ]]; then
-    run_scan "IaC" snyk iac test "$render_dir" --severity-threshold=high \
-      --report --target-name=laa-record-controlled-work-iac --target-reference=main \
-      --sarif-file-output="$report_dir/snyk-iac.sarif" "${policy_args[@]}"
-  else
-    run_scan "IaC" snyk iac test "$render_dir" --severity-threshold=high \
-      --sarif-file-output="$report_dir/snyk-iac.sarif" "${policy_args[@]}"
+    iac_args+=(--report \
+      --target-name=laa-record-controlled-work-iac --target-reference=main)
   fi
+  iac_args+=(--sarif-file-output="$report_dir/snyk-iac.sarif" "${policy_args[@]}")
+  run_scan "IaC" snyk iac test "${iac_args[@]}"
 fi
 
 if [[ -n "$summary_path" ]]; then
