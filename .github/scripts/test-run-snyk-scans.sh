@@ -42,6 +42,7 @@ run_case() {
   local monitor_exit=${4:-0}
   local snyk_org_id=${5-test-org-id}
   local fail_on_findings=${6:-false}
+  local report_to_snyk=${7:-false}
   local image_uri=registry.example/app@sha256:$(printf 'a%.0s' {1..64})
 
   if [[ "$scan_mode" == "monitor" ]]; then
@@ -56,7 +57,7 @@ run_case() {
     SOURCE_SHA=0123456789012345678901234567890123456789 \
     IMAGE_URI="$image_uri" \
     IMAGE_REFERENCE=registry.example/app \
-    REPORT_TO_SNYK=false \
+    REPORT_TO_SNYK="$report_to_snyk" \
     SNYK_TOKEN=test-token \
     SNYK_ORG_ID="$snyk_org_id" \
     SNYK_CALL_LOG="$tmp_dir/calls.log" \
@@ -126,6 +127,14 @@ if ! run_case absolute 1 0; then
   exit 1
 fi
 assert_logged 'snyk test --all-projects --dev --severity-threshold=high --sarif-file-output='
+
+if ! run_case absolute 0 0 0 test-org-id false true; then
+  cat "$tmp_dir/output.log" >&2
+  echo 'Snyk reporting should allow absolute scans to complete' >&2
+  exit 1
+fi
+assert_logged 'snyk code test --severity-threshold=high --report --project-name=laa-record-controlled-work-code --target-reference=main --sarif-file-output='
+assert_logged '--severity-threshold=high --report --target-name=laa-record-controlled-work-iac --target-reference=main --sarif-file-output='
 
 if run_case absolute 1 0 0 test-org-id true; then
   echo 'High findings should fail when strict findings are enabled' >&2

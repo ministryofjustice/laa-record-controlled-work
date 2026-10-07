@@ -106,7 +106,6 @@ fi
 run_scan() {
   local name=$1
   shift
-  local fail_on_findings=$findings_are_errors
   local exit_code
 
   echo "::group::Snyk $name"
@@ -120,7 +119,7 @@ run_scan() {
   case "$exit_code" in
     0) record_status "$name" passed ;;
     1)
-      if [[ "$fail_on_findings" == "true" ]]; then
+      if [[ "$findings_are_errors" == "true" ]]; then
         echo "::error::Snyk $name found high-severity findings"
         overall_status=1
       else
@@ -191,14 +190,13 @@ else
       --target-reference=main "${policy_args[@]}"
   fi
 
+  code_args=(--severity-threshold=high)
   if [[ "$report_to_snyk" == "true" ]]; then
-    run_scan "Code" snyk code test --severity-threshold=high --report \
-      --project-name=laa-record-controlled-work-code --target-reference=main \
-      --sarif-file-output="$report_dir/snyk-code.sarif"
-  else
-    run_scan "Code" snyk code test --severity-threshold=high \
-      --sarif-file-output="$report_dir/snyk-code.sarif"
+    code_args+=(--report \
+      --project-name=laa-record-controlled-work-code --target-reference=main)
   fi
+  code_args+=(--sarif-file-output="$report_dir/snyk-code.sarif")
+  run_scan "Code" snyk code test "${code_args[@]}"
 
   render_status=passed
   for environment in uat staging production; do
@@ -218,14 +216,13 @@ else
     printf '| Helm rendering | %s |\n' "$render_status" >> "$summary_path"
   fi
 
+  iac_args=("$render_dir" --severity-threshold=high)
   if [[ "$report_to_snyk" == "true" ]]; then
-    run_scan "IaC" snyk iac test "$render_dir" --severity-threshold=high \
-      --report --target-name=laa-record-controlled-work-iac --target-reference=main \
-      --sarif-file-output="$report_dir/snyk-iac.sarif" "${policy_args[@]}"
-  else
-    run_scan "IaC" snyk iac test "$render_dir" --severity-threshold=high \
-      --sarif-file-output="$report_dir/snyk-iac.sarif" "${policy_args[@]}"
+    iac_args+=(--report \
+      --target-name=laa-record-controlled-work-iac --target-reference=main)
   fi
+  iac_args+=(--sarif-file-output="$report_dir/snyk-iac.sarif" "${policy_args[@]}")
+  run_scan "IaC" snyk iac test "${iac_args[@]}"
 fi
 
 if [[ -n "$summary_path" ]]; then
