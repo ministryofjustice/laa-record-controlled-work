@@ -26,6 +26,11 @@ if [[ "$scan_mode" == "delta" && -z "${SNYK_TOKEN:-}" ]]; then
   exit 1
 fi
 
+if [[ "$scan_mode" == "delta" || "$scan_mode" == "monitor" ]] && [[ -z "${SNYK_ORG_ID:-}" ]]; then
+  echo "::error::SNYK_ORG_ID is required for Snyk Delta and monitoring"
+  exit 1
+fi
+
 if [[ "$scan_mode" != "monitor" && ! "$image_uri" =~ ^[^[:space:]@]+@sha256:[a-f0-9]{64}$ ]]; then
   echo "::error::image_uri must reference an immutable sha256 digest"
   exit 1
@@ -134,7 +139,10 @@ run_delta_scan() {
   local -a pipeline_status
 
   echo "::group::Snyk Open Source Delta"
-  snyk test --dev --severity-threshold=high --json --print-deps "${policy_args[@]}" \
+  snyk test --org="$SNYK_ORG_ID" \
+    --project-name=laa-record-controlled-work-open-source \
+    --target-reference=main \
+    --dev --severity-threshold=high --json --print-deps "${policy_args[@]}" \
     | snyk-delta --targetReference main
   pipeline_status=("${PIPESTATUS[@]}")
   echo "::endgroup::"
@@ -157,7 +165,8 @@ run_delta_scan() {
 }
 
 if [[ "$scan_mode" == "monitor" ]]; then
-  run_scan "Open Source monitoring" --fail-on-findings snyk monitor --dev \
+  run_scan "Open Source monitoring" --fail-on-findings snyk monitor \
+    --org="$SNYK_ORG_ID" --dev \
     --project-name=laa-record-controlled-work-open-source \
     --target-reference=main "${policy_args[@]}"
 else

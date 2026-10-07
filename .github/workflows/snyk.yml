@@ -153,6 +153,7 @@ jobs:
           SOURCE_SHA: ${{ inputs.source_sha }}
           SNYK_OAUTH_TOKEN: ${{ steps.snyk-auth.outputs.token }}
           SNYK_TOKEN: ${{ steps.snyk-auth.outputs.token }}
+          SNYK_ORG_ID: ${{ vars.SNYK_ORG_ID }}
           SNYK_REPORT_DIR: sarif
           SNYK_RENDER_DIR: rendered-templates
           SETUP_NODE_OUTCOME: ${{ steps.setup-node.outcome }}

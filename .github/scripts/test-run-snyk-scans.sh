@@ -40,6 +40,7 @@ run_case() {
   local snyk_test_exit=$2
   local delta_exit=$3
   local monitor_exit=${4:-0}
+  local snyk_org_id=${5-test-org-id}
   local image_uri=registry.example/app@sha256:$(printf 'a%.0s' {1..64})
 
   if [[ "$scan_mode" == "monitor" ]]; then
@@ -55,6 +56,7 @@ run_case() {
     IMAGE_REFERENCE=registry.example/app \
     REPORT_TO_SNYK=false \
     SNYK_TOKEN=test-token \
+    SNYK_ORG_ID="$snyk_org_id" \
     SNYK_CALL_LOG="$tmp_dir/calls.log" \
     SNYK_TEST_EXIT="$snyk_test_exit" \
     SNYK_DELTA_EXIT="$delta_exit" \
@@ -86,7 +88,7 @@ if ! run_case delta 1 0; then
   echo 'Existing high findings should pass when Delta finds no regression' >&2
   exit 1
 fi
-assert_logged 'snyk test --dev --severity-threshold=high --json --print-deps'
+assert_logged 'snyk test --org=test-org-id --project-name=laa-record-controlled-work-open-source --target-reference=main --dev --severity-threshold=high --json --print-deps'
 assert_logged 'snyk-delta --targetReference main'
 
 if run_case delta 1 1; then
@@ -107,6 +109,15 @@ if ! grep -Fq 'Snyk Delta failed with exit code 2' "$tmp_dir/output.log"; then
   exit 1
 fi
 
+if run_case delta 1 0 0 ''; then
+  echo 'Delta mode should require an explicit Snyk organization' >&2
+  exit 1
+fi
+if ! grep -Fq 'SNYK_ORG_ID is required' "$tmp_dir/output.log"; then
+  echo 'The missing organization should be reported clearly' >&2
+  exit 1
+fi
+
 if run_case absolute 1 0; then
   echo 'High findings should fail the absolute gate' >&2
   exit 1
@@ -118,7 +129,7 @@ if ! run_case monitor 0 0; then
   echo 'Baseline monitoring should pass without an image' >&2
   exit 1
 fi
-assert_logged 'snyk monitor --dev'
+assert_logged 'snyk monitor --org=test-org-id --dev --project-name=laa-record-controlled-work-open-source --target-reference=main'
 if grep -Fq 'container test' "$tmp_dir/calls.log"; then
   echo 'Monitor mode should run only the Open Source monitor' >&2
   exit 1

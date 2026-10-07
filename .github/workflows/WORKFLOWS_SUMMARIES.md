@@ -24,6 +24,10 @@ Snyk Code, and rendered UAT, staging, and production manifests. The CLI is
 pinned to `1.1307.4`; `snyk-delta` is pinned to `1.14.0`. CICD scans the
 immutable image digest returned by Docker push.
 
+PR Delta tests and post-merge monitoring use the same explicit `SNYK_ORG_ID`,
+project name, and `main` target reference. Configure `SNYK_ORG_ID` as a
+repository Actions variable so Delta compares against the intended baseline.
+
 After main deploys to staging, `snyk-monitor` runs `snyk monitor` to update the
 accepted Open Source baseline. Nightly scans do not update that baseline.
 
@@ -42,6 +46,7 @@ adapted for the RCW four-scan and digest contract.
 ## Environment & Secrets
 
 `SNYK_CLIENT_ID` and `SNYK_CLIENT_SECRET` - Snyk OAuth credentials used to obtain a short-lived scan token
+`SNYK_ORG_ID` - Snyk organization ID used by Delta and baseline monitoring
 `ECR_ROLE_TO_ASSUME`,`ECR_REGION`,`ECR_REGISTRY_URL`,`ECR_REPOSITORY`,`KUBE_NAMESPACE`,`KUBE_CLUSTER`,`KUBE_TOKEN`,`KUBE_CERT` - These are automated generated in github repo during namespace/container deployment set up see deployment readme
 
 `environment: uat` - We are using env specific environment secrets and variables via our deployment script/values.ylm files and our github environment.
