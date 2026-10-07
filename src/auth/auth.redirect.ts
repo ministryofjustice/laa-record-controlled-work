@@ -55,11 +55,6 @@ function isCandidateReturnTo(value: unknown): value is string {
 }
 
 /**
- * Checks each encoded pathname layer before URL normalization.
- * @param pathname - Parsed URL pathname.
- * @returns True when the pathname is safe for a local redirect.
- */
-/**
  * Checks that a parsed path stays outside the auth subtree.
  * @param pathname - Parsed URL pathname.
  * @returns True when the path is local and not under `/auth`.
