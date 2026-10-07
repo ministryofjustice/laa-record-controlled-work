@@ -1,14 +1,42 @@
-# Deploy Workflow Summary
+# CICD Workflow Summary
 
-Triggers on push to any branch and can be triggered manually.
+Runs for pull requests, main pushes, merge groups, and manual dispatches.
 
-`code-linting` - ESLint checks 
-`code-security-audit` - Yarn npm audit for vulnerabilities
-`snyk` - Snyk Docker image security scan
-`mocha-unit-tests` - Unit tests 
-`playwright` - E2E/accessibility tests
-`build-image` - Build & push Docker image to ECR
-`deploy-uat` - Deploy to UAT environment when all above flows pass.
+`code-linting` - ESLint and Knip dependency checks.
+`verify-api-code-generation` - Checks generated RCW API client code matches the OpenAPI specification.
+`code-security-audit` - Runs `yarn npm audit`.
+`snyk` - Runs the shared Snyk Open Source, container, Code, and IaC scans.
+`mocha-tests` - Unit and integration tests.
+`playwright` - Browser and accessibility tests.
+`e2e` - End-to-end tests.
+`build-image` - Builds and pushes the candidate image to ECR, then exposes its confirmed digest.
+`deploy-uat` - Deploys to UAT after the required CI, scan, and test jobs pass.
+`deploy-staging` - Deploys to staging after UAT succeeds on main.
+`notify-main-ci-failure` - Sends a Slack notification when main CI jobs fail.
+
+## Snyk Security Gate
+
+`snyk` calls `.github/workflows/snyk.yml`, the sole Snyk scan owner.
+It checks Open Source including development dependencies, the pushed ECR image,
+Snyk Code, and rendered UAT, staging, and production manifests.
+The CLI is pinned to `1.1307.4`; high findings and scan errors fail the gate.
+`build-image` exposes the digest returned by Docker push. CICD scans that
+immutable image URI before deployment.
+
+## Nightly Snyk Reporting
+
+`.github/workflows/nightly.yml` runs at 06:00 UTC, after Renovate's
+`before 5am Europe/London` merge window, and supports manual dispatch on main.
+It resolves the existing main image by commit tag and calls `snyk.yml` without
+building or deploying. PR scans remain GitHub SARIF checks and do not publish
+Snyk snapshots. Nightly main runs publish Open Source, Container, Code and IaC
+results to the Snyk organization using stable main project identities.
+The OAuth identity must prefer the intended organization; Code reporting also
+requires the `View Project Ignores` permission.
+
+Fork provenance: `.github/workflows/sast.yml` from
+`laa-reusable-github-actions@a7cbc9ed08d5ab503a21b24297b697797866dc14`,
+adapted for the RCW four-scan and digest contract.
 
 ## Environment & Secrets
 
@@ -41,31 +69,5 @@ Syft - SBOM generation - CycloneDX JSON
 ## Hidden setup steps
 Add the Snyk OAuth client ID and secret to GitHub repository secrets as `SNYK_CLIENT_ID` and `SNYK_CLIENT_SECRET`.
 You need to add renovate application to you github repo you can request this via #ask-operations-engineering
-
-# Snyk infra Workflow Summary
-
-snyk iac action docs - https://github.com/snyk/actions/tree/master/iac
-
-Triggers on weekly on 21:30 on Monday evening and can be triggered manually.
-
-Synk iac action checks out your Infrastructure as Code Configuration files, and scans them for any security issues. The results are then uploaded to GitHub Security Code Scanning
-
-## Other setup steps
-
-Helm template files need to be rendered prior to scanning as they will fail to parse within the action.
-
-```yml
-run: |
-    helm template deploy/laa-record-controlled-work \
-    -f deploy/laa-record-controlled-work/values/uat.yaml \
-    > rendered-values.yaml
-```
-
-The action autogenerates a sarif file to be uploaded to github under snyk.sarif which means when you scan different directories this will overwrite the previous sarif file to avoid this and  handle multiple different sarifs you set sarif to false and pass in the file output to be a customised name to avoid being overwritten
-
-```yml
-sarif: false
-args: --sarif-file-output=snyk-deploy.sarif
-```
 
 

@@ -27,8 +27,11 @@ outputs:
   image_tag:
     description: "Image Tag"
     value: ${{ steps.output.outputs.image_tag }}
+  image_digest:
+    description: "Digest returned by Docker push"
+    value: ${{ steps.output.outputs.image_digest }}
   image_uri:
-    description: "Image URI"
+    description: "Digest-addressed image URI"
     value: ${{ steps.output.outputs.image_uri }}
 
 runs:
@@ -36,18 +39,31 @@ runs:
   steps:
     - name: Docker Build, Push and Export with Cache
       id: build_and_push
+      env:
+        IMAGE_REGISTRY: ${{ inputs.image_registry }}
+        IMAGE_REPO: ${{ inputs.image_repo }}
+        IMAGE_TAG: ${{ inputs.image_tag }}
+        DOCKERFILE_PATH: ${{ inputs.dockerfile_path }}
       run: |
-        image_uri=${{ inputs.image_registry }}/${{ inputs.image_repo }}:${{ inputs.image_tag }}
-        runner_image=rcw-runner:${{ inputs.image_tag }}
+        set -euo pipefail
+        image_uri="${IMAGE_REGISTRY}/${IMAGE_REPO}:${IMAGE_TAG}"
+        runner_image="rcw-runner:${IMAGE_TAG}"
 
         docker buildx build \
           --load \
           --cache-from=type=local,src=/tmp/.buildx-cache \
           --cache-to=type=local,dest=/tmp/.buildx-cache-new \
           -t "$image_uri" \
-          -f ${{ inputs.dockerfile_path }} .
+          -f "$DOCKERFILE_PATH" .
 
-        docker push "$image_uri"
+        docker push "$image_uri" 2>&1 | tee "$RUNNER_TEMP/rcw-image-push.log"
+        pushed_digest=$(sed -nE 's/.*digest: (sha256:[a-f0-9]{64}).*/\1/p' "$RUNNER_TEMP/rcw-image-push.log" | tail -n1)
+        if [[ ! "$pushed_digest" =~ ^sha256:[a-f0-9]{64}$ ]]; then
+          echo "::error::Docker push did not report a registry digest"
+          exit 1
+        fi
+        printf 'pushed_digest=%s\n' "$pushed_digest" >> "$GITHUB_OUTPUT"
+
         docker tag "$image_uri" "$runner_image"
         docker save "$runner_image" -o rcw-runner-image.tar
 
@@ -64,9 +80,46 @@ runs:
 
     - name: Output
       id: output
+      env:
+        IMAGE_REGISTRY: ${{ inputs.image_registry }}
+        IMAGE_REPO: ${{ inputs.image_repo }}
+        IMAGE_TAG: ${{ inputs.image_tag }}
+        PUSHED_DIGEST: ${{ steps.build_and_push.outputs.pushed_digest }}
       run: |
-        echo image_registry=${{ inputs.image_registry }} >> "$GITHUB_OUTPUT"
-        echo image_repo=${{ inputs.image_repo }} >> "$GITHUB_OUTPUT"
-        echo image_tag=${{ inputs.image_tag }} >> "$GITHUB_OUTPUT"
-        echo image_uri="${{ inputs.image_registry }}/${{ inputs.image_repo }}:${{ inputs.image_tag }}" >> "$GITHUB_OUTPUT"
+        set -euo pipefail
+
+        for name in IMAGE_REGISTRY IMAGE_REPO IMAGE_TAG PUSHED_DIGEST GITHUB_OUTPUT; do
+          if [[ -z "${!name:-}" ]]; then
+            echo "::error::$name is required"
+            exit 1
+          fi
+        done
+
+        if [[ ! "$IMAGE_REGISTRY" =~ ^[A-Za-z0-9.-]+(:[0-9]+)?$ ]]; then
+          echo "::error::Invalid image registry"
+          exit 1
+        fi
+
+        if [[ ! "$IMAGE_REPO" =~ ^[a-z0-9]+([._-][a-z0-9]+)*(\/[a-z0-9]+([._-][a-z0-9]+)*)*$ ]]; then
+          echo "::error::Invalid ECR repository"
+          exit 1
+        fi
+
+        if [[ ! "$IMAGE_TAG" =~ ^[A-Za-z0-9_][A-Za-z0-9_.-]{0,127}$ ]]; then
+          echo "::error::Invalid image tag"
+          exit 1
+        fi
+
+        if [[ ! "$PUSHED_DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]]; then
+          echo "::error::Docker push did not return a valid image digest"
+          exit 1
+        fi
+
+        {
+          printf 'image_registry=%s\n' "$IMAGE_REGISTRY"
+          printf 'image_repo=%s\n' "$IMAGE_REPO"
+          printf 'image_tag=%s\n' "$IMAGE_TAG"
+          printf 'image_digest=%s\n' "$PUSHED_DIGEST"
+          printf 'image_uri=%s/%s@%s\n' "$IMAGE_REGISTRY" "$IMAGE_REPO" "$PUSHED_DIGEST"
+        } >> "$GITHUB_OUTPUT"
       shell: bash
