@@ -38,11 +38,33 @@ jobs:
             exit 1
           fi
 
-          image_digest=$(aws ecr describe-images \
-            --repository-name "$IMAGE_REPO" \
-            --image-ids "imageTag=$IMAGE_TAG" \
-            --query 'imageDetails[0].imageDigest' \
-            --output text)
+          image_digest=
+          for attempt in {1..11}; do
+            if image_digest=$(aws ecr describe-images \
+              --repository-name "$IMAGE_REPO" \
+              --image-ids "imageTag=$IMAGE_TAG" \
+              --query 'imageDetails[0].imageDigest' \
+              --output text 2>&1); then
+              break
+            fi
+
+            lookup_error=$image_digest
+            image_digest=
+            if [[ "$lookup_error" != *ImageNotFoundException* ]]; then
+              printf '%s\n' "$lookup_error" >&2
+              echo "::error::Failed to query ECR for main commit $IMAGE_TAG"
+              exit 1
+            fi
+
+            if [[ "$attempt" -eq 11 ]]; then
+              printf '%s\n' "$lookup_error" >&2
+              echo "::error::No ECR image found for main commit $IMAGE_TAG after waiting 5 minutes"
+              exit 1
+            fi
+
+            echo "Image tag not available yet; retrying in 30 seconds (attempt $attempt/11)"
+            sleep 30
+          done
 
           if [[ ! "$image_digest" =~ ^sha256:[a-f0-9]{64}$ ]]; then
             echo "::error::No valid ECR image digest found for main commit $IMAGE_TAG"
