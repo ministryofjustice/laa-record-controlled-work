@@ -41,6 +41,7 @@ run_case() {
   local delta_exit=$3
   local monitor_exit=${4:-0}
   local snyk_org_id=${5-test-org-id}
+  local fail_on_findings=${6:-false}
   local image_uri=registry.example/app@sha256:$(printf 'a%.0s' {1..64})
 
   if [[ "$scan_mode" == "monitor" ]]; then
@@ -51,6 +52,7 @@ run_case() {
   env \
     PATH="$tmp_dir/bin:$PATH" \
     SCAN_MODE="$scan_mode" \
+    FAIL_ON_FINDINGS="$fail_on_findings" \
     SOURCE_SHA=0123456789012345678901234567890123456789 \
     IMAGE_URI="$image_uri" \
     IMAGE_REFERENCE=registry.example/app \
@@ -118,11 +120,17 @@ if ! grep -Fq 'SNYK_ORG_ID is required' "$tmp_dir/output.log"; then
   exit 1
 fi
 
-if run_case absolute 1 0; then
-  echo 'High findings should fail the absolute gate' >&2
+if ! run_case absolute 1 0; then
+  cat "$tmp_dir/output.log" >&2
+  echo 'Absolute scans should report findings without failing by default' >&2
   exit 1
 fi
 assert_logged 'snyk test --all-projects --dev --severity-threshold=high --sarif-file-output='
+
+if run_case absolute 1 0 0 test-org-id true; then
+  echo 'High findings should fail when strict findings are enabled' >&2
+  exit 1
+fi
 
 if ! run_case monitor 0 0; then
   cat "$tmp_dir/output.log" >&2
@@ -134,7 +142,12 @@ if grep -Fq 'container test' "$tmp_dir/calls.log"; then
   echo 'Monitor mode should run only the Open Source monitor' >&2
   exit 1
 fi
-if run_case monitor 0 0 1; then
+if ! run_case monitor 0 0 1; then
+  cat "$tmp_dir/output.log" >&2
+  echo 'Monitoring findings should not fail the workflow' >&2
+  exit 1
+fi
+if run_case monitor 0 0 2; then
   echo 'A failed baseline update should fail the workflow' >&2
   exit 1
 fi

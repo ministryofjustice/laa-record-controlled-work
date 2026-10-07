@@ -5,7 +5,7 @@ Runs for pull requests, main pushes, merge groups, and manual dispatches.
 `code-linting` - ESLint and Knip dependency checks.
 `verify-api-code-generation` - Checks generated RCW API client code matches the OpenAPI specification.
 `code-security-audit` - Runs `yarn npm audit`.
-`snyk` - Runs the PR regression gate or main absolute Snyk gate.
+`snyk` - Runs the PR regression gate or observational main Snyk scans.
 `mocha-tests` - Unit and integration tests.
 `playwright` - Browser and accessibility tests.
 `e2e` - End-to-end tests.
@@ -18,11 +18,12 @@ Runs for pull requests, main pushes, merge groups, and manual dispatches.
 
 `snyk` calls `.github/workflows/snyk.yml`, the sole Snyk scan owner. PR and
 merge-group Open Source checks pipe JSON results into `snyk-delta`, failing on
-new high-severity findings. Main and nightly run the absolute all-projects
-Open Source gate and publish SARIF. Both modes also scan the pushed ECR image,
-Snyk Code, and rendered UAT, staging, and production manifests. The CLI is
-pinned to `1.1307.4`; `snyk-delta` is pinned to `1.14.0`. CICD scans the
-immutable image digest returned by Docker push.
+new high-severity findings. The main branch scans all projects and publishes
+SARIF, but findings alone do not fail CI. Nightly runs the same scans in strict mode.
+Both modes also scan the pushed ECR image, Snyk Code, and rendered UAT,
+staging, and production manifests. The CLI is pinned to `1.1307.4`;
+`snyk-delta` is pinned to `1.14.0`. CICD scans the immutable image digest
+returned by Docker push.
 
 PR Delta tests and post-merge monitoring use the same explicit `SNYK_ORG_ID`,
 project name, and `main` target reference. Configure `SNYK_ORG_ID` as a
@@ -36,8 +37,8 @@ accepted Open Source baseline. Nightly scans do not update that baseline.
 `.github/workflows/nightly.yml` runs at 06:00 UTC, after Renovate's
 `before 5am Europe/London` merge window, and supports manual dispatch on main.
 It resolves the existing main image by commit tag and calls `snyk.yml` without
-building, deploying, or publishing Snyk snapshots. The run is an absolute
-high-severity gate with SARIF reports.
+building, deploying, or publishing Snyk snapshots. Findings fail the strict
+scan and trigger a Slack alert; SARIF reports are attached to the run.
 
 Fork provenance: `.github/workflows/sast.yml` from
 `laa-reusable-github-actions@a7cbc9ed08d5ab503a21b24297b697797866dc14`,

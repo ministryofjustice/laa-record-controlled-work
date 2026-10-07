@@ -27,6 +27,11 @@ on:
         required: false
         type: boolean
         default: false
+      fail_on_findings:
+        description: Fail scans when vulnerabilities are found
+        required: false
+        type: boolean
+        default: false
     secrets:
       ECR_ROLE_TO_ASSUME:
         required: false
@@ -48,6 +53,7 @@ jobs:
       IMAGE_URI: ${{ secrets.ECR_REGISTRY_URL }}/${{ inputs.image_repo }}@${{ inputs.image_digest }}
       IMAGE_REFERENCE: ${{ inputs.image_repo }}@${{ inputs.image_digest }}
       REPORT_TO_SNYK: ${{ inputs.report_to_snyk }}
+      FAIL_ON_FINDINGS: ${{ inputs.fail_on_findings }}
     permissions:
       actions: read
       contents: read
