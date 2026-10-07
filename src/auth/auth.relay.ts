@@ -54,6 +54,8 @@ export function isAllowedRelayTarget(target: string): boolean {
     const url = new URL(target);
     return (
       url.protocol === "https:" &&
+      url.origin === target &&
+      url.port === "" &&
       ALLOWED_RELAY_HOSTNAME_PATTERN.test(url.hostname)
     );
   } catch {

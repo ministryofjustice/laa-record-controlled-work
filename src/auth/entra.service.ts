@@ -22,6 +22,7 @@ import {
   TokenAcquisitionError,
   TokenRefreshError,
 } from "#/auth/auth.errors.js";
+import { getValidatedReturnTo } from "#/auth/auth.redirect.js";
 import { createRelayState } from "#/auth/auth.relay.js";
 import { createMsalClient } from "#/auth/msal.client.js";
 import { RedisCachePlugin } from "#/auth/msal.plugin.js";
@@ -256,10 +257,7 @@ export class EntraService {
   ): Omit<AuthCodeFlowState, "authCodeUrl"> {
     const { challenge, challengeMethod, verifier } = pkceCodes;
 
-    const validReturnTo =
-      returnTo?.startsWith("/") === true && !returnTo.startsWith("//")
-        ? returnTo
-        : "/";
+    const validReturnTo = getValidatedReturnTo(returnTo);
 
     // Cryptographically random nonce used as the OAuth state parameter for CSRF protection.
     // Validated against session.authState on callback before any token exchange.
