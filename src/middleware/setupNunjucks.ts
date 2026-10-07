@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import nunjucks from "nunjucks";
 
+import { isEnv } from "#/app/utils/isEnv.js";
 import { fixedT, nunjucksT, nunjucksTt } from "#/lib/i18n.js";
 
 const FIRST_IN_ARRAY = 0;
@@ -58,21 +59,27 @@ export const setupNunjucks = (app: Application): nunjucks.Environment => {
   };
 
   // Tell Nunjucks where to look for njk files
-  const nunjucksEnv = nunjucks.configure(
-    [
-      path.join(process.cwd(), "public", "views"), // Main views directory
-      "node_modules/govuk-frontend/dist", // GOV.UK Frontend templates
-      "node_modules/govuk-frontend/dist/components/", // GOV.UK components
-      "node_modules/@ministryofjustice/frontend", // MoJ Design System components
-      "node_modules/@ministryofjustice/hmpps-forge/dist/govuk-components/",
-      "node_modules/@ministryofjustice/hmpps-forge/dist/moj-components/",
-    ],
-    {
-      autoescape: true, // Enable auto escaping to prevent XSS attacks
-      express: appInstance, // Bind Nunjucks to the Express app instance
-      watch: ["development", "docker"].includes(process.env.NODE_ENV ?? ""), // Watch for template changes in development and docker
-    },
-  );
+  const paths = [
+    path.join(process.cwd(), "public", "views"), // Main views directory
+    "node_modules/govuk-frontend/dist", // GOV.UK Frontend templates
+    "node_modules/govuk-frontend/dist/components/", // GOV.UK components
+    "node_modules/@ministryofjustice/frontend", // MoJ Design System components
+    "node_modules/@ministryofjustice/hmpps-forge/dist/govuk-components/",
+    "node_modules/@ministryofjustice/hmpps-forge/dist/moj-components/",
+  ];
+
+  // Add the src path in test env, since we don't do builds there and `public` won't exist.
+  if (isEnv("test")) {
+    paths.push(path.join(process.cwd(), "src", "views"));
+  }
+
+  const opts = {
+    autoescape: true, // Enable auto escaping to prevent XSS attacks
+    express: appInstance, // Bind Nunjucks to the Express app instance
+    watch: ["development", "docker"].includes(process.env.NODE_ENV ?? ""), // Watch for template changes in development and docker
+  };
+
+  const nunjucksEnv = nunjucks.configure(paths, opts);
 
   // Add global variables
   nunjucksEnv.addGlobal("fixedT", fixedT);

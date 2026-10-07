@@ -1,8 +1,10 @@
 import express from "express";
 import type { Request, Response } from "express";
 import request from "supertest";
+import { AuthError } from "@azure/msal-node";
 import {
   BAD_REQUEST,
+  FORBIDDEN,
   FOUND,
   INTERNAL_SERVER_ERROR,
   UNAUTHORIZED,
@@ -217,6 +219,22 @@ describe("Auth Handlers", () => {
 
       expect(res.status).to.equal(INTERNAL_SERVER_ERROR);
       expect(res.text).to.equal(errorMessage);
+    });
+
+    // Skipped because this test relies on rendering the error page, and we can't do that currently.
+    // See https://dsdmoj.atlassian.net/browse/MEM-1441
+    it.skip("renders the no-assigned-role error page when Entra reports the user has no role", async () => {
+      authServiceStub.initiateAuthCodeFlow.rejects(
+        new AuthError("1003009", "test-correlation-id", "No assigned role"),
+      );
+
+      const res = await request(mockApp).get("/auth/signin");
+
+      expect(res.status).to.equal(FORBIDDEN);
+      expect(res.text).to.contain("Service not accessible");
+      expect(res.text).to.contain(
+        "Your Legal Aid Services user account has not been assigned access to this service.",
+      );
     });
   });
 
