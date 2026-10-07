@@ -100,8 +100,25 @@ jobs:
     uses: ./.github/workflows/snyk.yml
     with:
       source_sha: ${{ github.event.pull_request.head.sha || github.sha }}
+      scan_mode: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 'delta' || 'absolute' }}
       image_digest: ${{ needs.build-image.outputs.image_digest }}
       image_repo: ${{ vars.ECR_REPOSITORY }}
+    secrets: inherit
+
+  snyk-monitor:
+    name: Update Snyk Open Source baseline
+    if: github.ref == 'refs/heads/main'
+    needs:
+      - snyk
+    permissions:
+      actions: read
+      contents: read
+      id-token: write
+      security-events: write
+    uses: ./.github/workflows/snyk.yml
+    with:
+      source_sha: ${{ github.sha }}
+      scan_mode: monitor
     secrets: inherit
 
   mocha-tests:
@@ -181,6 +198,7 @@ jobs:
       - playwright
       - e2e
       - build-image
+      - snyk-monitor
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7

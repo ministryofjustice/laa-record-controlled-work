@@ -7,14 +7,21 @@ on:
         description: Full source commit SHA to scan
         required: true
         type: string
+      scan_mode:
+        description: Open Source scan mode
+        required: false
+        type: string
+        default: absolute
       image_digest:
         description: SHA-256 digest returned by the image push
-        required: true
+        required: false
         type: string
+        default: ''
       image_repo:
         description: ECR repository containing the pushed image
-        required: true
+        required: false
         type: string
+        default: ''
       report_to_snyk:
         description: Publish scan snapshots to Snyk for the main branch
         required: false
@@ -22,9 +29,9 @@ on:
         default: false
     secrets:
       ECR_ROLE_TO_ASSUME:
-        required: true
+        required: false
       ECR_REGISTRY_URL:
-        required: true
+        required: false
       SNYK_CLIENT_ID:
         required: true
       SNYK_CLIENT_SECRET:
@@ -48,7 +55,7 @@ jobs:
       security-events: write
     steps:
       - name: Require main for Snyk UI reporting
-        if: ${{ inputs.report_to_snyk && github.ref != 'refs/heads/main' }}
+        if: ${{ (inputs.report_to_snyk || inputs.scan_mode == 'monitor') && github.ref != 'refs/heads/main' }}
         shell: bash
         run: |
           echo "::error::Snyk UI reporting is restricted to main"
@@ -80,6 +87,7 @@ jobs:
         uses: ./.github/actions/setup-node
 
       - name: Configure AWS credentials for ECR
+        if: ${{ inputs.scan_mode != 'monitor' }}
         id: ecr-auth
         continue-on-error: true
         uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
@@ -88,11 +96,13 @@ jobs:
           aws-region: ${{ vars.ECR_REGION }}
 
       - name: Log in to ECR
+        if: ${{ inputs.scan_mode != 'monitor' }}
         id: ecr-login
         continue-on-error: true
         uses: aws-actions/amazon-ecr-login@f2e9fc6c2b355c1890b65e6f6f0e2ac3e6e22f78
 
       - name: Set up Helm
+        if: ${{ inputs.scan_mode != 'monitor' }}
         id: helm
         continue-on-error: true
         uses: azure/setup-helm@9bc31f4ebc9c6b171d7bfbaa5d006ae7abdb4310 # v5
@@ -105,6 +115,14 @@ jobs:
         run: |
           npm install --global "snyk@$SNYK_CLI_VERSION"
           test "$(snyk --version)" = "$SNYK_CLI_VERSION"
+
+      - name: Install pinned Snyk Delta
+        id: snyk-delta
+        if: ${{ inputs.scan_mode == 'delta' }}
+        continue-on-error: true
+        env:
+          SNYK_DELTA_VERSION: 1.14.0
+        run: npm install --global "snyk-delta@$SNYK_DELTA_VERSION"
 
       - name: Obtain Snyk OAuth token
         id: snyk-auth
@@ -131,8 +149,10 @@ jobs:
 
       - name: Run all Snyk scans
         env:
+          SCAN_MODE: ${{ inputs.scan_mode }}
           SOURCE_SHA: ${{ inputs.source_sha }}
           SNYK_OAUTH_TOKEN: ${{ steps.snyk-auth.outputs.token }}
+          SNYK_TOKEN: ${{ steps.snyk-auth.outputs.token }}
           SNYK_REPORT_DIR: sarif
           SNYK_RENDER_DIR: rendered-templates
           SETUP_NODE_OUTCOME: ${{ steps.setup-node.outcome }}
@@ -140,6 +160,7 @@ jobs:
           ECR_LOGIN_OUTCOME: ${{ steps.ecr-login.outcome }}
           HELM_SETUP_OUTCOME: ${{ steps.helm.outcome }}
           SNYK_CLI_INSTALL_OUTCOME: ${{ steps.snyk-cli.outcome }}
+          SNYK_DELTA_INSTALL_OUTCOME: ${{ steps.snyk-delta.outcome }}
           SNYK_AUTH_OUTCOME: ${{ steps.snyk-auth.outcome }}
           SNYK_TOKEN_MASK_OUTCOME: ${{ steps.snyk-token-mask.outcome }}
         run: bash .github/scripts/run-snyk-scans.sh
