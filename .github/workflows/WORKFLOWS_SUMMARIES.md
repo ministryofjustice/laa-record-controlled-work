@@ -12,7 +12,7 @@ Triggers on push to any branch and can be triggered manually.
 
 ## Environment & Secrets
 
-`SNYK_TOKEN` - In order to use snyk you need a api token which you can get by asking in #snyk channel
+`SNYK_CLIENT_ID` and `SNYK_CLIENT_SECRET` - Snyk OAuth credentials used to obtain a short-lived scan token
 `ECR_ROLE_TO_ASSUME`,`ECR_REGION`,`ECR_REGISTRY_URL`,`ECR_REPOSITORY`,`KUBE_NAMESPACE`,`KUBE_CLUSTER`,`KUBE_TOKEN`,`KUBE_CERT` - These are automated generated in github repo during namespace/container deployment set up see deployment readme
 
 `environment: uat` - We are using env specific environment secrets and variables via our deployment script/values.ylm files and our github environment.
@@ -39,7 +39,7 @@ OpenSSF Scorecard - Repository security posture - JSON, Markdown
 Syft - SBOM generation - CycloneDX JSON
 
 ## Hidden setup steps
-You need to acquire and add a snyk api token in your github secrets under SNYK_TOKEN you can request this in #snyk channel for a API key **DO NOT USE PERSONAL API TOKEN**
+Add the Snyk OAuth client ID and secret to GitHub repository secrets as `SNYK_CLIENT_ID` and `SNYK_CLIENT_SECRET`.
 You need to add renovate application to you github repo you can request this via #ask-operations-engineering
 
 # Snyk infra Workflow Summary

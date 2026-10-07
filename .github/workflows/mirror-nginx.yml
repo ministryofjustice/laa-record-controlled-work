@@ -95,13 +95,20 @@ jobs:
           docker pull "$IMAGE"
           docker save "$IMAGE" -o nginx.tar
 
+      - name: Obtain Snyk OAuth token
+        id: snyk_auth
+        uses: ministryofjustice/laa-reusable-github-actions/.github/actions/snyk-auth@6db001458db30ae747d9eb8eb25707ce52b359bc
+        with:
+          client_id: ${{ secrets.SNYK_CLIENT_ID }}
+          client_secret: ${{ secrets.SNYK_CLIENT_SECRET }}
+
       - name: Scan image with Snyk
         uses: snyk/actions/docker@9adf32b1121593767fc3c057af55b55db032dc04
         with:
           image: nginx.tar
           args: --docker --severity-threshold=high --policy-path=.snyk
         env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+          SNYK_OAUTH_TOKEN: ${{ steps.snyk_auth.outputs.token }}
 
       - name: Configure AWS credentials
         if: inputs.dry_run != true

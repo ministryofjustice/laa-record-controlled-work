@@ -30,11 +30,18 @@ jobs:
               > rendered-templates/${env}.yaml
           done
 
+      - name: Obtain Snyk OAuth token
+        id: snyk_auth
+        uses: ministryofjustice/laa-reusable-github-actions/.github/actions/snyk-auth@6db001458db30ae747d9eb8eb25707ce52b359bc
+        with:
+          client_id: ${{ secrets.SNYK_CLIENT_ID }}
+          client_secret: ${{ secrets.SNYK_CLIENT_SECRET }}
+
       - name: Run Snyk to check Helm manifests for security issues
         continue-on-error: true
         uses: snyk/actions/iac@9adf32b1121593767fc3c057af55b55db032dc04 # v1.0.0
         env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+          SNYK_OAUTH_TOKEN: ${{ steps.snyk_auth.outputs.token }}
         with:
           file: rendered-templates/
 
