@@ -104,13 +104,20 @@ jobs:
           docker build -t laa-record-controlled-work ./
           docker save laa-record-controlled-work -o image.tar
 
+      - name: Obtain Snyk OAuth token
+        id: snyk_auth
+        uses: ministryofjustice/laa-reusable-github-actions/.github/actions/snyk-auth@6db001458db30ae747d9eb8eb25707ce52b359bc
+        with:
+          client_id: ${{ secrets.SNYK_CLIENT_ID }}
+          client_secret: ${{ secrets.SNYK_CLIENT_SECRET }}
+
       - name: Run Snyk to scan Docker image from tarball
         uses: snyk/actions/docker@b075801f26076be9bb50521154cafab73f44da0c # master
         with:
           image: image.tar
           args: --docker --severity-threshold=high --policy-path=.snyk
         env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+          SNYK_OAUTH_TOKEN: ${{ steps.snyk_auth.outputs.token }}
 
   snyk-infra:
     name: Snyk
