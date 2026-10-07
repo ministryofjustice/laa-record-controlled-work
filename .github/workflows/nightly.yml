@@ -84,7 +84,7 @@ jobs:
     uses: ./.github/workflows/snyk.yml
     with:
       source_sha: ${{ github.sha }}
+      scan_mode: absolute
       image_digest: ${{ needs.resolve-main-image.outputs.image_digest }}
       image_repo: ${{ vars.ECR_REPOSITORY }}
-      report_to_snyk: true
     secrets: inherit

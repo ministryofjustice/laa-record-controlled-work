@@ -22,3 +22,6 @@ ignore:
         reason: >
           Axios 1.15.2 vulnerabilities fixed in 1.16.0 which isn't released yet.
         expires: "2026-05-04T12:00:00.000Z"
+exclude:
+  code:
+    - msw/handlers/entra.ts
