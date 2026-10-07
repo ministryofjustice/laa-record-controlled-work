@@ -3,6 +3,7 @@ set -uo pipefail
 
 source_sha=${SOURCE_SHA:-}
 image_uri=${IMAGE_URI:-}
+image_reference=${IMAGE_REFERENCE:-}
 report_dir=${SNYK_REPORT_DIR:-sarif}
 render_dir=${SNYK_RENDER_DIR:-rendered-templates}
 summary_path=${GITHUB_STEP_SUMMARY:-}
@@ -26,7 +27,7 @@ if [[ -n "$summary_path" ]]; then
     echo "## Snyk security gate"
     echo
     echo "- Source SHA: $source_sha"
-    echo "- Image digest: $image_uri"
+    echo "- Image: $image_reference"
     echo "- Run: [${GITHUB_RUN_ID:-unknown}]($run_url)"
     echo
     echo "| Scan | Result |"

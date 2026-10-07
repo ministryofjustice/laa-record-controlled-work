@@ -7,12 +7,18 @@ on:
         description: Full source commit SHA to scan
         required: true
         type: string
-      image_uri:
-        description: Digest-addressed ECR image URI to scan
+      image_digest:
+        description: SHA-256 digest returned by the image push
+        required: true
+        type: string
+      image_repo:
+        description: ECR repository containing the pushed image
         required: true
         type: string
     secrets:
       ECR_ROLE_TO_ASSUME:
+        required: true
+      ECR_REGISTRY_URL:
         required: true
       SNYK_CLIENT_ID:
         required: true
@@ -26,6 +32,9 @@ jobs:
   scan:
     name: '[Code/Container/OSS/Monitoring]'
     runs-on: ubuntu-latest
+    env:
+      IMAGE_URI: ${{ secrets.ECR_REGISTRY_URL }}/${{ inputs.image_repo }}@${{ inputs.image_digest }}
+      IMAGE_REFERENCE: ${{ inputs.image_repo }}@${{ inputs.image_digest }}
     permissions:
       actions: read
       contents: read
@@ -41,7 +50,6 @@ jobs:
       - name: Initialise scan reports
         env:
           SOURCE_SHA: ${{ inputs.source_sha }}
-          IMAGE_URI: ${{ inputs.image_uri }}
         run: |
           mkdir -p sarif rendered-templates
           run_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/attempts/${GITHUB_RUN_ATTEMPT}"
@@ -49,7 +57,7 @@ jobs:
             echo "## Snyk security gate"
             echo
             printf -- '- Source SHA: %s\n' "$SOURCE_SHA"
-            printf -- '- Image digest: %s\n' "$IMAGE_URI"
+            printf -- '- Image: %s\n' "$IMAGE_REFERENCE"
             printf -- '- Run: [%s](%s)\n' "$GITHUB_RUN_ID" "$run_url"
           } > "$GITHUB_STEP_SUMMARY"
 
@@ -111,7 +119,6 @@ jobs:
       - name: Run all Snyk scans
         env:
           SOURCE_SHA: ${{ inputs.source_sha }}
-          IMAGE_URI: ${{ inputs.image_uri }}
           SNYK_OAUTH_TOKEN: ${{ steps.snyk-auth.outputs.token }}
           SNYK_REPORT_DIR: sarif
           SNYK_RENDER_DIR: rendered-templates

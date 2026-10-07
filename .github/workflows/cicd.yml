@@ -100,7 +100,8 @@ jobs:
     uses: ./.github/workflows/snyk.yml
     with:
       source_sha: ${{ github.event.pull_request.head.sha || github.sha }}
-      image_uri: ${{ needs.build-image.outputs.image_uri }}
+      image_digest: ${{ needs.build-image.outputs.image_digest }}
+      image_repo: ${{ vars.ECR_REPOSITORY }}
     secrets: inherit
 
   mocha-tests:
@@ -129,7 +130,6 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       image_digest: ${{ steps.build-and-push.outputs.image_digest }}
-      image_uri: ${{ steps.build-and-push.outputs.image_uri }}
     permissions:
       id-token: write
       contents: read
