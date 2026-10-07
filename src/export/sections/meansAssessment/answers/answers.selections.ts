@@ -7,6 +7,19 @@ export const client: AnswerSelection = {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- CCQ validates completed ownership answers.
     return answers.additional_property_owned!;
   },
+  assets: {
+    bankAccounts: (answers) => answers.bank_accounts,
+    investments: {
+      amount: (answers) => answers.investments,
+      disputed: (answers) => answers.investments_in_dispute,
+      relevant: (answers) => answers.investments_relevant,
+    },
+    valuables: {
+      amount: (answers) => answers.valuables,
+      disputed: (answers) => answers.valuables_in_dispute,
+      relevant: (answers) => answers.valuables_relevant,
+    },
+  },
   benefits: (answers) => answers.benefits,
   employmentIncomes: (answers) => answers.incomes,
   employmentStatus: (answers) => answers.employment_status,
@@ -68,6 +81,19 @@ export const partner: AnswerSelection = {
   additionalPropertyOwned: (answers) => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- CCQ validates completed partner ownership answers.
     return answers.partner_additional_property_owned!;
+  },
+  assets: {
+    bankAccounts: (answers) => answers.partner_bank_accounts,
+    investments: {
+      amount: (answers) => answers.partner_investments,
+      disputed: () => false,
+      relevant: (answers) => answers.partner_investments_relevant,
+    },
+    valuables: {
+      amount: (answers) => answers.partner_valuables,
+      disputed: () => false,
+      relevant: (answers) => answers.partner_valuables_relevant,
+    },
   },
   benefits: (answers) => answers.partner_benefits,
   employmentIncomes: (answers) => answers.partner_incomes,

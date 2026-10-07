@@ -82,4 +82,50 @@ describe("toExportApplicationViewModel", () => {
 
     expect(viewModel.meansAssessment).to.equal(null);
   });
+
+  it("exports saved passported assets without requiring calculations", () => {
+    const application = getGetApplicationResponseMock({
+      eligibility: {
+        data: {
+          additional_property_owned: "none",
+          bank_accounts: [{ amount: 0 }],
+          client_age: "standard",
+          immigration_or_asylum: false,
+          investments_relevant: false,
+          partner: true,
+          partner_additional_property_owned: "none",
+          partner_bank_accounts: [{ amount: 500 }],
+          partner_investments: 1000,
+          partner_investments_relevant: true,
+          partner_valuables_relevant: false,
+          passporting: true,
+          property_owned: "none",
+          valuables_relevant: false,
+          vehicle_owned: true,
+          vehicles: [{ vehicle_value: 10000 }],
+        },
+        result: null,
+      },
+      meansAssessmentRequired: true,
+    });
+
+    const meansAssessment = toExportApplicationViewModel(application)
+      .meansAssessment;
+
+    expect(meansAssessment?.calculations).to.deep.equal({
+      status: "unavailable",
+    });
+    expect(meansAssessment?.answerSummaries.map(({ heading }) => heading)).to
+      .include.members(["Client assets", "Partner assets"]);
+    expect(
+      meansAssessment?.answerSummaries.flatMap(({ rows }) =>
+        rows.map(({ value }) => value),
+      ),
+    ).to.include.members(["£0.00", "£500.00", "£1,000.00"]);
+    expect(
+      meansAssessment?.answerSummaries.some(({ heading, rows }) =>
+        `${heading} ${rows.map(({ key }) => key).join(" ")}`.includes("vehicle"),
+      ),
+    ).to.equal(false);
+  });
 });
