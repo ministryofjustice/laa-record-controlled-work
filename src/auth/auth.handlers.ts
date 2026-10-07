@@ -206,7 +206,7 @@ function getValidatedCallbackState(
   }
 
   // verify that session contains correct flow state
-  const { authCodeRequest, authState } = req.session;
+  const { authCodeRequest, authState, returnTo } = req.session;
   if (authCodeRequest === undefined) {
     res.status(BAD_REQUEST).send(new MissingAuthCodeRequestError().message);
     return undefined;
@@ -220,7 +220,7 @@ function getValidatedCallbackState(
   return {
     authCodeRequest,
     data: parsed.data,
-    returnTo: getValidatedReturnTo(req.session.returnTo),
+    returnTo: getValidatedReturnTo(returnTo),
   };
 }
 
