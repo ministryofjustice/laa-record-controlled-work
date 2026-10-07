@@ -131,16 +131,6 @@ jobs:
           SNYK_TOKEN_MASK_OUTCOME: ${{ steps.snyk-token-mask.outcome }}
         run: bash .github/scripts/run-snyk-scans.sh
 
-      - name: Sanitise SARIF files
-        if: always()
-        shell: bash
-        run: |
-          for report in sarif/*.sarif; do
-            [[ -f "$report" ]] || continue
-            temporary_report="${report}.tmp"
-            jq 'walk(if type == "object" and (.["security-severity"] == null or .["security-severity"] == "null" or .["security-severity"] == "undefined") then .["security-severity"] = "0" else . end)' \
-              "$report" > "$temporary_report" && mv "$temporary_report" "$report"
-          done
 
       - name: Upload Open Source SARIF
         if: always() && hashFiles('sarif/snyk-open-source.sarif') != ''
