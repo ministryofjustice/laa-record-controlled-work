@@ -1,9 +1,7 @@
 import type { EligibilityData } from "#/api/clients/rcw/model/eligibilityData.zod.gen.js";
+import type { EligibilityDataBenefit } from "#/api/clients/rcw/model/eligibilityDataBenefit.zod.gen.js";
 import type { QuestionSection } from "#/export/sections/meansAssessment/answers/answers.types.js";
-import type {
-  AnswerSelection,
-  SavedBenefit,
-} from "#/export/sections/meansAssessment/answers/questions/questions.types.js";
+import type { AnswerSelection } from "#/export/sections/meansAssessment/answers/questions/questions.types.js";
 
 import {
   client,
@@ -29,7 +27,7 @@ function getBenefit(
   adult: AnswerSelection,
   answers: EligibilityData,
   index: number,
-): SavedBenefit {
+): EligibilityDataBenefit {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- CCQ validates completed benefit entries.
   return adult.benefits(answers)![index];
 }

@@ -10,14 +10,18 @@ import { getGetApplicationResponseMock } from "#orval/mocks/rcw/fakers/applicati
 const BASE_ANSWERS = {
   client_age: "standard",
   immigration_or_asylum: false,
+  investments_relevant: false,
   level_of_help: "controlled",
   partner: false,
+  partner_investments_relevant: false,
+  partner_valuables_relevant: false,
   passporting: false,
   property_owned: "none",
   additional_property_owned: "none",
   partner_additional_property_owned: "none",
   housing_payments: 0,
   housing_benefit_relevant: false,
+  valuables_relevant: false,
 } satisfies EligibilityData;
 
 function summaries(overrides: Partial<EligibilityData> = {}) {
@@ -102,6 +106,16 @@ describe("saved employment answers", () => {
         rows: [
           {
             key: "Does the partner own any other property, a holiday home or land?",
+            value: "No",
+          },
+        ],
+      },
+      {
+        heading: "Partner assets",
+        rows: [
+          { key: "Does the partner have any investments?", value: "No" },
+          {
+            key: "Does the partner have valuable items worth £500 or more?",
             value: "No",
           },
         ],
