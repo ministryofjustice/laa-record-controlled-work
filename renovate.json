@@ -7,6 +7,18 @@
   ],
   "timezone": "Europe/London",
 
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Update the Snyk CLI used by the shared security workflow",
+      "managerFilePatterns": ["/^\\.github/workflows/snyk\\.yml$/"],
+      "matchStrings": ["SNYK_CLI_VERSION:\\s*(?<currentValue>[^\\s]+)"],
+      "depNameTemplate": "snyk",
+      "datasourceTemplate": "npm",
+      "versioningTemplate": "npm"
+    }
+  ],
+
   "packageRules": [
     {
       "description": "Ungroup NPM updates to enforce minimum release age rules",
