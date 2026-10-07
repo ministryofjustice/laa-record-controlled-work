@@ -1,0 +1,68 @@
+name: Nightly CI
+
+on:
+  schedule:
+    # Renovate may merge until 05:00 Europe/London; leave time for its build.
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  resolve-main-image:
+    name: Resolve main image
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    outputs:
+      image_digest: ${{ steps.resolve.outputs.image_digest }}
+    steps:
+      - name: Configure AWS credentials for ECR
+        uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
+        with:
+          role-to-assume: ${{ secrets.ECR_ROLE_TO_ASSUME }}
+          aws-region: ${{ vars.ECR_REGION }}
+
+      - name: Resolve main image digest
+        id: resolve
+        env:
+          IMAGE_REPO: ${{ vars.ECR_REPOSITORY }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          if [[ -z "$IMAGE_REPO" || ! "$IMAGE_TAG" =~ ^[a-f0-9]{40}$ ]]; then
+            echo "::error::Main image repository or commit tag is invalid"
+            exit 1
+          fi
+
+          image_digest=$(aws ecr describe-images \
+            --repository-name "$IMAGE_REPO" \
+            --image-ids "imageTag=$IMAGE_TAG" \
+            --query 'imageDetails[0].imageDigest' \
+            --output text)
+
+          if [[ ! "$image_digest" =~ ^sha256:[a-f0-9]{64}$ ]]; then
+            echo "::error::No valid ECR image digest found for main commit $IMAGE_TAG"
+            exit 1
+          fi
+
+          printf 'image_digest=%s\n' "$image_digest" >> "$GITHUB_OUTPUT"
+
+  snyk:
+    name: Snyk report
+    needs: resolve-main-image
+    permissions:
+      actions: read
+      contents: read
+      id-token: write
+      security-events: write
+    uses: ./.github/workflows/snyk.yml
+    with:
+      source_sha: ${{ github.sha }}
+      image_digest: ${{ needs.resolve-main-image.outputs.image_digest }}
+      image_repo: ${{ vars.ECR_REPOSITORY }}
+      report_to_snyk: true
+    secrets: inherit

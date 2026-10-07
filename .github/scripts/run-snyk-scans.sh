@@ -4,6 +4,7 @@ set -uo pipefail
 source_sha=${SOURCE_SHA:-}
 image_uri=${IMAGE_URI:-}
 image_reference=${IMAGE_REFERENCE:-}
+report_to_snyk=${REPORT_TO_SNYK:-false}
 report_dir=${SNYK_REPORT_DIR:-sarif}
 render_dir=${SNYK_RENDER_DIR:-rendered-templates}
 summary_path=${GITHUB_STEP_SUMMARY:-}
@@ -16,6 +17,11 @@ fi
 
 if [[ ! "$image_uri" =~ ^[^[:space:]@]+@sha256:[a-f0-9]{64}$ ]]; then
   echo "::error::image_uri must reference an immutable sha256 digest"
+  exit 1
+fi
+
+if [[ "$report_to_snyk" != "true" && "$report_to_snyk" != "false" ]]; then
+  echo "::error::REPORT_TO_SNYK must be true or false"
   exit 1
 fi
 
@@ -99,15 +105,31 @@ run_scan() {
 run_scan "Open Source" snyk test --dev --severity-threshold=high \
   --sarif-file-output="$report_dir/snyk-open-source.sarif" "${policy_args[@]}"
 
+if [[ "$report_to_snyk" == "true" ]]; then
+  run_scan "Open Source monitoring" snyk monitor --dev \
+    --project-name=laa-record-controlled-work-open-source \
+    --target-reference=main "${policy_args[@]}"
+fi
+
 run_scan "Container" snyk container test "$image_uri" \
   --file=Dockerfile --severity-threshold=high \
   --sarif-file-output="$report_dir/snyk-container.sarif" "${policy_args[@]}"
 
-run_scan "Container monitoring" snyk container monitor "$image_uri" \
-  --file=Dockerfile "${policy_args[@]}"
+if [[ "$report_to_snyk" == "true" ]]; then
+  run_scan "Container monitoring" snyk container monitor "$image_uri" \
+    --file=Dockerfile \
+    --project-name=laa-record-controlled-work-container \
+    --target-reference=main "${policy_args[@]}"
+fi
 
-run_scan "Code" snyk code test --severity-threshold=high \
-  --sarif-file-output="$report_dir/snyk-code.sarif"
+if [[ "$report_to_snyk" == "true" ]]; then
+  run_scan "Code" snyk code test --severity-threshold=high --report \
+    --project-name=laa-record-controlled-work-code --target-reference=main \
+    --sarif-file-output="$report_dir/snyk-code.sarif"
+else
+  run_scan "Code" snyk code test --severity-threshold=high \
+    --sarif-file-output="$report_dir/snyk-code.sarif"
+fi
 
 render_status=passed
 for environment in uat staging production; do
@@ -127,8 +149,14 @@ if [[ -n "$summary_path" ]]; then
   printf '| Helm rendering | %s |\n' "$render_status" >> "$summary_path"
 fi
 
-run_scan "IaC" snyk iac test "$render_dir" --severity-threshold=high \
-  --sarif-file-output="$report_dir/snyk-iac.sarif" "${policy_args[@]}"
+if [[ "$report_to_snyk" == "true" ]]; then
+  run_scan "IaC" snyk iac test "$render_dir" --severity-threshold=high \
+    --report --target-name=laa-record-controlled-work-iac --target-reference=main \
+    --sarif-file-output="$report_dir/snyk-iac.sarif" "${policy_args[@]}"
+else
+  run_scan "IaC" snyk iac test "$render_dir" --severity-threshold=high \
+    --sarif-file-output="$report_dir/snyk-iac.sarif" "${policy_args[@]}"
+fi
 
 if [[ -n "$summary_path" ]]; then
   echo >> "$summary_path"

@@ -20,9 +20,19 @@ Runs for pull requests, main pushes, merge groups, and manual dispatches.
 It checks Open Source including development dependencies, the pushed ECR image,
 Snyk Code, and rendered UAT, staging, and production manifests.
 The CLI is pinned to `1.1307.4`; high findings and scan errors fail the gate.
-Container monitoring runs even when the container scan finds vulnerabilities.
-`build-image` exposes an image digest only after ECR confirms the digest from
-the image push. CICD scans that immutable image URI before deployment.
+`build-image` exposes the digest returned by Docker push. CICD scans that
+immutable image URI before deployment.
+
+## Nightly Snyk Reporting
+
+`.github/workflows/nightly.yml` runs at 06:00 UTC, after Renovate's
+`before 5am Europe/London` merge window, and supports manual dispatch on main.
+It resolves the existing main image by commit tag and calls `snyk.yml` without
+building or deploying. PR scans remain GitHub SARIF checks and do not publish
+Snyk snapshots. Nightly main runs publish Open Source, Container, Code and IaC
+results to the Snyk organization using stable main project identities.
+The OAuth identity must prefer the intended organization; Code reporting also
+requires the `View Project Ignores` permission.
 
 Fork provenance: `.github/workflows/sast.yml` from
 `laa-reusable-github-actions@a7cbc9ed08d5ab503a21b24297b697797866dc14`,

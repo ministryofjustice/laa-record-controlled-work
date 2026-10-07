@@ -15,6 +15,11 @@ on:
         description: ECR repository containing the pushed image
         required: true
         type: string
+      report_to_snyk:
+        description: Publish scan snapshots to Snyk for the main branch
+        required: false
+        type: boolean
+        default: false
     secrets:
       ECR_ROLE_TO_ASSUME:
         required: true
@@ -35,12 +40,20 @@ jobs:
     env:
       IMAGE_URI: ${{ secrets.ECR_REGISTRY_URL }}/${{ inputs.image_repo }}@${{ inputs.image_digest }}
       IMAGE_REFERENCE: ${{ inputs.image_repo }}@${{ inputs.image_digest }}
+      REPORT_TO_SNYK: ${{ inputs.report_to_snyk }}
     permissions:
       actions: read
       contents: read
       id-token: write
       security-events: write
     steps:
+      - name: Require main for Snyk UI reporting
+        if: ${{ inputs.report_to_snyk && github.ref != 'refs/heads/main' }}
+        shell: bash
+        run: |
+          echo "::error::Snyk UI reporting is restricted to main"
+          exit 1
+
       - name: Checkout scanned source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
