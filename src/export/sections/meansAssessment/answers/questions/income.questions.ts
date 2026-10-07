@@ -1,9 +1,7 @@
 import type { EligibilityData } from "#/api/clients/rcw/model/eligibilityData.zod.gen.js";
+import type { EligibilityDataIncome } from "#/api/clients/rcw/model/eligibilityDataIncome.zod.gen.js";
 import type { QuestionSection } from "#/export/sections/meansAssessment/answers/answers.types.js";
-import type {
-  AnswerSelection,
-  SavedEmploymentIncome,
-} from "#/export/sections/meansAssessment/answers/questions/questions.types.js";
+import type { AnswerSelection } from "#/export/sections/meansAssessment/answers/questions/questions.types.js";
 
 import {
   client,
@@ -29,7 +27,7 @@ function getEmploymentIncome(
   adult: AnswerSelection,
   answers: EligibilityData,
   index: number,
-): SavedEmploymentIncome {
+): EligibilityDataIncome {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- CCQ validates completed income entries.
   return adult.employmentIncomes(answers)![index];
 }

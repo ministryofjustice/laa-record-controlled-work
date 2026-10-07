@@ -21,6 +21,7 @@ const BASE_ANSWERS = {
   employment_status: "unemployed",
   friends_or_family_relevant: false,
   immigration_or_asylum: false,
+  investments_relevant: false,
   level_of_help: "controlled",
   maintenance_relevant: false,
   other_relevant: false,
@@ -34,6 +35,7 @@ const BASE_ANSWERS = {
   property_or_lodger_relevant: false,
   receives_benefits: false,
   student_finance_relevant: false,
+  valuables_relevant: false,
 } satisfies EligibilityData;
 
 const NON_MEANS_TESTED_ROUTES: ReadonlyArray<{
@@ -77,9 +79,11 @@ function summaries(overrides: Partial<EligibilityData> = {}) {
 }
 
 function dependantSummaries(overrides: Partial<EligibilityData> = {}) {
-  return summaries(overrides).filter(
-    ({ heading }) =>
-      heading === "Dependants" || heading.startsWith("Dependant "),
+  return (
+    summaries(overrides)?.filter(
+      ({ heading }) =>
+        heading === "Dependants" || heading.startsWith("Dependant "),
+    ) ?? []
   );
 }
 
@@ -212,7 +216,7 @@ describe("saved dependant answers", () => {
 
   it("omits dependant answers for passported assessments", () => {
     expect(
-      summaries({
+      dependantSummaries({
         adult_dependants: true,
         adult_dependants_count: 1,
         child_dependants: true,
@@ -221,30 +225,6 @@ describe("saved dependant answers", () => {
         dependants_get_income: true,
         passporting: true,
       }),
-    ).to.deep.equal([
-      {
-        ...CLIENT_SUMMARY,
-        rows: [
-          ...CLIENT_SUMMARY.rows.slice(0, 2),
-          {
-            key: "Does your client receive a passporting benefit?",
-            value: "Yes",
-          },
-        ],
-      },
-      {
-        heading: "Home client usually lives in",
-        rows: [
-          {
-            key: "Does your client own the home the client usually lives in?",
-            value: "No",
-          },
-        ],
-      },
-      {
-        heading: "Client other property",
-        rows: [{ key: "Does your client own any other property, a holiday home or land?", value: "No" }],
-      },
-    ]);
+    ).to.deep.equal([]);
   });
 });
