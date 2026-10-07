@@ -1,4 +1,5 @@
-const APP_ORIGIN = new URL("https://rcw.invalid").origin;
+// returnTo accepts app-relative paths, resolved against this fixed base.
+const APP_ORIGIN = "https://no-host";
 const MAX_PATH_DECODE_PASSES = 3;
 const DECODE_PASS_INCREMENT = 1;
 
