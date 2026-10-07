@@ -66,7 +66,7 @@ export async function authCodeCallback(
     // exchange auth code for tokens and state
     const result = await entra.exchangeAuthCode(data.code, authCodeRequest);
     if (result.error) {
-      res.status(UNAUTHORIZED).send(result.error.message);
+      res.status(UNAUTHORIZED).type("text/plain").send(result.error.message);
       return;
     }
 
@@ -117,7 +117,10 @@ export async function signIn(
       callbackHostname: req.hostname,
     });
     if (result.error) {
-      res.status(INTERNAL_SERVER_ERROR).send(result.error.message);
+      res
+        .status(INTERNAL_SERVER_ERROR)
+        .type("text/plain")
+        .send(result.error.message);
       return;
     }
 
@@ -206,7 +209,10 @@ function getValidatedCallbackState(
         entraError: parsedError.data.error,
         entraErrorDescription: description,
       });
-      res.status(BAD_REQUEST).send(`Entra sign-in failed: ${errorMessage}`);
+      res
+        .status(BAD_REQUEST)
+        .type("text/plain")
+        .send(`Entra sign-in failed: ${errorMessage}`);
       return undefined;
     }
 

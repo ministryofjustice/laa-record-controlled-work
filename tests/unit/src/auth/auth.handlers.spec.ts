@@ -219,6 +219,7 @@ describe("Auth Handlers", () => {
 
       expect(res.status).to.equal(INTERNAL_SERVER_ERROR);
       expect(res.text).to.equal(errorMessage);
+      expect(res.headers["content-type"]).to.match(/^text\/plain/);
     });
 
     // Skipped because this test relies on rendering the error page, and we can't do that currently.
@@ -287,15 +288,15 @@ describe("Auth Handlers", () => {
     it("responds with 400 and the Entra callback error description when auth provider returns an error", async () => {
       const res = await request(mockApp).get("/auth/code/callback").query({
         error: "invalid_scope",
-        error_description:
-          "AADSTS650053: The application requested scope is invalid",
+        error_description: "<script>alert(1)</script>",
       });
 
       expect(authServiceStub.exchangeAuthCode.called).to.be.false;
       expect(res.status).to.equal(BAD_REQUEST);
       expect(res.text).to.equal(
-        "Entra sign-in failed: AADSTS650053: The application requested scope is invalid",
+        "Entra sign-in failed: <script>alert(1)</script>",
       );
+      expect(res.headers["content-type"]).to.match(/^text\/plain/);
     });
 
     it("responds with 401 when token exchange fails", async () => {
@@ -308,6 +309,7 @@ describe("Auth Handlers", () => {
 
       expect(res.status).to.equal(UNAUTHORIZED);
       expect(res.text).to.equal("Token acquisition failed");
+      expect(res.headers["content-type"]).to.match(/^text\/plain/);
     });
 
     it("responds with 401 when token exchange result has no account homeAccountId", async () => {
