@@ -5275,7 +5275,7 @@ __metadata:
     pino: "npm:^10.3.1"
     playwright-core: "npm:^1.63.0"
     prettier: "npm:^3.9.9"
-    redis: "npm:^6.2.1"
+    redis: "npm:^6.3.0"
     rimraf: "npm:^6.1.3"
     sass-embedded: "npm:^1.105.1"
     sinon: "npm:^22.1.0"
@@ -6539,7 +6539,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"redis@npm:^6.2.1":
+"redis@npm:^6.3.0":
   version: 6.3.0
   resolution: "redis@npm:6.3.0"
   dependencies:
