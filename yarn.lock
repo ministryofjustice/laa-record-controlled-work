@@ -2975,7 +2975,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chai@npm:^6.2.2":
+"chai@npm:^6.3.0":
   version: 6.3.0
   resolution: "chai@npm:6.3.0"
   checksum: 10c0/fd1bf7fc41295ba1eba18a44d68e204b3cb11b79c9ad51fd071de3ee85323c20d94afc07a386f1f5ff44a5da4a116614d419fc44a2d459e4b5b574aef9af4431
@@ -5237,7 +5237,7 @@ __metadata:
     "@typescript-eslint/parser": "npm:^8.71.0"
     accessible-autocomplete: "npm:^3.0.2"
     c8: "npm:^12.0.0"
-    chai: "npm:^6.2.2"
+    chai: "npm:^6.3.0"
     chai-as-promised: "npm:^8.0.2"
     compression: "npm:^1.8.2"
     concurrently: "npm:^10.0.5"
