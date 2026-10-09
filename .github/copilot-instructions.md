@@ -9,6 +9,7 @@
 - Meaningful names; avoid globals; comment only when necessary (why, not how).
 - Composition over inheritance; small, single-responsibility units.
 - Do not use "canonical" or its variations. Name the specific guarantee, such as a normalized path, same-origin URL, or validated destination.
+- Do not use `ReturnType<typeof X>` unless it is absolutely required. Use concrete types.
 
 ## Design & APIs
 

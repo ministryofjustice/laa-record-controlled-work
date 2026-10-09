@@ -1,5 +1,7 @@
 import type session from "express-session";
 
+import type { AuthFlowStore } from "#/auth/auth.flow-store.js";
+
 export interface ExpressLocaleLoader {
   t: (key: string, options?: Record<string, unknown>) => string;
 }
@@ -17,6 +19,7 @@ declare global {
 
 declare module "express-serve-static-core" {
   interface Locals {
+    authFlowStore?: AuthFlowStore;
     csrfToken?: string;
   }
 }

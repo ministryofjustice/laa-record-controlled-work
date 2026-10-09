@@ -88,8 +88,9 @@ describe("loadOffices", () => {
     expect(setData.firstCall.args[0]).to.equal(
       CONTEXT_DATA_KEYS.availableOffices,
     );
+    expect(distributionStub.calledOnce).to.equal(true);
     expect(
-      distributionStub.calledOnceWithMatch(
+      distributionStub.calledWithMatch(
         "api_response_time",
         sinon.match.number,
         {
@@ -172,8 +173,9 @@ describe("loadOffices", () => {
       expect(error).to.be.instanceOf(ApiResponseError);
       expect((error as ApiResponseError).cause).to.equal(cause);
     }
+    expect(distributionStub.calledOnce).to.equal(true);
     expect(
-      distributionStub.calledOnceWithMatch(
+      distributionStub.calledWithMatch(
         "api_response_time",
         sinon.match.number,
         {
@@ -198,8 +200,9 @@ describe("loadOffices", () => {
     } catch (error) {
       expect(error).to.be.instanceOf(ApiResponseError);
     }
+    expect(distributionStub.calledOnce).to.equal(true);
     expect(
-      distributionStub.calledOnceWithMatch(
+      distributionStub.calledWithMatch(
         "api_response_time",
         sinon.match.number,
         {
