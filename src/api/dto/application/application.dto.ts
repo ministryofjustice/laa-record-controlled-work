@@ -1,4 +1,5 @@
 import type { Application as ApplicationSchema } from "#/api/clients/rcw/model/application.zod.gen.js";
+import type { ApplicationScopingQuestions } from "#/api/clients/rcw/model/applicationScopingQuestions.zod.gen.js";
 import type { CreateApplicationRequestBody } from "#/api/clients/rcw/model/createApplicationRequestBody.zod.gen.js";
 import type { CreateScopingQuestions } from "#/api/clients/rcw/model/createScopingQuestions.zod.gen.js";
 import type { AnswersOutput } from "#/journeys/create-application/data/answers.zod.js";
@@ -9,7 +10,6 @@ import {
   mapCountryNameToIsoCode,
   mapIsoCodeToCountryName,
 } from "#/lib/countries.js";
-import { ApplicationScopingQuestions } from "#/api/clients/rcw/model/applicationScopingQuestions.zod.gen.js";
 
 interface Application {
   addressLine1?: string;
@@ -239,10 +239,6 @@ export class ApplicationDto {
   private static getAnswersFromScopingQuestions(
     scopingQuestions: ApplicationScopingQuestions,
   ): Partial<AnswersOutput> {
-    if (!scopingQuestions) {
-      return {};
-    }
-
     const scopingAnswers: Partial<AnswersOutput> = {};
 
     if (scopingQuestions.familyLawClassification === "private") {
