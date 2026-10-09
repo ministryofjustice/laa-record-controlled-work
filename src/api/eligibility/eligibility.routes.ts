@@ -5,7 +5,7 @@ import express from "express";
 import type {
   LoadEligibilityAssessmentDeps,
   SaveEligibilityAssessmentDeps,
-} from "#/api/eligibility/eligibility.service.js";
+} from "#/api/eligibility/eligibility.types.js";
 
 import {
   getApplication,

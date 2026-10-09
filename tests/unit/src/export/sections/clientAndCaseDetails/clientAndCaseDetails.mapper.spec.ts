@@ -1,19 +1,19 @@
 import { expect } from "chai";
 import { describe, it } from "mocha";
 
-import type { ExportApplication } from "#/export/export.types.js";
+import type { Application } from "#/api/clients/rcw/model/application.zod.gen.js";
 
 import { toClientAndCaseDetailsSection } from "#/export/sections/clientAndCaseDetails/clientAndCaseDetails.mapper.js";
 import { getGetApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
 
-type ClientDetails = ExportApplication["clientDetails"];
-type ApplicationOverrides = Omit<Partial<ExportApplication>, "clientDetails"> & {
+type ClientDetails = Application["clientDetails"];
+type ApplicationOverrides = Omit<Partial<Application>, "clientDetails"> & {
   clientDetails?: Partial<ClientDetails>;
 };
 
 function makeApplication(
   overrides: ApplicationOverrides = {},
-): ExportApplication {
+): Application {
   const { clientDetails, ...applicationOverrides } = overrides;
 
   return getGetApplicationResponseMock({
