@@ -12,6 +12,7 @@ import {
   client,
   partner,
 } from "#/export/sections/meansAssessment/answers/answers.selections.js";
+import { otherIncomeFrequencies } from "#/export/sections/meansAssessment/answers/questions/frequencies.js";
 import { isIncomeAssessmentRelevant } from "#/export/sections/meansAssessment/answers/questions/question.helpers.js";
 
 interface OtherIncomeCategory {
@@ -19,14 +20,6 @@ interface OtherIncomeCategory {
   label: string;
   selectors: OtherIncomeCategorySelectors;
 }
-
-const otherIncomeFrequencies = {
-  every_four_weeks: "otherIncome.frequencies.everyFourWeeks",
-  every_two_weeks: "otherIncome.frequencies.everyTwoWeeks",
-  every_week: "otherIncome.frequencies.everyWeek",
-  monthly: "otherIncome.frequencies.monthly",
-  total: "otherIncome.frequencies.threeMonths",
-};
 
 /**
  * Declares the relevant rows for one other-income category.

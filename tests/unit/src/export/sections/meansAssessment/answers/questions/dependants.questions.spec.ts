@@ -26,6 +26,9 @@ const BASE_ANSWERS = {
   other_relevant: false,
   partner: false,
   passporting: false,
+  property_owned: "none",
+  housing_payments: 0,
+  housing_benefit_relevant: false,
   pension_relevant: false,
   property_or_lodger_relevant: false,
   receives_benefits: false,
@@ -228,6 +231,15 @@ describe("saved dependant answers", () => {
           {
             key: "Does your client receive a passporting benefit?",
             value: "Yes",
+          },
+        ],
+      },
+      {
+        heading: "Home client usually lives in",
+        rows: [
+          {
+            key: "Does your client own the home the client usually lives in?",
+            value: "No",
           },
         ],
       },

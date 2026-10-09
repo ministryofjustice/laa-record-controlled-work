@@ -13,6 +13,9 @@ const BASE_ANSWERS = {
   level_of_help: "controlled",
   partner: false,
   passporting: false,
+  property_owned: "none",
+  housing_payments: 0,
+  housing_benefit_relevant: false,
 } satisfies EligibilityData;
 
 function summaries(overrides: Partial<EligibilityData> = {}) {

@@ -11,7 +11,14 @@ function summaries(data: EligibilityData) {
   return toMeansAssessmentSection(
     getGetApplicationResponseMock({
       eligibility: {
-        data: { adult_dependants: false, child_dependants: false, ...data },
+        data: {
+          adult_dependants: false,
+          child_dependants: false,
+          property_owned: "none",
+          housing_payments: 0,
+          housing_benefit_relevant: false,
+          ...data,
+        },
         result: null,
       },
       meansAssessmentRequired: true,

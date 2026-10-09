@@ -9,20 +9,13 @@ import {
   client,
   partner,
 } from "#/export/sections/meansAssessment/answers/answers.selections.js";
+import { incomeFrequencies } from "#/export/sections/meansAssessment/answers/questions/frequencies.js";
 import { isIncomeAssessmentRelevant } from "#/export/sections/meansAssessment/answers/questions/question.helpers.js";
 
 const incomeTypes = {
   employment: "income.types.employment",
   self_employment: "income.types.selfEmployment",
   statutory_pay: "income.types.statutoryPay",
-};
-
-const incomeFrequencies = {
-  every_four_weeks: "income.frequencies.everyFourWeeks",
-  every_two_weeks: "income.frequencies.everyTwoWeeks",
-  every_week: "income.frequencies.everyWeek",
-  monthly: "income.frequencies.monthly",
-  three_months: "income.frequencies.threeMonths",
 };
 
 /**
