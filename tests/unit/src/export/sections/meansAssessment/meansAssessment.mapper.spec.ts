@@ -50,6 +50,44 @@ describe("toMeansAssessmentSection", () => {
     }
   });
 
+  it("keeps calculated sections when another section total is null", () => {
+    const result = {
+      result_summary: {
+        disposable_income: {
+          combined_total_disposable_income: 100,
+          proceeding_types: [{ result: "eligible", upper_threshold: 200 }],
+        },
+        gross_income: {
+          combined_total_gross_income: null,
+          proceeding_types: [{ result: "eligible", upper_threshold: 1_000 }],
+        },
+        overall_result: { result: "eligible" },
+      },
+    };
+
+    expect(mapSection(result)?.calculations).to.deep.equal({
+      capital: { status: "not_calculated" },
+      capitalContribution: null,
+      disposableIncome: {
+        noUpperThreshold: false,
+        outcome: "eligible",
+        status: "calculated",
+        total: 100,
+        upperThreshold: 200,
+      },
+      grossIncome: {
+        noUpperThreshold: false,
+        outcome: "eligible",
+        status: "calculated",
+        total: null,
+        upperThreshold: 1_000,
+      },
+      incomeContribution: null,
+      outcome: "eligible",
+      status: "ready",
+    });
+  });
+
   it("returns unavailable calculations when a saved total is malformed", () => {
     const result = {
       result_summary: {
