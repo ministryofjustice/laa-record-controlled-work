@@ -174,6 +174,24 @@
             "houseValue": "Estimated value",
             "mortgage": "Outstanding mortgage",
             "percentageOwned": "Percentage share owned"
+          },
+          "additionalProperties": {
+            "client": {
+              "heading": "Client other property",
+              "ownership": "Does your client own any other property, a holiday home or land?",
+              "entryHeading": "Client other property {index} details",
+              "percentageOwned": "What percentage does your client own?"
+            },
+            "partner": {
+              "heading": "Partner other property",
+              "ownership": "Does the partner own any other property, a holiday home or land?",
+              "entryHeading": "Partner other property {index} details",
+              "percentageOwned": "What percentage does the partner own?"
+            },
+            "houseValue": "How much is the property, holiday home or land worth?",
+            "inlineMortgage": "Is there an outstanding mortgage on the property, holiday home or land?",
+            "mortgage": "Value of outstanding mortgage",
+            "disputedAsset": "Disputed asset"
           }
         }
       },

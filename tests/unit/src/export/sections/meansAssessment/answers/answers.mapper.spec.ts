@@ -28,6 +28,7 @@ const ANSWERS = {
   passporting: false,
   pension_relevant: false,
   property_owned: "none",
+  additional_property_owned: "none",
   property_or_lodger_relevant: false,
   receives_benefits: false,
   student_finance_relevant: false,
@@ -54,58 +55,31 @@ const SUMMARIES = [
   {
     heading: "Client income",
     rows: [
-      {
-        key: "What is your client's employment status?",
-        value: "Unemployed",
-      },
+      { key: "What is your client's employment status?", value: "Unemployed" },
     ],
   },
   {
     heading: "Client benefits",
     rows: [
-      {
-        key: "Does your client get any non-passporting benefits?",
-        value: "No",
-      },
+      { key: "Does your client get any non-passporting benefits?", value: "No" },
     ],
   },
   {
     heading: "Client other income",
     rows: [
-      {
-        key: "Does your client get financial help from friends or family?",
-        value: "No",
-      },
-      {
-        key: "Does your client get maintenance from a former partner?",
-        value: "No",
-      },
-      {
-        key: "Does your client get income from a property or lodger?",
-        value: "No",
-      },
+      { key: "Does your client get financial help from friends or family?", value: "No" },
+      { key: "Does your client get maintenance from a former partner?", value: "No" },
+      { key: "Does your client get income from a property or lodger?", value: "No" },
       { key: "Does your client get income from pensions?", value: "No" },
-      {
-        key: "Does your client get income from student finance?",
-        value: "No",
-      },
-      {
-        key: "Does your client get income from other sources?",
-        value: "No",
-      },
+      { key: "Does your client get income from student finance?", value: "No" },
+      { key: "Does your client get income from other sources?", value: "No" },
     ],
   },
   {
     heading: "Your client's outgoings and deductions",
     rows: [
-      {
-        key: "Does your client pay maintenance to a former partner?",
-        value: "No",
-      },
-      {
-        key: "Does your client make payments towards legal aid for a criminal case?",
-        value: "No",
-      },
+      { key: "Does your client pay maintenance to a former partner?", value: "No" },
+      { key: "Does your client make payments towards legal aid for a criminal case?", value: "No" },
     ],
   },
   {
@@ -123,6 +97,15 @@ const SUMMARIES = [
       { key: "Housing payments", value: "£0.00" },
       {
         key: "Is Housing Benefit claimed at the home the client lives in?",
+        value: "No",
+      },
+    ],
+  },
+  {
+    heading: "Client other property",
+    rows: [
+      {
+        key: "Does your client own any other property, a holiday home or land?",
         value: "No",
       },
     ],
@@ -233,7 +216,8 @@ describe("saved means answers", () => {
           },
         ],
       },
-      SUMMARIES[SUMMARIES.length - 2],
+      SUMMARIES.at(-3),
+      SUMMARIES.at(-1),
     ]);
     expect(section?.calculations).to.deep.equal({
       capital: { status: "not_calculated" },
