@@ -36,6 +36,23 @@ export const client: AnswerSelection = {
       relevant: (answers) => answers.student_finance_relevant,
     },
   },
+  payments: {
+    childcare: {
+      amount: (answers) => answers.childcare_payments_conditional_value,
+      frequency: (answers) => answers.childcare_payments_frequency,
+      relevant: (answers) => answers.childcare_payments_relevant,
+    },
+    legalAid: {
+      amount: (answers) => answers.legal_aid_payments_conditional_value,
+      frequency: (answers) => answers.legal_aid_payments_frequency,
+      relevant: (answers) => answers.legal_aid_payments_relevant,
+    },
+    maintenance: {
+      amount: (answers) => answers.maintenance_payments_conditional_value,
+      frequency: (answers) => answers.maintenance_payments_frequency,
+      relevant: (answers) => answers.maintenance_payments_relevant,
+    },
+  },
   receivesBenefits: (answers) => answers.receives_benefits,
 };
 
@@ -72,6 +89,24 @@ export const partner: AnswerSelection = {
     studentFinance: {
       amount: (answers) => answers.partner_student_finance_conditional_value,
       relevant: (answers) => answers.partner_student_finance_relevant,
+    },
+  },
+  payments: {
+    childcare: {
+      amount: (answers) => answers.partner_childcare_payments_conditional_value,
+      frequency: (answers) => answers.partner_childcare_payments_frequency,
+      relevant: (answers) => answers.partner_childcare_payments_relevant,
+    },
+    legalAid: {
+      amount: (answers) => answers.partner_legal_aid_payments_conditional_value,
+      frequency: (answers) => answers.partner_legal_aid_payments_frequency,
+      relevant: (answers) => answers.partner_legal_aid_payments_relevant,
+    },
+    maintenance: {
+      amount: (answers) =>
+        answers.partner_maintenance_payments_conditional_value,
+      frequency: (answers) => answers.partner_maintenance_payments_frequency,
+      relevant: (answers) => answers.partner_maintenance_payments_relevant,
     },
   },
   receivesBenefits: (answers) => answers.partner_receives_benefits,

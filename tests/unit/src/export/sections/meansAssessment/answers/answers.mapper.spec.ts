@@ -11,14 +11,20 @@ import { getGetApplicationResponseMock } from "#orval/mocks/rcw/fakers/applicati
 const ANSWERS = {
   adult_dependants: false,
   child_dependants: false,
+  childcare_payments_relevant: false,
   client_age: "standard",
   employment_status: "unemployed",
   friends_or_family_relevant: false,
   immigration_or_asylum: false,
+  legal_aid_payments_relevant: false,
   level_of_help: "controlled",
   maintenance_relevant: false,
+  maintenance_payments_relevant: false,
   other_relevant: false,
   partner: false,
+  partner_childcare_payments_relevant: false,
+  partner_legal_aid_payments_relevant: false,
+  partner_maintenance_payments_relevant: false,
   passporting: false,
   pension_relevant: false,
   property_or_lodger_relevant: false,
@@ -82,6 +88,19 @@ const SUMMARIES = [
       },
       {
         key: "Does your client get income from other sources?",
+        value: "No",
+      },
+    ],
+  },
+  {
+    heading: "Your client's outgoings and deductions",
+    rows: [
+      {
+        key: "Does your client pay maintenance to a former partner?",
+        value: "No",
+      },
+      {
+        key: "Does your client make payments towards legal aid for a criminal case?",
         value: "No",
       },
     ],
