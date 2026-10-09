@@ -172,22 +172,12 @@ function toCategory(
     return { status: MeansAssessmentStatus.NotCalculated };
   }
 
-  const proceedingTypes = category.proceeding_types;
-  if (
-    proceedingTypes === undefined ||
-    proceedingTypes === null ||
-    proceedingTypes.length === NO_CFE_PROCEEDING_TYPES
-  ) {
-    return { status: MeansAssessmentStatus.NotCalculated };
-  }
-  const [firstProceedingType] = proceedingTypes;
-  if (firstProceedingType.result === "not_calculated") {
+  const proceeding = toCategoryProceeding(category.proceeding_types);
+  if (proceeding === null) {
     return { status: MeansAssessmentStatus.NotCalculated };
   }
 
   const total = category[totalKey];
-  const outcome: MeansAssessmentCategoryOutcome = firstProceedingType.result;
-  const upperThreshold = firstProceedingType.upper_threshold;
   let mappedTotal = total ?? null;
   if (
     mappedTotal !== null &&
@@ -197,11 +187,48 @@ function toCategory(
   }
 
   return {
-    noUpperThreshold: upperThreshold === CFE_MAX_VALUE,
-    outcome,
+    // CCQ upperThreshold comparison: laa-check-client-qualifies/app/models/calculation_result.rb:39.
+    noUpperThreshold: proceeding.upperThreshold === CFE_MAX_VALUE,
+    outcome: proceeding.outcome,
     status: MeansAssessmentStatus.Calculated,
     total: mappedTotal,
-    upperThreshold,
+    upperThreshold: proceeding.upperThreshold,
+  };
+}
+
+/**
+ * Maps proceeding results using CCQ's calculated and first-result rules.
+ * @param proceedingTypes Saved proceeding results for a category.
+ * @returns The CCQ summary result and threshold, or null when uncalculated.
+ */
+function toCategoryProceeding(
+  proceedingTypes: CfeCategory["proceeding_types"],
+): null | {
+  outcome: MeansAssessmentCategoryOutcome;
+  upperThreshold: number;
+} {
+  if (
+    proceedingTypes === undefined ||
+    proceedingTypes === null ||
+    proceedingTypes.length === NO_CFE_PROCEEDING_TYPES ||
+    // Match CCQ's any-calculated-result check in laa-check-client-qualifies/app/models/cfe_result.rb:31.
+    !proceedingTypes.some(
+      ({ result }) => result !== CfeOutcomes.enum.not_calculated,
+    )
+  ) {
+    return null;
+  }
+  // Match CCQ's first-entry reads in CfeResult: cfe_result.rb:36,41.
+  const [firstProceedingType] = proceedingTypes;
+  // Match CCQ's eligible default to treat not_calculated as eligible: laa-check-client-qualifies/app/models/calculation_result.rb:48.
+  const outcome =
+    firstProceedingType.result === CfeOutcomes.enum.not_calculated
+      ? CfeOutcomes.enum.eligible
+      : firstProceedingType.result;
+
+  return {
+    outcome,
+    upperThreshold: firstProceedingType.upper_threshold,
   };
 }
 
