@@ -10,10 +10,13 @@ import { getGetApplicationResponseMock } from "#orval/mocks/rcw/fakers/applicati
 function summaries(data: EligibilityData) {
   return toMeansAssessmentSection(
     getGetApplicationResponseMock({
-      eligibility: { data, result: null },
+      eligibility: {
+        data: { adult_dependants: false, child_dependants: false, ...data },
+        result: null,
+      },
       meansAssessmentRequired: true,
     }),
-  )?.answerSummaries;
+  )?.answerSummaries.filter((summary) => summary.heading === "Client details");
 }
 
 describe("saved client answers", () => {
