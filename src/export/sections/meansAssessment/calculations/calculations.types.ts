@@ -1,3 +1,7 @@
+import type * as zod from "zod";
+
+import type { CfeOutcomes } from "#/export/sections/meansAssessment/calculations/calculations.zod.js";
+
 export enum MeansAssessmentStatus {
   Calculated = "calculated",
   NotCalculated = "not_calculated",
@@ -28,13 +32,15 @@ export type MeansAssessmentCategory =
       noUpperThreshold: boolean;
       outcome: MeansAssessmentCategoryOutcome;
       status: MeansAssessmentStatus.Calculated;
-      total: number;
+      total: null | number;
       upperThreshold: number;
     }
   | { status: MeansAssessmentStatus.NotCalculated };
 
-export type MeansAssessmentCategoryOutcome =
-  "contribution_required" | "eligible" | "ineligible";
+export type MeansAssessmentCategoryOutcome = Exclude<
+  CfeOutcome,
+  typeof CfeOutcomes.enum.not_calculated
+>;
 
 export type MeansAssessmentCategorySet = [
   capital: MeansAssessmentCategory,
@@ -42,4 +48,9 @@ export type MeansAssessmentCategorySet = [
   grossIncome: MeansAssessmentCategory,
 ];
 
-export type MeansAssessmentOutcome = "contribution_required" | "eligible";
+export type MeansAssessmentOutcome = Exclude<
+  CfeOutcome,
+  typeof CfeOutcomes.enum.ineligible | typeof CfeOutcomes.enum.not_calculated
+>;
+
+type CfeOutcome = zod.output<typeof CfeOutcomes>;

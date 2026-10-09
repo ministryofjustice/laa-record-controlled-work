@@ -9,8 +9,10 @@ const CFE_OUTCOMES = [
   "not_calculated",
 ] as const;
 
+export const CfeOutcomes = zod.enum(CFE_OUTCOMES);
+
 const cfeProceedingTypeSchema = zod.looseObject({
-  result: zod.enum(CFE_OUTCOMES),
+  result: CfeOutcomes,
   upper_threshold: zod.number(),
 });
 

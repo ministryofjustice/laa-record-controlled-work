@@ -14,6 +14,7 @@ import {
 } from "#/export/sections/meansAssessment/calculations/calculations.types.js";
 import {
   type CfeCategory,
+  CfeOutcomes,
   cfeResultSchema,
   type CfeResultSummary,
 } from "#/export/sections/meansAssessment/calculations/calculations.zod.js";
@@ -48,9 +49,6 @@ export function toMeansAssessmentCalculations(
   }
 
   const categories = toCategories(resultSummary);
-  if (categories === null) {
-    return { status: MeansAssessmentStatus.Unavailable };
-  }
   const hasCalculatedCategory = categories.some(
     (category) => category.status === MeansAssessmentStatus.Calculated,
   );
@@ -83,23 +81,18 @@ function isMeansAssessmentExemptOrPassported(
   if (data === null || data === undefined) {
     return false;
   }
+  /* eslint-disable @typescript-eslint/naming-convention -- API field names */
   const {
-    // eslint-disable-next-line @typescript-eslint/naming-convention -- API field names
     aggregated_means,
-    // eslint-disable-next-line @typescript-eslint/naming-convention -- API field names
     asylum_support,
-    // eslint-disable-next-line @typescript-eslint/naming-convention -- API field names
     client_age,
-    // eslint-disable-next-line @typescript-eslint/naming-convention -- API field names
     controlled_legal_representation,
-    // eslint-disable-next-line @typescript-eslint/naming-convention -- API field names
     immigration_or_asylum,
     passporting,
-    // eslint-disable-next-line @typescript-eslint/naming-convention -- API field names
     regular_income,
-    // eslint-disable-next-line @typescript-eslint/naming-convention -- API field names
     under_eighteen_assets,
   } = data;
+  /* eslint-enable @typescript-eslint/naming-convention */
 
   const hasAsylumSupportExemption = immigration_or_asylum && asylum_support;
 
@@ -148,7 +141,7 @@ function parseCfeResultSummary(
  */
 function toCategories(
   resultSummary: CfeResultSummary,
-): MeansAssessmentCategorySet | null {
+): MeansAssessmentCategorySet {
   const grossIncome = toCategory(
     resultSummary.gross_income,
     MeansAssessmentTotalField.CombinedTotalGrossIncome,
@@ -162,10 +155,6 @@ function toCategories(
     MeansAssessmentTotalField.CombinedAssessedCapital,
   );
 
-  if (grossIncome === null || disposableIncome === null || capital === null) {
-    return null;
-  }
-
   return [capital, disposableIncome, grossIncome];
 }
 
@@ -173,12 +162,12 @@ function toCategories(
  * Maps a saved category total and its first proceeding type without deriving values.
  * @param category Saved CFE category.
  * @param totalKey Saved total field for the category.
- * @returns A calculated category, an uncalculated state, or null for incompatible fields.
+ * @returns A calculated category or an uncalculated state.
  */
 function toCategory(
   category: CfeCategory | null | undefined,
   totalKey: MeansAssessmentTotalField,
-): MeansAssessmentCategory | null {
+): MeansAssessmentCategory {
   if (category === undefined || category === null) {
     return { status: MeansAssessmentStatus.NotCalculated };
   }
@@ -191,28 +180,27 @@ function toCategory(
   ) {
     return { status: MeansAssessmentStatus.NotCalculated };
   }
-
   const [firstProceedingType] = proceedingTypes;
   if (firstProceedingType.result === "not_calculated") {
     return { status: MeansAssessmentStatus.NotCalculated };
   }
 
   const total = category[totalKey];
-  if (total === null || total === undefined) {
-    return null;
-  }
-
   const outcome: MeansAssessmentCategoryOutcome = firstProceedingType.result;
   const upperThreshold = firstProceedingType.upper_threshold;
+  let mappedTotal = total ?? null;
+  if (
+    mappedTotal !== null &&
+    totalKey === MeansAssessmentTotalField.CombinedAssessedCapital
+  ) {
+    mappedTotal = Math.max(mappedTotal, MINIMUM_ASSESSED_CAPITAL);
+  }
 
   return {
     noUpperThreshold: upperThreshold === CFE_MAX_VALUE,
     outcome,
     status: MeansAssessmentStatus.Calculated,
-    total:
-      totalKey === MeansAssessmentTotalField.CombinedAssessedCapital
-        ? Math.max(total, MINIMUM_ASSESSED_CAPITAL)
-        : total,
+    total: mappedTotal,
     upperThreshold,
   };
 }
@@ -225,7 +213,10 @@ function toCategory(
 function toMeansAssessmentOutcome(
   outcome: null | string | undefined,
 ): MeansAssessmentOutcome | null {
-  if (outcome === "eligible" || outcome === "contribution_required") {
+  if (
+    outcome === CfeOutcomes.enum.eligible ||
+    outcome === CfeOutcomes.enum.contribution_required
+  ) {
     return outcome;
   }
 
