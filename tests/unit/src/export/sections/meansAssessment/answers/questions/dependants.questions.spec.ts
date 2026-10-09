@@ -18,10 +18,18 @@ const CLIENT_SUMMARY = {
 
 const BASE_ANSWERS = {
   client_age: "standard",
+  employment_status: "unemployed",
+  friends_or_family_relevant: false,
   immigration_or_asylum: false,
   level_of_help: "controlled",
+  maintenance_relevant: false,
+  other_relevant: false,
   partner: false,
   passporting: false,
+  pension_relevant: false,
+  property_or_lodger_relevant: false,
+  receives_benefits: false,
+  student_finance_relevant: false,
 } satisfies EligibilityData;
 
 const NON_MEANS_TESTED_ROUTES: ReadonlyArray<{
@@ -64,12 +72,19 @@ function summaries(overrides: Partial<EligibilityData> = {}) {
   )?.answerSummaries;
 }
 
+function dependantSummaries(overrides: Partial<EligibilityData> = {}) {
+  return summaries(overrides).filter(
+    ({ heading }) =>
+      heading === "Dependants" || heading.startsWith("Dependant "),
+  );
+}
+
 describe("saved dependant answers", () => {
   before(initializeI18nextSync);
 
   it("shows dependant counts and repeated incomes in saved order", () => {
     expect(
-      summaries({
+      dependantSummaries({
         adult_dependants: true,
         adult_dependants_count: 1,
         child_dependants: true,
@@ -82,7 +97,6 @@ describe("saved dependant answers", () => {
         dependants_get_income: true,
       }),
     ).to.deep.equal([
-      CLIENT_SUMMARY,
       {
         heading: "Dependants",
         rows: [
@@ -131,7 +145,7 @@ describe("saved dependant answers", () => {
 
   it("shows only the count enabled by each dependant answer", () => {
     expect(
-      summaries({
+      dependantSummaries({
         adult_dependants: true,
         adult_dependants_count: 2,
         child_dependants: false,
@@ -140,7 +154,6 @@ describe("saved dependant answers", () => {
         dependants_get_income: false,
       }),
     ).to.deep.equal([
-      CLIENT_SUMMARY,
       {
         heading: "Dependants",
         rows: [
@@ -158,14 +171,13 @@ describe("saved dependant answers", () => {
 
   it("omits income controls when neither dependant type is present", () => {
     expect(
-      summaries({
+      dependantSummaries({
         adult_dependants: false,
         child_dependants: false,
         dependant_incomes: [{ amount: 20, frequency: "monthly" }],
         dependants_get_income: true,
       }),
     ).to.deep.equal([
-      CLIENT_SUMMARY,
       {
         heading: "Dependants",
         rows: [

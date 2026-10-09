@@ -12,10 +12,18 @@ const ANSWERS = {
   adult_dependants: false,
   child_dependants: false,
   client_age: "standard",
+  employment_status: "unemployed",
+  friends_or_family_relevant: false,
   immigration_or_asylum: false,
   level_of_help: "controlled",
+  maintenance_relevant: false,
+  other_relevant: false,
   partner: false,
   passporting: false,
+  pension_relevant: false,
+  property_or_lodger_relevant: false,
+  receives_benefits: false,
+  student_finance_relevant: false,
 } satisfies EligibilityData;
 
 const SUMMARIES = [
@@ -32,6 +40,50 @@ const SUMMARIES = [
     rows: [
       { key: "Does your client have any child dependants?", value: "No" },
       { key: "Does your client have any adult dependants?", value: "No" },
+    ],
+  },
+  {
+    heading: "Client income",
+    rows: [
+      {
+        key: "What is your client's employment status?",
+        value: "Unemployed",
+      },
+    ],
+  },
+  {
+    heading: "Client benefits",
+    rows: [
+      {
+        key: "Does your client get any non-passporting benefits?",
+        value: "No",
+      },
+    ],
+  },
+  {
+    heading: "Client other income",
+    rows: [
+      {
+        key: "Does your client get financial help from friends or family?",
+        value: "No",
+      },
+      {
+        key: "Does your client get maintenance from a former partner?",
+        value: "No",
+      },
+      {
+        key: "Does your client get income from a property or lodger?",
+        value: "No",
+      },
+      { key: "Does your client get income from pensions?", value: "No" },
+      {
+        key: "Does your client get income from student finance?",
+        value: "No",
+      },
+      {
+        key: "Does your client get income from other sources?",
+        value: "No",
+      },
     ],
   },
 ];

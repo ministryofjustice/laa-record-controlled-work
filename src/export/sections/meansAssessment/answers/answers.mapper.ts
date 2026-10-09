@@ -7,8 +7,25 @@ import type {
 } from "#/export/sections/meansAssessment/answers/answers.types.js";
 
 import { formatAnswer } from "#/export/sections/meansAssessment/answers/answers.formatter.js";
+import {
+  clientBenefitsQuestionSections,
+  partnerBenefitsQuestionSections,
+} from "#/export/sections/meansAssessment/answers/questions/benefits.questions.js";
 import { clientQuestionSections } from "#/export/sections/meansAssessment/answers/questions/client.questions.js";
 import { dependantQuestionSections } from "#/export/sections/meansAssessment/answers/questions/dependants.questions.js";
+import {
+  clientEmploymentQuestionSections,
+  partnerAgeQuestionSections,
+  partnerEmploymentQuestionSections,
+} from "#/export/sections/meansAssessment/answers/questions/employment.questions.js";
+import {
+  clientIncomeQuestionSections,
+  partnerIncomeQuestionSections,
+} from "#/export/sections/meansAssessment/answers/questions/income.questions.js";
+import {
+  clientOtherIncomeQuestionSections,
+  partnerOtherIncomeQuestionSections,
+} from "#/export/sections/meansAssessment/answers/questions/otherIncome.questions.js";
 import { fixedT } from "#/lib/i18n.js";
 
 const DISPLAY_INDEX_OFFSET = 1;
@@ -31,6 +48,15 @@ export function toMeansAssessmentAnswerSummaries(
   return toQuestionSectionSummaries<EligibilityData>(answers, [
     ...clientQuestionSections,
     ...dependantQuestionSections,
+    ...clientEmploymentQuestionSections,
+    ...clientIncomeQuestionSections,
+    ...clientBenefitsQuestionSections,
+    ...clientOtherIncomeQuestionSections,
+    ...partnerAgeQuestionSections,
+    ...partnerEmploymentQuestionSections,
+    ...partnerIncomeQuestionSections,
+    ...partnerBenefitsQuestionSections,
+    ...partnerOtherIncomeQuestionSections,
   ]);
 }
 
