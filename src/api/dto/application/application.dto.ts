@@ -9,6 +9,7 @@ import {
   mapCountryNameToIsoCode,
   mapIsoCodeToCountryName,
 } from "#/lib/countries.js";
+import { ApplicationScopingQuestions } from "#/api/clients/rcw/model/applicationScopingQuestions.zod.gen.js";
 
 interface Application {
   addressLine1?: string;
@@ -182,7 +183,7 @@ export class ApplicationDto {
       application.scopingQuestions?.priorLegalAid,
     );
     const scopingAnswers = this.getAnswersFromScopingQuestions(
-      application.scopingQuestions,
+      application.scopingQuestions ?? {},
     );
 
     return {
@@ -236,7 +237,7 @@ export class ApplicationDto {
    * @returns Partial AnswersOutput object containing the scoping question fields.
    */
   private static getAnswersFromScopingQuestions(
-    scopingQuestions: null | CreateScopingQuestions,
+    scopingQuestions: ApplicationScopingQuestions,
   ): Partial<AnswersOutput> {
     if (!scopingQuestions) {
       return {};
