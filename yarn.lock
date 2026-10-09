@@ -1701,44 +1701,44 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@scalar/json-magic@npm:0.15.3, @scalar/json-magic@npm:^0.15.0":
-  version: 0.15.3
-  resolution: "@scalar/json-magic@npm:0.15.3"
+"@scalar/json-magic@npm:0.15.4, @scalar/json-magic@npm:^0.15.0":
+  version: 0.15.4
+  resolution: "@scalar/json-magic@npm:0.15.4"
   dependencies:
     "@scalar/helpers": "npm:0.16.0"
     pathe: "npm:^2.0.3"
-    undici: "npm:7.29.0"
+    undici: "npm:7.29.1"
     yaml: "npm:^2.9.0"
-  checksum: 10c0/89dbd2f3209c4db0c9fc85730b37a90c497444a4a78907e15b58ba5f3b9ba3f719d034b74b84ed364a1f2f6dbfd5669dd845742efe73dd4cde3a851a428c3086
+  checksum: 10c0/5270388217273a4fc79d35c3985d537cc83f5891410d70e02ddce1cb987b9f97fd4ac96b5bc110e8f5a9a31a73b47b8660efe5abc23d1e39200f1f809e204cd1
   languageName: node
   linkType: hard
 
-"@scalar/json-schema-validator@npm:0.1.8":
-  version: 0.1.8
-  resolution: "@scalar/json-schema-validator@npm:0.1.8"
+"@scalar/json-schema-validator@npm:0.1.9":
+  version: 0.1.9
+  resolution: "@scalar/json-schema-validator@npm:0.1.9"
   dependencies:
     "@scalar/helpers": "npm:0.16.0"
-    "@scalar/types": "npm:0.22.3"
+    "@scalar/types": "npm:0.22.4"
     ajv: "npm:^8.20.0"
     ajv-draft-04: "npm:^1.0.0"
     ajv-formats: "npm:^3.0.1"
     yaml: "npm:^2.9.0"
-  checksum: 10c0/05933bb22485a1637c2a3b52f1f89bc25c037cda67a8ef6be36dcbb20e426573a397636be386b5b64f5e3d47a34bfa8eae9deb47f683b1802c2654a241b10fbd
+  checksum: 10c0/290b47f7c551e242f61d5754605dea750394203f3188b25e1b9fc793916cbdb19d25564386cd692b765ec0ab319baf61a06094ccb3abf5e0362daa2333ae91a6
   languageName: node
   linkType: hard
 
 "@scalar/openapi-parser@npm:^0.29.2":
-  version: 0.29.9
-  resolution: "@scalar/openapi-parser@npm:0.29.9"
+  version: 0.29.10
+  resolution: "@scalar/openapi-parser@npm:0.29.10"
   dependencies:
     "@scalar/helpers": "npm:0.16.0"
-    "@scalar/json-magic": "npm:0.15.3"
+    "@scalar/json-magic": "npm:0.15.4"
     "@scalar/openapi-types": "npm:0.9.7"
     "@scalar/openapi-upgrader": "npm:0.4.1"
-    "@scalar/openapi-validator": "npm:0.1.8"
-    "@scalar/types": "npm:0.22.3"
+    "@scalar/openapi-validator": "npm:0.1.9"
+    "@scalar/types": "npm:0.22.4"
     yaml: "npm:^2.9.0"
-  checksum: 10c0/e386af618307383b17888efc875cf7157e8064b6cb2f2c438cef5143fad946ba296e99c99ff3ace51e50bb70140e34072f5bddbc325d019d0ca1dae4e96b7a1e
+  checksum: 10c0/8c292b70682064348de5bf38533837d39542453f767cc64b7a671a2c0be914fb183adedc98a61449c3680c231b875e3f9dc2596885604606831964f937956533
   languageName: node
   linkType: hard
 
@@ -1759,27 +1759,27 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@scalar/openapi-validator@npm:0.1.8":
-  version: 0.1.8
-  resolution: "@scalar/openapi-validator@npm:0.1.8"
+"@scalar/openapi-validator@npm:0.1.9":
+  version: 0.1.9
+  resolution: "@scalar/openapi-validator@npm:0.1.9"
   dependencies:
     "@scalar/helpers": "npm:0.16.0"
-    "@scalar/json-schema-validator": "npm:0.1.8"
-    "@scalar/types": "npm:0.22.3"
+    "@scalar/json-schema-validator": "npm:0.1.9"
+    "@scalar/types": "npm:0.22.4"
     yaml: "npm:^2.9.0"
-  checksum: 10c0/5f58871c5c7a456532083b571eea053bf76fd2da458118c0b208ca76ea5ccec9fd1cd6ba7d4524273a1dde634bf3ddfdd26ec506d159e4542a17fe5939414ad2
+  checksum: 10c0/31ee275df0212ae7b3e1634d8787adfc670931102a16f15ecd40fe0342a6e8c1a81fbab8def323c3c2766f8dc5a906f7278bc0bb5f696b72e731f80f0ad34186
   languageName: node
   linkType: hard
 
-"@scalar/types@npm:0.22.3":
-  version: 0.22.3
-  resolution: "@scalar/types@npm:0.22.3"
+"@scalar/types@npm:0.22.4":
+  version: 0.22.4
+  resolution: "@scalar/types@npm:0.22.4"
   dependencies:
     "@scalar/helpers": "npm:0.16.0"
     nanoid: "npm:^5.1.6"
     type-fest: "npm:^5.8.0"
     zod: "npm:^4.4.3"
-  checksum: 10c0/744004b3eb11aed8f8110ff3f0abda1eead0bdb5c6be5666fbc1646c9c3bbd593e7b7baf1116259593efae3bee189d6b8e93066cabc9858d5bb861033ee1d187
+  checksum: 10c0/5fa877a05c4a22fd81e850513297b553c7de4a8c12e26532a7ab57398bd8574df550f2f61f7f50c156a981d78c82c3bbf2fe96a43f1d3ae827e5d05251b04bff
   languageName: node
   linkType: hard
 
@@ -2119,11 +2119,11 @@ __metadata:
   linkType: hard
 
 "@types/node@npm:*, @types/node@npm:>=13.7.0, @types/node@npm:^26.4.0":
-  version: 26.6.3
-  resolution: "@types/node@npm:26.6.3"
+  version: 26.6.4
+  resolution: "@types/node@npm:26.6.4"
   dependencies:
     undici-types: "npm:~8.9.0"
-  checksum: 10c0/51070287167d157d246a5ad83e6ead93aa310bbd9cc880ecd1f244a00c2a31491620f997fbbb6ba4ce164388694827999ec68c1d16c3fb64c1037056e64613c7
+  checksum: 10c0/094e7362df9200ba4c2da09131ca3b5d1aa51535a268a24e4ee2546d9c5a323d1d30cbdaaaa3db7ef8b2387572d1f9edabb11538ab7a09d3bca33ae5cddc2b1b
   languageName: node
   linkType: hard
 
@@ -4865,9 +4865,9 @@ __metadata:
   linkType: hard
 
 "ip-address@npm:^10.2.0":
-  version: 10.7.2
-  resolution: "ip-address@npm:10.7.2"
-  checksum: 10c0/290b9c63289b2a89a442dac19eff88d919e65cd41d1a720fa963be736e126f3b0cf4f88f6056b06abbf4a95300dc9ce5362a773e012ef30e0400074d175b9d31
+  version: 10.7.3
+  resolution: "ip-address@npm:10.7.3"
+  checksum: 10c0/145d9848f315a0375437d206dee763e2dd654063e8c5d6270a329e249cfad30b4ae760b237bb1991abfe67276f542310a89fca891ddf76f934e397e0dda1bf3b
   languageName: node
   linkType: hard
 
@@ -5719,8 +5719,8 @@ __metadata:
   linkType: hard
 
 "node-gyp@npm:latest":
-  version: 13.0.2
-  resolution: "node-gyp@npm:13.0.2"
+  version: 13.1.0
+  resolution: "node-gyp@npm:13.1.0"
   dependencies:
     env-paths: "npm:^2.2.0"
     exponential-backoff: "npm:^3.1.1"
@@ -5728,13 +5728,13 @@ __metadata:
     nopt: "npm:^10.0.0"
     proc-log: "npm:^7.0.0"
     semver: "npm:^7.3.5"
-    tar: "npm:^7.5.4"
+    tar: "npm:^7.5.7"
     tinyglobby: "npm:^0.2.12"
     undici: "npm:^8.4.1"
     which: "npm:^7.0.0"
   bin:
     node-gyp: bin/node-gyp.js
-  checksum: 10c0/29d33ccf47ffeeb5e7af925550b416f698a26a72eb10975c7eb5775c1d0cecacd76d164a4aa45503d3ddcece209db65c712be00423c69381a4cd14e2e6540559
+  checksum: 10c0/c6693e52e0e111b21f5cd8ff303b41b51f40338adcc79ac5c6a02399eba7039d50dc816dcafcc485870291a641f7cb75db8887a9bdd0de537fe635a3a81cba5b
   languageName: node
   linkType: hard
 
