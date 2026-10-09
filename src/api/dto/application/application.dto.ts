@@ -1,6 +1,6 @@
 import type { Application as ApplicationSchema } from "#/api/clients/rcw/model/application.zod.gen.js";
 import type { CreateApplicationRequestBody } from "#/api/clients/rcw/model/createApplicationRequestBody.zod.gen.js";
-import type { ScopingQuestions } from "#/api/clients/rcw/model/scopingQuestions.zod.gen.js";
+import type { CreateScopingQuestions } from "#/api/clients/rcw/model/createScopingQuestions.zod.gen.js";
 import type { AnswersOutput } from "#/journeys/create-application/data/answers.zod.js";
 
 import { PriorLegalAid } from "#/api/clients/rcw/model/priorLegalAid.zod.gen.js";
@@ -26,7 +26,7 @@ interface Application {
   postcode?: string;
   providerOfficeCode: string;
   reasonForReapplication?: string;
-  scopingQuestions: ScopingQuestions;
+  scopingQuestions: CreateScopingQuestions;
   townOrCity?: string;
 }
 
@@ -71,7 +71,7 @@ export class ApplicationDto {
   public postCode?: string;
   public providerOfficeCode = "";
   public reasonForReapplication?: string;
-  public scopingQuestions!: ScopingQuestions;
+  public scopingQuestions!: CreateScopingQuestions;
   public townOrCity?: string;
 
   /**
@@ -154,8 +154,8 @@ export class ApplicationDto {
    */
   public static getScopingQuestionsFromAnswers(
     answers: AnswersOutput,
-  ): ScopingQuestions {
-    const scopingQuestions: ScopingQuestions = {
+  ): CreateScopingQuestions {
+    const scopingQuestions: CreateScopingQuestions = {
       familyLawClassification: answers.familyLawClassification,
       priorLegalAid: answers.legalAidBefore,
     };
@@ -236,7 +236,7 @@ export class ApplicationDto {
    * @returns Partial AnswersOutput object containing the scoping question fields.
    */
   private static getAnswersFromScopingQuestions(
-    scopingQuestions: null | ScopingQuestions,
+    scopingQuestions: null | CreateScopingQuestions,
   ): Partial<AnswersOutput> {
     if (!scopingQuestions) {
       return {};
