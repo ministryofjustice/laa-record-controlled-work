@@ -613,7 +613,12 @@ describe("Auth Handlers", () => {
       const redirect = sinon.stub();
       const status = sinon.stub().returnsThis();
       const send = sinon.stub().returnsThis();
-      const res = { redirect, send, status } as unknown as Response;
+      const res = {
+        redirect,
+        send,
+        status,
+        type: sinon.stub().returnsThis(),
+      } as unknown as Response;
 
       const signin = signIn(req, res, sinon.stub() as unknown as NextFunction);
       await saveStarted;
