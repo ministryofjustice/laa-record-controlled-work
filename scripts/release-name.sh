@@ -12,9 +12,22 @@ release=$(echo "$release" | sed 's:^\w*\/::')
 # Replace special character segments with singular hyphens
 # (e.g. "foo...bar" becomes "foo-bar", rather than "foo---bar")
 release=$(echo "$release" | tr -s ' _/[]().' '-')
-# Truncate to 18 characters to keep release names and hostnames short
-release=$(echo "$release" | cut -c1-18)
-# Strip any trailing hyphen left by truncation
+max=30
+# Long names keep their start (ticket) and end (part) so stacked branches
+# sharing a prefix don't collide on one Helm release.
+# e.g. "mem-10234-export-means-something-else" becomes "mem-10234-means-something-else"
+if [ "${#release}" -gt "$max" ]; then
+  # Full ticket so it never loses digits, e.g. "mem-1302" or "mem-10234"
+  head=$(echo "$release" | grep -oE '^[a-z]+-[0-9]+')
+  # No ticket in the name: fall back to the first word, max 18 chars, e.g. "fix-this-thing"
+  [ -z "$head" ] && head=$(echo "$release" | cut -d- -f1 | cut -c1-18)
+  # Whatever is left of the max (minus the joining hyphen) goes to the end
+  size=$((max - 1 - ${#head}))
+  tail="${release: -$size}"
+  tail="${tail#-}"
+  release="$head-$tail"
+fi
+# Strip any trailing hyphen
 release=$(echo "$release" | sed 's/-$//')
 
 echo "$release"
