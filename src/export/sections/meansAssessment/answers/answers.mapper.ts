@@ -7,6 +7,7 @@ import type {
 } from "#/export/sections/meansAssessment/answers/answers.types.js";
 
 import { formatAnswer } from "#/export/sections/meansAssessment/answers/answers.formatter.js";
+import { assetQuestionSections } from "#/export/sections/meansAssessment/answers/questions/assets.questions.js";
 import {
   clientBenefitsQuestionSections,
   partnerBenefitsQuestionSections,
@@ -67,6 +68,7 @@ export function toMeansAssessmentAnswerSummaries(
     ...partnerOutgoingsQuestionSections,
     ...housingQuestionSections,
     ...additionalPropertyQuestionSections,
+    ...assetQuestionSections,
   ]);
 }
 
