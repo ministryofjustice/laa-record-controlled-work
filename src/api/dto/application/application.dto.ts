@@ -1,6 +1,7 @@
 import type { Application as ApplicationSchema } from "#/api/clients/rcw/model/application.zod.gen.js";
+import type { ApplicationScopingQuestions } from "#/api/clients/rcw/model/applicationScopingQuestions.zod.gen.js";
 import type { CreateApplicationRequestBody } from "#/api/clients/rcw/model/createApplicationRequestBody.zod.gen.js";
-import type { ScopingQuestions } from "#/api/clients/rcw/model/scopingQuestions.zod.gen.js";
+import type { CreateScopingQuestions } from "#/api/clients/rcw/model/createScopingQuestions.zod.gen.js";
 import type { AnswersOutput } from "#/journeys/create-application/data/answers.zod.js";
 
 import { PriorLegalAid } from "#/api/clients/rcw/model/priorLegalAid.zod.gen.js";
@@ -26,7 +27,7 @@ interface Application {
   postcode?: string;
   providerOfficeCode: string;
   reasonForReapplication?: string;
-  scopingQuestions: ScopingQuestions;
+  scopingQuestions: CreateScopingQuestions;
   townOrCity?: string;
 }
 
@@ -71,7 +72,7 @@ export class ApplicationDto {
   public postCode?: string;
   public providerOfficeCode = "";
   public reasonForReapplication?: string;
-  public scopingQuestions!: ScopingQuestions;
+  public scopingQuestions!: CreateScopingQuestions;
   public townOrCity?: string;
 
   /**
@@ -96,6 +97,8 @@ export class ApplicationDto {
 
     const address = hasFixedAddress ? this.getAddressFromAnswers(answers) : {};
 
+    const scopingQuestions = this.getScopingQuestionsFromAnswers(answers);
+
     return new ApplicationDto({
       ...address,
       dateOfBirth: answers.dateOfBirth,
@@ -106,10 +109,7 @@ export class ApplicationDto {
       niNumber: answers.niNumber,
       providerOfficeCode,
       reasonForReapplication: answers.reasonForYes,
-      scopingQuestions: {
-        familyLawClassification: answers.familyLawClassification,
-        priorLegalAid: answers.legalAidBefore,
-      },
+      scopingQuestions,
     });
   }
 
@@ -148,6 +148,28 @@ export class ApplicationDto {
   }
 
   /**
+   * Extracts the scoping questions from the provided answers.
+   * Ensures that only relevant scoping questions are included based on the family law classification.
+   * @param answers - The answers from which to extract the scoping questions.
+   * @returns ScopingQuestions instance containing the extracted scoping questions.
+   */
+  public static getScopingQuestionsFromAnswers(
+    answers: AnswersOutput,
+  ): CreateScopingQuestions {
+    const scopingQuestions: CreateScopingQuestions = {
+      familyLawClassification: answers.familyLawClassification,
+      priorLegalAid: answers.legalAidBefore,
+    };
+
+    if (answers.familyLawClassification === "private") {
+      scopingQuestions.needsAdviceOnEUOrInternationalMaintenance =
+        answers.needsAdviceOnEUOrInternationalMaintenance === "yes";
+    }
+
+    return scopingQuestions;
+  }
+
+  /**
    * Creates an answers output instance from the provided application.
    * @param application - The application from which to create the answers output instance.
    * @returns AnswersOutput instance.
@@ -160,9 +182,13 @@ export class ApplicationDto {
     const priorLegalAid = PriorLegalAid.parse(
       application.scopingQuestions?.priorLegalAid,
     );
+    const scopingAnswers = this.getAnswersFromScopingQuestions(
+      application.scopingQuestions ?? {},
+    );
 
     return {
       ...addressAnswers,
+      ...scopingAnswers,
       [AnswerKey.dateOfBirth]: application.clientDetails.dateOfBirth,
       [AnswerKey.ecf]: "no",
       [AnswerKey.familyLawClassification]:
@@ -203,6 +229,26 @@ export class ApplicationDto {
       [AnswerKey.osAddressLine4]: address.addressLine4 ?? undefined,
       [AnswerKey.osCountry]: mapIsoCodeToCountryName(address.country),
     };
+  }
+
+  /**
+   * Extract answers from the scoping questions.
+   * @param scopingQuestions - The scoping questions from which to extract the answers.
+   * @returns Partial AnswersOutput object containing the scoping question fields.
+   */
+  private static getAnswersFromScopingQuestions(
+    scopingQuestions: ApplicationScopingQuestions,
+  ): Partial<AnswersOutput> {
+    const scopingAnswers: Partial<AnswersOutput> = {};
+
+    if (scopingQuestions.familyLawClassification === "private") {
+      scopingAnswers[AnswerKey.needsAdviceOnEUOrInternationalMaintenance] =
+        scopingQuestions.needsAdviceOnEUOrInternationalMaintenance
+          ? "yes"
+          : "no";
+    }
+
+    return scopingAnswers;
   }
 
   /**

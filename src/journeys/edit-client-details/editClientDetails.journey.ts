@@ -6,6 +6,7 @@ import { ineligibleStep } from "#/journeys/create-application/steps/ecfDropout/e
 import { enterAddressManuallyStep } from "#/journeys/create-application/steps/enterAddressManually/enterAddressManually.step.js";
 import { enterOverseasAddressStep } from "#/journeys/create-application/steps/enterOverseasAddress/enterOverseasAddress.step.js";
 import { familyLawClassificationStep } from "#/journeys/create-application/steps/familyLawClassification/familyLawClassification.step.js";
+import { familyPrivateNonMeansStep } from "#/journeys/create-application/steps/familyPrivateNonMeans/familyPrivateNonMeans.step.js";
 import { haveAHomeAddressStep } from "#/journeys/create-application/steps/haveAHomeAddress/haveAHomeAddress.step.js";
 import { legalAidBeforeStep } from "#/journeys/create-application/steps/legalAidBefore/legalAidBefore.step.js";
 import { legalAidLast6MonthsStep } from "#/journeys/create-application/steps/legalAidLast6Months/legalAidLast6Months.step.js";
@@ -31,6 +32,7 @@ export const editClientDetailsJourney = journey({
   steps: [
     ecfStep(editJourneyCode, { reachability: { entryWhen: true } }),
     familyLawClassificationStep(editJourneyCode),
+    familyPrivateNonMeansStep(editJourneyCode),
     ineligibleStep(editJourneyCode),
     legalAidBeforeStep(editJourneyCode),
     legalAidLast6MonthsStep(editJourneyCode),

@@ -480,6 +480,7 @@ export const getGetApplicationResponseMock = <
           "public",
           "private",
         ] as const),
+        needsAdviceOnEUOrInternationalMaintenance: faker.datatype.boolean(),
       },
       null,
     ]),

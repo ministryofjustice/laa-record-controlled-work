@@ -24,6 +24,7 @@ export const CreateApplicationBody = zod.object({
     familyLawClassification: zod
       .union([zod.enum(["public", "private"]), zod.null()])
       .optional(),
+    needsAdviceOnEUOrInternationalMaintenance: zod.boolean().nullish(),
   }),
   clientDetails: zod.object({
     firstName: zod.string(),

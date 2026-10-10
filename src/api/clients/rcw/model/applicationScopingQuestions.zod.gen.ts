@@ -11,6 +11,7 @@ export const ApplicationScopingQuestions = zod.object({
     .enum(["no", "yesDifferentMatter", "yesSameMatter"])
     .optional(),
   familyLawClassification: zod.enum(["public", "private"]).optional(),
+  needsAdviceOnEUOrInternationalMaintenance: zod.boolean().optional(),
 });
 
 export type ApplicationScopingQuestions = zod.input<

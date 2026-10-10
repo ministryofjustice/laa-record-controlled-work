@@ -164,6 +164,18 @@
           "required": "Please select an option"
         }
       },
+      "familyPrivateNonMeans": {
+        "title": "Does your client need advice about transitional EU arrangements or an international maintenance agreement?",
+        "guidance": "The following must all apply:",
+        "guidanceList": [
+          "This case relates to a maintenance decision under Article 56(1) of the EU Maintenance Regulation or Article 10 of the 2007 Hague Convention.",
+          "My client is the person entitled to receive maintenance (the creditor), not the person who must pay it.",
+          "The child or young person is under 21 years old."
+        ],
+        "validation": {
+          "required": "Please select an option"
+        }
+      },
       "legalAidBefore": {
         "title": "Has your client accessed legal aid before?",
         "radioButton": {
@@ -295,6 +307,7 @@
         "answerLabels": {
           "ecf": "ECF",
           "familyLawClassification": "Type of family law",
+          "familyPrivateNonMeans": "Transitional EU arrangements or an international maintenance agreement",
           "legalAidBefore": "Accessed legal aid before",
           "legalAidLast6Months": "Did your client get legal help for this matter in the last 6 months?",
           "legalAidLast6MonthsReasonForYes": "Reason for new application for same matter",
