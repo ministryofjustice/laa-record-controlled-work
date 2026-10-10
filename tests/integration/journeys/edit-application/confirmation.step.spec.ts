@@ -5,6 +5,7 @@ import {
 import { expect } from "chai";
 import sinon from "sinon";
 
+import type { Application } from "#/api/clients/rcw/model/application.zod.gen.js";
 import { getGetApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
 import { createForgeTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
@@ -14,11 +15,23 @@ import { editApplicationTransformersRegistry } from "#/journeys/edit-application
 import { faker } from "@faker-js/faker";
 
 describe("Confirmation step", () => {
+  function getApplicationResponse(data: Application) {
+    return {
+      status: 200,
+      data: {
+        ...data,
+        ecfFlag: data.ecfFlag ?? null,
+        scopingQuestions: data.scopingQuestions ?? null,
+      },
+      headers: new Headers({ etag: '"0"' }),
+    };
+  }
+
   const uuid = faker.string.uuid();
   const mockData = getGetApplicationResponseMock();
   const getApplicationStub = sinon
     .stub()
-    .resolves({ status: 200, data: mockData });
+    .resolves(getApplicationResponse(mockData));
   const updateApplicationStatusStub = sinon.stub().resolves({ status: 204 });
 
   const client = createForgeTestClient(
@@ -37,7 +50,7 @@ describe("Confirmation step", () => {
   beforeEach(() => {
     getApplicationStub.resetHistory();
     getApplicationStub.resetBehavior();
-    getApplicationStub.resolves({ status: 200, data: mockData });
+    getApplicationStub.resolves(getApplicationResponse(mockData));
   });
 
   describe("GET /cases/123e4567-e89b-12d3-a456-426614174000/confirmation", () => {
@@ -46,7 +59,7 @@ describe("Confirmation step", () => {
     let body: RenderBlock;
 
     before(async () => {
-      getApplicationStub.resolves({ status: 200, data: mockData });
+      getApplicationStub.resolves(getApplicationResponse(mockData));
       const result = await client.get(`/cases/${uuid}/confirmation`, {
         session,
       });

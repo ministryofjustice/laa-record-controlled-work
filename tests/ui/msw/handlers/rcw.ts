@@ -1,6 +1,8 @@
+import { http, HttpResponse } from "msw";
+
+import { HTTP_STATUS } from "#/lib/constants/http.js";
 import {
   getCreateApplicationMockHandler,
-  getGetApplicationMockHandler,
   getGetApplicationsMockHandler,
   getUpdateApplicationDeclarationMockHandler,
   getUpdateApplicationEvidenceMockHandler,
@@ -24,10 +26,18 @@ const applicationFixtures = [
 export const rcwHandlers = [
   getGetApplicationsMockHandler(applications),
   getCreateApplicationMockHandler(createApplicationResponse),
-  getGetApplicationMockHandler(({ params }) => {
-    return (
+  http.get("*/api/v1/applications/:id", ({ params }) => {
+    const application =
       applicationFixtures.find((f) => f.id === params.id) ??
-      incompleteApplication
+      incompleteApplication;
+
+    return HttpResponse.json(
+      {
+        ...application,
+        ecfFlag: application.ecfFlag,
+        scopingQuestions: application.scopingQuestions,
+      },
+      { headers: { etag: '"0"' }, status: HTTP_STATUS.OK },
     );
   }),
   getUpdateApplicationStatusMockHandler(),

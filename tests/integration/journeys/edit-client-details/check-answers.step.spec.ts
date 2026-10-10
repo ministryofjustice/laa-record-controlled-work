@@ -22,6 +22,18 @@ type SummaryRow = {
   visibleWhen?: boolean;
 };
 
+function getApplicationResponse(data: Application) {
+  return {
+    status: 200,
+    data: {
+      ...data,
+      ecfFlag: data.ecfFlag ?? null,
+      scopingQuestions: data.scopingQuestions ?? null,
+    },
+    headers: new Headers({ etag: '"0"' }),
+  };
+}
+
 describe("Edit client details check answers step", () => {
   const applicationId = "123e4567-e89b-12d3-a456-426614174000";
   const ukApplication: Application = getGetApplicationResponseMock({
@@ -72,7 +84,7 @@ describe("Edit client details check answers step", () => {
   const draftKey = `${JourneyCode.EDIT_CLIENT_DETAILS}:${applicationId}`;
   const getApplicationStub = sinon
     .stub()
-    .resolves({ status: 200, data: ukApplication });
+    .resolves(getApplicationResponse(ukApplication));
   const updateApplicationStatusStub = sinon
     .stub()
     .resolves({ status: 204, data: undefined });
@@ -92,7 +104,7 @@ describe("Edit client details check answers step", () => {
 
   const getCheckAnswers = async (application: Application = ukApplication) => {
     const session = {};
-    getApplicationStub.resolves({ status: 200, data: application });
+    getApplicationStub.resolves(getApplicationResponse(application));
 
     const taskListResult = await editApplicationClient.get(
       `/cases/${applicationId}/task-list`,

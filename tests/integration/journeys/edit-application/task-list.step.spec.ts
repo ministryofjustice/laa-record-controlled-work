@@ -5,6 +5,7 @@ import {
 import { expect } from "chai";
 import sinon from "sinon";
 
+import type { Application } from "#/api/clients/rcw/model/application.zod.gen.js";
 import { getGetApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
 import { completeApplication } from "#msw/fixtures/rcw.js";
 import { createForgeTestClient } from "../../utils/helpers.js";
@@ -28,10 +29,23 @@ describe("Task list step", () => {
       result_summary: { overall_result: { result: "eligible" } },
     },
   };
+
+  function getApplicationResponse(data: Application) {
+    return {
+      status: 200,
+      data: {
+        ...data,
+        ecfFlag: data.ecfFlag ?? null,
+        scopingQuestions: data.scopingQuestions ?? null,
+      },
+      headers: new Headers({ etag: '"0"' }),
+    };
+  }
+
   const mockData = getGetApplicationResponseMock();
   const getApplicationStub = sinon
     .stub()
-    .resolves({ status: 200, data: mockData });
+    .resolves(getApplicationResponse(mockData));
   const updateApplicationStatusStub = sinon
     .stub()
     .resolves({ status: 204, data: undefined });
@@ -52,7 +66,7 @@ describe("Task list step", () => {
   beforeEach(() => {
     getApplicationStub.resetHistory();
     getApplicationStub.resetBehavior();
-    getApplicationStub.resolves({ status: 200, data: mockData });
+    getApplicationStub.resolves(getApplicationResponse(mockData));
   });
 
   describe("GET /cases/123e4567-e89b-12d3-a456-426614174000/task-list", () => {
@@ -65,7 +79,7 @@ describe("Task list step", () => {
       lists[2].properties.items as RenderedTaskListItem[];
 
     before(async () => {
-      getApplicationStub.resolves({ status: 200, data: mockData });
+      getApplicationStub.resolves(getApplicationResponse(mockData));
       const result = await client.get(`/cases/${uuid}/task-list`, {
         session,
       });
@@ -92,17 +106,18 @@ describe("Task list step", () => {
     });
 
     it("renders the ineligible result and hides evidence and declaration", async () => {
-      getApplicationStub.resolves({
-        status: 200,
-        data: getGetApplicationResponseMock({
-          eligibility: {
-            data: null,
-            result: {
-              result_summary: { overall_result: { result: "ineligible" } },
+      getApplicationStub.resolves(
+        getApplicationResponse(
+          getGetApplicationResponseMock({
+            eligibility: {
+              data: null,
+              result: {
+                result_summary: { overall_result: { result: "ineligible" } },
+              },
             },
-          },
-        }),
-      });
+          }),
+        ),
+      );
 
       const result = await client.get(`/cases/${uuid}/task-list`, {
         session: {},
@@ -152,12 +167,13 @@ describe("Task list step", () => {
     });
 
     it("renders evidence and declaration when no eligibility result is available", async () => {
-      getApplicationStub.resolves({
-        status: 200,
-        data: getGetApplicationResponseMock({
-          eligibility: { data: null, result: {} },
-        }),
-      });
+      getApplicationStub.resolves(
+        getApplicationResponse(
+          getGetApplicationResponseMock({
+            eligibility: { data: null, result: {} },
+          }),
+        ),
+      );
 
       const result = await client.get(`/cases/${uuid}/task-list`, {
         session: {},
@@ -175,12 +191,13 @@ describe("Task list step", () => {
     });
 
     it("does not render an eligibility result indicator when no result is available", async () => {
-      getApplicationStub.resolves({
-        status: 200,
-        data: getGetApplicationResponseMock({
-          eligibility: { data: null, result: {} },
-        }),
-      });
+      getApplicationStub.resolves(
+        getApplicationResponse(
+          getGetApplicationResponseMock({
+            eligibility: { data: null, result: {} },
+          }),
+        ),
+      );
 
       const result = await client.get(`/cases/${uuid}/task-list`, {
         session: {},
@@ -198,12 +215,13 @@ describe("Task list step", () => {
     });
 
     it("renders eligibility content for an eligible assessment", async () => {
-      getApplicationStub.resolves({
-        status: 200,
-        data: getGetApplicationResponseMock({
-          eligibility: eligibilityResult,
-        }),
-      });
+      getApplicationStub.resolves(
+        getApplicationResponse(
+          getGetApplicationResponseMock({
+            eligibility: eligibilityResult,
+          }),
+        ),
+      );
 
       const result = await client.get(`/cases/${uuid}/task-list`, {
         session: {},
@@ -231,12 +249,13 @@ describe("Task list step", () => {
 
     describe("means assessment status rendering", () => {
       it("links to the CCQ landing with a check-answers destination when completed", async () => {
-        getApplicationStub.resolves({
-          status: 200,
-          data: getGetApplicationResponseMock({
-            eligibility: eligibilityResult,
-          }),
-        });
+        getApplicationStub.resolves(
+          getApplicationResponse(
+            getGetApplicationResponseMock({
+              eligibility: eligibilityResult,
+            }),
+          ),
+        );
 
         const result = await client.get(`/cases/${uuid}/task-list`, {
           session: {},
@@ -256,12 +275,13 @@ describe("Task list step", () => {
       });
 
       it("links to the CCQ landing without a destination when incomplete", async () => {
-        getApplicationStub.resolves({
-          status: 200,
-          data: getGetApplicationResponseMock({
-            eligibility: null,
-          }),
-        });
+        getApplicationStub.resolves(
+          getApplicationResponse(
+            getGetApplicationResponseMock({
+              eligibility: null,
+            }),
+          ),
+        );
 
         const result = await client.get(`/cases/${uuid}/task-list`, {
           session: {},
@@ -283,10 +303,9 @@ describe("Task list step", () => {
 
     describe("declaration status rendering", () => {
       it("renders declaration as Completed when declaration data is present", async () => {
-        getApplicationStub.resolves({
-          status: 200,
-          data: completeApplication,
-        });
+        getApplicationStub.resolves(
+          getApplicationResponse(completeApplication),
+        );
 
         const result = await client.get(`/cases/${uuid}/task-list`, {
           session: {},
@@ -305,13 +324,12 @@ describe("Task list step", () => {
       });
 
       it("renders declaration as Incomplete when declaration data is empty", async () => {
-        getApplicationStub.resolves({
-          status: 200,
-          data: {
+        getApplicationStub.resolves(
+          getApplicationResponse({
             ...completeApplication,
             declaration: null,
-          },
-        });
+          }),
+        );
 
         const result = await client.get(`/cases/${uuid}/task-list`, {
           session: {},
@@ -330,13 +348,12 @@ describe("Task list step", () => {
       });
 
       it("renders declaration as Cannot start yet when evidence is not complete", async () => {
-        getApplicationStub.resolves({
-          status: 200,
-          data: {
+        getApplicationStub.resolves(
+          getApplicationResponse({
             ...completeApplication,
             evidence: null,
-          },
-        });
+          }),
+        );
 
         const result = await client.get(`/cases/${uuid}/task-list`, {
           session: {},
@@ -362,10 +379,11 @@ describe("Task list step", () => {
     });
 
     it("hides the Record Controlled Work button when readyForSubmission is false", async () => {
-      getApplicationStub.resolves({
-        status: 200,
-        data: getGetApplicationResponseMock({ eligibility: null }),
-      });
+      getApplicationStub.resolves(
+        getApplicationResponse(
+          getGetApplicationResponseMock({ eligibility: null }),
+        ),
+      );
 
       const result = await client.get(`/cases/${uuid}/task-list`, {
         session: {},
@@ -378,10 +396,7 @@ describe("Task list step", () => {
     });
 
     it("shows the Record Controlled Work button when readyForSubmission is true", async () => {
-      getApplicationStub.resolves({
-        status: 200,
-        data: completeApplication,
-      });
+      getApplicationStub.resolves(getApplicationResponse(completeApplication));
 
       const result = await client.get(`/cases/${uuid}/task-list`, {
         session: {},
@@ -406,17 +421,18 @@ describe("Task list step", () => {
     });
 
     it("closes an ineligible case when Close case is submitted", async () => {
-      getApplicationStub.resolves({
-        status: 200,
-        data: getGetApplicationResponseMock({
-          eligibility: {
-            data: null,
-            result: {
-              result_summary: { overall_result: { result: "ineligible" } },
+      getApplicationStub.resolves(
+        getApplicationResponse(
+          getGetApplicationResponseMock({
+            eligibility: {
+              data: null,
+              result: {
+                result_summary: { overall_result: { result: "ineligible" } },
+              },
             },
-          },
-        }),
-      });
+          }),
+        ),
+      );
 
       const result = await client.post(`/cases/${uuid}/task-list`, {
         session: {},

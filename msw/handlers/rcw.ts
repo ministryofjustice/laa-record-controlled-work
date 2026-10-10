@@ -1,6 +1,8 @@
+import { http, HttpResponse } from "msw";
+
+import { HTTP_STATUS } from "#/lib/constants/http.js";
 import {
   getCreateApplicationMockHandler,
-  getGetApplicationMockHandler,
   getGetApplicationsMockHandler,
   getUpdateApplicationEvidenceMockHandler,
 } from "#orval/mocks/rcw/msw/applications/applications.msw.gen.js";
@@ -15,10 +17,20 @@ import {
 export const rcwHandlers = [
   getGetApplicationsMockHandler(applications),
   getCreateApplicationMockHandler(createApplicationResponse),
-  getGetApplicationMockHandler((info) =>
-    info.params.id === completeApplication.id
-      ? completeApplication
-      : incompleteApplication,
-  ),
+  http.get("*/api/v1/applications/:id", ({ params }) => {
+    const application =
+      params.id === completeApplication.id
+        ? completeApplication
+        : incompleteApplication;
+
+    return HttpResponse.json(
+      {
+        ...application,
+        ecfFlag: application.ecfFlag,
+        scopingQuestions: application.scopingQuestions,
+      },
+      { headers: { etag: '"0"' }, status: HTTP_STATUS.OK },
+    );
+  }),
   getUpdateApplicationEvidenceMockHandler(),
 ];
