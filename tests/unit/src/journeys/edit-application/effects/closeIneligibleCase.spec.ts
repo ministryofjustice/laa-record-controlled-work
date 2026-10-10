@@ -11,19 +11,21 @@ import type {
 
 describe("closeIneligibleCase", () => {
   let updateApplicationStatus: sinon.SinonStub;
+  let getData: sinon.SinonStub;
   let context: EditApplicationContext;
   let deps: EditApplicationEffectsDeps;
 
   beforeEach(() => {
     sinon.stub(config.api, "useMockAccessToken").value(true);
     updateApplicationStatus = sinon.stub();
+    getData = sinon.stub().returns('"3"');
     deps = { updateApplicationStatus } as unknown as EditApplicationEffectsDeps;
     context = {
       getPostData: sinon.stub().returns("close"),
       getRequestParam: sinon.stub().returns("application-id"),
       getRequestHeader: sinon.stub().returns("test-correlation-id"),
       getSession: sinon.stub().returns({ id: "session-id" }),
-      getData: sinon.stub().returns(3),
+      getData,
     } as unknown as EditApplicationContext;
   });
 
@@ -46,6 +48,10 @@ describe("closeIneligibleCase", () => {
     await closeIneligibleCase(deps)(context);
 
     expect(updateApplicationStatus.calledOnce).to.equal(true);
+    expect(updateApplicationStatus.firstCall.args[1]).to.deep.equal({
+      applicationState: "COMPLETED",
+      eTag: 3,
+    });
     expect(
       distributionStub.calledOnceWithMatch(
         "api_response_time",
@@ -56,6 +62,33 @@ describe("closeIneligibleCase", () => {
         },
       ),
     ).to.equal(true);
+  });
+
+  it("converts the largest safe ETag to a numeric status version", async () => {
+    getData.returns('"9007199254740991"');
+    updateApplicationStatus.resolves({ status: 204 });
+
+    await closeIneligibleCase(deps)(context);
+
+    expect(updateApplicationStatus.firstCall.args[1]).to.deep.equal({
+      applicationState: "COMPLETED",
+      eTag: Number.MAX_SAFE_INTEGER,
+    });
+  });
+
+  it("does not call the status API for malformed or unsafe ETags", async () => {
+    for (const etag of ['"9007199254740992"', 'W/"3"', undefined]) {
+      getData.returns(etag);
+
+      try {
+        await closeIneligibleCase(deps)(context);
+        expect.fail("expected an invalid ETag to reject the close");
+      } catch (error) {
+        expect(error).to.be.instanceOf(Error);
+      }
+
+      expect(updateApplicationStatus.notCalled).to.equal(true);
+    }
   });
 
   it("throws on an unexpected status and records that status", async () => {

@@ -4,6 +4,7 @@ import type {
 } from "#/journeys/edit-application/editApplication.types.js";
 
 import { getRcwApiDefaultOptions } from "#/api/clients/getRcwApiDefaultOptions.js";
+import { applicationETagToNumber } from "#/journeys/edit-application/applicationETag.js";
 import {
   CONTEXT_DATA_KEYS,
   PARAMS_KEYS,
@@ -23,6 +24,9 @@ export const closeIneligibleCase =
       throw new Error("applicationID parameter is required");
     }
 
+    const eTag = applicationETagToNumber(
+      context.getData<string | undefined>(CONTEXT_DATA_KEYS.applicationETag),
+    );
     const session = context.getSession();
     const correlationId = context
       .getRequestHeader("x-correlation-id")
@@ -35,7 +39,7 @@ export const closeIneligibleCase =
 
     const body = {
       applicationState: "COMPLETED" as const,
-      eTag: context.getData<number>(CONTEXT_DATA_KEYS.applicationETag),
+      eTag,
     };
     const response = await metrics.time(
       "updateApplicationStatus",
