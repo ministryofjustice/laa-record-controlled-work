@@ -252,6 +252,38 @@ describe("toAnswers method", () => {
     );
   });
 
+  it("preserves known client answers when a fixed-address response omits its address", () => {
+    const { address: _address, ...clientDetailsWithoutAddress } =
+      application.clientDetails;
+    const result = ApplicationDto.toAnswers({
+      ...application,
+      clientDetails: {
+        ...clientDetailsWithoutAddress,
+        hasFixedAddress: true,
+      },
+    });
+
+    expect(result).to.include({
+      dateOfBirth: "1990-01-01",
+      firstName: "Jane",
+      haveAHomeAddress: "yes",
+      lastName: "Bloggs",
+    });
+    expect(result).to.not.have.any.keys(
+      "ukAddressLine1",
+      "ukAddressLine2",
+      "ukTownOrCity",
+      "ukCounty",
+      "ukPostcode",
+      "ukCountry",
+      "osAddressLine1",
+      "osAddressLine2",
+      "osAddressLine3",
+      "osAddressLine4",
+      "osCountry",
+    );
+  });
+
   it("leaves unavailable answers unanswered while preserving client and address details", () => {
     const result = ApplicationDto.toAnswers({
       ...application,

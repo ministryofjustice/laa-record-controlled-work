@@ -1,4 +1,5 @@
 import {
+  and,
   Condition,
   Self,
   validation,
@@ -96,7 +97,10 @@ export function dateOfBirthInput(): GovUKDateInputFull {
         },
       }),
       validation({
-        condition: Self().match(Condition.Date.IsAfter("1900-01-01")),
+        condition: and(
+          Self().match(Condition.Date.IsValid()),
+          Self().match(Condition.Date.IsAfter("1900-01-01")),
+        ),
         message: DOB_VALIDATION.AGE_LIMIT,
       }),
     ],

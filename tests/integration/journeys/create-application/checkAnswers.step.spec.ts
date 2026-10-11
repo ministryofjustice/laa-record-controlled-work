@@ -188,6 +188,36 @@ describe("Check answers step", () => {
       expect(niNumberRow?.value.text).to.equal("No");
     });
 
+    it("keeps existing fallback labels for unanswered create choices", async () => {
+      const result = await client.get("/cases/new/check-answers", {
+        session: createSession({
+          ecf: undefined,
+          familyLawClassification: undefined,
+          legalAidBefore: undefined,
+        }),
+      });
+
+      expect(result.type).to.equal("render");
+      const [unansweredSummaryList] = (result as TestRenderResult).getBlocksByVariant(
+        "govukSummaryList",
+      );
+      const rows = unansweredSummaryList.properties.rows as Array<{
+        key: { text: string };
+        value: { text: string };
+      }>;
+
+      expect(rows.find((row) => row.key.text === "ECF")?.value.text).to.equal(
+        "No",
+      );
+      expect(
+        rows.find((row) => row.key.text === "Type of family law")?.value.text,
+      ).to.equal("Private");
+      expect(
+        rows.find((row) => row.key.text === "Accessed legal aid before")?.value
+          .text,
+      ).to.equal("No");
+    });
+
     it("renders the address in the correct format", () => {
       const rows = summaryList.properties.rows as Array<{
         key: { text: string };

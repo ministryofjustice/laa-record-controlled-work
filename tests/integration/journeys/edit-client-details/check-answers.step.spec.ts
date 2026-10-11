@@ -18,9 +18,18 @@ import { createForgeTestClient } from "../../utils/helpers.js";
 type SummaryRow = {
   actions?: { items: Array<{ href: string }> };
   key: { text: string };
-  value: { html?: string; text?: string };
+  value: {
+    html?: string;
+    text?: string;
+  };
   visibleWhen?: boolean;
 };
+
+function expectIncompleteTag(row: SummaryRow | undefined): void {
+  expect(row?.value.html).to.equal(
+    '<strong class="govuk-tag govuk-tag--blue">Incomplete</strong>',
+  );
+}
 
 function getApplicationResponse(data: Application) {
   return {
@@ -182,6 +191,28 @@ describe("Edit client details check answers step", () => {
 
       expect(rows.find((row) => row.key.text === "First name")?.value.text).to
         .equal("John");
+    });
+
+    it("opens the edit journey when a fixed-address response omits its address", async () => {
+      const { address: _address, ...clientDetailsWithoutAddress } =
+        ukApplication.clientDetails;
+      const applicationWithoutAddress: Application = {
+        ...ukApplication,
+        clientDetails: clientDetailsWithoutAddress,
+      };
+      getApplicationStub.resolves(
+        getApplicationResponse(applicationWithoutAddress),
+      );
+
+      const result = await editApplicationClient.get(
+        `/cases/${applicationId}/task-list/details/?destination=check-answers`,
+        { session: {} },
+      );
+
+      expect(result.type).to.equal("redirect");
+      expect((result as TestRedirectResult).url).to.equal(
+        `/cases/${applicationId}/task-list/details/check-answers`,
+      );
     });
 
     it("redirects to check answers", async () => {
@@ -429,11 +460,13 @@ describe("Edit client details check answers step", () => {
     it("renders the API client data in a summary list", () => {
       const rows = summaryList.properties.rows as Array<{
         key: { text: string };
-        value: { text: string };
+        value: { html?: string; text: string };
       }>;
 
       expect(rows.length).to.equal(11);
       expect(rows[0].key.text).to.equal("ECF");
+      expect(rows[0].value.text).to.equal("No");
+      expect(rows[0].value.html).to.equal("No");
       expect(rows[1].key.text).to.equal("Type of family law");
       expect(rows[1].value.text).to.equal("Public");
       expect(rows[2].key.text).to.equal("Accessed legal aid before");
@@ -457,6 +490,255 @@ describe("Edit client details check answers step", () => {
       expect(rows[9].key.text).to.equal("Has a home address");
       expect(rows[9].value.text).to.equal("Yes");
       expect(rows[10].key.text).to.equal("Address");
+    });
+
+    it("shows unknown API answers as incomplete with their question links", async () => {
+      const result = await getCheckAnswers({
+        ...ukApplication,
+        ecfFlag: null,
+        scopingQuestions: null,
+      });
+      const [incompleteSummaryList] = result.getBlocksByVariant(
+        "govukSummaryList",
+      );
+      const rows = incompleteSummaryList.properties.rows as SummaryRow[];
+      const incompleteRows = [
+        ["ECF", "ecf?returnTo=check-answers"],
+        ["Type of family law", "family-type-of-case?returnTo=check-answers"],
+        ["Accessed legal aid before", "legal-aid-before?returnTo=check-answers"],
+      ];
+
+      for (const [label, href] of incompleteRows) {
+        const row = rows.find((candidate) => candidate.key.text === label);
+        expectIncompleteTag(row);
+        expect(row?.actions?.items[0].href).to.equal(href);
+      }
+    });
+
+    it("keeps client details complete when prior legal aid is unset", async () => {
+      const result = await getCheckAnswers({
+        ...ukApplication,
+        scopingQuestions: { familyLawClassification: "public" },
+      });
+      const [summary] = result.getBlocksByVariant("govukSummaryList");
+      const rows = summary.properties.rows as SummaryRow[];
+
+      expectIncompleteTag(
+        rows.find((row) => row.key.text === "Accessed legal aid before"),
+      );
+
+      for (const [label, value] of [
+        ["First name", "John"],
+        ["Last name", "Doe"],
+        ["Date of birth", "1 January 1990"],
+        ["National Insurance number", "AB123456C"],
+        ["Has a home address", "Yes"],
+      ]) {
+        const row = rows.find((candidate) => candidate.key.text === label);
+        expect(row?.value.text).to.equal(value);
+        expect(row?.value.html).to.equal(value);
+      }
+
+      const recentAidRow = rows.find(
+        (row) =>
+          row.key.text ===
+          "Did your client get legal help for this matter in the last 6 months?",
+      );
+      const reasonRow = rows.find(
+        (row) => row.key.text === "Reason for new application for same matter",
+      );
+      const addressRow = rows.find((row) => row.key.text === "Address");
+
+      expect(recentAidRow?.visibleWhen).to.equal(false);
+      expect(reasonRow?.visibleWhen).to.equal(false);
+      expect(addressRow?.value.html).to.match(/123 Test Street/);
+    });
+
+    it("shows incomplete draft answers safely and hides inactive follow-ups", async () => {
+      getApplicationStub.resolves(getApplicationResponse(ukApplication));
+      const session = {
+        journeyDrafts: {
+          [draftKey]: {
+            ...ApplicationDto.toAnswers(ukApplication),
+            ecf: undefined,
+            familyLawClassification: undefined,
+            legalAidBefore: undefined,
+            legalAidLast6Months: "yes",
+            reasonForYes: "stale reason",
+            firstName: "",
+            lastName: " ",
+            dateOfBirth: "not-a-date",
+            hasNINumber: undefined,
+            niNumber: undefined,
+            haveAHomeAddress: undefined,
+          },
+        },
+      };
+
+      const rows = await getCheckAnswersRows(session);
+      const incompleteLabels = [
+        "ECF",
+        "Type of family law",
+        "Accessed legal aid before",
+        "First name",
+        "Last name",
+        "Date of birth",
+        "National Insurance number",
+        "Has a home address",
+        "Address",
+      ];
+
+      for (const label of incompleteLabels) {
+        const row = rows.find((candidate) => candidate.key.text === label);
+        expectIncompleteTag(row);
+      }
+
+      expect(
+        rows.find((row) => row.key.text === "National Insurance number")
+          ?.actions?.items[0].href,
+      ).to.equal("ni-number?returnTo=check-answers");
+      expect(
+        rows.find((row) => row.key.text === "Has a home address")?.actions
+          ?.items[0].href,
+      ).to.equal("have-a-home-address?returnTo=check-answers");
+      expect(
+        rows.find(
+          (row) =>
+            row.key.text ===
+            "Did your client get legal help for this matter in the last 6 months?",
+        )?.visibleWhen,
+      ).to.equal(false);
+      expect(
+        rows.find(
+          (row) => row.key.text === "Reason for new application for same matter",
+        )?.visibleWhen,
+      ).to.equal(false);
+    });
+
+    it("shows an unanswered active recent-legal-aid answer as incomplete", async () => {
+      getApplicationStub.resolves(getApplicationResponse(ukApplication));
+      const session = {
+        journeyDrafts: {
+          [draftKey]: {
+            ...ApplicationDto.toAnswers(ukApplication),
+            legalAidBefore: "yesSameMatter",
+            legalAidLast6Months: undefined,
+            reasonForYes: "stale reason",
+          },
+        },
+      };
+
+      const rows = await getCheckAnswersRows(session);
+      const recentAidRow = rows.find(
+        (row) =>
+          row.key.text ===
+          "Did your client get legal help for this matter in the last 6 months?",
+      );
+      const reasonRow = rows.find(
+        (row) => row.key.text === "Reason for new application for same matter",
+      );
+
+      expectIncompleteTag(recentAidRow);
+      expect(recentAidRow?.visibleWhen).to.equal(true);
+      expect(reasonRow?.visibleWhen).to.equal(false);
+    });
+
+    it("shows a saved NI number when its presence answer is unset", async () => {
+      getApplicationStub.resolves(getApplicationResponse(ukApplication));
+      const session = {
+        journeyDrafts: {
+          [draftKey]: {
+            ...ApplicationDto.toAnswers(ukApplication),
+            legalAidBefore: undefined,
+            hasNINumber: undefined,
+            niNumber: "AB123456C", // gitleaks:allow - fake NI number used to test saved answer
+          },
+        },
+      };
+
+      const rows = await getCheckAnswersRows(session);
+      const niNumberRow = rows.find(
+        (row) => row.key.text === "National Insurance number",
+      );
+
+      expect(niNumberRow?.value.text).to.equal("AB123456C");
+      expect(niNumberRow?.value.html).to.equal("AB123456C");
+    });
+
+    it("keeps a saved NI number after visiting its step with prior aid unset", async () => {
+      getApplicationStub.resolves(
+        getApplicationResponse({
+          ...ukApplication,
+          scopingQuestions: { familyLawClassification: "public" },
+        }),
+      );
+      const session = {};
+
+      const initialRows = await getCheckAnswersRows(session);
+      expect(
+        initialRows.find((row) => row.key.text === "National Insurance number")
+          ?.value.text,
+      ).to.equal("AB123456C");
+
+      const niNumberResult = await editApplicationClient.get(
+        `/cases/${applicationId}/task-list/details/ni-number`,
+        { query: { returnTo: "check-answers" }, session },
+      );
+      expect(niNumberResult.type).to.equal("render");
+
+      const submitResult = await editApplicationClient.post(
+        `/cases/${applicationId}/task-list/details/ni-number`,
+        {
+          body: {
+            hasNINumber: "yes",
+            niNumber: "AB123456C", // gitleaks:allow - fake NI number used to test saved answer
+          },
+          query: { returnTo: "check-answers" },
+          session,
+        },
+      );
+      expect(submitResult.type).to.equal("redirect");
+      expect((submitResult as TestRedirectResult).url).to.equal(
+        `/cases/${applicationId}/task-list/details/check-answers`,
+      );
+
+      const rows = await getCheckAnswersRows(session);
+      const niNumberRow = rows.find(
+        (row) => row.key.text === "National Insurance number",
+      );
+
+      expect(niNumberRow?.value.text).to.equal("AB123456C");
+      expect(niNumberRow?.value.html).to.equal("AB123456C");
+    });
+
+    it("shows blank active required answers as incomplete", async () => {
+      getApplicationStub.resolves(getApplicationResponse(ukApplication));
+      const session = {
+        journeyDrafts: {
+          [draftKey]: {
+            ...ApplicationDto.toAnswers(ukApplication),
+            firstName: "",
+            dateOfBirth: "",
+            legalAidBefore: "yesSameMatter",
+            legalAidLast6Months: "yes",
+            reasonForYes: "",
+          },
+        },
+      };
+
+      const rows = await getCheckAnswersRows(session);
+      const firstNameRow = rows.find((row) => row.key.text === "First name");
+      const dateOfBirthRow = rows.find(
+        (row) => row.key.text === "Date of birth",
+      );
+      const reasonRow = rows.find(
+        (row) => row.key.text === "Reason for new application for same matter",
+      );
+
+      expectIncompleteTag(firstNameRow);
+      expectIncompleteTag(dateOfBirthRow);
+      expectIncompleteTag(reasonRow);
+      expect(reasonRow?.visibleWhen).to.equal(true);
     });
 
     it("links the home address row to the home address question", () => {

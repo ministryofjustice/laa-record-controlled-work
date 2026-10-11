@@ -20,17 +20,19 @@ import { t } from "#/lib/i18n.js";
 
 const TITLE = t("journeys.createApplication.niNumber.title");
 
-/**
- *
- * @param journeyCode
- */
+type NiNumberStepOptions = Pick<StepDefinition, "reachability">;
+
 /**
  * Creates the National Insurance number step.
  *
  * @param journeyCode The code for the active journey.
+ * @param options Optional reachability configuration.
  * @returns A Forge step definition for the National Insurance number page.
  */
-export function niNumberStep(journeyCode: string): StepDefinition {
+export function niNumberStep(
+  journeyCode: string,
+  options: NiNumberStepOptions = {},
+): StepDefinition {
   return step({
     blocks: [clientDetailsCaption(), niNumberQuestion(), continueButton()],
     onSubmission: [saveNiNumber(journeyCode)],
@@ -38,6 +40,7 @@ export function niNumberStep(journeyCode: string): StepDefinition {
     reachability: {
       entryWhen: hasCheckAnswersInQuery,
     },
+    ...options,
     title: TITLE,
   });
 }

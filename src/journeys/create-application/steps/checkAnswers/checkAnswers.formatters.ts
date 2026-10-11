@@ -27,16 +27,18 @@ export function addressFormatResolver(): ResolvableString {
 
 /**
  * Formats the address summary value.
+ * @param showIncomplete Whether unknown choices use the incomplete label.
  * @returns The address HTML or no-fixed-address text.
  */
-export function formatAddressValue(): ResolvableString {
+export function formatAddressValue(showIncomplete = false): ResolvableString {
   const no = t(
     "journeys.createApplication.checkAnswers.answerValues.noFixedAddress",
   );
 
   return match(Answer(AnswerKey.haveAHomeAddress))
     .branch(Condition.Equals("yes"), addressFormatResolver())
-    .otherwise(no);
+    .branch(Condition.Equals("no"), no)
+    .otherwise(showIncomplete ? formatIncompleteAnswerValue() : no);
 }
 
 /**
@@ -51,33 +53,40 @@ export function formatChangeAddressRedirect(): ResolvableString {
 
 /**
  * Formats a date of birth for display.
+ * @param showIncomplete Whether an invalid date uses the incomplete label.
  * @returns The formatted date of birth.
  */
-export function formatDateOfBirth(): ResolvableString {
-  return Answer(AnswerKey.dateOfBirth).pipe(
+export function formatDateOfBirth(showIncomplete = false): ResolvableString {
+  const dateOfBirth = Answer(AnswerKey.dateOfBirth);
+  const formattedDate = dateOfBirth.pipe(
     Transformer.String.ToDate(),
     Transformer.Date.Format("D MMMM YYYY"),
   );
+
+  return showIncomplete
+    ? match(dateOfBirth)
+        .branch(Condition.Date.IsValid(), formattedDate)
+        .otherwise(formatIncompleteAnswerValue())
+    : formattedDate;
 }
 
 /**
  * Formats the ECF answer label.
+ * @param showIncomplete Whether unknown answers use the incomplete label.
  * @returns The ECF answer label.
  */
-export function formatEcfLabel(): ResolvableString {
-  const yes = t("common.yes");
-  const no = t("common.no");
-
-  return match(Answer(AnswerKey.ecf))
-    .branch(Condition.Equals("yes"), yes)
-    .otherwise(no);
+export function formatEcfLabel(showIncomplete = false): ResolvableString {
+  return formatYesNoAnswer(AnswerKey.ecf, showIncomplete);
 }
 
 /**
  * Formats the family law classification answer label.
+ * @param showIncomplete Whether unknown answers use the incomplete label.
  * @returns The family law classification answer label.
  */
-export function formatFamilyLawClassificationLabel(): ResolvableString {
+export function formatFamilyLawClassificationLabel(
+  showIncomplete = false,
+): ResolvableString {
   const publicLaw = t(
     "journeys.createApplication.familyLawClassification.radioButton.public",
   );
@@ -87,14 +96,37 @@ export function formatFamilyLawClassificationLabel(): ResolvableString {
 
   return match(Answer(AnswerKey.familyLawClassification))
     .branch(Condition.Equals("public"), publicLaw)
-    .otherwise(privateLaw);
+    .branch(Condition.Equals("private"), privateLaw)
+    .otherwise(showIncomplete ? formatIncompleteAnswerValue() : privateLaw);
+}
+
+/**
+ * Formats the incomplete answer as a GOV.UK blue status tag.
+ * @returns Escaped status-tag HTML.
+ */
+export function formatIncompleteAnswerTag(): ResolvableString {
+  return NunjucksGenerators.String({
+    data: { text: formatIncompleteAnswerValue() },
+    template: '<strong class="govuk-tag govuk-tag--blue">{{ text }}</strong>',
+  });
+}
+
+/**
+ * Formats the incomplete answer label.
+ * @returns The localized incomplete label.
+ */
+export function formatIncompleteAnswerValue(): ResolvableString {
+  return t("journeys.createApplication.checkAnswers.answerValues.incomplete");
 }
 
 /**
  * Formats the previous legal aid answer label.
+ * @param showIncomplete Whether unknown answers use the incomplete label.
  * @returns The previous legal aid answer label.
  */
-export function formatLegalAidBeforeLabel(): ResolvableString {
+export function formatLegalAidBeforeLabel(
+  showIncomplete = false,
+): ResolvableString {
   const same = t(
     "journeys.createApplication.legalAidBefore.radioButton.yesSameMatter",
   );
@@ -106,20 +138,19 @@ export function formatLegalAidBeforeLabel(): ResolvableString {
   return match(Answer(AnswerKey.legalAidBefore))
     .branch(Condition.Equals(PriorLegalAid.enum.yesSameMatter), same)
     .branch(Condition.Equals(PriorLegalAid.enum.yesDifferentMatter), different)
-    .otherwise(no);
+    .branch(Condition.Equals(PriorLegalAid.enum.no), no)
+    .otherwise(showIncomplete ? formatIncompleteAnswerValue() : no);
 }
 
 /**
  * Formats the recent legal aid answer label.
+ * @param showIncomplete Whether unknown answers use the incomplete label.
  * @returns The recent legal aid answer label.
  */
-export function formatLegalAidLast6MonthsLabel(): ResolvableString {
-  const yes = t("common.yes");
-  const no = t("common.no");
-
-  return match(Answer(AnswerKey.legalAidLast6Months))
-    .branch(Condition.Equals("yes"), yes)
-    .otherwise(no);
+export function formatLegalAidLast6MonthsLabel(
+  showIncomplete = false,
+): ResolvableString {
+  return formatYesNoAnswer(AnswerKey.legalAidLast6Months, showIncomplete);
 }
 
 /**
@@ -146,6 +177,37 @@ export function formatOsAddress(): ResolvableString {
 }
 
 /**
+ * Formats a required answer for an incomplete edit summary.
+ * @param answerKey The answer to format.
+ * @param showIncomplete Whether missing values use the incomplete label.
+ * @returns The answer or incomplete label.
+ */
+export function formatRequiredAnswer(
+  answerKey: AnswerKey,
+  showIncomplete = false,
+): ResolvableString {
+  const answer = Answer(answerKey);
+
+  return showIncomplete
+    ? match(answer)
+        .branch(Condition.IsRequired(), answer)
+        .otherwise(formatIncompleteAnswerValue())
+    : answer;
+}
+
+/**
+ * Escapes text for display in a summary row's HTML value.
+ * @param text The text to escape.
+ * @returns Escaped HTML content.
+ */
+export function formatSummaryText(text: ResolvableString): ResolvableString {
+  return NunjucksGenerators.String({
+    data: { text },
+    template: "{{ text }}",
+  });
+}
+
+/**
  * Formats a client's UK address for display.
  * @returns The formatted address HTML.
  */
@@ -166,6 +228,25 @@ export function formatUkAddress(): ResolvableString {
       {% if postcode %}{{ postcode }}<br />{% endif %}
     `,
   });
+}
+
+/**
+ * Formats a yes/no answer without treating unknown values as no in edit mode.
+ * @param answerKey The yes/no answer to format.
+ * @param showIncomplete Whether unknown values use the incomplete label.
+ * @returns The localized answer.
+ */
+export function formatYesNoAnswer(
+  answerKey: AnswerKey,
+  showIncomplete: boolean,
+): ResolvableString {
+  const yes = t("common.yes");
+  const no = t("common.no");
+
+  return match(Answer(answerKey))
+    .branch(Condition.Equals("yes"), yes)
+    .branch(Condition.Equals("no"), no)
+    .otherwise(showIncomplete ? formatIncompleteAnswerValue() : no);
 }
 
 /**

@@ -7,6 +7,9 @@ import {
   Answer,
   Condition,
   match,
+  not,
+  or,
+  type PredicateExpr,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 import { GovUKSummaryList } from "@ministryofjustice/hmpps-forge/govuk-components";
 
@@ -18,14 +21,23 @@ import {
   formatDateOfBirth,
   formatEcfLabel,
   formatFamilyLawClassificationLabel,
+  formatIncompleteAnswerTag,
   formatLegalAidBeforeLabel,
   formatLegalAidLast6MonthsLabel,
+  formatRequiredAnswer,
+  formatSummaryText,
+  formatYesNoAnswer,
 } from "#/journeys/create-application/steps/checkAnswers/checkAnswers.formatters.js";
+import { UK_ADDRESS_FIELDS } from "#/journeys/journey.constants.js";
 import { fixedT, t } from "#/lib/i18n.js";
 
-const answerLabelT = fixedT(
-  "journeys.createApplication.checkAnswers.answerLabels",
-);
+const answers = {
+  t: fixedT("journeys.createApplication.checkAnswers.answerLabels"),
+};
+
+interface SummaryListOptions {
+  showIncomplete?: boolean;
+}
 
 interface SummaryRow {
   actions: {
@@ -41,6 +53,7 @@ interface SummaryRow {
 }
 
 interface SummaryRowArgs {
+  displayAsIncomplete: ResolvableBoolean;
   href: ResolvableString;
   label: ResolvableString;
   value: {
@@ -53,94 +66,240 @@ interface SummaryRowArgs {
 /**
  * Creates the check-answers summary list.
  *
+ * @param options Summary list formatting options.
+ * @param options.showIncomplete Render unavailable answers as incomplete.
  * @returns The check-answers summary list.
  */
-export function summaryList(): GovUKSummaryList {
-  const ecf = summaryRow({
+export function summaryList(
+  options: SummaryListOptions = {},
+): GovUKSummaryList {
+  const { showIncomplete = false } = options;
+
+  const ecf = Answer(AnswerKey.ecf);
+  const ecfRow = summaryRow({
+    displayAsIncomplete: incompleteIf(
+      showIncomplete,
+      matchesNoneOf([
+        ecf.match(Condition.Equals("yes")),
+        ecf.match(Condition.Equals("no")),
+      ]),
+    ),
     href: "ecf?returnTo=check-answers",
-    label: answerLabelT("ecf"),
-    value: { text: formatEcfLabel() },
+    label: answers.t("ecf"),
+    value: { text: formatEcfLabel(showIncomplete) },
   });
-  const familyLawClassification = summaryRow({
+
+  const familyLawClassification = Answer(AnswerKey.familyLawClassification);
+  const familyLawClassificationRow = summaryRow({
+    displayAsIncomplete: incompleteIf(
+      showIncomplete,
+      matchesNoneOf([
+        familyLawClassification.match(Condition.Equals("public")),
+        familyLawClassification.match(Condition.Equals("private")),
+      ]),
+    ),
     href: "family-type-of-case?returnTo=check-answers",
-    label: answerLabelT("familyLawClassification"),
-    value: { text: formatFamilyLawClassificationLabel() },
+    label: answers.t("familyLawClassification"),
+    value: { text: formatFamilyLawClassificationLabel(showIncomplete) },
   });
-  const legalAidBefore = summaryRow({
+
+  const legalAidBeforeRow = summaryRow({
+    displayAsIncomplete: incompleteIf(
+      showIncomplete,
+      matchesNoneOf([
+        Answer(AnswerKey.legalAidBefore).match(
+          Condition.Equals(PriorLegalAid.enum.yesSameMatter),
+        ),
+        Answer(AnswerKey.legalAidBefore).match(
+          Condition.Equals(PriorLegalAid.enum.yesDifferentMatter),
+        ),
+        Answer(AnswerKey.legalAidBefore).match(
+          Condition.Equals(PriorLegalAid.enum.no),
+        ),
+      ]),
+    ),
     href: "legal-aid-before?returnTo=check-answers",
-    label: answerLabelT("legalAidBefore"),
-    value: { text: formatLegalAidBeforeLabel() },
+    label: answers.t("legalAidBefore"),
+    value: { text: formatLegalAidBeforeLabel(showIncomplete) },
   });
-  const legalAidLast6Months = summaryRow({
+
+  const legalAidLast6MonthsRow = summaryRow({
+    displayAsIncomplete: incompleteIf(
+      showIncomplete,
+      matchesNoneOf([
+        Answer(AnswerKey.legalAidLast6Months).match(Condition.Equals("yes")),
+        Answer(AnswerKey.legalAidLast6Months).match(Condition.Equals("no")),
+      ]),
+    ),
     href: "legal-aid-last-6-months?returnTo=check-answers",
-    label: answerLabelT("legalAidLast6Months"),
-    value: { text: formatLegalAidLast6MonthsLabel() },
+    label: answers.t("legalAidLast6Months"),
+    value: { text: formatLegalAidLast6MonthsLabel(showIncomplete) },
     visibleWhen: Answer(AnswerKey.legalAidBefore).match(
       Condition.Equals(PriorLegalAid.enum.yesSameMatter),
     ),
   });
-  const reasonForYes = summaryRow({
+
+  const reasonForYesRow = summaryRow({
+    displayAsIncomplete: incompleteIf(
+      showIncomplete,
+      missingAnswer(AnswerKey.reasonForYes),
+    ),
     href: "legal-aid-last-6-months?returnTo=check-answers",
-    label: answerLabelT("legalAidLast6MonthsReasonForYes"),
-    value: { text: Answer(AnswerKey.reasonForYes) },
+    label: answers.t("legalAidLast6MonthsReasonForYes"),
+    value: {
+      text: formatRequiredAnswer(AnswerKey.reasonForYes, showIncomplete),
+    },
     visibleWhen: Answer(AnswerKey.legalAidLast6Months).match(
       Condition.Equals("yes"),
     ),
   });
-  const firstName = summaryRow({
+
+  const firstNameRow = summaryRow({
+    displayAsIncomplete: incompleteIf(
+      showIncomplete,
+      missingAnswer(AnswerKey.firstName),
+    ),
     href: "client-details?returnTo=check-answers",
-    label: answerLabelT("firstName"),
-    value: { text: Answer(AnswerKey.firstName) },
+    label: answers.t("firstName"),
+    value: {
+      text: formatRequiredAnswer(AnswerKey.firstName, showIncomplete),
+    },
   });
-  const lastName = summaryRow({
+
+  const lastNameRow = summaryRow({
+    displayAsIncomplete: incompleteIf(
+      showIncomplete,
+      missingAnswer(AnswerKey.lastName),
+    ),
     href: "client-details?returnTo=check-answers",
-    label: answerLabelT("lastName"),
-    value: { text: Answer(AnswerKey.lastName) },
+    label: answers.t("lastName"),
+    value: {
+      text: formatRequiredAnswer(AnswerKey.lastName, showIncomplete),
+    },
   });
-  const dateOfBirth = summaryRow({
+
+  const dateOfBirthRow = summaryRow({
+    displayAsIncomplete: incompleteIf(
+      showIncomplete,
+      not(Answer(AnswerKey.dateOfBirth).match(Condition.Date.IsValid())),
+    ),
     href: "client-details?returnTo=check-answers",
-    label: answerLabelT("dateOfBirth"),
-    value: { text: formatDateOfBirth() },
+    label: answers.t("dateOfBirth"),
+    value: { text: formatDateOfBirth(showIncomplete) },
   });
-  const niNumber = summaryRow({
+
+  const niNumberRow = summaryRow({
+    displayAsIncomplete: incompleteIf(
+      showIncomplete,
+      match(Answer(AnswerKey.hasNINumber))
+        .branch(Condition.Equals("yes"), missingAnswer(AnswerKey.niNumber))
+        .branch(Condition.Equals("no"), false)
+        .otherwise(missingAnswer(AnswerKey.niNumber)),
+    ),
     href: "ni-number?returnTo=check-answers",
-    label: answerLabelT("niNumber"),
+    label: answers.t("niNumber"),
     value: {
       text: match(Answer(AnswerKey.hasNINumber))
-        .branch(Condition.Equals("yes"), Answer(AnswerKey.niNumber))
-        .otherwise(t("common.no")),
+        .branch(
+          Condition.Equals("yes"),
+          formatRequiredAnswer(AnswerKey.niNumber, showIncomplete),
+        )
+        .branch(Condition.Equals("no"), t("common.no"))
+        .otherwise(
+          showIncomplete
+            ? formatRequiredAnswer(AnswerKey.niNumber, true)
+            : t("common.no"),
+        ),
     },
   });
-  const haveAHomeAddress = summaryRow({
+
+  const haveAHomeAddressRow = summaryRow({
+    displayAsIncomplete: incompleteIf(
+      showIncomplete,
+      matchesNoneOf([
+        Answer(AnswerKey.haveAHomeAddress).match(Condition.Equals("yes")),
+        Answer(AnswerKey.haveAHomeAddress).match(Condition.Equals("no")),
+      ]),
+    ),
     href: "have-a-home-address?returnTo=check-answers",
-    label: answerLabelT("haveAHomeAddress"),
+    label: answers.t("haveAHomeAddress"),
     value: {
-      text: match(Answer(AnswerKey.haveAHomeAddress))
-        .branch(Condition.Equals("yes"), t("common.yes"))
-        .otherwise(t("common.no")),
+      text: formatYesNoAnswer(AnswerKey.haveAHomeAddress, showIncomplete),
     },
   });
-  const address = summaryRow({
+
+  const addressRow = summaryRow({
+    displayAsIncomplete: incompleteIf(showIncomplete, addressIsIncomplete()),
     href: formatChangeAddressRedirect(),
-    label: answerLabelT("address"),
-    value: { html: formatAddressValue() },
+    label: answers.t("address"),
+    value: { html: formatAddressValue(showIncomplete) },
   });
 
   return GovUKSummaryList({
     rows: [
-      ecf,
-      familyLawClassification,
-      legalAidBefore,
-      legalAidLast6Months,
-      reasonForYes,
-      firstName,
-      lastName,
-      dateOfBirth,
-      niNumber,
-      haveAHomeAddress,
-      address,
+      ecfRow,
+      familyLawClassificationRow,
+      legalAidBeforeRow,
+      legalAidLast6MonthsRow,
+      reasonForYesRow,
+      firstNameRow,
+      lastNameRow,
+      dateOfBirthRow,
+      niNumberRow,
+      haveAHomeAddressRow,
+      addressRow,
     ],
   });
+}
+
+/**
+ * Determines whether the active address lacks its required first line.
+ * @returns Whether the address summary should be incomplete.
+ */
+function addressIsIncomplete(): ResolvableBoolean {
+  return match(Answer(AnswerKey.haveAHomeAddress))
+    .branch(
+      Condition.Equals("yes"),
+      match(Answer(UK_ADDRESS_FIELDS.country))
+        .branch(
+          Condition.Equals("United Kingdom"),
+          missingAnswer(AnswerKey.ukAddressLine1),
+        )
+        .otherwise(missingAnswer(AnswerKey.osAddressLine1)),
+    )
+    .branch(Condition.Equals("no"), false)
+    .otherwise(true);
+}
+
+/**
+ * Applies an incomplete condition only to edit summaries.
+ * @param showIncomplete Whether edit formatting is enabled.
+ * @param condition The condition that identifies an incomplete value.
+ * @returns The condition for an edit summary, if enabled.
+ */
+function incompleteIf(
+  showIncomplete: boolean,
+  condition: ResolvableBoolean,
+): ResolvableBoolean {
+  return showIncomplete ? condition : false;
+}
+
+/**
+ * Determines whether none of the supplied conditions match.
+ * @param conditions The conditions to test.
+ * @returns Whether no condition matches.
+ */
+function matchesNoneOf(conditions: PredicateExpr[]): ResolvableBoolean {
+  return not(or(conditions));
+}
+
+/**
+ * Determines whether a required answer is missing.
+ * @param answerKey The required answer key.
+ * @returns Whether the answer is missing.
+ */
+function missingAnswer(answerKey: AnswerKey): ResolvableBoolean {
+  return not(Answer(answerKey).match(Condition.IsRequired()));
 }
 
 /**
@@ -150,7 +309,17 @@ export function summaryList(): GovUKSummaryList {
  * @returns A configured summary row.
  */
 function summaryRow(args: SummaryRowArgs): SummaryRow {
-  const { href, label, value, visibleWhen } = args;
+  const { displayAsIncomplete, href, label, value, visibleWhen } = args;
+
+  let summaryValue: SummaryRow["value"] = value;
+  if (displayAsIncomplete === true) {
+    summaryValue = {
+      ...value,
+      html: match(displayAsIncomplete)
+        .branch(Condition.Equals(true), formatIncompleteAnswerTag())
+        .otherwise(value.html ?? formatSummaryText(value.text ?? "")),
+    };
+  }
 
   return {
     actions: {
@@ -165,7 +334,7 @@ function summaryRow(args: SummaryRowArgs): SummaryRow {
     key: {
       text: label,
     },
-    value,
+    value: summaryValue,
     ...(visibleWhen === undefined ? {} : { visibleWhen }),
   };
 }

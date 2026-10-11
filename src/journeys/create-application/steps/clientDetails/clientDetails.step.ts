@@ -1,6 +1,7 @@
 import {
   redirect,
   step,
+  type StepDefinition,
   submit,
   type SubmitHook,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
@@ -24,8 +25,11 @@ import { t } from "#/lib/i18n.js";
 
 const TITLE = t("journeys.createApplication.clientDetails.title");
 
+type ClientDetailsStepOptions = Pick<StepDefinition, "reachability">;
+
 export const clientDetailsStep = (
   journeyCode: string,
+  options: ClientDetailsStepOptions = {},
 ): ReturnType<typeof step> =>
   step({
     blocks: [
@@ -41,6 +45,7 @@ export const clientDetailsStep = (
     reachability: {
       entryWhen: hasCheckAnswersInQuery,
     },
+    ...options,
     title: TITLE,
   });
 

@@ -139,7 +139,7 @@ export class ApplicationDto {
     const { address } = application.clientDetails;
 
     if (!address) {
-      throw new Error("Address is not defined in the application.");
+      return {};
     }
 
     return address.country === "GB"
