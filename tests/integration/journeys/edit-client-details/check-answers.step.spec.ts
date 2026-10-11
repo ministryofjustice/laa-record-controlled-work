@@ -643,6 +643,36 @@ describe("Edit client details check answers step", () => {
       expect(reasonRow?.visibleWhen).to.equal(false);
     });
 
+    it("hides prior-legal-aid follow-ups when the yes-same-matter branch is inactive", async () => {
+      getApplicationStub.resolves(getApplicationResponse(ukApplication));
+
+      for (const legalAidBefore of [undefined, "no", "yesDifferentMatter"]) {
+        const session = {
+          journeyDrafts: {
+            [draftKey]: {
+              ...ApplicationDto.toAnswers(ukApplication),
+              legalAidBefore,
+              legalAidLast6Months: "yes",
+              reasonForYes: "stale reason",
+            },
+          },
+        };
+
+        const rows = await getCheckAnswersRows(session);
+        const recentAidRow = rows.find(
+          (row) =>
+            row.key.text ===
+            "Did your client get legal help for this matter in the last 6 months?",
+        );
+        const reasonRow = rows.find(
+          (row) => row.key.text === "Reason for new application for same matter",
+        );
+
+        expect(recentAidRow?.visibleWhen).to.equal(false);
+        expect(reasonRow?.visibleWhen).to.equal(false);
+      }
+    });
+
     it("shows a saved NI number when its presence answer is unset", async () => {
       getApplicationStub.resolves(getApplicationResponse(ukApplication));
       const session = {
@@ -662,7 +692,10 @@ describe("Edit client details check answers step", () => {
       );
 
       expect(niNumberRow?.value.text).to.equal("AB123456C");
-      expect(niNumberRow?.value.html).to.equal("AB123456C");
+      expectIncompleteTag(niNumberRow);
+      expect(niNumberRow?.actions?.items[0].href).to.equal(
+        "ni-number?returnTo=check-answers",
+      );
     });
 
     it("keeps a saved NI number after visiting its step with prior aid unset", async () => {

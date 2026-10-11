@@ -4,6 +4,7 @@ import type {
 } from "@ministryofjustice/hmpps-forge/core/components";
 
 import {
+  and,
   Answer,
   Condition,
   match,
@@ -149,9 +150,14 @@ export function summaryList(
     value: {
       text: formatRequiredAnswer(AnswerKey.reasonForYes, showIncomplete),
     },
-    visibleWhen: Answer(AnswerKey.legalAidLast6Months).match(
-      Condition.Equals("yes"),
-    ),
+    visibleWhen: showIncomplete
+      ? and(
+          Answer(AnswerKey.legalAidBefore).match(
+            Condition.Equals(PriorLegalAid.enum.yesSameMatter),
+          ),
+          Answer(AnswerKey.legalAidLast6Months).match(Condition.Equals("yes")),
+        )
+      : Answer(AnswerKey.legalAidLast6Months).match(Condition.Equals("yes")),
   });
 
   const firstNameRow = summaryRow({
@@ -194,7 +200,7 @@ export function summaryList(
       match(Answer(AnswerKey.hasNINumber))
         .branch(Condition.Equals("yes"), missingAnswer(AnswerKey.niNumber))
         .branch(Condition.Equals("no"), false)
-        .otherwise(missingAnswer(AnswerKey.niNumber)),
+        .otherwise(true),
     ),
     href: "ni-number?returnTo=check-answers",
     label: answers.t("niNumber"),
@@ -312,7 +318,7 @@ function summaryRow(args: SummaryRowArgs): SummaryRow {
   const { displayAsIncomplete, href, label, value, visibleWhen } = args;
 
   let summaryValue: SummaryRow["value"] = value;
-  if (displayAsIncomplete === true) {
+  if (displayAsIncomplete !== false) {
     summaryValue = {
       ...value,
       html: match(displayAsIncomplete)
