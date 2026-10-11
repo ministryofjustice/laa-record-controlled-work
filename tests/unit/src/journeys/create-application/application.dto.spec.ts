@@ -130,6 +130,7 @@ describe("toAnswers method", () => {
     applicationState: "DRAFT",
     declaration: null,
     evidence: null,
+    ecfFlag: null,
     eligibility: null,
     reasonForReapplication: null,
     meansAssessmentRequired: null,
@@ -249,5 +250,100 @@ describe("toAnswers method", () => {
       "osAddressLine4",
       "osCountry",
     );
+  });
+
+  it("leaves unavailable answers unanswered while preserving client and address details", () => {
+    const result = ApplicationDto.toAnswers({
+      ...application,
+      ecfFlag: null,
+      reasonForReapplication: "stale reason",
+      scopingQuestions: null,
+    });
+
+    expect(result).to.include({
+      dateOfBirth: "1990-01-01",
+      firstName: "Jane",
+      hasNINumber: "no",
+      haveAHomeAddress: "yes",
+      lastName: "Bloggs",
+      ukAddressLine1: "123 Test Street",
+      ukCountry: "United Kingdom",
+    });
+    expect(result).to.not.have.any.keys(
+      "ecf",
+      "familyLawClassification",
+      "legalAidBefore",
+      "legalAidLast6Months",
+      "reasonForYes",
+    );
+  });
+
+  it("maps known ECF and family classification answers", () => {
+    for (const [ecfFlag, ecfAnswer] of [
+      [true, "yes"],
+      [false, "no"],
+    ] as const) {
+      const result = ApplicationDto.toAnswers({
+        ...application,
+        ecfFlag,
+        scopingQuestions: {
+          familyLawClassification: "private",
+          priorLegalAid: "no",
+        },
+      });
+
+      expect(result).to.include({
+        ecf: ecfAnswer,
+        familyLawClassification: "private",
+        legalAidBefore: "no",
+      });
+      expect(result).to.not.have.any.keys(
+        "legalAidLast6Months",
+        "reasonForYes",
+      );
+    }
+  });
+
+  it("does not infer prior legal aid from a partial scoping response", () => {
+    const result = ApplicationDto.toAnswers({
+      ...application,
+      ecfFlag: false,
+      reasonForReapplication: "stale reason",
+      scopingQuestions: {
+        familyLawClassification: "private",
+      },
+    });
+
+    expect(result).to.include({
+      ecf: "no",
+      familyLawClassification: "private",
+    });
+    expect(result).to.not.have.any.keys(
+      "legalAidBefore",
+      "legalAidLast6Months",
+      "reasonForYes",
+    );
+  });
+
+  it("infers recent legal aid only for the same-matter branch", () => {
+    const withReason = ApplicationDto.toAnswers({
+      ...application,
+      reasonForReapplication: "synthetic reason",
+    });
+    const withoutReason = ApplicationDto.toAnswers({
+      ...application,
+      reasonForReapplication: null,
+    });
+
+    expect(withReason).to.include({
+      legalAidBefore: "yesSameMatter",
+      legalAidLast6Months: "yes",
+      reasonForYes: "synthetic reason",
+    });
+    expect(withoutReason).to.include({
+      legalAidBefore: "yesSameMatter",
+      legalAidLast6Months: "no",
+      reasonForYes: "",
+    });
   });
 });

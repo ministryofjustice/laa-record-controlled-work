@@ -150,40 +150,21 @@ export class ApplicationDto {
   /**
    * Creates an answers output instance from the provided application.
    * @param application - The application from which to create the answers output instance.
-   * @returns AnswersOutput instance.
+   * @returns Partial AnswersOutput instance.
    */
-  // eslint-disable-next-line complexity -- Got a lot of checks to do here.
-  public static toAnswers(application: ApplicationSchema): AnswersOutput {
-    const addressAnswers = application.clientDetails.hasFixedAddress
-      ? this.getAnswersFromAddress(application)
-      : {};
-    const priorLegalAid = PriorLegalAid.parse(
-      application.scopingQuestions?.priorLegalAid,
-    );
-
-    return {
-      ...addressAnswers,
-      [AnswerKey.dateOfBirth]: application.clientDetails.dateOfBirth,
-      [AnswerKey.ecf]: "no",
-      [AnswerKey.familyLawClassification]:
-        application.scopingQuestions?.familyLawClassification ?? "public",
-      [AnswerKey.firstName]: application.clientDetails.firstName,
-      [AnswerKey.hasNINumber]: application.clientDetails.niNumber
-        ? "yes"
-        : "no",
-      [AnswerKey.haveAHomeAddress]: application.clientDetails.hasFixedAddress
-        ? "yes"
-        : "no",
-      [AnswerKey.lastName]: application.clientDetails.lastName,
-      [AnswerKey.legalAidBefore]: priorLegalAid,
-      [AnswerKey.legalAidLast6Months]:
-        priorLegalAid === PriorLegalAid.enum.yesSameMatter &&
-        application.reasonForReapplication
-          ? "yes"
-          : "no",
-      [AnswerKey.niNumber]: application.clientDetails.niNumber ?? "",
-      [AnswerKey.reasonForYes]: application.reasonForReapplication ?? "",
+  public static toAnswers(
+    application: ApplicationSchema,
+  ): Partial<AnswersOutput> {
+    const answers: Partial<AnswersOutput> = {
+      ...this.getClientDetailsAnswers(application),
+      ...this.getScopingAnswers(application),
     };
+
+    if (typeof application.ecfFlag === "boolean") {
+      answers[AnswerKey.ecf] = application.ecfFlag ? "yes" : "no";
+    }
+
+    return answers;
   }
 
   /**
@@ -225,6 +206,33 @@ export class ApplicationDto {
   }
 
   /**
+   * Maps known client and active address details to journey answers.
+   * @param application - The application containing client details.
+   * @returns Partial answers from the client details.
+   */
+  private static getClientDetailsAnswers(
+    application: ApplicationSchema,
+  ): Partial<AnswersOutput> {
+    const { clientDetails } = application;
+
+    const addressAnswers = clientDetails.hasFixedAddress
+      ? this.getAnswersFromAddress(application)
+      : {};
+
+    return {
+      ...addressAnswers,
+      [AnswerKey.dateOfBirth]: clientDetails.dateOfBirth,
+      [AnswerKey.firstName]: clientDetails.firstName,
+      [AnswerKey.hasNINumber]: clientDetails.niNumber ? "yes" : "no",
+      [AnswerKey.haveAHomeAddress]: clientDetails.hasFixedAddress
+        ? "yes"
+        : "no",
+      [AnswerKey.lastName]: clientDetails.lastName,
+      [AnswerKey.niNumber]: clientDetails.niNumber ?? "",
+    };
+  }
+
+  /**
    * Extract overseas address fields from the answers.
    * @param answers - The answers from which to extract the address fields.
    * @returns Address object containing the overseas address fields.
@@ -241,6 +249,37 @@ export class ApplicationDto {
       addressLine4: answers[AnswerKey.osAddressLine4],
       country: countryName ? mapCountryNameToIsoCode(countryName) : "",
     };
+  }
+
+  /**
+   * Maps available scoping answers and same-matter follow-up details.
+   * @param application - The application containing scoping details.
+   * @returns Partial answers from scoping details.
+   */
+  private static getScopingAnswers(
+    application: ApplicationSchema,
+  ): Partial<AnswersOutput> {
+    const answers: Partial<AnswersOutput> = {};
+    const { reasonForReapplication, scopingQuestions } = application;
+
+    const familyLawClassification = scopingQuestions?.familyLawClassification;
+    if (familyLawClassification !== undefined) {
+      answers[AnswerKey.familyLawClassification] = familyLawClassification;
+    }
+
+    const priorLegalAid = scopingQuestions?.priorLegalAid;
+    if (priorLegalAid !== undefined) {
+      answers[AnswerKey.legalAidBefore] = priorLegalAid;
+
+      if (priorLegalAid === PriorLegalAid.enum.yesSameMatter) {
+        answers[AnswerKey.legalAidLast6Months] = reasonForReapplication
+          ? "yes"
+          : "no";
+        answers[AnswerKey.reasonForYes] = reasonForReapplication ?? "";
+      }
+    }
+
+    return answers;
   }
 
   /**

@@ -70,6 +70,61 @@ describe("loadApplicationAsAnswers", () => {
     });
   });
 
+  it("loads known details without inventing unavailable answers", () => {
+    const sourceApplication = {
+      clientDetails: {
+        firstName: "Synthetic",
+        lastName: "Client",
+        dateOfBirth: "1990-01-01",
+        niNumber: null,
+        hasFixedAddress: true,
+        address: {
+          addressLine1: "1 Example Road",
+          addressLine2: null,
+          addressLine3: null,
+          addressLine4: null,
+          townOrCity: null,
+          postCode: null,
+          county: null,
+          country: "GB",
+        },
+      },
+      ecfFlag: null,
+      reasonForReapplication: null,
+      scopingQuestions: null,
+    } as Application;
+    const loadedAnswers: Record<string, unknown> = {};
+    const session = { journeyDrafts: {} };
+
+    getData.withArgs(CONTEXT_DATA_KEYS.application).returns(sourceApplication);
+    getSession.returns(session);
+    getAllAnswers.callsFake(() => loadedAnswers);
+    setAnswer.callsFake((key, value) => {
+      loadedAnswers[key] = value;
+    });
+    toAnswers.restore();
+
+    loadApplicationAsAnswers()(context, journeyCode);
+
+    expect(loadedAnswers).to.include({
+      firstName: "Synthetic",
+      lastName: "Client",
+      haveAHomeAddress: "yes",
+      ukAddressLine1: "1 Example Road",
+      ukCountry: "United Kingdom",
+    });
+    expect(loadedAnswers).to.not.have.any.keys(
+      "ecf",
+      "familyLawClassification",
+      "legalAidBefore",
+      "legalAidLast6Months",
+      "reasonForYes",
+    );
+    expect(session.journeyDrafts).to.deep.equal({
+      [`${journeyCode}:application-1`]: loadedAnswers,
+    });
+  });
+
   it("does not overwrite an existing journey draft", () => {
     const session = {
       journeyDrafts: {

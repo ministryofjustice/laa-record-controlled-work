@@ -59,6 +59,7 @@ describe("Edit client details check answers step", () => {
         modifiedAt: null,
       },
     },
+    ecfFlag: false,
     reasonForReapplication: "Some reason for help",
     scopingQuestions: { priorLegalAid: "yesSameMatter", familyLawClassification: "public" },
   });
