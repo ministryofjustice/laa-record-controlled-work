@@ -18,6 +18,7 @@ import {
   partnerAgeQuestionSections,
   partnerEmploymentQuestionSections,
 } from "#/export/sections/meansAssessment/answers/questions/employment.questions.js";
+import { housingQuestionSections } from "#/export/sections/meansAssessment/answers/questions/housing.questions.js";
 import {
   clientIncomeQuestionSections,
   partnerIncomeQuestionSections,
@@ -63,6 +64,7 @@ export function toMeansAssessmentAnswerSummaries(
     ...partnerOtherIncomeQuestionSections,
     ...clientOutgoingsQuestionSections,
     ...partnerOutgoingsQuestionSections,
+    ...housingQuestionSections,
   ]);
 }
 

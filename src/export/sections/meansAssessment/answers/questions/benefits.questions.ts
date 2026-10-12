@@ -9,14 +9,8 @@ import {
   client,
   partner,
 } from "#/export/sections/meansAssessment/answers/answers.selections.js";
+import { standardFrequencyChoices } from "#/export/sections/meansAssessment/answers/questions/frequencies.js";
 import { isIncomeAssessmentRelevant } from "#/export/sections/meansAssessment/answers/questions/question.helpers.js";
-
-const benefitFrequencies = {
-  every_four_weeks: "benefits.frequencies.everyFourWeeks",
-  every_two_weeks: "benefits.frequencies.everyTwoWeeks",
-  every_week: "benefits.frequencies.everyWeek",
-  monthly: "benefits.frequencies.monthly",
-};
 
 interface BenefitLabels {
   entryHeading: string;
@@ -98,7 +92,7 @@ function toBenefitSection(params: {
           },
         },
         {
-          choices: benefitFrequencies,
+          choices: standardFrequencyChoices,
           kind: "frequency",
           label: "benefits.frequency",
           select: (answers, index) => {

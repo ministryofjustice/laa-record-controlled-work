@@ -23,6 +23,9 @@ const BASE_ANSWERS = {
   partner_maintenance_payments_relevant: false,
   partner_student_finance_relevant: false,
   passporting: false,
+  property_owned: "none",
+  housing_payments: 0,
+  housing_benefit_relevant: false,
   student_finance_relevant: false,
 } satisfies EligibilityData;
 
