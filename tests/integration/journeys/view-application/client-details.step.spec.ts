@@ -67,6 +67,7 @@ describe("View recorded client details step", () => {
         {
           day: "numeric",
           month: "short",
+          timeZone: "Europe/London",
           year: "numeric",
         },
       );
