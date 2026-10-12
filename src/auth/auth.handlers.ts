@@ -15,13 +15,13 @@ import {
   authCodeCallbackErrorSchema,
   authCodeCallbackSchema,
 } from "#/auth/auth.types.js";
-import { EntraErrorCode } from "#/auth/domain/EntraErrorCode.enum.js";
-import { EntraService } from "#/auth/entra.service.js";
 import {
   type AuthFlow,
   type AuthFlowStore,
   getAuthFlowStore,
-} from "#/auth/auth-code-flow/factory.js";
+} from "#/auth/authCodeFlow/factory.js";
+import { EntraErrorCode } from "#/auth/domain/EntraErrorCode.enum.js";
+import { EntraService } from "#/auth/entra.service.js";
 import { getMsalCacheKey } from "#/auth/msal.cache-key.js";
 import config from "#/config.js";
 import {

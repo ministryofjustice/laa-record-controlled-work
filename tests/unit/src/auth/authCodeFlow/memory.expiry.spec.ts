@@ -1,7 +1,7 @@
 import { expect } from "chai";
 
-import { createAuthFlowStore } from "#/auth/auth-code-flow/factory.js";
-import { EXPIRY_MS, FLOW, getValue, SESSION_ID } from "#tests/unit/src/auth/auth-code-flow/fixtures.js";
+import { createAuthFlowStore } from "#/auth/authCodeFlow/factory.js";
+import { EXPIRY_MS, FLOW, getValue, SESSION_ID } from "#tests/unit/src/auth/authCodeFlow/fixtures.js";
 
 describe("Memory auth flow expiry", () => {
   let now: number;

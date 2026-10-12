@@ -15,7 +15,7 @@ import type { RedisClientType } from "redis";
 import { createClient } from "redis";
 import { createRedisClient as createAppRedisClient } from "#/lib/redis.js";
 import { BAD_REQUEST, FOUND, OK } from "#/lib/constants/http.js";
-import { createAuthFlowStore } from "#/auth/auth-code-flow/factory.js";
+import { createAuthFlowStore } from "#/auth/authCodeFlow/factory.js";
 import { EntraService } from "#/auth/entra.service.js";
 import { type Either, success } from "#/lib/either.js";
 import sinon from "sinon";

@@ -1,9 +1,9 @@
 import { expect } from "chai";
 import sinon from "sinon";
 
-import { createAuthFlowStore } from "#/auth/auth-code-flow/factory.js";
+import { createAuthFlowStore } from "#/auth/authCodeFlow/factory.js";
 import config from "#/config.js";
-import { SESSION_ID } from "#tests/unit/src/auth/auth-code-flow/fixtures.js";
+import { SESSION_ID } from "#tests/unit/src/auth/authCodeFlow/fixtures.js";
 
 describe("Auth flow store configuration", () => {
   afterEach(() => {
