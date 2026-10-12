@@ -59,7 +59,7 @@ export async function authCodeCallback(
 
     let consumed: Either<Error, AuthFlow | undefined>;
     try {
-      consumed = await getRequestAuthFlowStore(req).consume(
+      consumed = await getRequestAuthFlowStore(req.app).consume(
         req.sessionID,
         callbackData.state,
       );
@@ -221,13 +221,15 @@ async function destroySession(req: Request): Promise<void> {
 
 /**
  * Returns the app-scoped flow store, or the production singleton by default.
- * @param req - The request whose app may provide a store.
+ * @param app - The application providing an optional flow store.
+ * @param app.locals - The application-local values.
+ * @param app.locals.authFlowStore - The optional app-scoped flow store.
  * @returns The app store when supplied, otherwise the default store.
  */
-function getRequestAuthFlowStore(req: Request): AuthFlowStore {
-  const store: unknown = req.app.locals.authFlowStore;
-  if (isAuthFlowStore(store)) return store;
-  return getAuthFlowStore();
+function getRequestAuthFlowStore(app: {
+  locals: { authFlowStore?: AuthFlowStore };
+}): AuthFlowStore {
+  return app.locals.authFlowStore ?? getAuthFlowStore();
 }
 
 /**
@@ -306,23 +308,6 @@ function handleRelay(data: CallbackData, req: Request, res: Response): boolean {
 }
 
 /**
- * Checks that an app-local value implements the flow-store contract.
- * @param value - The value to check.
- * @returns True when all flow-store operations are functions.
- */
-function isAuthFlowStore(value: unknown): value is AuthFlowStore {
-  if (typeof value !== "object" || value === null) return false;
-
-  return [
-    "abandon",
-    "authorizeRedirect",
-    "consume",
-    "publish",
-    "reserve",
-  ].every((operation) => typeof Reflect.get(value, operation) === "function");
-}
-
-/**
  * Saves authenticated state or destroys the failed session and cache partition.
  * @param req - The authenticated callback request.
  * @param res - The callback response.
@@ -363,7 +348,7 @@ async function prepareSignInFlow(
   req: Request,
   returnTo: string,
 ): Promise<string> {
-  const flowStore = getRequestAuthFlowStore(req);
+  const flowStore = getRequestAuthFlowStore(req.app);
   const reservation = await flowStore.reserve(req.sessionID);
   if (reservation.error) throw reservation.error;
 
