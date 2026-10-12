@@ -11,7 +11,6 @@ import {
 } from "#/export/sections/meansAssessment/answers/answers.selections.js";
 import { standardFrequencyChoices } from "#/export/sections/meansAssessment/answers/questions/frequencies.js";
 import { isIncomeAssessmentRelevant } from "#/export/sections/meansAssessment/answers/questions/question.helpers.js";
-
 interface BenefitLabels {
   entryHeading: string;
   heading: string;
