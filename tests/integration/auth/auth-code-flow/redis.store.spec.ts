@@ -9,8 +9,8 @@ import {
   type StartedTestContainer,
 } from "testcontainers";
 
-import { createAuthFlowStore } from "#/auth/flow-store/flow-store.js";
-import type { AuthFlow } from "#/auth/flow-store/flow-store.types.js";
+import { createAuthFlowStore } from "#/auth/auth-code-flow/factory.js";
+import type { AuthFlow } from "#/auth/auth-code-flow/store.types.js";
 import config from "#/config.js";
 import type { Either } from "#/lib/either.js";
 

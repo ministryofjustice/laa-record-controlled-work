@@ -1,7 +1,7 @@
-import type { AuthFlow } from "#/auth/flow-store/flow-store.types.js";
+import type { AuthFlow } from "#/auth/auth-code-flow/store.types.js";
 import type { Either } from "#/lib/either.js";
 
-import { AUTH_FLOW_LIFETIME } from "#/auth/flow-store/auth.flow.js";
+import { AUTH_FLOW_LIFETIME } from "#/auth/auth-code-flow/flow.record.js";
 
 export const SESSION_ID = "initiating-session";
 export const EXPIRY_MS = AUTH_FLOW_LIFETIME;

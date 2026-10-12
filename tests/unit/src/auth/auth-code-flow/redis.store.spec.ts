@@ -1,14 +1,14 @@
 import { expect } from "chai";
 import sinon from "sinon";
 
-import { createAuthFlowStore } from "#/auth/flow-store/flow-store.js";
+import { createAuthFlowStore } from "#/auth/auth-code-flow/factory.js";
 import config from "#/config.js";
 import { getRedisClient } from "#/lib/redis.js";
 import {
   FLOW,
   getValue,
   SESSION_ID,
-} from "#tests/unit/src/auth/flow-store/fixtures.js";
+} from "#tests/unit/src/auth/auth-code-flow/fixtures.js";
 
 describe("Auth flow store Redis failures", () => {
   afterEach(() => {

@@ -1,10 +1,10 @@
 import type {
   AuthFlowStore,
   AuthFlowStoreOptions,
-} from "#/auth/flow-store/flow-store.types.js";
+} from "#/auth/auth-code-flow/store.types.js";
 
-import { createMemoryAuthFlowStore } from "#/auth/flow-store/memory.store.js";
-import { createRedisAuthFlowStore } from "#/auth/flow-store/redis.store.js";
+import { createMemoryAuthFlowStore } from "#/auth/auth-code-flow/memory.store.js";
+import { createRedisAuthFlowStore } from "#/auth/auth-code-flow/redis.store.js";
 import config from "#/config.js";
 import { getRedisClient } from "#/lib/redis.js";
 
@@ -12,7 +12,7 @@ export type {
   AuthFlow,
   AuthFlowReservation,
   AuthFlowStore,
-} from "#/auth/flow-store/flow-store.types.js";
+} from "#/auth/auth-code-flow/store.types.js";
 
 const MEMORY_ENVIRONMENTS = new Set(["development", "docker", "test"]);
 

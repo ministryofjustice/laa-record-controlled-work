@@ -21,7 +21,7 @@ import {
   type AuthFlow,
   type AuthFlowStore,
   getAuthFlowStore,
-} from "#/auth/flow-store/flow-store.js";
+} from "#/auth/auth-code-flow/factory.js";
 import { getMsalCacheKey } from "#/auth/msal.cache-key.js";
 import config from "#/config.js";
 import {

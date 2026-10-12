@@ -7,21 +7,21 @@ import type {
   AuthFlowReservation,
   AuthFlowStore,
   StoreResult,
-} from "#/auth/flow-store/flow-store.types.js";
+} from "#/auth/auth-code-flow/store.types.js";
 
-import { AUTH_FLOW_LIFETIME } from "#/auth/flow-store/auth.flow.js";
+import { AUTH_FLOW_LIFETIME } from "#/auth/auth-code-flow/flow.record.js";
 import {
   decodeAuthFlowReservation,
   decodeConsumedAuthFlow,
   decodeRedisSuccess,
-} from "#/auth/flow-store/redis.codec.js";
+} from "#/auth/auth-code-flow/redis.codec.js";
 import {
   ABANDON_SCRIPT,
   AUTHORIZE_SCRIPT,
   CONSUME_SCRIPT,
   PUBLISH_SCRIPT,
   RESERVE_SCRIPT,
-} from "#/auth/flow-store/redis.scripts.js";
+} from "#/auth/auth-code-flow/redis.scripts.js";
 import { type Either, failure, success } from "#/lib/either.js";
 
 const AUTH_FLOW_KEY_PREFIX = "auth-flow:v1:";

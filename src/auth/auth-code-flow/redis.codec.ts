@@ -5,9 +5,9 @@ import { z } from "zod";
 import type {
   AuthFlow,
   AuthFlowReservation,
-} from "#/auth/flow-store/flow-store.types.js";
+} from "#/auth/auth-code-flow/store.types.js";
 
-import { toAuthFlow } from "#/auth/flow-store/auth.flow.js";
+import { toAuthFlow } from "#/auth/auth-code-flow/flow.record.js";
 
 const REDIS_SUCCESS = 1;
 

@@ -4,7 +4,7 @@ import type {
   AuthFlowReservation,
   AuthFlowStore,
   StoreResult,
-} from "#/auth/flow-store/flow-store.types.js";
+} from "#/auth/auth-code-flow/store.types.js";
 
 import {
   type AuthFlowRecord,
@@ -16,7 +16,7 @@ import {
   matchesReadyAuthFlow,
   publishAuthFlow,
   toAuthFlow,
-} from "#/auth/flow-store/auth.flow.js";
+} from "#/auth/auth-code-flow/flow.record.js";
 import { success } from "#/lib/either.js";
 
 /** Creates a process-local store using the supplied clock.

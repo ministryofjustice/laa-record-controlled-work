@@ -1,4 +1,4 @@
-import type { AuthFlow } from "#/auth/flow-store/flow-store.types.js";
+import type { AuthFlow } from "#/auth/auth-code-flow/store.types.js";
 
 import { MINUTE } from "#/lib/constants/time.js";
 
