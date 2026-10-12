@@ -1,13 +1,12 @@
-import type { Application } from "#/api/clients/rcw/model/application.zod.gen.js";
 import type { getApplication } from "#/api/clients/rcw/schema/applications/applications.gen.js";
 import type { ClientAndCaseDetailsSection } from "#/export/sections/clientAndCaseDetails/clientAndCaseDetails.types.js";
-
-export type ExportApplication = Application;
+import type { MeansAssessmentSection } from "#/export/sections/meansAssessment/meansAssessment.types.js";
 
 export interface ExportApplicationViewModel {
   applicationRefNumber: null | string;
   clientAndCaseDetails: ClientAndCaseDetailsSection;
   clientName: null | string;
+  meansAssessment: MeansAssessmentSection | null;
 }
 
 export interface LoadApplicationForExportDeps {

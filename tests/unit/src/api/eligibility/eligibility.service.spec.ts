@@ -3,17 +3,20 @@ import { expect } from "chai";
 import { describe, it } from "mocha";
 import sinon from "sinon";
 
+import type { EligibilityData } from "#/api/clients/rcw/model/eligibilityData.zod.gen.js";
 import { NotAuthenticatedError } from "#/auth/auth.errors.js";
 import config from "#/config.js";
 import type { Success } from "#/lib/either.js";
 import { logger } from "#/logger.js";
 import {
-  type EligibilityAssessment,
-  type LoadEligibilityAssessmentDeps,
-  type SaveEligibilityAssessmentDeps,
   loadEligibilityAssessment,
   saveEligibilityAssessment,
 } from "#/api/eligibility/eligibility.service.js";
+import type {
+  EligibilityAssessment,
+  LoadEligibilityAssessmentDeps,
+  SaveEligibilityAssessmentDeps,
+} from "#/api/eligibility/eligibility.types.js";
 import { getGetApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
 import {
   LoadEligibilityAssessmentError,
@@ -182,7 +185,9 @@ describe("saveEligibilityAssessment", () => {
     updateApplicationMeansStub.resolves({ data: undefined, status: 204 });
 
     await saveEligibilityAssessment(deps, {
-      eligibilityAssessment: { api_response: "not-an-object" },
+      eligibilityAssessment: {
+        api_response: "not-an-object",
+      } as unknown as EligibilityData,
       homeAccountId: "home-account-id",
       applicationId,
       sessionId: "session-id",
@@ -270,6 +275,38 @@ describe("loadEligibilityAssessment", () => {
         level_of_help: "controlled_legal_representation",
         client_age: "standard",
       },
+      result: { indication: true },
+    });
+  });
+
+  it("preserves structured eligibility answers from the application", async () => {
+    const data = {
+      bank_accounts: [{ account_in_dispute: false, amount: 125 }],
+      incomes: [
+        {
+          gross_income: 2400,
+          income_frequency: "monthly",
+          income_type: "employment",
+        },
+      ],
+    };
+    getApplicationStub.resolves({
+      data: getApplicationResponse("1990-01-01", {
+        data,
+        result: { indication: true },
+      }),
+      status: 200,
+    });
+    sinon.useFakeTimers(new Date("2026-09-10T12:00:00Z"));
+
+    const result = (await loadEligibilityAssessment(deps, {
+      applicationId,
+      homeAccountId: "home-account-id",
+      sessionId: "session-id",
+    })) as Success<EligibilityAssessment>;
+
+    expect(result.value).to.deep.equal({
+      data: { ...data, client_age: "standard" },
       result: { indication: true },
     });
   });
