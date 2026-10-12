@@ -2,11 +2,20 @@ serviceAccount:
   name: rcw-github-action-service-account
 
 ingress:
+  className: default
   hosts:
     - host: laa-record-controlled-work-production.cloud-platform.service.justice.gov.uk
       paths:
         - path: /
           pathType: Prefix
+    - host: record-controlled-work.service.justice.gov.uk
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - hosts:
+        - record-controlled-work.service.justice.gov.uk
+      secretName: rcw-production-cert-secret
   annotations:
     external-dns.alpha.kubernetes.io/set-identifier: "laa-record-controlled-work-laa-record-controlled-work-production-green"
 
