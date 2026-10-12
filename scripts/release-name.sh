@@ -12,7 +12,7 @@ release=$(echo "$release" | sed 's:^\w*\/::')
 # Replace special character segments with singular hyphens
 # (e.g. "foo...bar" becomes "foo-bar", rather than "foo---bar")
 release=$(echo "$release" | tr -s ' _/[]().' '-')
-max=30
+max=26
 # Keep the start of long names within Helm's 30-character limit.
 if [ "${#release}" -gt "$max" ]; then
   release="${release:0:$max}"
