@@ -2,7 +2,8 @@ import { execFileSync } from "node:child_process";
 
 import { expect } from "chai";
 
-interface CookieSecurityConfig {
+interface ConfigSnapshot {
+  additionalRedirectUris: string[];
   csrfSecure: boolean;
   sessionName: string;
   sessionSecure: boolean | "auto";
@@ -12,15 +13,17 @@ const CONFIG_SCRIPT = `
   import config from "./src/config.ts";
   console.log(JSON.stringify({
     csrfSecure: config.csrf.secure,
+    additionalRedirectUris: config.entra.additionalRedirectUris,
     sessionName: config.session.name,
     sessionSecure: config.session.cookie.secure,
   }));
 `;
 
-const loadCookieSecurityConfig = (
+const loadConfig = (
   nodeEnvironment: string,
   useHttps?: string,
-): CookieSecurityConfig => {
+  additionalRedirectUris?: string,
+): ConfigSnapshot => {
   const environment: NodeJS.ProcessEnv = {
     ...process.env,
     ENTRA_AUTHORITY_BASE_URL: "https://login.microsoftonline.com/",
@@ -38,18 +41,24 @@ const loadCookieSecurityConfig = (
   } else {
     environment.USE_HTTPS = useHttps;
   }
+  if (additionalRedirectUris === undefined) {
+    delete environment.ENTRA_ADDITIONAL_REDIRECT_URIS;
+  } else {
+    environment.ENTRA_ADDITIONAL_REDIRECT_URIS = additionalRedirectUris;
+  }
 
   return JSON.parse(
     execFileSync("./node_modules/.bin/tsx", ["-e", CONFIG_SCRIPT], {
       encoding: "utf8",
       env: environment,
     }),
-  ) as CookieSecurityConfig;
+  ) as ConfigSnapshot;
 };
 
 describe("config cookie security", () => {
   it("uses secure cookies by default in production", () => {
-    expect(loadCookieSecurityConfig("production")).to.deep.equal({
+    expect(loadConfig("production")).to.deep.equal({
+      additionalRedirectUris: [],
       csrfSecure: true,
       sessionName: "__Host-rcw.sid",
       sessionSecure: true,
@@ -57,7 +66,8 @@ describe("config cookie security", () => {
   });
 
   it("uses HTTP-compatible cookies by default in Docker", () => {
-    expect(loadCookieSecurityConfig("docker")).to.deep.equal({
+    expect(loadConfig("docker")).to.deep.equal({
+      additionalRedirectUris: [],
       csrfSecure: false,
       sessionName: "rcw.sid",
       sessionSecure: "auto",
@@ -65,7 +75,8 @@ describe("config cookie security", () => {
   });
 
   it("allows HTTPS to be disabled in production", () => {
-    expect(loadCookieSecurityConfig("production", "false")).to.deep.equal({
+    expect(loadConfig("production", "false")).to.deep.equal({
+      additionalRedirectUris: [],
       csrfSecure: false,
       sessionName: "rcw.sid",
       sessionSecure: "auto",
@@ -73,10 +84,26 @@ describe("config cookie security", () => {
   });
 
   it("allows HTTPS to be enabled in Docker", () => {
-    expect(loadCookieSecurityConfig("docker", "true")).to.deep.equal({
+    expect(loadConfig("docker", "true")).to.deep.equal({
+      additionalRedirectUris: [],
       csrfSecure: true,
       sessionName: "__Host-rcw.sid",
       sessionSecure: true,
     });
+  });
+});
+
+describe("Entra callback configuration", () => {
+  it("parses additional callback URIs from a comma-separated environment value", () => {
+    expect(
+      loadConfig(
+        "production",
+        undefined,
+        " https://old.example.test/auth/code/callback, https://uat.example.test/auth/code/callback ",
+      ).additionalRedirectUris,
+    ).to.deep.equal([
+      "https://old.example.test/auth/code/callback",
+      "https://uat.example.test/auth/code/callback",
+    ]);
   });
 });

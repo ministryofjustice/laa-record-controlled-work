@@ -61,6 +61,7 @@ export interface CsrfConfig {
 }
 
 export interface EntraConfig {
+  additionalRedirectUris: string[];
   authority: string;
   clientId: string;
   clientSecret: string;

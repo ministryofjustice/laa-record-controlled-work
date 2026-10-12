@@ -97,6 +97,7 @@ export default {
   } satisfies CsrfConfig,
 
   entra: {
+    additionalRedirectUris: optional.ENTRA_ADDITIONAL_REDIRECT_URIS ?? [],
     authority: `${required.ENTRA_AUTHORITY_BASE_URL}${required.ENTRA_TENANT_ID}`,
     clientId: required.ENTRA_CLIENT_ID,
     clientSecret: required.ENTRA_CLIENT_SECRET,
