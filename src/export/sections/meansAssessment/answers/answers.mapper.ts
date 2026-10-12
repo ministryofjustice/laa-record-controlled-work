@@ -69,38 +69,6 @@ export function toMeansAssessmentAnswerSummaries(
 }
 
 /**
- * Maps question sections while preserving order and saved answer-context indexes.
- * @template TAnswerContext Context provided to each question.
- * @param answers Trusted saved CCQ answers used for presentation gates.
- * @param sections Ordered sections and their answer contexts.
- * @returns Plain-text summaries for the relevant sections and questions.
- */
-export function toQuestionSectionSummaries<TAnswerContext>(
-  answers: EligibilityData,
-  sections: ReadonlyArray<QuestionSection<TAnswerContext>>,
-): MeansAssessmentAnswerSummary[] {
-  const summaries: MeansAssessmentAnswerSummary[] = [];
-
-  for (const section of sections) {
-    if (section.isRelevant?.(answers) === false) {
-      continue;
-    }
-
-    const answerContexts: readonly TAnswerContext[] =
-      section.answerContexts(answers);
-
-    // One context can feed several questions; repeated contexts give each
-    // question multiple answers. Preserve each context index for numbering.
-    for (const [index, answerContext] of answerContexts.entries()) {
-      summaries.push(
-        toAnswerSummary<TAnswerContext>(section, answers, answerContext, index),
-      );
-    }
-  }
-
-  return summaries;
-}
-/**
  * Creates a section summary for one answer context.
  * @param section Section containing the questions.
  * @param answers Complete saved assessment answers.
@@ -147,4 +115,37 @@ function toAnswerSummaryRow<TAnswerContext>(
     key: means.t(question.label, { index: index + DISPLAY_INDEX_OFFSET }),
     value: formatAnswer<TAnswerContext>(question, answerContext, index),
   };
+}
+
+/**
+ * Maps question sections while preserving order and saved answer-context indexes.
+ * @template TAnswerContext Context provided to each question.
+ * @param answers Trusted saved CCQ answers used for presentation gates.
+ * @param sections Ordered sections and their answer contexts.
+ * @returns Plain-text summaries for the relevant sections and questions.
+ */
+function toQuestionSectionSummaries<TAnswerContext>(
+  answers: EligibilityData,
+  sections: ReadonlyArray<QuestionSection<TAnswerContext>>,
+): MeansAssessmentAnswerSummary[] {
+  const summaries: MeansAssessmentAnswerSummary[] = [];
+
+  for (const section of sections) {
+    if (section.isRelevant?.(answers) === false) {
+      continue;
+    }
+
+    const answerContexts: readonly TAnswerContext[] =
+      section.answerContexts(answers);
+
+    // One context can feed several questions; repeated contexts give each
+    // question multiple answers. Preserve each context index for numbering.
+    for (const [index, answerContext] of answerContexts.entries()) {
+      summaries.push(
+        toAnswerSummary<TAnswerContext>(section, answers, answerContext, index),
+      );
+    }
+  }
+
+  return summaries;
 }
