@@ -3,7 +3,7 @@ import type { NextFunction, Request, Response } from "express";
 import type {
   LoadEligibilityAssessmentDeps,
   SaveEligibilityAssessmentDeps,
-} from "#/api/eligibility/eligibility.service.js";
+} from "#/api/eligibility/eligibility.types.js";
 
 import {
   loadEligibilityAssessment,

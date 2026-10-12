@@ -1,5 +1,8 @@
 FROM node:26.10.0-alpine@sha256:0b36e8c136b94cd4fcf02188228e76c31ad5872eef3fec8cbd2eee500cfd9e80 AS base
 
+# fix CVE SNYK-ALPINE324-ZLIB-20541555
+RUN apk upgrade --no-cache zlib
+
 ###########################################
 FROM base AS installer
 
