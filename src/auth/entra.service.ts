@@ -243,8 +243,7 @@ export class EntraService {
 
   /**
    * Builds the MSAL authorisation URL request and related auth flow state.
-   * When the callback hostname differs from the configured redirect URI hostname (ephemeral environments),
-   * the state parameter includes a signed relay target so UAT can forward the callback.
+   * Configured callback URIs are direct; unconfigured ephemeral UAT hosts use a signed relay target.
    * @param pkceCodes - The PKCE code verifier, challenge, and challenge method.
    * @param returnTo - The post-authentication redirect path to validate.
    * @param callbackHostname - Optional current request hostname used for relay-state targeting.
@@ -263,11 +262,23 @@ export class EntraService {
     // Validated against session.authState on callback before any token exchange.
     // Encoded as base64(JSON) so MSAL's parseRequestState can parse it without throwing invalid_state.
     const nonce = randomUUID();
-    const redirectHostname = new URL(authRequestDefaults.redirectUri).hostname;
     const normalizedCallbackHostname =
       callbackHostname === undefined
         ? undefined
         : normalizeCallbackHostname(callbackHostname);
+
+    const redirectUris = [
+      authRequestDefaults.redirectUri,
+      ...config.entra.additionalRedirectUris,
+    ];
+
+    const callbackRedirectUri =
+      redirectUris.find(
+        (redirectUri) =>
+          new URL(redirectUri).hostname === normalizedCallbackHostname,
+      ) ?? authRequestDefaults.redirectUri;
+
+    const redirectHostname = new URL(callbackRedirectUri).hostname;
     const isRelay =
       normalizedCallbackHostname !== undefined &&
       normalizedCallbackHostname !== redirectHostname;
@@ -284,7 +295,7 @@ export class EntraService {
       authCodeRequest: {
         code: "",
         codeVerifier: verifier,
-        redirectUri: config.entra.redirectUri,
+        redirectUri: callbackRedirectUri,
         scopes: authRequestDefaults.scopes,
       } satisfies AuthorizationCodeRequest,
 
@@ -292,7 +303,7 @@ export class EntraService {
         codeChallenge: challenge,
         codeChallengeMethod: challengeMethod,
         prompt: authRequestDefaults.prompt,
-        redirectUri: config.entra.redirectUri,
+        redirectUri: callbackRedirectUri,
         responseMode: authRequestDefaults.responseMode,
         scopes: authRequestDefaults.scopes,
         state: authState,

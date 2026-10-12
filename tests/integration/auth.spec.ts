@@ -14,9 +14,17 @@ import { Agent, request as undiciRequest, setGlobalDispatcher } from "undici";
 import type { RedisClientType } from "redis";
 import { createRedisClient as createAppRedisClient } from "#/lib/redis.js";
 import { FOUND, OK } from "#/lib/constants/http.js";
+import { parseRelayState } from "#/auth/auth.relay.js";
 
 const REDIS_PORT = 6379;
 const IDP_PORT = 8080;
+const PRODUCTION_REDIRECT_URIS = [
+  "https://record-controlled-work.service.justice.gov.uk/auth/code/callback",
+  "https://laa-record-controlled-work-production.cloud-platform.service.justice.gov.uk/auth/code/callback",
+];
+const PRODUCTION_HOSTNAMES = PRODUCTION_REDIRECT_URIS.map(
+  (redirectUri) => new URL(redirectUri).hostname,
+);
 
 type MockMsalMetadata = {
   authorityMetadata: string;
@@ -41,7 +49,9 @@ type MsalOriginalValues = {
   authority: string;
   authorityMetadata?: string;
   cloudDiscoveryMetadata?: string;
+  additionalRedirectUris: string[];
   redirectUri: string;
+  configRedirectUri: string;
 };
 
 function buildMockIdpMsalMetadata(authority: string): MockMsalMetadata {
@@ -117,17 +127,20 @@ describe("Auth Integration", () => {
     const mutableAuthRequestDefaults =
       authRequestDefaults as unknown as MutableAuthRequestDefaults;
 
-    config.entra.authority = `https://localhost:${idpPort}/default`;
-    config.entra.redirectUri = "http://127.0.0.1/auth/code/callback";
-    const { authorityMetadata, cloudDiscoveryMetadata } =
-      buildMockIdpMsalMetadata(config.entra.authority);
-
     msalOriginalValues = {
       authority: mutableMsalConfig.auth.authority,
       authorityMetadata: mutableMsalConfig.auth.authorityMetadata,
       cloudDiscoveryMetadata: mutableMsalConfig.auth.cloudDiscoveryMetadata,
+      additionalRedirectUris: [...config.entra.additionalRedirectUris],
       redirectUri: mutableAuthRequestDefaults.redirectUri,
+      configRedirectUri: config.entra.redirectUri,
     };
+
+    config.entra.authority = `https://localhost:${idpPort}/default`;
+    config.entra.redirectUri = "http://127.0.0.1/auth/code/callback";
+    config.entra.additionalRedirectUris = PRODUCTION_REDIRECT_URIS;
+    const { authorityMetadata, cloudDiscoveryMetadata } =
+      buildMockIdpMsalMetadata(config.entra.authority);
 
     mutableMsalConfig.auth.authority = config.entra.authority;
     mutableMsalConfig.auth.authorityMetadata = authorityMetadata;
@@ -156,6 +169,9 @@ describe("Auth Integration", () => {
       msalOriginalValues.authorityMetadata;
     mutableMsalConfig.auth.cloudDiscoveryMetadata =
       msalOriginalValues.cloudDiscoveryMetadata;
+    config.entra.additionalRedirectUris =
+      msalOriginalValues.additionalRedirectUris;
+    config.entra.redirectUri = msalOriginalValues.configRedirectUri;
     mutableAuthRequestDefaults.redirectUri = msalOriginalValues.redirectUri;
 
     if (sessionRedisClient.isOpen) {
@@ -248,5 +264,47 @@ describe("Auth Integration", () => {
       expect(landingRes.status).to.equal(OK);
       expect(landingRes.text).to.include("Landing Page");
     });
+
+    for (const hostname of PRODUCTION_HOSTNAMES) {
+      it(`completes sign-in directly on ${hostname}`, async () => {
+        const user = request.agent(app);
+        const signinRes = await user
+          .get("/auth/signin")
+          .set("Host", hostname);
+        expect(signinRes.status).to.equal(FOUND);
+
+        const authorizeUrl = new URL(signinRes.headers.location as string);
+        const expectedRedirectUri =
+          `https://${hostname}/auth/code/callback`;
+        expect(authorizeUrl.searchParams.get("redirect_uri")).to.equal(
+          expectedRedirectUri,
+        );
+        expect(
+          parseRelayState(authorizeUrl.searchParams.get("state") ?? ""),
+        ).to.be.null;
+
+        const idpResponse = await undiciRequest(authorizeUrl.toString(), {
+          method: "POST",
+          body: new URLSearchParams({ username: "testuser" }).toString(),
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        });
+        const location = idpResponse.headers.location;
+        const callbackLocation = Array.isArray(location) ? location[0] : location;
+        expect(callbackLocation).to.be.a("string");
+        const callbackUrl = new URL(callbackLocation as string);
+        expect(callbackUrl.origin).to.equal(`https://${hostname}`);
+
+        const callbackRes = await user
+          .get(callbackUrl.pathname + callbackUrl.search)
+          .set("Host", hostname);
+        expect(callbackRes.status).to.equal(FOUND);
+        expect(callbackRes.headers.location).to.equal("/");
+
+        await user.get("/test/select-office").set("Host", hostname);
+        const landingRes = await user.get("/").set("Host", hostname);
+        expect(landingRes.status).to.equal(OK);
+        expect(landingRes.text).to.include("Landing Page");
+      });
+    }
   });
 });

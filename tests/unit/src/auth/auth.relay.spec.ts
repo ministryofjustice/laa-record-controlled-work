@@ -12,6 +12,10 @@ const SECRET = "test-session-secret";
 const NONCE = "550e8400-e29b-41d4-a716-446655440000";
 const VALID_TARGET =
   "https://el-257-deploy-laa-record-controlled-work-uat.cloud-platform.service.justice.gov.uk";
+const PRODUCTION_ORIGINS = [
+  "https://record-controlled-work.service.justice.gov.uk",
+  "https://laa-record-controlled-work-production.cloud-platform.service.justice.gov.uk",
+];
 
 describe("authRelay", () => {
   describe("createRelayState / parseRelayState roundtrip", () => {
@@ -101,6 +105,12 @@ describe("authRelay", () => {
     it("accepts a valid ephemeral environment hostname", () => {
       expect(isAllowedRelayTarget(VALID_TARGET)).to.be.true;
     });
+
+    for (const productionOrigin of PRODUCTION_ORIGINS) {
+      it(`rejects production origin as a relay target: ${productionOrigin}`, () => {
+        expect(isAllowedRelayTarget(productionOrigin)).to.be.false;
+      });
+    }
 
     it("accepts single-segment branch prefixes", () => {
       expect(
