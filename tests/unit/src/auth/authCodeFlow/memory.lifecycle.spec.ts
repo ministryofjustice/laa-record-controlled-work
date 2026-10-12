@@ -1,6 +1,9 @@
 import { expect } from "chai";
 
-import { createAuthFlowStore } from "#/auth/authCodeFlow/factory.js";
+import {
+  createAuthFlowStore,
+  type AuthFlowStore,
+} from "#/auth/authCodeFlow/factory.js";
 import {
   EXPIRY_MS,
   FLOW,
@@ -10,7 +13,7 @@ import {
 
 describe("Memory auth flow lifecycle", () => {
   let now: number;
-  let store: ReturnType<typeof createAuthFlowStore>;
+  let store: AuthFlowStore;
 
   beforeEach(() => {
     now = 1_800_000_000_000;
