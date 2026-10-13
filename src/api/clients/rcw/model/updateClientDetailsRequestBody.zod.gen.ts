@@ -25,7 +25,9 @@ export const UpdateClientDetailsRequestBody = zod.object({
     .max(updateClientDetailsRequestBodyNiNumberMax)
     .regex(updateClientDetailsRequestBodyNiNumberRegExp)
     .nullable()
-    .describe("Required but nullable; null clears the NI number."),
+    .describe(
+      "Required but nullable; formatting characters are removed and letters uppercased before validation. Null clears the NI number.",
+    ),
   hasFixedAddress: zod.boolean().describe("False requires address to be null."),
   address: zod
     .union([
@@ -36,7 +38,12 @@ export const UpdateClientDetailsRequestBody = zod.object({
           addressLine3: zod.string().nullable(),
           addressLine4: zod.string().nullable(),
           townOrCity: zod.string().nullable(),
-          postCode: zod.string().nullable(),
+          postCode: zod
+            .string()
+            .nullable()
+            .describe(
+              "For UK addresses, formatting characters are removed and letters uppercased before validation.",
+            ),
           county: zod.string().nullable(),
           country: zod
             .string()

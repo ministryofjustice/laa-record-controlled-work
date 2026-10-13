@@ -178,6 +178,7 @@ describe("toAnswers method", () => {
     createdBy: "test-user",
     modifiedAt: "2025-01-01T00:00:00Z",
     modifiedBy: "test-user",
+    ecfFlag: null,
   } satisfies Application;
 
   it("maps a UK API address to only the UK answer fields", () => {

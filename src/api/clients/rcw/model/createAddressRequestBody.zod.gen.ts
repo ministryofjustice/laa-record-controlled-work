@@ -6,18 +6,46 @@
  */
 import * as zod from "zod";
 
-export const createAddressRequestBodyCountryMax = 2;
+export const createAddressRequestBodyThreeCountryMin = 2;
+export const createAddressRequestBodyThreeCountryMax = 2;
 
-export const CreateAddressRequestBody = zod.object({
-  addressLine1: zod.string(),
-  addressLine2: zod.string().optional(),
-  addressLine3: zod.string().optional(),
-  addressLine4: zod.string().optional(),
-  townOrCity: zod.string().optional(),
-  postCode: zod.string().optional(),
-  county: zod.string().optional(),
-  country: zod.string().max(createAddressRequestBodyCountryMax),
-});
+export const createAddressRequestBodyThreeCountryRegExp = new RegExp(
+  "^(?:A(?:D|E|F|G|L|M|O|R|T|U|Z)|B(?:A|B|D|E|F|G|H|I|J|N|O|R|S|T|W|Y|Z)|C(?:A|D|F|G|H|I|L|M|N|O|R|U|V|Y|Z)|D(?:E|J|K|M|O|Z)|E(?:C|E|G|R|S|T)|F(?:I|J|M|R)|G(?:A|B|D|E|H|M|N|Q|R|T|W|Y)|H(?:N|R|T|U)|I(?:D|E|L|N|Q|R|S|T)|J(?:M|O|P)|K(?:E|G|H|I|M|N|P|R|W|Z)|L(?:A|B|C|I|K|R|S|T|U|V|Y)|M(?:A|C|D|E|G|H|K|L|M|N|R|T|U|V|W|X|Y|Z)|N(?:A|E|G|I|L|O|P|R|Z)|O(?:M)|P(?:A|E|G|H|K|L|S|T|W|Y)|Q(?:A)|R(?:O|S|U|W)|S(?:A|B|C|D|E|G|I|K|L|M|N|O|R|S|T|V|Y|Z)|T(?:D|G|H|J|L|M|N|O|R|T|V|Z)|U(?:A|G|S|Y|Z)|V(?:A|C|E|N|U)|W(?:S)|X(?:K)|Y(?:E)|Z(?:A|M|W))$",
+);
+
+export const CreateAddressRequestBody = zod
+  .unknown()
+  .and(
+    zod.union([
+      zod.object({
+        country: zod.enum(["GB"]).optional(),
+        townOrCity: zod.unknown(),
+        postCode: zod.unknown(),
+      }),
+      zod.unknown(),
+    ]),
+  )
+  .and(
+    zod.object({
+      addressLine1: zod.string().min(1),
+      addressLine2: zod.string().optional(),
+      addressLine3: zod.string().optional(),
+      addressLine4: zod.string().optional(),
+      townOrCity: zod.string().optional(),
+      postCode: zod
+        .string()
+        .optional()
+        .describe(
+          "For UK addresses, formatting characters are removed and letters uppercased before validation.",
+        ),
+      county: zod.string().optional(),
+      country: zod
+        .string()
+        .min(createAddressRequestBodyThreeCountryMin)
+        .max(createAddressRequestBodyThreeCountryMax)
+        .regex(createAddressRequestBodyThreeCountryRegExp),
+    }),
+  );
 
 export type CreateAddressRequestBody = zod.input<
   typeof CreateAddressRequestBody

@@ -1,7 +1,7 @@
 import type { Application as ApplicationSchema } from "#/api/clients/rcw/model/application.zod.gen.js";
 import type { ApplicationScopingQuestions } from "#/api/clients/rcw/model/applicationScopingQuestions.zod.gen.js";
 import type { CreateApplicationRequestBody } from "#/api/clients/rcw/model/createApplicationRequestBody.zod.gen.js";
-import type { CreateScopingQuestions } from "#/api/clients/rcw/model/createScopingQuestions.zod.gen.js";
+import type { CreateScopingQuestions as ScopingQuestions } from "#/api/clients/rcw/model/createScopingQuestions.zod.gen.js";
 import type { AnswersOutput } from "#/journeys/create-application/data/answers.zod.js";
 
 import { PriorLegalAid } from "#/api/clients/rcw/model/priorLegalAid.zod.gen.js";
@@ -10,6 +10,9 @@ import {
   mapCountryNameToIsoCode,
   mapIsoCodeToCountryName,
 } from "#/lib/countries.js";
+
+const NON_WHITESPACE_REGEX =
+  /[^\t\n\v\f\r \u0085\u00A0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]/;
 
 interface Application {
   addressLine1?: string;
@@ -27,7 +30,7 @@ interface Application {
   postcode?: string;
   providerOfficeCode: string;
   reasonForReapplication?: string;
-  scopingQuestions: CreateScopingQuestions;
+  scopingQuestions: ScopingQuestions;
   townOrCity?: string;
 }
 
@@ -72,7 +75,7 @@ export class ApplicationDto {
   public postCode?: string;
   public providerOfficeCode = "";
   public reasonForReapplication?: string;
-  public scopingQuestions!: CreateScopingQuestions;
+  public scopingQuestions!: ScopingQuestions;
   public townOrCity?: string;
 
   /**
@@ -95,7 +98,16 @@ export class ApplicationDto {
   ): ApplicationDto {
     const hasFixedAddress = answers.haveAHomeAddress === "yes";
 
-    const address = hasFixedAddress ? this.getAddressFromAnswers(answers) : {};
+    let address: Partial<OverseasAddress | UkAddress> = {};
+    if (hasFixedAddress) {
+      address = this.getAddressFromAnswers(answers);
+    }
+
+    const sameMatter =
+      answers.legalAidBefore === PriorLegalAid.enum.yesSameMatter;
+    const recentAidAnswer = sameMatter
+      ? answers.legalAidLast6Months
+      : undefined;
 
     const scopingQuestions = this.getScopingQuestionsFromAnswers(answers);
 
@@ -105,11 +117,16 @@ export class ApplicationDto {
       firstName: answers.firstName,
       hasFixedAddress,
       lastName: answers.lastName,
-      legalAidLast6Months: answers.legalAidLast6Months === "yes",
+      legalAidLast6Months:
+        recentAidAnswer === undefined ? undefined : recentAidAnswer === "yes",
       niNumber: answers.niNumber,
       providerOfficeCode,
-      reasonForReapplication: answers.reasonForYes,
-      scopingQuestions,
+      reasonForReapplication:
+        recentAidAnswer === "yes" ? answers.reasonForYes?.trim() : undefined,
+      scopingQuestions: {
+        familyLawClassification: answers.familyLawClassification,
+        priorLegalAid: answers.legalAidBefore,
+      },
     });
   }
 
@@ -333,12 +350,58 @@ export class ApplicationDto {
       };
     }
 
-    return {
+    const common = {
       clientDetails,
-      legalAidLast6Months: this.legalAidLast6Months,
       providerOfficeCode: this.providerOfficeCode,
-      reasonForReapplication: this.reasonForReapplication,
-      scopingQuestions: this.scopingQuestions,
     };
+
+    switch (this.scopingQuestions.priorLegalAid) {
+      case PriorLegalAid.enum.no:
+        return {
+          ...common,
+          scopingQuestions: {
+            ...this.scopingQuestions,
+            priorLegalAid: PriorLegalAid.enum.no,
+          },
+        };
+
+      case PriorLegalAid.enum.yesDifferentMatter:
+        return {
+          ...common,
+          scopingQuestions: {
+            ...this.scopingQuestions,
+            priorLegalAid: PriorLegalAid.enum.yesDifferentMatter,
+          },
+        };
+
+      case PriorLegalAid.enum.yesSameMatter: {
+        const scopingQuestions = {
+          ...this.scopingQuestions,
+          priorLegalAid: PriorLegalAid.enum.yesSameMatter,
+        };
+
+        if (this.legalAidLast6Months === false) {
+          return { ...common, legalAidLast6Months: false, scopingQuestions };
+        }
+
+        const reason = this.reasonForReapplication?.trim();
+        if (
+          this.legalAidLast6Months !== true ||
+          !reason ||
+          !NON_WHITESPACE_REGEX.test(reason)
+        ) {
+          throw new Error(
+            "A non-blank reason is required for recent aid on the same matter",
+          );
+        }
+
+        return {
+          ...common,
+          legalAidLast6Months: true,
+          reasonForReapplication: reason,
+          scopingQuestions,
+        };
+      }
+    }
   }
 }

@@ -39,6 +39,7 @@ describe("Check answers step", () => {
         legalAidLast6Months: "yes",
         needsAdviceOnEUOrInternationalMaintenance: "no",
         reasonForHelp: "Some reason for help",
+        reasonForYes: "Some reason for help",
         firstName: "John",
         lastName: "Doe",
         dateOfBirth: "1990-01-01",
