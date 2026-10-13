@@ -355,7 +355,8 @@ export class ApplicationDto {
       providerOfficeCode: this.providerOfficeCode,
     };
 
-    switch (this.scopingQuestions.priorLegalAid) {
+    const { priorLegalAid } = this.scopingQuestions;
+    switch (priorLegalAid) {
       case PriorLegalAid.enum.no:
         return {
           ...common,
