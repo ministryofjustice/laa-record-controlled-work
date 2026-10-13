@@ -108,6 +108,7 @@ export const CreateApplicationRequestBody = zod
           .union([zod.enum(["public", "private"]), zod.null()])
           .optional(),
         needsAdviceOnEUOrInternationalMaintenance: zod.boolean().nullish(),
+        needsProtectiveInjunction: zod.boolean().nullish(),
       }),
       clientDetails: zod
         .union([
