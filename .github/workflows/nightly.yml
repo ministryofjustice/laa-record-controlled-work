@@ -125,22 +125,6 @@ jobs:
             printf '%s\n' "$delimiter"
           } >> "$GITHUB_OUTPUT"
 
-      - name: Notify Slack on nightly Snyk failure
-        uses: ./.github/actions/notify-slack
-        with:
-          slack-bot-token: ${{ secrets.SLACK_ALERTS_BOT_TOKEN }}
-          slack-channel-id: ${{ vars.SLACK_ALERTS_CHANNEL_ID }}
-          slack-mention: ${{ vars.SLACK_ALERTS_MENTION }}
-          unfurl-links: 'false'
-          unfurl-media: 'false'
-          message: &snyk-alert |
-            :red_circle: *Nightly Snyk scan failed for RCW `main` branch*
-
-            Findings:
-            ${{ steps.findings.outputs.list }}
-
-            Run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/attempts/${{ github.run_attempt }}
-
       - name: Notify engineering alerts on nightly Snyk failure
         if: ${{ !cancelled() }}
         uses: ./.github/actions/notify-slack
