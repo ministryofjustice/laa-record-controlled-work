@@ -93,7 +93,8 @@ const meansAssessment = {
     heading: "Means assessment",
     outcome: {
       contributions: [],
-      description: "The case must also meet scope and merits criteria.",
+      description:
+        "Your client qualifies financially for civil legal aid based on the information you entered. Before you (or a provider of advice or services funded by legal aid) proceed with your client's case, it must also be within scope for legal aid and satisfy the relevant merits criteria set out in the relevant legislation and guidance. These calculations were made in line with the latest version of the Lord Chancellor's Guidance on Determining Financial Eligibility for Controlled Work.",
       heading: "Your client is financially eligible for controlled work.",
     },
     totals: {
@@ -208,6 +209,12 @@ describe("export application view", () => {
     expect(response.status).to.equal(200);
     expect(response.text).to.include("<h2");
     expect(response.text).to.include("Means assessment");
+    expect(response.text).to.include(
+      meansAssessment.outcomeSummary.outcome.description.replaceAll(
+        "'",
+        "&#39;",
+      ),
+    );
     expect(response.text).to.include(
       "Your client&#39;s key eligibility totals",
     );
