@@ -318,4 +318,6 @@ if run_case monitor 0 0 2; then
   exit 1
 fi
 
+node --test "$repo_root/.github/scripts/test-format-snyk-findings.mjs"
+
 echo 'Snyk scan mode checks passed'

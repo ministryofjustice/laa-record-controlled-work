@@ -245,82 +245,12 @@ if [[ "$scan_mode" != "monitor" && -n "$summary_path" ]]; then
 fi
 
 if [[ "$scan_mode" == "absolute" ]]; then
-  findings_path="$report_dir/findings.txt"
-  markdown_findings_path="$report_dir/findings.md"
-  : > "$findings_path"
-  : > "$markdown_findings_path"
-
-  for report in \
-    "Open Source:$report_dir/snyk-open-source.sarif" \
-    "Container:$report_dir/snyk-container.sarif" \
-    "Code:$report_dir/snyk-code.sarif" \
-    "IaC:$report_dir/snyk-iac.sarif"; do
-    scan_name=${report%%:*}
-    sarif_path=${report#*:}
-    if [[ -f "$sarif_path" ]]; then
-      findings=$(jq -c '
-        [
-          .runs[]? as $run
-          | ($run.tool.driver.rules // []) as $rules
-          | $run.results[]? as $finding
-          | ($rules | map(select(.id == $finding.ruleId)) | .[0] // {}) as $rule
-          | ($finding.locations[0].physicalLocation // {}) as $location
-          | ($location.artifactLocation.uri // "location unavailable") as $file
-          | ($location.region.startLine // null) as $line
-          | ($rule.shortDescription.text // "") as $title
-          | (if ($title | test("^(critical|high|medium|low) severity"; "i")) then ($title | capture("^(?<severity>critical|high|medium|low) severity"; "i").severity) else null end) as $title_severity
-          | (($rule.properties["security-severity"] // $finding.properties["security-severity"] // $rule.properties.cvssv3_baseScore // null) | try tonumber catch null) as $score
-          | ($finding.properties.severity // $rule.properties.severity // $rule.properties["problem.severity"] // $title_severity) as $explicit_severity
-          | (if $explicit_severity != null then
-              ($explicit_severity | tostring | ascii_downcase) as $severity
-              | if $severity == "critical" then "Critical"
-                elif $severity == "high" then "High"
-                elif $severity == "medium" then "Medium"
-                elif $severity == "low" then "Low"
-                else "Unknown" end
-            elif $score != null then
-              if $score >= 9 then "Critical"
-              elif $score >= 7 then "High"
-              elif $score >= 4 then "Medium"
-              else "Low" end
-            elif $finding.level == "error" then "High"
-            elif $finding.level == "warning" then "Medium"
-            elif $finding.level == "note" or $finding.level == "info" then "Low"
-            else "Unknown" end) as $severity
-          | (($finding.message.text // $finding.message.markdown // $title // "No description")
-            | gsub("[\r\n\t]+"; " ")
-            | gsub("  +"; " ")) as $description
-          | {
-              id: ($finding.ruleId // "Unknown rule"),
-              severity: $severity,
-              description: $description,
-              location: (if $line == null then $file else "\($file):\($line)" end)
-            }
-        ]
-      ' "$sarif_path")
-      if [[ "$findings" != "[]" ]]; then
-        printf '\n### %s findings\n\n' "$scan_name" >> "$markdown_findings_path"
-        printf '\n*%s findings*\n' "$scan_name" >> "$findings_path"
-        printf '%s\n' "$findings" | jq -r '
-          .[]
-          | (if (.id | test("^SNYK-[A-Z0-9-]+$")) then "[\(.id)](https://security.snyk.io/vuln/\(.id))" else .id end) as $id
-          | "- \($id) (\(.severity)): \(.description) (\(.location))"
-        ' >> "$markdown_findings_path"
-        printf '%s\n' "$findings" | jq -r '
-          .[]
-          | (if (.id | test("^SNYK-[A-Z0-9-]+$")) then "<https://security.snyk.io/vuln/\(.id)|\(.id)>" else .id end) as $id
-          | "- \($id) (\(.severity)): \(.description) (\(.location))"
-        ' >> "$findings_path"
-      fi
-    fi
-  done
-
-  if [[ ! -s "$findings_path" ]]; then
-    echo "No findings." > "$findings_path"
-    echo "No findings." > "$markdown_findings_path"
+  if ! node .github/scripts/format-snyk-findings.mjs "$report_dir"; then
+    echo "::error::Failed to format findings from Snyk SARIF reports"
+    overall_status=1
   fi
-
-  if [[ -n "$summary_path" ]]; then
+  markdown_findings_path="$report_dir/findings.md"
+  if [[ -n "$summary_path" && -f "$markdown_findings_path" ]]; then
     echo >> "$summary_path"
     echo "## Findings" >> "$summary_path"
     cat "$markdown_findings_path" >> "$summary_path"
