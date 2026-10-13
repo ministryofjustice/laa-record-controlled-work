@@ -5,11 +5,6 @@ import { promisify } from "node:util";
 
 import type { Either } from "#/lib/either.js";
 
-import {
-  type AuthFlow,
-  type AuthFlowStore,
-  getAuthFlowStore,
-} from "#/auth/auth.flow-store.js";
 import { getValidatedReturnTo } from "#/auth/auth.redirect.js";
 import {
   decodeRelayState,
@@ -20,6 +15,11 @@ import {
   authCodeCallbackErrorSchema,
   authCodeCallbackSchema,
 } from "#/auth/auth.types.js";
+import {
+  type AuthFlow,
+  type AuthFlowStore,
+  getAuthFlowStore,
+} from "#/auth/authCodeFlow/factory.js";
 import { EntraErrorCode } from "#/auth/domain/EntraErrorCode.enum.js";
 import { EntraService } from "#/auth/entra.service.js";
 import { getMsalCacheKey } from "#/auth/msal.cache-key.js";
