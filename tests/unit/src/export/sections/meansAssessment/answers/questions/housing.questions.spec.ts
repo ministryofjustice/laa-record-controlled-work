@@ -3,6 +3,7 @@ import { before, describe, it } from "mocha";
 
 import type { EligibilityData } from "#/api/clients/rcw/model/eligibilityData.zod.gen.js";
 
+import { answerCards } from "#tests/unit/src/export/sections/meansAssessment/answers/answers.fixtures.js";
 import { toMeansAssessmentSection } from "#/export/sections/meansAssessment/meansAssessment.mapper.js";
 import { initializeI18nextSync } from "#/lib/i18n.js";
 import { getGetApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
@@ -26,14 +27,10 @@ const BASE_ANSWERS = {
   student_finance_relevant: false,
 } satisfies EligibilityData;
 
-const HOUSING_HEADINGS = new Set([
-  "Home client usually lives in",
-  "Housing costs",
-  "Home client lives in equity",
-]);
+const HOUSING_HEADING_PREFIXES = ["Housing costs", "Home client"];
 
 function housing(overrides: Partial<EligibilityData> = {}) {
-  return (
+  return answerCards(
     toMeansAssessmentSection(
       getGetApplicationResponseMock({
         eligibility: {
@@ -42,8 +39,9 @@ function housing(overrides: Partial<EligibilityData> = {}) {
         },
         meansAssessmentRequired: true,
       }),
-    )?.answerSummaries.filter(({ heading }) => HOUSING_HEADINGS.has(heading)) ??
-    []
+    )?.answerSummaries,
+  ).filter(({ heading }) =>
+    HOUSING_HEADING_PREFIXES.some((prefix) => heading.startsWith(prefix)),
   );
 }
 

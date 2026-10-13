@@ -1,7 +1,8 @@
 import { expect } from "chai";
-import { describe, it } from "mocha";
+import { before, describe, it } from "mocha";
 
 import { toMeansAssessmentSection } from "#/export/sections/meansAssessment/meansAssessment.mapper.js";
+import { initializeI18nextSync } from "#/lib/i18n.js";
 import { getGetApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
 
 const CALCULATED_RESULT = {
@@ -42,6 +43,8 @@ function mapSection(
 }
 
 describe("toMeansAssessmentSection", () => {
+  before(initializeI18nextSync);
+
   it("returns unavailable calculations for null or empty results", () => {
     for (const result of [null, {}]) {
       expect(mapSection(result)?.calculations).to.deep.equal({
@@ -174,9 +177,7 @@ describe("toMeansAssessmentSection", () => {
     const result = {
       result_summary: {
         capital: {
-          proceeding_types: [
-            { result: "not_calculated", upper_threshold: 0 },
-          ],
+          proceeding_types: [{ result: "not_calculated", upper_threshold: 0 }],
         },
         gross_income: {
           combined_total_gross_income: 500,
@@ -215,6 +216,104 @@ describe("toMeansAssessmentSection", () => {
     if (calculations?.status === "ready") {
       expect(calculations.capital).to.have.property("total", 0);
     }
+  });
+
+  it("prepares saved outcome and totals for display", () => {
+    expect(mapSection(CALCULATED_RESULT)?.outcomeSummary).to.deep.equal({
+      heading: "Means assessment",
+      outcome: {
+        contributions: [],
+        description:
+          "The case must also be in scope and meet relevant merits criteria.",
+        heading:
+          "Your client is financially eligible for controlled work and family mediation.",
+      },
+      totals: {
+        heading: "Your client's key eligibility totals",
+        items: [
+          {
+            amount: "£999.99",
+            detail: "Below upper limit (£1,000)",
+            heading: "Gross monthly income",
+          },
+          {
+            amount: "£0",
+            detail: "Eligible",
+            heading: "Disposable monthly income",
+          },
+          {
+            amount: "£0",
+            detail: "No upper limit applies",
+            heading: "Disposable capital",
+          },
+        ],
+      },
+      yourAnswersHeading: "Your answers",
+    });
+  });
+
+  it("shows a neutral outcome and no totals when calculations are unavailable", () => {
+    expect(mapSection(null)?.outcomeSummary).to.deep.equal({
+      heading: "Means assessment",
+      outcome: {
+        contributions: [],
+        description: "Saved answer summaries are shown below.",
+        heading: "Financial eligibility outcome unavailable.",
+      },
+      totals: null,
+      yourAnswersHeading: "Your answers",
+    });
+  });
+
+  it("does not show a limit claim when the saved total is unavailable", () => {
+    const result = {
+      result_summary: {
+        gross_income: {
+          combined_total_gross_income: null,
+          proceeding_types: [{ result: "eligible", upper_threshold: 1_000 }],
+        },
+        overall_result: { result: "eligible" },
+      },
+    };
+
+    expect(mapSection(result)?.outcomeSummary.totals?.items[0]).to.deep.equal({
+      amount: "Not available",
+      detail: null,
+      heading: "Gross monthly income",
+    });
+  });
+
+  it("shows saved contribution amounts without deriving them", () => {
+    const result = {
+      result_summary: {
+        disposable_income: {
+          combined_total_disposable_income: 100,
+          proceeding_types: [
+            { result: "contribution_required", upper_threshold: 733 },
+          ],
+        },
+        gross_income: {
+          combined_total_gross_income: 500,
+          proceeding_types: [{ result: "eligible", upper_threshold: 2_657 }],
+        },
+        overall_result: {
+          capital_contribution: 125.5,
+          income_contribution: 25,
+          result: "contribution_required",
+        },
+      },
+    };
+
+    expect(mapSection(result)?.outcomeSummary.outcome).to.deep.equal({
+      contributions: [
+        "Monthly income contribution: £25",
+        "Capital contribution: £125.50",
+      ],
+      description:
+        "The case must also be in scope and meet relevant merits criteria.",
+      heading:
+        "Your client is financially eligible for controlled work and family mediation, with a contribution.",
+    });
   });
 
   for (const data of [

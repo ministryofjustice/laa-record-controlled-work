@@ -3,12 +3,13 @@ import { before, describe, it } from "mocha";
 
 import type { EligibilityData } from "#/api/clients/rcw/model/eligibilityData.zod.gen.js";
 
+import { answerCards } from "#tests/unit/src/export/sections/meansAssessment/answers/answers.fixtures.js";
 import { toMeansAssessmentSection } from "#/export/sections/meansAssessment/meansAssessment.mapper.js";
 import { initializeI18nextSync } from "#/lib/i18n.js";
 import { getGetApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
 
 function summaries(data: EligibilityData) {
-  return toMeansAssessmentSection(
+  const sections = toMeansAssessmentSection(
     getGetApplicationResponseMock({
       eligibility: {
         data: {
@@ -24,6 +25,8 @@ function summaries(data: EligibilityData) {
       meansAssessmentRequired: true,
     }),
   )?.answerSummaries.filter((summary) => summary.heading === "Client details");
+
+  return answerCards(sections);
 }
 
 describe("saved client answers", () => {
@@ -47,9 +50,12 @@ describe("saved client answers", () => {
         }),
       ).to.deep.equal([
         {
-          heading: "Client details",
+          heading: "Client age",
+          rows: [{ key: "What age is your client?", value: display }],
+        },
+        {
+          heading: "Partner and passporting",
           rows: [
-            { key: "What age is your client?", value: display },
             { key: "Does your client have a partner?", value: "No" },
             {
               key: "Does your client receive a passporting benefit?",
@@ -72,9 +78,12 @@ describe("saved client answers", () => {
       }),
     ).to.deep.equal([
       {
-        heading: "Client details",
+        heading: "Client age",
+        rows: [{ key: "What age is your client?", value: "60 or over" }],
+      },
+      {
+        heading: "Partner and passporting",
         rows: [
-          { key: "What age is your client?", value: "60 or over" },
           { key: "Does your client have a partner?", value: "Yes" },
           {
             key: "Does your client receive a passporting benefit?",
@@ -110,7 +119,7 @@ describe("saved client answers", () => {
         }),
       ).to.deep.equal([
         {
-          heading: "Client details",
+          heading: "Client age",
           rows: [
             {
               key: "What age is your client?",
@@ -152,9 +161,12 @@ describe("saved client answers", () => {
         }),
       ).to.deep.equal([
         {
-          heading: "Client details",
+          heading: "Client age",
+          rows: [{ key: "What age is your client?", value: "Under 18" }],
+        },
+        {
+          heading: "Partner and passporting",
           rows: [
-            { key: "What age is your client?", value: "Under 18" },
             { key: "Does your client have a partner?", value: "No" },
             {
               key: "Does your client receive a passporting benefit?",
@@ -187,9 +199,12 @@ describe("saved client answers", () => {
         }),
       ).to.deep.equal([
         {
-          heading: "Client details",
+          heading: "Client age",
+          rows: [{ key: "What age is your client?", value: "18 to 59" }],
+        },
+        {
+          heading: "Partner and passporting",
           rows: [
-            { key: "What age is your client?", value: "18 to 59" },
             { key: "Does your client have a partner?", value: "No" },
             {
               key: "Does your client receive a passporting benefit?",

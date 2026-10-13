@@ -1,6 +1,7 @@
 import { expect } from "chai";
 import { describe, it } from "mocha";
 
+import { answerCards } from "#tests/unit/src/export/sections/meansAssessment/answers/answers.fixtures.js";
 import { toExportApplicationViewModel } from "#/export/export.mappers.js";
 import { getGetApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
 
@@ -42,8 +43,9 @@ describe("toExportApplicationViewModel", () => {
       applicationRefNumber: null,
     });
 
-    expect(toExportApplicationViewModel(application).applicationRefNumber).to
-      .equal(null);
+    expect(
+      toExportApplicationViewModel(application).applicationRefNumber,
+    ).to.equal(null);
   });
 
   it("includes the client and case details section", () => {
@@ -109,23 +111,24 @@ describe("toExportApplicationViewModel", () => {
       meansAssessmentRequired: true,
     });
 
-    const meansAssessment = toExportApplicationViewModel(application)
-      .meansAssessment;
+    const meansAssessment =
+      toExportApplicationViewModel(application).meansAssessment;
 
     expect(meansAssessment?.calculations).to.deep.equal({
       status: "unavailable",
     });
-    expect(meansAssessment?.answerSummaries.map(({ heading }) => heading)).to
-      .include.members(["Client assets", "Partner assets"]);
+    const cards = answerCards(meansAssessment?.answerSummaries);
+    expect(cards.map(({ heading }) => heading)).to.include.members([
+      "Client assets",
+      "Partner assets",
+    ]);
     expect(
-      meansAssessment?.answerSummaries.flatMap(({ rows }) =>
-        rows.map(({ value }) => value),
-      ),
+      cards.flatMap(({ rows }) => rows.map(({ value }) => value)),
     ).to.include.members(["£0.00", "£500.00", "£1,000.00"]);
     expect(
-      meansAssessment?.answerSummaries.some(({ heading, rows }) =>
-        `${heading} ${rows.map(({ key }) => key).join(" ")}`.includes("vehicle"),
-      ),
+      cards
+        .flatMap(({ rows }) => rows.map(({ key }) => key))
+        .some((key) => key.toLowerCase().includes("vehicle")),
     ).to.equal(false);
   });
 });

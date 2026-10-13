@@ -27,7 +27,9 @@ test("export page renders the application header", async ({
   ).toBeVisible();
   await expect(page.getByText("Client:")).toBeVisible();
   await expect(
-    page.getByText(`Reference number: ${completeApplication.applicationRefNumber}`),
+    page.getByText(
+      `Reference number: ${completeApplication.applicationRefNumber}`,
+    ),
   ).toBeVisible();
   await expect(
     page.getByRole("img", { name: "Legal Aid Agency logo" }),
@@ -78,9 +80,9 @@ test("export page renders the client details section", async ({
       year: "numeric",
     }).format(new Date(clientDetails.dateOfBirth)),
   );
-  await expect(rows.filter({ hasText: "National Insurance number" })).toContainText(
-    clientDetails.niNumber!,
-  );
+  await expect(
+    rows.filter({ hasText: "National Insurance number" }),
+  ).toContainText(clientDetails.niNumber!);
   for (const addressLine of [
     clientDetails.address!.addressLine1,
     clientDetails.address!.addressLine2,
@@ -88,8 +90,50 @@ test("export page renders the client details section", async ({
     clientDetails.address!.county,
     clientDetails.address!.postCode,
   ]) {
-    await expect(rows.filter({ hasText: "Address" })).toContainText(addressLine!);
+    await expect(rows.filter({ hasText: "Address" })).toContainText(
+      addressLine!,
+    );
   }
+});
+
+test("export page renders mapped means outcomes, totals, and answer cards", async ({
+  withSelectedOffice: page,
+}) => {
+  const response = await page.goto(`/cases/${completeApplication.id}/export`);
+
+  expect(response?.ok()).toBe(true);
+  await expect(
+    page.getByRole("heading", { level: 2, name: "Means assessment" }),
+  ).toBeVisible();
+  await expect(
+    page.getByText(
+      "Your client is financially eligible for controlled work and family mediation.",
+    ),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", {
+      level: 3,
+      name: "Your client's key eligibility totals",
+    }),
+  ).toBeVisible();
+  await expect(page.locator(".app-means-assessment__total")).toHaveCount(3);
+  await expect(
+    page.locator(".app-means-assessment__total").nth(0),
+  ).toContainText(
+    ["Gross monthly income", "£2,450", "Below upper limit (£2,657)"].join(" "),
+  );
+  await expect(
+    page.getByRole("heading", { level: 3, name: "Your answers" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { level: 3, name: "Client details" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { level: 4, name: "Client age" }),
+  ).toBeVisible();
+  await expect(
+    page.locator(".app-means-assessment .govuk-summary-list__row").first(),
+  ).toContainText("18 to 59");
 });
 
 test("export page loads assets without CSP violations", async ({
@@ -117,9 +161,13 @@ test("export page loads assets without CSP violations", async ({
     ),
   ).toBe(true);
   expect(
-    await page.getByRole("img", { name: "Legal Aid Agency logo" }).evaluate(
-      (image) => (image as HTMLImageElement).complete && (image as HTMLImageElement).naturalWidth > 0,
-    ),
+    await page
+      .getByRole("img", { name: "Legal Aid Agency logo" })
+      .evaluate(
+        (image) =>
+          (image as HTMLImageElement).complete &&
+          (image as HTMLImageElement).naturalWidth > 0,
+      ),
   ).toBe(true);
   expect(
     await page.evaluate(
@@ -130,7 +178,8 @@ test("export page loads assets without CSP violations", async ({
   ).toBe(true);
   expect(
     await page.evaluate(
-      () => (window as Window & { cspViolations?: string[] }).cspViolations ?? [],
+      () =>
+        (window as Window & { cspViolations?: string[] }).cspViolations ?? [],
     ),
   ).toEqual([]);
 });
