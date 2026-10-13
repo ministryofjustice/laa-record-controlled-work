@@ -1,0 +1,62 @@
+<section class="app-means-assessment" aria-labelledby="means-assessment-heading">
+  <h2 id="means-assessment-heading" class="govuk-heading-l govuk-!-margin-top-8">
+    {{ meansAssessment.outcomeSummary.heading }}
+  </h2>
+
+  <div class="app-means-assessment__outcome">
+    <p class="govuk-body govuk-!-font-weight-bold">
+      {{ meansAssessment.outcomeSummary.outcome.heading }}
+    </p>
+    <p class="govuk-body govuk-!-font-size-16">
+      {{ meansAssessment.outcomeSummary.outcome.description }}
+    </p>
+    {% for contribution in meansAssessment.outcomeSummary.outcome.contributions %}
+      <p class="govuk-body">{{ contribution }}</p>
+    {% endfor %}
+  </div>
+
+  {% if meansAssessment.outcomeSummary.totals %}
+    <h3 class="govuk-heading-m">
+      {{ meansAssessment.outcomeSummary.totals.heading }}
+    </h3>
+    <div class="app-means-assessment__totals">
+      {% for total in meansAssessment.outcomeSummary.totals.items %}
+        <article class="app-means-assessment__total">
+          <p class="govuk-body app-means-assessment__total-heading">
+            {{ total.heading }}
+          </p>
+          <p class="govuk-heading-m govuk-!-margin-bottom-2 govuk-!-margin-top-0">
+            {{ total.amount }}
+          </p>
+          {% if total.detail %}
+            <p class="govuk-body govuk-!-margin-bottom-0">
+              {{ total.detail }}
+            </p>
+          {% endif %}
+        </article>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  {% if meansAssessment.answerSummaries.length %}
+    <h3 class="govuk-heading-l govuk-!-margin-bottom-6 govuk-!-margin-top-8">
+      {{ meansAssessment.outcomeSummary.yourAnswersHeading }}
+    </h3>
+    {% for section in meansAssessment.answerSummaries %}
+      <h3 class="govuk-heading-l govuk-!-margin-top-8">
+        {{ section.heading }}
+      </h3>
+      {% for card in section.cards %}
+        <h4 class="govuk-heading-s govuk-!-margin-top-5">{{ card.heading }}</h4>
+        <dl class="govuk-summary-list app-means-assessment__summary-list">
+          {% for row in card.rows %}
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">{{ row.key }}</dt>
+              <dd class="govuk-summary-list__value">{{ row.value }}</dd>
+            </div>
+          {% endfor %}
+        </dl>
+      {% endfor %}
+    {% endfor %}
+  {% endif %}
+</section>

@@ -17,7 +17,10 @@ export const dependantQuestionSections: Array<
     questions: [
       {
         kind: "boolean",
-        label: "dependants.childDependants",
+        label: (answers) =>
+          answers.partner === true
+            ? "dependants.childDependantsWithPartner"
+            : "dependants.childDependants",
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- CCQ validates completed saved answers.
         select: (answers: EligibilityData) => answers.child_dependants!,
       },
@@ -26,13 +29,15 @@ export const dependantQuestionSections: Array<
           answers.child_dependants === true,
         kind: "text",
         label: "dependants.childDependantsCount",
-
         select: (answers: EligibilityData) =>
           String(answers.child_dependants_count),
       },
       {
         kind: "boolean",
-        label: "dependants.adultDependants",
+        label: (answers) =>
+          answers.partner === true
+            ? "dependants.adultDependantsWithPartner"
+            : "dependants.adultDependants",
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- CCQ validates completed saved answers.
         select: (answers: EligibilityData) => answers.adult_dependants!,
       },
@@ -41,12 +46,18 @@ export const dependantQuestionSections: Array<
           answers.adult_dependants === true,
         kind: "text",
         label: "dependants.adultDependantsCount",
-
         select: (answers: EligibilityData) =>
           String(answers.adult_dependants_count),
       },
+    ],
+  },
+  {
+    answerContexts: (answers: EligibilityData) => [answers],
+    heading: "dependants.incomeControl.heading",
+    isRelevant: (answers: EligibilityData) =>
+      isIncomeAssessmentRelevant(answers) && hasDependants(answers),
+    questions: [
       {
-        isRelevant: hasDependants,
         kind: "boolean",
         label: "dependants.getIncome",
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- CCQ validates completed saved answers.

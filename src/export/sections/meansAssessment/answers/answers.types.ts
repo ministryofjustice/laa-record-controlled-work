@@ -1,6 +1,11 @@
 import type { EligibilityData } from "#/api/clients/rcw/model/eligibilityData.zod.gen.js";
 
 export interface MeansAssessmentAnswerSummary {
+  cards: MeansAssessmentAnswerSummaryCard[];
+  heading: string;
+}
+
+export interface MeansAssessmentAnswerSummaryCard {
   heading: string;
   rows: MeansAssessmentAnswerSummaryRow[];
 }
@@ -14,7 +19,7 @@ export type Question<TAnswerContext> = QuestionFormat<TAnswerContext> &
   QuestionMetadata<TAnswerContext>;
 
 export interface QuestionSection<TAnswerContext> {
-  /** Each context produces one section containing all questions. */
+  /** Each context produces one titled card containing its questions. */
   answerContexts: (answers: EligibilityData) => readonly TAnswerContext[];
   heading: string;
   isRelevant?: (answers: EligibilityData) => boolean;
@@ -48,13 +53,19 @@ type QuestionFormat<TAnswerContext> =
   | NumericQuestionFormat<TAnswerContext>
   | TextQuestionFormat<TAnswerContext>;
 
+type QuestionLabel<TAnswerContext> = (
+  answers: EligibilityData,
+  answerContext: TAnswerContext,
+  index: number,
+) => string;
+
 interface QuestionMetadata<TAnswerContext> {
   isRelevant?: (
     answers: EligibilityData,
     answerContext: TAnswerContext,
     index: number,
   ) => boolean;
-  label: string;
+  label: QuestionLabel<TAnswerContext> | string;
 }
 
 interface TextQuestionFormat<TAnswerContext> {
