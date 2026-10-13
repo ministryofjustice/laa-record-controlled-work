@@ -1,4 +1,5 @@
 import { access, journey } from "@ministryofjustice/hmpps-forge/core/authoring";
+import { needsProtectiveInjunctionStep } from "#/journeys/create-application/steps/needsProtectiveInjunction/needsProtectiveInjunction.step.js";
 
 import { clientDetailsStep } from "#/journeys/create-application/steps/clientDetails/clientDetails.step.js";
 import { ecfStep } from "#/journeys/create-application/steps/ecf/ecf.step.js";
@@ -33,6 +34,7 @@ export const editClientDetailsJourney = journey({
     ecfStep(editJourneyCode, { reachability: { entryWhen: true } }),
     familyLawClassificationStep(editJourneyCode),
     internationalMaintenanceAgreementStep(editJourneyCode),
+    needsProtectiveInjunctionStep(editJourneyCode),
     ineligibleStep(editJourneyCode),
     legalAidBeforeStep(editJourneyCode),
     legalAidLast6MonthsStep(editJourneyCode),

@@ -104,6 +104,19 @@ export function formatInternationalMaintenanceAgreementLabel(): ResolvableString
 }
 
 /**
+ * Formats the needs protective injunction answer label.
+ * @returns The needs protective injunction answer label.
+ */
+export function formatNeedsProtectiveInjunctionLabel(): ResolvableString {
+  const yes = t("common.yes");
+  const no = t("common.no");
+
+  return match(Answer(AnswerKey.needsProtectiveInjunction))
+    .branch(Condition.Equals("yes"), yes)
+    .otherwise(no);
+}
+
+/**
  * Formats the previous legal aid answer label.
  * @returns The previous legal aid answer label.
  */

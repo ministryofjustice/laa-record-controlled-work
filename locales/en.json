@@ -327,7 +327,7 @@
           "The child or young person is under 21 years old."
         ],
         "validation": {
-          "required": "Select whether your client needs advice about transitional EU arrangements or an international maintenance agreement "
+          "required": "Select whether your client needs advice about transitional EU arrangements or an international maintenance agreement."
         }
       },
       "protectThemself": {
@@ -339,7 +339,7 @@
           "prohibited steps orders"
         ],
         "validation": {
-          "required": "Select whether your client needs legal aid to get a protective injunction order for themselves or their children "
+          "required": "Select whether your client needs legal aid to get a protective injunction order for themselves or their children."
         }
       },
       "legalAidBefore": {
