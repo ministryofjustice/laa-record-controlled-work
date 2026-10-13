@@ -225,8 +225,6 @@ CSRF protection is not applied to `/auth/code/callback` — it is secured by the
 | `ENTRA_AUTHORITY_BASE_URL` | Authority base URL (e.g. `https://login.microsoftonline.com/`) |
 | `ENTRA_REDIRECT_URI` | Redirect URI registered in Entra for auth code callback |
 
-`ENTRA_ADDITIONAL_REDIRECT_URIS` is an optional comma-separated list of exact callback URIs for additional registered hosts.
-
 Sensitive values are stored in 1Password and injected at runtime via the 1Password CLI (see above). Redirect URI settings are non-secret environment configuration.
 
 #### Ephemeral environments and redirect URIs

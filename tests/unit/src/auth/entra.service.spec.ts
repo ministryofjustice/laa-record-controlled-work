@@ -15,7 +15,6 @@ import sinon from "sinon";
 import { authRequestDefaults } from "#/auth/auth.config.js";
 import { parseRelayState, verifyRelayState } from "#/auth/auth.relay.js";
 import { Success } from "#/lib/either.js";
-import config from "#/config.js";
 import {
   MsalError,
   NotAuthenticatedError,
@@ -45,19 +44,10 @@ describe("EntraService", () => {
   const DOWNSTREAM_SCOPES = ["api://rcw/Applications.Read"];
   const TOKEN_EXPIRY = new Date(Date.now() + 3600 * 1000);
   const SESSION_SECRET = process.env.SESSION_SECRET as string;
-  const ORIGINAL_ADDITIONAL_REDIRECT_URIS = [
-    ...config.entra.additionalRedirectUris,
-  ];
   const REDIRECT_URI_HOSTNAME = new URL(authRequestDefaults.redirectUri)
     .hostname;
   const EPHEMERAL_HOSTNAME =
     "el-257-laa-record-controlled-work-uat.cloud-platform.service.justice.gov.uk";
-  const PRODUCTION_REDIRECT_URIS = [
-    "https://record-controlled-work.service.justice.gov.uk/auth/code/callback",
-    "https://laa-record-controlled-work-production.cloud-platform.service.justice.gov.uk/auth/code/callback",
-  ];
-  const EXTRA_REDIRECT_URI =
-    "https://registered.example.test/registered/callback";
 
   beforeEach(() => {
     tokenCacheStub = {
@@ -91,12 +81,7 @@ describe("EntraService", () => {
     });
   });
 
-  afterEach(() => {
-    config.entra.additionalRedirectUris = [
-      ...ORIGINAL_ADDITIONAL_REDIRECT_URIS,
-    ];
-    sinon.restore();
-  });
+  afterEach(() => sinon.restore());
 
   describe("create() factory method", () => {
     it("returns an EntraService instance", () => {
@@ -234,6 +219,15 @@ describe("EntraService", () => {
         })) as Success<AuthCodeFlowState>;
       const parsed = parseRelayState(result.value.authState);
       expect(parsed).to.be.null;
+        expect(result.value.authCodeRequest.redirectUri).to.equal(
+          authRequestDefaults.redirectUri,
+        );
+        const [authCodeUrlRequest] = (
+          msalStub.getAuthCodeUrl as sinon.SinonStub
+        ).firstCall.args;
+        expect(authCodeUrlRequest.redirectUri).to.equal(
+          authRequestDefaults.redirectUri,
+        );
     });
 
     it("creates a relay state with target and sig when requestHostname differs from redirect URI hostname", async () => {
@@ -248,38 +242,6 @@ describe("EntraService", () => {
       expect(parsed).to.not.be.null;
       expect(parsed!.target).to.equal(`https://${EPHEMERAL_HOSTNAME}`);
       expect(verifyRelayState(parsed!, SESSION_SECRET)).to.be.true;
-    });
-
-    for (const redirectUri of PRODUCTION_REDIRECT_URIS) {
-      const hostname = new URL(redirectUri).hostname;
-
-      it(`uses the configured direct callback for ${hostname}`, async () => {
-        config.entra.additionalRedirectUris = PRODUCTION_REDIRECT_URIS;
-        const result = (await service.initiateAuthCodeFlow(undefined, {
-          callbackHostname: hostname,
-        })) as Success<AuthCodeFlowState>;
-
-        expect(parseRelayState(result.value.authState)).to.be.null;
-        expect(result.value.authCodeRequest.redirectUri).to.equal(
-          redirectUri,
-        );
-        const [authCodeUrlRequest] = (
-          msalStub.getAuthCodeUrl as sinon.SinonStub
-        ).firstCall.args;
-        expect(authCodeUrlRequest.redirectUri).to.equal(redirectUri);
-      });
-    }
-
-    it("uses the exact URI configured for an additional callback hostname", async () => {
-      config.entra.additionalRedirectUris = [EXTRA_REDIRECT_URI];
-      const result = (await service.initiateAuthCodeFlow(undefined, {
-        callbackHostname: new URL(EXTRA_REDIRECT_URI).hostname,
-      })) as Success<AuthCodeFlowState>;
-
-      expect(parseRelayState(result.value.authState)).to.be.null;
-      expect(result.value.authCodeRequest.redirectUri).to.equal(
-        EXTRA_REDIRECT_URI,
-      );
     });
 
     it("normalizes callbackHostname to lowercase", async () => {

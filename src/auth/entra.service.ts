@@ -243,7 +243,7 @@ export class EntraService {
 
   /**
    * Builds the MSAL authorisation URL request and related auth flow state.
-   * Configured callback URIs are direct; unconfigured ephemeral UAT hosts use a signed relay target.
+   * A different callback hostname uses a signed relay target for ephemeral UAT hosts.
    * @param pkceCodes - The PKCE code verifier, challenge, and challenge method.
    * @param returnTo - The post-authentication redirect path to validate.
    * @param callbackHostname - Optional current request hostname used for relay-state targeting.
@@ -266,19 +266,8 @@ export class EntraService {
       callbackHostname === undefined
         ? undefined
         : normalizeCallbackHostname(callbackHostname);
-
-    const redirectUris = [
-      authRequestDefaults.redirectUri,
-      ...config.entra.additionalRedirectUris,
-    ];
-
-    const callbackRedirectUri =
-      redirectUris.find(
-        (redirectUri) =>
-          new URL(redirectUri).hostname === normalizedCallbackHostname,
-      ) ?? authRequestDefaults.redirectUri;
-
-    const redirectHostname = new URL(callbackRedirectUri).hostname;
+    const { redirectUri } = config.entra;
+    const redirectHostname = new URL(redirectUri).hostname;
     const isRelay =
       normalizedCallbackHostname !== undefined &&
       normalizedCallbackHostname !== redirectHostname;
@@ -295,7 +284,7 @@ export class EntraService {
       authCodeRequest: {
         code: "",
         codeVerifier: verifier,
-        redirectUri: callbackRedirectUri,
+        redirectUri,
         scopes: authRequestDefaults.scopes,
       } satisfies AuthorizationCodeRequest,
 
@@ -303,7 +292,7 @@ export class EntraService {
         codeChallenge: challenge,
         codeChallengeMethod: challengeMethod,
         prompt: authRequestDefaults.prompt,
-        redirectUri: callbackRedirectUri,
+        redirectUri,
         responseMode: authRequestDefaults.responseMode,
         scopes: authRequestDefaults.scopes,
         state: authState,

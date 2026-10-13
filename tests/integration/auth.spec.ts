@@ -18,13 +18,9 @@ import { parseRelayState } from "#/auth/auth.relay.js";
 
 const REDIS_PORT = 6379;
 const IDP_PORT = 8080;
-const PRODUCTION_REDIRECT_URIS = [
-  "https://record-controlled-work.service.justice.gov.uk/auth/code/callback",
-  "https://laa-record-controlled-work-production.cloud-platform.service.justice.gov.uk/auth/code/callback",
-];
-const PRODUCTION_HOSTNAMES = PRODUCTION_REDIRECT_URIS.map(
-  (redirectUri) => new URL(redirectUri).hostname,
-);
+const PRODUCTION_REDIRECT_URI =
+  "https://record-controlled-work.service.justice.gov.uk/auth/code/callback";
+const PRODUCTION_HOSTNAME = new URL(PRODUCTION_REDIRECT_URI).hostname;
 
 type MockMsalMetadata = {
   authorityMetadata: string;
@@ -49,7 +45,6 @@ type MsalOriginalValues = {
   authority: string;
   authorityMetadata?: string;
   cloudDiscoveryMetadata?: string;
-  additionalRedirectUris: string[];
   redirectUri: string;
   configRedirectUri: string;
 };
@@ -131,14 +126,12 @@ describe("Auth Integration", () => {
       authority: mutableMsalConfig.auth.authority,
       authorityMetadata: mutableMsalConfig.auth.authorityMetadata,
       cloudDiscoveryMetadata: mutableMsalConfig.auth.cloudDiscoveryMetadata,
-      additionalRedirectUris: [...config.entra.additionalRedirectUris],
       redirectUri: mutableAuthRequestDefaults.redirectUri,
       configRedirectUri: config.entra.redirectUri,
     };
 
     config.entra.authority = `https://localhost:${idpPort}/default`;
-    config.entra.redirectUri = "http://127.0.0.1/auth/code/callback";
-    config.entra.additionalRedirectUris = PRODUCTION_REDIRECT_URIS;
+    config.entra.redirectUri = PRODUCTION_REDIRECT_URI;
     const { authorityMetadata, cloudDiscoveryMetadata } =
       buildMockIdpMsalMetadata(config.entra.authority);
 
@@ -169,8 +162,6 @@ describe("Auth Integration", () => {
       msalOriginalValues.authorityMetadata;
     mutableMsalConfig.auth.cloudDiscoveryMetadata =
       msalOriginalValues.cloudDiscoveryMetadata;
-    config.entra.additionalRedirectUris =
-      msalOriginalValues.additionalRedirectUris;
     config.entra.redirectUri = msalOriginalValues.configRedirectUri;
     mutableAuthRequestDefaults.redirectUri = msalOriginalValues.redirectUri;
 
@@ -223,17 +214,25 @@ describe("Auth Integration", () => {
   });
 
   describe("OAuth2 Authorization Code Flow", () => {
-    it("unauthenticated user can complete full login flow via mock IdP", async () => {
-      const signinRes = await unauthenticatedUser.get("/auth/signin");
+    it("uses the single configured callback to complete mock IdP sign-in", async () => {
+      const signinRes = await unauthenticatedUser
+        .get("/auth/signin")
+        .set("Host", PRODUCTION_HOSTNAME);
       expect(signinRes.status).to.equal(FOUND);
 
       // Extract the authorize URL from the redirect to send the next request to the IdP
-      const authorizeUrl = signinRes.headers.location as string;
+      const authorizeUrl = new URL(signinRes.headers.location as string);
+      expect(authorizeUrl.searchParams.get("redirect_uri")).to.equal(
+        PRODUCTION_REDIRECT_URI,
+      );
+      expect(
+        parseRelayState(authorizeUrl.searchParams.get("state") ?? ""),
+      ).to.be.null;
 
       // Bypass the mock server's login form by POSTing directly to the
       // authorize endpoint with a username.
       const postBody = new URLSearchParams({ username: "testuser" }).toString();
-      const idpResponse = await undiciRequest(authorizeUrl, {
+      const idpResponse = await undiciRequest(authorizeUrl.toString(), {
         method: "POST",
         body: postBody,
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -246,65 +245,32 @@ describe("Auth Integration", () => {
       expect(callbackLocation, "IdP response location header").to.be.a(
         "string",
       );
-      const { pathname, search } = new URL(
+      const callbackUrl = new URL(
         callbackLocation as string,
         config.entra.redirectUri,
       );
+      expect(callbackUrl.origin).to.equal(
+        new URL(PRODUCTION_REDIRECT_URI).origin,
+      );
 
       // Complete the OAuth2 callback by sending the code and state to callback endpoint
-      const callbackRes = await unauthenticatedUser.get(pathname + search);
+      const callbackRes = await unauthenticatedUser
+        .get(callbackUrl.pathname + callbackUrl.search)
+        .set("Host", PRODUCTION_HOSTNAME);
       expect(callbackRes.status).to.equal(FOUND);
       expect(callbackRes.headers.location).to.equal("/");
 
       // Mimic office selection, which is not handled by the mock IdP. Without this, auth will fail.
-      await unauthenticatedUser.get("/test/select-office");
+      await unauthenticatedUser
+        .get("/test/select-office")
+        .set("Host", PRODUCTION_HOSTNAME);
 
       // Verify the user is now authenticated and can reach the landing page
-      const landingRes = await unauthenticatedUser.get("/");
+      const landingRes = await unauthenticatedUser
+        .get("/")
+        .set("Host", PRODUCTION_HOSTNAME);
       expect(landingRes.status).to.equal(OK);
       expect(landingRes.text).to.include("Landing Page");
     });
-
-    for (const hostname of PRODUCTION_HOSTNAMES) {
-      it(`completes sign-in directly on ${hostname}`, async () => {
-        const user = request.agent(app);
-        const signinRes = await user
-          .get("/auth/signin")
-          .set("Host", hostname);
-        expect(signinRes.status).to.equal(FOUND);
-
-        const authorizeUrl = new URL(signinRes.headers.location as string);
-        const expectedRedirectUri =
-          `https://${hostname}/auth/code/callback`;
-        expect(authorizeUrl.searchParams.get("redirect_uri")).to.equal(
-          expectedRedirectUri,
-        );
-        expect(
-          parseRelayState(authorizeUrl.searchParams.get("state") ?? ""),
-        ).to.be.null;
-
-        const idpResponse = await undiciRequest(authorizeUrl.toString(), {
-          method: "POST",
-          body: new URLSearchParams({ username: "testuser" }).toString(),
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        });
-        const location = idpResponse.headers.location;
-        const callbackLocation = Array.isArray(location) ? location[0] : location;
-        expect(callbackLocation).to.be.a("string");
-        const callbackUrl = new URL(callbackLocation as string);
-        expect(callbackUrl.origin).to.equal(`https://${hostname}`);
-
-        const callbackRes = await user
-          .get(callbackUrl.pathname + callbackUrl.search)
-          .set("Host", hostname);
-        expect(callbackRes.status).to.equal(FOUND);
-        expect(callbackRes.headers.location).to.equal("/");
-
-        await user.get("/test/select-office").set("Host", hostname);
-        const landingRes = await user.get("/").set("Host", hostname);
-        expect(landingRes.status).to.equal(OK);
-        expect(landingRes.text).to.include("Landing Page");
-      });
-    }
   });
 });

@@ -10,11 +10,6 @@ const optionalEnvSchema = z.object({
   CONTACT_PHONE: z.string().optional(),
   DEPARTMENT_NAME: z.string().optional(),
   DEPARTMENT_URL: z.url().optional(),
-  ENTRA_ADDITIONAL_REDIRECT_URIS: z
-    .string()
-    .transform((value) => value.split(",").map((uri) => uri.trim()))
-    .pipe(z.array(z.url().nonempty()))
-    .optional(),
   ENTRA_ADDITIONAL_SCOPES: z
     .string()
     .transform((value) => value.split(",").map((scope) => scope.trim()))
