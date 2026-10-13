@@ -20,9 +20,7 @@ import {
 import { redirectToCheckAnswers } from "#/journeys/shared.hook.js";
 import { StepCode } from "#/journeys/StepCode.enum.js";
 
-const TITLE = t(
-  "journeys.createApplication.protectThemself.title",
-);
+const TITLE = t("journeys.createApplication.protectThemself.title");
 
 /**
  * Renders the Needs Protective Injunction question step.
@@ -54,9 +52,7 @@ export function needsProtectiveInjunctionStep(
  * @param {string} journeyCode - The journey code for saving draft answers
  * @returns {SubmitHook} A submit hook with validation and conditional routing logic
  */
-function saveNeedsProtectiveInjunction(
-  journeyCode: string,
-): SubmitHook {
+function saveNeedsProtectiveInjunction(journeyCode: string): SubmitHook {
   return submit({
     onValid: {
       effects: [CreateApplicationEffects.saveDraftAnswers(journeyCode)],

@@ -13,12 +13,8 @@ import { AnswerKey } from "#/journeys/AnswerKey.enum.js";
 import { H1 } from "#/lib/constants/headings.js";
 import { i18next, t } from "#/lib/i18n.js";
 
-const TITLE = t(
-  "journeys.createApplication.protectThemself.title",
-);
-const GUIDANCE = t(
-  "journeys.createApplication.protectThemself.guidance",
-);
+const TITLE = t("journeys.createApplication.protectThemself.title");
+const GUIDANCE = t("journeys.createApplication.protectThemself.guidance");
 const REQUIRED_VALIDATION = t(
   "journeys.createApplication.protectThemself.validation.required",
 );

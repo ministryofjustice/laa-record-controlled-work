@@ -3,7 +3,6 @@ import { access, journey } from "@ministryofjustice/hmpps-forge/core/authoring";
 import { CreateApplicationEffects } from "#/journeys/create-application/create-application.effects.js";
 import { checkAnswersStep } from "#/journeys/create-application/steps/checkAnswers/checkAnswers.step.js";
 import { clientDetailsStep } from "#/journeys/create-application/steps/clientDetails/clientDetails.step.js";
-import { needsProtectiveInjunctionStep } from "#/journeys/create-application/steps/needsProtectiveInjunction/needsProtectiveInjunction.step.js";
 import { declarationStep } from "#/journeys/create-application/steps/declaration/declaration.step.js";
 import { enterAddressManuallyStep } from "#/journeys/create-application/steps/enterAddressManually/enterAddressManually.step.js";
 import { enterOverseasAddressStep } from "#/journeys/create-application/steps/enterOverseasAddress/enterOverseasAddress.step.js";
@@ -11,6 +10,7 @@ import { familyLawClassificationStep } from "#/journeys/create-application/steps
 import { haveAHomeAddressStep } from "#/journeys/create-application/steps/haveAHomeAddress/haveAHomeAddress.step.js";
 import { internationalMaintenanceAgreementStep } from "#/journeys/create-application/steps/internationalMaintenanceAgreement/internationalMaintenanceAgreement.step.js";
 import { legalAidLast6MonthsStep } from "#/journeys/create-application/steps/legalAidLast6Months/legalAidLast6Months.step.js";
+import { needsProtectiveInjunctionStep } from "#/journeys/create-application/steps/needsProtectiveInjunction/needsProtectiveInjunction.step.js";
 import { JourneyCode } from "#/journeys/JourneyCode.enum.js";
 import { JourneyPath } from "#/journeys/JourneyPath.enum.js";
 

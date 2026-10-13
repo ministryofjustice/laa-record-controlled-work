@@ -249,9 +249,7 @@ export class ApplicationDto {
           ? "yes"
           : "no";
       scopingAnswers[AnswerKey.needsProtectiveInjunction] =
-        scopingQuestions.needsProtectiveInjunction
-          ? "yes"
-          : "no";
+        scopingQuestions.needsProtectiveInjunction ? "yes" : "no";
     }
 
     return scopingAnswers;

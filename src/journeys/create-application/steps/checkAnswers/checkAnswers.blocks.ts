@@ -77,7 +77,7 @@ export function summaryList(): GovUKSummaryList {
       Condition.Equals(FamilyLawClassification.enum.private),
     ),
   });
-    const needsProtectiveInjunction = summaryRow({
+  const needsProtectiveInjunction = summaryRow({
     href: "protect-themself?returnTo=check-answers",
     label: answerLabelT("protectThemselves"),
     value: { text: formatNeedsProtectiveInjunctionLabel() },
