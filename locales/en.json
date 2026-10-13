@@ -30,7 +30,7 @@
         "outcomes": {
           "eligible": {
             "heading": "Your client is financially eligible for controlled work and family mediation.",
-            "description": "The case must also be in scope and meet relevant merits criteria."
+            "description": "Your client qualifies financially for civil legal aid based on the information you entered. Before you (or a provider of advice or services funded by legal aid) proceed with your client's case, it must also be within scope for legal aid and satisfy the relevant merits criteria set out in the relevant legislation and guidance. These calculations were made in line with the latest version of the Lord Chancellor's Guidance on Determining Financial Eligibility for Controlled Work."
           },
           "contributionRequired": {
             "heading": "Your client is financially eligible for controlled work and family mediation, with a contribution.",
