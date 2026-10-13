@@ -1,4 +1,6 @@
 import {
+  Answer,
+  Condition,
   redirect,
   step,
   type StepDefinition,
@@ -19,6 +21,7 @@ import {
 } from "#/journeys/shared.blocks.js";
 import { redirectToCheckAnswers } from "#/journeys/shared.hook.js";
 import { StepCode } from "#/journeys/StepCode.enum.js";
+import { AnswerKey } from "#/journeys/AnswerKey.enum.js";
 
 const TITLE = t(
   "journeys.createApplication.internationalMaintenanceAgreement.title",
@@ -60,12 +63,22 @@ function saveInternationalMaintenanceAgreement(
   return submit({
     onValid: {
       effects: [CreateApplicationEffects.saveDraftAnswers(journeyCode)],
-      next: [redirectToCheckAnswers, redirectToLegalAidBefore],
+      next: [redirectToCheckAnswers, redirectToProtectThemself, redirectToLegalAidBefore],
     },
     validate: true,
   });
 }
 
+const redirectToProtectThemself = redirect({
+  goto: StepCode.PROTECT_THEMSELF,
+  when: Answer(AnswerKey.needsAdviceOnEUOrInternationalMaintenance).match(
+      Condition.Equals("no"),
+    ),
+});
+
 const redirectToLegalAidBefore = redirect({
-  goto: "legal-aid-before",
+  goto: StepCode.LEGAL_AID_BEFORE,
+  when: Answer(AnswerKey.needsAdviceOnEUOrInternationalMaintenance).match(
+      Condition.Equals("yes"),
+    ),
 });
