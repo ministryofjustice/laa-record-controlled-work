@@ -103,7 +103,8 @@ describe("fromAnswers method", () => {
       {
         ...answers,
         familyLawClassification: "private",
-        needsAdviceOnEUOrInternationalMaintenance: "yes",
+        needsAdviceOnEUOrInternationalMaintenance: "no",
+        needsProtectiveInjunction: "no",
       },
       providerOfficeCode,
     ).toRcwApi();
@@ -111,7 +112,8 @@ describe("fromAnswers method", () => {
     expect(result.scopingQuestions).to.deep.equal({
       priorLegalAid: "yesSameMatter",
       familyLawClassification: "private",
-      needsAdviceOnEUOrInternationalMaintenance: true,
+      needsAdviceOnEUOrInternationalMaintenance: false,
+      needsProtectiveInjunction: false,
     });
   });
 
