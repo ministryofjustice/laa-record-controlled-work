@@ -39,6 +39,10 @@ accepted Open Source baseline. Nightly scans do not update that baseline.
 It resolves the existing main image by commit tag and calls `snyk.yml` without
 building, deploying, or publishing Snyk snapshots. Findings fail the strict
 scan and trigger a Slack alert; SARIF reports are attached to the run.
+The workflow summary and Slack alert include a concise list of findings from
+Open Source, Container, Code, and IaC scans. Each finding includes its
+description and severity; Snyk vulnerability IDs link to their database entry.
+Empty scan categories are omitted.
 
 Fork provenance: `.github/workflows/sast.yml` from
 `laa-reusable-github-actions@a7cbc9ed08d5ab503a21b24297b697797866dc14`,

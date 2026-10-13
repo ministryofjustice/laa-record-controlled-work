@@ -102,6 +102,29 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
+      - name: Download Snyk scan reports
+        continue-on-error: true
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: snyk-scan-reports
+          path: snyk-scan-reports
+
+      - name: Read Snyk findings
+        id: findings
+        env:
+          FINDINGS_FILE: snyk-scan-reports/findings.txt
+        run: |
+          delimiter="EOF_$(uuidgen)"
+          {
+            printf 'list<<%s\n' "$delimiter"
+            if [[ -f "$FINDINGS_FILE" ]]; then
+              cat "$FINDINGS_FILE"
+            else
+              echo "Findings report unavailable."
+            fi
+            printf '%s\n' "$delimiter"
+          } >> "$GITHUB_OUTPUT"
+
       - name: Notify Slack on nightly Snyk failure
         uses: ./.github/actions/notify-slack
         with:
@@ -110,5 +133,8 @@ jobs:
           slack-mention: ${{ vars.SLACK_ALERTS_MENTION }}
           message: |
             :red_circle: *Nightly Snyk scan failed for RCW `main` branch*
+
+            Findings:
+            ${{ steps.findings.outputs.list }}
 
             Run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/attempts/${{ github.run_attempt }}
