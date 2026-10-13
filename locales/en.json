@@ -318,7 +318,7 @@
           "required": "Please select an option"
         }
       },
-      "familyPrivateNonMeans": {
+      "internationalMaintenanceAgreement": {
         "title": "Does your client need advice about transitional EU arrangements or an international maintenance agreement?",
         "guidance": "The following must all apply:",
         "guidanceList": [
@@ -327,7 +327,7 @@
           "The child or young person is under 21 years old."
         ],
         "validation": {
-          "required": "Please select an option"
+          "required": "Select whether your client needs advice about transitional EU arrangements or an international maintenance agreement "
         }
       },
       "legalAidBefore": {
@@ -461,7 +461,7 @@
         "answerLabels": {
           "ecf": "ECF",
           "familyLawClassification": "Type of family law",
-          "familyPrivateNonMeans": "Transitional EU arrangements or an international maintenance agreement",
+          "internationalMaintenanceAgreement": "Transitional EU arrangements or an international maintenance agreement",
           "legalAidBefore": "Accessed legal aid before",
           "legalAidLast6Months": "Did your client get legal help for this matter in the last 6 months?",
           "legalAidLast6MonthsReasonForYes": "Reason for new application for same matter",

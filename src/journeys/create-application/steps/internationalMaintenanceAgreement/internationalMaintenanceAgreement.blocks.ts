@@ -13,18 +13,48 @@ import { AnswerKey } from "#/journeys/AnswerKey.enum.js";
 import { H1 } from "#/lib/constants/headings.js";
 import { i18next, t } from "#/lib/i18n.js";
 
-const TITLE = t("journeys.createApplication.familyPrivateNonMeans.title");
-const GUIDANCE = t("journeys.createApplication.familyPrivateNonMeans.guidance");
-const REQUIRED_VALIDATION = t(
-  "journeys.createApplication.familyPrivateNonMeans.validation.required",
+const TITLE = t(
+  "journeys.createApplication.internationalMaintenanceAgreement.title",
 );
+const GUIDANCE = t(
+  "journeys.createApplication.internationalMaintenanceAgreement.guidance",
+);
+const REQUIRED_VALIDATION = t(
+  "journeys.createApplication.internationalMaintenanceAgreement.validation.required",
+);
+
+/**
+ * Creates the guidance text for the International Maintenance Agreement question step.
+ *
+ * @returns A GovUK body component with the guidance text and list.
+ */
+export function guidance(): GovUKBody {
+  return GovUKBody({
+    text: `${GUIDANCE}<br>${textListHtml(
+      "journeys.createApplication.internationalMaintenanceAgreement.guidanceList",
+      "govuk-list govuk-list--bullet",
+    )}`,
+  });
+}
+
+/**
+ * Creates the heading for the International Maintenance Agreement question step.
+ *
+ * @returns A GovUK heading component with the step title.
+ */
+export function heading(): GovUKHeading {
+  return GovUKHeading({
+    level: H1,
+    text: TITLE,
+  });
+}
 
 /**
  * Creates the Family Private Non-Means question and its yes/no options.
  *
  * @returns A GovUK radio input for the Family Private Non-Means question.
  */
-export function familyPrivateNonMeansQuestion(): GovUKRadioInput {
+export function internationalMaintenanceAgreementQuestion(): GovUKRadioInput {
   return GovUKRadioInput({
     code: AnswerKey.needsAdviceOnEUOrInternationalMaintenance,
     items: [
@@ -43,32 +73,6 @@ export function familyPrivateNonMeansQuestion(): GovUKRadioInput {
         message: REQUIRED_VALIDATION,
       }),
     ],
-  });
-}
-
-/**
- * Creates the guidance text for the Family Private Non-Means question step.
- *
- * @returns A GovUK body component with the guidance text and list.
- */
-export function guidance(): GovUKBody {
-  return GovUKBody({
-    text: `${GUIDANCE}<br>${textListHtml(
-      "journeys.createApplication.familyPrivateNonMeans.guidanceList",
-      "govuk-list govuk-list--bullet",
-    )}`,
-  });
-}
-
-/**
- * Creates the heading for the Family Private Non-Means question step.
- *
- * @returns A GovUK heading component with the step title.
- */
-export function heading(): GovUKHeading {
-  return GovUKHeading({
-    level: H1,
-    text: TITLE,
   });
 }
 

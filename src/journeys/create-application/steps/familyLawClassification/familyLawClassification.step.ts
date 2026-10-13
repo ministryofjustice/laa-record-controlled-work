@@ -58,7 +58,7 @@ function saveFamilyLawClassificationPrivate(journeyCode: string): SubmitHook {
     onValid: {
       effects: [CreateApplicationEffects.saveDraftAnswers(journeyCode)],
       next: [
-        redirectToFamilyPrivateNonMeansWithCheckQuery,
+        redirectToInternationalMaintenanceAgreementWithCheckQuery,
         redirectToCheckAnswers,
         redirectToEUOrInternational,
       ],
@@ -87,7 +87,7 @@ function saveFamilyLawClassificationPublic(journeyCode: string): SubmitHook {
         CreateApplicationEffects.saveDraftAnswers(journeyCode),
       ],
       next: [
-        redirectToFamilyPrivateNonMeansWithCheckQuery,
+        redirectToInternationalMaintenanceAgreementWithCheckQuery,
         redirectToCheckAnswers,
         redirectToLegalAidBefore,
       ],
@@ -105,14 +105,14 @@ const submitInvalid = submit({
 });
 
 const redirectToEUOrInternational = redirect({
-  goto: StepCode.FAMILY_PRIVATE_NON_MEANS,
+  goto: StepCode.INTERNATIONAL_MAINTENANCE_AGREEMENT,
   when: Answer(AnswerKey.familyLawClassification).match(
     Condition.Equals("private"),
   ),
 });
 
-const redirectToFamilyPrivateNonMeansWithCheckQuery = redirect({
-  goto: `${StepCode.FAMILY_PRIVATE_NON_MEANS}?returnTo=check-answers`,
+const redirectToInternationalMaintenanceAgreementWithCheckQuery = redirect({
+  goto: `${StepCode.INTERNATIONAL_MAINTENANCE_AGREEMENT}?returnTo=check-answers`,
   when: and(
     hasCheckAnswersInQuery,
     Answer(AnswerKey.familyLawClassification).match(

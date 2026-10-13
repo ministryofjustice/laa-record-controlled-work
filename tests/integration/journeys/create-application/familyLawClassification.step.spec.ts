@@ -60,7 +60,7 @@ describe("Family law classification step", () => {
       });
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
-      expect(redirectResult.url).to.equal("/cases/new/family-private-non-means-question");
+      expect(redirectResult.url).to.equal("/cases/new/international-maintenance-agreement");
     });
 
     // TODO: uncomment when steps are added

@@ -19,7 +19,7 @@ import {
   formatDateOfBirth,
   formatEcfLabel,
   formatFamilyLawClassificationLabel,
-  formatFamilyPrivateNonMeansLabel,
+  formatInternationalMaintenanceAgreementLabel,
   formatLegalAidBeforeLabel,
   formatLegalAidLast6MonthsLabel,
 } from "#/journeys/create-application/steps/checkAnswers/checkAnswers.formatters.js";
@@ -69,9 +69,9 @@ export function summaryList(): GovUKSummaryList {
     value: { text: formatFamilyLawClassificationLabel() },
   });
   const needsAdviceOnEUOrInternationalMaintenance = summaryRow({
-    href: "family-private-non-means-question?returnTo=check-answers",
-    label: answerLabelT("familyPrivateNonMeans"),
-    value: { text: formatFamilyPrivateNonMeansLabel() },
+    href: "international-maintenance-agreement?returnTo=check-answers",
+    label: answerLabelT("internationalMaintenanceAgreement"),
+    value: { text: formatInternationalMaintenanceAgreementLabel() },
     visibleWhen: Answer(AnswerKey.familyLawClassification).match(
       Condition.Equals(FamilyLawClassification.enum.private),
     ),

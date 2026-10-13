@@ -7,8 +7,8 @@ import { declarationStep } from "#/journeys/create-application/steps/declaration
 import { enterAddressManuallyStep } from "#/journeys/create-application/steps/enterAddressManually/enterAddressManually.step.js";
 import { enterOverseasAddressStep } from "#/journeys/create-application/steps/enterOverseasAddress/enterOverseasAddress.step.js";
 import { familyLawClassificationStep } from "#/journeys/create-application/steps/familyLawClassification/familyLawClassification.step.js";
-import { familyPrivateNonMeansStep } from "#/journeys/create-application/steps/familyPrivateNonMeans/familyPrivateNonMeans.step.js";
 import { haveAHomeAddressStep } from "#/journeys/create-application/steps/haveAHomeAddress/haveAHomeAddress.step.js";
+import { internationalMaintenanceAgreementStep } from "#/journeys/create-application/steps/internationalMaintenanceAgreement/internationalMaintenanceAgreement.step.js";
 import { legalAidLast6MonthsStep } from "#/journeys/create-application/steps/legalAidLast6Months/legalAidLast6Months.step.js";
 import { JourneyCode } from "#/journeys/JourneyCode.enum.js";
 import { JourneyPath } from "#/journeys/JourneyPath.enum.js";
@@ -32,7 +32,7 @@ export const createApplicationJourney = journey({
   steps: [
     declarationStep(),
     familyLawClassificationStep(JourneyCode.CREATE_APPLICATION),
-    familyPrivateNonMeansStep(JourneyCode.CREATE_APPLICATION),
+    internationalMaintenanceAgreementStep(JourneyCode.CREATE_APPLICATION),
     ecfStep(JourneyCode.CREATE_APPLICATION),
     ineligibleStep(JourneyCode.CREATE_APPLICATION),
     legalAidBeforeStep(JourneyCode.CREATE_APPLICATION),

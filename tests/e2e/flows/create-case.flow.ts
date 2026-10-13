@@ -30,7 +30,7 @@ export const completeCreateCaseShortestPath = async (
   await page.getByRole("radio", { name: "Private" }).check();
   await clickContinue(page);
 
-  await expect(page).toHaveURL("/cases/new/family-private-non-means-question");
+  await expect(page).toHaveURL("/cases/new/international-maintenance-agreement");
   await page.getByRole("radio", { name: "No" }).check();
   await clickContinue(page);
 

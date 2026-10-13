@@ -91,10 +91,10 @@ export function formatFamilyLawClassificationLabel(): ResolvableString {
 }
 
 /**
- * Formats the Family Private Non-Means answer label.
- * @returns The Family Private Non-Means answer label.
+ * Formats the International Maintenance Agreement answer label.
+ * @returns The International Maintenance Agreement answer label.
  */
-export function formatFamilyPrivateNonMeansLabel(): ResolvableString {
+export function formatInternationalMaintenanceAgreementLabel(): ResolvableString {
   const yes = t("common.yes");
   const no = t("common.no");
 
