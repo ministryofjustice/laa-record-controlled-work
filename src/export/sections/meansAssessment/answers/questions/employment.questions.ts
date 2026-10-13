@@ -20,7 +20,7 @@ export const clientEmploymentQuestionSections: Array<
 > = [
   {
     answerContexts: (answers) => [answers],
-    heading: "employment.client.heading",
+    heading: "employment.client.statusHeading",
     isRelevant: isIncomeAssessmentRelevant,
     questions: [
       {
@@ -58,7 +58,7 @@ export const partnerEmploymentQuestionSections: Array<
 > = [
   {
     answerContexts: (answers) => [answers],
-    heading: "employment.partner.heading",
+    heading: "employment.partner.statusHeading",
     isRelevant: (answers) =>
       isIncomeAssessmentRelevant(answers) && partner.isPresent(answers),
     questions: [

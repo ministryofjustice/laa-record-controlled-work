@@ -28,6 +28,9 @@
         </div>
 
         {% include "export/sections/client-and-case-details.njk" %}
+        {% if meansAssessment %}
+          {% include "export/sections/means-assessment.njk" %}
+        {% endif %}
       </div>
     </main>
   </body>
