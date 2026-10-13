@@ -4,6 +4,7 @@ import { before, describe, it } from "mocha";
 import type { Application } from "#/api/clients/rcw/model/application.zod.gen.js";
 import type { EligibilityData } from "#/api/clients/rcw/model/eligibilityData.zod.gen.js";
 
+import { expectedAnswerSummaries } from "#tests/unit/src/export/sections/meansAssessment/answers/answers.fixtures.js";
 import { toMeansAssessmentSection } from "#/export/sections/meansAssessment/meansAssessment.mapper.js";
 import { initializeI18nextSync } from "#/lib/i18n.js";
 import { getGetApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
@@ -38,92 +39,6 @@ const ANSWERS = {
   housing_benefit_relevant: false,
 } satisfies EligibilityData;
 
-const SUMMARIES = [
-  {
-    heading: "Client details",
-    rows: [
-      { key: "What age is your client?", value: "18 to 59" },
-      { key: "Does your client have a partner?", value: "No" },
-      { key: "Does your client receive a passporting benefit?", value: "No" },
-    ],
-  },
-  {
-    heading: "Dependants",
-    rows: [
-      { key: "Does your client have any child dependants?", value: "No" },
-      { key: "Does your client have any adult dependants?", value: "No" },
-    ],
-  },
-  {
-    heading: "Client income",
-    rows: [
-      { key: "What is your client's employment status?", value: "Unemployed" },
-    ],
-  },
-  {
-    heading: "Client benefits",
-    rows: [
-      { key: "Does your client get any non-passporting benefits?", value: "No" },
-    ],
-  },
-  {
-    heading: "Client other income",
-    rows: [
-      { key: "Does your client get financial help from friends or family?", value: "No" },
-      { key: "Does your client get maintenance from a former partner?", value: "No" },
-      { key: "Does your client get income from a property or lodger?", value: "No" },
-      { key: "Does your client get income from pensions?", value: "No" },
-      { key: "Does your client get income from student finance?", value: "No" },
-      { key: "Does your client get income from other sources?", value: "No" },
-    ],
-  },
-  {
-    heading: "Your client's outgoings and deductions",
-    rows: [
-      { key: "Does your client pay maintenance to a former partner?", value: "No" },
-      { key: "Does your client make payments towards legal aid for a criminal case?", value: "No" },
-    ],
-  },
-  {
-    heading: "Home client usually lives in",
-    rows: [
-      {
-        key: "Does your client own the home the client usually lives in?",
-        value: "No",
-      },
-    ],
-  },
-  {
-    heading: "Housing costs",
-    rows: [
-      { key: "Housing payments", value: "£0.00" },
-      {
-        key: "Is Housing Benefit claimed at the home the client lives in?",
-        value: "No",
-      },
-    ],
-  },
-  {
-    heading: "Client other property",
-    rows: [
-      {
-        key: "Does your client own any other property, a holiday home or land?",
-        value: "No",
-      },
-    ],
-  },
-  {
-    heading: "Client assets",
-    rows: [
-      { key: "Does your client have any investments?", value: "No" },
-      {
-        key: "Does your client have valuable items worth £500 or more?",
-        value: "No",
-      },
-    ],
-  },
-];
-
 function application(overrides: Partial<Application> = {}): Application {
   return getGetApplicationResponseMock({
     eligibility: { data: ANSWERS, result: null },
@@ -134,6 +49,36 @@ function application(overrides: Partial<Application> = {}): Application {
 
 describe("saved means answers", () => {
   before(initializeI18nextSync);
+
+  it("groups relevant cards beneath ordered answer sections", () => {
+    const section = toMeansAssessmentSection(application());
+
+    expect(
+      section?.answerSummaries.map(({ heading, cards }) => [
+        heading,
+        cards.map(({ heading: cardHeading }) => cardHeading),
+      ]),
+    ).to.deep.equal([
+      ["Client details", ["Client age", "Partner and passporting"]],
+      ["Dependants", ["Number of dependants"]],
+      [
+        "Client income",
+        ["Employment status", "Client benefits", "Client other income"],
+      ],
+      ["Outgoings", ["Client outgoings and deductions"]],
+      [
+        "Housing and property",
+        [
+          "Home client usually lives in",
+          "Housing costs",
+          "Client other property",
+        ],
+      ],
+      ["Assets", ["Client assets"]],
+    ]);
+
+    expect(section?.answerSummaries).to.deep.equal(expectedAnswerSummaries);
+  });
 
   for (const result of [
     null,
@@ -154,7 +99,7 @@ describe("saved means answers", () => {
       );
 
       expect(section?.calculations).to.deep.equal({ status: "unavailable" });
-      expect(section?.answerSummaries).to.deep.equal(SUMMARIES);
+      expect(section?.answerSummaries).to.deep.equal(expectedAnswerSummaries);
     });
   }
 
@@ -178,16 +123,20 @@ describe("saved means answers", () => {
       }),
     );
 
-    expect(section?.answerSummaries).to.deep.equal(SUMMARIES);
+    expect(section?.answerSummaries).to.deep.equal(expectedAnswerSummaries);
   });
 
   it("returns no summaries without saved eligibility", () => {
-    expect(
-      toMeansAssessmentSection(application({ eligibility: null })),
-    ).to.deep.equal({
-      answerSummaries: [],
-      calculations: { status: "unavailable" },
-    });
+    const section = toMeansAssessmentSection(
+      application({ eligibility: null }),
+    );
+
+    expect(section?.answerSummaries).to.deep.equal([]);
+    expect(section?.calculations).to.deep.equal({ status: "unavailable" });
+    expect(section?.outcomeSummary.outcome.heading).to.equal(
+      "Financial eligibility outcome unavailable.",
+    );
+    expect(section?.outcomeSummary.totals).to.equal(null);
   });
 
   it("omits the whole section when means assessment is not required", () => {
@@ -201,7 +150,7 @@ describe("saved means answers", () => {
       expect(
         toMeansAssessmentSection(application({ meansAssessmentRequired }))
           ?.answerSummaries,
-      ).to.deep.equal(SUMMARIES);
+      ).to.deep.equal(expectedAnswerSummaries);
     });
   }
 
@@ -217,25 +166,23 @@ describe("saved means answers", () => {
       }),
     );
 
-    expect(section?.answerSummaries).to.deep.equal([
-      {
-        heading: "Client details",
-        rows: [
-          ...SUMMARIES[0].rows.slice(0, 2),
-          {
-            key: "Does your client receive a passporting benefit?",
-            value: "Yes",
-          },
-        ],
-      },
-      ...SUMMARIES.filter(({ heading }) =>
-        [
-          "Home client usually lives in",
-          "Client other property",
-          "Client assets",
-        ].includes(heading),
-      ),
+    expect(
+      section?.answerSummaries.map(({ heading, cards }) => [
+        heading,
+        cards.map(({ heading: cardHeading }) => cardHeading),
+      ]),
+    ).to.deep.equal([
+      ["Client details", ["Client age", "Partner and passporting"]],
+      [
+        "Housing and property",
+        ["Home client usually lives in", "Client other property"],
+      ],
+      ["Assets", ["Client assets"]],
     ]);
+    expect(section?.answerSummaries[0].cards[1].rows[1]).to.deep.equal({
+      key: "Does your client receive a passporting benefit?",
+      value: "Yes",
+    });
     expect(section?.calculations).to.deep.equal({
       capital: { status: "not_calculated" },
       capitalContribution: null,

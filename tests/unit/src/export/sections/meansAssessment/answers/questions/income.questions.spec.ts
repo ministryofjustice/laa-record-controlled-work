@@ -3,6 +3,7 @@ import { before, describe, it } from "mocha";
 
 import type { EligibilityData } from "#/api/clients/rcw/model/eligibilityData.zod.gen.js";
 
+import { answerCards } from "#tests/unit/src/export/sections/meansAssessment/answers/answers.fixtures.js";
 import { toMeansAssessmentSection } from "#/export/sections/meansAssessment/meansAssessment.mapper.js";
 import { initializeI18nextSync } from "#/lib/i18n.js";
 import { getGetApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
@@ -19,7 +20,7 @@ const BASE_ANSWERS = {
 } satisfies EligibilityData;
 
 function summaries(overrides: Partial<EligibilityData> = {}) {
-  return (
+  return answerCards(
     toMeansAssessmentSection(
       getGetApplicationResponseMock({
         eligibility: {
@@ -28,7 +29,7 @@ function summaries(overrides: Partial<EligibilityData> = {}) {
         },
         meansAssessmentRequired: true,
       }),
-    )?.answerSummaries ?? []
+    )?.answerSummaries,
   );
 }
 
@@ -112,7 +113,13 @@ describe("saved employment income", () => {
         "£20.00",
       ],
       ["Self-employment income", "Monthly", "£700.00", "£30.00", "£15.00"],
-      ["A salary or wage", "Total in last 3 months", "£600.00", "£0.00", "£0.00"],
+      [
+        "A salary or wage",
+        "Total in last 3 months",
+        "£600.00",
+        "£0.00",
+        "£0.00",
+      ],
       ["A salary or wage", "Monthly", "£500.00", "£0.00", "£0.00"],
     ]);
   });

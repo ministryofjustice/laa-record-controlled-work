@@ -3,6 +3,7 @@ import { before, describe, it } from "mocha";
 
 import type { EligibilityData } from "#/api/clients/rcw/model/eligibilityData.zod.gen.js";
 
+import { answerCards } from "#tests/unit/src/export/sections/meansAssessment/answers/answers.fixtures.js";
 import { toMeansAssessmentSection } from "#/export/sections/meansAssessment/meansAssessment.mapper.js";
 import { initializeI18nextSync } from "#/lib/i18n.js";
 import { getGetApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
@@ -20,7 +21,7 @@ const BASE_ANSWERS = {
 } satisfies EligibilityData;
 
 function assetSummaries(overrides: Partial<EligibilityData> = {}) {
-  return (
+  return answerCards(
     toMeansAssessmentSection(
       getGetApplicationResponseMock({
         eligibility: {
@@ -29,11 +30,11 @@ function assetSummaries(overrides: Partial<EligibilityData> = {}) {
         },
         meansAssessmentRequired: true,
       }),
-    )?.answerSummaries.filter(
-      ({ heading }) =>
-        heading.toLowerCase().includes("asset") ||
-        heading.toLowerCase().includes("account"),
-    ) ?? []
+    )?.answerSummaries,
+  ).filter(
+    ({ heading }) =>
+      heading.toLowerCase().includes("asset") ||
+      heading.toLowerCase().includes("account"),
   );
 }
 
