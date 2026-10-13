@@ -58,7 +58,9 @@ if [[ -n "$summary_path" ]]; then
     echo "- Image: $image_reference"
     echo "- Run: [${GITHUB_RUN_ID:-unknown}]($run_url)"
     echo
-    echo "| Scan | Result |"
+    echo "## Setup checks"
+    echo
+    echo "| Check | Result |"
     echo "| --- | --- |"
   } > "$summary_path"
 fi
@@ -97,6 +99,16 @@ if [[ "$scan_mode" == "delta" ]]; then
 fi
 record_setup "Snyk OAuth action" "${SNYK_AUTH_OUTCOME:-success}"
 record_setup "Snyk OAuth token masking" "${SNYK_TOKEN_MASK_OUTCOME:-success}"
+
+if [[ -n "$summary_path" ]]; then
+  {
+    echo
+    echo "## Snyk scan results"
+    echo
+    echo "| Scan | Result |"
+    echo "| --- | --- |"
+  } >> "$summary_path"
+fi
 
 policy_args=()
 if [[ -f .snyk ]]; then
@@ -212,10 +224,6 @@ else
     fi
   done
 
-  if [[ -n "$summary_path" ]]; then
-    printf '| Helm rendering | %s |\n' "$render_status" >> "$summary_path"
-  fi
-
   iac_args=("$render_dir" --severity-threshold=high)
   if [[ "$report_to_snyk" == "true" ]]; then
     iac_args+=(--report \
@@ -223,6 +231,30 @@ else
   fi
   iac_args+=(--sarif-file-output="$report_dir/snyk-iac.sarif" "${policy_args[@]}")
   run_scan "IaC" snyk iac test "${iac_args[@]}"
+fi
+
+if [[ "$scan_mode" != "monitor" && -n "$summary_path" ]]; then
+  {
+    echo
+    echo "## Validation"
+    echo
+    echo "| Check | Result |"
+    echo "| --- | --- |"
+    printf '| Helm rendering | %s |\n' "$render_status"
+  } >> "$summary_path"
+fi
+
+if [[ "$scan_mode" == "absolute" ]]; then
+  if ! node .github/scripts/format-snyk-findings.mjs "$report_dir"; then
+    echo "::error::Failed to format findings from Snyk SARIF reports"
+    overall_status=1
+  fi
+  markdown_findings_path="$report_dir/findings.md"
+  if [[ -n "$summary_path" && -f "$markdown_findings_path" ]]; then
+    echo >> "$summary_path"
+    echo "## Findings" >> "$summary_path"
+    cat "$markdown_findings_path" >> "$summary_path"
+  fi
 fi
 
 if [[ -n "$summary_path" ]]; then
