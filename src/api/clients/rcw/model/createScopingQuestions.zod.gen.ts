@@ -6,12 +6,15 @@
  */
 import * as zod from "zod";
 
-export const ScopingQuestions = zod.object({
+export const CreateScopingQuestions = zod.object({
   priorLegalAid: zod.enum(["no", "yesDifferentMatter", "yesSameMatter"]),
   familyLawClassification: zod
     .union([zod.enum(["public", "private"]), zod.null()])
     .optional(),
+  needsAdviceOnEUOrInternationalMaintenance: zod.boolean().nullish(),
 });
 
-export type ScopingQuestions = zod.input<typeof ScopingQuestions>;
-export type ScopingQuestionsOutput = zod.output<typeof ScopingQuestions>;
+export type CreateScopingQuestions = zod.input<typeof CreateScopingQuestions>;
+export type CreateScopingQuestionsOutput = zod.output<
+  typeof CreateScopingQuestions
+>;

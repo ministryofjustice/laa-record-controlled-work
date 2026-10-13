@@ -91,6 +91,19 @@ export function formatFamilyLawClassificationLabel(): ResolvableString {
 }
 
 /**
+ * Formats the International Maintenance Agreement answer label.
+ * @returns The International Maintenance Agreement answer label.
+ */
+export function formatInternationalMaintenanceAgreementLabel(): ResolvableString {
+  const yes = t("common.yes");
+  const no = t("common.no");
+
+  return match(Answer(AnswerKey.needsAdviceOnEUOrInternationalMaintenance))
+    .branch(Condition.Equals("yes"), yes)
+    .otherwise(no);
+}
+
+/**
  * Formats the previous legal aid answer label.
  * @returns The previous legal aid answer label.
  */

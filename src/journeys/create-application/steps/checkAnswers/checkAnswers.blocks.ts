@@ -10,6 +10,7 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 import { GovUKSummaryList } from "@ministryofjustice/hmpps-forge/govuk-components";
 
+import { FamilyLawClassification } from "#/api/clients/rcw/model/familyLawClassification.zod.gen.js";
 import { PriorLegalAid } from "#/api/clients/rcw/model/priorLegalAid.zod.gen.js";
 import { AnswerKey } from "#/journeys/AnswerKey.enum.js";
 import {
@@ -18,6 +19,7 @@ import {
   formatDateOfBirth,
   formatEcfLabel,
   formatFamilyLawClassificationLabel,
+  formatInternationalMaintenanceAgreementLabel,
   formatLegalAidBeforeLabel,
   formatLegalAidLast6MonthsLabel,
 } from "#/journeys/create-application/steps/checkAnswers/checkAnswers.formatters.js";
@@ -65,6 +67,14 @@ export function summaryList(): GovUKSummaryList {
     href: "family-type-of-case?returnTo=check-answers",
     label: answerLabelT("familyLawClassification"),
     value: { text: formatFamilyLawClassificationLabel() },
+  });
+  const needsAdviceOnEUOrInternationalMaintenance = summaryRow({
+    href: "international-maintenance-agreement?returnTo=check-answers",
+    label: answerLabelT("internationalMaintenanceAgreement"),
+    value: { text: formatInternationalMaintenanceAgreementLabel() },
+    visibleWhen: Answer(AnswerKey.familyLawClassification).match(
+      Condition.Equals(FamilyLawClassification.enum.private),
+    ),
   });
   const legalAidBefore = summaryRow({
     href: "legal-aid-before?returnTo=check-answers",
@@ -130,6 +140,7 @@ export function summaryList(): GovUKSummaryList {
     rows: [
       ecf,
       familyLawClassification,
+      needsAdviceOnEUOrInternationalMaintenance,
       legalAidBefore,
       legalAidLast6Months,
       reasonForYes,
