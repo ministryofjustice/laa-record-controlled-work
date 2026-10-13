@@ -481,7 +481,7 @@ export const getGetApplicationResponseMock = <
           "private",
         ] as const),
         needsAdviceOnEUOrInternationalMaintenance: faker.datatype.boolean(),
-        needsAdviceOnProtectiveInjunction: faker.datatype.boolean(),
+        needsProtectiveInjunction: faker.datatype.boolean(),
       },
       null,
     ]),

@@ -291,14 +291,16 @@ describe("toAnswers method", () => {
       scopingQuestions: {
         priorLegalAid: "yesSameMatter",
         familyLawClassification: "private",
-        needsAdviceOnEUOrInternationalMaintenance: true,
+        needsAdviceOnEUOrInternationalMaintenance: false,
+        needsProtectiveInjunction: true,
       },
     });
 
     expect(result).to.include({
       legalAidBefore: "yesSameMatter",
       familyLawClassification: "private",
-      needsAdviceOnEUOrInternationalMaintenance: "yes",
+      needsAdviceOnEUOrInternationalMaintenance: "no",
+      needsProtectiveInjunction: "yes",
     });
   });
 

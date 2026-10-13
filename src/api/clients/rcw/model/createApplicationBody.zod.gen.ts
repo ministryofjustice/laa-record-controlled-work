@@ -25,6 +25,7 @@ export const CreateApplicationBody = zod.object({
       .union([zod.enum(["public", "private"]), zod.null()])
       .optional(),
     needsAdviceOnEUOrInternationalMaintenance: zod.boolean().nullish(),
+    needsProtectiveInjunction: zod.boolean().nullish(),
   }),
   clientDetails: zod.object({
     firstName: zod.string(),
