@@ -6,13 +6,13 @@
  */
 import * as zod from "zod";
 
-export const updateApplicationDetailsRequestBodyClientDetailsNiNumberMin = 9;
-export const updateApplicationDetailsRequestBodyClientDetailsNiNumberMax = 9;
-
-export const updateApplicationDetailsRequestBodyClientDetailsNiNumberRegExp =
+export const updateApplicationDetailsRequestBodyClientDetailsNiNumberOneRegExp =
   new RegExp(
     "^(?!BG|GB|KN|NK|NT|TN|ZZ)[A-CEGHJ-PR-TW-Z][A-CEGHJ-NPR-TW-Z][0-9]{6}[ABCD]$",
   );
+export const updateApplicationDetailsRequestBodyClientDetailsNiNumberMin = 9;
+export const updateApplicationDetailsRequestBodyClientDetailsNiNumberMax = 9;
+
 export const updateApplicationDetailsRequestBodyClientDetailsAddressOneCountryMin = 2;
 export const updateApplicationDetailsRequestBodyClientDetailsAddressOneCountryMax = 2;
 
@@ -34,9 +34,12 @@ export const UpdateApplicationDetailsRequestBody = zod.object({
     dateOfBirth: zod.iso.date(),
     niNumber: zod
       .string()
+      .regex(updateApplicationDetailsRequestBodyClientDetailsNiNumberOneRegExp)
+      .describe(
+        "Matches the UK National Insurance number format after formatting characters are removed and letters are uppercased.",
+      )
       .min(updateApplicationDetailsRequestBodyClientDetailsNiNumberMin)
       .max(updateApplicationDetailsRequestBodyClientDetailsNiNumberMax)
-      .regex(updateApplicationDetailsRequestBodyClientDetailsNiNumberRegExp)
       .nullable()
       .describe(
         "Required but nullable; formatting characters are removed and letters uppercased before validation. Null clears the NI number.",

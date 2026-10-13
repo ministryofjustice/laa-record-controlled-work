@@ -6,9 +6,14 @@
  */
 import * as zod from "zod";
 
+export const noLegalAidInLastSixMonthsBranchReasonForReapplicationMax = 0;
+
 export const NoLegalAidInLastSixMonthsBranch = zod.object({
   legalAidLast6Months: zod.literal(false).optional(),
-  reasonForReapplication: zod.unknown().optional(),
+  reasonForReapplication: zod
+    .string()
+    .max(noLegalAidInLastSixMonthsBranchReasonForReapplicationMax)
+    .optional(),
 });
 
 export type NoLegalAidInLastSixMonthsBranch = zod.input<

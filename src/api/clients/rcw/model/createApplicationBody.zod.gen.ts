@@ -6,13 +6,25 @@
  */
 import * as zod from "zod";
 
-export const createApplicationBodyThreeClientDetailsTwoNiNumberMin = 9;
-export const createApplicationBodyThreeClientDetailsTwoNiNumberMax = 9;
+export const createApplicationBodyTwoOneReasonForReapplicationMax = 0;
 
-export const createApplicationBodyThreeClientDetailsTwoNiNumberRegExp =
+export const createApplicationBodyTwoTwoTwoReasonForReapplicationRegExp =
+  new RegExp(
+    "[^\\t\\n\\x0B\\f\\r \\u0085\\u00A0\\u1680\\u2000-\\u200A\\u2028\\u2029\\u202F\\u205F\\u3000\\uFEFF]",
+  );
+export const createApplicationBodyThreeClientDetailsTwoNiNumberOneRegExp =
   new RegExp(
     "^(?!BG|GB|KN|NK|NT|TN|ZZ)[A-CEGHJ-PR-TW-Z][A-CEGHJ-NPR-TW-Z][0-9]{6}[ABCD]$",
   );
+export const createApplicationBodyThreeClientDetailsTwoNiNumberMin = 9;
+export const createApplicationBodyThreeClientDetailsTwoNiNumberMax = 9;
+
+export const createApplicationBodyThreeClientDetailsTwoAddressTwoOneTownOrCityRegExp =
+  new RegExp(
+    "[^\\t\\n\\x0B\\f\\r \\u0085\\u00A0\\u1680\\u2000-\\u200A\\u2028\\u2029\\u202F\\u205F\\u3000\\uFEFF]",
+  );
+export const createApplicationBodyThreeClientDetailsTwoAddressTwoOnePostCodeRegExp =
+  new RegExp("^(?:GIR0AA|[A-Z]{1,2}[0-9][A-Z0-9]?[0-9][A-Z]{2})$");
 
 export const createApplicationBodyThreeClientDetailsTwoAddressThreeCountryMin = 2;
 export const createApplicationBodyThreeClientDetailsTwoAddressThreeCountryMax = 2;
@@ -53,7 +65,10 @@ export const CreateApplicationBody = zod
     zod.union([
       zod.object({
         legalAidLast6Months: zod.literal(false).optional(),
-        reasonForReapplication: zod.unknown().optional(),
+        reasonForReapplication: zod
+          .string()
+          .max(createApplicationBodyTwoOneReasonForReapplicationMax)
+          .optional(),
       }),
       zod
         .object({
@@ -67,7 +82,12 @@ export const CreateApplicationBody = zod
         .and(
           zod.object({
             legalAidLast6Months: zod.literal(true),
-            reasonForReapplication: zod.unknown(),
+            reasonForReapplication: zod
+              .string()
+              .regex(createApplicationBodyTwoTwoTwoReasonForReapplicationRegExp)
+              .describe(
+                "String containing at least one non-whitespace character; U+FEFF is treated as whitespace.",
+              ),
           }),
         ),
     ]),
@@ -103,9 +123,14 @@ export const CreateApplicationBody = zod
             dateOfBirth: zod.iso.date(),
             niNumber: zod
               .string()
+              .regex(
+                createApplicationBodyThreeClientDetailsTwoNiNumberOneRegExp,
+              )
+              .describe(
+                "Matches the UK National Insurance number format after formatting characters are removed and letters are uppercased.",
+              )
               .min(createApplicationBodyThreeClientDetailsTwoNiNumberMin)
               .max(createApplicationBodyThreeClientDetailsTwoNiNumberMax)
-              .regex(createApplicationBodyThreeClientDetailsTwoNiNumberRegExp)
               .optional()
               .describe(
                 "Formatting characters are removed and letters uppercased before validation.",
@@ -117,8 +142,22 @@ export const CreateApplicationBody = zod
                 zod.union([
                   zod.object({
                     country: zod.enum(["GB"]).optional(),
-                    townOrCity: zod.unknown(),
-                    postCode: zod.unknown(),
+                    townOrCity: zod
+                      .string()
+                      .regex(
+                        createApplicationBodyThreeClientDetailsTwoAddressTwoOneTownOrCityRegExp,
+                      )
+                      .describe(
+                        "String containing at least one non-whitespace character; U+FEFF is treated as whitespace.",
+                      ),
+                    postCode: zod
+                      .string()
+                      .regex(
+                        createApplicationBodyThreeClientDetailsTwoAddressTwoOnePostCodeRegExp,
+                      )
+                      .describe(
+                        "Normalized UK postcode without formatting characters, matching the supported postcode format.",
+                      ),
                   }),
                   zod.unknown(),
                 ]),

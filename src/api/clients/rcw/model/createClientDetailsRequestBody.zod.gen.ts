@@ -6,12 +6,18 @@
  */
 import * as zod from "zod";
 
+export const createClientDetailsRequestBodyTwoNiNumberOneRegExp = new RegExp(
+  "^(?!BG|GB|KN|NK|NT|TN|ZZ)[A-CEGHJ-PR-TW-Z][A-CEGHJ-NPR-TW-Z][0-9]{6}[ABCD]$",
+);
 export const createClientDetailsRequestBodyTwoNiNumberMin = 9;
 export const createClientDetailsRequestBodyTwoNiNumberMax = 9;
 
-export const createClientDetailsRequestBodyTwoNiNumberRegExp = new RegExp(
-  "^(?!BG|GB|KN|NK|NT|TN|ZZ)[A-CEGHJ-PR-TW-Z][A-CEGHJ-NPR-TW-Z][0-9]{6}[ABCD]$",
-);
+export const createClientDetailsRequestBodyTwoAddressTwoOneTownOrCityRegExp =
+  new RegExp(
+    "[^\\t\\n\\x0B\\f\\r \\u0085\\u00A0\\u1680\\u2000-\\u200A\\u2028\\u2029\\u202F\\u205F\\u3000\\uFEFF]",
+  );
+export const createClientDetailsRequestBodyTwoAddressTwoOnePostCodeRegExp =
+  new RegExp("^(?:GIR0AA|[A-Z]{1,2}[0-9][A-Z0-9]?[0-9][A-Z]{2})$");
 
 export const createClientDetailsRequestBodyTwoAddressThreeCountryMin = 2;
 export const createClientDetailsRequestBodyTwoAddressThreeCountryMax = 2;
@@ -37,9 +43,12 @@ export const CreateClientDetailsRequestBody = zod
       dateOfBirth: zod.iso.date(),
       niNumber: zod
         .string()
+        .regex(createClientDetailsRequestBodyTwoNiNumberOneRegExp)
+        .describe(
+          "Matches the UK National Insurance number format after formatting characters are removed and letters are uppercased.",
+        )
         .min(createClientDetailsRequestBodyTwoNiNumberMin)
         .max(createClientDetailsRequestBodyTwoNiNumberMax)
-        .regex(createClientDetailsRequestBodyTwoNiNumberRegExp)
         .optional()
         .describe(
           "Formatting characters are removed and letters uppercased before validation.",
@@ -51,8 +60,22 @@ export const CreateClientDetailsRequestBody = zod
           zod.union([
             zod.object({
               country: zod.enum(["GB"]).optional(),
-              townOrCity: zod.unknown(),
-              postCode: zod.unknown(),
+              townOrCity: zod
+                .string()
+                .regex(
+                  createClientDetailsRequestBodyTwoAddressTwoOneTownOrCityRegExp,
+                )
+                .describe(
+                  "String containing at least one non-whitespace character; U+FEFF is treated as whitespace.",
+                ),
+              postCode: zod
+                .string()
+                .regex(
+                  createClientDetailsRequestBodyTwoAddressTwoOnePostCodeRegExp,
+                )
+                .describe(
+                  "Normalized UK postcode without formatting characters, matching the supported postcode format.",
+                ),
             }),
             zod.unknown(),
           ]),

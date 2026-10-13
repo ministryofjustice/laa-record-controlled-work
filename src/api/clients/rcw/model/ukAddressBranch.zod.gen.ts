@@ -6,10 +6,27 @@
  */
 import * as zod from "zod";
 
+export const ukAddressBranchTownOrCityRegExp = new RegExp(
+  "[^\\t\\n\\x0B\\f\\r \\u0085\\u00A0\\u1680\\u2000-\\u200A\\u2028\\u2029\\u202F\\u205F\\u3000\\uFEFF]",
+);
+export const ukAddressBranchPostCodeRegExp = new RegExp(
+  "^(?:GIR0AA|[A-Z]{1,2}[0-9][A-Z0-9]?[0-9][A-Z]{2})$",
+);
+
 export const UkAddressBranch = zod.object({
   country: zod.enum(["GB"]).optional(),
-  townOrCity: zod.unknown(),
-  postCode: zod.unknown(),
+  townOrCity: zod
+    .string()
+    .regex(ukAddressBranchTownOrCityRegExp)
+    .describe(
+      "String containing at least one non-whitespace character; U+FEFF is treated as whitespace.",
+    ),
+  postCode: zod
+    .string()
+    .regex(ukAddressBranchPostCodeRegExp)
+    .describe(
+      "Normalized UK postcode without formatting characters, matching the supported postcode format.",
+    ),
 });
 
 export type UkAddressBranch = zod.input<typeof UkAddressBranch>;

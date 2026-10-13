@@ -6,12 +6,12 @@
  */
 import * as zod from "zod";
 
+export const applicationClientDetailsNiNumberOneRegExp = new RegExp(
+  "^(?!BG|GB|KN|NK|NT|TN|ZZ)[A-CEGHJ-PR-TW-Z][A-CEGHJ-NPR-TW-Z][0-9]{6}[ABCD]$",
+);
 export const applicationClientDetailsNiNumberMin = 9;
 export const applicationClientDetailsNiNumberMax = 9;
 
-export const applicationClientDetailsNiNumberRegExp = new RegExp(
-  "^(?!BG|GB|KN|NK|NT|TN|ZZ)[A-CEGHJ-PR-TW-Z][A-CEGHJ-NPR-TW-Z][0-9]{6}[ABCD]$",
-);
 export const applicationClientDetailsAddressOneCountryMax = 2;
 
 export const Application = zod.object({
@@ -29,9 +29,12 @@ export const Application = zod.object({
     dateOfBirth: zod.iso.date(),
     niNumber: zod
       .string()
+      .regex(applicationClientDetailsNiNumberOneRegExp)
+      .describe(
+        "Matches the UK National Insurance number format after formatting characters are removed and letters are uppercased.",
+      )
       .min(applicationClientDetailsNiNumberMin)
       .max(applicationClientDetailsNiNumberMax)
-      .regex(applicationClientDetailsNiNumberRegExp)
       .nullish(),
     hasFixedAddress: zod.boolean(),
     address: zod

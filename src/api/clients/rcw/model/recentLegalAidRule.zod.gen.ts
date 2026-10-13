@@ -6,10 +6,19 @@
  */
 import * as zod from "zod";
 
+export const recentLegalAidRuleOneReasonForReapplicationMax = 0;
+
+export const recentLegalAidRuleTwoTwoReasonForReapplicationRegExp = new RegExp(
+  "[^\\t\\n\\x0B\\f\\r \\u0085\\u00A0\\u1680\\u2000-\\u200A\\u2028\\u2029\\u202F\\u205F\\u3000\\uFEFF]",
+);
+
 export const RecentLegalAidRule = zod.union([
   zod.object({
     legalAidLast6Months: zod.literal(false).optional(),
-    reasonForReapplication: zod.unknown().optional(),
+    reasonForReapplication: zod
+      .string()
+      .max(recentLegalAidRuleOneReasonForReapplicationMax)
+      .optional(),
   }),
   zod
     .object({
@@ -23,7 +32,12 @@ export const RecentLegalAidRule = zod.union([
     .and(
       zod.object({
         legalAidLast6Months: zod.literal(true),
-        reasonForReapplication: zod.unknown(),
+        reasonForReapplication: zod
+          .string()
+          .regex(recentLegalAidRuleTwoTwoReasonForReapplicationRegExp)
+          .describe(
+            "String containing at least one non-whitespace character; U+FEFF is treated as whitespace.",
+          ),
       }),
     ),
 ]);

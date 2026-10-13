@@ -6,6 +6,11 @@
  */
 import * as zod from "zod";
 
+export const yesLegalAidInLastSixMonthsBranchTwoReasonForReapplicationRegExp =
+  new RegExp(
+    "[^\\t\\n\\x0B\\f\\r \\u0085\\u00A0\\u1680\\u2000-\\u200A\\u2028\\u2029\\u202F\\u205F\\u3000\\uFEFF]",
+  );
+
 export const YesLegalAidInLastSixMonthsBranch = zod
   .object({
     legalAidBefore: zod.enum(["yesSameMatter"]).optional(),
@@ -18,7 +23,12 @@ export const YesLegalAidInLastSixMonthsBranch = zod
   .and(
     zod.object({
       legalAidLast6Months: zod.literal(true),
-      reasonForReapplication: zod.unknown(),
+      reasonForReapplication: zod
+        .string()
+        .regex(yesLegalAidInLastSixMonthsBranchTwoReasonForReapplicationRegExp)
+        .describe(
+          "String containing at least one non-whitespace character; U+FEFF is treated as whitespace.",
+        ),
     }),
   );
 
