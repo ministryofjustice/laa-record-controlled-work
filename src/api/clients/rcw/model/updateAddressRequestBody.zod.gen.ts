@@ -16,7 +16,12 @@ export const UpdateAddressRequestBody = zod
     addressLine3: zod.string().nullable(),
     addressLine4: zod.string().nullable(),
     townOrCity: zod.string().nullable(),
-    postCode: zod.string().nullable(),
+    postCode: zod
+      .string()
+      .nullable()
+      .describe(
+        "For UK addresses, formatting characters are removed and letters uppercased before validation.",
+      ),
     county: zod.string().nullable(),
     country: zod
       .string()

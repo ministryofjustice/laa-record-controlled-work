@@ -327,7 +327,19 @@
           "The child or young person is under 21 years old."
         ],
         "validation": {
-          "required": "Select whether your client needs advice about transitional EU arrangements or an international maintenance agreement "
+          "required": "Select whether your client needs advice about transitional EU arrangements or an international maintenance agreement."
+        }
+      },
+      "protectThemself": {
+        "title": "Does your client need legal aid to get a protective injunction order for themselves or their children?",
+        "guidance": "This includes things like:",
+        "guidanceList": [
+          "non-molestation orders",
+          "occupation orders",
+          "prohibited steps orders"
+        ],
+        "validation": {
+          "required": "Select whether your client needs legal aid to get a protective injunction order for themselves or their children."
         }
       },
       "legalAidBefore": {
@@ -462,6 +474,7 @@
           "ecf": "ECF",
           "familyLawClassification": "Type of family law",
           "internationalMaintenanceAgreement": "Transitional EU arrangements or an international maintenance agreement",
+          "protectThemselves": "Legal aid to get a protective injunction order",
           "legalAidBefore": "Accessed legal aid before",
           "legalAidLast6Months": "Did your client get legal help for this matter in the last 6 months?",
           "legalAidLast6MonthsReasonForYes": "Reason for new application for same matter",

@@ -136,6 +136,19 @@ export function formatLegalAidLast6MonthsLabel(): ResolvableString {
 }
 
 /**
+ * Formats the needs protective injunction answer label.
+ * @returns The needs protective injunction answer label.
+ */
+export function formatNeedsProtectiveInjunctionLabel(): ResolvableString {
+  const yes = t("common.yes");
+  const no = t("common.no");
+
+  return match(Answer(AnswerKey.needsProtectiveInjunction))
+    .branch(Condition.Equals("yes"), yes)
+    .otherwise(no);
+}
+
+/**
  * Formats a client's overseas address for display.
  * @returns The formatted address HTML.
  */

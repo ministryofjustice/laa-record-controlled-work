@@ -12,6 +12,7 @@ export const CreateScopingQuestions = zod.object({
     .union([zod.enum(["public", "private"]), zod.null()])
     .optional(),
   needsAdviceOnEUOrInternationalMaintenance: zod.boolean().nullish(),
+  needsProtectiveInjunction: zod.boolean().nullish(),
 });
 
 export type CreateScopingQuestions = zod.input<typeof CreateScopingQuestions>;

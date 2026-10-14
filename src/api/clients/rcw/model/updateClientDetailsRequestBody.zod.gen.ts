@@ -6,12 +6,12 @@
  */
 import * as zod from "zod";
 
+export const updateClientDetailsRequestBodyNiNumberOneRegExp = new RegExp(
+  "^(?!BG|GB|KN|NK|NT|TN|ZZ)[A-CEGHJ-PR-TW-Z][A-CEGHJ-NPR-TW-Z][0-9]{6}[ABCD]$",
+);
 export const updateClientDetailsRequestBodyNiNumberMin = 9;
 export const updateClientDetailsRequestBodyNiNumberMax = 9;
 
-export const updateClientDetailsRequestBodyNiNumberRegExp = new RegExp(
-  "^(?!BG|GB|KN|NK|NT|TN|ZZ)[A-CEGHJ-PR-TW-Z][A-CEGHJ-NPR-TW-Z][0-9]{6}[ABCD]$",
-);
 export const updateClientDetailsRequestBodyAddressOneCountryMin = 2;
 export const updateClientDetailsRequestBodyAddressOneCountryMax = 2;
 
@@ -21,11 +21,16 @@ export const UpdateClientDetailsRequestBody = zod.object({
   dateOfBirth: zod.iso.date(),
   niNumber: zod
     .string()
+    .regex(updateClientDetailsRequestBodyNiNumberOneRegExp)
+    .describe(
+      "Matches the UK National Insurance number format after formatting characters are removed and letters are uppercased.",
+    )
     .min(updateClientDetailsRequestBodyNiNumberMin)
     .max(updateClientDetailsRequestBodyNiNumberMax)
-    .regex(updateClientDetailsRequestBodyNiNumberRegExp)
     .nullable()
-    .describe("Required but nullable; null clears the NI number."),
+    .describe(
+      "Required but nullable; formatting characters are removed and letters uppercased before validation. Null clears the NI number.",
+    ),
   hasFixedAddress: zod.boolean().describe("False requires address to be null."),
   address: zod
     .union([
@@ -36,7 +41,12 @@ export const UpdateClientDetailsRequestBody = zod.object({
           addressLine3: zod.string().nullable(),
           addressLine4: zod.string().nullable(),
           townOrCity: zod.string().nullable(),
-          postCode: zod.string().nullable(),
+          postCode: zod
+            .string()
+            .nullable()
+            .describe(
+              "For UK addresses, formatting characters are removed and letters uppercased before validation.",
+            ),
           county: zod.string().nullable(),
           country: zod
             .string()
