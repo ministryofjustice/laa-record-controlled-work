@@ -54,6 +54,31 @@
           "exceedsUpperLimit": "Exceeds upper limit ({amount})",
           "noUpperLimit": "No upper limit applies"
         },
+        "calculations": {
+          "notApplicable": "Not applicable",
+          "income": {
+            "heading": "Income calculation",
+            "unavailable": "Income calculation details are unavailable.",
+            "monthlyHint": "All figures have been converted into a monthly amount.",
+            "clientHeading": "Client's monthly income",
+            "partnerHeading": "Partner's monthly income",
+            "totalHeading": "Total",
+            "clientTotal": "Total monthly income",
+            "combinedTotal": "Total client and partner monthly income",
+            "upperThreshold": "Monthly income upper limit",
+            "benefitsHint": "This does not include Housing Benefit",
+            "rows": {
+              "employmentIncome": "Employment income",
+              "benefits": "Benefits received",
+              "friendsAndFamily": "Financial help from friends and family",
+              "maintenance": "Maintenance payments from a former partner",
+              "propertyOrLodger": "Income from a property or lodger",
+              "pensions": "Pensions",
+              "studentFinance": "Student finance",
+              "other": "Other sources"
+            }
+          }
+        },
         "sections": {
           "clientDetails": "Client details",
           "dependants": "Dependants",
