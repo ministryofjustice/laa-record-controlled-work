@@ -342,7 +342,7 @@
           "required": "Select whether your client needs legal aid to get a protective injunction order for themselves or their children."
         }
       },
-      "proveInScope": {
+      "privateFamilyCaseScope": {
         "title": "How can you prove this case is in scope?",
         "guidance": "Legal aid is only available for these proceedings under paragraphs 12 and 13 of Part 1, Schedule 1 of the Legal Aid Sentencing and Punishment of Offenders Act 2012 if the <a href=\"https://assets.publishing.service.gov.uk/media/6a3122bae50716856ed4b160/Evidence_requirements_for_private_family_law_matters_guidance_version_15_15_June_2026.pdf\" target=\"_blank\">evidence requirements (opens in new window or tab)</a> set out in Schedule 1, regulation 33 and Schedule 2, regulation 34 of the Civil Legal Aid (Procedures) Regulations and guidance are satisfied.",
         "radioButton": {

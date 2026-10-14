@@ -20,9 +20,7 @@ import { redirectToCheckAnswers } from "#/journeys/shared.hook.js";
 import { StepCode } from "#/journeys/StepCode.enum.js";
 import { t } from "#/lib/i18n.js";
 
-const TITLE = t(
-  "journeys.createApplication.privateFamilyCaseScope.title",
-);
+const TITLE = t("journeys.createApplication.privateFamilyCaseScope.title");
 
 /**
  * Renders the Private Family Case Scope question step.
@@ -54,9 +52,7 @@ export function privateFamilyCaseScopeStep(
  * @param {string} journeyCode - The journey code for saving draft answers
  * @returns {SubmitHook} A submit hook with validation and conditional routing logic
  */
-function savePrivateFamilyCaseScope(
-  journeyCode: string,
-): SubmitHook {
+function savePrivateFamilyCaseScope(journeyCode: string): SubmitHook {
   return submit({
     onValid: {
       effects: [CreateApplicationEffects.saveDraftAnswers(journeyCode)],

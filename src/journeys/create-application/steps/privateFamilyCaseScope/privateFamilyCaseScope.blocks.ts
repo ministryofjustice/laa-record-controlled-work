@@ -11,7 +11,7 @@ import {
 
 import { AnswerKey } from "#/journeys/AnswerKey.enum.js";
 import { H1 } from "#/lib/constants/headings.js";
-import { fixedT, t } from "#/lib/i18n.js";
+import { fixedT } from "#/lib/i18n.js";
 
 const questionT = fixedT("journeys.createApplication.privateFamilyCaseScope");
 
@@ -68,7 +68,7 @@ export function scopeQuestion(): GovUKRadioInput {
         value: "clientHasParentalResponsibility",
       },
       {
-        divider: t("radioButton.or"),
+        divider: questionT("radioButton.or"),
       },
       {
         text: questionT("radioButton.none"),

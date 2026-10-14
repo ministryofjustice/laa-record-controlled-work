@@ -41,7 +41,9 @@ export const completeCreateCaseShortestPath = async (
   await clickContinue(page);
 
   await expect(page).toHaveURL("/cases/new/private-family-case-scope");
-  await page.getByRole("radio", { name: "Evidence of child abuse (Schedule 2)" }).check();
+  await page
+    .getByRole("radio", { name: "Evidence of child abuse (Schedule 2)" })
+    .check();
   await clickContinue(page);
 
   //TODO: Add steps for family-public-written-notice

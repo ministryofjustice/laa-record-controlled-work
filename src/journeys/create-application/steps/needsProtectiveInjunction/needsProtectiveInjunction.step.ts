@@ -1,4 +1,6 @@
 import {
+  Answer,
+  Condition,
   redirect,
   step,
   type StepDefinition,
@@ -7,6 +9,7 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 import { t } from "i18next";
 
+import { AnswerKey } from "#/journeys/AnswerKey.enum.js";
 import { CreateApplicationEffects } from "#/journeys/create-application/create-application.effects.js";
 import {
   guidance,
@@ -39,7 +42,7 @@ export function needsProtectiveInjunctionStep(
       continueButton(),
     ],
     code: StepCode.PROTECT_THEMSELF,
-    onSubmission: [saveNeedsProtectiveInjunction(journeyCode)],
+    onSubmission: [saveNeedsProtectiveInjunction(journeyCode), submitInvalid],
     path: StepCode.PROTECT_THEMSELF,
     title: TITLE,
   });
@@ -56,12 +59,31 @@ function saveNeedsProtectiveInjunction(journeyCode: string): SubmitHook {
   return submit({
     onValid: {
       effects: [CreateApplicationEffects.saveDraftAnswers(journeyCode)],
-      next: [redirectToCheckAnswers, redirectToLegalAidBefore],
+      next: [
+        redirectToCheckAnswers,
+        redirectToLegalAidBefore,
+        redirectToPrivateFamilyCaseScope,
+      ],
     },
     validate: true,
   });
 }
 
 const redirectToLegalAidBefore = redirect({
-  goto: "legal-aid-before",
+  goto: StepCode.LEGAL_AID_BEFORE,
+  when: Answer(AnswerKey.needsProtectiveInjunction).match(
+    Condition.Equals("yes"),
+  ),
+});
+
+const redirectToPrivateFamilyCaseScope = redirect({
+  goto: StepCode.PRIVATE_FAMILY_CASE_SCOPE,
+  when: Answer(AnswerKey.needsProtectiveInjunction).match(
+    Condition.Equals("no"),
+  ),
+});
+
+const submitInvalid = submit({
+  onInvalid: {},
+  validate: true,
 });

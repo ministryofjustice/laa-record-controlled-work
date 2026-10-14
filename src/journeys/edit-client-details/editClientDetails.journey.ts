@@ -1,5 +1,4 @@
 import { access, journey } from "@ministryofjustice/hmpps-forge/core/authoring";
-import { privateFamilyCaseScopeStep } from "#/journeys/create-application/steps/privateFamilyCaseScope/privateFamilyCaseScope.step.js";
 
 import { clientDetailsStep } from "#/journeys/create-application/steps/clientDetails/clientDetails.step.js";
 import { ecfStep } from "#/journeys/create-application/steps/ecf/ecf.step.js";
@@ -13,6 +12,7 @@ import { legalAidBeforeStep } from "#/journeys/create-application/steps/legalAid
 import { legalAidLast6MonthsStep } from "#/journeys/create-application/steps/legalAidLast6Months/legalAidLast6Months.step.js";
 import { needsProtectiveInjunctionStep } from "#/journeys/create-application/steps/needsProtectiveInjunction/needsProtectiveInjunction.step.js";
 import { niNumberStep } from "#/journeys/create-application/steps/niNumber/niNumber.step.js";
+import { privateFamilyCaseScopeStep } from "#/journeys/create-application/steps/privateFamilyCaseScope/privateFamilyCaseScope.step.js";
 import { editClientDetailsEffects } from "#/journeys/edit-client-details/editClientDetails.effects.js";
 import { checkAnswersStep } from "#/journeys/edit-client-details/steps/check-answers/check-answers.step.js";
 import { JourneyCode } from "#/journeys/JourneyCode.enum.js";
