@@ -3,6 +3,7 @@
 The suite in `tests/e2e/` is a Playwright-based end-to-end test suite that drives the full docker-compose stack (RCW front-end, RCW API, datastore API, CCQ embedded, mock OAuth2 server).
 
 It is distinct from `tests/ui/`, which is a single-service UI test suite that uses MSW to mock all upstream APIs.
+In CI, the RCW API container is selected from `.rcw-api-version`, keeping the running API revision aligned with the OpenAPI revision used to generate the client.
 
 ## Structure
 

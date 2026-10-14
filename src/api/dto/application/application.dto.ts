@@ -123,10 +123,7 @@ export class ApplicationDto {
       providerOfficeCode,
       reasonForReapplication:
         recentAidAnswer === "yes" ? answers.reasonForYes?.trim() : undefined,
-      scopingQuestions: {
-        familyLawClassification: answers.familyLawClassification,
-        priorLegalAid: answers.legalAidBefore,
-      },
+      scopingQuestions,
     });
   }
 
@@ -172,8 +169,8 @@ export class ApplicationDto {
    */
   public static getScopingQuestionsFromAnswers(
     answers: AnswersOutput,
-  ): CreateScopingQuestions {
-    const scopingQuestions: CreateScopingQuestions = {
+  ): ScopingQuestions {
+    const scopingQuestions: ScopingQuestions = {
       familyLawClassification: answers.familyLawClassification,
       priorLegalAid: answers.legalAidBefore,
     };
