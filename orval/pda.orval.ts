@@ -14,9 +14,9 @@ import { sharedOutputConfig } from "./shared.orval.js";
 // Don't reference identifiers from this module.
 const PDA_MOCK_PROPERTIES: Record<string, () => unknown> = {
   addressLine1: () => faker.location.streetAddress(),
-  addressLine2: () => null,
-  addressLine3: () => null,
-  addressLine4: () => null,
+  addressLine2: () => "",
+  addressLine3: () => "",
+  addressLine4: () => "",
   city: () => faker.location.city(),
   firmName: () => faker.company.name(),
   // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- intuitive
@@ -55,7 +55,7 @@ export function createPdaConfig(): Options {
     input: {
       filters: {
         mode: "include" as const,
-        schemas: ["ProviderFirmOfficeListDto"],
+        schemas: ["ProviderFirmOfficeDto"],
       },
       override: {
         transformer: pdaTransformer,

@@ -4,14 +4,14 @@
  * Provider Details API r1
  * OpenAPI spec version: 0.27.2
  */
-import type { ProviderFirmOfficeListDto } from "#/api/clients/pda/model/providerFirmOfficeListDto.zod.gen.js";
+import type { ProviderFirmOfficeDto } from "#/api/clients/pda/model/providerFirmOfficeDto.zod.gen.js";
 
 import { HttpResponse, http } from "msw";
 import type { RequestHandlerOptions } from "msw";
 
-import { getGetAllProviderOfficesResponseMock } from "../../fakers/provider-firms-endpoints/provider-firms-endpoints.faker.gen.js";
+import { getGetFirmOfficeResponseMock } from "../../fakers/provider-firm-offices/provider-firm-offices.faker.gen.js";
 
-export { getGetAllProviderOfficesResponseMock } from "../../fakers/provider-firms-endpoints/provider-firms-endpoints.faker.gen.js";
+export { getGetFirmOfficeResponseMock } from "../../fakers/provider-firm-offices/provider-firm-offices.faker.gen.js";
 
 export type KeysWithNull<O> = {
   [K in keyof O]-?: null extends O[K] ? K : never;
@@ -25,33 +25,31 @@ export type MockWithNullableOverrides<
   [K in Extract<KeysWithNull<O>, keyof T>]: M[K] | null;
 };
 
-export type ProviderFirmOfficeListDtoMock = {
-  [K in keyof Required<NonNullable<ProviderFirmOfficeListDto>>]: NonNullable<
-    Required<NonNullable<ProviderFirmOfficeListDto>>[K]
+export type ProviderFirmOfficeDtoMock = {
+  [K in keyof Required<NonNullable<ProviderFirmOfficeDto>>]: NonNullable<
+    Required<NonNullable<ProviderFirmOfficeDto>>[K]
   >;
 };
 
-export const getGetAllProviderOfficesMockHandler = (
+export const getGetFirmOfficeMockHandler = (
   overrideResponse?:
-    | ProviderFirmOfficeListDto
+    | ProviderFirmOfficeDto
     | void
     | ((
         info: Parameters<Parameters<typeof http.get>[1]>[0],
       ) =>
-        | Promise<ProviderFirmOfficeListDto | void>
-        | ProviderFirmOfficeListDto
-        | void),
+        Promise<ProviderFirmOfficeDto | void> | ProviderFirmOfficeDto | void),
   options?: RequestHandlerOptions,
 ) => {
   return http.get(
-    "*/provider-firms/:firmId/provider-offices",
+    "*/provider-offices/:officeCode",
     async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
       const resolvedBody =
         overrideResponse !== undefined
           ? typeof overrideResponse === "function"
             ? await overrideResponse(info)
             : overrideResponse
-          : getGetAllProviderOfficesResponseMock();
+          : getGetFirmOfficeResponseMock();
       return resolvedBody === undefined
         ? new HttpResponse(null, { status: 204 })
         : HttpResponse.json(resolvedBody, { status: 200 });
@@ -59,6 +57,4 @@ export const getGetAllProviderOfficesMockHandler = (
     options,
   );
 };
-export const getProviderFirmsEndpointsMock = () => [
-  getGetAllProviderOfficesMockHandler(),
-];
+export const getProviderFirmOfficesMock = () => [getGetFirmOfficeMockHandler()];

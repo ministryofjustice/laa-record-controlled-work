@@ -1,6 +1,6 @@
 import type { OpenApiDocument } from "@orval/core";
 
-const TARGET_ENDPOINT_PATH = "/provider-firms/{firmId}/provider-offices";
+const TARGET_ENDPOINT_PATH = "/provider-offices/{officeCode}";
 
 /**
  * Scopes the PDA spec to a single endpoint path.
