@@ -141,6 +141,7 @@ describe("fromAnswers method", () => {
         ...answers,
         familyLawClassification: "private",
         needsAdviceOnEUOrInternationalMaintenance: "no",
+        needsProtectiveInjunction: "yes",
       },
       "test-office",
     ).toRcwApi();
@@ -149,6 +150,7 @@ describe("fromAnswers method", () => {
       priorLegalAid: "yesSameMatter",
       familyLawClassification: "private",
       needsAdviceOnEUOrInternationalMaintenance: false,
+      needsProtectiveInjunction: true,
     });
   });
 
