@@ -103,13 +103,19 @@ export class ApplicationDto {
       address = this.getAddressFromAnswers(answers);
     }
 
-    const sameMatter =
-      answers.legalAidBefore === PriorLegalAid.enum.yesSameMatter;
-    const recentAidAnswer = sameMatter
-      ? answers.legalAidLast6Months
-      : undefined;
+    let legalAidLast6Months: boolean | undefined;
+    let reasonForReapplication: string | undefined;
 
-    const scopingQuestions = this.getScopingQuestionsFromAnswers(answers);
+    if (
+      answers.legalAidBefore === PriorLegalAid.enum.yesSameMatter &&
+      answers.legalAidLast6Months !== undefined
+    ) {
+      legalAidLast6Months = answers.legalAidLast6Months === "yes";
+
+      if (legalAidLast6Months) {
+        reasonForReapplication = answers.reasonForYes?.trim();
+      }
+    }
 
     return new ApplicationDto({
       ...address,
@@ -117,13 +123,11 @@ export class ApplicationDto {
       firstName: answers.firstName,
       hasFixedAddress,
       lastName: answers.lastName,
-      legalAidLast6Months:
-        recentAidAnswer === undefined ? undefined : recentAidAnswer === "yes",
+      legalAidLast6Months,
       niNumber: answers.niNumber,
       providerOfficeCode,
-      reasonForReapplication:
-        recentAidAnswer === "yes" ? answers.reasonForYes?.trim() : undefined,
-      scopingQuestions,
+      reasonForReapplication,
+      scopingQuestions: this.getScopingQuestionsFromAnswers(answers),
     });
   }
 
