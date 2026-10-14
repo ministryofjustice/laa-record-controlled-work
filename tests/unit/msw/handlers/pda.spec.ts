@@ -1,28 +1,24 @@
 import { expect } from "chai";
+import { setupServer } from "msw/node";
 
-import { readLaaAccountsHeader } from "#msw/handlers/pda.js";
-import { PDA_MSW_LAA_ACCOUNTS_HEADER } from "#/lib/constants/pda.js";
+import config from "#/config.js";
+import { pdaApiHandlers } from "#msw/handlers/pda.js";
 
-describe("readLaaAccountsHeader", () => {
-  it("returns the office codes from the header", () => {
-    const request = new Request("https://pda.test/provider-firms/1/provider-offices", {
-      headers: { [PDA_MSW_LAA_ACCOUNTS_HEADER]: JSON.stringify(["0R128U", "0R695K"]) },
-    });
+const server = setupServer(...pdaApiHandlers);
 
-    expect(readLaaAccountsHeader(request)).to.deep.equal(["0R128U", "0R695K"]);
-  });
+describe("PDA handlers", () => {
+  before(() => server.listen({ onUnhandledRequest: "error" }));
+  after(() => server.close());
 
-  it("returns undefined when the header is absent", () => {
-    const request = new Request("https://pda.test/provider-firms/1/provider-offices");
+  it("returns the requested office from the office-code path", async () => {
+    const response = await fetch(
+      `${config.api.pda.baseUrl}/provider-offices/AB12CD`,
+    );
+    const body = (await response.json()) as {
+      office: { firmOfficeCode: string };
+    };
 
-    expect(readLaaAccountsHeader(request)).to.equal(undefined);
-  });
-
-  it("returns undefined when the header is not valid JSON", () => {
-    const request = new Request("https://pda.test/provider-firms/1/provider-offices", {
-      headers: { [PDA_MSW_LAA_ACCOUNTS_HEADER]: "not-json" },
-    });
-
-    expect(readLaaAccountsHeader(request)).to.equal(undefined);
+    expect(response.status).to.equal(200);
+    expect(body.office.firmOfficeCode).to.equal("AB12CD");
   });
 });
