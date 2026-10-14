@@ -14,7 +14,8 @@ export const UpdateApplicationDetailsHeaders = zod.object({
   "If-Match": zod
     .string()
     .regex(updateApplicationDetailsHeadersIfMatchRegExp)
-    .optional(),
+    .optional()
+    .describe("Strong application version validator, quoted as an integer."),
 });
 
 export type UpdateApplicationDetailsHeaders = zod.input<

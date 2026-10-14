@@ -40,6 +40,7 @@ describe("Check answers step", () => {
         needsAdviceOnEUOrInternationalMaintenance: "no",
         needsProtectiveInjunction: "yes",
         reasonForHelp: "Some reason for help",
+        reasonForYes: "Some reason for help",
         firstName: "John",
         lastName: "Doe",
         dateOfBirth: "1990-01-01",

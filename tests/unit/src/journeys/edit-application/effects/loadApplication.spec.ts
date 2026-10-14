@@ -64,6 +64,30 @@ describe("loadApplication", () => {
     ).to.equal(true);
   });
 
+  it("preserves null scoping question answers when validating the response", async () => {
+    const mockApplication = getGetApplicationResponseMock();
+    mockApplication.scopingQuestions = {
+      priorLegalAid: "no",
+      familyLawClassification: "private",
+      needsAdviceOnEUOrInternationalMaintenance: false,
+      needsProtectiveInjunction: null,
+    };
+
+    getApplicationStub.resolves({ status: 200, data: mockApplication });
+
+    await loadApplication(deps)(context);
+
+    const parsedApplication = setData.firstCall.args[1];
+    expect(parsedApplication).to.have.nested.property(
+      "scopingQuestions.needsAdviceOnEUOrInternationalMaintenance",
+      false,
+    );
+    expect(parsedApplication).to.have.nested.property(
+      "scopingQuestions.needsProtectiveInjunction",
+      null,
+    );
+  });
+
   it("throws ApiResponseError when getApplication responds with non-200", async () => {
     getApplicationStub.resolves({
       status: 500,

@@ -60,6 +60,24 @@ describe("fromAnswers method", () => {
     expect(result).to.deep.equal(expected);
   });
 
+  it("maps no and different-matter legal aid without recent aid details", () => {
+    for (const priorLegalAid of ["no", "yesDifferentMatter"] as const) {
+      const result = ApplicationDto.fromAnswers(
+        {
+          ...answers,
+          legalAidBefore: priorLegalAid,
+          legalAidLast6Months: undefined,
+          reasonForYes: undefined,
+        },
+        "test-office",
+      ).toRcwApi();
+
+      expect(result.scopingQuestions.priorLegalAid).to.equal(priorLegalAid);
+      expect(result).to.not.have.property("legalAidLast6Months");
+      expect(result).to.not.have.property("reasonForReapplication");
+    }
+  });
+
   it("omits client address when client has no fixed address", () => {
     const providerOfficeCode = "22439e72-68d3-4770-b435-c352d883d21e";
     const result = ApplicationDto.fromAnswers(
@@ -114,6 +132,25 @@ describe("fromAnswers method", () => {
       familyLawClassification: "private",
       needsAdviceOnEUOrInternationalMaintenance: false,
       needsProtectiveInjunction: false,
+    });
+  });
+
+  it("preserves a negative maintenance advice answer for private family law", () => {
+    const result = ApplicationDto.fromAnswers(
+      {
+        ...answers,
+        familyLawClassification: "private",
+        needsAdviceOnEUOrInternationalMaintenance: "no",
+        needsProtectiveInjunction: "yes",
+      },
+      "test-office",
+    ).toRcwApi();
+
+    expect(result.scopingQuestions).to.deep.equal({
+      priorLegalAid: "yesSameMatter",
+      familyLawClassification: "private",
+      needsAdviceOnEUOrInternationalMaintenance: false,
+      needsProtectiveInjunction: true,
     });
   });
 

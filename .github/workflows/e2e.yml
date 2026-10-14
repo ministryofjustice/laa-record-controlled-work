@@ -37,6 +37,16 @@ jobs:
         if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: yarn playwright install chromium --with-deps
 
+      - name: Select API image matching the generated client for pull requests
+        if: github.event_name == 'pull_request'
+        run: |
+          api_sha="$(tr -d '\r\n' < .rcw-api-version)"
+          if [[ ! "$api_sha" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "Invalid API commit in .rcw-api-version: $api_sha" >&2
+            exit 1
+          fi
+          echo "RCW_API_IMAGE_TAG=sha-${api_sha}" >> "$GITHUB_ENV"
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@21162887f0d6e25b4e8eafb0cf44cf9bf7f6acd3
 

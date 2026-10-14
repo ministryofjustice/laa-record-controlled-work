@@ -6,40 +6,106 @@
  */
 import * as zod from "zod";
 
-export const createClientDetailsRequestBodyNiNumberMin = 9;
-export const createClientDetailsRequestBodyNiNumberMax = 9;
-
-export const createClientDetailsRequestBodyNiNumberRegExp = new RegExp(
+export const createClientDetailsRequestBodyTwoNiNumberOneRegExp = new RegExp(
   "^(?!BG|GB|KN|NK|NT|TN|ZZ)[A-CEGHJ-PR-TW-Z][A-CEGHJ-NPR-TW-Z][0-9]{6}[ABCD]$",
 );
-export const createClientDetailsRequestBodyAddressCountryMax = 2;
+export const createClientDetailsRequestBodyTwoNiNumberMin = 9;
+export const createClientDetailsRequestBodyTwoNiNumberMax = 9;
 
-export const CreateClientDetailsRequestBody = zod.object({
-  firstName: zod.string(),
-  lastName: zod.string(),
-  dateOfBirth: zod.iso.date(),
-  niNumber: zod
-    .string()
-    .min(createClientDetailsRequestBodyNiNumberMin)
-    .max(createClientDetailsRequestBodyNiNumberMax)
-    .regex(createClientDetailsRequestBodyNiNumberRegExp)
-    .optional(),
-  hasFixedAddress: zod.boolean(),
-  address: zod
-    .object({
-      addressLine1: zod.string(),
-      addressLine2: zod.string().optional(),
-      addressLine3: zod.string().optional(),
-      addressLine4: zod.string().optional(),
-      townOrCity: zod.string().optional(),
-      postCode: zod.string().optional(),
-      county: zod.string().optional(),
-      country: zod
+export const createClientDetailsRequestBodyTwoAddressTwoOneTownOrCityRegExp =
+  new RegExp(
+    "[^\\t\\n\\x0B\\f\\r \\u0085\\u00A0\\u1680\\u2000-\\u200A\\u2028\\u2029\\u202F\\u205F\\u3000\\uFEFF]",
+  );
+export const createClientDetailsRequestBodyTwoAddressTwoOnePostCodeRegExp =
+  new RegExp("^(?:GIR0AA|[A-Z]{1,2}[0-9][A-Z0-9]?[0-9][A-Z]{2})$");
+
+export const createClientDetailsRequestBodyTwoAddressThreeCountryMin = 2;
+export const createClientDetailsRequestBodyTwoAddressThreeCountryMax = 2;
+
+export const createClientDetailsRequestBodyTwoAddressThreeCountryRegExp =
+  new RegExp(
+    "^(?:A(?:D|E|F|G|L|M|O|R|T|U|Z)|B(?:A|B|D|E|F|G|H|I|J|N|O|R|S|T|W|Y|Z)|C(?:A|D|F|G|H|I|L|M|N|O|R|U|V|Y|Z)|D(?:E|J|K|M|O|Z)|E(?:C|E|G|R|S|T)|F(?:I|J|M|R)|G(?:A|B|D|E|H|M|N|Q|R|T|W|Y)|H(?:N|R|T|U)|I(?:D|E|L|N|Q|R|S|T)|J(?:M|O|P)|K(?:E|G|H|I|M|N|P|R|W|Z)|L(?:A|B|C|I|K|R|S|T|U|V|Y)|M(?:A|C|D|E|G|H|K|L|M|N|R|T|U|V|W|X|Y|Z)|N(?:A|E|G|I|L|O|P|R|Z)|O(?:M)|P(?:A|E|G|H|K|L|S|T|W|Y)|Q(?:A)|R(?:O|S|U|W)|S(?:A|B|C|D|E|G|I|K|L|M|N|O|R|S|T|V|Y|Z)|T(?:D|G|H|J|L|M|N|O|R|T|V|Z)|U(?:A|G|S|Y|Z)|V(?:A|C|E|N|U)|W(?:S)|X(?:K)|Y(?:E)|Z(?:A|M|W))$",
+  );
+
+export const CreateClientDetailsRequestBody = zod
+  .union([
+    zod.object({
+      hasFixedAddress: zod.literal(true).optional(),
+    }),
+    zod.object({
+      hasFixedAddress: zod.literal(false).optional(),
+    }),
+  ])
+  .and(
+    zod.object({
+      firstName: zod.string(),
+      lastName: zod.string(),
+      dateOfBirth: zod.iso.date(),
+      niNumber: zod
         .string()
-        .max(createClientDetailsRequestBodyAddressCountryMax),
-    })
-    .optional(),
-});
+        .regex(createClientDetailsRequestBodyTwoNiNumberOneRegExp)
+        .describe(
+          "Matches the UK National Insurance number format after formatting characters are removed and letters are uppercased.",
+        )
+        .min(createClientDetailsRequestBodyTwoNiNumberMin)
+        .max(createClientDetailsRequestBodyTwoNiNumberMax)
+        .optional()
+        .describe(
+          "Formatting characters are removed and letters uppercased before validation.",
+        ),
+      hasFixedAddress: zod.boolean(),
+      address: zod
+        .unknown()
+        .and(
+          zod.union([
+            zod.object({
+              country: zod.enum(["GB"]).optional(),
+              townOrCity: zod
+                .string()
+                .regex(
+                  createClientDetailsRequestBodyTwoAddressTwoOneTownOrCityRegExp,
+                )
+                .describe(
+                  "String containing at least one non-whitespace character; U+FEFF is treated as whitespace.",
+                ),
+              postCode: zod
+                .string()
+                .regex(
+                  createClientDetailsRequestBodyTwoAddressTwoOnePostCodeRegExp,
+                )
+                .describe(
+                  "Normalized UK postcode without formatting characters, matching the supported postcode format.",
+                ),
+            }),
+            zod.unknown(),
+          ]),
+        )
+        .and(
+          zod.object({
+            addressLine1: zod.string().min(1),
+            addressLine2: zod.string().optional(),
+            addressLine3: zod.string().optional(),
+            addressLine4: zod.string().optional(),
+            townOrCity: zod.string().optional(),
+            postCode: zod
+              .string()
+              .optional()
+              .describe(
+                "For UK addresses, formatting characters are removed and letters uppercased before validation.",
+              ),
+            county: zod.string().optional(),
+            country: zod
+              .string()
+              .min(createClientDetailsRequestBodyTwoAddressThreeCountryMin)
+              .max(createClientDetailsRequestBodyTwoAddressThreeCountryMax)
+              .regex(
+                createClientDetailsRequestBodyTwoAddressThreeCountryRegExp,
+              ),
+          }),
+        )
+        .optional(),
+    }),
+  );
 
 export type CreateClientDetailsRequestBody = zod.input<
   typeof CreateClientDetailsRequestBody
