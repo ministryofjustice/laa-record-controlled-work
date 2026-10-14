@@ -104,7 +104,7 @@ describe("loadApplicationForExport", () => {
     expect(result.error).to.be.instanceOf(LoadApplicationForExportError);
   });
 
-  it("passes API-valid incompatible calculation fields to the export mapper", async () => {
+  it("accepts API-valid data with unusable calculations", async () => {
     const application = getGetApplicationResponseMock({
       eligibility: {
         data: { passporting: false },

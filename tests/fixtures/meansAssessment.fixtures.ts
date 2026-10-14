@@ -13,6 +13,7 @@ export enum MeansAssessmentScenarioName {
   FormattingVariants = "formattingVariants",
   HousingMortgage = "housingMortgage",
   HousingSharedOwnership = "housingSharedOwnership",
+  MeansAssessmentNotRequired = "meansAssessmentNotRequired",
   MissingEligibility = "missingEligibility",
   OtherIncomeAndOutgoings = "otherIncomeAndOutgoings",
   Passporting = "passporting",
@@ -21,7 +22,6 @@ export enum MeansAssessmentScenarioName {
   UnavailableResult = "unavailableResult",
   Under18ControlledClr = "under18ControlledClr",
   Under18NoMeans = "under18NoMeans",
-  UnsupportedMeansAssessment = "unsupportedMeansAssessment",
 }
 
 interface MeansAssessmentScenario {
@@ -255,7 +255,7 @@ export const meansAssessmentScenarios: Record<
       ],
       employment_status: "in_work",
       friends_or_family_conditional_value: 1_234.56,
-      friends_or_family_frequency: "total",
+      friends_or_family_frequency: "monthly",
       friends_or_family_relevant: true,
       housing_benefit_frequency: "monthly",
       housing_benefit_relevant: true,
@@ -267,12 +267,12 @@ export const meansAssessmentScenarios: Record<
         savedIncome(2_345.67, "every_two_weeks", "self_employment", [200, 90]),
         savedIncome(3_456.78, "every_four_weeks", "statutory_pay", [300, 100]),
         savedIncome(4_567.89, "monthly", "employment", [400, 110]),
-        savedIncome(5_678.9, "three_months", "employment", [500, 120]),
+        savedIncome(5_678.9, "every_two_weeks", "employment", [500, 120]),
       ],
       investments: 9_876.54,
       investments_relevant: true,
-      legal_aid_payments_conditional_value: 0,
-      legal_aid_payments_frequency: "total",
+      legal_aid_payments_conditional_value: 25,
+      legal_aid_payments_frequency: "monthly",
       legal_aid_payments_relevant: true,
       property_owned: "none",
       receives_benefits: true,
@@ -298,11 +298,14 @@ export const meansAssessmentScenarios: Record<
       housing_benefit_value: 90,
       mortgage: 32_000,
       percentage_owned: 40,
-      property_landlord: false,
+      property_landlord: true,
       property_owned: "shared_ownership",
       rent: 480,
       shared_ownership_mortgage: 320,
     }),
+
+  [MeansAssessmentScenarioName.MeansAssessmentNotRequired]: () =>
+    createMeansAssessment({}, savedResult(), false),
 
   [MeansAssessmentScenarioName.MissingEligibility]: () => ({
     eligibility: null,
@@ -346,7 +349,7 @@ export const meansAssessmentScenarios: Record<
       partner_legal_aid_payments_frequency: "monthly",
       partner_legal_aid_payments_relevant: true,
       partner_maintenance_conditional_value: 90,
-      partner_maintenance_frequency: "total",
+      partner_maintenance_frequency: "monthly",
       partner_maintenance_payments_conditional_value: 30,
       partner_maintenance_payments_frequency: "every_week",
       partner_maintenance_payments_relevant: true,
@@ -467,7 +470,4 @@ export const meansAssessmentScenarios: Record<
       },
       exemptResult(),
     ),
-
-  [MeansAssessmentScenarioName.UnsupportedMeansAssessment]: () =>
-    createMeansAssessment({}, savedResult(), false),
 };

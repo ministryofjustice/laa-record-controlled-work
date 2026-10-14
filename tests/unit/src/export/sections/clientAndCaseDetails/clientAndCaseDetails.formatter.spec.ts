@@ -36,7 +36,7 @@ function makeClientDetails(
 }
 
 describe("formatClientAddress", () => {
-  it("returns noFixedAddress when the client has no fixed address", () => {
+  it("returns null when the client has no fixed address", () => {
     expect(
       formatClientAddress(
         makeClientDetails({
@@ -70,12 +70,30 @@ describe("formatClientAddress", () => {
     ).to.deep.equal(["1 Test Lane", "Test Area", "France"]);
   });
 
-  for (const extraLines of [
-    { addressLine3: "Region", addressLine4: null },
-    { addressLine3: null, addressLine4: "District" },
-    { addressLine3: "Region", addressLine4: "District" },
+  for (const { expected, extraLines, name } of [
+    {
+      name: "third address line",
+      extraLines: { addressLine3: "Region", addressLine4: null },
+      expected: ["1 Test Lane", "Test Area", "Region", "France"],
+    },
+    {
+      name: "fourth address line",
+      extraLines: { addressLine3: null, addressLine4: "District" },
+      expected: ["1 Test Lane", "Test Area", "District", "France"],
+    },
+    {
+      name: "third and fourth address lines",
+      extraLines: { addressLine3: "Region", addressLine4: "District" },
+      expected: [
+        "1 Test Lane",
+        "Test Area",
+        "Region",
+        "District",
+        "France",
+      ],
+    },
   ]) {
-    it("includes populated international address lines", () => {
+    it(`includes the ${name} for an international address`, () => {
       expect(
         formatClientAddress(
           makeClientDetails({
@@ -86,12 +104,7 @@ describe("formatClientAddress", () => {
             },
           }),
         ),
-      ).to.deep.equal([
-        "1 Test Lane",
-        "Test Area",
-        ...Object.values(extraLines).filter(Boolean),
-        "France",
-      ]);
+      ).to.deep.equal(expected);
     });
   }
 
