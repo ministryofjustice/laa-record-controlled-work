@@ -5,6 +5,8 @@ type E2EAuthMode = "entra" | "mock";
 const CI_RETRIES = 2;
 const CI_WORKERS = 2;
 const LOCAL_RETRIES = 0;
+const MOCK_OAUTH_HOST_RESOLVER_RULE =
+  "--host-resolver-rules=MAP host.docker.internal 127.0.0.1";
 
 const resolveAuthMode = (): E2EAuthMode => {
   const authMode = (process.env.E2E_AUTH_MODE ?? "mock").toLowerCase();
@@ -39,6 +41,9 @@ export default defineConfig({
   use: {
     baseURL: E2E_CONFIG.BASE_URL,
     ignoreHTTPSErrors: true,
+    launchOptions: {
+      args: [MOCK_OAUTH_HOST_RESOLVER_RULE],
+    },
     trace: process.env.CI === "true" ? "on" : "on-first-retry",
   },
   workers: process.env.CI === "true" ? CI_WORKERS : undefined,
