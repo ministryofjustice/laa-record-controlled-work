@@ -10,6 +10,7 @@ import { haveAHomeAddressStep } from "#/journeys/create-application/steps/haveAH
 import { internationalMaintenanceAgreementStep } from "#/journeys/create-application/steps/internationalMaintenanceAgreement/internationalMaintenanceAgreement.step.js";
 import { legalAidBeforeStep } from "#/journeys/create-application/steps/legalAidBefore/legalAidBefore.step.js";
 import { legalAidLast6MonthsStep } from "#/journeys/create-application/steps/legalAidLast6Months/legalAidLast6Months.step.js";
+import { needsProtectiveInjunctionStep } from "#/journeys/create-application/steps/needsProtectiveInjunction/needsProtectiveInjunction.step.js";
 import { niNumberStep } from "#/journeys/create-application/steps/niNumber/niNumber.step.js";
 import { editClientDetailsEffects } from "#/journeys/edit-client-details/editClientDetails.effects.js";
 import { checkAnswersStep } from "#/journeys/edit-client-details/steps/check-answers/check-answers.step.js";
@@ -33,6 +34,7 @@ export const editClientDetailsJourney = journey({
     ecfStep(editJourneyCode, { reachability: { entryWhen: true } }),
     familyLawClassificationStep(editJourneyCode),
     internationalMaintenanceAgreementStep(editJourneyCode),
+    needsProtectiveInjunctionStep(editJourneyCode),
     ineligibleStep(editJourneyCode),
     legalAidBeforeStep(editJourneyCode),
     legalAidLast6MonthsStep(editJourneyCode),

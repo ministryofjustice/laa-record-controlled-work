@@ -186,6 +186,8 @@ export class ApplicationDto {
     if (answers.familyLawClassification === "private") {
       scopingQuestions.needsAdviceOnEUOrInternationalMaintenance =
         answers.needsAdviceOnEUOrInternationalMaintenance === "yes";
+      scopingQuestions.needsProtectiveInjunction =
+        answers.needsProtectiveInjunction === "yes";
     }
 
     return scopingQuestions;
@@ -268,6 +270,8 @@ export class ApplicationDto {
         scopingQuestions.needsAdviceOnEUOrInternationalMaintenance
           ? "yes"
           : "no";
+      scopingAnswers[AnswerKey.needsProtectiveInjunction] =
+        scopingQuestions.needsProtectiveInjunction ? "yes" : "no";
     }
 
     return scopingAnswers;

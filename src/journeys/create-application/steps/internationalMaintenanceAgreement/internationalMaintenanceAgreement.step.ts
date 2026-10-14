@@ -1,4 +1,6 @@
 import {
+  Answer,
+  Condition,
   redirect,
   step,
   type StepDefinition,
@@ -7,6 +9,7 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 import { t } from "i18next";
 
+import { AnswerKey } from "#/journeys/AnswerKey.enum.js";
 import { CreateApplicationEffects } from "#/journeys/create-application/create-application.effects.js";
 import {
   guidance,
@@ -60,12 +63,26 @@ function saveInternationalMaintenanceAgreement(
   return submit({
     onValid: {
       effects: [CreateApplicationEffects.saveDraftAnswers(journeyCode)],
-      next: [redirectToCheckAnswers, redirectToLegalAidBefore],
+      next: [
+        redirectToCheckAnswers,
+        redirectToProtectThemself,
+        redirectToLegalAidBefore,
+      ],
     },
     validate: true,
   });
 }
 
+const redirectToProtectThemself = redirect({
+  goto: StepCode.PROTECT_THEMSELF,
+  when: Answer(AnswerKey.needsAdviceOnEUOrInternationalMaintenance).match(
+    Condition.Equals("no"),
+  ),
+});
+
 const redirectToLegalAidBefore = redirect({
-  goto: "legal-aid-before",
+  goto: StepCode.LEGAL_AID_BEFORE,
+  when: Answer(AnswerKey.needsAdviceOnEUOrInternationalMaintenance).match(
+    Condition.Equals("yes"),
+  ),
 });

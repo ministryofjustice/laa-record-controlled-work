@@ -48,7 +48,7 @@ describe("Edit client details check answers step", () => {
       },
     },
     reasonForReapplication: "Some reason for help",
-    scopingQuestions: { priorLegalAid: "yesSameMatter", familyLawClassification: "private", needsAdviceOnEUOrInternationalMaintenance: false },
+    scopingQuestions: { priorLegalAid: "yesSameMatter", familyLawClassification: "private", needsAdviceOnEUOrInternationalMaintenance: false, needsProtectiveInjunction: true },
   });
   const overseasApplication: Application = getGetApplicationResponseMock({
     ...ukApplication,
@@ -419,33 +419,33 @@ describe("Edit client details check answers step", () => {
         value: { text: string };
       }>;
 
-      expect(rows.length).to.equal(12);
+      expect(rows.length).to.equal(13);
       expect(rows[0].key.text).to.equal("ECF");
       expect(rows[1].key.text).to.equal("Type of family law");
       expect(rows[1].value.text).to.equal("Private");
       expect(rows[2].key.text).to.equal("Transitional EU arrangements or an international maintenance agreement");
       expect(rows[2].value.text).to.equal("No");
-      expect(rows[3].key.text).to.equal("Accessed legal aid before");
-      expect(rows[3].value.text).to.equal("Yes, about the same matter");
-      expect(rows[4].key.text).to.equal(
+      expect(rows[3].key.text).to.equal("Legal aid to get a protective injunction order");
+      expect(rows[3].value.text).to.equal("Yes");
+      expect(rows[4].key.text).to.equal("Accessed legal aid before");
+      expect(rows[4].value.text).to.equal("Yes, about the same matter");
+      expect(rows[5].key.text).to.equal(
         "Did your client get legal help for this matter in the last 6 months?",
       );
-      expect(rows[4].value.text).to.equal("Yes");
-      expect(rows[5].key.text).to.equal(
+      expect(rows[6].key.text).to.equal(
         "Reason for new application for same matter",
       );
-      expect(rows[5].value.text).to.equal("Some reason for help");
-      expect(rows[6].key.text).to.equal("First name");
-      expect(rows[6].value.text).to.equal("John");
-      expect(rows[7].key.text).to.equal("Last name");
-      expect(rows[7].value.text).to.equal("Doe");
-      expect(rows[8].key.text).to.equal("Date of birth");
-      expect(rows[8].value.text).to.equal("1 January 1990");
-      expect(rows[9].key.text).to.equal("National Insurance number");
-      expect(rows[9].value.text).to.equal("AB123456C");
-      expect(rows[10].key.text).to.equal("Has a home address");
-      expect(rows[10].value.text).to.equal("Yes");
-      expect(rows[11].key.text).to.equal("Address");
+      expect(rows[7].key.text).to.equal("First name");
+      expect(rows[7].value.text).to.equal("John");
+      expect(rows[8].key.text).to.equal("Last name");
+      expect(rows[8].value.text).to.equal("Doe");
+      expect(rows[9].key.text).to.equal("Date of birth");
+      expect(rows[9].value.text).to.equal("1 January 1990");
+      expect(rows[10].key.text).to.equal("National Insurance number");
+      expect(rows[10].value.text).to.equal("AB123456C");
+      expect(rows[11].key.text).to.equal("Has a home address");
+      expect(rows[11].value.text).to.equal("Yes");
+      expect(rows[12].key.text).to.equal("Address");
     });
 
     it("links the home address row to the home address question", () => {

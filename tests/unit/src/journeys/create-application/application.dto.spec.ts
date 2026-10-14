@@ -121,7 +121,8 @@ describe("fromAnswers method", () => {
       {
         ...answers,
         familyLawClassification: "private",
-        needsAdviceOnEUOrInternationalMaintenance: "yes",
+        needsAdviceOnEUOrInternationalMaintenance: "no",
+        needsProtectiveInjunction: "no",
       },
       providerOfficeCode,
     ).toRcwApi();
@@ -129,7 +130,8 @@ describe("fromAnswers method", () => {
     expect(result.scopingQuestions).to.deep.equal({
       priorLegalAid: "yesSameMatter",
       familyLawClassification: "private",
-      needsAdviceOnEUOrInternationalMaintenance: true,
+      needsAdviceOnEUOrInternationalMaintenance: false,
+      needsProtectiveInjunction: false,
     });
   });
 
@@ -213,7 +215,7 @@ describe("toAnswers method", () => {
     createdBy: "test-user",
     modifiedAt: "2025-01-01T00:00:00Z",
     modifiedBy: "test-user",
-    ecfFlag: null,
+    ecfFlag: null
   } satisfies Application;
 
   it("maps a UK API address to only the UK answer fields", () => {
@@ -327,14 +329,16 @@ describe("toAnswers method", () => {
       scopingQuestions: {
         priorLegalAid: "yesSameMatter",
         familyLawClassification: "private",
-        needsAdviceOnEUOrInternationalMaintenance: true,
+        needsAdviceOnEUOrInternationalMaintenance: false,
+        needsProtectiveInjunction: true,
       },
     });
 
     expect(result).to.include({
       legalAidBefore: "yesSameMatter",
       familyLawClassification: "private",
-      needsAdviceOnEUOrInternationalMaintenance: "yes",
+      needsAdviceOnEUOrInternationalMaintenance: "no",
+      needsProtectiveInjunction: "yes",
     });
   });
 
