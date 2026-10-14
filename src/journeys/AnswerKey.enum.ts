@@ -10,6 +10,7 @@ export enum AnswerKey {
   legalAidLast6Months = "legalAidLast6Months",
   needsAdviceOnEUOrInternationalMaintenance = "needsAdviceOnEUOrInternationalMaintenance",
   needsProtectiveInjunction = "needsProtectiveInjunction",
+  privateFamilyCaseScope = "privateFamilyCaseScope",
   niNumber = "niNumber",
   osAddressLine1 = "osAddressLine1",
   osAddressLine2 = "osAddressLine2",

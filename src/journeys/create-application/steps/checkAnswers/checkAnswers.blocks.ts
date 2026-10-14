@@ -23,6 +23,7 @@ import {
   formatLegalAidBeforeLabel,
   formatLegalAidLast6MonthsLabel,
   formatNeedsProtectiveInjunctionLabel,
+  formatPrivateFamilyCaseScopeLabel,
 } from "#/journeys/create-application/steps/checkAnswers/checkAnswers.formatters.js";
 import { fixedT, t } from "#/lib/i18n.js";
 
@@ -84,6 +85,11 @@ export function summaryList(): GovUKSummaryList {
     visibleWhen: Answer(AnswerKey.familyLawClassification).match(
       Condition.Equals(FamilyLawClassification.enum.private),
     ),
+  });
+  const privateFamilyCaseScope = summaryRow({
+    href: "private-family-case-scope?returnTo=check-answers",
+    label: answerLabelT("privateFamilyCaseScope"),
+    value: { text: formatPrivateFamilyCaseScopeLabel() },
   });
   const legalAidBefore = summaryRow({
     href: "legal-aid-before?returnTo=check-answers",
@@ -151,6 +157,7 @@ export function summaryList(): GovUKSummaryList {
       familyLawClassification,
       needsAdviceOnEUOrInternationalMaintenance,
       needsProtectiveInjunction,
+      privateFamilyCaseScope,
       legalAidBefore,
       legalAidLast6Months,
       reasonForYes,

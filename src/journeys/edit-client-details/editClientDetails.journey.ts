@@ -1,4 +1,5 @@
 import { access, journey } from "@ministryofjustice/hmpps-forge/core/authoring";
+import { privateFamilyCaseScopeStep } from "#/journeys/create-application/steps/privateFamilyCaseScope/privateFamilyCaseScope.step.js";
 
 import { clientDetailsStep } from "#/journeys/create-application/steps/clientDetails/clientDetails.step.js";
 import { ecfStep } from "#/journeys/create-application/steps/ecf/ecf.step.js";
@@ -35,6 +36,7 @@ export const editClientDetailsJourney = journey({
     familyLawClassificationStep(editJourneyCode),
     internationalMaintenanceAgreementStep(editJourneyCode),
     needsProtectiveInjunctionStep(editJourneyCode),
+    privateFamilyCaseScopeStep(editJourneyCode),
     ineligibleStep(editJourneyCode),
     legalAidBeforeStep(editJourneyCode),
     legalAidLast6MonthsStep(editJourneyCode),
