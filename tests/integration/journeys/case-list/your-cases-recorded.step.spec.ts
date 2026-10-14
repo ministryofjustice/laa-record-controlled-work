@@ -11,7 +11,7 @@ import { getGetApplicationsResponseMock } from "#orval/mocks/rcw/fakers/applicat
 const session = {
   selectedOffice: {
     address: "1 High Street, Leeds, LS1 1AA",
-    code: "LEEDS-01",
+    code: "AB12CD",
   },
   singleOffice: false,
 };
@@ -73,6 +73,35 @@ describe("Your Cases recorded step", () => {
 
     it("renders a selected office block", () => {
       expect(selectedOffice).to.exist;
+      expect(String(selectedOffice.properties.text)).to.include(
+        "Office: 1 High Street, Leeds, LS1 1AA (AB12CD)",
+      );
+    });
+
+    it("renders a code-only selected office for single and multiple office users", async () => {
+      for (const singleOffice of [false, true]) {
+        const result = await client.get("/cases/recorded", {
+          session: {
+            selectedOffice: { code: "AB12CD" },
+            singleOffice,
+          },
+        });
+        expect(result.type).to.equal("render");
+
+        const resultView = result as TestRenderResult;
+        const officeBlock = resultView
+          .getBlocksByVariant("govukBody")
+          .find((b) => String(b.properties.text).includes("Office:"));
+        const text = String(officeBlock?.properties.text);
+
+        expect(text).to.include("Office: AB12CD");
+        expect(text).not.to.include("undefined");
+        expect(text).not.to.include("()");
+        expect(text.match(/AB12CD/g)).to.have.length(1);
+        expect(text.includes('href="/select-office/"')).to.equal(
+          !singleOffice,
+        );
+      }
     });
 
     it("renders a sub navigation with the correct items", () => {

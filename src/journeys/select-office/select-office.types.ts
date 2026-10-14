@@ -7,7 +7,7 @@ import type { JourneySession } from "#/journeys/context.type.js";
 import type { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 
 export const OfficeSchema = z.object({
-  address: z.string(),
+  address: z.string().optional(),
   code: z.string(),
   firmName: z.string().optional(),
 });
