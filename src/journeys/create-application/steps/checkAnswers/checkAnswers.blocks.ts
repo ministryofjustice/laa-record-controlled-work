@@ -28,6 +28,7 @@ import {
   formatLegalAidLast6MonthsLabel,
   formatLetterFromLocalAuthority,
   formatNeedsProtectiveInjunctionLabel,
+  formatPrivateFamilyCaseScopeLabel,
 } from "#/journeys/create-application/steps/checkAnswers/checkAnswers.formatters.js";
 import { fixedT, t } from "#/lib/i18n.js";
 
@@ -131,6 +132,12 @@ function createSummaryList(
       href: "protect-themself?returnTo=check-answers",
       label: answerLabelT("protectThemselves"),
       value: { text: formatNeedsProtectiveInjunctionLabel() },
+    },
+    {
+      field: AnswerKey.privateFamilyCaseScope,
+      href: "private-family-case-scope?returnTo=check-answers",
+      label: answerLabelT("privateFamilyCaseScope"),
+      value: { text: formatPrivateFamilyCaseScopeLabel() },
     },
     {
       field: AnswerKey.legalAidBefore,

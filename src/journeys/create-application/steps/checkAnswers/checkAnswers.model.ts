@@ -28,6 +28,7 @@ type SummaryFieldKey =
   | AnswerKey.needsAdviceOnEUOrInternationalMaintenance
   | AnswerKey.needsProtectiveInjunction
   | AnswerKey.niNumber
+  | AnswerKey.privateFamilyCaseScope
   | AnswerKey.reasonForYes;
 
 /**
@@ -155,6 +156,10 @@ export function checkAnswersModel(): Record<SummaryFieldKey, SummaryField> {
           required(AnswerKey.niNumber),
         ),
       ),
+      visibleWhen: true,
+    }),
+    privateFamilyCaseScope: field({
+      completeWhen: required(AnswerKey.privateFamilyCaseScope),
       visibleWhen: true,
     }),
     reasonForYes: field({
