@@ -34,7 +34,8 @@ describe("Check answers step", () => {
         legalAidBefore: "yesSameMatter",
         legalAidLast6Months: "yes",
         needsAdviceOnEUOrInternationalMaintenance: "no",
-        needsProtectiveInjunction: "yes",
+        needsProtectiveInjunction: "no",
+        privateFamilyCaseScope: "domesticAbuse",
         reasonForHelp: "Some reason for help",
         reasonForYes: "Some reason for help",
         firstName: "John",
@@ -95,6 +96,7 @@ describe("Check answers step", () => {
           value: "No",
         },
         { key: "Legal aid to get a protective injunction order", value: "Yes" },
+        { key: "Evidence case is in scope", value: "Evidence of domestic abuse (Schedule 1)" },
         {
           key: "Accessed legal aid before",
           value: "Yes, about the same matter",

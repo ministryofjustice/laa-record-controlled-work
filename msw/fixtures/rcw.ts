@@ -42,6 +42,7 @@ const CLIENT_DETAILS = {
     familyLawClassification: FamilyLawClassification.enum.private,
     needsAdviceOnEUOrInternationalMaintenance: false,
     priorLegalAid: PriorLegalAid.enum.no,
+    privateFamilyCaseScope: "domesticAbuse", // TODO: swap to enum when added
   },
 };
 
