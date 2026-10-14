@@ -183,11 +183,16 @@ export class ApplicationDto {
       priorLegalAid: answers.legalAidBefore,
     };
 
-    if (answers.familyLawClassification === "private") {
+    if(answers.needsAdviceOnEUOrInternationalMaintenance !== undefined) {
       scopingQuestions.needsAdviceOnEUOrInternationalMaintenance =
         answers.needsAdviceOnEUOrInternationalMaintenance === "yes";
+    }
+    if(answers.needsProtectiveInjunction !== undefined) {
       scopingQuestions.needsProtectiveInjunction =
         answers.needsProtectiveInjunction === "yes";
+    }
+    if(answers.privateFamilyCaseScope !== undefined) {
+      scopingQuestions.privateFamilyCaseScope = answers.privateFamilyCaseScope;
     }
 
     return scopingQuestions;
@@ -265,13 +270,19 @@ export class ApplicationDto {
   ): Partial<AnswersOutput> {
     const scopingAnswers: Partial<AnswersOutput> = {};
 
-    if (scopingQuestions.familyLawClassification === "private") {
+    if (scopingQuestions.needsAdviceOnEUOrInternationalMaintenance !== undefined) {
       scopingAnswers[AnswerKey.needsAdviceOnEUOrInternationalMaintenance] =
         scopingQuestions.needsAdviceOnEUOrInternationalMaintenance
           ? "yes"
           : "no";
+    }
+    if (scopingQuestions.needsProtectiveInjunction !== undefined) {
       scopingAnswers[AnswerKey.needsProtectiveInjunction] =
         scopingQuestions.needsProtectiveInjunction ? "yes" : "no";
+    }
+    if (scopingQuestions.privateFamilyCaseScope !== undefined) {
+      scopingAnswers[AnswerKey.privateFamilyCaseScope] =
+        scopingQuestions.privateFamilyCaseScope;
     }
 
     return scopingAnswers;

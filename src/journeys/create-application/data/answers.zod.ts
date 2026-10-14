@@ -16,6 +16,7 @@ export const Answers = zod
     legalAidLast6Months: zod.string().optional(),
     needsAdviceOnEUOrInternationalMaintenance: zod.string().optional(),
     needsProtectiveInjunction: zod.string().optional(),
+    privateFamilyCaseScope: zod.string().optional(),
     niNumber: zod.string().optional(),
     osAddressLine1: zod.string().optional(),
     osAddressLine2: zod.string().optional(),
