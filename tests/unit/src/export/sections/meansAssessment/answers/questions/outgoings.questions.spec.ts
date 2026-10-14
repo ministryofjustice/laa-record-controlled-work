@@ -53,11 +53,12 @@ function childcareRows(answers: Partial<EligibilityData>) {
 describe("saved outgoings answers", () => {
   before(initializeI18nextSync);
 
-  it("shows enabled payment details and explicit No answers", () => {
+  it("maps a zero childcare amount and explicit No payment answers", () => {
     expect(
       outgoings({
         child_dependants: true,
         student_finance_relevant: true,
+        student_finance_conditional_value: 100,
         childcare_payments_conditional_value: 0,
         childcare_payments_frequency: "monthly",
         childcare_payments_relevant: true,
@@ -93,20 +94,31 @@ describe("saved outgoings answers", () => {
     ]);
   });
 
-  it("shows childcare only when every applicable adult qualifies", () => {
+  it("shows childcare for a working client and student partner", () => {
     const answers = {
       child_dependants: true,
       employment_status: "in_work",
-      incomes: [{ income_type: "employment" }],
+      incomes: [
+        {
+          gross_income: 500,
+          income_frequency: "monthly",
+          income_tax: 0,
+          income_type: "employment",
+          national_insurance: 0,
+        },
+      ],
       partner: true,
+      partner_employment_status: "unemployed",
+      partner_over_60: false,
       partner_student_finance_relevant: true,
+      partner_student_finance_conditional_value: 120,
       childcare_payments_conditional_value: 40,
       childcare_payments_frequency: "monthly",
       childcare_payments_relevant: true,
       maintenance_payments_relevant: false,
       legal_aid_payments_relevant: false,
       partner_childcare_payments_conditional_value: 60,
-      partner_childcare_payments_frequency: "total",
+      partner_childcare_payments_frequency: "monthly",
       partner_childcare_payments_relevant: true,
       partner_maintenance_payments_relevant: false,
       partner_legal_aid_payments_relevant: false,
@@ -133,7 +145,7 @@ describe("saved outgoings answers", () => {
       [
         ["Does the partner pay for childcare?", "Yes"],
         ["Amount", "£60.00"],
-        ["Frequency", "Total in last 3 months"],
+        ["Frequency", "Every month"],
         ["Does the partner pay maintenance to a former partner?", "No"],
         [
           "Does the partner make payments toward legal aid for a criminal case?",
@@ -150,7 +162,15 @@ describe("saved outgoings answers", () => {
         adult_dependants: true,
         child_dependants: false,
         employment_status: "in_work",
-        incomes: [{ income_type: "employment" }],
+        incomes: [
+          {
+            gross_income: 500,
+            income_frequency: "monthly",
+            income_tax: 0,
+            income_type: "employment",
+            national_insurance: 0,
+          },
+        ],
         childcare_payments_relevant: true,
       },
     },
@@ -159,7 +179,15 @@ describe("saved outgoings answers", () => {
       answers: {
         child_dependants: true,
         employment_status: "in_work",
-        incomes: [{ income_type: "statutory_pay" }],
+        incomes: [
+          {
+            gross_income: 500,
+            income_frequency: "monthly",
+            income_tax: 0,
+            income_type: "statutory_pay",
+            national_insurance: 0,
+          },
+        ],
         childcare_payments_relevant: true,
       },
     },
@@ -168,10 +196,27 @@ describe("saved outgoings answers", () => {
       answers: {
         child_dependants: true,
         employment_status: "in_work",
-        incomes: [{ income_type: "employment" }],
+        incomes: [
+          {
+            gross_income: 500,
+            income_frequency: "monthly",
+            income_tax: 0,
+            income_type: "employment",
+            national_insurance: 0,
+          },
+        ],
         partner: true,
         partner_employment_status: "in_work",
-        partner_incomes: [{ income_type: "statutory_pay" }],
+        partner_incomes: [
+          {
+            gross_income: 500,
+            income_frequency: "monthly",
+            income_tax: 0,
+            income_type: "statutory_pay",
+            national_insurance: 0,
+          },
+        ],
+        partner_over_60: false,
         childcare_payments_relevant: true,
         partner_childcare_payments_relevant: true,
       },

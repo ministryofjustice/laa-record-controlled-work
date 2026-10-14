@@ -108,8 +108,13 @@ describe("toClientAndCaseDetailsSection", () => {
     });
   });
 
-  for (const reasonForReapplication of [undefined, null, "", "   "]) {
-    it("includes same-matter row and omits a blank reason", () => {
+  for (const { name, reasonForReapplication } of [
+    { name: "undefined", reasonForReapplication: undefined },
+    { name: "null", reasonForReapplication: null },
+    { name: "empty", reasonForReapplication: "" },
+    { name: "whitespace-only", reasonForReapplication: "   " },
+  ]) {
+    it(`includes the same-matter row and omits a ${name} reason`, () => {
       const application = makeApplication({
         reasonForReapplication,
         scopingQuestions: { priorLegalAid: "yesSameMatter" },

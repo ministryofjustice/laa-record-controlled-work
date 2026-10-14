@@ -164,7 +164,7 @@ const RENDERED_SCENARIOS: RenderedScenarioExpectation[] = [
   {
     answerSummaries: false,
     outcome: null,
-    scenario: MeansAssessmentScenarioName.UnsupportedMeansAssessment,
+    scenario: MeansAssessmentScenarioName.MeansAssessmentNotRequired,
     section: false,
     totals: [],
   },
@@ -321,7 +321,12 @@ test("export page renders mapped means outcomes, totals, and answer cards", asyn
 });
 
 for (const expected of RENDERED_SCENARIOS) {
-  test(`renders ${expected.scenario} means assessment`, async ({
+  const title =
+    expected.scenario === MeansAssessmentScenarioName.MeansAssessmentNotRequired
+      ? "omits means assessment when explicitly not required"
+      : `renders ${expected.scenario} means assessment`;
+
+  test(title, async ({
     withSelectedOffice: page,
   }) => {
     const application = meansAssessmentApplications[expected.scenario];

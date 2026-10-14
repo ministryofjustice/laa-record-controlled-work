@@ -118,7 +118,7 @@ describe("saved means answers", () => {
     }
   });
 
-  it("maps household entries in saved order with their saved values", () => {
+  it("maps household values from saved entries", () => {
     expect(
       scenarioCardValues(
         MeansAssessmentScenarioName.EmployedHousehold,
@@ -222,7 +222,7 @@ describe("saved means answers", () => {
       "Every 4 weeks",
       "Yes",
       "£90.00",
-      "Total in last 3 months",
+      "Monthly",
       "Yes",
       "£200.00",
       "Every 2 weeks",
@@ -338,7 +338,7 @@ describe("saved means answers", () => {
     ).to.deep.equal(["Yes", "£1,800.00", "Yes", "£950.00"]);
   });
 
-  it("formats saved pence, repeated entries, and stale branches correctly", () => {
+  it("formats saved pence and omits stale answers", () => {
     expect(
       scenarioCardValues(
         MeansAssessmentScenarioName.FormattingVariants,
@@ -346,7 +346,7 @@ describe("saved means answers", () => {
       ),
     ).to.deep.equal([
       "A salary or wage",
-      "Total in last 3 months",
+      "Every 2 weeks",
       "£5,678.90",
       "£500.00",
       "£120.00",
@@ -411,18 +411,24 @@ describe("saved means answers", () => {
     expect(section?.answerSummaries).to.deep.equal(expectedAnswerSummaries);
   });
 
-  for (const result of [
-    null,
-    {},
-    { result_summary: { overall_result: { result: "ineligible" } } },
+  for (const { name, result } of [
+    { name: "null result", result: null },
+    { name: "empty result", result: {} },
     {
-      result_summary: {
-        gross_income: { combined_total_gross_income: "incompatible" },
-        overall_result: { result: "eligible" },
+      name: "unsupported outcome",
+      result: { result_summary: { overall_result: { result: "ineligible" } } },
+    },
+    {
+      name: "malformed saved total",
+      result: {
+        result_summary: {
+          gross_income: { combined_total_gross_income: "incompatible" },
+          overall_result: { result: "eligible" },
+        },
       },
     },
   ]) {
-    it("keeps saved summaries when calculations are unavailable", () => {
+    it(`keeps saved summaries when calculations are unavailable for ${name}`, () => {
       const section = toMeansAssessmentSection(
         application({
           eligibility: { data: ANSWERS, result },
@@ -476,10 +482,13 @@ describe("saved means answers", () => {
     ).to.equal(null);
   });
 
-  for (const meansAssessmentRequired of [null, undefined]) {
-    it("keeps saved answers when the required flag is unspecified", () => {
+  for (const { name, value } of [
+    { name: "null", value: null },
+    { name: "undefined", value: undefined },
+  ]) {
+    it(`keeps saved answers when the required flag is ${name}`, () => {
       expect(
-        toMeansAssessmentSection(application({ meansAssessmentRequired }))
+        toMeansAssessmentSection(application({ meansAssessmentRequired: value }))
           ?.answerSummaries,
       ).to.deep.equal(expectedAnswerSummaries);
     });

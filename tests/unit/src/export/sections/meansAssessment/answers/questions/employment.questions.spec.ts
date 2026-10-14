@@ -84,9 +84,8 @@ describe("saved employment answers", () => {
     ]);
   });
 
-  it("shows partner age for passporting but hides financial answers", () => {
-    expect(
-      summaries({
+  it("shows passporting-relevant assets without employment income cards", () => {
+    const cards = summaries({
         partner: true,
         passporting: true,
         partner_over_60: false,
@@ -100,7 +99,10 @@ describe("saved employment answers", () => {
             national_insurance: 0,
           },
         ],
-      }).filter(({ heading }) =>
+      });
+
+    expect(
+      cards.filter(({ heading }) =>
         ["Partner age", "Partner other property", "Partner assets"].includes(
           heading,
         ),
@@ -130,6 +132,11 @@ describe("saved employment answers", () => {
         ],
       },
     ]);
+    expect(
+      cards.filter(({ heading }) =>
+        /employment|income|benefit/i.test(heading),
+      ),
+    ).to.deep.equal([]);
   });
 
   it("omits saved partner details after partner removal", () => {
