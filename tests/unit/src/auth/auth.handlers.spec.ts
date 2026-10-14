@@ -26,7 +26,11 @@ import config from "#/config.js";
 import { type Either, failure, success } from "#/lib/either.js";
 import * as redis from "#/lib/redis.js";
 import { expect } from "chai";
-import { TokenAcquisitionError } from "#/auth/auth.errors.js";
+import {
+  AuthenticationError,
+  BadAuthenticationRequestError,
+  TokenAcquisitionError,
+} from "#/auth/auth.errors.js";
 import { MINUTE } from "#/lib/constants/time.js";
 import { createMockApp } from "../../utils.js";
 import { requireAuth } from "#/auth/middleware/requireAuth.middleware.js";
@@ -614,6 +618,7 @@ describe("Auth Handlers", () => {
       const redirect = sinon.stub();
       const status = sinon.stub().returnsThis();
       const send = sinon.stub().returnsThis();
+      const next = sinon.stub();
       const res = {
         redirect,
         send,
@@ -621,15 +626,20 @@ describe("Auth Handlers", () => {
         type: sinon.stub().returnsThis(),
       } as unknown as Response;
 
-      const signin = signIn(req, res, sinon.stub() as unknown as NextFunction);
+      const signin = signIn(req, res, next as unknown as NextFunction);
       await saveStarted;
       releaseSave();
       await signin;
 
       expect(authorize.calledOnce).to.be.true;
       expect(now).to.equal(expiresAt);
-      expect(status.calledOnceWithExactly(INTERNAL_SERVER_ERROR)).to.be.true;
-      expect(send.calledOnceWithExactly("Unable to start sign-in")).to.be.true;
+      expect(status.called).to.be.false;
+      expect(send.called).to.be.false;
+      expect(next.calledOnce).to.be.true;
+      expect(next.firstCall.args[0]).to.be.instanceOf(AuthenticationError);
+      expect((next.firstCall.args[0] as AuthenticationError).message).to.equal(
+        "Unable to start sign-in",
+      );
       expect(redirect.called).to.be.false;
     });
 
@@ -773,8 +783,8 @@ describe("Auth Handlers", () => {
       const res = await request(mockApp).get("/auth/signin");
 
       expect(res.status).to.equal(INTERNAL_SERVER_ERROR);
-      expect(res.text).to.equal("Unable to start sign-in");
-      expect(res.headers["content-type"]).to.match(/^text\/plain/);
+      expect(res.body.message).to.equal("Unable to start sign-in");
+      expect(res.headers["content-type"]).to.match(/^application\/json/);
     });
 
     // Skipped because this test relies on rendering the error page, and we can't do that currently.
@@ -806,6 +816,7 @@ describe("Auth Handlers", () => {
       });
       const redirect = sinon.stub();
       const status = sinon.stub().returnsThis();
+      const next = sinon.stub();
       const res = {
         redirect,
         send: sinon.stub().returnsThis(),
@@ -813,17 +824,17 @@ describe("Auth Handlers", () => {
         type: sinon.stub().returnsThis(),
       } as unknown as Response;
 
-      await signIn(req, res, sinon.stub() as unknown as NextFunction);
+      await signIn(req, res, next as unknown as NextFunction);
       const remaining = await getAuthFlowStore().consume(
         sessionId,
         CALLBACK_STATE,
       );
 
-      expect(status.calledOnceWithExactly(INTERNAL_SERVER_ERROR)).to.be.true;
+      expect(status.called).to.be.false;
       expect(redirect.called).to.be.false;
-      expect((res.send as sinon.SinonStub).calledOnceWithExactly(
-        "Unable to start sign-in",
-      )).to.be.true;
+      expect((res.send as sinon.SinonStub).called).to.be.false;
+      expect(next.calledOnce).to.be.true;
+      expect(next.firstCall.args[0]).to.be.instanceOf(AuthenticationError);
       expect(remaining.error).to.be.undefined;
       if (remaining.error) return;
       expect(remaining.value).to.be.undefined;
@@ -926,7 +937,7 @@ describe("Auth Handlers", () => {
 
       expect(authServiceStub.exchangeAuthCode.called).to.be.false;
       expect(res.status).to.equal(BAD_REQUEST);
-      expect(res.text).to.equal("Invalid redirect payload");
+      expect(res.body.message).to.equal("Invalid redirect payload");
     });
 
     it("returns a generic error when the provider rejects authentication", async () => {
@@ -940,8 +951,8 @@ describe("Auth Handlers", () => {
 
       expect(authServiceStub.exchangeAuthCode.called).to.be.false;
       expect(res.status).to.equal(BAD_REQUEST);
-      expect(res.text).to.equal("Entra sign-in failed");
-      expect(res.headers["content-type"]).to.match(/^text\/plain/);
+      expect(res.body.message).to.equal("Entra sign-in failed");
+      expect(res.headers["content-type"]).to.match(/^application\/json/);
     });
 
     it("does not authenticate or restore state when token exchange fails", async () => {
@@ -953,8 +964,8 @@ describe("Auth Handlers", () => {
       const res = await agent.get("/auth/code/callback").query(QUERY_PARAMS);
 
       expect(res.status).to.equal(UNAUTHORIZED);
-      expect(res.text).to.equal("Token acquisition failed");
-      expect(res.headers["content-type"]).to.match(/^text\/plain/);
+      expect(res.body.message).to.equal("Token acquisition failed");
+      expect(res.headers["content-type"]).to.match(/^application\/json/);
       const sessionResponse = await agent.get("/test/session");
       expect(sessionResponse.body.isAuthenticated).to.not.equal(true);
       expect(sessionResponse.body).to.not.have.property("msal");
@@ -1111,7 +1122,7 @@ describe("Auth Handlers", () => {
       const res = await agent.get("/auth/code/callback").query(QUERY_PARAMS);
 
       expect(res.status).to.equal(UNAUTHORIZED);
-      expect(res.text).to.equal("Token acquisition failed");
+      expect(res.body.message).to.equal("Token acquisition failed");
     });
 
     it("destroys a failed authenticated session and does not restore its consumed flow", async () => {
@@ -1120,9 +1131,9 @@ describe("Auth Handlers", () => {
       sinon.stub(config.redis, "enabled").value(true);
       const redisClient = redis.getRedisClient();
       const deleteCache = sinon.stub(redisClient, "del").resolves(1);
-      const status = sinon.stub().returnsThis();
       const redirect = sinon.stub();
       const clearCookie = sinon.stub();
+      const next = sinon.stub();
       const req = createHandlerRequest({
         query: QUERY_PARAMS,
         sessionID: sessionId,
@@ -1147,16 +1158,19 @@ describe("Auth Handlers", () => {
         redirect,
         send: sinon.stub().returnsThis(),
         set: sinon.stub().returnsThis(),
-        status,
       } as unknown as Response;
 
-      await authCodeCallback(req, res, sinon.stub() as unknown as NextFunction);
+      await authCodeCallback(req, res, next as unknown as NextFunction);
       const replay = await getAuthFlowStore().consume(
         sessionId,
         CALLBACK_STATE,
       );
 
-      expect(status.calledOnceWithExactly(INTERNAL_SERVER_ERROR)).to.be.true;
+      expect(next.calledOnce).to.be.true;
+      expect(next.firstCall.args[0]).to.be.instanceOf(AuthenticationError);
+      expect(
+        (next.firstCall.args[0] as AuthenticationError).statusCode,
+      ).to.equal(INTERNAL_SERVER_ERROR);
       expect(redirect.called).to.be.false;
       expect(clearCookie.calledOnceWithExactly(config.session.name)).to.be.true;
       expect(deleteCache.calledOnce).to.be.true;
@@ -1425,7 +1439,7 @@ describe("Auth Handlers", () => {
           .query(QUERY_PARAMS);
 
         expect(res.status).to.equal(BAD_REQUEST);
-        expect(res.text).to.equal("Invalid or expired sign-in flow");
+        expect(res.body.message).to.equal("Invalid or expired sign-in flow");
       });
 
       it("responds with 400 when state does not match the pending flow", async () => {
@@ -1434,7 +1448,7 @@ describe("Auth Handlers", () => {
           .query({ code: "auth-code", state: "mismatched-state" });
 
         expect(res.status).to.equal(BAD_REQUEST);
-        expect(res.text).to.equal("Invalid or expired sign-in flow");
+        expect(res.body.message).to.equal("Invalid or expired sign-in flow");
       });
 
       it("responds generically when the flow store returns an error", async () => {
@@ -1450,7 +1464,7 @@ describe("Auth Handlers", () => {
           .query(QUERY_PARAMS);
 
         expect(response.status).to.equal(INTERNAL_SERVER_ERROR);
-        expect(response.text).to.equal("Unable to complete sign-in");
+        expect(response.body.message).to.equal("Unable to complete sign-in");
         expect(authServiceStub.exchangeAuthCode.called).to.be.false;
       });
     });
@@ -1475,24 +1489,27 @@ describe("Auth Handlers", () => {
           query: { code: "auth-code", state },
           sessionID: sessionId,
         } as unknown as Request;
-        const status = sinon.stub().returnsThis();
-        const send = sinon.stub().returnsThis();
+        const next = sinon.stub();
         const res = {
           redirect: sinon.stub(),
-          send,
+          send: sinon.stub().returnsThis(),
           set: sinon.stub().returnsThis(),
-          status,
         } as unknown as Response;
 
         await authCodeCallback(
           req,
           res,
-          sinon.stub() as unknown as NextFunction,
+          next as unknown as NextFunction,
         );
         const flow = await getAuthFlowStore().consume(sessionId, state);
 
-        expect(status.calledOnceWithExactly(BAD_REQUEST)).to.be.true;
-        expect(send.calledOnceWithExactly("Invalid relay target")).to.be.true;
+        expect(next.calledOnce).to.be.true;
+        expect(next.firstCall.args[0]).to.be.instanceOf(
+          BadAuthenticationRequestError,
+        );
+        expect(
+          (next.firstCall.args[0] as BadAuthenticationRequestError).statusCode,
+        ).to.equal(BAD_REQUEST);
         expect(authServiceStub.exchangeAuthCode.called).to.be.false;
         expect(flow.error).to.be.undefined;
         if (flow.error) return;
@@ -1691,8 +1708,8 @@ describe("Auth Handlers", () => {
 
         expect(signin.status).to.equal(FOUND);
         expect(invalid.status).to.equal(BAD_REQUEST);
-        expect(invalid.text).to.equal("Invalid relay target");
-        expect(expired.text).to.equal("Invalid relay target");
+        expect(invalid.body.message).to.equal("Invalid redirect target");
+        expect(expired.body.message).to.equal("Invalid redirect target");
         expect(matching.status).to.equal(FOUND);
         expect(expired.status).to.equal(BAD_REQUEST);
         expect(authServiceStub.exchangeAuthCode.calledOnce).to.be.true;
@@ -1749,7 +1766,7 @@ describe("Auth Handlers", () => {
         ]);
         expect(forwarded.searchParams.has("error_description")).to.be.false;
         expect(originResponse.status).to.equal(BAD_REQUEST);
-        expect(originResponse.text).to.equal("Entra sign-in failed");
+        expect(originResponse.body.message).to.equal("Entra sign-in failed");
         expect(replay.status).to.equal(BAD_REQUEST);
         expect(authServiceStub.exchangeAuthCode.called).to.be.false;
       });
@@ -1795,14 +1812,12 @@ describe("Auth Handlers", () => {
         expect(relayLocation.searchParams.has("error_description")).to.be.false;
         expect(authServiceStub.exchangeAuthCode.called).to.be.false;
 
-        const originStatus = sinon.stub().returnsThis();
-        const originSend = sinon.stub().returnsThis();
+        const originNext = sinon.stub();
         const originRes = {
           clearCookie: sinon.stub(),
           redirect: sinon.stub(),
-          send: originSend,
+          send: sinon.stub().returnsThis(),
           set: sinon.stub().returnsThis(),
-          status: originStatus,
           type: sinon.stub().returnsThis(),
         } as unknown as Response;
         await authCodeCallback(
@@ -1812,12 +1827,17 @@ describe("Auth Handlers", () => {
             sessionID: originSessionId,
           }),
           originRes,
-          sinon.stub() as unknown as NextFunction,
+          originNext as unknown as NextFunction,
         );
 
-        expect(originStatus.calledOnceWithExactly(BAD_REQUEST)).to.be.true;
-        expect(originSend.calledOnceWithExactly("Entra sign-in failed")).to.be
-          .true;
+        expect(originNext.calledOnce).to.be.true;
+        expect(originNext.firstCall.args[0]).to.be.instanceOf(
+          BadAuthenticationRequestError,
+        );
+        expect(
+          (originNext.firstCall.args[0] as BadAuthenticationRequestError)
+            .statusCode,
+        ).to.equal(BAD_REQUEST);
         expect(authServiceStub.exchangeAuthCode.called).to.be.false;
         expect(
           getValue(await getAuthFlowStore().consume(originSessionId, state)),
@@ -1837,7 +1857,7 @@ describe("Auth Handlers", () => {
           .query({ code: "auth-code", state });
 
         expect(res.status).to.equal(BAD_REQUEST);
-        expect(res.text).to.equal("Invalid relay target");
+        expect(res.body.message).to.equal("Invalid redirect target");
       });
 
       it("responds with 400 when the relay target is not in the allowlist", async () => {
@@ -1853,7 +1873,7 @@ describe("Auth Handlers", () => {
           .query({ code: "auth-code", state });
 
         expect(res.status).to.equal(BAD_REQUEST);
-        expect(res.text).to.equal("Invalid relay target");
+        expect(res.body.message).to.equal("Invalid redirect target");
       });
 
       it("processes the callback normally when the relay target matches the current host", async () => {

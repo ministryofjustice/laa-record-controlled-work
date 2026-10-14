@@ -77,14 +77,16 @@ export async function authCodeCallback(
     }
 
     if (consumed.value === undefined) {
-      next(new AuthenticationError("Invalid or expired sign-in flow"));
+      next(
+        new BadAuthenticationRequestError("Invalid or expired sign-in flow"),
+      );
       return;
     }
 
     const flow = consumed.value;
 
     if ("error" in callbackData) {
-      next(new AuthenticationError("Entra sign-in failed"));
+      next(new BadAuthenticationRequestError("Entra sign-in failed"));
       return;
     }
 
@@ -125,7 +127,7 @@ export async function signIn(
       return;
     }
 
-    next(error);
+    next(new AuthenticationError("Unable to start sign-in", error));
   }
 }
 
