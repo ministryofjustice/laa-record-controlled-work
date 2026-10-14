@@ -13,12 +13,14 @@ import {
   completeApplication,
   createApplicationResponse,
   incompleteApplication,
+  meansAssessmentApplications,
 } from "../fixtures/rcw.fixtures.js";
 
 const applicationFixtures = [
   incompleteApplication,
   completeApplication,
   clientDetailsApplication,
+  ...Object.values(meansAssessmentApplications),
 ];
 
 export const rcwHandlers = [
