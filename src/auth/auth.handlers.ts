@@ -29,12 +29,7 @@ import { EntraErrorCode } from "#/auth/domain/EntraErrorCode.enum.js";
 import { EntraService } from "#/auth/entra.service.js";
 import { getMsalCacheKey } from "#/auth/msal.cache-key.js";
 import config from "#/config.js";
-import {
-  BAD_REQUEST,
-  FORBIDDEN,
-  INTERNAL_SERVER_ERROR,
-  UNAUTHORIZED,
-} from "#/lib/constants/http.js";
+import { FORBIDDEN } from "#/lib/constants/http.js";
 import { getRedisClient } from "#/lib/redis.js";
 import { logger } from "#/logger.js";
 
