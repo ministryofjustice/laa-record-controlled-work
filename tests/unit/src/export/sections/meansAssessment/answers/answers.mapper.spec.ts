@@ -2,10 +2,17 @@ import { expect } from "chai";
 import { before, describe, it } from "mocha";
 
 import type { Application } from "#/api/clients/rcw/model/application.zod.gen.js";
-import type { EligibilityData } from "#/api/clients/rcw/model/eligibilityData.zod.gen.js";
+import {
+  EligibilityData as EligibilityDataSchema,
+  type EligibilityData,
+} from "#/api/clients/rcw/model/eligibilityData.zod.gen.js";
 
+import {
+  meansAssessmentScenarios,
+} from "#tests/fixtures/meansAssessment.fixtures.js";
 import { expectedAnswerSummaries } from "#tests/unit/src/export/sections/meansAssessment/answers/answers.fixtures.js";
 import { toMeansAssessmentSection } from "#/export/sections/meansAssessment/meansAssessment.mapper.js";
+import { cfeResultSchema } from "#/export/sections/meansAssessment/calculations/calculations.zod.js";
 import { initializeI18nextSync } from "#/lib/i18n.js";
 import { getGetApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
 
@@ -49,6 +56,55 @@ function application(overrides: Partial<Application> = {}): Application {
 
 describe("saved means answers", () => {
   before(initializeI18nextSync);
+
+  it("provides schema-valid fixtures for each assessment scenario", () => {
+    expect(Object.keys(meansAssessmentScenarios)).to.have.members([
+      "baseline",
+      "calculationStates",
+      "employedHousehold",
+      "formattingVariants",
+      "housingMortgage",
+      "housingSharedOwnership",
+      "missingEligibility",
+      "otherIncomeAndOutgoings",
+      "passporting",
+      "propertiesAndAssets",
+      "staleInactiveAnswers",
+      "asylumSupport",
+      "under18ControlledClr",
+      "under18NoMeans",
+      "unavailableResult",
+      "unsupportedMeansAssessment",
+    ]);
+
+    for (const createScenario of Object.values(meansAssessmentScenarios)) {
+      const scenario = createScenario();
+
+      if (scenario.eligibility !== null) {
+        expect(
+          EligibilityDataSchema.safeParse(scenario.eligibility.data).success,
+        ).to.equal(true);
+
+        if (scenario.eligibility.result !== null) {
+          expect(
+            cfeResultSchema.safeParse(scenario.eligibility.result).success,
+          ).to.equal(true);
+        }
+      }
+
+      const section = toMeansAssessmentSection(
+        getGetApplicationResponseMock({
+          eligibility: scenario.eligibility,
+          meansAssessmentRequired: scenario.meansAssessmentRequired,
+        }),
+      );
+      if (scenario.meansAssessmentRequired === false) {
+        expect(section).to.equal(null);
+      } else {
+        expect(section).not.to.equal(null);
+      }
+    }
+  });
 
   it("groups relevant cards beneath ordered answer sections", () => {
     const section = toMeansAssessmentSection(application());
