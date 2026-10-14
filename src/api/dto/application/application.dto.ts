@@ -357,53 +357,54 @@ export class ApplicationDto {
     };
 
     const { priorLegalAid } = this.scopingQuestions;
-    switch (priorLegalAid) {
-      case PriorLegalAid.enum.no:
-        return {
-          ...common,
-          scopingQuestions: {
-            ...this.scopingQuestions,
-            priorLegalAid: PriorLegalAid.enum.no,
-          },
-        };
-
-      case PriorLegalAid.enum.yesDifferentMatter:
-        return {
-          ...common,
-          scopingQuestions: {
-            ...this.scopingQuestions,
-            priorLegalAid: PriorLegalAid.enum.yesDifferentMatter,
-          },
-        };
-
-      case PriorLegalAid.enum.yesSameMatter: {
-        const scopingQuestions = {
-          ...this.scopingQuestions,
-          priorLegalAid: PriorLegalAid.enum.yesSameMatter,
-        };
-
-        if (this.legalAidLast6Months === false) {
-          return { ...common, legalAidLast6Months: false, scopingQuestions };
-        }
-
-        const reason = this.reasonForReapplication?.trim();
-        if (
-          this.legalAidLast6Months !== true ||
-          !reason ||
-          !NON_WHITESPACE_REGEX.test(reason)
-        ) {
-          throw new Error(
-            "A non-blank reason is required for recent aid on the same matter",
-          );
-        }
-
-        return {
-          ...common,
-          legalAidLast6Months: true,
-          reasonForReapplication: reason,
-          scopingQuestions,
-        };
-      }
+    if (priorLegalAid === PriorLegalAid.enum.no) {
+      return {
+        ...common,
+        scopingQuestions: { ...this.scopingQuestions, priorLegalAid },
+      };
     }
+
+    if (priorLegalAid === PriorLegalAid.enum.yesDifferentMatter) {
+      return {
+        ...common,
+        scopingQuestions: { ...this.scopingQuestions, priorLegalAid },
+      };
+    }
+
+    const scopingQuestions = {
+      ...this.scopingQuestions,
+      priorLegalAid,
+    };
+
+    if (this.legalAidLast6Months === false) {
+      return { ...common, legalAidLast6Months: false, scopingQuestions };
+    }
+
+    const reason = this.getRequiredReasonForReapplication();
+    return {
+      ...common,
+      legalAidLast6Months: true,
+      reasonForReapplication: reason,
+      scopingQuestions,
+    };
+  }
+
+  /**
+   * Returns a trimmed, non-blank reason for recent aid on the same matter.
+   * @returns The validated reason for reapplication.
+   */
+  private getRequiredReasonForReapplication(): string {
+    const reason = this.reasonForReapplication?.trim();
+    if (
+      this.legalAidLast6Months !== true ||
+      !reason ||
+      !NON_WHITESPACE_REGEX.test(reason)
+    ) {
+      throw new Error(
+        "A non-blank reason is required for recent aid on the same matter",
+      );
+    }
+
+    return reason;
   }
 }

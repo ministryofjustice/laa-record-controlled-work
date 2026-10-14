@@ -8,7 +8,6 @@ import * as zod from "zod";
 
 export const SameMatterMissingRecentAidRule = zod
   .object({
-    legalAidBefore: zod.enum(["yesSameMatter"]).optional(),
     scopingQuestions: zod
       .object({
         priorLegalAid: zod.enum(["yesSameMatter"]).optional(),

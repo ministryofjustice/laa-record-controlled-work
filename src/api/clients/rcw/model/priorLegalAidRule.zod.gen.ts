@@ -8,23 +8,13 @@ import * as zod from "zod";
 
 export const PriorLegalAidRule = zod.union([
   zod.object({
-    legalAidBefore: zod.enum(["no"]).optional(),
     scopingQuestions: zod
       .object({
-        priorLegalAid: zod.enum(["no"]).optional(),
+        priorLegalAid: zod.enum(["no", "yesDifferentMatter"]).optional(),
       })
       .optional(),
   }),
   zod.object({
-    legalAidBefore: zod.enum(["yesDifferentMatter"]).optional(),
-    scopingQuestions: zod
-      .object({
-        priorLegalAid: zod.enum(["yesDifferentMatter"]).optional(),
-      })
-      .optional(),
-  }),
-  zod.object({
-    legalAidBefore: zod.enum(["yesSameMatter"]).optional(),
     scopingQuestions: zod
       .object({
         priorLegalAid: zod.enum(["yesSameMatter"]).optional(),

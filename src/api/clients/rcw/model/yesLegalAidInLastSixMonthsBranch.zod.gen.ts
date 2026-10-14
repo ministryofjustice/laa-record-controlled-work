@@ -13,7 +13,6 @@ export const yesLegalAidInLastSixMonthsBranchTwoReasonForReapplicationRegExp =
 
 export const YesLegalAidInLastSixMonthsBranch = zod
   .object({
-    legalAidBefore: zod.enum(["yesSameMatter"]).optional(),
     scopingQuestions: zod
       .object({
         priorLegalAid: zod.enum(["yesSameMatter"]).optional(),

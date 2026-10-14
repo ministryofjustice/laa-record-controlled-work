@@ -22,7 +22,6 @@ export const RecentLegalAidRule = zod.union([
   }),
   zod
     .object({
-      legalAidBefore: zod.enum(["yesSameMatter"]).optional(),
       scopingQuestions: zod
         .object({
           priorLegalAid: zod.enum(["yesSameMatter"]).optional(),
