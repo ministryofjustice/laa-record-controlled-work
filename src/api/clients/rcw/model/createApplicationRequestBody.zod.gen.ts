@@ -96,6 +96,9 @@ export const CreateApplicationRequestBody = zod
   )
   .and(
     zod.object({
+      legalAidBefore: zod
+        .enum(["no", "yesDifferentMatter", "yesSameMatter"])
+        .optional(),
       legalAidLast6Months: zod.boolean().optional(),
       reasonForReapplication: zod.string().optional(),
       providerOfficeCode: zod.string(),
