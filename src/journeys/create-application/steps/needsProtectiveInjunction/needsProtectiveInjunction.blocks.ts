@@ -25,11 +25,15 @@ const REQUIRED_VALIDATION = t(
  * @returns A GovUK body component with the guidance text and list.
  */
 export function guidance(): GovUKBody {
+  const items = tt("journeys.createApplication.protectThemself.guidanceList")
+    .map((item) => `<li>${item}</li>`)
+    .join("");
+
   return GovUKBody({
-    text: `${GUIDANCE}<br>${textListHtml(
-      "journeys.createApplication.protectThemself.guidanceList",
-      "govuk-list govuk-list--bullet",
-    )}`,
+    text: `
+      ${GUIDANCE}<br>
+      <ul class="govuk-list govuk-list--bullet">${items}</ul>
+    `,
   });
 }
 
