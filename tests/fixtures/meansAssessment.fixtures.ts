@@ -5,6 +5,25 @@ import type { EligibilityDataBenefit } from "#/api/clients/rcw/model/eligibility
 import type { EligibilityDataIncome } from "#/api/clients/rcw/model/eligibilityDataIncome.zod.gen.js";
 import type { EligibilityDataProperty } from "#/api/clients/rcw/model/eligibilityDataProperty.zod.gen.js";
 
+export enum MeansAssessmentScenarioName {
+  AsylumSupport = "asylumSupport",
+  Baseline = "baseline",
+  CalculationStates = "calculationStates",
+  EmployedHousehold = "employedHousehold",
+  FormattingVariants = "formattingVariants",
+  HousingMortgage = "housingMortgage",
+  HousingSharedOwnership = "housingSharedOwnership",
+  MissingEligibility = "missingEligibility",
+  OtherIncomeAndOutgoings = "otherIncomeAndOutgoings",
+  Passporting = "passporting",
+  PropertiesAndAssets = "propertiesAndAssets",
+  StaleInactiveAnswers = "staleInactiveAnswers",
+  UnavailableResult = "unavailableResult",
+  Under18ControlledClr = "under18ControlledClr",
+  Under18NoMeans = "under18NoMeans",
+  UnsupportedMeansAssessment = "unsupportedMeansAssessment",
+}
+
 interface MeansAssessmentScenario {
   eligibility: null | {
     data: EligibilityData;
@@ -120,18 +139,20 @@ function savedProperty(
   percentageOwned: number,
   options: {
     disputed?: boolean;
-    inline_mortgage?: boolean;
+    inlineMortgage?: boolean;
     mortgage?: number;
   } = {},
 ): EligibilityDataProperty {
-  // eslint-disable-next-line @typescript-eslint/naming-convention -- matching CCQ properties
-  const { disputed = {}, inline_mortgage = {}, mortgage = {} } = options;
+  const { disputed, inlineMortgage, mortgage } = options;
+
   return {
     house_value: houseValue,
     percentage_owned: percentageOwned,
-    ...disputed,
-    ...inline_mortgage,
-    ...mortgage,
+    ...(disputed === undefined ? {} : { house_in_dispute: disputed }),
+    ...(inlineMortgage === undefined
+      ? {}
+      : { inline_owned_with_mortgage: inlineMortgage }),
+    ...(typeof mortgage === "number" ? { mortgage } : {}),
   };
 }
 
@@ -158,18 +179,16 @@ function savedResult(): Record<string, unknown> {
 }
 
 export const meansAssessmentScenarios: Record<
-  string,
+  MeansAssessmentScenarioName,
   () => MeansAssessmentScenario
 > = {
-  asylumSupport: () =>
+  [MeansAssessmentScenarioName.AsylumSupport]: () =>
     createMeansAssessment(
       { asylum_support: true, immigration_or_asylum: true },
       exemptResult(),
     ),
-
-  baseline: () => createMeansAssessment(),
-
-  calculationStates: () =>
+  [MeansAssessmentScenarioName.Baseline]: () => createMeansAssessment(),
+  [MeansAssessmentScenarioName.CalculationStates]: () =>
     createMeansAssessment(
       {},
       {
@@ -189,8 +208,7 @@ export const meansAssessmentScenarios: Record<
         },
       },
     ),
-
-  employedHousehold: () =>
+  [MeansAssessmentScenarioName.EmployedHousehold]: () =>
     createMeansAssessment({
       ...partnerAnswers(),
       adult_dependants: true,
@@ -221,12 +239,11 @@ export const meansAssessmentScenarios: Record<
       partner_receives_benefits: true,
       receives_benefits: true,
     }),
-
-  formattingVariants: () =>
+  [MeansAssessmentScenarioName.FormattingVariants]: () =>
     createMeansAssessment({
       additional_properties: [
         savedProperty(123_456.78, 37),
-        savedProperty(9_999.99, 100, { inline_mortgage: false }),
+        savedProperty(9_999.99, 100, { inlineMortgage: false }),
       ],
       additional_property_owned: "outright",
       bank_accounts: [{ amount: 1_234.56 }, { amount: 1_234.56 }],
@@ -262,8 +279,7 @@ export const meansAssessmentScenarios: Record<
       valuables: 500.01,
       valuables_relevant: true,
     }),
-
-  housingMortgage: () =>
+  [MeansAssessmentScenarioName.HousingMortgage]: () =>
     createMeansAssessment({
       house_value: 275_000,
       housing_loan_payments: 950,
@@ -273,7 +289,7 @@ export const meansAssessmentScenarios: Record<
       property_owned: "with_mortgage",
     }),
 
-  housingSharedOwnership: () =>
+  [MeansAssessmentScenarioName.HousingSharedOwnership]: () =>
     createMeansAssessment({
       combined_frequency: "monthly",
       house_value: 190_000,
@@ -288,12 +304,12 @@ export const meansAssessmentScenarios: Record<
       shared_ownership_mortgage: 320,
     }),
 
-  missingEligibility: () => ({
+  [MeansAssessmentScenarioName.MissingEligibility]: () => ({
     eligibility: null,
     meansAssessmentRequired: true,
   }),
 
-  otherIncomeAndOutgoings: () =>
+  [MeansAssessmentScenarioName.OtherIncomeAndOutgoings]: () =>
     createMeansAssessment({
       ...partnerAnswers(),
       child_dependants: true,
@@ -355,17 +371,17 @@ export const meansAssessmentScenarios: Record<
       student_finance_relevant: true,
     }),
 
-  passporting: () =>
+  [MeansAssessmentScenarioName.Passporting]: () =>
     createMeansAssessment({ passporting: true }, exemptResult()),
 
-  propertiesAndAssets: () =>
+  [MeansAssessmentScenarioName.PropertiesAndAssets]: () =>
     createMeansAssessment({
       ...partnerAnswers(),
       additional_properties: [
         savedProperty(125_000, 50, { disputed: true, mortgage: 65_000 }),
         savedProperty(80_000, 25, {
           disputed: false,
-          inline_mortgage: true,
+          inlineMortgage: true,
           mortgage: 25_000,
         }),
       ],
@@ -394,7 +410,7 @@ export const meansAssessmentScenarios: Record<
       valuables_relevant: true,
     }),
 
-  staleInactiveAnswers: () =>
+  [MeansAssessmentScenarioName.StaleInactiveAnswers]: () =>
     createMeansAssessment({
       additional_properties: [savedProperty(90_000, 100)],
       additional_property_owned: "none",
@@ -428,9 +444,10 @@ export const meansAssessmentScenarios: Record<
       valuables_relevant: false,
     }),
 
-  unavailableResult: () => createMeansAssessment({}, null),
+  [MeansAssessmentScenarioName.UnavailableResult]: () =>
+    createMeansAssessment({}, null),
 
-  under18ControlledClr: () =>
+  [MeansAssessmentScenarioName.Under18ControlledClr]: () =>
     createMeansAssessment(
       {
         client_age: "under_18",
@@ -440,7 +457,7 @@ export const meansAssessmentScenarios: Record<
       exemptResult(),
     ),
 
-  under18NoMeans: () =>
+  [MeansAssessmentScenarioName.Under18NoMeans]: () =>
     createMeansAssessment(
       {
         aggregated_means: false,
@@ -451,6 +468,6 @@ export const meansAssessmentScenarios: Record<
       exemptResult(),
     ),
 
-  unsupportedMeansAssessment: () =>
+  [MeansAssessmentScenarioName.UnsupportedMeansAssessment]: () =>
     createMeansAssessment({}, savedResult(), false),
 };

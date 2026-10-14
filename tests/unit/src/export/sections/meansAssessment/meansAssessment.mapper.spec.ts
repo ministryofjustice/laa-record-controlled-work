@@ -1,6 +1,10 @@
 import { expect } from "chai";
 import { before, describe, it } from "mocha";
 
+import {
+  MeansAssessmentScenarioName,
+  meansAssessmentScenarios,
+} from "#tests/fixtures/meansAssessment.fixtures.js";
 import { toMeansAssessmentSection } from "#/export/sections/meansAssessment/meansAssessment.mapper.js";
 import { initializeI18nextSync } from "#/lib/i18n.js";
 import { getGetApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
@@ -38,6 +42,17 @@ function mapSection(
     getGetApplicationResponseMock({
       eligibility: { data, result },
       meansAssessmentRequired,
+    }),
+  );
+}
+
+function mapScenario(name: MeansAssessmentScenarioName) {
+  const scenario = meansAssessmentScenarios[name]();
+
+  return toMeansAssessmentSection(
+    getGetApplicationResponseMock({
+      eligibility: scenario.eligibility,
+      meansAssessmentRequired: scenario.meansAssessmentRequired,
     }),
   );
 }
@@ -149,6 +164,65 @@ describe("toMeansAssessmentSection", () => {
       outcome: "eligible",
       status: "ready",
     });
+  });
+
+  it("presents the three saved totals in export order", () => {
+    expect(
+      mapScenario(MeansAssessmentScenarioName.Baseline)?.outcomeSummary.totals,
+    ).to.deep.equal({
+      heading: "Your client's key eligibility totals",
+      items: [
+        {
+          amount: "£0",
+          detail: "Below upper limit (£2,657)",
+          heading: "Gross monthly income",
+        },
+        {
+          amount: "£0",
+          detail: "Eligible",
+          heading: "Disposable monthly income",
+        },
+        {
+          amount: "£0",
+          detail: "No upper limit applies",
+          heading: "Disposable capital",
+        },
+      ],
+    });
+  });
+
+  it("omits uncalculated totals and keeps saved null totals unavailable", () => {
+    expect(
+      mapScenario(MeansAssessmentScenarioName.CalculationStates)?.outcomeSummary
+        .totals,
+    ).to.deep.equal({
+      heading: "Your client's key eligibility totals",
+      items: [
+        {
+          amount: "Not available",
+          detail: null,
+          heading: "Gross monthly income",
+        },
+        {
+          amount: "£0",
+          detail: "No upper limit applies",
+          heading: "Disposable capital",
+        },
+      ],
+    });
+  });
+
+  it("shows no totals when saved calculations are unavailable or exempt", () => {
+    for (const name of [
+      MeansAssessmentScenarioName.AsylumSupport,
+      MeansAssessmentScenarioName.MissingEligibility,
+      MeansAssessmentScenarioName.Passporting,
+      MeansAssessmentScenarioName.Under18ControlledClr,
+      MeansAssessmentScenarioName.Under18NoMeans,
+      MeansAssessmentScenarioName.UnavailableResult,
+    ]) {
+      expect(mapScenario(name)?.outcomeSummary.totals, name).to.equal(null);
+    }
   });
 
   it("keeps absent calculation categories uncalculated", () => {
