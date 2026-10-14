@@ -104,26 +104,6 @@ export function formatInternationalMaintenanceAgreementLabel(): ResolvableString
 }
 
 /**
- * Formats the private family case scope answer label.
- * @returns The private family case scope answer label.
- */
-export function formatPrivateFamilyCaseScopeLabel(): ResolvableString {
-
-  const domesticAbuse = t("journeys.createApplication.privateFamilyCaseScope.radioButton.domesticAbuse");
-  const childAbuse = t("journeys.createApplication.privateFamilyCaseScope.radioButton.childAbuse");
-  const clientUnder18 = t("journeys.createApplication.privateFamilyCaseScope.radioButton.clientUnder18");
-  const clientHasParentalResponsibility = t("journeys.createApplication.privateFamilyCaseScope.radioButton.clientHasParentalResponsibility");
-  const none = t("journeys.createApplication.privateFamilyCaseScope.radioButton.none");
-
-  return match(Answer(AnswerKey.privateFamilyCaseScope))
-    .branch(Condition.Equals("domesticAbuse"), domesticAbuse)
-    .branch(Condition.Equals("childAbuse"), childAbuse)
-    .branch(Condition.Equals("clientUnder18"), clientUnder18)
-    .branch(Condition.Equals("clientHasParentalResponsibility"), clientHasParentalResponsibility)
-    .otherwise(none);
-}
-
-/**
  * Formats the previous legal aid answer label.
  * @returns The previous legal aid answer label.
  */
@@ -202,6 +182,38 @@ export function formatOsAddress(): ResolvableString {
       {% if country %}{{ country }}<br />{% endif %}
     `,
   });
+}
+
+/**
+ * Formats the private family case scope answer label.
+ * @returns The private family case scope answer label.
+ */
+export function formatPrivateFamilyCaseScopeLabel(): ResolvableString {
+  const domesticAbuse = t(
+    "journeys.createApplication.privateFamilyCaseScope.radioButton.domesticAbuse",
+  );
+  const childAbuse = t(
+    "journeys.createApplication.privateFamilyCaseScope.radioButton.childAbuse",
+  );
+  const clientUnder18 = t(
+    "journeys.createApplication.privateFamilyCaseScope.radioButton.clientUnder18",
+  );
+  const clientHasParentalResponsibility = t(
+    "journeys.createApplication.privateFamilyCaseScope.radioButton.clientHasParentalResponsibility",
+  );
+  const none = t(
+    "journeys.createApplication.privateFamilyCaseScope.radioButton.none",
+  );
+
+  return match(Answer(AnswerKey.privateFamilyCaseScope))
+    .branch(Condition.Equals("domesticAbuse"), domesticAbuse)
+    .branch(Condition.Equals("childAbuse"), childAbuse)
+    .branch(Condition.Equals("clientUnder18"), clientUnder18)
+    .branch(
+      Condition.Equals("clientHasParentalResponsibility"),
+      clientHasParentalResponsibility,
+    )
+    .otherwise(none);
 }
 
 /**

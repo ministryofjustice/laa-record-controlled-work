@@ -12,6 +12,7 @@ import { internationalMaintenanceAgreementStep } from "#/journeys/create-applica
 import { legalAidLast6MonthsStep } from "#/journeys/create-application/steps/legalAidLast6Months/legalAidLast6Months.step.js";
 import { letterFromLocalAuthorityStep } from "#/journeys/create-application/steps/letterFromLocalAuthority/letterFromLocalAuthority.step.js";
 import { needsProtectiveInjunctionStep } from "#/journeys/create-application/steps/needsProtectiveInjunction/needsProtectiveInjunction.step.js";
+import { privateFamilyCaseScopeStep } from "#/journeys/create-application/steps/privateFamilyCaseScope/privateFamilyCaseScope.step.js";
 import { JourneyCode } from "#/journeys/JourneyCode.enum.js";
 import { JourneyPath } from "#/journeys/JourneyPath.enum.js";
 
@@ -36,6 +37,7 @@ export const createApplicationJourney = journey({
     familyLawClassificationStep(JourneyCode.CREATE_APPLICATION),
     internationalMaintenanceAgreementStep(JourneyCode.CREATE_APPLICATION),
     needsProtectiveInjunctionStep(JourneyCode.CREATE_APPLICATION),
+    privateFamilyCaseScopeStep(JourneyCode.CREATE_APPLICATION),
     ecfStep(JourneyCode.CREATE_APPLICATION),
     ineligibleStep(JourneyCode.CREATE_APPLICATION),
     legalAidBeforeStep(JourneyCode.CREATE_APPLICATION),
