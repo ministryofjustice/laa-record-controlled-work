@@ -48,7 +48,13 @@ describe("Edit client details check answers step", () => {
       },
     },
     reasonForReapplication: "Some reason for help",
-    scopingQuestions: { priorLegalAid: "yesSameMatter", familyLawClassification: "private", needsAdviceOnEUOrInternationalMaintenance: false, needsProtectiveInjunction: true },
+    scopingQuestions: {
+      priorLegalAid: "yesSameMatter",
+      familyLawClassification: "private",
+      needsAdviceOnEUOrInternationalMaintenance: false,
+      needsProtectiveInjunction: false,
+      evidenceCaseInScope: "domesticAbuse",
+    },
   });
   const overseasApplication: Application = getGetApplicationResponseMock({
     ...ukApplication,
@@ -147,9 +153,7 @@ describe("Edit client details check answers step", () => {
       expect((result as TestRedirectResult).url).to.equal(
         `/cases/${applicationId}/task-list/details/check-answers`,
       );
-      expect(
-        session.journeyDrafts?.[draftKey]?.niNumber,
-      ).to.equal("JN123456A");
+      expect(session.journeyDrafts?.[draftKey]?.niNumber).to.equal("JN123456A");
     });
 
     it("renders API client data for direct check answers access", async () => {
@@ -167,8 +171,9 @@ describe("Edit client details check answers step", () => {
         value: { text: string };
       }>;
 
-      expect(rows.find((row) => row.key.text === "First name")?.value.text).to
-        .equal("John");
+      expect(
+        rows.find((row) => row.key.text === "First name")?.value.text,
+      ).to.equal("John");
     });
 
     it("redirects to check answers", async () => {
@@ -233,9 +238,9 @@ describe("Edit client details check answers step", () => {
       );
 
       const rows = await getCheckAnswersRows(session);
-      expect(rows.find((row) => row.key.text === "Address")?.value.html).to.equal(
-        "No fixed address",
-      );
+      expect(
+        rows.find((row) => row.key.text === "Address")?.value.html,
+      ).to.equal("No fixed address");
     });
 
     it("redirect to UK address capture when 'has fixed address' is 'yes'", async () => {
@@ -372,7 +377,8 @@ describe("Edit client details check answers step", () => {
       ).to.equal(false);
       expect(
         visibleRows.some(
-          (row) => row.key.text === "Reason for new application for same matter",
+          (row) =>
+            row.key.text === "Reason for new application for same matter",
         ),
       ).to.equal(false);
     });
@@ -419,33 +425,41 @@ describe("Edit client details check answers step", () => {
         value: { text: string };
       }>;
 
-      expect(rows.length).to.equal(13);
+      expect(rows.length).to.equal(14);
       expect(rows[0].key.text).to.equal("ECF");
       expect(rows[1].key.text).to.equal("Type of family law");
       expect(rows[1].value.text).to.equal("Private");
-      expect(rows[2].key.text).to.equal("Transitional EU arrangements or an international maintenance agreement");
+      expect(rows[2].key.text).to.equal(
+        "Transitional EU arrangements or an international maintenance agreement",
+      );
       expect(rows[2].value.text).to.equal("No");
-      expect(rows[3].key.text).to.equal("Legal aid to get a protective injunction order");
-      expect(rows[3].value.text).to.equal("Yes");
-      expect(rows[4].key.text).to.equal("Accessed legal aid before");
-      expect(rows[4].value.text).to.equal("Yes, about the same matter");
-      expect(rows[5].key.text).to.equal(
+      expect(rows[3].key.text).to.equal(
+        "Legal aid to get a protective injunction order",
+      );
+      expect(rows[3].value.text).to.equal("No");
+      expect(rows[4].key.text).to.equal("Evidence case is in scope");
+      expect(rows[4].value.text).to.equal(
+        "Evidence of domestic abuse (Schedule 1)",
+      );
+      expect(rows[5].key.text).to.equal("Accessed legal aid before");
+      expect(rows[5].value.text).to.equal("Yes, about the same matter");
+      expect(rows[6].key.text).to.equal(
         "Did your client get legal help for this matter in the last 6 months?",
       );
-      expect(rows[6].key.text).to.equal(
+      expect(rows[7].key.text).to.equal(
         "Reason for new application for same matter",
       );
-      expect(rows[7].key.text).to.equal("First name");
-      expect(rows[7].value.text).to.equal("John");
-      expect(rows[8].key.text).to.equal("Last name");
-      expect(rows[8].value.text).to.equal("Doe");
-      expect(rows[9].key.text).to.equal("Date of birth");
-      expect(rows[9].value.text).to.equal("1 January 1990");
-      expect(rows[10].key.text).to.equal("National Insurance number");
-      expect(rows[10].value.text).to.equal("AB123456C");
-      expect(rows[11].key.text).to.equal("Has a home address");
-      expect(rows[11].value.text).to.equal("Yes");
-      expect(rows[12].key.text).to.equal("Address");
+      expect(rows[8].key.text).to.equal("First name");
+      expect(rows[8].value.text).to.equal("John");
+      expect(rows[9].key.text).to.equal("Last name");
+      expect(rows[9].value.text).to.equal("Doe");
+      expect(rows[10].key.text).to.equal("Date of birth");
+      expect(rows[10].value.text).to.equal("1 January 1990");
+      expect(rows[11].key.text).to.equal("National Insurance number");
+      expect(rows[11].value.text).to.equal("AB123456C");
+      expect(rows[12].key.text).to.equal("Has a home address");
+      expect(rows[12].value.text).to.equal("Yes");
+      expect(rows[13].key.text).to.equal("Address");
     });
 
     it("links the home address row to the home address question", () => {
@@ -585,9 +599,8 @@ describe("Edit client details check answers step", () => {
       );
       expect(result.type).to.equal("render");
       const renderResult = result as TestRenderResult;
-      const [savedSummaryList] = renderResult.getBlocksByVariant(
-        "govukSummaryList",
-      );
+      const [savedSummaryList] =
+        renderResult.getBlocksByVariant("govukSummaryList");
       const rows = savedSummaryList.properties.rows as Array<{
         actions?: { items: Array<{ href: string }> };
         key: { text: string };
@@ -620,8 +633,9 @@ describe("Edit client details check answers step", () => {
       expect(clientDetailsResult.type).to.equal("render");
 
       const rows = await getCheckAnswersRows(session);
-      expect(rows.find((row) => row.key.text === "First name")?.value.text).to
-        .equal("Edited");
+      expect(
+        rows.find((row) => row.key.text === "First name")?.value.text,
+      ).to.equal("Edited");
     });
   });
 

@@ -43,6 +43,8 @@ test("Edit Application - Client details journey", async ({
       "No",
       // Needs protective injunction
       "No",
+      // Evidence case is in scope
+      "Evidence of domestic abuse (Schedule 1)",
       // Accessed legal aid before
       "No",
       // First name
