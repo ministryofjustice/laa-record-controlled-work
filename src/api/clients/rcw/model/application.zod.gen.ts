@@ -385,9 +385,11 @@ export const Application = zod.object({
       priorLegalAid: zod
         .enum(["no", "yesDifferentMatter", "yesSameMatter"])
         .optional(),
-      familyLawClassification: zod.enum(["public", "private"]).optional(),
-      needsAdviceOnEUOrInternationalMaintenance: zod.boolean().optional(),
-      needsProtectiveInjunction: zod.boolean().optional(),
+      familyLawClassification: zod
+        .union([zod.enum(["public", "private"]), zod.null()])
+        .optional(),
+      needsAdviceOnEUOrInternationalMaintenance: zod.boolean().nullish(),
+      needsProtectiveInjunction: zod.boolean().nullish(),
     }),
     zod.null(),
   ]),
