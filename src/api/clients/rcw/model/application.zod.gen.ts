@@ -384,6 +384,7 @@ export const Application = zod.object({
         .optional(),
       familyLawClassification: zod.enum(["public", "private"]).optional(),
       needsAdviceOnEUOrInternationalMaintenance: zod.boolean().optional(),
+      needsProtectiveInjunction: zod.boolean().optional(),
     }),
     zod.null(),
   ]),

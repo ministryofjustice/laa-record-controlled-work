@@ -36,6 +36,10 @@ export const completeCreateCaseShortestPath = async (
   await page.getByRole("radio", { name: "No" }).check();
   await clickContinue(page);
 
+  await expect(page).toHaveURL("/cases/new/protect-themself");
+  await page.getByRole("radio", { name: "No" }).check();
+  await clickContinue(page);
+
   //TODO: Add steps for family-public-written-notice
 
   await expect(page).toHaveURL("/cases/new/legal-aid-before");

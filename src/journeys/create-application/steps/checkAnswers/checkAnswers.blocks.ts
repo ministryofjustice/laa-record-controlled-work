@@ -22,6 +22,7 @@ import {
   formatInternationalMaintenanceAgreementLabel,
   formatLegalAidBeforeLabel,
   formatLegalAidLast6MonthsLabel,
+  formatNeedsProtectiveInjunctionLabel,
 } from "#/journeys/create-application/steps/checkAnswers/checkAnswers.formatters.js";
 import { fixedT, t } from "#/lib/i18n.js";
 
@@ -72,6 +73,14 @@ export function summaryList(): GovUKSummaryList {
     href: "international-maintenance-agreement?returnTo=check-answers",
     label: answerLabelT("internationalMaintenanceAgreement"),
     value: { text: formatInternationalMaintenanceAgreementLabel() },
+    visibleWhen: Answer(AnswerKey.familyLawClassification).match(
+      Condition.Equals(FamilyLawClassification.enum.private),
+    ),
+  });
+  const needsProtectiveInjunction = summaryRow({
+    href: "protect-themself?returnTo=check-answers",
+    label: answerLabelT("protectThemselves"),
+    value: { text: formatNeedsProtectiveInjunctionLabel() },
     visibleWhen: Answer(AnswerKey.familyLawClassification).match(
       Condition.Equals(FamilyLawClassification.enum.private),
     ),
@@ -141,6 +150,7 @@ export function summaryList(): GovUKSummaryList {
       ecf,
       familyLawClassification,
       needsAdviceOnEUOrInternationalMaintenance,
+      needsProtectiveInjunction,
       legalAidBefore,
       legalAidLast6Months,
       reasonForYes,

@@ -32,7 +32,7 @@ test("Edit Application - Client details journey", async ({
   // Check that all answers are displayed correctly
   const summaryList = page.locator(".govuk-summary-list");
   const rows = summaryList.locator(".govuk-summary-list__row");
-  await expect(rows).toHaveCount(10);
+  await expect(rows).toHaveCount(11);
   await expect(rows.locator(".govuk-summary-list__value")).toContainText(
     [
       // ECF
@@ -40,6 +40,8 @@ test("Edit Application - Client details journey", async ({
       // Type of family law
       "Private",
       // Transitional EU arrangements or an international maintenance agreement
+      "No",
+      // Needs protective injunction
       "No",
       // Accessed legal aid before
       "No",
