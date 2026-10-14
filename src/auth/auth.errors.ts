@@ -1,27 +1,30 @@
 /* eslint-disable jsdoc/require-jsdoc -- not needed */
 import { DomainError } from "#/lib/errors/domainError.js";
 
+/**
+ * Base class for all Authentication errors.
+ */
 export class AuthenticationError extends DomainError {
-  public readonly name = "AuthenticationError";
+  public readonly name: string = "AuthenticationError";
 }
 
-export class MissingAuthCodeRequestError extends DomainError {
-  public readonly name = "MissingAuthCodeRequestError";
+export class BadAuthenticationRequestError extends AuthenticationError {
+  public readonly name = "BadAuthenticationRequestError";
 
   constructor(cause?: unknown) {
-    super("Missing auth code request in session", cause);
+    super("Authentication request was not properly formed", cause);
   }
 }
 
-export class MsalError extends DomainError {
+export class MsalError extends AuthenticationError {
   public readonly name = "MsalError";
 
-  constructor(cause?: unknown) {
-    super("Authentication service error", cause);
+  constructor(message: string, cause?: unknown) {
+    super(`Authentication service error: ${message}`, cause);
   }
 }
 
-export class NotAuthenticatedError extends DomainError {
+export class NotAuthenticatedError extends AuthenticationError {
   public readonly name = "NotAuthenticatedError";
 
   constructor(cause?: unknown) {
@@ -29,7 +32,7 @@ export class NotAuthenticatedError extends DomainError {
   }
 }
 
-export class PkceGenerationError extends DomainError {
+export class PkceGenerationError extends AuthenticationError {
   public readonly name = "PkceGenerationError";
 
   constructor(cause?: unknown) {
@@ -37,15 +40,7 @@ export class PkceGenerationError extends DomainError {
   }
 }
 
-export class StateMismatchError extends DomainError {
-  public readonly name = "StateMismatchError";
-
-  constructor(cause?: unknown) {
-    super("State mismatch: possible CSRF attack", cause);
-  }
-}
-
-export class TokenAcquisitionError extends DomainError {
+export class TokenAcquisitionError extends AuthenticationError {
   public readonly name = "TokenAcquisitionError";
 
   constructor(cause?: unknown) {
@@ -53,7 +48,7 @@ export class TokenAcquisitionError extends DomainError {
   }
 }
 
-export class TokenRefreshError extends DomainError {
+export class TokenRefreshError extends AuthenticationError {
   public readonly name = "TokenRefreshError";
 
   constructor(cause?: unknown) {
