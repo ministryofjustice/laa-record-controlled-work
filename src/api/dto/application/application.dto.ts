@@ -1,7 +1,11 @@
 import type { Application as ApplicationSchema } from "#/api/clients/rcw/model/application.zod.gen.js";
 import type { ApplicationScopingQuestions } from "#/api/clients/rcw/model/applicationScopingQuestions.zod.gen.js";
 import type { CreateApplicationRequestBody } from "#/api/clients/rcw/model/createApplicationRequestBody.zod.gen.js";
+import type { CreateClientDetailsRequestBody } from "#/api/clients/rcw/model/createClientDetailsRequestBody.zod.gen.js";
 import type { CreateScopingQuestions as ScopingQuestions } from "#/api/clients/rcw/model/createScopingQuestions.zod.gen.js";
+import type { NoOrDifferentMatterBranch } from "#/api/clients/rcw/model/noOrDifferentMatterBranch.zod.gen.js";
+import type { RecentLegalAidRule } from "#/api/clients/rcw/model/recentLegalAidRule.zod.gen.js";
+import type { YesSameMatterBranch } from "#/api/clients/rcw/model/yesSameMatterBranch.zod.gen.js";
 import type { AnswersOutput } from "#/journeys/create-application/data/answers.zod.js";
 
 import { PriorLegalAid } from "#/api/clients/rcw/model/priorLegalAid.zod.gen.js";
@@ -330,7 +334,7 @@ export class ApplicationDto {
    * @returns CreateApplicationRequestBody.
    */
   public toRcwApi(): CreateApplicationRequestBody {
-    const clientDetails: CreateApplicationRequestBody["clientDetails"] = {
+    const clientDetails: CreateClientDetailsRequestBody = {
       dateOfBirth: this.dateOfBirth,
       firstName: this.firstName,
       hasFixedAddress: this.hasFixedAddress,
@@ -357,35 +361,44 @@ export class ApplicationDto {
     };
 
     const { priorLegalAid } = this.scopingQuestions;
-    if (priorLegalAid === PriorLegalAid.enum.no) {
-      return {
-        ...common,
-        scopingQuestions: { ...this.scopingQuestions, priorLegalAid },
-      };
+    if (
+      priorLegalAid === PriorLegalAid.enum.no ||
+      priorLegalAid === PriorLegalAid.enum.yesDifferentMatter
+    ) {
+      const noOrDifferentMatter = {
+        scopingQuestions: {
+          ...this.scopingQuestions,
+          priorLegalAid,
+        },
+      } satisfies NoOrDifferentMatterBranch;
+
+      return { ...common, ...noOrDifferentMatter };
     }
 
-    if (priorLegalAid === PriorLegalAid.enum.yesDifferentMatter) {
-      return {
-        ...common,
-        scopingQuestions: { ...this.scopingQuestions, priorLegalAid },
-      };
-    }
-
-    const scopingQuestions = {
-      ...this.scopingQuestions,
-      priorLegalAid,
-    };
+    const yesSameMatter = {
+      scopingQuestions: {
+        ...this.scopingQuestions,
+        priorLegalAid,
+      },
+    } satisfies YesSameMatterBranch;
 
     if (this.legalAidLast6Months === false) {
-      return { ...common, legalAidLast6Months: false, scopingQuestions };
+      const recentLegalAid = {
+        legalAidLast6Months: false,
+      } satisfies RecentLegalAidRule;
+
+      return { ...common, ...yesSameMatter, ...recentLegalAid };
     }
 
-    const reason = this.getRequiredReasonForReapplication();
+    const recentLegalAid = {
+      legalAidLast6Months: true,
+      reasonForReapplication: this.getRequiredReasonForReapplication(),
+    } satisfies RecentLegalAidRule;
+
     return {
       ...common,
-      legalAidLast6Months: true,
-      reasonForReapplication: reason,
-      scopingQuestions,
+      ...yesSameMatter,
+      ...recentLegalAid,
     };
   }
 

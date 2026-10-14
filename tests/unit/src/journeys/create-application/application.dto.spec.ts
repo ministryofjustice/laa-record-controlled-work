@@ -60,6 +60,24 @@ describe("fromAnswers method", () => {
     expect(result).to.deep.equal(expected);
   });
 
+  it("maps no and different-matter legal aid without recent aid details", () => {
+    for (const priorLegalAid of ["no", "yesDifferentMatter"] as const) {
+      const result = ApplicationDto.fromAnswers(
+        {
+          ...answers,
+          legalAidBefore: priorLegalAid,
+          legalAidLast6Months: undefined,
+          reasonForYes: undefined,
+        },
+        "test-office",
+      ).toRcwApi();
+
+      expect(result.scopingQuestions.priorLegalAid).to.equal(priorLegalAid);
+      expect(result).to.not.have.property("legalAidLast6Months");
+      expect(result).to.not.have.property("reasonForReapplication");
+    }
+  });
+
   it("omits client address when client has no fixed address", () => {
     const providerOfficeCode = "22439e72-68d3-4770-b435-c352d883d21e";
     const result = ApplicationDto.fromAnswers(
