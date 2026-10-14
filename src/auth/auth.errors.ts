@@ -25,7 +25,8 @@ export class BadAuthenticationRequestError extends AuthenticationError {
 export class MsalError extends AuthenticationError {
   public readonly name = "MsalError";
 
-  constructor(message: string, cause?: unknown) {
+  constructor(cause?: unknown) {
+    const message = cause instanceof Error ? cause.message : "Unknown error";
     super(`Authentication service error: ${message}`, cause);
   }
 }
