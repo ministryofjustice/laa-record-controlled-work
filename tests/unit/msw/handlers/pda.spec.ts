@@ -21,4 +21,23 @@ describe("PDA handlers", () => {
     expect(response.status).to.equal(200);
     expect(body.office.firmOfficeCode).to.equal("AB12CD");
   });
+
+  it("returns no content for the configured failed office code", async () => {
+    const originalFailedOfficeCode = process.env.PDA_MSW_FAIL_OFFICE_CODE;
+    process.env.PDA_MSW_FAIL_OFFICE_CODE = "E2EFAIL";
+
+    try {
+      const response = await fetch(
+        `${config.api.pda.baseUrl}/provider-offices/E2EFAIL`,
+      );
+
+      expect(response.status).to.equal(204);
+    } finally {
+      if (originalFailedOfficeCode === undefined) {
+        delete process.env.PDA_MSW_FAIL_OFFICE_CODE;
+      } else {
+        process.env.PDA_MSW_FAIL_OFFICE_CODE = originalFailedOfficeCode;
+      }
+    }
+  });
 });
