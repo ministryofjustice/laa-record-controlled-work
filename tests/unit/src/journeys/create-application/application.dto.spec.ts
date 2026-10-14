@@ -115,6 +115,23 @@ describe("fromAnswers method", () => {
     });
   });
 
+  it("preserves a negative maintenance advice answer for private family law", () => {
+    const result = ApplicationDto.fromAnswers(
+      {
+        ...answers,
+        familyLawClassification: "private",
+        needsAdviceOnEUOrInternationalMaintenance: "no",
+      },
+      "test-office",
+    ).toRcwApi();
+
+    expect(result.scopingQuestions).to.deep.equal({
+      priorLegalAid: "yesSameMatter",
+      familyLawClassification: "private",
+      needsAdviceOnEUOrInternationalMaintenance: false,
+    });
+  });
+
   it("correctly maps scoping questions for public family law classification", () => {
     const providerOfficeCode = "22439e72-68d3-4770-b435-c352d883d21e";
     const result = ApplicationDto.fromAnswers(
