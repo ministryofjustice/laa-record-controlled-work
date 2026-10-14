@@ -11,48 +11,18 @@ import {
 
 import { AnswerKey } from "#/journeys/AnswerKey.enum.js";
 import { H1 } from "#/lib/constants/headings.js";
-import { i18next, t } from "#/lib/i18n.js";
+import { t, tt } from "#/lib/i18n.js";
 
-const TITLE = t(
-  "journeys.createApplication.internationalMaintenanceAgreement.title",
-);
-const GUIDANCE = t(
-  "journeys.createApplication.internationalMaintenanceAgreement.guidance",
-);
+const TITLE = t("journeys.createApplication.internationalMaintenanceAgreement.title");
+const GUIDANCE = t("journeys.createApplication.internationalMaintenanceAgreement.guidance");
 const REQUIRED_VALIDATION = t(
   "journeys.createApplication.internationalMaintenanceAgreement.validation.required",
 );
 
 /**
- * Creates the guidance text for the International Maintenance Agreement question step.
+ * Creates the International Maintenance Agreement question and its yes/no options.
  *
- * @returns A GovUK body component with the guidance text and list.
- */
-export function guidance(): GovUKBody {
-  return GovUKBody({
-    text: `${GUIDANCE}<br>${textListHtml(
-      "journeys.createApplication.internationalMaintenanceAgreement.guidanceList",
-      "govuk-list govuk-list--bullet",
-    )}`,
-  });
-}
-
-/**
- * Creates the heading for the International Maintenance Agreement question step.
- *
- * @returns A GovUK heading component with the step title.
- */
-export function heading(): GovUKHeading {
-  return GovUKHeading({
-    level: H1,
-    text: TITLE,
-  });
-}
-
-/**
- * Creates the Family Private Non-Means question and its yes/no options.
- *
- * @returns A GovUK radio input for the Family Private Non-Means question.
+ * @returns A GovUK radio input for the International Maintenance Agreement question.
  */
 export function internationalMaintenanceAgreementQuestion(): GovUKRadioInput {
   return GovUKRadioInput({
@@ -77,22 +47,31 @@ export function internationalMaintenanceAgreementQuestion(): GovUKRadioInput {
 }
 
 /**
- * Generates an HTML unordered list from a translation key that returns an array of strings.
- * @param key - The key in the translation file
- * @param classes - The classes to apply to the unordered list
- * @returns An HTML string representing the unordered list
+ * Creates the guidance text for the International Maintenance Agreement question step.
+ *
+ * @returns A GovUK body component with the guidance text and list.
  */
-function textListHtml(key: string, classes: string): string {
-  const items = i18next.t(key, { returnObjects: true });
-
-  if (!Array.isArray(items)) {
-    return "";
-  }
-
-  const listItems = items
-    .filter((item): item is string => typeof item === "string")
+export function guidance(): GovUKBody {
+  const items = tt("journeys.createApplication.internationalMaintenanceAgreement.guidanceList")
     .map((item) => `<li>${item}</li>`)
     .join("");
 
-  return `<ul class="${classes}">${listItems}</ul>`;
+  return GovUKBody({
+    text: `
+      ${GUIDANCE}<br>
+      <ul class="govuk-list govuk-list--bullet">${items}</ul>
+    `,
+  });
+}
+
+/**
+ * Creates the heading for the International Maintenance Agreement question step.
+ *
+ * @returns A GovUK heading component with the step title.
+ */
+export function heading(): GovUKHeading {
+  return GovUKHeading({
+    level: H1,
+    text: TITLE,
+  });
 }
