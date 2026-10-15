@@ -342,6 +342,19 @@
           "required": "Select whether your client needs legal aid to get a protective injunction order for themselves or their children."
         }
       },
+      "familyPrivateNotInScope": {
+        "title": "This case is not in scope for legal aid ",
+        "guidance": [
+          "Based on your answers, this case is not in scope for legal aid.",
+          "The case must meet the <a href=\"https://assets.publishing.service.gov.uk/media/6a3122bae50716856ed4b160/Evidence_requirements_for_private_family_law_matters_guidance_version_15_15_June_2026.pdf\" target=\"_blank\">evidence requirements (opens in new window or tab)</a> set out in Schedule 1, regulation 33 and Schedule 2, regulation 34 of the Civil Legal Aid (Procedures) Regulations and guidance for this type of case to be in scope."
+        ],
+        "exceptionalCaseFunding": {
+          "title": "Exceptional case funding (ECF)",
+          "guidance": "Your client could still get legal aid for a case that would not usually be eligible if their human rights are at risk.",
+          "link": "<a href=\"https://www.gov.uk/legal-aid/funding-for-exceptional-cases\" target=\"_blank\">Find out more about exceptional case funding (opens in a new window or tab)</a>"
+        },
+        "button": "Finish and return to case list"
+      },
       "legalAidBefore": {
         "title": "Has your client accessed legal aid before?",
         "radioButton": {
