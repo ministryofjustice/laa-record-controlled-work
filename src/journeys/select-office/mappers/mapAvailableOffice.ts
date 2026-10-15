@@ -1,10 +1,7 @@
 import type { ProviderFirmOfficeDto } from "#/api/clients/pda/model/providerFirmOfficeDto.zod.gen.js";
 import type { Office } from "#/journeys/select-office/select-office.types.js";
 
-import {
-  InvalidOfficeError,
-  MissingFirmNameError,
-} from "#/journeys/journey.errors.js";
+import { InvalidOfficeError } from "#/journeys/journey.errors.js";
 import { logger } from "#/logger.js";
 
 const EMPTY = 0;
@@ -19,10 +16,6 @@ export function mapAvailableOffice(
 ): Office {
   const { firm, office } = officeDetails;
   const firmName = firm?.firmName;
-  if (!firmName) {
-    logger.error("Provider office details are missing the firm name");
-    throw new MissingFirmNameError();
-  }
 
   const addressParts = getAddressParts(office);
 
@@ -36,7 +29,7 @@ export function mapAvailableOffice(
   return {
     address: addressParts.join(", "),
     code: office.firmOfficeCode,
-    firmName,
+    ...(firmName && { firmName }),
   };
 }
 
