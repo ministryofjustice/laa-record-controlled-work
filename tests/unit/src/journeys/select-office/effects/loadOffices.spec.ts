@@ -84,6 +84,32 @@ describe("loadOffices", () => {
     ).to.equal(true);
   });
 
+  it("keeps the address when optional PDA fields are null", async () => {
+    getSession.returns({
+      account: { idTokenClaims: { LAA_ACCOUNTS: "AB12CD" } },
+    });
+    getFirmOffice.resolves({
+      data: officeResponse("AB12CD", {
+        addressLine2: null,
+        addressLine3: null,
+        addressLine4: null,
+      }),
+      status: 200,
+    });
+
+    await loadOffices(deps)(context);
+
+    expect(
+      setData.calledOnceWithExactly(CONTEXT_DATA_KEYS.availableOffices, [
+        {
+          address: "1 High Street, Leeds, LS1 1AA",
+          code: "AB12CD",
+          firmName: "Acme Legal LLP",
+        },
+      ]),
+    ).to.equal(true);
+  });
+
   it("requests distinct offices once in claim order despite a mismatched FIRM_CODE", async () => {
     getSession.returns({
       account: {

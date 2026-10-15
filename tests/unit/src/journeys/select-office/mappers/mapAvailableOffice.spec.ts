@@ -3,7 +3,6 @@ import sinon from "sinon";
 
 import {
   InvalidOfficeError,
-  MissingFirmNameError,
 } from "#/journeys/journey.errors.js";
 import { mapAvailableOffice } from "#/journeys/select-office/mappers/mapAvailableOffice.js";
 import { logger } from "#/logger.js";
@@ -30,12 +29,13 @@ describe("mapAvailableOffice", () => {
     });
   });
 
-  it("throws MissingFirmNameError when the firm name is missing", () => {
-    sinon.stub(logger, "error");
-
-    expect(() =>
-      mapAvailableOffice({ ...officeResponse(), firm: {} }),
-    ).to.throw(MissingFirmNameError);
+  it("preserves address and code when the firm name is missing", () => {
+    expect(mapAvailableOffice({ ...officeResponse(), firm: {} })).to.deep.equal(
+      {
+        address: "1 High Street, Leeds, LS1 1AA",
+        code: "AB12CD",
+      },
+    );
   });
 
   it("throws InvalidOfficeError when the office code is missing", () => {
