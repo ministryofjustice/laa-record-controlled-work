@@ -22,7 +22,7 @@ rcw:
     NODE_ENV: production
     ENTRA_REDIRECT_URI: https://record-controlled-work.service.justice.gov.uk/auth/code/callback
     ENTRA_ADDITIONAL_SCOPES: api://rcw-api/Applications.Read
-    RCW_API_BASE_URL: http://laa-record-controlled-work-api-production.laa-record-controlled-work-api.svc:8081
+    RCW_API_BASE_URL: http://laa-record-controlled-work-api.laa-record-controlled-work-api-production.svc:8081
     PDA_API_BASE_URL: https://laa-provider-details-api-prod.apps.live.cloud-platform.service.justice.gov.uk
     SENTRY_ENV: "production"
 
