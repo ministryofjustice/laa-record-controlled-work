@@ -89,6 +89,46 @@ const meansAssessment = {
       heading: "Client details",
     },
   ],
+  calculations: { status: "ready" },
+  incomeBreakdown: {
+    heading: "Income calculation",
+    status: "ready",
+    tables: [
+      {
+        heading: "Client's monthly income",
+        hint: "All figures have been converted into a monthly amount.",
+        rows: [
+          {
+            amount: "£500.00",
+            heading: "Employment income",
+            hint: null,
+          },
+          {
+            amount: "£0.00",
+            heading: "Benefits received",
+            hint: "This does not include Housing Benefit",
+          },
+        ],
+      },
+      {
+        heading: "Total",
+        hint: null,
+        rows: [
+          {
+            amount: "£500.00",
+            emphasis: true,
+            heading: "Total monthly income",
+            hint: null,
+          },
+          {
+            amount: "£2,000.00",
+            heading: "Monthly income upper limit",
+            hint: null,
+          },
+        ],
+      },
+    ],
+  },
   outcomeSummary: {
     heading: "Means assessment",
     outcome: {
@@ -233,6 +273,29 @@ describe("export application view", () => {
     );
     expect(response.text.indexOf("Your answers")).to.be.lessThan(
       response.text.indexOf("Client details"),
+    );
+  });
+
+  it("renders income tables before saved answers with semantic row headers", async () => {
+    const response = await request(createViewApp()).get("/export");
+
+    expect(response.status).to.equal(200);
+    expect(response.text).to.include("Income calculation");
+    expect(response.text).to.include(
+      "All figures have been converted into a monthly amount.",
+    );
+    expect(response.text).to.include("This does not include Housing Benefit");
+    expect(response.text).to.match(
+      /<th scope="row" class="govuk-table__header app-calculation__row-heading">\s*Employment income/,
+    );
+    expect(response.text).to.include(
+      '<td class="govuk-table__cell app-calculation__amount">£500.00</td>',
+    );
+    expect(
+      response.text.indexOf("Your client's key eligibility totals"),
+    ).to.be.lessThan(response.text.indexOf("Income calculation"));
+    expect(response.text.indexOf("Income calculation")).to.be.lessThan(
+      response.text.indexOf("Your answers"),
     );
   });
 });

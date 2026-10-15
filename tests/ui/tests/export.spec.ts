@@ -1,6 +1,6 @@
 import type { Page } from "@playwright/test";
 
-import { MeansAssessmentScenarioName } from "#tests/fixtures/meansAssessment.fixtures.js";
+import { MeansAssessmentScenarioName } from "#tests/fixtures/meansAssessment/meansAssessment.fixtures.js";
 
 import { expect, test } from "../fixtures/index.js";
 import {
@@ -556,4 +556,158 @@ test("export page loads assets without CSP violations", async ({
         (window as Window & { cspViolations?: string[] }).cspViolations ?? [],
     ),
   ).toEqual([]);
+});
+
+test("renders saved income details across screen and print layouts", async ({
+  withSelectedOffice: page,
+}, testInfo) => {
+  const application = meansAssessmentApplications[
+    MeansAssessmentScenarioName.IncomeBreakdownReady
+  ];
+  const response = await page.goto(`/cases/${application.id}/export`);
+
+  expect(response?.ok()).toBe(true);
+  await page.setViewportSize({ height: 900, width: 1280 });
+
+  const meansAssessment = page.locator(".app-means-assessment");
+  const incomeHeading = meansAssessment.getByRole("heading", {
+    level: 3,
+    name: "Income calculation",
+  });
+  const tables = meansAssessment.locator(
+    "table.app-means-assessment__calculation-table",
+  );
+  await expect(incomeHeading).toBeVisible();
+  await expect(tables).toHaveCount(2);
+
+  const incomeRows = await tables.first().locator("tbody tr").allTextContents();
+  expect(incomeRows.map((row) => row.replace(/\s+/g, " ").trim())).toEqual([
+    "Employment income £1,000.50",
+    "Benefits received This does not include Housing Benefit £0.00",
+    "Financial help from friends and family £1.23",
+    "Maintenance payments from a former partner Not applicable",
+    "Income from a property or lodger £55.55",
+    "Pensions £0.00",
+    "Student finance £0.01",
+    "Other sources Not applicable",
+  ]);
+  await expect(tables.nth(1)).toContainText("Total monthly income");
+  await expect(tables.nth(1)).toContainText("£102.03");
+  await expect(tables.nth(1)).toContainText("£2,000.00");
+  await expect(
+    meansAssessment.locator(".app-means-assessment__total").first(),
+  ).toContainText("Below upper limit (£2,500)");
+
+  const headings = (await meansAssessment.locator("h3").allTextContents()).map(
+    (heading) => heading.replace(/\s+/g, " ").trim(),
+  );
+  expect(headings.indexOf("Your client's key eligibility totals")).toBeLessThan(
+    headings.indexOf("Income calculation"),
+  );
+  expect(headings.indexOf("Income calculation")).toBeLessThan(
+    headings.indexOf("Your answers"),
+  );
+
+  const desktopTable = await tables.first().boundingBox();
+  expect(desktopTable?.width).toBeLessThan(1280);
+  await page.screenshot({
+    fullPage: true,
+    path: testInfo.outputPath("income-desktop.png"),
+  });
+
+  await page.emulateMedia({ media: "print" });
+  await expect(tables.first()).toBeVisible();
+  await page.screenshot({
+    fullPage: true,
+    path: testInfo.outputPath("income-print.png"),
+  });
+
+  await page.emulateMedia({ media: null });
+  await page.setViewportSize({ height: 844, width: 390 });
+  await expect(tables.first()).toBeVisible();
+  const mobileWidths = await page.evaluate(() => ({
+    client: document.documentElement.clientWidth,
+    scroll: document.documentElement.scrollWidth,
+  }));
+  expect(mobileWidths.scroll).toBeLessThanOrEqual(mobileWidths.client);
+  await page.screenshot({
+    fullPage: true,
+    path: testInfo.outputPath("income-mobile.png"),
+  });
+});
+
+test("renders partner income from saved-result partner data", async ({
+  withSelectedOffice: page,
+}) => {
+  const application =
+    meansAssessmentApplications[
+      MeansAssessmentScenarioName.IncomeBreakdownPartner
+    ];
+  const response = await page.goto(`/cases/${application.id}/export`);
+  const tables = page.locator(".app-means-assessment__calculation-table");
+
+  expect(response?.ok()).toBe(true);
+  await expect(tables).toHaveCount(3);
+  await expect(tables.nth(0)).toContainText("£1,000.50");
+  await expect(tables.nth(1)).toContainText("Partner's monthly income");
+  await expect(tables.nth(1)).toContainText("£350.25");
+  await expect(tables.nth(2)).toContainText(
+    "Total client and partner monthly income",
+  );
+});
+
+test("preserves key totals when income details are incompatible", async ({
+  withSelectedOffice: page,
+}) => {
+  const application =
+    meansAssessmentApplications[
+      MeansAssessmentScenarioName.IncomeBreakdownUnavailable
+    ];
+  const response = await page.goto(`/cases/${application.id}/export`);
+  const meansAssessment = page.locator(".app-means-assessment");
+
+  expect(response?.ok()).toBe(true);
+  await expect(
+    meansAssessment.getByRole("heading", {
+      level: 3,
+      name: "Income calculation",
+    }),
+  ).toBeVisible();
+  await expect(meansAssessment).toContainText(
+    "Income calculation details are unavailable.",
+  );
+  await expect(
+    meansAssessment.locator(".app-means-assessment__total").first(),
+  ).toContainText("£102.03");
+  await expect(
+    meansAssessment.locator("table.app-means-assessment__calculation-table"),
+  ).toHaveCount(0);
+  await expect(
+    meansAssessment.getByRole("heading", { level: 3, name: "Your answers" }),
+  ).toBeVisible();
+});
+
+test("omits income calculation details when income was not calculated", async ({
+  withSelectedOffice: page,
+}) => {
+  const application =
+    meansAssessmentApplications[
+      MeansAssessmentScenarioName.IncomeBreakdownNotCalculated
+    ];
+  const response = await page.goto(`/cases/${application.id}/export`);
+  const meansAssessment = page.locator(".app-means-assessment");
+
+  expect(response?.ok()).toBe(true);
+  await expect(
+    meansAssessment.getByRole("heading", {
+      level: 3,
+      name: "Income calculation",
+    }),
+  ).toHaveCount(0);
+  await expect(
+    meansAssessment.locator("table.app-means-assessment__calculation-table"),
+  ).toHaveCount(0);
+  await expect(
+    meansAssessment.getByRole("heading", { level: 3, name: "Your answers" }),
+  ).toBeVisible();
 });

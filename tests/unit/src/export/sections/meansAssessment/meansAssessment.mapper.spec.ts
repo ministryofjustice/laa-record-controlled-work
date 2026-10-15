@@ -4,7 +4,7 @@ import { before, describe, it } from "mocha";
 import {
   MeansAssessmentScenarioName,
   meansAssessmentScenarios,
-} from "#tests/fixtures/meansAssessment.fixtures.js";
+} from "#tests/fixtures/meansAssessment/meansAssessment.fixtures.js";
 import { toMeansAssessmentSection } from "#/export/sections/meansAssessment/meansAssessment.mapper.js";
 import { initializeI18nextSync } from "#/lib/i18n.js";
 import { getGetApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
