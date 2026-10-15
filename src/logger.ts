@@ -14,12 +14,17 @@ export interface LogFields extends Record<string, unknown> {}
 
 const SENSITIVE_FIELD_NAMES = new Set([
   "accessToken",
+  "address",
   "apiKey",
   "authorization",
   "cookie",
+  "dateOfBirth",
+  "firstName",
   "headers.authorization",
   "headers.cookie",
   "idToken",
+  "lastName",
+  "niNumber",
   "password",
   "refreshToken",
   "req.headers.authorization",
