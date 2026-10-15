@@ -13,6 +13,12 @@ export const CreateScopingQuestions = zod.object({
     .optional(),
   needsAdviceOnEUOrInternationalMaintenance: zod.boolean().nullish(),
   needsProtectiveInjunction: zod.boolean().nullish(),
+  privateFamilyCaseScope: zod
+    .union([
+      zod.enum(["domesticAbuse", "childAbuse", "under18", "parentOrGuardian"]),
+      zod.null(),
+    ])
+    .optional(),
 });
 
 export type CreateScopingQuestions = zod.input<typeof CreateScopingQuestions>;

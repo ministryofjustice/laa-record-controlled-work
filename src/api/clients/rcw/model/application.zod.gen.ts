@@ -390,6 +390,17 @@ export const Application = zod.object({
         .optional(),
       needsAdviceOnEUOrInternationalMaintenance: zod.boolean().nullish(),
       needsProtectiveInjunction: zod.boolean().nullish(),
+      privateFamilyCaseScope: zod
+        .union([
+          zod.enum([
+            "domesticAbuse",
+            "childAbuse",
+            "under18",
+            "parentOrGuardian",
+          ]),
+          zod.null(),
+        ])
+        .optional(),
     }),
     zod.null(),
   ]),
