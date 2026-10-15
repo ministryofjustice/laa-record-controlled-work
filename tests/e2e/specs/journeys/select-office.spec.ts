@@ -17,6 +17,7 @@ const SELECT_OFFICE_URL_PATTERN = new RegExp("/select-office/?$");
 const LANDING_URL_PATTERN = new RegExp("/$");
 const OFFICE_ONE_CODE = "R1XEVG";
 const OFFICE_TWO_CODE = "VGHVEY";
+const OFFICE_WITH_FAILED_LOOKUP = "E2EFAIL";
 
 const gotoInProgressCases = async (page: Page): Promise<void> => {
   await page.goto("/cases");
@@ -68,6 +69,26 @@ test.describe("@e2e multi office user", () => {
     async () => {
       await signInWithMultiOffice(page, [OFFICE_ONE_CODE, OFFICE_TWO_CODE]);
       await expect(page).toHaveURL(SELECT_OFFICE_URL_PATTERN);
+    },
+  );
+
+  test(
+    "keeps an office selectable when its lookup returns no content",
+    async () => {
+      await signInWithMultiOffice(page, [
+        OFFICE_WITH_FAILED_LOOKUP,
+        OFFICE_ONE_CODE,
+      ]);
+
+      const failedOfficeOption = page.locator(".govuk-radios__item", {
+        hasText: OFFICE_WITH_FAILED_LOOKUP,
+      });
+      await expect(failedOfficeOption).toHaveText(OFFICE_WITH_FAILED_LOOKUP);
+
+      await selectOfficeByCode(page, OFFICE_WITH_FAILED_LOOKUP);
+      await expect(
+        page.locator("p", { hasText: "Office:" }),
+      ).toContainText(`Office: ${OFFICE_WITH_FAILED_LOOKUP}`);
     },
   );
 

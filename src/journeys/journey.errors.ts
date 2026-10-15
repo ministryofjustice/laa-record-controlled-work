@@ -9,14 +9,6 @@ export class InvalidEvidenceError extends DomainError {
   }
 }
 
-export class InvalidFirmCodeClaimError extends DomainError {
-  public readonly name = "InvalidFirmCodeClaimError";
-
-  constructor(cause?: unknown) {
-    super("Missing or invalid FIRM_CODE claim", cause);
-  }
-}
-
 export class InvalidOfficeError extends DomainError {
   public readonly name = "InvalidOfficeError";
 

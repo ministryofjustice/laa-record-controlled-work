@@ -17,7 +17,6 @@ const optionalEnvSchema = z.object({
     .optional(),
   PDA_API_BASE_URL: z.url().optional(),
   PDA_API_MODE: z.enum(["msw", "api"]).optional(),
-  PDA_MSW_OFFICE_COUNT: z.coerce.number().optional(),
   PORT: z.coerce.number().optional(),
   RATE_LIMIT_ENABLED: z
     .string()

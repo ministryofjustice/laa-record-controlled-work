@@ -8,12 +8,12 @@ import type { Office, SelectOfficeContext } from "#/journeys/select-office/selec
 
 const mockOffice: Office = {
   address: "1 High Street, Leeds, LS1 1AA",
-  code: "LEEDS-01",
+  code: "AB12CD",
 };
 
 const mockOffices: Office[] = [
   mockOffice,
-  { address: "2 King Street, Manchester, M1 1BB", code: "MCR-01" },
+  { address: "2 King Street, Manchester, M1 1BB", code: "EF34GH" },
 ];
 
 describe("autoSelectSingleOffice", () => {
@@ -48,6 +48,21 @@ describe("autoSelectSingleOffice", () => {
       expect(session.selectedOffice).to.deep.equal(mockOffice);
       expect(
         setData.calledOnceWithExactly(CONTEXT_DATA_KEYS.selectedOffice, mockOffice),
+      ).to.equal(true);
+    });
+
+    it("stores a single code-only office unchanged", () => {
+      const office: Office = { code: "ZX98QW" };
+      getData.withArgs(CONTEXT_DATA_KEYS.availableOffices).returns([office]);
+
+      autoSelectSingleOffice()(context);
+
+      expect(session.selectedOffice).to.deep.equal(office);
+      expect(
+        setData.calledOnceWithExactly(
+          CONTEXT_DATA_KEYS.selectedOffice,
+          office,
+        ),
       ).to.equal(true);
     });
 

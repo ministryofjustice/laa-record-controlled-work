@@ -1,34 +1,20 @@
 import { expect } from "chai";
 
-import { getProviderOfficesResponse } from "#msw/fixtures/pda.js";
+import { ProviderFirmOfficeDto } from "#/api/clients/pda/model/providerFirmOfficeDto.zod.gen.js";
+import { getProviderOfficeResponse } from "#msw/fixtures/pda.js";
 
 describe("PDA fixtures", () => {
-  it("returns offices with the configured codes", () => {
-    const response = getProviderOfficesResponse(2, ["0R128U", "0R695K"]);
+  it("returns detailed data correlated to the requested office code", () => {
+    const response = getProviderOfficeResponse("AB12CD");
 
-    expect(
-      response.offices?.map(({ firmOfficeCode }) => firmOfficeCode),
-    ).to.eql(["0R128U", "0R695K"]);
-  });
-
-  it("returns one office for every configured code", () => {
-    const officeCodes = Array.from(
-      { length: 11 },
-      (_, index) => `OFFICE${index}`,
-    );
-
-    const response = getProviderOfficesResponse(2, officeCodes);
-
-    expect(
-      response.offices?.map(({ firmOfficeCode }) => firmOfficeCode),
-    ).to.eql(officeCodes);
+    expect(response.office?.firmOfficeCode).to.equal("AB12CD");
+    expect(response.office?.addressLine1).to.be.a("string").and.not.empty;
+    expect(ProviderFirmOfficeDto.safeParse(response).success).to.equal(true);
   });
 
   it("returns the same office details on subsequent calls", () => {
-    const officeCodes = ["0R128U", "0R695K"];
-
-    const firstResponse = getProviderOfficesResponse(2, officeCodes);
-    const secondResponse = getProviderOfficesResponse(2, officeCodes);
+    const firstResponse = getProviderOfficeResponse("AB12CD");
+    const secondResponse = getProviderOfficeResponse("AB12CD");
 
     expect(secondResponse).to.eql(firstResponse);
   });

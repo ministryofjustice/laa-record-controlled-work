@@ -1,39 +1,28 @@
 import { faker } from "@faker-js/faker";
 
-import type { ProviderFirmOfficeListDto } from "#/api/clients/pda/model/providerFirmOfficeListDto.zod.gen.js";
+import type { ProviderFirmOfficeDto } from "#/api/clients/pda/model/providerFirmOfficeDto.zod.gen.js";
 
-import { getGetAllProviderOfficesResponseMock } from "#orval/mocks/pda/msw/provider-firms-endpoints/provider-firms-endpoints.msw.gen.js";
+import { getGetFirmOfficeResponseMock } from "#orval/mocks/pda/msw/provider-firm-offices/provider-firm-offices.msw.gen.js";
 
-const FIRST_OFFICE_INDEX = 0;
 const FAKER_SEED = 12345;
 
 /**
- * .
- * @param limitNumberOfOffices .
- * @param officeCodes .
- * @returns .
+ * Creates deterministic office details correlated to a requested code.
+ * @param officeCode Office code to include in the response.
+ * @returns Generated PDA office details.
  */
-export function getProviderOfficesResponse(
-  limitNumberOfOffices: number,
-  officeCodes?: string[],
-): ProviderFirmOfficeListDto {
+export function getProviderOfficeResponse(
+  officeCode: string,
+): ProviderFirmOfficeDto {
   faker.seed(FAKER_SEED);
 
-  const providerOfficesResponse = getGetAllProviderOfficesResponseMock();
-  const offices = officeCodes
-    ? officeCodes.map((firmOfficeCode, index) => ({
-        ...providerOfficesResponse.offices[
-          index % providerOfficesResponse.offices.length
-        ],
-        firmOfficeCode,
-      }))
-    : providerOfficesResponse.offices.slice(
-        FIRST_OFFICE_INDEX,
-        limitNumberOfOffices,
-      );
+  const officeResponse = getGetFirmOfficeResponseMock();
 
   return {
-    ...providerOfficesResponse,
-    offices,
+    ...officeResponse,
+    office: {
+      ...officeResponse.office,
+      firmOfficeCode: officeCode,
+    },
   };
 }

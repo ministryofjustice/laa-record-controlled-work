@@ -7,7 +7,6 @@ export interface ApiConfig {
     baseUrl: string;
     key: string;
     mode: ApiMode;
-    mswOfficeCount: number;
   };
   rcw: {
     baseUrl: string;

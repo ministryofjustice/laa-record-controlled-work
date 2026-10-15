@@ -8,117 +8,77 @@ import {
   ApiValidationError,
 } from "#/api/clients/api.errors.js";
 import { getPdaApiDefaultOptions } from "#/api/clients/getPdaApiDefaultOptions.js";
-import { ProviderFirmOfficeListDto } from "#/api/clients/pda/model/providerFirmOfficeListDto.zod.gen.js";
+import { ProviderFirmOfficeDto } from "#/api/clients/pda/model/providerFirmOfficeDto.zod.gen.js";
 import { ID_TOKEN_CLAIMS_KEYS } from "#/auth/auth.constants.js";
 import { AuthenticationError } from "#/auth/auth.errors.js";
-import config from "#/config.js";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import {
-  InvalidFirmCodeClaimError,
-  InvalidSessionError,
+  InvalidOfficeError,
+  NoAvailableOfficesError,
 } from "#/journeys/journey.errors.js";
-import { mapAvailableOffices } from "#/journeys/select-office/mappers/mapAvailableOffices.js";
+import { mapAvailableOffice } from "#/journeys/select-office/mappers/mapAvailableOffice.js";
+import { getSessionDataOrThrow } from "#/journeys/shared.helper.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
-import { PDA_MSW_LAA_ACCOUNTS_HEADER } from "#/lib/constants/pda.js";
 import * as metrics from "#/lib/metrics.js";
 import { logger } from "#/logger.js";
 
+const EMPTY = 0;
+
 export const loadOffices =
   (deps: SelectOfficeEffectsDeps) => async (context: SelectOfficeContext) => {
-    let response;
-    const firmCode = getFirmCodeFromSession(context);
+    const session = getSessionDataOrThrow(context);
+
     const laaAccounts =
-      context.getSession()?.account?.idTokenClaims?.[
-        ID_TOKEN_CLAIMS_KEYS.laaAccounts
-      ];
-    const laaAccountCodes = parseOfficeCodesClaim(laaAccounts);
+      session.account?.idTokenClaims?.[ID_TOKEN_CLAIMS_KEYS.laaAccounts];
+    const officeCodes = [...new Set(parseOfficeCodesClaim(laaAccounts))];
+    if (officeCodes.length === EMPTY) {
+      logger.error("No office codes found in LAA_ACCOUNTS claim");
+      throw new NoAvailableOfficesError();
+    }
+
     const correlationId = context
       .getRequestHeader("x-correlation-id")
       ?.toString();
+    const options = getPdaApiDefaultOptions(correlationId);
 
-    try {
-      const opts = getPdaApiDefaultOptions(
-        correlationId,
-        config.api.pda.mode === "msw"
-          ? {
-              [PDA_MSW_LAA_ACCOUNTS_HEADER]: JSON.stringify(laaAccountCodes),
-            }
-          : undefined,
-      );
-      response = await metrics.time(
-        "getAllProviderOffices",
-        async () => await deps.getAllProviderOffices(firmCode, opts),
-        (status) => status === HTTP_STATUS.OK,
-      );
-    } catch (error) {
-      logger.error("Error fetching offices", error, {
-        api: "getAllProviderOffices",
-      });
-      throw ApiResponseError.from(error);
-    }
+    const results = await Promise.allSettled(
+      officeCodes.map(async (officeCode) => {
+        const response = await metrics.time(
+          "getFirmOffice",
+          async () => await deps.getFirmOffice(officeCode, options),
+          (status) => status === HTTP_STATUS.OK,
+        );
 
-    if (response.status !== HTTP_STATUS.OK) {
-      logger.error(
-        "getAllProviderOffices did not return 200",
-        {
-          data: response.data,
-          status: response.status,
-        },
-        {
-          api: "getAllProviderOffices",
-        },
-      );
-      throw new ApiResponseError();
-    }
+        if (response.status !== HTTP_STATUS.OK) {
+          throw new ApiResponseError();
+        }
 
-    const result = ProviderFirmOfficeListDto.safeParse(response.data);
+        const result = ProviderFirmOfficeDto.safeParse(response.data);
+        if (!result.success) {
+          throw ApiValidationError.from(result.error);
+        }
 
-    if (!result.success) {
-      logger.error(
-        "ProviderFirmOfficeListDto response data failed validation",
-        result.error,
-      );
-      throw ApiValidationError.from(result.error);
-    }
-    const mappedOffices = mapAvailableOffices(result.data);
-    const availableOffices = mappedOffices.filter((o) =>
-      laaAccountCodes.includes(o.code),
+        if (result.data.office?.firmOfficeCode !== officeCode) {
+          throw new InvalidOfficeError();
+        }
+
+        return mapAvailableOffice(result.data);
+      }),
     );
+
+    const availableOffices = results.map((result, index) => {
+      if (result.status === "fulfilled") {
+        return result.value;
+      }
+
+      logger.error("Provider office lookup failed; using code-only office", {
+        api: "getFirmOffice",
+      });
+      return { code: officeCodes[index] };
+    });
 
     context.setData(CONTEXT_DATA_KEYS.availableOffices, availableOffices);
   };
-
-/**
- * Reads and validates the numeric firm code from the authenticated account claims.
- * @param context Journey effect context containing the current session.
- * @returns Firm code required by the PDA provider offices API.
- */
-function getFirmCodeFromSession(context: SelectOfficeContext): number {
-  const session = context.getSession();
-  if (!session) {
-    throw new InvalidSessionError();
-  }
-
-  const claims = session.account?.idTokenClaims;
-
-  const firmCode = claims?.[ID_TOKEN_CLAIMS_KEYS.firmCode];
-
-  if (typeof firmCode !== "number" && typeof firmCode !== "string") {
-    logger.error(
-      "Missing or invalid FIRM_CODE claim in authenticated account",
-      {
-        claims,
-      },
-    );
-    throw new InvalidFirmCodeClaimError();
-  }
-  if (typeof firmCode === "string") {
-    const parsedFirmCode = Number.parseInt(firmCode, 10);
-    return parsedFirmCode;
-  }
-
-  return firmCode;
-}
 
 /**
  * Reads office codes from array and serialized-array Entra claims.

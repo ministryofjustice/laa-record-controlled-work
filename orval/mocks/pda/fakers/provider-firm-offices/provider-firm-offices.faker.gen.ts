@@ -4,7 +4,7 @@
  * Provider Details API r1
  * OpenAPI spec version: 0.27.2
  */
-import type { ProviderFirmOfficeListDto } from "#/api/clients/pda/model/providerFirmOfficeListDto.zod.gen.js";
+import type { ProviderFirmOfficeDto } from "#/api/clients/pda/model/providerFirmOfficeDto.zod.gen.js";
 
 import { faker } from "@faker-js/faker";
 
@@ -20,20 +20,20 @@ export type MockWithNullableOverrides<
   [K in Extract<KeysWithNull<O>, keyof T>]: M[K] | null;
 };
 
-export type ProviderFirmOfficeListDtoMock = {
-  [K in keyof Required<NonNullable<ProviderFirmOfficeListDto>>]: NonNullable<
-    Required<NonNullable<ProviderFirmOfficeListDto>>[K]
+export type ProviderFirmOfficeDtoMock = {
+  [K in keyof Required<NonNullable<ProviderFirmOfficeDto>>]: NonNullable<
+    Required<NonNullable<ProviderFirmOfficeDto>>[K]
   >;
 };
 
-export const getGetAllProviderOfficesResponseMock = <
-  O extends Partial<Extract<ProviderFirmOfficeListDto, object>> = {},
+export const getGetFirmOfficeResponseMock = <
+  O extends Partial<Extract<ProviderFirmOfficeDto, object>> = {},
 >(
   overrideResponse?: O,
 ): MockWithNullableOverrides<
-  ProviderFirmOfficeListDto,
+  ProviderFirmOfficeDto,
   O,
-  ProviderFirmOfficeListDtoMock
+  ProviderFirmOfficeDtoMock
 > =>
   ({
     firm: {
@@ -51,10 +51,7 @@ export const getGetAllProviderOfficesResponseMock = <
       barCouncilRoll: faker.string.alpha({ length: { min: 10, max: 20 } }),
       companyHouseNumber: faker.string.alpha({ length: { min: 10, max: 20 } }),
     },
-    offices: Array.from(
-      { length: faker.number.int({ min: 1, max: 10 }) },
-      (_, i) => i + 1,
-    ).map(() => ({
+    office: {
       firmOfficeId: faker.number.int(),
       ccmsFirmOfficeId: faker.number.int(),
       firmOfficeCode: (() => faker.string.alphanumeric(6).toUpperCase())(),
@@ -62,9 +59,9 @@ export const getGetAllProviderOfficesResponseMock = <
       officeCodeAlt: faker.string.alpha({ length: { min: 10, max: 20 } }),
       type: faker.string.alpha({ length: { min: 10, max: 20 } }),
       addressLine1: (() => faker.location.streetAddress())(),
-      addressLine2: (() => null)(),
-      addressLine3: (() => null)(),
-      addressLine4: (() => null)(),
+      addressLine2: (() => "")(),
+      addressLine3: (() => "")(),
+      addressLine4: (() => "")(),
       city: (() => faker.location.city())(),
       county: faker.string.alpha({ length: { min: 10, max: 20 } }),
       postCode: (() =>
@@ -92,10 +89,10 @@ export const getGetAllProviderOfficesResponseMock = <
       dutySolicitorAreaName: faker.string.alpha({
         length: { min: 10, max: 20 },
       }),
-    })),
+    },
     ...overrideResponse,
   }) as MockWithNullableOverrides<
-    ProviderFirmOfficeListDto,
+    ProviderFirmOfficeDto,
     O,
-    ProviderFirmOfficeListDtoMock
+    ProviderFirmOfficeDtoMock
   >;

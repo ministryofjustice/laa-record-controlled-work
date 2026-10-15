@@ -57,7 +57,6 @@ services:
       - RCW_API_BASE_URL=http://rcw-api:8081
       - PDA_API_MODE=msw
       - PDA_API_KEY=${PDA_API_KEY:-default}
-      - PDA_MSW_OFFICE_COUNT=${PDA_MSW_OFFICE_COUNT:-3}
       # Session cache
       - REDIS_ENABLED=true
       - REDIS_URL=redis://redis-rcw:6379
