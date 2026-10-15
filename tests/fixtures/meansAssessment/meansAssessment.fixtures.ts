@@ -1,0 +1,94 @@
+import type { MeansAssessmentScenario } from "#tests/fixtures/meansAssessment/builders.js";
+
+import {
+  createEmployedHouseholdScenario,
+  createFormattingVariantsScenario,
+  createHousingMortgageScenario,
+  createHousingSharedOwnershipScenario,
+  createOtherIncomeAndOutgoingsScenario,
+  createPropertiesAndAssetsScenario,
+  createStaleInactiveAnswersScenario,
+} from "#tests/fixtures/meansAssessment/answers.fixtures.js";
+import { createMeansAssessment } from "#tests/fixtures/meansAssessment/builders.js";
+import {
+  createIncomeCalculationScenario,
+  createPartnerIncomeCalculationScenario,
+  createUnavailableIncomeCalculationScenario,
+  createUncalculatedIncomeScenario,
+} from "#tests/fixtures/meansAssessment/calculations/income.fixtures.js";
+import {
+  createAsylumSupportScenario,
+  createCalculationStatesScenario,
+  createMeansAssessmentNotRequiredScenario,
+  createMissingEligibilityScenario,
+  createPassportingScenario,
+  createUnavailableResultScenario,
+  createUnder18ControlledClrScenario,
+  createUnder18NoMeansScenario,
+} from "#tests/fixtures/meansAssessment/outcomes.fixtures.js";
+
+export type { MeansAssessmentScenario } from "#tests/fixtures/meansAssessment/builders.js";
+
+export enum MeansAssessmentScenarioName {
+  AsylumSupport = "asylumSupport",
+  Baseline = "baseline",
+  CalculationStates = "calculationStates",
+  EmployedHousehold = "employedHousehold",
+  FormattingVariants = "formattingVariants",
+  HousingMortgage = "housingMortgage",
+  HousingSharedOwnership = "housingSharedOwnership",
+  IncomeBreakdownNotCalculated = "incomeBreakdownNotCalculated",
+  IncomeBreakdownPartner = "incomeBreakdownPartner",
+  IncomeBreakdownReady = "incomeBreakdownReady",
+  IncomeBreakdownUnavailable = "incomeBreakdownUnavailable",
+  MeansAssessmentNotRequired = "meansAssessmentNotRequired",
+  MissingEligibility = "missingEligibility",
+  OtherIncomeAndOutgoings = "otherIncomeAndOutgoings",
+  Passporting = "passporting",
+  PropertiesAndAssets = "propertiesAndAssets",
+  StaleInactiveAnswers = "staleInactiveAnswers",
+  UnavailableResult = "unavailableResult",
+  Under18ControlledClr = "under18ControlledClr",
+  Under18NoMeans = "under18NoMeans",
+}
+
+export const meansAssessmentScenarios: Record<
+  MeansAssessmentScenarioName,
+  () => MeansAssessmentScenario
+> = {
+  [MeansAssessmentScenarioName.AsylumSupport]: createAsylumSupportScenario,
+  [MeansAssessmentScenarioName.Baseline]: () => createMeansAssessment(),
+  [MeansAssessmentScenarioName.CalculationStates]:
+    createCalculationStatesScenario,
+  [MeansAssessmentScenarioName.EmployedHousehold]:
+    createEmployedHouseholdScenario,
+  [MeansAssessmentScenarioName.FormattingVariants]:
+    createFormattingVariantsScenario,
+  [MeansAssessmentScenarioName.HousingMortgage]: createHousingMortgageScenario,
+  [MeansAssessmentScenarioName.HousingSharedOwnership]:
+    createHousingSharedOwnershipScenario,
+  [MeansAssessmentScenarioName.IncomeBreakdownNotCalculated]:
+    createUncalculatedIncomeScenario,
+  [MeansAssessmentScenarioName.IncomeBreakdownPartner]:
+    createPartnerIncomeCalculationScenario,
+  [MeansAssessmentScenarioName.IncomeBreakdownReady]:
+    createIncomeCalculationScenario,
+  [MeansAssessmentScenarioName.IncomeBreakdownUnavailable]:
+    createUnavailableIncomeCalculationScenario,
+  [MeansAssessmentScenarioName.MeansAssessmentNotRequired]:
+    createMeansAssessmentNotRequiredScenario,
+  [MeansAssessmentScenarioName.MissingEligibility]:
+    createMissingEligibilityScenario,
+  [MeansAssessmentScenarioName.OtherIncomeAndOutgoings]:
+    createOtherIncomeAndOutgoingsScenario,
+  [MeansAssessmentScenarioName.Passporting]: createPassportingScenario,
+  [MeansAssessmentScenarioName.PropertiesAndAssets]:
+    createPropertiesAndAssetsScenario,
+  [MeansAssessmentScenarioName.StaleInactiveAnswers]:
+    createStaleInactiveAnswersScenario,
+  [MeansAssessmentScenarioName.UnavailableResult]:
+    createUnavailableResultScenario,
+  [MeansAssessmentScenarioName.Under18ControlledClr]:
+    createUnder18ControlledClrScenario,
+  [MeansAssessmentScenarioName.Under18NoMeans]: createUnder18NoMeansScenario,
+};

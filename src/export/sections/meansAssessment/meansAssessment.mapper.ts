@@ -13,28 +13,13 @@ import type {
 import { toMeansAssessmentAnswerSummaries } from "#/export/sections/meansAssessment/answers/answers.mapper.js";
 import { toMeansAssessmentCalculations } from "#/export/sections/meansAssessment/calculations/calculations.mapper.js";
 import { MeansAssessmentStatus } from "#/export/sections/meansAssessment/calculations/calculations.types.js";
+import { toMeansAssessmentIncomeBreakdown } from "#/export/sections/meansAssessment/calculations/income/income.mapper.js";
+import { formatGBP } from "#/lib/currency.js";
 import { fixedT } from "#/lib/i18n.js";
 
 const means = {
   t: fixedT("pages.export.meansAssessment"),
 };
-
-const MAX_CURRENCY_FRACTION_DIGITS = 2;
-const PENCE_CURRENCY_MIN_FRACTION_DIGITS = 2;
-const WHOLE_CURRENCY_MIN_FRACTION_DIGITS = 0;
-
-const currency = new Intl.NumberFormat("en-GB", {
-  currency: "GBP",
-  maximumFractionDigits: MAX_CURRENCY_FRACTION_DIGITS,
-  minimumFractionDigits: WHOLE_CURRENCY_MIN_FRACTION_DIGITS,
-  style: "currency",
-});
-const currencyWithPence = new Intl.NumberFormat("en-GB", {
-  currency: "GBP",
-  maximumFractionDigits: MAX_CURRENCY_FRACTION_DIGITS,
-  minimumFractionDigits: PENCE_CURRENCY_MIN_FRACTION_DIGITS,
-  style: "currency",
-});
 
 /**
  * Maps a saved means assessment to its export section without recalculating CFE values.
@@ -58,6 +43,10 @@ export function toMeansAssessmentSection(
   return {
     answerSummaries: toMeansAssessmentAnswerSummaries(eligibility?.data),
     calculations,
+    incomeBreakdown: toMeansAssessmentIncomeBreakdown(
+      eligibility?.result,
+      calculations,
+    ),
     outcomeSummary: toMeansAssessmentOutcomeSummary(calculations),
   };
 }
@@ -68,9 +57,7 @@ export function toMeansAssessmentSection(
  * @returns The amount formatted in pounds sterling.
  */
 function formatCurrency(amount: number): string {
-  return Number.isInteger(amount)
-    ? currency.format(amount)
-    : currencyWithPence.format(amount);
+  return formatGBP(amount, true);
 }
 
 /**
