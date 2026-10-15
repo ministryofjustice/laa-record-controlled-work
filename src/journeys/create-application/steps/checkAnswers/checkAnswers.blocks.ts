@@ -69,6 +69,14 @@ export function summaryList(): GovUKSummaryList {
     label: answerLabelT("familyLawClassification"),
     value: { text: formatFamilyLawClassificationLabel() },
   });
+  const letterFromLocalAuthority = summaryRow({
+    href: "care-proceedings?returnTo=check-answers",
+    label: answerLabelT("letterFromLocalAuthority"),
+    value: { text: formatLetterFromLocalAuthority() },
+    visibleWhen: Answer(AnswerKey.letterFromLocalAuthority).match(
+      Condition.Equals("yes"),
+    ),
+  });
   const needsAdviceOnEUOrInternationalMaintenance = summaryRow({
     href: "international-maintenance-agreement?returnTo=check-answers",
     label: answerLabelT("internationalMaintenanceAgreement"),

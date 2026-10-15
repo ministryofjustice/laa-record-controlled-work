@@ -89,7 +89,7 @@ function saveFamilyLawClassificationPublic(journeyCode: string): SubmitHook {
       next: [
         redirectToInternationalMaintenanceAgreementWithCheckQuery,
         redirectToCheckAnswers,
-        redirectToLegalAidBefore,
+        redirectToLetterFromLocalAuthority,
       ],
     },
     validate: true,
@@ -121,13 +121,9 @@ const redirectToInternationalMaintenanceAgreementWithCheckQuery = redirect({
   ),
 });
 
-// const redirectToCareProceedingsInitiated = redirect({
-//   goto: "family-public-written-notice",
-//   when: Answer(AnswerKey.familyLawClassification).match(
-//     Condition.Equals("public"),
-//   ),
-// });
-
-const redirectToLegalAidBefore = redirect({
-  goto: StepCode.LEGAL_AID_BEFORE,
+const redirectToLetterFromLocalAuthority = redirect({
+  goto: "care-proceedings",
+  when: Answer(AnswerKey.familyLawClassification).match(
+    Condition.Equals("public"),
+  ),
 });
