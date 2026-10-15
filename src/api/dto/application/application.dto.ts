@@ -183,11 +183,11 @@ export class ApplicationDto {
       priorLegalAid: answers.legalAidBefore,
     };
 
-    if(answers.needsAdviceOnEUOrInternationalMaintenance !== undefined) {
+    if (answers.needsAdviceOnEUOrInternationalMaintenance !== undefined) {
       scopingQuestions.needsAdviceOnEUOrInternationalMaintenance =
         answers.needsAdviceOnEUOrInternationalMaintenance === "yes";
     }
-    if(answers.needsProtectiveInjunction !== undefined) {
+    if (answers.needsProtectiveInjunction !== undefined) {
       scopingQuestions.needsProtectiveInjunction =
         answers.needsProtectiveInjunction === "yes";
     }
@@ -275,7 +275,9 @@ export class ApplicationDto {
   ): Partial<AnswersOutput> {
     const scopingAnswers: Partial<AnswersOutput> = {};
 
-    if (scopingQuestions.needsAdviceOnEUOrInternationalMaintenance !== undefined) {
+    if (
+      scopingQuestions.needsAdviceOnEUOrInternationalMaintenance !== undefined
+    ) {
       scopingAnswers[AnswerKey.needsAdviceOnEUOrInternationalMaintenance] =
         scopingQuestions.needsAdviceOnEUOrInternationalMaintenance
           ? "yes"
