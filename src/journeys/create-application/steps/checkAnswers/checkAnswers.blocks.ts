@@ -22,6 +22,7 @@ import {
   formatInternationalMaintenanceAgreementLabel,
   formatLegalAidBeforeLabel,
   formatLegalAidLast6MonthsLabel,
+  formatLetterFromLocalAuthority,
   formatNeedsProtectiveInjunctionLabel,
 } from "#/journeys/create-application/steps/checkAnswers/checkAnswers.formatters.js";
 import { fixedT, t } from "#/lib/i18n.js";
@@ -158,6 +159,7 @@ export function summaryList(): GovUKSummaryList {
       ecf,
       familyLawClassification,
       needsAdviceOnEUOrInternationalMaintenance,
+      letterFromLocalAuthority,
       needsProtectiveInjunction,
       legalAidBefore,
       legalAidLast6Months,
