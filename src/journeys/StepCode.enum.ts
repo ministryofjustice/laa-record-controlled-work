@@ -3,6 +3,7 @@ export enum StepCode {
   CLIENT_DETAILS = "client-details",
   ECF = "ecf",
   ECF_DROPOUT = "ecf-dropout",
+  FAMILY_PRIVATE_NOT_IN_SCOPE = "not-in-scope",
   FAMILY_TYPE_OF_CASE = "family-type-of-case",
   INTERNATIONAL_MAINTENANCE_AGREEMENT = "international-maintenance-agreement",
   LASPO_EVIDENCE_SCOPE = "laspo-evidence-scope",
