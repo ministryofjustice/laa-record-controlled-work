@@ -29,6 +29,27 @@
   text-align: left;
 }
 
+.app-means-assessment__calculation-table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.app-means-assessment__calculation-table .app-calculation__row-heading {
+  overflow-wrap: anywhere;
+  width: 72%;
+}
+
+.app-means-assessment__calculation-table .app-calculation__amount {
+  overflow-wrap: anywhere;
+  text-align: right;
+  white-space: normal;
+  width: 28%;
+}
+
+.app-means-assessment__calculation-table .app-calculation__row--emphasis {
+  border-top: 1px solid #0b0c0c;
+}
+
 @media (max-width: 40.0525em) {
   .app-means-assessment__totals {
     grid-template-columns: minmax(0, 1fr);
