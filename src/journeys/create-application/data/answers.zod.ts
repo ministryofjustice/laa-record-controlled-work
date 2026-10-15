@@ -2,9 +2,12 @@ import { z as zod } from "zod";
 
 import { FamilyLawClassification } from "#/api/clients/rcw/model/familyLawClassification.zod.gen.js";
 import { PriorLegalAid } from "#/api/clients/rcw/model/priorLegalAid.zod.gen.js";
+import { PrivateFamilyCaseScope } from "#/api/clients/rcw/model/privateFamilyCaseScope.zod.gen.js";
 
 export const Answers = zod
   .object({
+    careProceedingsParentalResponsibility: zod.string().optional(),
+    careProceedingsStarted: zod.string().optional(),
     dateOfBirth: zod.string(),
     ecf: zod.string(),
     familyLawClassification: FamilyLawClassification,
@@ -22,6 +25,7 @@ export const Answers = zod
     osAddressLine3: zod.string().optional(),
     osAddressLine4: zod.string().optional(),
     osCountry: zod.string().optional(),
+    privateFamilyCaseScope: PrivateFamilyCaseScope.optional(),
     reasonForYes: zod.string().optional(),
     ukAddressLine1: zod.string().optional(),
     ukAddressLine2: zod.string().optional(),
