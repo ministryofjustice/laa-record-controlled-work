@@ -38,7 +38,7 @@ describe("Private Family Case Scope step", () => {
       expect(buttons[1].text).to.equal("Evidence of child abuse (Schedule 2)");
       expect(buttons[2].text).to.equal("Client is under 18 at time of signing");
       expect(buttons[3].text).to.equal("Client is a parent, person with parental responsibility, or prospective special guardian involved in a Special Guardianship Order application");
-      expect(buttons[4].text).to.equal("None of the above");
+      expect(buttons[4].text).to.equal("None of these");
     });
   });
 
