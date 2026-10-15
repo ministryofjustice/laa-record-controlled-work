@@ -354,7 +354,7 @@
           "none": "None of these"
         },
         "validation": {
-          "required": "Select how can you prove this case is in scope "
+          "required": "Select how can you prove this case is in scope"
         }
       },
       "legalAidBefore": {
