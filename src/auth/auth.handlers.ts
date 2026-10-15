@@ -5,6 +5,11 @@ import { promisify } from "node:util";
 
 import type { Either } from "#/lib/either.js";
 
+import {
+  AuthenticationError,
+  BadAuthenticationRequestError,
+  TokenAcquisitionError,
+} from "#/auth/auth.errors.js";
 import { getValidatedReturnTo } from "#/auth/auth.redirect.js";
 import {
   decodeRelayState,
@@ -24,12 +29,7 @@ import { EntraErrorCode } from "#/auth/domain/EntraErrorCode.enum.js";
 import { EntraService } from "#/auth/entra.service.js";
 import { getMsalCacheKey } from "#/auth/msal.cache-key.js";
 import config from "#/config.js";
-import {
-  BAD_REQUEST,
-  FORBIDDEN,
-  INTERNAL_SERVER_ERROR,
-  UNAUTHORIZED,
-} from "#/lib/constants/http.js";
+import { FORBIDDEN } from "#/lib/constants/http.js";
 import { getRedisClient } from "#/lib/redis.js";
 import { logger } from "#/logger.js";
 
@@ -51,6 +51,7 @@ export async function authCodeCallback(
 ): Promise<void> {
   try {
     const callbackData = getValidatedCallbackData(req, res);
+
     if (callbackData === undefined) {
       return;
     }
@@ -58,26 +59,34 @@ export async function authCodeCallback(
     if (handleRelay(callbackData, req, res)) return;
 
     let consumed: Either<Error, AuthFlow | undefined>;
+
     try {
       consumed = await getRequestAuthFlowStore(req.app).consume(
         req.sessionID,
         callbackData.state,
       );
-    } catch {
-      res.status(INTERNAL_SERVER_ERROR).send("Unable to complete sign-in");
+    } catch (error) {
+      next(new AuthenticationError("Unable to complete sign-in", error));
       return;
     }
+
     if (consumed.error) {
-      res.status(INTERNAL_SERVER_ERROR).send("Unable to complete sign-in");
+      const { error } = consumed;
+      next(new AuthenticationError("Unable to complete sign-in", error));
       return;
     }
+
     if (consumed.value === undefined) {
-      res.status(BAD_REQUEST).send("Invalid or expired sign-in flow");
+      next(
+        new BadAuthenticationRequestError("Invalid or expired sign-in flow"),
+      );
       return;
     }
+
     const flow = consumed.value;
+
     if ("error" in callbackData) {
-      res.status(BAD_REQUEST).type("text/plain").send("Entra sign-in failed");
+      next(new BadAuthenticationRequestError("Entra sign-in failed"));
       return;
     }
 
@@ -91,17 +100,18 @@ export async function authCodeCallback(
  * Initiates the Entra sign-in flow by generating a PKCE auth code URL.
  * @param req - The Express request.
  * @param res - The Express response.
- * @param _next - The Express next function, unused by this handler.
+ * @param next - The Express next function, unused by this handler.
  */
 export async function signIn(
   req: Request,
   res: Response,
-  _next: NextFunction,
+  next: NextFunction,
 ): Promise<void> {
   const returnTo =
     req.query.returnTo === undefined
       ? getValidatedReturnTo(req.session.returnTo)
       : getValidatedReturnTo(req.query.returnTo);
+
   try {
     const authCodeUrl = await prepareSignInFlow(req, returnTo);
     res.redirect(authCodeUrl);
@@ -117,10 +127,7 @@ export async function signIn(
       return;
     }
 
-    res
-      .status(INTERNAL_SERVER_ERROR)
-      .type("text/plain")
-      .send("Unable to start sign-in");
+    next(new AuthenticationError("Unable to start sign-in", error));
   }
 }
 
@@ -170,9 +177,9 @@ async function completeAuthCodeCallback(
   await regenerateSession(req);
   const entra = EntraService.create({ sessionId: req.sessionID });
   const result = await entra.exchangeAuthCode(data.code, flow.authCodeRequest);
+
   if (result.error) {
-    res.status(UNAUTHORIZED).type("text/plain").send(result.error.message);
-    return;
+    throw result.error;
   }
 
   const homeAccountId = result.value.account?.homeAccountId.trim();
@@ -181,8 +188,7 @@ async function completeAuthCodeCallback(
     homeAccountId.length === EMPTY_STRING_LENGTH
   ) {
     logger.error("Token exchange succeeded without an account homeAccountId");
-    res.status(UNAUTHORIZED).send("Token acquisition failed");
-    return;
+    throw new TokenAcquisitionError();
   }
 
   Object.assign(req.session, {
@@ -244,17 +250,17 @@ function getValidatedCallbackData(
 ): CallbackData | undefined {
   const hasCode = Object.hasOwn(req.query, "code");
   const hasError = Object.hasOwn(req.query, "error");
+
   if (hasCode === hasError) {
-    res.status(BAD_REQUEST).send("Invalid redirect payload");
-    return undefined;
+    throw new BadAuthenticationRequestError("Invalid redirect payload");
   }
 
   const parsed = hasCode
     ? authCodeCallbackSchema.safeParse(req.query)
     : authCodeCallbackErrorSchema.safeParse(req.query);
+
   if (!parsed.success) {
-    res.status(BAD_REQUEST).send("Invalid redirect payload");
-    return undefined;
+    throw new BadAuthenticationRequestError("Invalid redirect payload");
   }
 
   return parsed.data;
@@ -276,8 +282,7 @@ function handleRelay(data: CallbackData, req: Request, res: Response): boolean {
   const decoded = decodeRelayState(data.state);
   if (decoded.kind === "plain") return false;
   if (decoded.kind === "invalid") {
-    res.status(BAD_REQUEST).send("Invalid relay target");
-    return true;
+    throw new BadAuthenticationRequestError("Invalid redirect target");
   }
 
   const relayState = decoded.state;
@@ -286,8 +291,7 @@ function handleRelay(data: CallbackData, req: Request, res: Response): boolean {
     !verifyRelayState(relayState, config.session.secret) ||
     !isAllowedRelayTarget(target)
   ) {
-    res.status(BAD_REQUEST).send("Invalid relay target");
-    return true;
+    throw new BadAuthenticationRequestError("Invalid redirect target");
   }
 
   const targetUrl = new URL(target);
@@ -321,7 +325,7 @@ async function persistAuthenticatedSession(
   try {
     await saveSession(req);
     return true;
-  } catch {
+  } catch (initialError) {
     try {
       await destroySession(req);
     } catch (error) {
@@ -333,8 +337,7 @@ async function persistAuthenticatedSession(
     } catch (error) {
       logger.error("Failed to delete unauthenticated MSAL cache", error);
     }
-    res.status(INTERNAL_SERVER_ERROR).send("Unable to complete sign-in");
-    return false;
+    throw new AuthenticationError("Unable to complete sign-in", initialError);
   }
 }
 

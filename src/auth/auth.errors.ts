@@ -1,27 +1,37 @@
 /* eslint-disable jsdoc/require-jsdoc -- not needed */
+import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { DomainError } from "#/lib/errors/domainError.js";
 
+/**
+ * Base class for all Authentication errors.
+ */
 export class AuthenticationError extends DomainError {
-  public readonly name = "AuthenticationError";
+  public readonly name: string = "AuthenticationError";
+  public readonly statusCode: number = HTTP_STATUS.INTERNAL_SERVER_ERROR;
 }
 
-export class MissingAuthCodeRequestError extends DomainError {
-  public readonly name = "MissingAuthCodeRequestError";
+export class BadAuthenticationRequestError extends AuthenticationError {
+  public readonly name = "BadAuthenticationRequestError";
+  public readonly statusCode = HTTP_STATUS.BAD_REQUEST;
 
-  constructor(cause?: unknown) {
-    super("Missing auth code request in session", cause);
+  constructor(
+    message = "Authentication request was not properly formed",
+    cause?: unknown,
+  ) {
+    super(message, cause);
   }
 }
 
-export class MsalError extends DomainError {
+export class MsalError extends AuthenticationError {
   public readonly name = "MsalError";
 
   constructor(cause?: unknown) {
-    super("Authentication service error", cause);
+    const message = cause instanceof Error ? cause.message : "Unknown error";
+    super(`Authentication service error: ${message}`, cause);
   }
 }
 
-export class NotAuthenticatedError extends DomainError {
+export class NotAuthenticatedError extends AuthenticationError {
   public readonly name = "NotAuthenticatedError";
 
   constructor(cause?: unknown) {
@@ -29,7 +39,7 @@ export class NotAuthenticatedError extends DomainError {
   }
 }
 
-export class PkceGenerationError extends DomainError {
+export class PkceGenerationError extends AuthenticationError {
   public readonly name = "PkceGenerationError";
 
   constructor(cause?: unknown) {
@@ -37,23 +47,16 @@ export class PkceGenerationError extends DomainError {
   }
 }
 
-export class StateMismatchError extends DomainError {
-  public readonly name = "StateMismatchError";
-
-  constructor(cause?: unknown) {
-    super("State mismatch: possible CSRF attack", cause);
-  }
-}
-
-export class TokenAcquisitionError extends DomainError {
+export class TokenAcquisitionError extends AuthenticationError {
   public readonly name = "TokenAcquisitionError";
+  public readonly statusCode = HTTP_STATUS.UNAUTHORIZED;
 
   constructor(cause?: unknown) {
     super("Token acquisition failed", cause);
   }
 }
 
-export class TokenRefreshError extends DomainError {
+export class TokenRefreshError extends AuthenticationError {
   public readonly name = "TokenRefreshError";
 
   constructor(cause?: unknown) {
