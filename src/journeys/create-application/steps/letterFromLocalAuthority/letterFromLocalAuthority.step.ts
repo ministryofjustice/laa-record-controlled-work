@@ -66,6 +66,7 @@ function onSubmitNo(journeyCode: string): SubmitHook {
       effects: [CreateApplicationEffects.saveDraftAnswers(journeyCode)],
       next: [
         redirectToCheckAnswers(),
+        tempRedirectToLegalAidBefore(),
         redirectToConfirmMerits(),
       ],
     },
@@ -87,6 +88,7 @@ function onSubmitYes(journeyCode: string): SubmitHook {
       effects: [CreateApplicationEffects.saveDraftAnswers(journeyCode)],
       next: [
         redirectToCheckAnswers(),
+        tempRedirectToLegalAidBefore(),
         redirectToParentalResponsibility(),
       ],
     },
@@ -131,5 +133,16 @@ function redirectToParentalResponsibility(): RedirectOutcome {
     when: Answer(AnswerKey.letterFromLocalAuthority).match(
       Condition.Equals("yes"),
     ),
+  });
+}
+
+/**
+ * Temporary redirect to Legal Aid Before step.
+ * @todo Remove this and use the redirectToConfirmMerits and redirectToParentalResponsibility redirects when those steps are available.
+ * @returns Redirect hook.
+ */
+function tempRedirectToLegalAidBefore(): RedirectOutcome {
+  return redirect({
+    goto: "legal-aid-before",
   });
 }
