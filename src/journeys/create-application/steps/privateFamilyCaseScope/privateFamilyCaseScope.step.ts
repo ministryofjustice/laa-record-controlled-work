@@ -1,4 +1,6 @@
 import {
+  Answer,
+  Condition,
   redirect,
   step,
   type StepDefinition,
@@ -19,6 +21,7 @@ import {
 import { redirectToCheckAnswers } from "#/journeys/shared.hook.js";
 import { StepCode } from "#/journeys/StepCode.enum.js";
 import { t } from "#/lib/i18n.js";
+import { AnswerKey } from "#/journeys/AnswerKey.enum.js";
 
 const TITLE = t("journeys.createApplication.privateFamilyCaseScope.title");
 
@@ -40,7 +43,7 @@ export function privateFamilyCaseScopeStep(
     ],
     code: StepCode.PRIVATE_FAMILY_CASE_SCOPE,
     onSubmission: [savePrivateFamilyCaseScope(journeyCode)],
-    path: StepCode.PRIVATE_FAMILY_CASE_SCOPE,
+    path: 'private-family-case-scope',
     title: TITLE,
   });
 }
@@ -56,12 +59,31 @@ function savePrivateFamilyCaseScope(journeyCode: string): SubmitHook {
   return submit({
     onValid: {
       effects: [CreateApplicationEffects.saveDraftAnswers(journeyCode)],
-      next: [redirectToCheckAnswers, redirectToLegalAidBefore],
+      next: [redirectToCheckAnswers, tempTedirectToLegalAidBefore, redirectToNotInScope, redirectToConfirmMerits],
     },
     validate: true,
   });
 }
 
-const redirectToLegalAidBefore = redirect({
-  goto: StepCode.LEGAL_AID_BEFORE,
+/**
+ * Redirects to the "Legal Aid Before" page while the next pages are being built.
+ */
+const tempTedirectToLegalAidBefore = redirect({
+  goto: 'legal-aid-before',
+});
+
+/**
+ * Redirects to the "Not in Scope" page if the private family case scope is "none".
+ */
+const redirectToNotInScope = redirect({
+  goto: 'not-in-scope',
+  when: Answer(AnswerKey.privateFamilyCaseScope).match(Condition.Equals("none")),
+});
+
+/**
+ * Redirects to the "Confirm Merits" page if the private family case scope is not "none".
+ */
+const redirectToConfirmMerits = redirect({
+  goto: 'confirm-merits',
+  when: Answer(AnswerKey.privateFamilyCaseScope).not.match(Condition.Equals("none")),
 });
