@@ -14,10 +14,10 @@ import { AuthenticationError } from "#/auth/auth.errors.js";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import {
   InvalidOfficeError,
-  InvalidSessionError,
   NoAvailableOfficesError,
 } from "#/journeys/journey.errors.js";
 import { mapAvailableOffice } from "#/journeys/select-office/mappers/mapAvailableOffice.js";
+import { getSessionDataOrThrow } from "#/journeys/shared.helper.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import * as metrics from "#/lib/metrics.js";
 import { logger } from "#/logger.js";
@@ -26,10 +26,7 @@ const EMPTY = 0;
 
 export const loadOffices =
   (deps: SelectOfficeEffectsDeps) => async (context: SelectOfficeContext) => {
-    const session = context.getSession();
-    if (!session) {
-      throw new InvalidSessionError();
-    }
+    const session = getSessionDataOrThrow(context);
 
     const laaAccounts =
       session.account?.idTokenClaims?.[ID_TOKEN_CLAIMS_KEYS.laaAccounts];
