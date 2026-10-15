@@ -43,7 +43,7 @@ export function needsProtectiveInjunctionStep(
     ],
     code: StepCode.PROTECT_THEMSELF,
     onSubmission: [saveNeedsProtectiveInjunction(journeyCode), submitInvalid],
-    path: StepCode.PROTECT_THEMSELF,
+    path: 'protect-themself',
     title: TITLE,
   });
 }
@@ -70,14 +70,14 @@ function saveNeedsProtectiveInjunction(journeyCode: string): SubmitHook {
 }
 
 const redirectToLegalAidBefore = redirect({
-  goto: StepCode.LEGAL_AID_BEFORE,
+  goto: 'legal-aid-before',
   when: Answer(AnswerKey.needsProtectiveInjunction).match(
     Condition.Equals("yes"),
   ),
 });
 
 const redirectToPrivateFamilyCaseScope = redirect({
-  goto: StepCode.PRIVATE_FAMILY_CASE_SCOPE,
+  goto: 'private-family-case-scope',
   when: Answer(AnswerKey.needsProtectiveInjunction).match(
     Condition.Equals("no"),
   ),
