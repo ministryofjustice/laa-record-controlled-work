@@ -51,7 +51,7 @@ describe("Answers schema", () => {
       haveAHomeAddress: "no",
       careProceedingsStarted: "yes",
       careProceedingsParentalResponsibility: "no",
-      privateFamilyCaseScope: "none",
+      laspoEvidenceScope: "none",
     });
 
     expect(result.success).to.equal(true);
@@ -59,7 +59,7 @@ describe("Answers schema", () => {
       expect(result.data).to.include({
         careProceedingsStarted: "yes",
         careProceedingsParentalResponsibility: "no",
-        privateFamilyCaseScope: "none",
+        laspoEvidenceScope: "none",
       });
     }
   });

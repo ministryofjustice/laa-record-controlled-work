@@ -1,8 +1,8 @@
 import { z as zod } from "zod";
 
 import { FamilyLawClassification } from "#/api/clients/rcw/model/familyLawClassification.zod.gen.js";
+import { LaspoEvidenceScope } from "#/api/clients/rcw/model/laspoEvidenceScope.zod.gen.js";
 import { PriorLegalAid } from "#/api/clients/rcw/model/priorLegalAid.zod.gen.js";
-import { PrivateFamilyCaseScope } from "#/api/clients/rcw/model/privateFamilyCaseScope.zod.gen.js";
 
 export const Answers = zod
   .object({
@@ -14,6 +14,7 @@ export const Answers = zod
     firstName: zod.string(),
     hasNINumber: zod.string(),
     haveAHomeAddress: zod.string(),
+    laspoEvidenceScope: LaspoEvidenceScope.optional(),
     lastName: zod.string(),
     legalAidBefore: PriorLegalAid,
     legalAidLast6Months: zod.string().optional(),
@@ -25,7 +26,6 @@ export const Answers = zod
     osAddressLine3: zod.string().optional(),
     osAddressLine4: zod.string().optional(),
     osCountry: zod.string().optional(),
-    privateFamilyCaseScope: PrivateFamilyCaseScope.optional(),
     reasonForYes: zod.string().optional(),
     ukAddressLine1: zod.string().optional(),
     ukAddressLine2: zod.string().optional(),
