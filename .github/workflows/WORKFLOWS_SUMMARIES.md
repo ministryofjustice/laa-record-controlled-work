@@ -6,6 +6,7 @@ Runs for pull requests, main pushes, merge groups, and manual dispatches.
 `verify-api-code-generation` - Checks generated RCW API client code matches the OpenAPI specification.
 `code-security-audit` - Runs `yarn npm audit`.
 `snyk` - Runs the PR regression gate or observational main Snyk scans.
+`sbom-ecr-probe.yml` - Verifies digest-bound CycloneDX referrer access in UAT on main, or before merge on an opted-in same-repository PR.
 `mocha-tests` - Unit and integration tests.
 `playwright` - Browser and accessibility tests.
 `e2e` - End-to-end tests.
@@ -55,6 +56,28 @@ adapted for the RCW four-scan and digest contract.
 `ECR_ROLE_TO_ASSUME`,`ECR_REGION`,`ECR_REGISTRY_URL`,`ECR_REPOSITORY`,`KUBE_NAMESPACE`,`KUBE_CLUSTER`,`KUBE_TOKEN`,`KUBE_CERT` - These are automated generated in github repo during namespace/container deployment set up see deployment readme
 
 `environment: uat` - We are using env specific environment secrets and variables via our deployment script/values.ylm files and our github environment.
+
+## ECR SBOM Referrer Probe
+
+Approval record: RCW Tech Lead, 2026-10-13. Reference: RCW UI: Image-Bound
+SBOMs and Signed Deployment plan, Phase 1.
+
+The RCW Tech Lead approved use of the existing UAT application repository,
+`laa-record-controlled-work/laa-record-controlled-work-uat`, and retention of
+SBOM referrers for the lifetime of their subject image. ECR may remove a
+referrer within 24 hours after its subject image is deleted. This decision does
+not include retention after image deletion.
+
+Add the `run-ecr-sbom-probe` label to a same-repository PR targeting `main` to
+run the check before merge. Fork PRs are not eligible. Manual dispatch is
+restricted to `main`.
+
+The probe uses the native OCI 1.1 referrers API with ORAS `1.3.4`
+(`sha256:f27adb935022d94df8dc77719c322dda592c78a0d57a6f7dcdd8d900b248c454`).
+CycloneDX documents use `application/vnd.cyclonedx+json` for both the artifact
+type and SBOM layer media type. The workflow uses the existing GitHub OIDC ECR
+role and deletes only its uniquely tagged synthetic fixture images after the
+round-trip check.
 
 
 # SCA Workflow Summary
