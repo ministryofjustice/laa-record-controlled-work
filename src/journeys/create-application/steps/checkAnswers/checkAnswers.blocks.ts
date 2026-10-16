@@ -87,7 +87,7 @@ export function summaryList(): GovUKSummaryList {
     ),
   });
   const laspoEvidenceScope = summaryRow({
-    href: "private-family-case-scope?returnTo=check-answers",
+    href: "prove-in-scope?returnTo=check-answers",
     label: answerLabelT("laspoEvidenceScope"),
     value: { text: formatPrivateFamilyCaseScopeLabel() },
   });

@@ -40,7 +40,7 @@ export const completeCreateCaseShortestPath = async (
   await page.getByRole("radio", { name: "No" }).check();
   await clickContinue(page);
 
-  await expect(page).toHaveURL("/cases/new/private-family-case-scope");
+  await expect(page).toHaveURL("/cases/new/prove-in-scope");
   await page
     .getByRole("radio", { name: "Evidence of child abuse (Schedule 2)" })
     .check();
