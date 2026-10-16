@@ -196,14 +196,8 @@ export function formatPrivateFamilyCaseScopeLabel(): ResolvableString {
     .branch(Condition.Equals("domesticAbuse"), domesticAbuse)
     .branch(Condition.Equals("childAbuse"), childAbuse)
     .branch(Condition.Equals("under18"), under18)
-    .branch(
-      Condition.Equals("parentOrGuardian"),
-      parentOrGuardian,
-    )
-    .branch(
-      Condition.Equals("none"),
-      none,
-    );
+    .branch(Condition.Equals("parentOrGuardian"), parentOrGuardian)
+    .branch(Condition.Equals("none"), none);
 }
 
 /**

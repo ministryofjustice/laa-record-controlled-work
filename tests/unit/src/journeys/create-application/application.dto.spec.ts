@@ -133,7 +133,7 @@ describe("fromAnswers method", () => {
       familyLawClassification: "private",
       needsAdviceOnEUOrInternationalMaintenance: false,
       needsProtectiveInjunction: false,
-      laspoEvidenceScope: "domesticAbuse",
+      privateFamilyCaseScope: "domesticAbuse",
     });
   });
 
@@ -335,7 +335,7 @@ describe("toAnswers method", () => {
         familyLawClassification: "private",
         needsAdviceOnEUOrInternationalMaintenance: false,
         needsProtectiveInjunction: false,
-        laspoEvidenceScope: "domesticAbuse", 
+        privateFamilyCaseScope: "domesticAbuse", 
       },
     });
 
