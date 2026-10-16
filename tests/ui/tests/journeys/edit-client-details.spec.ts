@@ -1,12 +1,10 @@
 import { expect, test } from "../../fixtures/index.js";
-import {
-  clientDetailsApplication,
-} from "../../msw/fixtures/rcw.fixtures.js";
+import { clientDetailsApplication } from "#msw/fixtures/rcw.js";
 test("Edit Application - Client details journey", async ({
   withSelectedOffice: page,
 }) => {
   const applicationId = clientDetailsApplication.id;
-  
+
   // ==========================================================================
   // Task list page
   // ==========================================================================
@@ -15,7 +13,9 @@ test("Edit Application - Client details journey", async ({
   await page.goto(`/cases/${applicationId}/task-list`);
 
   // Click the client details link
-  await page.click(`a[href$="/cases/${applicationId}/task-list/details/?destination=check-answers"]`);
+  await page.click(
+    `a[href$="/cases/${applicationId}/task-list/details/?destination=check-answers"]`,
+  );
 
   // ==========================================================================
   // Check answers page
@@ -50,10 +50,13 @@ test("Edit Application - Client details journey", async ({
       // Last name
       clientDetailsApplication.clientDetails.lastName,
       // Date of birth
-      new Date(clientDetailsApplication.clientDetails.dateOfBirth).toLocaleDateString(
-        "en-GB",
-        { day: "numeric", month: "long", year: "numeric" },
-      ),
+      new Date(
+        clientDetailsApplication.clientDetails.dateOfBirth,
+      ).toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      }),
       // National insurance number
       clientDetailsApplication.clientDetails.niNumber ?? "",
       // Address
