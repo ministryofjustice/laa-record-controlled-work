@@ -48,11 +48,11 @@ export const PrivateFamilyLawBranch = zod
         )
         .and(
           zod.object({
-            privateFamilyCaseScope: zod.unknown(),
+            laspoEvidenceScope: zod.unknown(),
           }),
         ),
       zod.object({
-        privateFamilyCaseScope: zod.literal(null).optional(),
+        laspoEvidenceScope: zod.literal(null).optional(),
       }),
     ]),
   )

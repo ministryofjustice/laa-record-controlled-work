@@ -49,11 +49,11 @@ export const FamilyLawRule = zod.union([
           )
           .and(
             zod.object({
-              privateFamilyCaseScope: zod.unknown(),
+              laspoEvidenceScope: zod.unknown(),
             }),
           ),
         zod.object({
-          privateFamilyCaseScope: zod.literal(null).optional(),
+          laspoEvidenceScope: zod.literal(null).optional(),
         }),
       ]),
     )
@@ -75,7 +75,7 @@ export const FamilyLawRule = zod.union([
       zod.object({
         needsAdviceOnEUOrInternationalMaintenance: zod.literal(null).optional(),
         needsProtectiveInjunction: zod.literal(null).optional(),
-        privateFamilyCaseScope: zod.literal(null).optional(),
+        laspoEvidenceScope: zod.literal(null).optional(),
       }),
     )
     .and(

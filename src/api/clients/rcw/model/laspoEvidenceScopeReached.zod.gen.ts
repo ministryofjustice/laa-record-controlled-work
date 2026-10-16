@@ -6,7 +6,7 @@
  */
 import * as zod from "zod";
 
-export const PrivateFamilyCaseScopeReached = zod
+export const LaspoEvidenceScopeReached = zod
   .object({
     familyLawClassification: zod.enum(["private"]).optional(),
     needsAdviceOnEUOrInternationalMaintenance: zod.literal(false),
@@ -17,9 +17,9 @@ export const PrivateFamilyCaseScopeReached = zod
     }),
   );
 
-export type PrivateFamilyCaseScopeReached = zod.input<
-  typeof PrivateFamilyCaseScopeReached
+export type LaspoEvidenceScopeReached = zod.input<
+  typeof LaspoEvidenceScopeReached
 >;
-export type PrivateFamilyCaseScopeReachedOutput = zod.output<
-  typeof PrivateFamilyCaseScopeReached
+export type LaspoEvidenceScopeReachedOutput = zod.output<
+  typeof LaspoEvidenceScopeReached
 >;
