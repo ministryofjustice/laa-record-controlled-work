@@ -17,7 +17,7 @@ describe("loadApplicationAsAnswers", () => {
     careProceedingsParentalResponsibility: "no",
     firstName: "Jane",
     hasNINumber: "no",
-    privateFamilyCaseScope: "none",
+    laspoEvidenceScope: "none",
   } as ReturnType<typeof ApplicationDto.toAnswers>;
 
   let context: EditApplicationContext;
@@ -75,7 +75,7 @@ describe("loadApplicationAsAnswers", () => {
       setAnswer.calledWithExactly("careProceedingsParentalResponsibility", "no"),
     ).to.equal(true);
     expect(
-      setAnswer.calledWithExactly("privateFamilyCaseScope", "none"),
+      setAnswer.calledWithExactly("laspoEvidenceScope", "none"),
     ).to.equal(true);
     expect(session.journeyDrafts).to.deep.equal({
       [`${journeyCode}:application-1`]: { ...answers },
