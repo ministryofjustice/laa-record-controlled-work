@@ -86,9 +86,9 @@ export function summaryList(): GovUKSummaryList {
       Condition.Equals(FamilyLawClassification.enum.private),
     ),
   });
-  const privateFamilyCaseScope = summaryRow({
+  const laspoEvidenceScope = summaryRow({
     href: "private-family-case-scope?returnTo=check-answers",
-    label: answerLabelT("privateFamilyCaseScope"),
+    label: answerLabelT("laspoEvidenceScope"),
     value: { text: formatPrivateFamilyCaseScopeLabel() },
   });
   const legalAidBefore = summaryRow({
@@ -157,7 +157,7 @@ export function summaryList(): GovUKSummaryList {
       familyLawClassification,
       needsAdviceOnEUOrInternationalMaintenance,
       needsProtectiveInjunction,
-      privateFamilyCaseScope,
+      laspoEvidenceScope,
       legalAidBefore,
       legalAidLast6Months,
       reasonForYes,

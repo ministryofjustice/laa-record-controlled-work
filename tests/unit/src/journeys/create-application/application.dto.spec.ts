@@ -123,7 +123,7 @@ describe("fromAnswers method", () => {
         familyLawClassification: "private",
         needsAdviceOnEUOrInternationalMaintenance: "no",
         needsProtectiveInjunction: "no",
-        privateFamilyCaseScope: "domesticAbuse",
+        laspoEvidenceScope: "domesticAbuse",
       },
       providerOfficeCode,
     ).toRcwApi();
@@ -133,7 +133,7 @@ describe("fromAnswers method", () => {
       familyLawClassification: "private",
       needsAdviceOnEUOrInternationalMaintenance: false,
       needsProtectiveInjunction: false,
-      privateFamilyCaseScope: "domesticAbuse",
+      laspoEvidenceScope: "domesticAbuse",
     });
   });
 
@@ -335,7 +335,7 @@ describe("toAnswers method", () => {
         familyLawClassification: "private",
         needsAdviceOnEUOrInternationalMaintenance: false,
         needsProtectiveInjunction: false,
-        privateFamilyCaseScope: "domesticAbuse", 
+        laspoEvidenceScope: "domesticAbuse", 
       },
     });
 
@@ -344,7 +344,7 @@ describe("toAnswers method", () => {
       familyLawClassification: "private",
       needsAdviceOnEUOrInternationalMaintenance: "no",
       needsProtectiveInjunction: "no",
-      privateFamilyCaseScope: "domesticAbuse",
+      laspoEvidenceScope: "domesticAbuse",
     });
   });
 
@@ -365,7 +365,7 @@ describe("toAnswers method", () => {
     expect(result).to.not.have.any.keys(
       "needsAdviceOnEUOrInternationalMaintenance",
       "needsProtectiveInjunction",
-      "privateFamilyCaseScope",
+      "laspoEvidenceScope",
     );
   });
 });

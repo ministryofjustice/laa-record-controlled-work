@@ -192,12 +192,12 @@ export class ApplicationDto {
         answers.needsProtectiveInjunction === "yes";
     }
     if (
-      answers.privateFamilyCaseScope === "domesticAbuse" ||
-      answers.privateFamilyCaseScope === "childAbuse" ||
-      answers.privateFamilyCaseScope === "under18" ||
-      answers.privateFamilyCaseScope === "parentOrGuardian"
+      answers.laspoEvidenceScope === "domesticAbuse" ||
+      answers.laspoEvidenceScope === "childAbuse" ||
+      answers.laspoEvidenceScope === "under18" ||
+      answers.laspoEvidenceScope === "parentOrGuardian"
     ) {
-      scopingQuestions.privateFamilyCaseScope = answers.privateFamilyCaseScope;
+      scopingQuestions.laspoEvidenceScope = answers.laspoEvidenceScope;
     }
 
     return scopingQuestions;
@@ -287,9 +287,9 @@ export class ApplicationDto {
       scopingAnswers[AnswerKey.needsProtectiveInjunction] =
         scopingQuestions.needsProtectiveInjunction ? "yes" : "no";
     }
-    if (scopingQuestions.privateFamilyCaseScope !== undefined) {
-      scopingAnswers[AnswerKey.privateFamilyCaseScope] =
-        scopingQuestions.privateFamilyCaseScope ?? undefined;
+    if (scopingQuestions.laspoEvidenceScope !== undefined) {
+      scopingAnswers[AnswerKey.laspoEvidenceScope] =
+        scopingQuestions.laspoEvidenceScope ?? undefined;
     }
 
     return scopingAnswers;

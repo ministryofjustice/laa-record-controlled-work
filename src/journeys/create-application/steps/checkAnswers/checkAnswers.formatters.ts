@@ -177,22 +177,22 @@ export function formatOsAddress(): ResolvableString {
  */
 export function formatPrivateFamilyCaseScopeLabel(): ResolvableString {
   const domesticAbuse = t(
-    "journeys.createApplication.privateFamilyCaseScope.radioButton.domesticAbuse",
+    "journeys.createApplication.laspoEvidenceScope.radioButton.domesticAbuse",
   );
   const childAbuse = t(
-    "journeys.createApplication.privateFamilyCaseScope.radioButton.childAbuse",
+    "journeys.createApplication.laspoEvidenceScope.radioButton.childAbuse",
   );
   const clientUnder18 = t(
-    "journeys.createApplication.privateFamilyCaseScope.radioButton.clientUnder18",
+    "journeys.createApplication.laspoEvidenceScope.radioButton.clientUnder18",
   );
   const clientHasParentalResponsibility = t(
-    "journeys.createApplication.privateFamilyCaseScope.radioButton.clientHasParentalResponsibility",
+    "journeys.createApplication.laspoEvidenceScope.radioButton.clientHasParentalResponsibility",
   );
   const none = t(
-    "journeys.createApplication.privateFamilyCaseScope.radioButton.none",
+    "journeys.createApplication.laspoEvidenceScope.radioButton.none",
   );
 
-  return match(Answer(AnswerKey.privateFamilyCaseScope))
+  return match(Answer(AnswerKey.laspoEvidenceScope))
     .branch(Condition.Equals("domesticAbuse"), domesticAbuse)
     .branch(Condition.Equals("childAbuse"), childAbuse)
     .branch(Condition.Equals("clientUnder18"), clientUnder18)

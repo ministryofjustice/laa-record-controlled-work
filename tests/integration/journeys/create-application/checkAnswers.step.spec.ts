@@ -39,7 +39,7 @@ describe("Check answers step", () => {
         legalAidLast6Months: "yes",
         needsAdviceOnEUOrInternationalMaintenance: "no",
         needsProtectiveInjunction: "no",
-        privateFamilyCaseScope: "domesticAbuse",
+        laspoEvidenceScope: "domesticAbuse",
         reasonForHelp: "Some reason for help",
         reasonForYes: "Some reason for help",
         firstName: "John",

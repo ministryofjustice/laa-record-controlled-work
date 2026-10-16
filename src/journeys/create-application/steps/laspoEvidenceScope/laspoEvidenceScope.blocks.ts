@@ -13,7 +13,7 @@ import { AnswerKey } from "#/journeys/AnswerKey.enum.js";
 import { H1 } from "#/lib/constants/headings.js";
 import { fixedT } from "#/lib/i18n.js";
 
-const questionT = fixedT("journeys.createApplication.privateFamilyCaseScope");
+const questionT = fixedT("journeys.createApplication.laspoEvidenceScope");
 
 const TITLE = questionT("title");
 const GUIDANCE = questionT("guidance");
@@ -49,7 +49,7 @@ export function heading(): GovUKHeading {
  */
 export function scopeQuestion(): GovUKRadioInput {
   return GovUKRadioInput({
-    code: AnswerKey.privateFamilyCaseScope,
+    code: AnswerKey.laspoEvidenceScope,
     items: [
       {
         text: questionT("radioButton.domesticAbuse"),

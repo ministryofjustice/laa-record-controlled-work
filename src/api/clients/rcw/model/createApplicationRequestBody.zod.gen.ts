@@ -95,7 +95,7 @@ export const CreateApplicationRequestBody = zod
           .optional(),
         needsAdviceOnEUOrInternationalMaintenance: zod.boolean().nullish(),
         needsProtectiveInjunction: zod.boolean().nullish(),
-        privateFamilyCaseScope: zod
+        laspoEvidenceScope: zod
           .union([
             zod.enum([
               "domesticAbuse",

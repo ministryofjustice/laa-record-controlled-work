@@ -8,11 +8,11 @@ import { enterOverseasAddressStep } from "#/journeys/create-application/steps/en
 import { familyLawClassificationStep } from "#/journeys/create-application/steps/familyLawClassification/familyLawClassification.step.js";
 import { haveAHomeAddressStep } from "#/journeys/create-application/steps/haveAHomeAddress/haveAHomeAddress.step.js";
 import { internationalMaintenanceAgreementStep } from "#/journeys/create-application/steps/internationalMaintenanceAgreement/internationalMaintenanceAgreement.step.js";
+import { laspoEvidenceScopeStep } from "#/journeys/create-application/steps/laspoEvidenceScope/laspoEvidenceScope.step.js";
 import { legalAidBeforeStep } from "#/journeys/create-application/steps/legalAidBefore/legalAidBefore.step.js";
 import { legalAidLast6MonthsStep } from "#/journeys/create-application/steps/legalAidLast6Months/legalAidLast6Months.step.js";
 import { needsProtectiveInjunctionStep } from "#/journeys/create-application/steps/needsProtectiveInjunction/needsProtectiveInjunction.step.js";
 import { niNumberStep } from "#/journeys/create-application/steps/niNumber/niNumber.step.js";
-import { privateFamilyCaseScopeStep } from "#/journeys/create-application/steps/privateFamilyCaseScope/privateFamilyCaseScope.step.js";
 import { editClientDetailsEffects } from "#/journeys/edit-client-details/editClientDetails.effects.js";
 import { checkAnswersStep } from "#/journeys/edit-client-details/steps/check-answers/check-answers.step.js";
 import { JourneyCode } from "#/journeys/JourneyCode.enum.js";
@@ -36,7 +36,7 @@ export const editClientDetailsJourney = journey({
     familyLawClassificationStep(editJourneyCode),
     internationalMaintenanceAgreementStep(editJourneyCode),
     needsProtectiveInjunctionStep(editJourneyCode),
-    privateFamilyCaseScopeStep(editJourneyCode),
+    laspoEvidenceScopeStep(editJourneyCode),
     ineligibleStep(editJourneyCode),
     legalAidBeforeStep(editJourneyCode),
     legalAidLast6MonthsStep(editJourneyCode),

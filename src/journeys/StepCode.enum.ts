@@ -5,8 +5,8 @@ export enum StepCode {
   ECF_DROPOUT = "ecf-dropout",
   FAMILY_TYPE_OF_CASE = "family-type-of-case",
   INTERNATIONAL_MAINTENANCE_AGREEMENT = "international-maintenance-agreement",
+  LASPO_EVIDENCE_SCOPE = "laspo-evidence-scope",
   LEGAL_AID_BEFORE = "legal-aid-before",
   LEGAL_AID_LAST_6_MONTHS = "legal-aid-last-6-months",
-  PRIVATE_FAMILY_CASE_SCOPE = "private-family-case-scope",
   PROTECT_THEMSELF = "protect-themself",
 }
