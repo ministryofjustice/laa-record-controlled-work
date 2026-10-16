@@ -47,7 +47,7 @@ export function heading(): BlockDefinition {
  */
 export function question(): BlockDefinition {
   const errorMessage = t(
-    "journeys.createApplication.letterFromLocalAuthority.errors.required",
+    "journeys.createApplication.letterFromLocalAuthority.validation.required",
   );
 
   return GovUKRadioInput({

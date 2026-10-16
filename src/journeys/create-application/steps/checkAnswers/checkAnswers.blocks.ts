@@ -74,8 +74,8 @@ export function summaryList(): GovUKSummaryList {
     href: "care-proceedings?returnTo=check-answers",
     label: answerLabelT("letterFromLocalAuthority"),
     value: { text: formatLetterFromLocalAuthority() },
-    visibleWhen: Answer(AnswerKey.letterFromLocalAuthority).match(
-      Condition.Equals("yes"),
+    visibleWhen: Answer(AnswerKey.familyLawClassification).match(
+      Condition.Equals("public"),
     ),
   });
   const needsAdviceOnEUOrInternationalMaintenance = summaryRow({

@@ -369,7 +369,7 @@
           "The local authority starts care proceedings under Section 31 of the Children Act 1989 when they think a child is at risk of serious harm.",
           "Your client must provide evidence of this."
         ],
-        "errors": {
+        "validation": {
           "required": "Select if your client received a letter saying the local authority is initiating care proceedings"
         }
       },
