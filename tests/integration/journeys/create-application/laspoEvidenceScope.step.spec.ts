@@ -8,7 +8,7 @@ import { createApplicationTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import { createApplicationJourney } from "#/journeys/create-application/create-application.journey.js";
 
-describe("Private Family Case Scope step", () => {
+describe("LASPO Evidence Scope step", () => {
   const client = createApplicationTestClient(
     createApplicationJourney,
     createApplicationEffectsRegistry,
@@ -32,13 +32,15 @@ describe("Private Family Case Scope step", () => {
     });
 
     it("renders all radio options", () => {
-      const buttons = radioInput.properties.items as { text: string }[];
-      expect(buttons.length).to.equal(6);
-      expect(buttons[0].text).to.equal("Evidence of domestic abuse (Schedule 1)");
-      expect(buttons[1].text).to.equal("Evidence of child abuse (Schedule 2)");
-      expect(buttons[2].text).to.equal("Client is under 18 at time of signing");
-      expect(buttons[3].text).to.equal("Client is a parent, person with parental responsibility, or prospective special guardian involved in a Special Guardianship Order application");
-      expect(buttons[4].text).to.equal("None of these");
+      const buttons = radioInput.properties.items as { text: string, value: string }[];
+      expect(buttons.length).to.equal(5);
+      expect(buttons).to.have.deep.include.members([
+        { text: "Evidence of domestic abuse (Schedule 1)", value: "domesticAbuse" },
+        { text: "Evidence of child abuse (Schedule 2)", value: "childAbuse" },
+        { text: "Client is under 18 at time of signing", value: "clientUnder18" },
+        { text: "Client is a parent, person with parental responsibility, or prospective special guardian involved in a Special Guardianship Order application", value: "clientHasParentalResponsibility" },
+        { text: "None of these", value: "none" },
+      ]);
     });
   });
 

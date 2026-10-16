@@ -3,12 +3,12 @@ import { faker } from "@faker-js/faker";
 
 import { FamilyLawClassification } from "#/api/clients/rcw/model/familyLawClassification.zod.gen.js";
 import { PriorLegalAid } from "#/api/clients/rcw/model/priorLegalAid.zod.gen.js";
+import { PrivateFamilyCaseScope } from "#/api/clients/rcw/model/privateFamilyCaseScope.zod.gen.js";
 import {
   getCreateApplicationResponseMock,
   getGetApplicationResponseMock,
   getGetApplicationsResponseMock,
 } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
-import { PrivateFamilyCaseScope } from "#/api/clients/rcw/model/privateFamilyCaseScope.zod.gen.js";
 
 faker.seed(12345);
 
