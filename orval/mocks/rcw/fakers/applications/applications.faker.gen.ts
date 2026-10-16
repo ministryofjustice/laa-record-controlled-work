@@ -482,6 +482,15 @@ export const getGetApplicationResponseMock = <
         ]),
         needsAdviceOnEUOrInternationalMaintenance: faker.datatype.boolean(),
         needsProtectiveInjunction: faker.datatype.boolean(),
+        privateFamilyCaseScope: faker.helpers.arrayElement([
+          faker.helpers.arrayElement([
+            "domesticAbuse",
+            "childAbuse",
+            "under18",
+            "parentOrGuardian",
+          ] as const),
+          null,
+        ]),
       },
       null,
     ]),

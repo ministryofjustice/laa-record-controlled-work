@@ -93,6 +93,17 @@ export const CreateApplicationBody = zod
           .optional(),
         needsAdviceOnEUOrInternationalMaintenance: zod.boolean().nullish(),
         needsProtectiveInjunction: zod.boolean().nullish(),
+        privateFamilyCaseScope: zod
+          .union([
+            zod.enum([
+              "domesticAbuse",
+              "childAbuse",
+              "under18",
+              "parentOrGuardian",
+            ]),
+            zod.null(),
+          ])
+          .optional(),
       }),
       clientDetails: zod
         .union([

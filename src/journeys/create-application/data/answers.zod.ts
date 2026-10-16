@@ -11,6 +11,7 @@ export const Answers = zod
     firstName: zod.string(),
     hasNINumber: zod.string(),
     haveAHomeAddress: zod.string(),
+    laspoEvidenceScope: zod.string().optional(),
     lastName: zod.string(),
     legalAidBefore: PriorLegalAid,
     legalAidLast6Months: zod.string().optional(),

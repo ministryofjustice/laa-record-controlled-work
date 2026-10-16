@@ -342,6 +342,21 @@
           "required": "Select whether your client needs legal aid to get a protective injunction order for themselves or their children."
         }
       },
+      "laspoEvidenceScope": {
+        "title": "How can you prove this case is in scope?",
+        "guidance": "Legal aid is only available for these proceedings under paragraphs 12 and 13 of Part 1, Schedule 1 of the Legal Aid Sentencing and Punishment of Offenders Act 2012 if the <a href=\"https://assets.publishing.service.gov.uk/media/6a3122bae50716856ed4b160/Evidence_requirements_for_private_family_law_matters_guidance_version_15_15_June_2026.pdf\" target=\"_blank\">evidence requirements (opens in new window or tab)</a> set out in Schedule 1, regulation 33 and Schedule 2, regulation 34 of the Civil Legal Aid (Procedures) Regulations and guidance are satisfied.",
+        "radioButton": {
+          "domesticAbuse": "Evidence of domestic abuse (Schedule 1)",
+          "childAbuse": "Evidence of child abuse (Schedule 2)",
+          "under18": "Client is under 18 at time of signing",
+          "parentOrGuardian": "Client is a parent, person with parental responsibility, or prospective special guardian involved in a Special Guardianship Order application",
+          "or": "or",
+          "none": "None of these"
+        },
+        "validation": {
+          "required": "Select how can you prove this case is in scope"
+        }
+      },
       "legalAidBefore": {
         "title": "Has your client accessed legal aid before?",
         "radioButton": {
@@ -475,6 +490,7 @@
           "familyLawClassification": "Type of family law",
           "internationalMaintenanceAgreement": "Transitional EU arrangements or an international maintenance agreement",
           "protectThemselves": "Legal aid to get a protective injunction order",
+          "laspoEvidenceScope": "Evidence case is in scope",
           "legalAidBefore": "Accessed legal aid before",
           "legalAidLast6Months": "Did your client get legal help for this matter in the last 6 months?",
           "legalAidLast6MonthsReasonForYes": "Reason for new application for same matter",

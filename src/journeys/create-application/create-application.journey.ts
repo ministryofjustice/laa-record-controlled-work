@@ -9,6 +9,7 @@ import { enterOverseasAddressStep } from "#/journeys/create-application/steps/en
 import { familyLawClassificationStep } from "#/journeys/create-application/steps/familyLawClassification/familyLawClassification.step.js";
 import { haveAHomeAddressStep } from "#/journeys/create-application/steps/haveAHomeAddress/haveAHomeAddress.step.js";
 import { internationalMaintenanceAgreementStep } from "#/journeys/create-application/steps/internationalMaintenanceAgreement/internationalMaintenanceAgreement.step.js";
+import { laspoEvidenceScopeStep } from "#/journeys/create-application/steps/laspoEvidenceScope/laspoEvidenceScope.step.js";
 import { legalAidLast6MonthsStep } from "#/journeys/create-application/steps/legalAidLast6Months/legalAidLast6Months.step.js";
 import { needsProtectiveInjunctionStep } from "#/journeys/create-application/steps/needsProtectiveInjunction/needsProtectiveInjunction.step.js";
 import { JourneyCode } from "#/journeys/JourneyCode.enum.js";
@@ -35,6 +36,7 @@ export const createApplicationJourney = journey({
     familyLawClassificationStep(JourneyCode.CREATE_APPLICATION),
     internationalMaintenanceAgreementStep(JourneyCode.CREATE_APPLICATION),
     needsProtectiveInjunctionStep(JourneyCode.CREATE_APPLICATION),
+    laspoEvidenceScopeStep(JourneyCode.CREATE_APPLICATION),
     ecfStep(JourneyCode.CREATE_APPLICATION),
     ineligibleStep(JourneyCode.CREATE_APPLICATION),
     legalAidBeforeStep(JourneyCode.CREATE_APPLICATION),

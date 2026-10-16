@@ -5,6 +5,7 @@ export enum AnswerKey {
   firstName = "firstName",
   hasNINumber = "hasNINumber",
   haveAHomeAddress = "haveAHomeAddress",
+  laspoEvidenceScope = "laspoEvidenceScope",
   lastName = "lastName",
   legalAidBefore = "legalAidBefore",
   legalAidLast6Months = "legalAidLast6Months",

@@ -172,6 +172,41 @@ export function formatOsAddress(): ResolvableString {
 }
 
 /**
+ * Formats the private family case scope answer label.
+ * @returns The private family case scope answer label.
+ */
+export function formatPrivateFamilyCaseScopeLabel(): ResolvableString {
+  const domesticAbuse = t(
+    "journeys.createApplication.laspoEvidenceScope.radioButton.domesticAbuse",
+  );
+  const childAbuse = t(
+    "journeys.createApplication.laspoEvidenceScope.radioButton.childAbuse",
+  );
+  const under18 = t(
+    "journeys.createApplication.laspoEvidenceScope.radioButton.under18",
+  );
+  const parentOrGuardian = t(
+    "journeys.createApplication.laspoEvidenceScope.radioButton.parentOrGuardian",
+  );
+  const none = t(
+    "journeys.createApplication.laspoEvidenceScope.radioButton.none",
+  );
+
+  return match(Answer(AnswerKey.laspoEvidenceScope))
+    .branch(Condition.Equals("domesticAbuse"), domesticAbuse)
+    .branch(Condition.Equals("childAbuse"), childAbuse)
+    .branch(Condition.Equals("under18"), under18)
+    .branch(
+      Condition.Equals("parentOrGuardian"),
+      parentOrGuardian,
+    )
+    .branch(
+      Condition.Equals("none"),
+      none,
+    );
+}
+
+/**
  * Formats a client's UK address for display.
  * @returns The formatted address HTML.
  */

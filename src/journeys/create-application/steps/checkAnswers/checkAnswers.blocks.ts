@@ -23,6 +23,7 @@ import {
   formatLegalAidBeforeLabel,
   formatLegalAidLast6MonthsLabel,
   formatNeedsProtectiveInjunctionLabel,
+  formatPrivateFamilyCaseScopeLabel,
 } from "#/journeys/create-application/steps/checkAnswers/checkAnswers.formatters.js";
 import { fixedT, t } from "#/lib/i18n.js";
 
@@ -81,6 +82,14 @@ export function summaryList(): GovUKSummaryList {
     href: "protect-themself?returnTo=check-answers",
     label: answerLabelT("protectThemselves"),
     value: { text: formatNeedsProtectiveInjunctionLabel() },
+    visibleWhen: Answer(AnswerKey.familyLawClassification).match(
+      Condition.Equals(FamilyLawClassification.enum.private),
+    ),
+  });
+  const laspoEvidenceScope = summaryRow({
+    href: "prove-in-scope?returnTo=check-answers",
+    label: answerLabelT("laspoEvidenceScope"),
+    value: { text: formatPrivateFamilyCaseScopeLabel() },
     visibleWhen: Answer(AnswerKey.familyLawClassification).match(
       Condition.Equals(FamilyLawClassification.enum.private),
     ),
@@ -151,6 +160,7 @@ export function summaryList(): GovUKSummaryList {
       familyLawClassification,
       needsAdviceOnEUOrInternationalMaintenance,
       needsProtectiveInjunction,
+      laspoEvidenceScope,
       legalAidBefore,
       legalAidLast6Months,
       reasonForYes,

@@ -32,7 +32,7 @@ test("Edit Application - Client details journey", async ({
   // Check that all answers are displayed correctly
   const summaryList = page.locator(".govuk-summary-list");
   const rows = summaryList.locator(".govuk-summary-list__row");
-  await expect(rows).toHaveCount(11);
+  await expect(rows).toHaveCount(12);
   await expect(rows.locator(".govuk-summary-list__value")).toContainText(
     [
       // ECF
@@ -43,6 +43,8 @@ test("Edit Application - Client details journey", async ({
       "No",
       // Needs protective injunction
       "No",
+      // Evidence case is in scope
+      "Evidence of domestic abuse (Schedule 1)",
       // Accessed legal aid before
       "No",
       // First name

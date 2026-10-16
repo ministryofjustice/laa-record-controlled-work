@@ -183,11 +183,21 @@ export class ApplicationDto {
       priorLegalAid: answers.legalAidBefore,
     };
 
-    if (answers.familyLawClassification === "private") {
+    if (answers.needsAdviceOnEUOrInternationalMaintenance !== undefined) {
       scopingQuestions.needsAdviceOnEUOrInternationalMaintenance =
         answers.needsAdviceOnEUOrInternationalMaintenance === "yes";
+    }
+    if (answers.needsProtectiveInjunction !== undefined) {
       scopingQuestions.needsProtectiveInjunction =
         answers.needsProtectiveInjunction === "yes";
+    }
+    if (
+      answers.laspoEvidenceScope === "domesticAbuse" ||
+      answers.laspoEvidenceScope === "childAbuse" ||
+      answers.laspoEvidenceScope === "under18" ||
+      answers.laspoEvidenceScope === "parentOrGuardian"
+    ) {
+      scopingQuestions.privateFamilyCaseScope = answers.laspoEvidenceScope;
     }
 
     return scopingQuestions;
@@ -265,13 +275,21 @@ export class ApplicationDto {
   ): Partial<AnswersOutput> {
     const scopingAnswers: Partial<AnswersOutput> = {};
 
-    if (scopingQuestions.familyLawClassification === "private") {
+    if (
+      scopingQuestions.needsAdviceOnEUOrInternationalMaintenance !== undefined
+    ) {
       scopingAnswers[AnswerKey.needsAdviceOnEUOrInternationalMaintenance] =
         scopingQuestions.needsAdviceOnEUOrInternationalMaintenance
           ? "yes"
           : "no";
+    }
+    if (scopingQuestions.needsProtectiveInjunction !== undefined) {
       scopingAnswers[AnswerKey.needsProtectiveInjunction] =
         scopingQuestions.needsProtectiveInjunction ? "yes" : "no";
+    }
+    if (scopingQuestions.privateFamilyCaseScope !== undefined) {
+      scopingAnswers[AnswerKey.laspoEvidenceScope] =
+        scopingQuestions.privateFamilyCaseScope ?? undefined;
     }
 
     return scopingAnswers;
