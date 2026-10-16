@@ -8,8 +8,8 @@ import type { ScopingQuestions } from "#/api/clients/rcw/model/scopingQuestions.
 import type { YesSameMatterBranch } from "#/api/clients/rcw/model/yesSameMatterBranch.zod.gen.js";
 import type { AnswersOutput } from "#/journeys/create-application/data/answers.zod.js";
 
+import { LaspoEvidenceScope } from "#/api/clients/rcw/model/laspoEvidenceScope.zod.gen.js";
 import { PriorLegalAid } from "#/api/clients/rcw/model/priorLegalAid.zod.gen.js";
-import { PrivateFamilyCaseScope } from "#/api/clients/rcw/model/privateFamilyCaseScope.zod.gen.js";
 import { AnswerKey } from "#/journeys/AnswerKey.enum.js";
 import {
   mapCountryNameToIsoCode,
@@ -205,11 +205,11 @@ export class ApplicationDto {
 
       return {
         ...common,
+        laspoEvidenceScope: LaspoEvidenceScope.parse(
+          answers.laspoEvidenceScope ?? "none",
+        ),
         needsAdviceOnEUOrInternationalMaintenance: false,
         needsProtectiveInjunction: false,
-        privateFamilyCaseScope: PrivateFamilyCaseScope.parse(
-          answers.privateFamilyCaseScope ?? "none",
-        ),
       };
     }
 
@@ -375,8 +375,8 @@ export class ApplicationDto {
       : "no";
 
     if (!needsProtectiveInjunction) {
-      answers[AnswerKey.privateFamilyCaseScope] =
-        scopingQuestions.privateFamilyCaseScope ?? "none";
+      answers[AnswerKey.laspoEvidenceScope] =
+        scopingQuestions.laspoEvidenceScope ?? "none";
     }
 
     return answers;

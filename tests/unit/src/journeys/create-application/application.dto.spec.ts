@@ -139,7 +139,7 @@ describe("fromAnswers method", () => {
       familyLawClassification: "private",
       needsAdviceOnEUOrInternationalMaintenance: false,
       needsProtectiveInjunction: false,
-      privateFamilyCaseScope: "none",
+      laspoEvidenceScope: "none",
       caseMeetsMeritsCriteria: true,
     });
     expect(ScopingQuestions.safeParse(result.scopingQuestions).success).to.equal(
@@ -154,7 +154,7 @@ describe("fromAnswers method", () => {
         familyLawClassification: "private",
         needsAdviceOnEUOrInternationalMaintenance: "no",
         needsProtectiveInjunction: "yes",
-        privateFamilyCaseScope: "domesticAbuse",
+        laspoEvidenceScope: "domesticAbuse",
       },
       "test-office",
     ).toRcwApi();
@@ -174,7 +174,7 @@ describe("fromAnswers method", () => {
       familyLawClassification: "private" as const,
       needsAdviceOnEUOrInternationalMaintenance: "no",
       needsProtectiveInjunction: "no",
-      privateFamilyCaseScope: "domesticAbuse" as const,
+      laspoEvidenceScope: "domesticAbuse" as const,
     };
 
     const result = ApplicationDto.fromAnswers(
@@ -187,7 +187,7 @@ describe("fromAnswers method", () => {
       familyLawClassification: "private",
       needsAdviceOnEUOrInternationalMaintenance: false,
       needsProtectiveInjunction: false,
-      privateFamilyCaseScope: "domesticAbuse",
+      laspoEvidenceScope: "domesticAbuse",
       caseMeetsMeritsCriteria: true,
     });
   });
@@ -198,7 +198,7 @@ describe("fromAnswers method", () => {
       familyLawClassification: "private" as const,
       needsAdviceOnEUOrInternationalMaintenance: "yes",
       needsProtectiveInjunction: "no",
-      privateFamilyCaseScope: "domesticAbuse" as const,
+      laspoEvidenceScope: "domesticAbuse" as const,
     };
 
     const result = ApplicationDto.fromAnswers(
@@ -484,7 +484,7 @@ describe("toAnswers method", () => {
     expect(result).to.include({
       needsAdviceOnEUOrInternationalMaintenance: "no",
       needsProtectiveInjunction: "no",
-      privateFamilyCaseScope: "none",
+      laspoEvidenceScope: "none",
     });
   });
 
@@ -495,15 +495,30 @@ describe("toAnswers method", () => {
         familyLawClassification: "private",
         needsAdviceOnEUOrInternationalMaintenance: false,
         needsProtectiveInjunction: false,
-        privateFamilyCaseScope: "childAbuse",
+        laspoEvidenceScope: "childAbuse",
       }),
     );
 
     expect(result).to.include({
       needsAdviceOnEUOrInternationalMaintenance: "no",
       needsProtectiveInjunction: "no",
-      privateFamilyCaseScope: "childAbuse",
+      laspoEvidenceScope: "childAbuse",
     });
+  });
+
+  it("omits a skipped scope answer when a protective injunction applies", () => {
+    const result = ApplicationDto.toAnswers(
+      applicationWithScopingQuestions({
+        priorLegalAid: "no",
+        familyLawClassification: "private",
+        needsAdviceOnEUOrInternationalMaintenance: false,
+        needsProtectiveInjunction: true,
+        laspoEvidenceScope: "domesticAbuse",
+      }),
+    );
+
+    expect(result).to.include({ needsProtectiveInjunction: "yes" });
+    expect(result).to.not.have.any.keys("laspoEvidenceScope");
   });
 
   it("omits skipped answers when hydrating a maintenance shortcut", () => {
@@ -513,7 +528,7 @@ describe("toAnswers method", () => {
         familyLawClassification: "private",
         needsAdviceOnEUOrInternationalMaintenance: true,
         needsProtectiveInjunction: false,
-        privateFamilyCaseScope: "domesticAbuse",
+        laspoEvidenceScope: "domesticAbuse",
       }),
     );
 
@@ -522,7 +537,7 @@ describe("toAnswers method", () => {
     });
     expect(result).to.not.have.any.keys(
       "needsProtectiveInjunction",
-      "privateFamilyCaseScope",
+      "laspoEvidenceScope",
     );
   });
 
@@ -542,7 +557,7 @@ describe("toAnswers method", () => {
     expect(result).to.not.have.any.keys(
       "needsAdviceOnEUOrInternationalMaintenance",
       "needsProtectiveInjunction",
-      "privateFamilyCaseScope",
+      "laspoEvidenceScope",
     );
   });
 });
