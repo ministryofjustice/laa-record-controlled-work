@@ -36,7 +36,7 @@ function summaries(overrides: Partial<EligibilityData> = {}) {
 describe("saved employment income", () => {
   before(initializeI18nextSync);
 
-  it("preserves client and partner entries, duplicates, frequencies, and zero deductions", () => {
+  it("preserves client and partner entries, frequencies, and zero deductions", () => {
     const answerSummaries = summaries({
       employment_status: "in_work",
       incomes: [

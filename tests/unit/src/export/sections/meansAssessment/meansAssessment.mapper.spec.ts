@@ -1,6 +1,10 @@
 import { expect } from "chai";
 import { before, describe, it } from "mocha";
 
+import {
+  MeansAssessmentScenarioName,
+  meansAssessmentScenarios,
+} from "#tests/fixtures/meansAssessment.fixtures.js";
 import { toMeansAssessmentSection } from "#/export/sections/meansAssessment/meansAssessment.mapper.js";
 import { initializeI18nextSync } from "#/lib/i18n.js";
 import { getGetApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
@@ -29,15 +33,31 @@ const CALCULATED_RESULT = {
   },
 };
 
+interface SectionApplicationOverrides {
+  data?: null | Record<string, unknown>;
+  meansAssessmentRequired?: boolean | null | undefined;
+}
+
 function mapSection(
   result: null | Record<string, unknown>,
-  data: null | Record<string, unknown> = {},
-  meansAssessmentRequired: boolean | null | undefined = true,
+  { data = {}, ...applicationOverrides }: SectionApplicationOverrides = {},
 ) {
   return toMeansAssessmentSection(
     getGetApplicationResponseMock({
       eligibility: { data, result },
-      meansAssessmentRequired,
+      meansAssessmentRequired: true,
+      ...applicationOverrides,
+    }),
+  );
+}
+
+function mapScenario(name: MeansAssessmentScenarioName) {
+  const scenario = meansAssessmentScenarios[name]();
+
+  return toMeansAssessmentSection(
+    getGetApplicationResponseMock({
+      eligibility: scenario.eligibility,
+      meansAssessmentRequired: scenario.meansAssessmentRequired,
     }),
   );
 }
@@ -151,6 +171,65 @@ describe("toMeansAssessmentSection", () => {
     });
   });
 
+  it("presents the three saved totals in export order", () => {
+    expect(
+      mapScenario(MeansAssessmentScenarioName.Baseline)?.outcomeSummary.totals,
+    ).to.deep.equal({
+      heading: "Your client's key eligibility totals",
+      items: [
+        {
+          amount: "£0",
+          detail: "Below upper limit (£2,657)",
+          heading: "Gross monthly income",
+        },
+        {
+          amount: "£0",
+          detail: "Eligible",
+          heading: "Disposable monthly income",
+        },
+        {
+          amount: "£0",
+          detail: "No upper limit applies",
+          heading: "Disposable capital",
+        },
+      ],
+    });
+  });
+
+  it("omits uncalculated totals and keeps saved null totals unavailable", () => {
+    expect(
+      mapScenario(MeansAssessmentScenarioName.CalculationStates)?.outcomeSummary
+        .totals,
+    ).to.deep.equal({
+      heading: "Your client's key eligibility totals",
+      items: [
+        {
+          amount: "Not available",
+          detail: null,
+          heading: "Gross monthly income",
+        },
+        {
+          amount: "£0",
+          detail: "No upper limit applies",
+          heading: "Disposable capital",
+        },
+      ],
+    });
+  });
+
+  it("shows no totals when saved calculations are unavailable or exempt", () => {
+    for (const name of [
+      MeansAssessmentScenarioName.AsylumSupport,
+      MeansAssessmentScenarioName.MissingEligibility,
+      MeansAssessmentScenarioName.Passporting,
+      MeansAssessmentScenarioName.Under18ControlledClr,
+      MeansAssessmentScenarioName.Under18NoMeans,
+      MeansAssessmentScenarioName.UnavailableResult,
+    ]) {
+      expect(mapScenario(name)?.outcomeSummary.totals, name).to.equal(null);
+    }
+  });
+
   it("keeps absent calculation categories uncalculated", () => {
     const result = {
       result_summary: {
@@ -173,7 +252,7 @@ describe("toMeansAssessmentSection", () => {
     }
   });
 
-  it("keeps explicitly uncalculated proceeding categories available", () => {
+  it("marks explicitly uncalculated categories as not calculated", () => {
     const result = {
       result_summary: {
         capital: {
@@ -316,33 +395,45 @@ describe("toMeansAssessmentSection", () => {
     });
   });
 
-  for (const data of [
-    { passporting: true },
-    { asylum_support: true, immigration_or_asylum: true },
+  for (const { data, name } of [
+    { name: "passporting", data: { passporting: true } },
     {
-      passporting: false,
-      asylum_support: true,
-      immigration_or_asylum: true,
+      name: "asylum support",
+      data: { asylum_support: true, immigration_or_asylum: true },
     },
     {
-      aggregated_means: false,
-      client_age: "under_18",
-      under_eighteen_assets: false,
-      regular_income: false,
+      name: "asylum support with passporting false",
+      data: {
+        passporting: false,
+        asylum_support: true,
+        immigration_or_asylum: true,
+      },
     },
     {
-      aggregated_means: false,
-      client_age: "under_18",
-      controlled_legal_representation: false,
-      under_eighteen_assets: false,
-      regular_income: false,
+      name: "under-18 with no aggregated means or regular income",
+      data: {
+        aggregated_means: false,
+        client_age: "under_18",
+        under_eighteen_assets: false,
+        regular_income: false,
+      },
     },
-  ]) {
-    it("accepts a saved eligible exemption or passporting result without categories", () => {
+    {
+      name: "under-18 with no controlled legal representation",
+      data: {
+        aggregated_means: false,
+        client_age: "under_18",
+        controlled_legal_representation: false,
+        under_eighteen_assets: false,
+        regular_income: false,
+      },
+    },
+  ] satisfies Array<{ data: Record<string, unknown>; name: string }>) {
+    it(`accepts a saved exemption or passporting result without categories for ${name}`, () => {
       const result = {
         result_summary: { overall_result: { result: "eligible" } },
       };
-      const calculations = mapSection(result, data)?.calculations;
+      const calculations = mapSection(result, { data })?.calculations;
 
       expect(calculations).to.deep.equal({
         capital: { status: "not_calculated" },
@@ -366,12 +457,25 @@ describe("toMeansAssessmentSection", () => {
     });
   });
 
-  for (const meansAssessmentRequired of [null, undefined]) {
-    it(`keeps a valid assessment when meansAssessmentRequired is ${String(meansAssessmentRequired)}`, () => {
-      expect(
-        mapSection(CALCULATED_RESULT, {}, meansAssessmentRequired)?.calculations
-          .status,
-      ).to.equal("ready");
+  for (const { name, value } of [
+    { name: "false", value: false },
+    { name: "null", value: null },
+    { name: "undefined", value: undefined },
+    { name: "true", value: true },
+  ] satisfies Array<{
+    name: string;
+    value: boolean | null | undefined;
+  }>) {
+    it(`handles an explicitly ${name} means assessment required flag`, () => {
+      const section = mapSection(CALCULATED_RESULT, {
+        meansAssessmentRequired: value,
+      });
+
+      if (value === false) {
+        expect(section).to.equal(null);
+      } else {
+        expect(section?.calculations.status).to.equal("ready");
+      }
     });
   }
 });
