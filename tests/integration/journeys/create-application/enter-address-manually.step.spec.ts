@@ -163,6 +163,25 @@ describe("Enter address manually step", () => {
         expectedMessage: "Enter a valid postcode, for example SW1A 1AA",
         fieldCode: "ukPostcode",
       },
+      {
+        description: "town or city contains only spaces",
+        body: { ...validBody, ukTownOrCity: "   " },
+        fieldCode: "ukTownOrCity",
+        expectedMessage: "Enter town or city",
+      },
+      {
+        description: "town or city contains only U+0085",
+        body: { ...validBody, ukTownOrCity: "\u0085" },
+        fieldCode: "ukTownOrCity",
+        expectedMessage: "Enter town or city",
+      },
+      {
+        description: "address line 1 contains only U+0085",
+        body: { ...validBody, ukAddressLine1: "\u0085" },
+        fieldCode: "ukAddressLine1",
+        expectedMessage:
+          "Enter address line 1, typically the building and street",
+      },
     ];
 
     for (const {

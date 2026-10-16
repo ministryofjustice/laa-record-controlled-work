@@ -10,6 +10,7 @@ import {
 } from "@ministryofjustice/hmpps-forge/govuk-components";
 
 import { AnswerKey } from "#/journeys/AnswerKey.enum.js";
+import { nonBlank } from "#/journeys/validation.js";
 import { t } from "#/lib/i18n.js";
 
 const REASON_MAX_LENGTH = 500;
@@ -76,10 +77,7 @@ function reasonForYesTextInput(): GovUKCharacterCount {
     label: TEXT_QUESTION,
     maxLength: REASON_MAX_LENGTH,
     validWhen: [
-      validation({
-        condition: Self().match(Condition.IsRequired()),
-        message: t(TEXT_VALIDATION),
-      }),
+      nonBlank(TEXT_VALIDATION),
       validation({
         condition: Self().match(
           Condition.String.HasMaxLength(REASON_MAX_LENGTH),

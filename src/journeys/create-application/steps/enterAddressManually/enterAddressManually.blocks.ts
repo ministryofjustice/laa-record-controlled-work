@@ -9,7 +9,7 @@ import { HtmlBlock } from "@ministryofjustice/hmpps-forge/core/components";
 
 import { UK_ADDRESS_FIELDS } from "#/journeys/journey.constants.js";
 import { textInput } from "#/journeys/shared.blocks.js";
-import { required } from "#/journeys/validation.js";
+import { nonBlank, required } from "#/journeys/validation.js";
 import { fixedT } from "#/lib/i18n.js";
 
 const addressT = fixedT("journeys.createApplication.enterAddressManually");
@@ -55,12 +55,12 @@ const postcode = {
  */
 export function manualAddressInputs(): GovUKTextInput[] {
   const addressLine1 = textInput(line1.code, line1.label, {
-    validations: [required(line1.requiredValidation)],
+    validations: [nonBlank(line1.requiredValidation)],
   });
   const addressLine2 = textInput(line2.code, line2.label);
   const townOrCityInput = textInput(townOrCity.code, townOrCity.label, {
     classes: "govuk-!-width-two-thirds",
-    validations: [required(townOrCity.requiredValidation)],
+    validations: [nonBlank(townOrCity.requiredValidation)],
   });
   const countyInput = textInput(county.code, county.label, {
     classes: "govuk-!-width-two-thirds",
