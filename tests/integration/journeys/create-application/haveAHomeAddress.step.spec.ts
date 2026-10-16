@@ -91,11 +91,17 @@ describe("Have A Home Address Step", () => {
           createApplication: {
             haveAHomeAddress: "yes",
             ukAddressLine1: "10 Some Street",
+            ukAddressLine2: "Old UK detail",
+            ukCounty: "Old UK county",
             ukTownOrCity: "SomeCity",
             ukPostcode: "AB1 2CD",
             ukCountry: "United Kingdom",
             osAddressLine1: "10 Some Other Street",
+            osAddressLine2: "Old overseas detail",
+            osAddressLine3: "Old district",
+            osAddressLine4: "Old region",
             osCountry: "Australia",
+            ecf: "no",
           },
         },
       };
@@ -111,6 +117,7 @@ describe("Have A Home Address Step", () => {
       expect(redirectResult.url).to.equal("/cases/new/check-answers");
       expect(session.journeyDrafts.createApplication).to.deep.equal({
         haveAHomeAddress: "no",
+        ecf: "no",
       });
     });
 

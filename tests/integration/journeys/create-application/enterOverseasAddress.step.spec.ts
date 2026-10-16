@@ -104,6 +104,40 @@ describe("Enter overseas address step", () => {
       expect(redirectResult.url).to.equal("/cases/new/check-answers");
     });
 
+    it("clears UK answers and preserves other answers when an overseas address is submitted", async () => {
+  const session = {
+    journeyDrafts: {
+      createApplication: {
+        haveAHomeAddress: "yes",
+        ecf: "no",
+        ukAddressLine1: "Test UK address line 1",
+        ukAddressLine2: "Test UK address line 2",
+        ukTownOrCity: "Test town",
+        ukCounty: "Test county",
+        ukPostcode: "AB1 2CD",
+        ukCountry: "United Kingdom",
+        osAddressLine1: "Old overseas street",
+        osAddressLine2: "Old overseas detail",
+        osAddressLine3: "Old district",
+        osAddressLine4: "Old region",
+        osCountry: "Australia",
+      },
+    },
+  };
+  const result = await client.post("/cases/new/enter-overseas-address", {
+    body: validBody,
+    session,
+  });
+  expect(result.type).to.equal("redirect");
+  expect((result as TestRedirectResult).url).to.equal("/cases/new/check-answers");
+  expect(session.journeyDrafts.createApplication).to.deep.equal({
+    haveAHomeAddress: "yes",
+    ecf: "no",
+    ...validBody,
+  });
+});
+
+
     const validationErrorTests: Array<{
       description: string;
       body: Partial<typeof validBody>;
