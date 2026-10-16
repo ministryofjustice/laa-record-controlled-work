@@ -117,7 +117,7 @@ jobs:
         id: snyk-cli
         continue-on-error: true
         env:
-          SNYK_CLI_VERSION: 1.1307.4
+          SNYK_CLI_VERSION: 1.1308.0
         run: |
           npm install --global "snyk@$SNYK_CLI_VERSION"
           test "$(snyk --version)" = "$SNYK_CLI_VERSION"
