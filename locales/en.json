@@ -24,6 +24,45 @@
       "notProvided": "Not provided",
       "referenceNumber": "Reference number",
       "meansAssessment": {
+        "heading": "Means assessment",
+        "yourAnswers": "Your answers",
+        "totalsHeading": "Your client's key eligibility totals",
+        "outcomes": {
+          "eligible": {
+            "heading": "Your client is financially eligible for controlled work and family mediation.",
+            "description": "Your client qualifies financially for civil legal aid based on the information you entered. Before you (or a provider of advice or services funded by legal aid) proceed with your client's case, it must also be within scope for legal aid and satisfy the relevant merits criteria set out in the relevant legislation and guidance. These calculations were made in line with the latest version of the Lord Chancellor's Guidance on Determining Financial Eligibility for Controlled Work."
+          },
+          "contributionRequired": {
+            "heading": "Your client is financially eligible for controlled work and family mediation, with a contribution.",
+            "description": "The case must also be in scope and meet relevant merits criteria.",
+            "incomeContribution": "Monthly income contribution: {amount}",
+            "capitalContribution": "Capital contribution: {amount}"
+          },
+          "unavailable": {
+            "heading": "Financial eligibility outcome unavailable.",
+            "description": "Saved answer summaries are shown below."
+          }
+        },
+        "totals": {
+          "grossIncome": "Gross monthly income",
+          "disposableIncome": "Disposable monthly income",
+          "capital": "Disposable capital",
+          "notAvailable": "Not available",
+          "eligible": "Eligible",
+          "contributionRequired": "Contribution required",
+          "belowUpperLimit": "Below upper limit ({amount})",
+          "exceedsUpperLimit": "Exceeds upper limit ({amount})",
+          "noUpperLimit": "No upper limit applies"
+        },
+        "sections": {
+          "clientDetails": "Client details",
+          "dependants": "Dependants",
+          "clientIncome": "Client income",
+          "partnerIncome": "Partner income",
+          "outgoings": "Outgoings",
+          "housingAndProperty": "Housing and property",
+          "assets": "Assets"
+        },
         "frequencies": {
           "everyWeek": "Every week",
           "everyTwoWeeks": "Every 2 weeks",
@@ -33,23 +72,31 @@
           "threeMonths": "Total in last 3 months"
         },
         "client": {
-          "heading": "Client details",
           "age": {
+            "heading": "Client age",
             "label": "What age is your client?",
             "under18": "Under 18",
             "standard": "18 to 59",
             "over60": "60 or over"
           },
-          "partner": "Does your client have a partner?",
+          "partner": {
+            "heading": "Partner and passporting",
+            "label": "Does your client have a partner?"
+          },
           "passporting": "Does your client receive a passporting benefit?"
         },
         "dependants": {
-          "heading": "Dependants",
+          "heading": "Number of dependants",
           "childDependants": "Does your client have any child dependants?",
+          "childDependantsWithPartner": "Does your client or their partner have any child dependants?",
           "childDependantsCount": "How many child dependants are there?",
           "adultDependants": "Does your client have any adult dependants?",
+          "adultDependantsWithPartner": "Does your client or their partner have any adult dependants?",
           "adultDependantsCount": "How many adult dependants are there?",
           "getIncome": "Do any of the dependants aged 16 or over get regular income?",
+          "incomeControl": {
+            "heading": "Dependant income"
+          },
           "income": {
             "heading": "Dependant {index} income",
             "frequency": "When does the dependant normally get this income?",
@@ -62,7 +109,7 @@
             "unemployed": "Unemployed"
           },
           "client": {
-            "heading": "Client income",
+            "statusHeading": "Employment status",
             "status": "What is your client's employment status?"
           },
           "partnerAge": {
@@ -70,7 +117,7 @@
             "label": "Is the partner aged 60 or over?"
           },
           "partner": {
-            "heading": "Partner income",
+            "statusHeading": "Partner employment status",
             "status": "What is the partner's employment status?"
           }
         },
@@ -81,9 +128,9 @@
           },
           "partner": {
             "entryHeading": "Partner employment income {index}",
-            "frequency": "When does your partner normally get this income?"
+            "frequency": "When does the partner normally get this income?"
           },
-          "incomeType": "Type of employment income",
+          "incomeType": "What type of employment income is this?",
           "grossIncome": "Income before any deductions",
           "incomeTax": "Income tax",
           "nationalInsurance": "National Insurance",
@@ -132,16 +179,16 @@
         },
         "outgoings": {
           "client": {
-            "heading": "Your client's outgoings and deductions",
+            "heading": "Client outgoings and deductions",
             "childcare": "Does your client pay for childcare?",
             "maintenance": "Does your client pay maintenance to a former partner?",
-            "legalAid": "Does your client make payments towards legal aid for a criminal case?"
+            "legalAid": "Does your client make payments toward legal aid for a criminal case?"
           },
           "partner": {
-            "heading": "The partner's outgoings and deductions",
+            "heading": "Partner outgoings and deductions",
             "childcare": "Does the partner pay for childcare?",
             "maintenance": "Does the partner pay maintenance to a former partner?",
-            "legalAid": "Does the partner make payments towards legal aid for a criminal case?"
+            "legalAid": "Does the partner make payments toward legal aid for a criminal case?"
           },
           "amount": "Amount",
           "frequency": "Frequency"

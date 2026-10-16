@@ -3,6 +3,7 @@ import { before, describe, it } from "mocha";
 
 import type { EligibilityData } from "#/api/clients/rcw/model/eligibilityData.zod.gen.js";
 
+import { answerCards } from "#tests/unit/src/export/sections/meansAssessment/answers/answers.fixtures.js";
 import { toMeansAssessmentSection } from "#/export/sections/meansAssessment/meansAssessment.mapper.js";
 import { initializeI18nextSync } from "#/lib/i18n.js";
 import { getGetApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
@@ -30,7 +31,7 @@ const BASE_ANSWERS = {
 } satisfies EligibilityData;
 
 function outgoings(overrides: Partial<EligibilityData> = {}) {
-  return (
+  return answerCards(
     toMeansAssessmentSection(
       getGetApplicationResponseMock({
         eligibility: {
@@ -39,9 +40,8 @@ function outgoings(overrides: Partial<EligibilityData> = {}) {
         },
         meansAssessmentRequired: true,
       }),
-    )?.answerSummaries.filter(({ heading }) => heading.includes("outgoings")) ??
-    []
-  );
+    )?.answerSummaries,
+  ).filter(({ heading }) => heading.toLowerCase().includes("outgoings"));
 }
 
 function childcareRows(answers: Partial<EligibilityData>) {
@@ -73,7 +73,7 @@ describe("saved outgoings answers", () => {
       }),
     ).to.deep.equal([
       {
-        heading: "Your client's outgoings and deductions",
+        heading: "Client outgoings and deductions",
         rows: [
           { key: "Does your client pay for childcare?", value: "Yes" },
           { key: "Amount", value: "£0.00" },
@@ -85,7 +85,7 @@ describe("saved outgoings answers", () => {
           { key: "Amount", value: "£47.50" },
           { key: "Frequency", value: "Every 2 weeks" },
           {
-            key: "Does your client make payments towards legal aid for a criminal case?",
+            key: "Does your client make payments toward legal aid for a criminal case?",
             value: "No",
           },
         ],
@@ -114,8 +114,8 @@ describe("saved outgoings answers", () => {
     const summaries = outgoings(answers);
 
     expect(summaries.map(({ heading }) => heading)).to.deep.equal([
-      "Your client's outgoings and deductions",
-      "The partner's outgoings and deductions",
+      "Client outgoings and deductions",
+      "Partner outgoings and deductions",
     ]);
     expect(
       summaries.map(({ rows }) => rows.map(({ key, value }) => [key, value])),
@@ -126,7 +126,7 @@ describe("saved outgoings answers", () => {
         ["Frequency", "Every month"],
         ["Does your client pay maintenance to a former partner?", "No"],
         [
-          "Does your client make payments towards legal aid for a criminal case?",
+          "Does your client make payments toward legal aid for a criminal case?",
           "No",
         ],
       ],
@@ -136,7 +136,7 @@ describe("saved outgoings answers", () => {
         ["Frequency", "Total in last 3 months"],
         ["Does the partner pay maintenance to a former partner?", "No"],
         [
-          "Does the partner make payments towards legal aid for a criminal case?",
+          "Does the partner make payments toward legal aid for a criminal case?",
           "No",
         ],
       ],
@@ -197,6 +197,6 @@ describe("saved outgoings answers", () => {
         partner_legal_aid_payments_conditional_value: 10,
         partner_legal_aid_payments_frequency: "monthly",
       }).map(({ heading }) => heading),
-    ).to.deep.equal(["Your client's outgoings and deductions"]);
+    ).to.deep.equal(["Client outgoings and deductions"]);
   });
 });

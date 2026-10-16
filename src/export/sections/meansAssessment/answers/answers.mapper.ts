@@ -1,6 +1,7 @@
 import type { EligibilityData } from "#/api/clients/rcw/model/eligibilityData.zod.gen.js";
 import type {
   MeansAssessmentAnswerSummary,
+  MeansAssessmentAnswerSummaryCard,
   MeansAssessmentAnswerSummaryRow,
   Question,
   QuestionSection,
@@ -36,9 +37,51 @@ import { additionalPropertyQuestionSections } from "#/export/sections/meansAsses
 import { fixedT } from "#/lib/i18n.js";
 
 const DISPLAY_INDEX_OFFSET = 1;
+const NO_ANSWER_CARDS = 0;
 const means = {
   t: fixedT("pages.export.meansAssessment"),
 };
+
+interface AnswerSectionDefinition {
+  cards: ReadonlyArray<QuestionSection<EligibilityData>>;
+  heading: string;
+}
+
+const answerSections: readonly AnswerSectionDefinition[] = [
+  { cards: clientQuestionSections, heading: "sections.clientDetails" },
+  { cards: dependantQuestionSections, heading: "sections.dependants" },
+  {
+    cards: [
+      ...clientEmploymentQuestionSections,
+      ...clientIncomeQuestionSections,
+      ...clientBenefitsQuestionSections,
+      ...clientOtherIncomeQuestionSections,
+    ],
+    heading: "sections.clientIncome",
+  },
+  {
+    cards: [
+      ...partnerAgeQuestionSections,
+      ...partnerEmploymentQuestionSections,
+      ...partnerIncomeQuestionSections,
+      ...partnerBenefitsQuestionSections,
+      ...partnerOtherIncomeQuestionSections,
+    ],
+    heading: "sections.partnerIncome",
+  },
+  {
+    cards: [
+      ...clientOutgoingsQuestionSections,
+      ...partnerOutgoingsQuestionSections,
+    ],
+    heading: "sections.outgoings",
+  },
+  {
+    cards: [...housingQuestionSections, ...additionalPropertyQuestionSections],
+    heading: "sections.housingAndProperty",
+  },
+  { cards: assetQuestionSections, heading: "sections.assets" },
+];
 
 /**
  * Maps saved CCQ answers independently of calculation availability.
@@ -52,40 +95,31 @@ export function toMeansAssessmentAnswerSummaries(
     return [];
   }
 
-  return toQuestionSectionSummaries<EligibilityData>(answers, [
-    ...clientQuestionSections,
-    ...dependantQuestionSections,
-    ...clientEmploymentQuestionSections,
-    ...clientIncomeQuestionSections,
-    ...clientBenefitsQuestionSections,
-    ...clientOtherIncomeQuestionSections,
-    ...partnerAgeQuestionSections,
-    ...partnerEmploymentQuestionSections,
-    ...partnerIncomeQuestionSections,
-    ...partnerBenefitsQuestionSections,
-    ...partnerOtherIncomeQuestionSections,
-    ...clientOutgoingsQuestionSections,
-    ...partnerOutgoingsQuestionSections,
-    ...housingQuestionSections,
-    ...additionalPropertyQuestionSections,
-    ...assetQuestionSections,
-  ]);
+  const summaries: MeansAssessmentAnswerSummary[] = [];
+  for (const section of answerSections) {
+    const cards = toQuestionSectionSummaries(answers, section.cards);
+    if (cards.length > NO_ANSWER_CARDS) {
+      summaries.push({ cards, heading: means.t(section.heading) });
+    }
+  }
+
+  return summaries;
 }
 
 /**
- * Creates a section summary for one answer context.
- * @param section Section containing the questions.
+ * Creates a card summary for one answer context.
+ * @param section Card containing the questions.
  * @param answers Complete saved assessment answers.
- * @param answerContext Saved data used by the section's questions.
+ * @param answerContext Saved data used by the card's questions.
  * @param index The unchanged answer-context index.
- * @returns The section heading and relevant question answers.
+ * @returns The card heading and relevant question answers, or null when empty.
  */
 function toAnswerSummary<TAnswerContext>(
   section: QuestionSection<TAnswerContext>,
   answers: EligibilityData,
   answerContext: TAnswerContext,
   index: number,
-): MeansAssessmentAnswerSummary {
+): MeansAssessmentAnswerSummaryCard | null {
   const rows: MeansAssessmentAnswerSummaryRow[] = [];
 
   for (const question of section.questions) {
@@ -93,9 +127,11 @@ function toAnswerSummary<TAnswerContext>(
       continue;
     }
 
-    rows.push(
-      toAnswerSummaryRow<TAnswerContext>(question, answerContext, index),
-    );
+    rows.push(toAnswerSummaryRow(question, answers, answerContext, index));
+  }
+
+  if (rows.length === NO_ANSWER_CARDS) {
+    return null;
   }
 
   return {
@@ -103,36 +139,44 @@ function toAnswerSummary<TAnswerContext>(
     rows,
   };
 }
+
 /**
  * Formats one question for one answer context.
  * @param question Question definition to format.
+ * @param answers Complete saved assessment answers.
  * @param answerContext Saved data used by the question.
  * @param index The unchanged answer-context index.
  * @returns The translated label and formatted answer.
  */
 function toAnswerSummaryRow<TAnswerContext>(
   question: Question<TAnswerContext>,
+  answers: EligibilityData,
   answerContext: TAnswerContext,
   index: number,
 ): MeansAssessmentAnswerSummaryRow {
+  const label =
+    typeof question.label === "string"
+      ? question.label
+      : question.label(answers, answerContext, index);
+
   return {
-    key: means.t(question.label, { index: index + DISPLAY_INDEX_OFFSET }),
+    key: means.t(label, { index: index + DISPLAY_INDEX_OFFSET }),
     value: formatAnswer<TAnswerContext>(question, answerContext, index),
   };
 }
 
 /**
- * Maps question sections while preserving order and saved answer-context indexes.
- * @template TAnswerContext Context provided to each question.
+ * Maps question cards while preserving order and saved answer-context indexes.
+ * @template TAnswerContext Context provided to each card.
  * @param answers Trusted saved CCQ answers used for presentation gates.
- * @param sections Ordered sections and their answer contexts.
- * @returns Plain-text summaries for the relevant sections and questions.
+ * @param sections Ordered cards and their answer contexts.
+ * @returns Plain-text cards for relevant questions.
  */
 function toQuestionSectionSummaries<TAnswerContext>(
   answers: EligibilityData,
   sections: ReadonlyArray<QuestionSection<TAnswerContext>>,
-): MeansAssessmentAnswerSummary[] {
-  const summaries: MeansAssessmentAnswerSummary[] = [];
+): MeansAssessmentAnswerSummaryCard[] {
+  const summaries: MeansAssessmentAnswerSummaryCard[] = [];
 
   for (const section of sections) {
     if (section.isRelevant?.(answers) === false) {
@@ -145,9 +189,10 @@ function toQuestionSectionSummaries<TAnswerContext>(
     // One context can feed several questions; repeated contexts give each
     // question multiple answers. Preserve each context index for numbering.
     for (const [index, answerContext] of answerContexts.entries()) {
-      summaries.push(
-        toAnswerSummary<TAnswerContext>(section, answers, answerContext, index),
-      );
+      const summary = toAnswerSummary(section, answers, answerContext, index);
+      if (summary !== null) {
+        summaries.push(summary);
+      }
     }
   }
 
