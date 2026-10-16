@@ -77,7 +77,7 @@ const redirectToLegalAidBefore = redirect({
 });
 
 const redirectToPrivateFamilyCaseScope = redirect({
-  goto: "private-family-case-scope",
+  goto: "prove-in-scope",
   when: Answer(AnswerKey.needsProtectiveInjunction).match(
     Condition.Equals("no"),
   ),

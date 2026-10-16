@@ -14,12 +14,12 @@ describe("Private Family Case Scope step", () => {
     createApplicationEffectsRegistry,
   );
 
-  describe("GET /cases/new/private-family-case-scope", () => {
+  describe("GET /cases/new/prove-in-scope", () => {
     let renderResult: TestRenderResult;
     let radioInput: RenderBlock;
 
     before(async () => {
-      const result = await client.get("/cases/new/private-family-case-scope");
+      const result = await client.get("/cases/new/prove-in-scope");
       expect(result.type).to.equal("render");
       renderResult = result as TestRenderResult;
       [radioInput] = renderResult.getBlocksByVariant("govukRadioInput");
@@ -42,11 +42,11 @@ describe("Private Family Case Scope step", () => {
     });
   });
 
-  describe("POST /cases/new/private-family-case-scope", () => {
+  describe("POST /cases/new/prove-in-scope", () => {
     const fieldCode = "laspoEvidenceScope";
 
     it("should show validation error if no option is selected", async () => {
-      const result = await client.post("/cases/new/private-family-case-scope");
+      const result = await client.post("/cases/new/prove-in-scope");
       expect(result.type).to.equal("render");
       const renderResult = result as TestRenderResult;
       expect(renderResult.context.showValidationFailures).to.equal(true);
@@ -57,7 +57,7 @@ describe("Private Family Case Scope step", () => {
 
     // TODO: Update when next step is added
     it("should redirect to legal aid before step if an option is selected", async () => {
-      const result = await client.post("/cases/new/private-family-case-scope", {
+      const result = await client.post("/cases/new/prove-in-scope", {
         body: {
           laspoEvidenceScope: "domesticAbuse",
         },
@@ -69,7 +69,7 @@ describe("Private Family Case Scope step", () => {
 
     // TODO: Update when next step is added
     it("should redirect to legal aid before step if none is selected", async () => {
-      const result = await client.post("/cases/new/private-family-case-scope", {
+      const result = await client.post("/cases/new/prove-in-scope", {
         body: {
           laspoEvidenceScope: "none",
         },

@@ -41,7 +41,7 @@ export function laspoEvidenceScopeStep(journeyCode: string): StepDefinition {
     ],
     code: StepCode.LASPO_EVIDENCE_SCOPE,
     onSubmission: [savePrivateFamilyCaseScope(journeyCode)],
-    path: "private-family-case-scope",
+    path: "prove-in-scope",
     title: TITLE,
   });
 }

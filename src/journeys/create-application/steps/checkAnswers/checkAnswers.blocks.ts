@@ -135,7 +135,7 @@ function createSummaryList(
     },
     {
       field: AnswerKey.laspoEvidenceScope,
-      href: "private-family-case-scope?returnTo=check-answers",
+      href: "prove-in-scope?returnTo=check-answers",
       label: answerLabelT("laspoEvidenceScope"),
       value: { text: formatPrivateFamilyCaseScopeLabel() },
     },
