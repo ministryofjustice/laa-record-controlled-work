@@ -10,6 +10,7 @@ import { familyLawClassificationStep } from "#/journeys/create-application/steps
 import { haveAHomeAddressStep } from "#/journeys/create-application/steps/haveAHomeAddress/haveAHomeAddress.step.js";
 import { internationalMaintenanceAgreementStep } from "#/journeys/create-application/steps/internationalMaintenanceAgreement/internationalMaintenanceAgreement.step.js";
 import { legalAidLast6MonthsStep } from "#/journeys/create-application/steps/legalAidLast6Months/legalAidLast6Months.step.js";
+import { letterFromLocalAuthorityStep } from "#/journeys/create-application/steps/letterFromLocalAuthority/letterFromLocalAuthority.step.js";
 import { needsProtectiveInjunctionStep } from "#/journeys/create-application/steps/needsProtectiveInjunction/needsProtectiveInjunction.step.js";
 import { JourneyCode } from "#/journeys/JourneyCode.enum.js";
 import { JourneyPath } from "#/journeys/JourneyPath.enum.js";
@@ -39,6 +40,7 @@ export const createApplicationJourney = journey({
     ineligibleStep(JourneyCode.CREATE_APPLICATION),
     legalAidBeforeStep(JourneyCode.CREATE_APPLICATION),
     legalAidLast6MonthsStep(JourneyCode.CREATE_APPLICATION),
+    letterFromLocalAuthorityStep(JourneyCode.CREATE_APPLICATION),
     clientDetailsStep(JourneyCode.CREATE_APPLICATION),
     niNumberStep(JourneyCode.CREATE_APPLICATION),
     haveAHomeAddressStep(JourneyCode.CREATE_APPLICATION),

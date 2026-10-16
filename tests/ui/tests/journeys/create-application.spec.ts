@@ -73,10 +73,28 @@ test("create application flow", async ({ withSelectedOffice: page }) => {
 
   // Select "Public" and submit
   await page.getByRole("radio", { name: "Public" }).check();
-  await page.getByRole("button", { name: "Continue" }).click(); 
+  await page.getByRole("button", { name: "Continue" }).click();
 
-  // TODO: Update to new routing questions when implemented
-  // Verify redirection to the legal aid before page
+  // Verify redirect to Letter from Local Authority page.
+  await expect(page).toHaveURL("/cases/new/care-proceedings");
+
+  // ==========================================================================
+  // Letter from Local Authority page
+  // ==========================================================================
+
+  // Check for question.
+  await expect(
+    page.getByRole("heading", {
+      name: "Has your client received a letter saying the local authority is initiating care proceedings?",
+      level: 1,
+    }),
+  ).toBeVisible();
+
+  // Select "Yes" and submit.
+  await page.getByRole("radio", { name: "Yes" }).check();
+  await page.getByRole("button", { name: "Continue" }).click();
+
+  // Verify redirection to the legal aid before page.
   await expect(page).toHaveURL("/cases/new/legal-aid-before");
 
   // ==========================================================================
@@ -254,33 +272,38 @@ test("create application flow", async ({ withSelectedOffice: page }) => {
       level: 1,
     }),
   ).toBeVisible();
-  
+
   // Check that all answers are displayed correctly
   const summaryList = page.locator(".govuk-summary-list");
   const rows = summaryList.locator(".govuk-summary-list__row");
-  await expect(rows).toHaveCount(10);
-  await expect(rows.locator(".govuk-summary-list__value")).toHaveText([
-    // ECF
-    "No",
-    // Family law classification
-    "Public",
-    // Accessed legal aid before
-    "Yes, about the same matter",
-    // Did your client get legal help for this matter in the last 6 months?
-    "No",
-    // First name
-    "John",
-    // Last name
-    "Doe",
-    // Date of birth
-    "15 June 1990",
-    // National Insurance number
-    "No",
-    // Has a home address
-    "Yes",
-    // Address
-    "10 Some Street, SomeCity, AB1 2CD",
-  ], { useInnerText: true });
+  await expect(rows).toHaveCount(11);
+  await expect(rows.locator(".govuk-summary-list__value")).toHaveText(
+    [
+      // ECF
+      "No",
+      // Family law classification
+      "Public",
+      // Letter from Local Authority
+      "Yes",
+      // Accessed legal aid before
+      "Yes, about the same matter",
+      // Did your client get legal help for this matter in the last 6 months?
+      "No",
+      // First name
+      "John",
+      // Last name
+      "Doe",
+      // Date of birth
+      "15 June 1990",
+      // National Insurance number
+      "No",
+      // Has a home address
+      "Yes",
+      // Address
+      "10 Some Street,\nSomeCity,\nAB1 2CD\n",
+    ],
+    { useInnerText: true },
+  );
 
   const changeAddressLink = rows
     .filter({ has: page.getByText("Address", { exact: true }) })
@@ -292,14 +315,18 @@ test("create application flow", async ({ withSelectedOffice: page }) => {
   await changeAddressLink.click();
 
   // Verify redirection back to the UK address entry page
-  await expect(page).toHaveURL("/cases/new/enter-address-manually?returnTo=check-answers");
-  
+  await expect(page).toHaveURL(
+    "/cases/new/enter-address-manually?returnTo=check-answers",
+  );
+
   // ==========================================================================
   // Enter overseas address page
   // ==========================================================================
 
   // click the non-UK address link
-  await page.getByRole("link", { name: "The address is not in the UK" }).click();
+  await page
+    .getByRole("link", { name: "The address is not in the UK" })
+    .click();
 
   // Verify redirection to the overseas address page
   await expect(page).toHaveURL("/cases/new/enter-overseas-address");
@@ -312,7 +339,7 @@ test("create application flow", async ({ withSelectedOffice: page }) => {
   ).toBeVisible();
 
   // Fill in the full address and submit
-  
+
   // expect options to be visible with autocomplete
   await page.getByLabel("Country").fill("Aus");
   const australiaOption = page.getByRole("option", { name: "Australia" });
@@ -322,7 +349,7 @@ test("create application flow", async ({ withSelectedOffice: page }) => {
   await australiaOption.click();
 
   await page.getByLabel("Address line 1").fill("10 Some Other Street");
-  
+
   // Navigate back to the check answers page
   await page.getByRole("button", { name: "Continue" }).click();
   await expect(page).toHaveURL("/cases/new/check-answers");
@@ -332,10 +359,7 @@ test("create application flow", async ({ withSelectedOffice: page }) => {
     rows
       .filter({ has: page.getByText("Address", { exact: true }) })
       .locator(".govuk-summary-list__value"),
-  ).toHaveText(
-    "10 Some Other Street, Australia",
-    { useInnerText: true },
-  );
+  ).toHaveText("10 Some Other Street, Australia", { useInnerText: true });
 
   // Check that the submit button is displayed
   const submitButton = page.getByRole("button", { name: "Save and continue" });
@@ -346,7 +370,6 @@ test("create application flow", async ({ withSelectedOffice: page }) => {
 
   // Verify redirection to the task list page
   await expect(page).toHaveURL(`/cases/${applicationId}/task-list`);
-
 });
 
 test("changing no fixed address to yes from check answers reaches address entry", async ({
@@ -361,6 +384,8 @@ test("changing no fixed address to yes from check answers reaches address entry"
   await page.getByRole("button", { name: "Continue" }).click();
   await page.getByRole("radio", { name: "No" }).check();
   await page.getByRole("button", { name: "Continue" }).click();
+  await page.getByRole("radio", { name: "No" }).check();
+  await page.getByRole("button", { name: "Continue" }).click();
 
   await page.getByLabel("First name").fill("Jane");
   await page.getByLabel("Last name").fill("Doe");
@@ -371,15 +396,16 @@ test("changing no fixed address to yes from check answers reaches address entry"
 
   await page.getByRole("radio", { name: "No" }).check();
   await page.getByRole("button", { name: "Continue" }).click();
-  await page.getByRole("radio", { name: "No, they have no fixed address" }).check();
+  await page
+    .getByRole("radio", { name: "No, they have no fixed address" })
+    .check();
   await page.getByRole("button", { name: "Continue" }).click();
   await expect(page).toHaveURL("/cases/new/check-answers");
 
   const addressRow = page.locator(".govuk-summary-list__row").last();
-  await expect(addressRow.locator(".govuk-summary-list__actions a")).toHaveAttribute(
-    "href",
-    "have-a-home-address?returnTo=check-answers",
-  );
+  await expect(
+    addressRow.locator(".govuk-summary-list__actions a"),
+  ).toHaveAttribute("href", "have-a-home-address?returnTo=check-answers");
   await addressRow.locator(".govuk-summary-list__actions a").click();
 
   await page.getByRole("radio", { name: "Yes" }).check();
