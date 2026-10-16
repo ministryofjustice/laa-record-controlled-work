@@ -197,7 +197,7 @@ export class ApplicationDto {
       answers.laspoEvidenceScope === "under18" ||
       answers.laspoEvidenceScope === "parentOrGuardian"
     ) {
-      scopingQuestions.laspoEvidenceScope = answers.laspoEvidenceScope;
+      scopingQuestions.privateFamilyCaseScope = answers.laspoEvidenceScope;
     }
 
     return scopingQuestions;
@@ -287,9 +287,9 @@ export class ApplicationDto {
       scopingAnswers[AnswerKey.needsProtectiveInjunction] =
         scopingQuestions.needsProtectiveInjunction ? "yes" : "no";
     }
-    if (scopingQuestions.laspoEvidenceScope !== undefined) {
+    if (scopingQuestions.privateFamilyCaseScope !== undefined) {
       scopingAnswers[AnswerKey.laspoEvidenceScope] =
-        scopingQuestions.laspoEvidenceScope ?? undefined;
+        scopingQuestions.privateFamilyCaseScope ?? undefined;
     }
 
     return scopingAnswers;

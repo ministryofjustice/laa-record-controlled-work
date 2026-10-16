@@ -348,8 +348,8 @@
         "radioButton": {
           "domesticAbuse": "Evidence of domestic abuse (Schedule 1)",
           "childAbuse": "Evidence of child abuse (Schedule 2)",
-          "clientUnder18": "Client is under 18 at time of signing",
-          "clientHasParentalResponsibility": "Client is a parent, person with parental responsibility, or prospective special guardian involved in a Special Guardianship Order application",
+          "under18": "Client is under 18 at time of signing",
+          "parentOrGuardian": "Client is a parent, person with parental responsibility, or prospective special guardian involved in a Special Guardianship Order application",
           "or": "or",
           "none": "None of these"
         },

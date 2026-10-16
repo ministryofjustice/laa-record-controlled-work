@@ -37,8 +37,8 @@ describe("LASPO Evidence Scope step", () => {
       expect(buttons).to.have.deep.include.members([
         { text: "Evidence of domestic abuse (Schedule 1)", value: "domesticAbuse" },
         { text: "Evidence of child abuse (Schedule 2)", value: "childAbuse" },
-        { text: "Client is under 18 at time of signing", value: "clientUnder18" },
-        { text: "Client is a parent, person with parental responsibility, or prospective special guardian involved in a Special Guardianship Order application", value: "clientHasParentalResponsibility" },
+        { text: "Client is under 18 at time of signing", value: "under18" },
+        { text: "Client is a parent, person with parental responsibility, or prospective special guardian involved in a Special Guardianship Order application", value: "parentOrGuardian" },
         { text: "None of these", value: "none" },
       ]);
     });

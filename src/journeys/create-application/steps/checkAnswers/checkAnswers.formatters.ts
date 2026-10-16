@@ -182,11 +182,11 @@ export function formatPrivateFamilyCaseScopeLabel(): ResolvableString {
   const childAbuse = t(
     "journeys.createApplication.laspoEvidenceScope.radioButton.childAbuse",
   );
-  const clientUnder18 = t(
-    "journeys.createApplication.laspoEvidenceScope.radioButton.clientUnder18",
+  const under18 = t(
+    "journeys.createApplication.laspoEvidenceScope.radioButton.under18",
   );
-  const clientHasParentalResponsibility = t(
-    "journeys.createApplication.laspoEvidenceScope.radioButton.clientHasParentalResponsibility",
+  const parentOrGuardian = t(
+    "journeys.createApplication.laspoEvidenceScope.radioButton.parentOrGuardian",
   );
   const none = t(
     "journeys.createApplication.laspoEvidenceScope.radioButton.none",
@@ -195,10 +195,10 @@ export function formatPrivateFamilyCaseScopeLabel(): ResolvableString {
   return match(Answer(AnswerKey.laspoEvidenceScope))
     .branch(Condition.Equals("domesticAbuse"), domesticAbuse)
     .branch(Condition.Equals("childAbuse"), childAbuse)
-    .branch(Condition.Equals("clientUnder18"), clientUnder18)
+    .branch(Condition.Equals("under18"), under18)
     .branch(
-      Condition.Equals("clientHasParentalResponsibility"),
-      clientHasParentalResponsibility,
+      Condition.Equals("parentOrGuardian"),
+      parentOrGuardian,
     )
     .otherwise(none);
 }
