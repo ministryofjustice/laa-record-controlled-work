@@ -134,11 +134,11 @@ export const CreateApplicationRequestBody = zod
                   )
                   .and(
                     zod.object({
-                      privateFamilyCaseScope: zod.unknown(),
+                      laspoEvidenceScope: zod.unknown(),
                     }),
                   ),
                 zod.object({
-                  privateFamilyCaseScope: zod.literal(null).optional(),
+                  laspoEvidenceScope: zod.literal(null).optional(),
                 }),
               ]),
             )
@@ -164,7 +164,7 @@ export const CreateApplicationRequestBody = zod
                   .literal(null)
                   .optional(),
                 needsProtectiveInjunction: zod.literal(null).optional(),
-                privateFamilyCaseScope: zod.literal(null).optional(),
+                laspoEvidenceScope: zod.literal(null).optional(),
               }),
             )
             .and(
@@ -205,7 +205,7 @@ export const CreateApplicationRequestBody = zod
             familyLawClassification: zod.enum(["public", "private"]),
             needsAdviceOnEUOrInternationalMaintenance: zod.boolean().nullish(),
             needsProtectiveInjunction: zod.boolean().nullish(),
-            privateFamilyCaseScope: zod
+            laspoEvidenceScope: zod
               .union([
                 zod.enum([
                   "none",

@@ -6,7 +6,7 @@
  */
 import * as zod from "zod";
 
-export const PrivateFamilyCaseScope = zod.enum([
+export const LaspoEvidenceScope = zod.enum([
   "none",
   "domesticAbuse",
   "childAbuse",
@@ -14,7 +14,5 @@ export const PrivateFamilyCaseScope = zod.enum([
   "parentOrGuardian",
 ]);
 
-export type PrivateFamilyCaseScope = zod.input<typeof PrivateFamilyCaseScope>;
-export type PrivateFamilyCaseScopeOutput = zod.output<
-  typeof PrivateFamilyCaseScope
->;
+export type LaspoEvidenceScope = zod.input<typeof LaspoEvidenceScope>;
+export type LaspoEvidenceScopeOutput = zod.output<typeof LaspoEvidenceScope>;
