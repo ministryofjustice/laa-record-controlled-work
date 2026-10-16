@@ -90,6 +90,9 @@ export function summaryList(): GovUKSummaryList {
     href: "prove-in-scope?returnTo=check-answers",
     label: answerLabelT("laspoEvidenceScope"),
     value: { text: formatPrivateFamilyCaseScopeLabel() },
+    visibleWhen: Answer(AnswerKey.familyLawClassification).match(
+      Condition.Equals(FamilyLawClassification.enum.private),
+    ),
   });
   const legalAidBefore = summaryRow({
     href: "legal-aid-before?returnTo=check-answers",
