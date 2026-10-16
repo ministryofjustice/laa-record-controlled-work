@@ -123,6 +123,10 @@ export function checkAnswersModel(): Record<SummaryFieldKey, SummaryField> {
       completeWhen: yesNo(AnswerKey.haveAHomeAddress),
       visibleWhen: true,
     }),
+    laspoEvidenceScope: field({
+      completeWhen: required(AnswerKey.laspoEvidenceScope),
+      visibleWhen: isPrivateLaw,
+    }),
     lastName: field({
       completeWhen: required(AnswerKey.lastName),
       visibleWhen: true,
@@ -156,10 +160,6 @@ export function checkAnswersModel(): Record<SummaryFieldKey, SummaryField> {
           required(AnswerKey.niNumber),
         ),
       ),
-      visibleWhen: true,
-    }),
-    laspoEvidenceScope: field({
-      completeWhen: required(AnswerKey.laspoEvidenceScope),
       visibleWhen: true,
     }),
     reasonForYes: field({

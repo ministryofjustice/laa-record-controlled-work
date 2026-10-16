@@ -213,7 +213,10 @@ export function formatPrivateFamilyCaseScopeLabel(): ResolvableString {
       Condition.Equals("parentOrGuardian"),
       parentOrGuardian,
     )
-    .otherwise(none);
+    .branch(
+      Condition.Equals("none"),
+      none,
+    );
 }
 
 /**
