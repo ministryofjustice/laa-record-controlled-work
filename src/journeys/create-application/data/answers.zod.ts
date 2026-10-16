@@ -26,7 +26,6 @@ export const Answers = zod
     osAddressLine3: zod.string().optional(),
     osAddressLine4: zod.string().optional(),
     osCountry: zod.string().optional(),
-    privateFamilyCaseScope: zod.string().optional(),
     reasonForYes: zod.string().optional(),
     ukAddressLine1: zod.string().optional(),
     ukAddressLine2: zod.string().optional(),

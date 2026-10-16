@@ -22,13 +22,13 @@ type SummaryFieldKey =
   | AnswerKey.familyLawClassification
   | AnswerKey.firstName
   | AnswerKey.haveAHomeAddress
+  | AnswerKey.laspoEvidenceScope
   | AnswerKey.lastName
   | AnswerKey.legalAidBefore
   | AnswerKey.legalAidLast6Months
   | AnswerKey.needsAdviceOnEUOrInternationalMaintenance
   | AnswerKey.needsProtectiveInjunction
   | AnswerKey.niNumber
-  | AnswerKey.privateFamilyCaseScope
   | AnswerKey.reasonForYes;
 
 /**
@@ -158,8 +158,8 @@ export function checkAnswersModel(): Record<SummaryFieldKey, SummaryField> {
       ),
       visibleWhen: true,
     }),
-    privateFamilyCaseScope: field({
-      completeWhen: required(AnswerKey.privateFamilyCaseScope),
+    laspoEvidenceScope: field({
+      completeWhen: required(AnswerKey.laspoEvidenceScope),
       visibleWhen: true,
     }),
     reasonForYes: field({

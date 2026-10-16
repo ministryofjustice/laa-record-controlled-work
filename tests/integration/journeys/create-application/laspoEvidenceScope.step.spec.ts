@@ -43,7 +43,7 @@ describe("Private Family Case Scope step", () => {
   });
 
   describe("POST /cases/new/private-family-case-scope", () => {
-    const fieldCode = "privateFamilyCaseScope";
+    const fieldCode = "laspoEvidenceScope";
 
     it("should show validation error if no option is selected", async () => {
       const result = await client.post("/cases/new/private-family-case-scope");
@@ -59,7 +59,7 @@ describe("Private Family Case Scope step", () => {
     it("should redirect to legal aid before step if an option is selected", async () => {
       const result = await client.post("/cases/new/private-family-case-scope", {
         body: {
-          privateFamilyCaseScope: "domesticAbuse",
+          laspoEvidenceScope: "domesticAbuse",
         },
       });
       expect(result.type).to.equal("redirect");
@@ -71,7 +71,7 @@ describe("Private Family Case Scope step", () => {
     it("should redirect to legal aid before step if none is selected", async () => {
       const result = await client.post("/cases/new/private-family-case-scope", {
         body: {
-          privateFamilyCaseScope: "none",
+          laspoEvidenceScope: "none",
         },
       });
       expect(result.type).to.equal("redirect");

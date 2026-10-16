@@ -14,7 +14,7 @@ import {
   guidance,
   heading,
   scopeQuestion,
-} from "#/journeys/create-application/steps/privateFamilyCaseScope/privateFamilyCaseScope.blocks.js";
+} from "#/journeys/create-application/steps/laspoEvidenceScope/laspoEvidenceScope.blocks.js";
 import {
   clientDetailsCaption,
   continueButton,
@@ -23,16 +23,14 @@ import { redirectToCheckAnswers } from "#/journeys/shared.hook.js";
 import { StepCode } from "#/journeys/StepCode.enum.js";
 import { t } from "#/lib/i18n.js";
 
-const TITLE = t("journeys.createApplication.privateFamilyCaseScope.title");
+const TITLE = t("journeys.createApplication.laspoEvidenceScope.title");
 
 /**
  * Renders the Private Family Case Scope question step.
  * @param journeyCode - The journey code for saving draft answers
  * @returns {StepDefinition} The step definition for the Private Family Case Scope question step.
  */
-export function privateFamilyCaseScopeStep(
-  journeyCode: string,
-): StepDefinition {
+export function laspoEvidenceScopeStep(journeyCode: string): StepDefinition {
   return step({
     blocks: [
       clientDetailsCaption(),
@@ -41,7 +39,7 @@ export function privateFamilyCaseScopeStep(
       scopeQuestion(),
       continueButton(),
     ],
-    code: StepCode.PRIVATE_FAMILY_CASE_SCOPE,
+    code: StepCode.LASPO_EVIDENCE_SCOPE,
     onSubmission: [savePrivateFamilyCaseScope(journeyCode)],
     path: "private-family-case-scope",
     title: TITLE,
@@ -82,9 +80,7 @@ const tempTedirectToLegalAidBefore = redirect({
  */
 const redirectToNotInScope = redirect({
   goto: "not-in-scope",
-  when: Answer(AnswerKey.privateFamilyCaseScope).match(
-    Condition.Equals("none"),
-  ),
+  when: Answer(AnswerKey.laspoEvidenceScope).match(Condition.Equals("none")),
 });
 
 /**
@@ -92,7 +88,7 @@ const redirectToNotInScope = redirect({
  */
 const redirectToConfirmMerits = redirect({
   goto: "confirm-merits",
-  when: Answer(AnswerKey.privateFamilyCaseScope).not.match(
+  when: Answer(AnswerKey.laspoEvidenceScope).not.match(
     Condition.Equals("none"),
   ),
 });

@@ -134,9 +134,9 @@ function createSummaryList(
       value: { text: formatNeedsProtectiveInjunctionLabel() },
     },
     {
-      field: AnswerKey.privateFamilyCaseScope,
+      field: AnswerKey.laspoEvidenceScope,
       href: "private-family-case-scope?returnTo=check-answers",
-      label: answerLabelT("privateFamilyCaseScope"),
+      label: answerLabelT("laspoEvidenceScope"),
       value: { text: formatPrivateFamilyCaseScopeLabel() },
     },
     {

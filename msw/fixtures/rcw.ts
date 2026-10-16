@@ -8,6 +8,7 @@ import {
   getGetApplicationResponseMock,
   getGetApplicationsResponseMock,
 } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
+import { PrivateFamilyCaseScope } from "#/api/clients/rcw/model/privateFamilyCaseScope.zod.gen.js";
 
 faker.seed(12345);
 
@@ -40,9 +41,9 @@ const CLIENT_DETAILS = {
   },
   scopingQuestions: {
     familyLawClassification: FamilyLawClassification.enum.private,
+    laspoEvidenceScope: PrivateFamilyCaseScope.enum.domesticAbuse,
     needsAdviceOnEUOrInternationalMaintenance: false,
     priorLegalAid: PriorLegalAid.enum.no,
-    privateFamilyCaseScope: "domesticAbuse", // TODO: swap to enum when added
   },
 };
 
