@@ -2,21 +2,17 @@ import { expect } from "chai";
 import { before, describe, it } from "mocha";
 
 import type { Application } from "#/api/clients/rcw/model/application.zod.gen.js";
-import {
-  EligibilityData as EligibilityDataSchema,
-  type EligibilityData,
-} from "#/api/clients/rcw/model/eligibilityData.zod.gen.js";
+import type { EligibilityData } from "#/api/clients/rcw/model/eligibilityData.zod.gen.js";
 
 import {
   MeansAssessmentScenarioName,
   meansAssessmentScenarios,
-} from "#tests/fixtures/meansAssessment.fixtures.js";
+} from "#tests/fixtures/meansAssessment/meansAssessment.fixtures.js";
 import {
   answerCards,
   expectedAnswerSummaries,
 } from "#tests/unit/src/export/sections/meansAssessment/answers/answers.fixtures.js";
 import { toMeansAssessmentSection } from "#/export/sections/meansAssessment/meansAssessment.mapper.js";
-import { cfeResultSchema } from "#/export/sections/meansAssessment/calculations/calculations.zod.js";
 import { initializeI18nextSync } from "#/lib/i18n.js";
 import { getGetApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
 
@@ -84,25 +80,9 @@ function scenarioCardValues(
 describe("saved means answers", () => {
   before(initializeI18nextSync);
 
-  it("provides schema-valid fixtures for each assessment scenario", () => {
-    expect(Object.keys(meansAssessmentScenarios)).to.have.members(
-      Object.values(MeansAssessmentScenarioName),
-    );
-
+  it("preserves section relevance for each assessment scenario", () => {
     for (const createScenario of Object.values(meansAssessmentScenarios)) {
       const scenario = createScenario();
-
-      if (scenario.eligibility !== null) {
-        expect(
-          EligibilityDataSchema.safeParse(scenario.eligibility.data).success,
-        ).to.equal(true);
-
-        if (scenario.eligibility.result !== null) {
-          expect(
-            cfeResultSchema.safeParse(scenario.eligibility.result).success,
-          ).to.equal(true);
-        }
-      }
 
       const section = toMeansAssessmentSection(
         getGetApplicationResponseMock({

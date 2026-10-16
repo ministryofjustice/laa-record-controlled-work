@@ -1,6 +1,32 @@
 import type { MeansAssessmentAnswerSummary } from "#/export/sections/meansAssessment/answers/answers.types.js";
 import type { MeansAssessmentCalculations } from "#/export/sections/meansAssessment/calculations/calculations.types.js";
 
+export interface MeansAssessmentCalculationRow {
+  amount: string;
+  emphasis?: boolean;
+  heading: string;
+  hint: null | string;
+}
+
+export interface MeansAssessmentCalculationTable {
+  heading: string;
+  hint: null | string;
+  rows: MeansAssessmentCalculationRow[];
+}
+
+export type MeansAssessmentIncomeBreakdown =
+  | {
+      heading: string;
+      status: "ready";
+      tables: MeansAssessmentCalculationTable[];
+    }
+  | {
+      heading?: string;
+      message?: string;
+      status: "unavailable";
+    }
+  | { status: "not-calculated" };
+
 export interface MeansAssessmentOutcomePresentation {
   contributions: string[];
   description: string;
@@ -17,6 +43,7 @@ export interface MeansAssessmentOutcomeSummary {
 export interface MeansAssessmentSection {
   answerSummaries: MeansAssessmentAnswerSummary[];
   calculations: MeansAssessmentCalculations;
+  incomeBreakdown: MeansAssessmentIncomeBreakdown;
   outcomeSummary: MeansAssessmentOutcomeSummary;
 }
 
