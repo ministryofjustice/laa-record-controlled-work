@@ -19,6 +19,7 @@ declare module "express-session" {
     authFlowPending?: string;
     isAuthenticated?: boolean;
     journeyDrafts?: Record<string, Record<string, unknown>>;
+    journeyDraftVersions?: Record<string, string>;
     journeySubmitted?: Record<string, boolean>;
     msal?: SessionMsalReference;
     returnTo?: string;

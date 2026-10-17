@@ -30,10 +30,8 @@ describe("loadApplicationAsAnswers", () => {
   let toAnswers: sinon.SinonStub;
 
   beforeEach(() => {
-    getData = sinon
-      .stub()
-      .withArgs(CONTEXT_DATA_KEYS.application)
-      .returns(application);
+    getData = sinon.stub();
+    getData.withArgs(CONTEXT_DATA_KEYS.application).returns(application);
     getRequestParam = sinon
       .stub()
       .withArgs(PARAMS_KEYS.applicationID)
@@ -56,15 +54,22 @@ describe("loadApplicationAsAnswers", () => {
   afterEach(() => sinon.restore());
 
   it("loads application answers", () => {
+    getData
+      .withArgs(CONTEXT_DATA_KEYS.applicationETag)
+      .returns('"00023"');
     const session = {
       journeyDrafts: {},
+      journeyDraftVersions: {},
     };
     getSession.returns(session);
 
     loadApplicationAsAnswers()(context, journeyCode);
 
     expect(
-      getData.calledOnceWithExactly(CONTEXT_DATA_KEYS.application),
+      getData.calledWithExactly(CONTEXT_DATA_KEYS.application),
+    ).to.equal(true);
+    expect(
+      getData.calledWithExactly(CONTEXT_DATA_KEYS.applicationETag),
     ).to.equal(true);
     expect(toAnswers.calledOnceWithExactly(application)).to.equal(true);
     expect(setAnswer.calledWithExactly("firstName", "Jane")).to.equal(true);
@@ -81,6 +86,9 @@ describe("loadApplicationAsAnswers", () => {
     expect(session.journeyDrafts).to.deep.equal({
       [`${journeyCode}:application-1`]: { ...answers },
     });
+    expect(session.journeyDraftVersions).to.deep.equal({
+      [`${journeyCode}:application-1`]: '"00023"',
+    });
   });
 
   it("does not overwrite an existing journey draft", () => {
@@ -89,6 +97,7 @@ describe("loadApplicationAsAnswers", () => {
         [`${journeyCode}:application-1`]: { existingAnswer: "keep" },
         anotherJourney: { otherAnswer: "keep" },
       },
+      journeyDraftVersions: { anotherJourney: '"31"' },
     };
     getSession.returns(session);
 
@@ -101,10 +110,19 @@ describe("loadApplicationAsAnswers", () => {
       [`${journeyCode}:application-1`]: { existingAnswer: "keep" },
       anotherJourney: { otherAnswer: "keep" },
     });
+    expect(session.journeyDraftVersions).to.deep.equal({
+      anotherJourney: '"31"',
+    });
   });
 
   it("initializes journey drafts when none exist", () => {
-    const session: { journeyDrafts?: Record<string, unknown> } = {};
+    getData
+      .withArgs(CONTEXT_DATA_KEYS.applicationETag)
+      .returns('"9007199254740992"');
+    const session: {
+      journeyDrafts?: Record<string, unknown>;
+      journeyDraftVersions?: Record<string, string>;
+    } = {};
     getSession.returns(session);
 
     loadApplicationAsAnswers()(context, journeyCode);
@@ -112,10 +130,42 @@ describe("loadApplicationAsAnswers", () => {
     expect(session.journeyDrafts).to.deep.equal({
       [`${journeyCode}:application-1`]: answers,
     });
+    expect(session.journeyDraftVersions).to.deep.equal({
+      [`${journeyCode}:application-1`]: '"9007199254740992"',
+    });
+  });
+
+  it("does not attach a later ETag to a draft created without one", () => {
+    const session = {
+      journeyDrafts: {},
+      journeyDraftVersions: { [`${journeyCode}:application-1`]: '"old"' },
+    };
+    getSession.returns(session);
+
+    loadApplicationAsAnswers()(context, journeyCode);
+    getData
+      .withArgs(CONTEXT_DATA_KEYS.applicationETag)
+      .returns('"42"');
+
+    loadApplicationAsAnswers()(context, journeyCode);
+
+    expect(session.journeyDrafts).to.deep.equal({
+      [`${journeyCode}:application-1`]: answers,
+    });
+    expect(session.journeyDraftVersions[`${journeyCode}:application-1`]).to.be
+      .undefined;
   });
 
   it("keeps drafts separate for different applications", () => {
-    const session = { journeyDrafts: {} };
+    getData
+      .withArgs(CONTEXT_DATA_KEYS.applicationETag)
+      .onFirstCall()
+      .returns('"00023"');
+    getData
+      .withArgs(CONTEXT_DATA_KEYS.applicationETag)
+      .onSecondCall()
+      .returns('"9007199254740992"');
+    const session = { journeyDrafts: {}, journeyDraftVersions: {} };
     getSession.returns(session);
 
     loadApplicationAsAnswers()(context, journeyCode);
@@ -126,6 +176,10 @@ describe("loadApplicationAsAnswers", () => {
     expect(session.journeyDrafts).to.deep.equal({
       [`${journeyCode}:application-1`]: answers,
       [`${journeyCode}:application-2`]: answers,
+    });
+    expect(session.journeyDraftVersions).to.deep.equal({
+      [`${journeyCode}:application-1`]: '"00023"',
+      [`${journeyCode}:application-2`]: '"9007199254740992"',
     });
   });
 });

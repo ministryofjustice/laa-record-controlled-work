@@ -380,6 +380,108 @@ describe("Edit client details check answers step", () => {
   });
 
   describe("Edit journey entry navigation", () => {
+    it("retains the original version when a later parent GET reloads the case", async () => {
+      const session: {
+        journeyDrafts?: Record<string, Record<string, unknown>>;
+        journeyDraftVersions?: Record<string, string>;
+      } = {};
+      getApplicationStub.resolves({
+        status: 200,
+        data: ukApplication,
+        headers: new Headers({ etag: '"00023"' }),
+      });
+
+      const initial = await editApplicationClient.get(
+        `/cases/${applicationId}/task-list/details/check-answers`,
+        { session },
+      );
+      expect(initial.type).to.equal("render");
+      expect(session.journeyDraftVersions?.[draftKey]).to.equal('"00023"');
+      session.journeyDrafts![draftKey].firstName = "Edited draft";
+
+      getApplicationStub.resolves({
+        status: 200,
+        data: {
+          ...ukApplication,
+          clientDetails: { ...ukApplication.clientDetails, firstName: "Reloaded" },
+        },
+        headers: new Headers({ etag: '"42"' }),
+      });
+      const taskList = await editApplicationClient.get(
+        `/cases/${applicationId}/task-list`,
+        { session },
+      );
+      expect(taskList.type).to.equal("render");
+
+      const refreshed = await editApplicationClient.get(
+        `/cases/${applicationId}/task-list/details/check-answers`,
+        { session },
+      );
+
+      expect(refreshed.type).to.equal("render");
+      expect(session.journeyDraftVersions?.[draftKey]).to.equal('"00023"');
+      expect(session.journeyDrafts?.[draftKey]?.firstName).to.equal("Edited draft");
+    });
+
+    it("clears only the edit draft and version when ECF leads to dropout", async () => {
+      const otherDraftKey = `${JourneyCode.EDIT_CLIENT_DETAILS}:application-2`;
+      const session: {
+        journeyDrafts?: Record<string, Record<string, unknown>>;
+        journeyDraftVersions?: Record<string, string>;
+      } = {};
+      getApplicationStub.resolves({
+        status: 200,
+        data: ukApplication,
+        headers: new Headers({ etag: '"00023"' }),
+      });
+
+      const initial = await editApplicationClient.get(
+        `/cases/${applicationId}/task-list/details/check-answers`,
+        { session },
+      );
+      expect(initial.type).to.equal("render");
+      expect(session.journeyDraftVersions?.[draftKey]).to.equal('"00023"');
+      session.journeyDraftVersions ??= {};
+      session.journeyDrafts![otherDraftKey] = { firstName: "Other case" };
+      session.journeyDraftVersions![otherDraftKey] = '"42"';
+
+      const ecfResult = await editApplicationClient.post(
+        `/cases/${applicationId}/task-list/details/ecf`,
+        { session, body: { ecf: "yes" } },
+      );
+      expect(ecfResult.type).to.equal("redirect");
+      expect((ecfResult as TestRedirectResult).url).to.equal(
+        `/cases/${applicationId}/task-list/details/ecf-dropout`,
+      );
+
+      const dropoutResult = await editApplicationClient.post(
+        `/cases/${applicationId}/task-list/details/ecf-dropout`,
+        { session },
+      );
+
+      expect(dropoutResult.type).to.equal("redirect");
+      expect((dropoutResult as TestRedirectResult).url).to.equal("/");
+      expect(session.journeyDrafts?.[draftKey]).to.be.undefined;
+      expect(session.journeyDraftVersions?.[draftKey]).to.be.undefined;
+      expect(session.journeyDrafts?.[otherDraftKey]).to.deep.equal({
+        firstName: "Other case",
+      });
+      expect(session.journeyDraftVersions?.[otherDraftKey]).to.equal('"42"');
+
+      getApplicationStub.resolves({
+        status: 200,
+        data: ukApplication,
+        headers: new Headers({ etag: '"99"' }),
+      });
+      const reentered = await editApplicationClient.get(
+        `/cases/${applicationId}/task-list/details/check-answers`,
+        { session },
+      );
+
+      expect(reentered.type).to.equal("render");
+      expect(session.journeyDraftVersions?.[draftKey]).to.equal('"99"');
+    });
+
     it("stores a normalized NI number when editing client details", async () => {
       const session: {
         journeyDrafts?: Record<string, Record<string, unknown>>;

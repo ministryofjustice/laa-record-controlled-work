@@ -16,6 +16,7 @@ export const loadApplicationAsAnswers =
       return;
     }
 
+    const applicationETag = context.getData(CONTEXT_DATA_KEYS.applicationETag);
     const application: Application = context.getData(
       CONTEXT_DATA_KEYS.application,
     );
@@ -32,4 +33,15 @@ export const loadApplicationAsAnswers =
       ...session.journeyDrafts[draftKey],
       ...context.getAllAnswers(),
     };
+
+    if (typeof applicationETag === "string") {
+      session.journeyDraftVersions ??= {};
+      session.journeyDraftVersions[draftKey] = applicationETag;
+    } else if (session.journeyDraftVersions) {
+      const {
+        [draftKey]: _staleJourneyDraftVersion,
+        ...otherJourneyDraftVersions
+      } = session.journeyDraftVersions;
+      session.journeyDraftVersions = otherJourneyDraftVersions;
+    }
   };
