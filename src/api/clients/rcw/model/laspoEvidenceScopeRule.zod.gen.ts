@@ -6,7 +6,7 @@
  */
 import * as zod from "zod";
 
-export const PrivateFamilyCaseScopeRule = zod.union([
+export const LaspoEvidenceScopeRule = zod.union([
   zod
     .object({
       familyLawClassification: zod.enum(["private"]).optional(),
@@ -19,17 +19,15 @@ export const PrivateFamilyCaseScopeRule = zod.union([
     )
     .and(
       zod.object({
-        privateFamilyCaseScope: zod.unknown(),
+        laspoEvidenceScope: zod.unknown(),
       }),
     ),
   zod.object({
-    privateFamilyCaseScope: zod.literal(null).optional(),
+    laspoEvidenceScope: zod.literal(null).optional(),
   }),
 ]);
 
-export type PrivateFamilyCaseScopeRule = zod.input<
-  typeof PrivateFamilyCaseScopeRule
->;
-export type PrivateFamilyCaseScopeRuleOutput = zod.output<
-  typeof PrivateFamilyCaseScopeRule
+export type LaspoEvidenceScopeRule = zod.input<typeof LaspoEvidenceScopeRule>;
+export type LaspoEvidenceScopeRuleOutput = zod.output<
+  typeof LaspoEvidenceScopeRule
 >;

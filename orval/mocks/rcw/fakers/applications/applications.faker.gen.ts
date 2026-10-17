@@ -482,7 +482,7 @@ export const getGetApplicationResponseMock = <
         ]),
         needsAdviceOnEUOrInternationalMaintenance: faker.datatype.boolean(),
         needsProtectiveInjunction: faker.datatype.boolean(),
-        privateFamilyCaseScope: faker.helpers.arrayElement([
+        laspoEvidenceScope: faker.helpers.arrayElement([
           faker.helpers.arrayElement([
             "none",
             "domesticAbuse",

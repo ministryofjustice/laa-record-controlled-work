@@ -47,7 +47,7 @@ describe("CreateApplicationEffect", () => {
           familyLawClassification: "public",
           needsAdviceOnEUOrInternationalMaintenance: "no",
           needsProtectiveInjunction: "no",
-          privateFamilyCaseScope: "domesticAbuse",
+          laspoEvidenceScope: "domesticAbuse",
           firstName: "Jane",
           hasNINumber: "yes",
           haveAHomeAddress: "yes",
@@ -114,7 +114,7 @@ describe("CreateApplicationEffect", () => {
       familyLawClassification: "private",
       needsAdviceOnEUOrInternationalMaintenance: "yes",
       needsProtectiveInjunction: "no",
-      privateFamilyCaseScope: "domesticAbuse",
+      laspoEvidenceScope: "domesticAbuse",
     };
     createApplicationStub.resolves({
       data: getCreateApplicationResponseMock({ id: applicationId }),
@@ -130,6 +130,34 @@ describe("CreateApplicationEffect", () => {
       priorLegalAid: "yesSameMatter",
       familyLawClassification: "private",
       needsAdviceOnEUOrInternationalMaintenance: true,
+      caseMeetsMeritsCriteria: true,
+    });
+  });
+
+  it("submits a reached private LASPO evidence scope", async () => {
+    session.journeyDrafts[journeyCode] = {
+      ...(session.journeyDrafts[journeyCode] as Record<string, unknown>),
+      familyLawClassification: "private",
+      needsAdviceOnEUOrInternationalMaintenance: "no",
+      needsProtectiveInjunction: "no",
+      laspoEvidenceScope: "domesticAbuse",
+    };
+    createApplicationStub.resolves({
+      data: getCreateApplicationResponseMock({ id: applicationId }),
+      status: 201,
+      headers: new Headers(),
+    });
+
+    await createApplication(deps)(context, journeyCode);
+
+    expect(
+      createApplicationStub.firstCall.args[0].scopingQuestions,
+    ).to.deep.equal({
+      priorLegalAid: "yesSameMatter",
+      familyLawClassification: "private",
+      needsAdviceOnEUOrInternationalMaintenance: false,
+      needsProtectiveInjunction: false,
+      laspoEvidenceScope: "domesticAbuse",
       caseMeetsMeritsCriteria: true,
     });
   });

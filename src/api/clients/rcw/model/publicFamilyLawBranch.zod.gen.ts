@@ -15,7 +15,7 @@ export const PublicFamilyLawBranch = zod
     zod.object({
       needsAdviceOnEUOrInternationalMaintenance: zod.literal(null).optional(),
       needsProtectiveInjunction: zod.literal(null).optional(),
-      privateFamilyCaseScope: zod.literal(null).optional(),
+      laspoEvidenceScope: zod.literal(null).optional(),
     }),
   )
   .and(
