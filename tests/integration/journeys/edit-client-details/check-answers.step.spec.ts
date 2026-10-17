@@ -3,7 +3,10 @@ import {
   TestRenderResult,
 } from "@ministryofjustice/hmpps-forge/core/testing";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
+import { NunjucksRenderer } from "@ministryofjustice/hmpps-forge/express-nunjucks";
 import { expect } from "chai";
+import express from "express";
+import { parse } from "node-html-parser";
 import sinon from "sinon";
 
 import type { Application } from "#/api/clients/rcw/model/application.zod.gen.js";
@@ -12,13 +15,21 @@ import { editApplicationEffectsRegistry } from "#/journeys/edit-application/edit
 import { editApplicationJourney } from "#/journeys/edit-application/editApplication.journey.js";
 import { editApplicationTransformersRegistry } from "#/journeys/edit-application/editApplication.transformers.js";
 import { JourneyCode } from "#/journeys/JourneyCode.enum.js";
+import { setupNunjucks } from "#/middleware/setupNunjucks.js";
 import { getGetApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
 import { createForgeTestClient } from "../../utils/helpers.js";
 
 type SummaryRow = {
   actions?: { items: Array<{ href: string }> };
   key: { text: string };
-  value: { html?: string; text?: string };
+  value: {
+    blocks?: Array<{
+      properties?: Record<string, unknown>;
+      variant?: string;
+    }>;
+    html?: string;
+    text?: string;
+  };
   visibleWhen?: boolean;
 };
 
@@ -26,6 +37,7 @@ describe("Edit client details check answers step", () => {
   const applicationId = "123e4567-e89b-12d3-a456-426614174000";
   const ukApplication: Application = getGetApplicationResponseMock({
     applicationRefNumber: "CW-123456",
+    ecfFlag: false,
     clientDetails: {
       ...getGetApplicationResponseMock().clientDetails,
       firstName: "John",
@@ -82,11 +94,19 @@ describe("Edit client details check answers step", () => {
     .stub()
     .resolves({ status: 204, data: undefined });
 
+  beforeEach(() => {
+    getApplicationStub.resolves({ status: 200, data: ukApplication });
+  });
+
+  const renderer = new NunjucksRenderer({ nunjucksEnv: setupNunjucks(express()) });
+  renderer.assemblePage = (_context, blocks) => blocks.join("");
+
   const editApplicationClient = createForgeTestClient(
     editApplicationJourney,
     editApplicationEffectsRegistry,
     {
       additionalFunctions: [editApplicationTransformersRegistry],
+      renderer,
       disableReachabilityChecks: false,
       dependencies: {
         getApplication: getApplicationStub,
@@ -130,6 +150,216 @@ describe("Edit client details check answers step", () => {
     return summaryList.properties.rows as SummaryRow[];
   };
 
+  const incompleteTag = (
+    row?: SummaryRow,
+  ): Record<string, unknown> | undefined =>
+    row?.value.blocks?.find(
+      (block) =>
+        block.variant === "govukTag" &&
+        block.properties?.visibleWhen === true,
+    )?.properties;
+
+  const expectSummaryValue = (
+    result: TestRenderResult,
+    label: string,
+    value: string | string[],
+  ): void => {
+    const [summaryList] = result.getBlocksByVariant("govukSummaryList");
+    const rows = summaryList.properties.rows as SummaryRow[];
+    const row = rows.find((item) => item.key.text === label);
+
+    const content = row?.value.blocks?.find(
+      (block) => block.properties?.visibleWhen === true,
+    )?.properties?.content;
+    expect(content, label).to.be.a("string");
+
+    const lines = (content as string)
+      .split("<br />")
+      .map((line) => line.trim())
+      .filter(Boolean);
+    expect(lines, label).to.deep.equal(Array.isArray(value) ? value : [value]);
+
+    const html = parse(result.output as string);
+    const key = html.querySelectorAll("dt").find(
+      (item) => item.text.trim() === label,
+    );
+    const renderedLines = key?.nextElementSibling?.textContent
+      .split("\n")
+      .map((line) => line.trim())
+      .filter(Boolean);
+    expect(renderedLines, label).to.deep.equal(lines);
+  };
+
+  const expectDraftValue = async (
+    session: Record<string, unknown>,
+    label: string,
+    value: string | string[],
+  ): Promise<void> => {
+    const result = await editApplicationClient.get(
+      `/cases/${applicationId}/task-list/details/check-answers`,
+      { session },
+    );
+    expect(result.type).to.equal("render");
+    expectSummaryValue(result as TestRenderResult, label, value);
+  };
+
+  describe("Incomplete saved details", () => {
+    const complete = ApplicationDto.toAnswers(ukApplication);
+    it("renders completed text safely beside incomplete tags", async () => {
+      const session = { journeyDrafts: { [draftKey]: {
+        ...complete, firstName: "<b>Client</b>", ecf: undefined,
+      } } };
+      const result = await editApplicationClient.get(
+        `/cases/${applicationId}/task-list/details/check-answers`,
+        { session },
+      );
+      expect(result.type, result.type === "error" ? JSON.stringify(result.error) : undefined).to.equal("render");
+      const html = parse((result as TestRenderResult).output as string);
+      const key = html.querySelectorAll("dt").find(
+        (item) => item.text.trim() === "First name",
+      );
+
+      expect(key?.nextElementSibling?.text.trim()).to.equal("<b>Client</b>");
+      expect(html.querySelector("b")).to.equal(null);
+      expect(html.querySelector(".govuk-tag--blue")?.text.trim()).to.equal("INCOMPLETE");
+    });
+
+    const cases = [
+      ["ecf", "ECF"],
+      ["familyLawClassification", "Type of family law"],
+      ["legalAidBefore", "Accessed legal aid before"],
+      ["needsAdviceOnEUOrInternationalMaintenance", "Transitional EU arrangements or an international maintenance agreement"],
+      ["needsProtectiveInjunction", "Legal aid to get a protective injunction order"],
+      ["firstName", "First name"],
+      ["lastName", "Last name"],
+      ["dateOfBirth", "Date of birth"],
+      ["hasNINumber", "National Insurance number"],
+      ["niNumber", "National Insurance number"],
+      ["haveAHomeAddress", "Has a home address"],
+      ["ukAddressLine1", "Address"],
+      ["ukTownOrCity", "Address"],
+      ["ukPostcode", "Address"],
+      ["ukCountry", "Address"],
+      ["legalAidLast6Months", "Did your client get legal help for this matter in the last 6 months?"],
+      ["reasonForYes", "Reason for new application for same matter"],
+    ] as const;
+
+    for (const [key, label] of cases) {
+      it(`tags missing ${key} and blocks submission without clearing the draft`, async () => {
+        const draft = { ...complete, [key]: undefined };
+        const session = { journeyDrafts: { [draftKey]: draft } };
+        const rows = await getCheckAnswersRows(session);
+        const row = rows.find((item) => item.key.text === label);
+        expect(incompleteTag(row)).to.include({
+          classes: "govuk-tag--blue",
+          text: "INCOMPLETE",
+        });
+
+        const result = await editApplicationClient.post(
+          `/cases/${applicationId}/task-list/details/check-answers`,
+          { session },
+        );
+        expect(result.type).to.equal("render");
+        expect(session.journeyDrafts[draftKey]).to.deep.equal(draft);
+      });
+    }
+
+    it("renders null scoping questions and ECF without choosing a law branch", async () => {
+      const result = await getCheckAnswers({ ...ukApplication, scopingQuestions: null, ecfFlag: null });
+      const [summary] = result.getBlocksByVariant("govukSummaryList");
+      const rows = summary.properties.rows as SummaryRow[];
+      for (const label of ["ECF", "Type of family law", "Accessed legal aid before"]) {
+        const row = rows.find((item) => item.key.text === label);
+        expect(incompleteTag(row)).to.include({
+          classes: "govuk-tag--blue",
+          text: "INCOMPLETE",
+        });
+      }
+      expect(rows.filter((row) => row.visibleWhen !== false).some((row) =>
+        ["Letter from local authority", "Legal aid to get a protective injunction order"].includes(row.key.text),
+      )).to.equal(false);
+    });
+
+    it("requires public care proceedings and clears the tag after answering its existing page", async () => {
+      const session = { journeyDrafts: { [draftKey]: {
+        ...complete,
+        familyLawClassification: "public",
+        careProceedingsStarted: undefined,
+      } } };
+      const rows = await getCheckAnswersRows(session);
+      const row = rows.find((item) => item.actions?.items[0].href.startsWith("care-proceedings"));
+      expect(incompleteTag(row)).to.include({
+        classes: "govuk-tag--blue",
+        text: "INCOMPLETE",
+      });
+      expect((await editApplicationClient.post(
+        `/cases/${applicationId}/task-list/details/check-answers`, { session },
+      )).type).to.equal("render");
+
+      const result = await editApplicationClient.post(
+        `/cases/${applicationId}/task-list/details/care-proceedings`,
+        { session, query: { returnTo: "check-answers" }, body: { careProceedingsStarted: "no" } },
+      );
+      expect(result.type).to.equal("redirect");
+      await expectDraftValue(session, "Local authority is initiating care proceedings", "No");
+      expect((await editApplicationClient.post(
+        `/cases/${applicationId}/task-list/details/check-answers`, { session },
+      )).type).to.equal("redirect");
+    });
+
+    it("hides and ignores inactive answers, including an injunction skipped by maintenance", async () => {
+      const session = { journeyDrafts: { [draftKey]: {
+        ...complete,
+        legalAidBefore: "no",
+        legalAidLast6Months: "yes",
+        reasonForYes: undefined,
+        needsAdviceOnEUOrInternationalMaintenance: "yes",
+        needsProtectiveInjunction: undefined,
+        careProceedingsStarted: undefined,
+        haveAHomeAddress: "no",
+        ukAddressLine1: undefined,
+        ukTownOrCity: undefined,
+        ukPostcode: undefined,
+      } } };
+      const rows = await getCheckAnswersRows(session);
+      const visible = rows.filter((row) => row.visibleWhen !== false);
+      expect(visible.some((row) => row.key.text === "Legal aid to get a protective injunction order")).to.equal(false);
+      expect(visible.some((row) => row.key.text === "Reason for new application for same matter")).to.equal(false);
+      expect(visible.some((row) => incompleteTag(row)?.text === "INCOMPLETE")).to.equal(false);
+      expect((await editApplicationClient.post(
+        `/cases/${applicationId}/task-list/details/check-answers`, { session },
+      )).type).to.equal("redirect");
+    });
+
+    it("requires only the reached overseas address fields", async () => {
+      for (const key of ["osAddressLine1", "osCountry"] as const) {
+        const session = { journeyDrafts: { [draftKey]: {
+          ...ApplicationDto.toAnswers(overseasApplication), [key]: "",
+        } } };
+        const rows = await getCheckAnswersRows(session);
+        const row = rows.find((item) => item.key.text === "Address");
+        expect(incompleteTag(row)).to.include({
+          classes: "govuk-tag--blue",
+          text: "INCOMPLETE",
+        });
+        expect((await editApplicationClient.post(
+          `/cases/${applicationId}/task-list/details/check-answers`, { session },
+        )).type).to.equal("render");
+      }
+    });
+
+    it("requires explicit ECF and removes the tag after answering", async () => {
+      const session = { journeyDrafts: { [draftKey]: { ...complete, ecf: undefined } } };
+      await editApplicationClient.post(`/cases/${applicationId}/task-list/details/ecf`, {
+        session, query: { returnTo: "check-answers" }, body: { ecf: "no" },
+      });
+      await expectDraftValue(session, "ECF", "No");
+      expect((await editApplicationClient.post(
+        `/cases/${applicationId}/task-list/details/check-answers`, { session },
+      )).type).to.equal("redirect");
+    });
+  });
+
   describe("Edit journey entry navigation", () => {
     it("stores a normalized NI number when editing client details", async () => {
       const session: {
@@ -162,17 +392,7 @@ describe("Edit client details check answers step", () => {
       );
 
       expect(result.type).to.equal("render");
-      const [summaryList] = (result as TestRenderResult).getBlocksByVariant(
-        "govukSummaryList",
-      );
-      const rows = summaryList.properties.rows as Array<{
-        key: { text: string };
-        value: { text: string };
-      }>;
-
-      expect(
-        rows.find((row) => row.key.text === "First name")?.value.text,
-      ).to.equal("John");
+      expectSummaryValue(result as TestRenderResult, "First name", "John");
     });
 
     it("redirects to check answers", async () => {
@@ -236,10 +456,7 @@ describe("Edit client details check answers step", () => {
         `/cases/${applicationId}/task-list/details/check-answers`,
       );
 
-      const rows = await getCheckAnswersRows(session);
-      expect(
-        rows.find((row) => row.key.text === "Address")?.value.html,
-      ).to.equal("No fixed address");
+      await expectDraftValue(session, "Address", "No fixed address");
     });
 
     it("redirect to UK address capture when 'has fixed address' is 'yes'", async () => {
@@ -295,8 +512,8 @@ describe("Edit client details check answers step", () => {
       expect(addressRow?.actions?.items[0].href).to.equal(
         "enter-overseas-address?returnTo=check-answers",
       );
-      expect(addressRow?.value.html).to.match(
-        /10 Some Other Street,<br \/>.*Paris,<br \/>.*France/s,
+      await expectDraftValue(session, "Address",
+        ["10 Some Other Street,", "Paris,", "France"],
       );
     });
 
@@ -332,8 +549,8 @@ describe("Edit client details check answers step", () => {
       expect(addressRow?.actions?.items[0].href).to.equal(
         "enter-address-manually?returnTo=check-answers",
       );
-      expect(addressRow?.value.html).to.match(
-        /123 Test Street,<br \/>.*Test Area,<br \/>.*Testville,<br \/>.*TE5 7ST/s,
+      await expectDraftValue(session, "Address",
+        ["123 Test Street,", "Test Area,", "Testville,", "TE5 7ST"],
       );
     });
   });
@@ -419,18 +636,8 @@ describe("Edit client details check answers step", () => {
     });
 
     it("renders the API client data in a summary list", () => {
-      const initialRows = summaryList.properties.rows as {
-        key: { text: string };
-        value: { text: string };
-      }[];
-
-      const rows = initialRows.map((row) => ({
-        key: row.key.text,
-        value: row.value.text,
-      }));
-
-      expect(rows.length).to.equal(14);
-      expect(rows).to.deep.include.members([
+      expect(summaryList.properties.rows).to.have.lengthOf(14);
+      const values = [
         { key: "ECF", value: "No" },
         { key: "Type of family law", value: "Private" },
         {
@@ -455,8 +662,10 @@ describe("Edit client details check answers step", () => {
         { key: "Date of birth", value: "1 January 1990" },
         { key: "National Insurance number", value: "AB123456C" },
         { key: "Has a home address", value: "Yes" },
-        { key: "Address", value: undefined },
-      ]);
+      ];
+      for (const { key, value } of values) {
+        expectSummaryValue(renderResult, key, value);
+      }
     });
 
     it("links the home address row to the home address question", () => {
@@ -486,14 +695,8 @@ describe("Edit client details check answers step", () => {
     });
 
     it("renders the API UK address in the correct format", () => {
-      const rows = summaryList.properties.rows as Array<{
-        key: { text: string };
-        value: { html: string };
-      }>;
-      const addressRow = rows.find((row) => row.key.text === "Address");
-
-      expect(addressRow?.value.html).to.match(
-        /123 Test Street,<br \/>.*Test Area,<br \/>.*Testville,<br \/>.*TE5 7ST/s,
+      expectSummaryValue(renderResult, "Address",
+        ["123 Test Street,", "Test Area,", "Testville,", "TE5 7ST"],
       );
     });
 
@@ -509,16 +712,7 @@ describe("Edit client details check answers step", () => {
           niNumber: null,
         },
       });
-      const [noNiSummaryList] = result.getBlocksByVariant("govukSummaryList");
-      const rows = noNiSummaryList.properties.rows as Array<{
-        key: { text: string };
-        value: { text: string };
-      }>;
-      const niNumberRow = rows.find(
-        (row) => row.key.text === "National Insurance number",
-      );
-
-      expect(niNumberRow?.value.text).to.equal("No");
+      expectSummaryValue(result, "National Insurance number", "No");
     });
 
     it("renders no fixed address when the API has no fixed address", async () => {
@@ -538,15 +732,32 @@ describe("Edit client details check answers step", () => {
         value: { html?: string; text?: string };
       }>;
       const addressRow = rows.find((row) => row.key.text === "Address");
-      const homeAddressRow = rows.find(
-        (row) => row.key.text === "Has a home address",
-      );
-
       expect(addressRow).to.not.be.undefined;
-      expect(homeAddressRow?.value.text).to.equal("No");
-      expect(addressRow?.value.html).to.equal("No fixed address");
+      expectSummaryValue(result, "Has a home address", "No");
+      expectSummaryValue(result, "Address", "No fixed address");
       expect(addressRow?.actions?.items[0].href).to.equal(
         "have-a-home-address?returnTo=check-answers",
+      );
+    });
+
+    it("links a missing fixed address to the UK address step", async () => {
+      const result = await getCheckAnswers({
+        ...ukApplication,
+        clientDetails: {
+          ...ukApplication.clientDetails,
+          hasFixedAddress: true,
+          address: null,
+        },
+      });
+      const [summaryList] = result.getBlocksByVariant("govukSummaryList");
+      const rows = summaryList.properties.rows as Array<{
+        actions?: { items: Array<{ href: string }> };
+        key: { text: string };
+      }>;
+      const addressRow = rows.find((row) => row.key.text === "Address");
+
+      expect(addressRow?.actions?.items[0].href).to.equal(
+        "enter-address-manually?returnTo=check-answers",
       );
     });
 
@@ -564,8 +775,8 @@ describe("Edit client details check answers step", () => {
       expect(addressRow?.actions?.items[0].href).to.equal(
         "enter-overseas-address?returnTo=check-answers",
       );
-      expect(addressRow?.value.html).to.match(
-        /10 Some Other Street,<br \/>.*Paris,<br \/>.*France/s,
+      expectSummaryValue(result, "Address",
+        ["10 Some Other Street,", "Paris,", "France"],
       );
     });
 
@@ -581,7 +792,7 @@ describe("Edit client details check answers step", () => {
       } = ApplicationDto.toAnswers(ukApplication);
       const session = {
         journeyDrafts: {
-          [JourneyCode.EDIT_CLIENT_DETAILS]: {
+          [draftKey]: {
             ...savedAnswers,
             osAddressLine1: "10 Some Other Street",
             osAddressLine3: "Paris",
@@ -608,8 +819,8 @@ describe("Edit client details check answers step", () => {
       expect(addressRow?.actions?.items[0].href).to.equal(
         "enter-overseas-address?returnTo=check-answers",
       );
-      expect(addressRow?.value.html).to.match(
-        /10 Some Other Street,<br \/>.*Paris,<br \/>.*France/s,
+      expectSummaryValue(renderResult, "Address",
+        ["10 Some Other Street,", "Paris,", "France"],
       );
     });
 
@@ -629,10 +840,7 @@ describe("Edit client details check answers step", () => {
       );
       expect(clientDetailsResult.type).to.equal("render");
 
-      const rows = await getCheckAnswersRows(session);
-      expect(
-        rows.find((row) => row.key.text === "First name")?.value.text,
-      ).to.equal("Edited");
+      await expectDraftValue(session, "First name", "Edited");
     });
   });
 

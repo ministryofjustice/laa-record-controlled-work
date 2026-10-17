@@ -10,6 +10,7 @@ import { haveAHomeAddressStep } from "#/journeys/create-application/steps/haveAH
 import { internationalMaintenanceAgreementStep } from "#/journeys/create-application/steps/internationalMaintenanceAgreement/internationalMaintenanceAgreement.step.js";
 import { legalAidBeforeStep } from "#/journeys/create-application/steps/legalAidBefore/legalAidBefore.step.js";
 import { legalAidLast6MonthsStep } from "#/journeys/create-application/steps/legalAidLast6Months/legalAidLast6Months.step.js";
+import { letterFromLocalAuthorityStep } from "#/journeys/create-application/steps/letterFromLocalAuthority/letterFromLocalAuthority.step.js";
 import { needsProtectiveInjunctionStep } from "#/journeys/create-application/steps/needsProtectiveInjunction/needsProtectiveInjunction.step.js";
 import { niNumberStep } from "#/journeys/create-application/steps/niNumber/niNumber.step.js";
 import { editClientDetailsEffects } from "#/journeys/edit-client-details/editClientDetails.effects.js";
@@ -17,6 +18,22 @@ import { checkAnswersStep } from "#/journeys/edit-client-details/steps/check-ans
 import { JourneyCode } from "#/journeys/JourneyCode.enum.js";
 
 const editJourneyCode = JourneyCode.EDIT_CLIENT_DETAILS;
+
+const stepsDirectlyEnterableWhileEditing = [
+  ecfStep(editJourneyCode),
+  familyLawClassificationStep(editJourneyCode),
+  internationalMaintenanceAgreementStep(editJourneyCode),
+  needsProtectiveInjunctionStep(editJourneyCode),
+  letterFromLocalAuthorityStep(editJourneyCode),
+  legalAidBeforeStep(editJourneyCode),
+  legalAidLast6MonthsStep(editJourneyCode),
+  clientDetailsStep(editJourneyCode),
+  niNumberStep(editJourneyCode),
+  haveAHomeAddressStep(editJourneyCode),
+].map((stepDefinition) => ({
+  ...stepDefinition,
+  reachability: { ...stepDefinition.reachability, entryWhen: true },
+}));
 
 export const editClientDetailsJourney = journey({
   code: editJourneyCode,
@@ -31,16 +48,8 @@ export const editClientDetailsJourney = journey({
   path: "/task-list/details",
   reachability: { disableReachabilityChecks: false },
   steps: [
-    ecfStep(editJourneyCode, { reachability: { entryWhen: true } }),
-    familyLawClassificationStep(editJourneyCode),
-    internationalMaintenanceAgreementStep(editJourneyCode),
-    needsProtectiveInjunctionStep(editJourneyCode),
+    ...stepsDirectlyEnterableWhileEditing,
     ineligibleStep(editJourneyCode),
-    legalAidBeforeStep(editJourneyCode),
-    legalAidLast6MonthsStep(editJourneyCode),
-    clientDetailsStep(editJourneyCode),
-    niNumberStep(editJourneyCode),
-    haveAHomeAddressStep(editJourneyCode),
     enterAddressManuallyStep(editJourneyCode),
     enterOverseasAddressStep(editJourneyCode),
     checkAnswersStep(editJourneyCode),
