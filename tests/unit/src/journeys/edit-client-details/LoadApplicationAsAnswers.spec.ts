@@ -13,8 +13,11 @@ describe("loadApplicationAsAnswers", () => {
   const journeyCode = "editClientDetails";
   const application = {} as Application;
   const answers = {
+    careProceedingsStarted: "yes",
+    careProceedingsParentalResponsibility: "no",
     firstName: "Jane",
     hasNINumber: "no",
+    privateFamilyCaseScope: "none",
   } as ReturnType<typeof ApplicationDto.toAnswers>;
 
   let context: EditApplicationContext;
@@ -65,6 +68,15 @@ describe("loadApplicationAsAnswers", () => {
     expect(toAnswers.calledOnceWithExactly(application)).to.equal(true);
     expect(setAnswer.calledWithExactly("firstName", "Jane")).to.equal(true);
     expect(setAnswer.calledWithExactly("hasNINumber", "no")).to.equal(true);
+    expect(
+      setAnswer.calledWithExactly("careProceedingsStarted", "yes"),
+    ).to.equal(true);
+    expect(
+      setAnswer.calledWithExactly("careProceedingsParentalResponsibility", "no"),
+    ).to.equal(true);
+    expect(
+      setAnswer.calledWithExactly("privateFamilyCaseScope", "none"),
+    ).to.equal(true);
     expect(session.journeyDrafts).to.deep.equal({
       [`${journeyCode}:application-1`]: { ...answers },
     });

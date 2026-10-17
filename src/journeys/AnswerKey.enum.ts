@@ -1,4 +1,6 @@
 export enum AnswerKey {
+  careProceedingsParentalResponsibility = "careProceedingsParentalResponsibility",
+  careProceedingsStarted = "careProceedingsStarted",
   dateOfBirth = "dateOfBirth",
   ecf = "ecf",
   familyLawClassification = "familyLawClassification",
@@ -17,6 +19,7 @@ export enum AnswerKey {
   osAddressLine3 = "osAddressLine3",
   osAddressLine4 = "osAddressLine4",
   osCountry = "osCountry",
+  privateFamilyCaseScope = "privateFamilyCaseScope",
   reasonForYes = "reasonForYes",
   ukAddressLine1 = "ukAddressLine1",
   ukAddressLine2 = "ukAddressLine2",
