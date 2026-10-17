@@ -71,7 +71,7 @@ function onSubmitNo(journeyCode: string): SubmitHook {
       ],
     },
     validate: true,
-    when: Answer(AnswerKey.letterFromLocalAuthority).match(
+    when: Answer(AnswerKey.careProceedingsStarted).match(
       Condition.Equals("no"),
     ),
   });
@@ -93,7 +93,7 @@ function onSubmitYes(journeyCode: string): SubmitHook {
       ],
     },
     validate: true,
-    when: Answer(AnswerKey.letterFromLocalAuthority).match(
+    when: Answer(AnswerKey.careProceedingsStarted).match(
       Condition.Equals("yes"),
     ),
   });
@@ -117,7 +117,7 @@ function redirectToCheckAnswers(): RedirectOutcome {
 function redirectToConfirmMerits(): RedirectOutcome {
   return redirect({
     goto: "confirm-merits",
-    when: Answer(AnswerKey.letterFromLocalAuthority).match(
+    when: Answer(AnswerKey.careProceedingsStarted).match(
       Condition.Equals("no"),
     ),
   });
@@ -130,7 +130,7 @@ function redirectToConfirmMerits(): RedirectOutcome {
 function redirectToParentalResponsibility(): RedirectOutcome {
   return redirect({
     goto: "parental-responsibility",
-    when: Answer(AnswerKey.letterFromLocalAuthority).match(
+    when: Answer(AnswerKey.careProceedingsStarted).match(
       Condition.Equals("yes"),
     ),
   });

@@ -51,7 +51,7 @@ export function question(): BlockDefinition {
   );
 
   return GovUKRadioInput({
-    code: AnswerKey.letterFromLocalAuthority,
+    code: AnswerKey.careProceedingsStarted,
     items: [
       {
         text: t("common.yes"),

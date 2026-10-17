@@ -143,7 +143,7 @@ export function formatLetterFromLocalAuthority(): ResolvableString {
   const yes = t("common.yes");
   const no = t("common.no");
 
-  return match(Answer(AnswerKey.letterFromLocalAuthority))
+  return match(Answer(AnswerKey.careProceedingsStarted))
     .branch(Condition.Equals("yes"), yes)
     .otherwise(no);
 }
