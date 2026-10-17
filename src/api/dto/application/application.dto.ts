@@ -162,7 +162,7 @@ export class ApplicationDto {
     const { address } = application.clientDetails;
 
     if (!address) {
-      throw new Error("Address is not defined in the application.");
+      return {};
     }
 
     return address.country === "GB"
@@ -237,26 +237,30 @@ export class ApplicationDto {
    * @returns AnswersOutput instance.
    */
   // eslint-disable-next-line complexity -- Got a lot of checks to do here.
-  public static toAnswers(application: ApplicationSchema): AnswersOutput {
+  public static toAnswers(
+    application: ApplicationSchema,
+  ): Partial<AnswersOutput> {
     const addressAnswers = application.clientDetails.hasFixedAddress
       ? this.getAnswersFromAddress(application)
       : {};
-    const priorLegalAid = PriorLegalAid.parse(
-      application.scopingQuestions?.priorLegalAid,
-    );
+    const priorLegalAid = application.scopingQuestions?.priorLegalAid;
     const applicationScopingQuestions = application.scopingQuestions ?? {};
     const familyLawClassification =
-      applicationScopingQuestions.familyLawClassification ?? "public";
-    const scopingAnswers = this.getAnswersFromScopingQuestions({
-      ...applicationScopingQuestions,
-      familyLawClassification,
-    });
+      applicationScopingQuestions.familyLawClassification ?? undefined;
+    const scopingAnswers = this.getAnswersFromScopingQuestions(
+      applicationScopingQuestions,
+    );
 
     return {
       ...addressAnswers,
       ...scopingAnswers,
       [AnswerKey.dateOfBirth]: application.clientDetails.dateOfBirth,
-      [AnswerKey.ecf]: "no",
+      [AnswerKey.ecf]:
+        application.ecfFlag === null
+          ? undefined
+          : application.ecfFlag
+            ? "yes"
+            : "no",
       [AnswerKey.familyLawClassification]: familyLawClassification,
       [AnswerKey.firstName]: application.clientDetails.firstName,
       [AnswerKey.hasNINumber]: application.clientDetails.niNumber
@@ -304,11 +308,14 @@ export class ApplicationDto {
   private static getAnswersFromScopingQuestions(
     scopingQuestions: ApplicationScopingQuestions,
   ): Partial<AnswersOutput> {
-    if (scopingQuestions.familyLawClassification === "private") {
-      return this.getPrivateFamilyLawAnswers(scopingQuestions);
+    switch (scopingQuestions.familyLawClassification) {
+      case "private":
+        return this.getPrivateFamilyLawAnswers(scopingQuestions);
+      case "public":
+        return this.getPublicFamilyLawAnswers(scopingQuestions);
+      default:
+        return {};
     }
-
-    return this.getPublicFamilyLawAnswers(scopingQuestions);
   }
 
   /**
@@ -350,7 +357,7 @@ export class ApplicationDto {
   }
 
   /**
-   * Extracts reached private-law answers, defaulting missing answers.
+   * Extracts reached private-law answers.
    * @param scopingQuestions - The scoping questions from the application.
    * @returns Partial AnswersOutput containing reached private-law answers.
    */
@@ -358,7 +365,13 @@ export class ApplicationDto {
     scopingQuestions: ApplicationScopingQuestions,
   ): Partial<AnswersOutput> {
     const needsAdviceOnMaintenance =
-      scopingQuestions.needsAdviceOnEUOrInternationalMaintenance ?? false;
+      scopingQuestions.needsAdviceOnEUOrInternationalMaintenance;
+    if (
+      needsAdviceOnMaintenance === null ||
+      needsAdviceOnMaintenance === undefined
+    ) {
+      return {};
+    }
     const answers: Partial<AnswersOutput> = {
       [AnswerKey.needsAdviceOnEUOrInternationalMaintenance]:
         needsAdviceOnMaintenance ? "yes" : "no",
@@ -368,8 +381,13 @@ export class ApplicationDto {
       return answers;
     }
 
-    const needsProtectiveInjunction =
-      scopingQuestions.needsProtectiveInjunction ?? false;
+    const { needsProtectiveInjunction } = scopingQuestions;
+    if (
+      needsProtectiveInjunction === null ||
+      needsProtectiveInjunction === undefined
+    ) {
+      return answers;
+    }
     answers[AnswerKey.needsProtectiveInjunction] = needsProtectiveInjunction
       ? "yes"
       : "no";
@@ -383,15 +401,20 @@ export class ApplicationDto {
   }
 
   /**
-   * Extracts reached public-law answers, defaulting missing answers.
+   * Extracts reached public-law answers.
    * @param scopingQuestions - The scoping questions from the application.
    * @returns Partial AnswersOutput containing reached public-law answers.
    */
   private static getPublicFamilyLawAnswers(
     scopingQuestions: ApplicationScopingQuestions,
   ): Partial<AnswersOutput> {
-    const careProceedingsStarted =
-      scopingQuestions.careProceedingsStarted ?? false;
+    const { careProceedingsStarted } = scopingQuestions;
+    if (
+      careProceedingsStarted === null ||
+      careProceedingsStarted === undefined
+    ) {
+      return {};
+    }
     const answers: Partial<AnswersOutput> = {
       [AnswerKey.careProceedingsStarted]: careProceedingsStarted ? "yes" : "no",
     };
