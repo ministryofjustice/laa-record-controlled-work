@@ -120,7 +120,7 @@ for (const viewport of [
     await page.getByRole("button", { name: "Save and continue" }).click();
     await expect(page).toHaveURL(path);
     await expect(page.locator(".govuk-error-summary")).toContainText(
-      "Complete all incomplete answers before continuing",
+      "You must complete all required answers to continue",
     );
     await page.screenshot({ path: testInfo.outputPath("incomplete-details.png"), fullPage: true });
 
