@@ -327,6 +327,84 @@ describe("toAnswers method", () => {
     return { ...application, scopingQuestions } as Application;
   }
 
+  it("leaves missing exposed scoping and ECF answers unanswered", () => {
+    for (const scopingQuestions of [null, {}]) {
+      const result = ApplicationDto.toAnswers({ ...application, scopingQuestions });
+
+      for (const key of [
+        "legalAidBefore",
+        "familyLawClassification",
+        "careProceedingsStarted",
+        "needsAdviceOnEUOrInternationalMaintenance",
+        "needsProtectiveInjunction",
+        "ecf",
+      ]) {
+        expect(result[key as keyof typeof result], key).to.equal(undefined);
+      }
+    }
+  });
+
+  it("preserves explicit ECF answers without defaulting missing values", () => {
+    for (const ecfFlag of [true, false, null]) {
+      expect(ApplicationDto.toAnswers({ ...application, ecfFlag }).ecf).to.equal(
+        ecfFlag === null ? undefined : ecfFlag ? "yes" : "no",
+      );
+    }
+  });
+
+  it("allows a fixed address to be corrected when its details are missing", () => {
+    const result = ApplicationDto.toAnswers({
+      ...application,
+      clientDetails: { ...application.clientDetails, address: null },
+    });
+
+    expect(result.haveAHomeAddress).to.equal("yes");
+    expect(result.ukAddressLine1).to.equal(undefined);
+    expect(result.osAddressLine1).to.equal(undefined);
+  });
+
+  it("does not select family law classification when classification is missing", () => {
+    const result = ApplicationDto.toAnswers(applicationWithScopingQuestions({
+      priorLegalAid: "no",
+      careProceedingsStarted: true,
+    }));
+
+    expect(result.familyLawClassification).to.equal(undefined);
+    expect(result.careProceedingsStarted).to.equal(undefined);
+  });
+
+  it("leaves null or absent reached scoping answers unanswered", () => {
+    for (const missing of [undefined, null]) {
+      const privateResult = ApplicationDto.toAnswers(applicationWithScopingQuestions({
+        priorLegalAid: "no",
+        familyLawClassification: "private",
+        needsAdviceOnEUOrInternationalMaintenance: false,
+        needsProtectiveInjunction: missing,
+      }));
+      expect(privateResult.needsAdviceOnEUOrInternationalMaintenance).to.equal("no");
+      expect(privateResult.needsProtectiveInjunction).to.equal(undefined);
+
+      const publicResult = ApplicationDto.toAnswers(applicationWithScopingQuestions({
+        priorLegalAid: "no",
+        familyLawClassification: "public",
+        careProceedingsStarted: missing,
+      }));
+      expect(publicResult.careProceedingsStarted).to.equal(undefined);
+      expect(publicResult.careProceedingsParentalResponsibility).to.equal(undefined);
+    }
+  });
+
+  it("preserves explicit negative public scoping answers without reaching responsibility", () => {
+    const result = ApplicationDto.toAnswers(applicationWithScopingQuestions({
+      priorLegalAid: "no",
+      familyLawClassification: "public",
+      careProceedingsStarted: false,
+      careProceedingsParentalResponsibility: true,
+    }));
+    expect(result.careProceedingsStarted).to.equal("no");
+    expect(result.careProceedingsParentalResponsibility).to.equal(undefined);
+  });
+
   it("maps a UK API address to only the UK answer fields", () => {
     const result = ApplicationDto.toAnswers(application);
 
@@ -468,7 +546,7 @@ describe("toAnswers method", () => {
     );
   });
 
-  it("defaults reached private answers for sparse historical applications", () => {
+  it("leaves exposed private answers missing for sparse historical applications", () => {
     const scopingQuestions = {
       priorLegalAid: "no",
       familyLawClassification: "private",
@@ -481,11 +559,9 @@ describe("toAnswers method", () => {
       applicationWithScopingQuestions(scopingQuestions),
     );
 
-    expect(result).to.include({
-      needsAdviceOnEUOrInternationalMaintenance: "no",
-      needsProtectiveInjunction: "no",
-      laspoEvidenceScope: "none",
-    });
+    expect(result.needsAdviceOnEUOrInternationalMaintenance).to.equal(undefined);
+    expect(result.needsProtectiveInjunction).to.equal(undefined);
+    expect(result.laspoEvidenceScope).to.equal(undefined);
   });
 
   it("preserves a saved private scope when the question was reached", () => {
