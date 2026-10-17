@@ -98,5 +98,7 @@ export const completeApplication = getGetApplicationResponseMock({
   ...EVIDENCE,
 });
 
-export const clientDetailsApplication =
-  getGetApplicationResponseMock(CLIENT_DETAILS);
+export const clientDetailsApplication = getGetApplicationResponseMock({
+  ...CLIENT_DETAILS,
+  ecfFlag: null,
+});
