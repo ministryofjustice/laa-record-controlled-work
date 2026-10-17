@@ -190,6 +190,21 @@ describe("Edit client details check answers step", () => {
     expect(renderedLines, label).to.deep.equal(lines);
   };
 
+  const expectOverseasAddress = (result: TestRenderResult): void => {
+    const [summaryList] = result.getBlocksByVariant("govukSummaryList");
+    const rows = summaryList.properties.rows as SummaryRow[];
+    const addressRow = rows.find((row) => row.key.text === "Address");
+
+    expect(addressRow?.actions?.items[0].href).to.equal(
+      "enter-overseas-address?returnTo=check-answers",
+    );
+    expectSummaryValue(result, "Address", [
+      "10 Some Other Street,",
+      "Paris,",
+      "France",
+    ]);
+  };
+
   const expectDraftValue = async (
     session: Record<string, unknown>,
     label: string,
@@ -763,21 +778,7 @@ describe("Edit client details check answers step", () => {
 
     it("links and renders an overseas address from the API", async () => {
       const result = await getCheckAnswers(overseasApplication);
-      const [overseasSummaryList] =
-        result.getBlocksByVariant("govukSummaryList");
-      const rows = overseasSummaryList.properties.rows as Array<{
-        actions?: { items: Array<{ href: string }> };
-        key: { text: string };
-        value: { html?: string; text?: string };
-      }>;
-      const addressRow = rows.find((row) => row.key.text === "Address");
-
-      expect(addressRow?.actions?.items[0].href).to.equal(
-        "enter-overseas-address?returnTo=check-answers",
-      );
-      expectSummaryValue(result, "Address",
-        ["10 Some Other Street,", "Paris,", "France"],
-      );
+      expectOverseasAddress(result);
     });
 
     it("renders the saved overseas address after switching from UK", async () => {
@@ -807,21 +808,7 @@ describe("Edit client details check answers step", () => {
       );
       expect(result.type).to.equal("render");
       const renderResult = result as TestRenderResult;
-      const [savedSummaryList] =
-        renderResult.getBlocksByVariant("govukSummaryList");
-      const rows = savedSummaryList.properties.rows as Array<{
-        actions?: { items: Array<{ href: string }> };
-        key: { text: string };
-        value: { html?: string; text?: string };
-      }>;
-      const addressRow = rows.find((row) => row.key.text === "Address");
-
-      expect(addressRow?.actions?.items[0].href).to.equal(
-        "enter-overseas-address?returnTo=check-answers",
-      );
-      expectSummaryValue(renderResult, "Address",
-        ["10 Some Other Street,", "Paris,", "France"],
-      );
+      expectOverseasAddress(renderResult);
     });
 
     it("preserves draft answers when navigating between edit steps", async () => {
