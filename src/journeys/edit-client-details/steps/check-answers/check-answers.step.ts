@@ -4,11 +4,14 @@ import {
   Params,
   redirect,
   step,
+  type StepDefinition,
   submit,
   tieBreaker,
+  validation,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
-import { summaryList } from "#/journeys/create-application/steps/checkAnswers/checkAnswers.blocks.js";
+import { editSummaryListBlock } from "#/journeys/create-application/steps/checkAnswers/checkAnswers.blocks.js";
+import { checkAnswersComplete } from "#/journeys/create-application/steps/checkAnswers/checkAnswers.model.js";
 import { editClientDetailsEffects } from "#/journeys/edit-client-details/editClientDetails.effects.js";
 import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
 import { heading, submitButton } from "#/journeys/shared.blocks.js";
@@ -18,11 +21,14 @@ const CHECK_ANSWERS = t("journeys.createApplication.checkAnswers.title");
 
 const tieBreakerPriority = 100;
 
-export const checkAnswersStep = (
-  journeyCode: string,
-): ReturnType<typeof step> =>
-  step({
-    blocks: [heading(CHECK_ANSWERS), summaryList(), submitButton()],
+/**
+ * Creates the editable check-answers step.
+ * @param journeyCode The journey whose draft should be loaded.
+ * @returns The check-answers step definition.
+ */
+export function checkAnswersStep(journeyCode: string): StepDefinition {
+  return step({
+    blocks: [heading(CHECK_ANSWERS), editSummaryListBlock(), submitButton()],
     code: "check-answers",
     onAccess: [
       access({
@@ -31,7 +37,7 @@ export const checkAnswersStep = (
     ],
     onSubmission: [
       submit({
-        onAlways: {
+        onValid: {
           next: [
             redirect({
               goto: Format(
@@ -41,7 +47,7 @@ export const checkAnswersStep = (
             }),
           ],
         },
-        validate: false,
+        validate: true,
       }),
     ],
     path: "/check-answers",
@@ -50,4 +56,14 @@ export const checkAnswersStep = (
       tieBreakers: [tieBreaker({ priority: tieBreakerPriority })],
     },
     title: CHECK_ANSWERS,
+    validWhen: [
+      validation({
+        condition: checkAnswersComplete(),
+        message: t(
+          "journeys.createApplication.checkAnswers.validation.incomplete",
+        ),
+        submissionOnly: true,
+      }),
+    ],
   });
+}

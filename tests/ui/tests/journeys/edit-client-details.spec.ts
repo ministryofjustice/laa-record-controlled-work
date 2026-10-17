@@ -36,13 +36,13 @@ test("Edit Application - Client details journey", async ({
   await expect(rows.locator(".govuk-summary-list__value")).toContainText(
     [
       // ECF
-      "No",
+      "INCOMPLETE",
       // Type of family law
       "Private",
       // Transitional EU arrangements or an international maintenance agreement
       "No",
       // Needs protective injunction
-      "No",
+      "INCOMPLETE",
       // Accessed legal aid before
       "No",
       // First name
@@ -99,3 +99,63 @@ test("Edit Application - Client details journey", async ({
     { useInnerText: true },
   );
 });
+
+for (const viewport of [
+  { width: 1280, height: 900 },
+  { width: 390, height: 844 },
+]) {
+  test(`Incomplete client details can be corrected at ${viewport.width}px`, async ({
+    withSelectedOffice: page,
+  }, testInfo) => {
+    await page.setViewportSize(viewport);
+    const path = `/cases/${clientDetailsApplication.id}/task-list/details/check-answers`;
+    await page.goto(path);
+    const rows = page.locator(".govuk-summary-list__row");
+    const ecf = rows.filter({ has: page.getByText("ECF", { exact: true }) });
+    const injunction = rows.filter({
+      has: page.getByText("Legal aid to get a protective injunction order", { exact: true }),
+    });
+    await expect(ecf.locator(".govuk-tag")).toHaveText("INCOMPLETE");
+    await expect(injunction.locator(".govuk-tag")).toHaveText("INCOMPLETE");
+    await page.getByRole("button", { name: "Save and continue" }).click();
+    await expect(page).toHaveURL(path);
+    await expect(page.locator(".govuk-error-summary")).toContainText(
+      "You must complete all required answers to continue",
+    );
+    await page.screenshot({ path: testInfo.outputPath("incomplete-details.png"), fullPage: true });
+
+    await ecf.getByRole("link", { name: /Change/ }).click();
+    await expect(page.getByRole("radio", { name: "No", exact: true })).not.toBeChecked();
+    await page.getByRole("radio", { name: "No", exact: true }).check();
+    await page.getByRole("button", { name: "Continue", exact: true }).click();
+    await expect(page).toHaveURL(path);
+    await expect(ecf.locator(".govuk-summary-list__value")).toHaveText("No");
+    await expect(page.locator(".govuk-error-summary")).toHaveCount(0);
+
+    await injunction.getByRole("link", { name: /Change/ }).click();
+    await expect(page.getByRole("radio", { name: "No", exact: true })).not.toBeChecked();
+    await page.getByRole("radio", { name: "No", exact: true }).check();
+    await page.getByRole("button", { name: "Continue", exact: true }).click();
+    await expect(page).toHaveURL(path);
+    await expect(page.locator(".govuk-tag").filter({ hasText: "INCOMPLETE" })).toHaveCount(0);
+    await expect(injunction.locator(".govuk-summary-list__value")).toHaveText("No");
+
+    await rows.filter({ has: page.getByText("Type of family law", { exact: true }) })
+      .getByRole("link", { name: /Change/ }).click();
+    await page.getByRole("radio", { name: "Public", exact: true }).check();
+    await page.getByRole("button", { name: "Continue", exact: true }).click();
+    await expect(page).toHaveURL(path);
+    await expect(injunction).toHaveCount(0);
+    const care = rows.filter({ has: page.locator('a[href="care-proceedings?returnTo=check-answers"]') });
+    await expect(care.locator(".govuk-tag")).toHaveText("INCOMPLETE");
+    await care.getByRole("link", { name: /Change/ }).click();
+    await expect(page.getByRole("radio", { name: "No", exact: true })).not.toBeChecked();
+    await page.getByRole("radio", { name: "No", exact: true }).check();
+    await page.getByRole("button", { name: "Continue", exact: true }).click();
+    await expect(page).toHaveURL(path);
+    await expect(care.locator(".govuk-summary-list__value")).toHaveText("No");
+    await expect(page.locator(".govuk-tag").filter({ hasText: "INCOMPLETE" })).toHaveCount(0);
+    await page.getByRole("button", { name: "Save and continue" }).click();
+    await expect(page).toHaveURL(`/cases/${clientDetailsApplication.id}/task-list`);
+  });
+}
