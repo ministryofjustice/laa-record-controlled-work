@@ -8,8 +8,10 @@ import {
   CONTEXT_DATA_KEYS,
   PARAMS_KEYS,
 } from "#/journeys/journey.constants.js";
+import { parseApplicationVersion } from "#/lib/applicationVersion.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import * as metrics from "#/lib/metrics.js";
+import { logger } from "#/logger.js";
 
 export const closeIneligibleCase =
   (deps: EditApplicationEffectsDeps) =>
@@ -23,10 +25,31 @@ export const closeIneligibleCase =
       throw new Error("applicationID parameter is required");
     }
 
-    const session = context.getSession();
     const correlationId = context
       .getRequestHeader("x-correlation-id")
       ?.toString();
+
+    let eTag: number;
+    try {
+      eTag = parseApplicationVersion(
+        context.getData(CONTEXT_DATA_KEYS.applicationETag),
+      );
+    } catch (error) {
+      logger.error(
+        "Cannot close ineligible case with an invalid application ETag",
+        error,
+        {
+          correlationId,
+          reason:
+            error instanceof Error
+              ? error.message
+              : "Unknown ETag validation failure",
+        },
+      );
+      throw error;
+    }
+
+    const session = context.getSession();
     const options = await getRcwApiDefaultOptions({
       correlationId,
       homeAccountId: session?.msal?.homeAccountId,
@@ -35,7 +58,7 @@ export const closeIneligibleCase =
 
     const body = {
       applicationState: "COMPLETED" as const,
-      eTag: context.getData<number>(CONTEXT_DATA_KEYS.applicationETag),
+      eTag,
     };
     const response = await metrics.time(
       "updateApplicationStatus",

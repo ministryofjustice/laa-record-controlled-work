@@ -18,8 +18,6 @@ import { HTTP_STATUS } from "#/lib/constants/http.js";
 import * as metrics from "#/lib/metrics.js";
 import { logger } from "#/logger.js";
 
-const DEFAULT_ETAG = 0;
-
 export const loadApplication =
   (deps: EditApplicationEffectsDeps) =>
   async (context: EditApplicationContext): Promise<void> => {
@@ -85,16 +83,10 @@ export const loadApplication =
   };
 
 /**
- * Retrieves the ETag value from the API response headers.
- * @param headers - The headers from the API response.
- * @returns The ETag value as a number, or the default ETag if not present.
+ * Returns the ETag header without parsing its value.
+ * @param headers - The response headers, when available.
+ * @returns The raw ETag value, or undefined when absent.
  */
-function getApplicationETag(headers: Headers | undefined): number {
-  const eTag = headers?.get("etag");
-
-  if (!eTag) {
-    return DEFAULT_ETAG;
-  }
-
-  return Number.parseInt(eTag, 10);
+function getApplicationETag(headers: Headers | undefined): string | undefined {
+  return headers?.get("etag") ?? undefined;
 }

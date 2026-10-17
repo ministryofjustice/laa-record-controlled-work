@@ -8,6 +8,7 @@ import type {
   EditApplicationContext,
   EditApplicationEffectsDeps,
 } from "#/journeys/edit-application/editApplication.types.js";
+import { logger } from "#/logger.js";
 
 describe("closeIneligibleCase", () => {
   let updateApplicationStatus: sinon.SinonStub;
@@ -23,7 +24,7 @@ describe("closeIneligibleCase", () => {
       getRequestParam: sinon.stub().returns("application-id"),
       getRequestHeader: sinon.stub().returns("test-correlation-id"),
       getSession: sinon.stub().returns({ id: "session-id" }),
-      getData: sinon.stub().returns(3),
+      getData: sinon.stub().returns('"3"'),
     } as unknown as EditApplicationContext;
   });
 
@@ -46,6 +47,10 @@ describe("closeIneligibleCase", () => {
     await closeIneligibleCase(deps)(context);
 
     expect(updateApplicationStatus.calledOnce).to.equal(true);
+    expect(updateApplicationStatus.firstCall.args[1]).to.deep.equal({
+      applicationState: "COMPLETED",
+      eTag: 3,
+    });
     expect(distributionStub.calledOnce).to.equal(true);
     expect(
       distributionStub.calledWithMatch(
@@ -58,6 +63,58 @@ describe("closeIneligibleCase", () => {
       ),
     ).to.equal(true);
   });
+
+  for (const [etag, expectedVersion] of [
+    ['"0"', 0],
+    ['"00023"', 23],
+    ['"9007199254740991"', Number.MAX_SAFE_INTEGER],
+  ] as const) {
+    it(`closes with the safe numeric version from ${etag}`, async () => {
+      (context.getData as sinon.SinonStub).returns(etag);
+      updateApplicationStatus.resolves({ status: 204 });
+
+      await closeIneligibleCase(deps)(context);
+
+      expect(updateApplicationStatus.firstCall.args[1]).to.deep.equal({
+        applicationState: "COMPLETED",
+        eTag: expectedVersion,
+      });
+    });
+  }
+
+  for (const [etag, reason] of [
+    [undefined, "Application ETag is missing or not a string"],
+    ["17", "Application ETag must be a strong quoted value"],
+    ['""', "Application ETag does not contain a version"],
+    ['"17suffix"', "Application ETag must contain decimal digits only"],
+    ['W/"17"', "Application ETag must be a strong quoted value"],
+    ["*", "Application ETag must be a strong quoted value"],
+    ['"9007199254740992"', "Application ETag exceeds the safe integer range"],
+  ]) {
+    it(`logs an error with the reason when ETag ${etag} is invalid`, async () => {
+      (context.getData as sinon.SinonStub).returns(etag);
+      const errorStub = sinon.stub(logger, "error");
+
+      try {
+        await closeIneligibleCase(deps)(context);
+        expect.fail("expected a rejected close");
+      } catch (error) {
+        expect((error as Error).message).to.equal(reason);
+      }
+
+      expect(updateApplicationStatus.notCalled).to.equal(true);
+      expect(
+        errorStub.calledOnceWith(
+          "Cannot close ineligible case with an invalid application ETag",
+          undefined,
+          {
+            correlationId: "test-correlation-id",
+            reason,
+          },
+        ),
+      ).to.equal(true);
+    });
+  }
 
   it("throws on an unexpected status and records that status", async () => {
     const distributionStub = sinon.stub(Sentry.metrics, "distribution");

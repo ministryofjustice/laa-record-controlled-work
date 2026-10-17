@@ -64,6 +64,43 @@ describe("loadApplication", () => {
     ).to.equal(true);
   });
 
+  for (const etag of [
+    '"17"',
+    '"0"',
+    '"00017"',
+    '"9007199254740992"',
+    '17suffix',
+    'W/"17"',
+    "*",
+  ]) {
+    it(`preserves the raw ETag ${etag}`, async () => {
+      getApplicationStub.resolves({
+        status: 200,
+        data: getGetApplicationResponseMock(),
+        headers: new Headers({ etag }),
+      });
+
+      await loadApplication(deps)(context);
+
+      expect(
+        setData.calledWith(CONTEXT_DATA_KEYS.applicationETag, etag),
+      ).to.equal(true);
+    });
+  }
+
+  it("sets an absent ETag to undefined", async () => {
+    getApplicationStub.resolves({
+      status: 200,
+      data: getGetApplicationResponseMock(),
+    });
+
+    await loadApplication(deps)(context);
+
+    expect(
+      setData.calledWith(CONTEXT_DATA_KEYS.applicationETag, undefined),
+    ).to.equal(true);
+  });
+
   it("preserves null scoping question answers when validating the response", async () => {
     const mockApplication = getGetApplicationResponseMock();
     mockApplication.scopingQuestions = {
