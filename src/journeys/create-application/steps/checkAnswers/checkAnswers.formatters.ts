@@ -213,10 +213,10 @@ export function formatUkAddress(): ResolvableString {
  * @returns The address entry URL.
  */
 function addressStepResolver(): ResolvableString {
-  return match(Answer(UK_ADDRESS_FIELDS.country))
+  return match(Answer(AnswerKey.osCountry))
     .branch(
-      Condition.Equals(UNITED_KINGDOM),
-      "enter-address-manually?returnTo=check-answers",
+      Condition.IsRequired(),
+      "enter-overseas-address?returnTo=check-answers",
     )
-    .otherwise("enter-overseas-address?returnTo=check-answers");
+    .otherwise("enter-address-manually?returnTo=check-answers");
 }
