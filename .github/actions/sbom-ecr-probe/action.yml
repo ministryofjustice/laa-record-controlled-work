@@ -1,0 +1,46 @@
+name: ECR SBOM Referrer Probe
+description: Verify OCI 1.1 CycloneDX referrer access in the RCW application ECR repository
+
+inputs:
+  registry:
+    required: true
+    description: ECR registry hostname
+  repository:
+    required: true
+    description: ECR application repository name
+  region:
+    required: true
+    description: AWS region containing the ECR repository
+
+runs:
+  using: composite
+  steps:
+    - name: Install checksum-pinned ORAS
+      shell: bash
+      env:
+        ORAS_VERSION: 1.3.4
+        ORAS_SHA256: f27adb935022d94df8dc77719c322dda592c78a0d57a6f7dcdd8d900b248c454
+      run: |
+        set -euo pipefail
+        install_dir="$(mktemp -d "$RUNNER_TEMP/oras.XXXXXX")"
+        archive="oras_${ORAS_VERSION}_linux_amd64.tar.gz"
+        curl -fsSL \
+          "https://github.com/oras-project/oras/releases/download/v${ORAS_VERSION}/${archive}" \
+          --output "$install_dir/$archive"
+        printf '%s  %s\n' "$ORAS_SHA256" "$install_dir/$archive" | sha256sum --check
+        tar -xzf "$install_dir/$archive" -C "$install_dir" oras
+        chmod 0755 "$install_dir/oras"
+        version="$("$install_dir/oras" version | awk '/^Version:/ { print $2 }')"
+        if [[ "$version" != "$ORAS_VERSION" ]]; then
+          echo "::error::Unexpected ORAS version: $version"
+          exit 1
+        fi
+        printf '%s\n' "$install_dir" >> "$GITHUB_PATH"
+
+    - name: Probe ECR SBOM referrer behavior
+      shell: bash
+      env:
+        ECR_REGISTRY_URL: ${{ inputs.registry }}
+        ECR_REPOSITORY: ${{ inputs.repository }}
+        AWS_REGION: ${{ inputs.region }}
+      run: bash "$GITHUB_ACTION_PATH/../../scripts/ecr-sbom-referrer-probe.sh"
