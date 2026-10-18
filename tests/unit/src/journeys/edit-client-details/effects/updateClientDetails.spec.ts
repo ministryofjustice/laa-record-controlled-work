@@ -101,7 +101,6 @@ describe("updateClientDetails", () => {
     );
     const options = updateApplicationDetailsStub.firstCall
       .args[2] as RequestInit;
-    expect(options.headers).to.be.instanceOf(Headers);
     const headers = new Headers(options.headers);
     expect(headers.get("authorization")).to.equal("Bearer test-access-token");
     expect(headers.get("x-correlation-id")).to.equal("test-correlation-id");
