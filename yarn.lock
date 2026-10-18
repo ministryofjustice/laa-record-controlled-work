@@ -3493,7 +3493,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dotenv@npm:^18.0.0":
+"dotenv@npm:^18.0.7":
   version: 18.0.7
   resolution: "dotenv@npm:18.0.7"
   bin:
@@ -5266,7 +5266,7 @@ __metadata:
     connect-redis: "npm:^10.0.0"
     cookie-parser: "npm:~1.4.7"
     csrf-sync: "npm:^4.2.1"
-    dotenv: "npm:^18.0.0"
+    dotenv: "npm:^18.0.7"
     esbuild: "npm:^0.28.2"
     esbuild-plugin-copy: "npm:^2.1.1"
     esbuild-sass-plugin: "npm:^3.7.0"
