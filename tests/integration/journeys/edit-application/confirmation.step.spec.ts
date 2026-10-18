@@ -28,6 +28,7 @@ describe("Confirmation step", () => {
       additionalFunctions: [editApplicationTransformersRegistry],
       dependencies: {
         getApplication: getApplicationStub,
+        updateApplicationDetails: sinon.stub().resolves({ status: 204 }),
         updateApplicationStatus: updateApplicationStatusStub,
       },
     },

@@ -7,6 +7,7 @@ import { loadApplication } from "#/journeys/edit-application/effects/loadApplica
 import { setTaskListStatuses } from "#/journeys/edit-application/effects/setTaskListStatuses.js";
 import { submitApplication } from "#/journeys/edit-application/effects/submitApplication.js";
 import { loadApplicationAsAnswers } from "#/journeys/edit-client-details/effects/loadApplicationAsAnswers.js";
+import { updateClientDetails } from "#/journeys/edit-client-details/effects/updateClientDetails.js";
 import { clearAllDraftAnswers } from "#/journeys/effects/clearAllDraftAnswers.js";
 import { clearFieldAnswers } from "#/journeys/effects/clearFieldAnswers.js";
 import { loadDraftAnswers } from "#/journeys/effects/loadDraftAnswers.js";
@@ -30,4 +31,6 @@ export const editApplicationEffects = {
   setTaskListStatuses:
     editApplicationEffectsRegistry.register(setTaskListStatuses),
   submitApplication: editApplicationEffectsRegistry.register(submitApplication),
+  updateClientDetails:
+    editApplicationEffectsRegistry.register(updateClientDetails),
 };

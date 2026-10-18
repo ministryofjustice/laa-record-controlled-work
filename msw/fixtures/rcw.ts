@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers -- super magic faker values */
 import { faker } from "@faker-js/faker";
+import { randomUUID } from "node:crypto";
 
 import { FamilyLawClassification } from "#/api/clients/rcw/model/familyLawClassification.zod.gen.js";
 import { LaspoEvidenceScope } from "#/api/clients/rcw/model/laspoEvidenceScope.zod.gen.js";
@@ -11,6 +12,24 @@ import {
 } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
 
 faker.seed(12345);
+
+const CLIENT_DETAILS_TEST_APPLICATION_ID_PREFIX = "d3490000";
+
+/** Creates a unique UUID in the client-details browser-test namespace.
+ * @returns An application ID reserved for an isolated browser test.
+ */
+export function createClientDetailsTestApplicationId(): string {
+  return `${CLIENT_DETAILS_TEST_APPLICATION_ID_PREFIX}${randomUUID().slice(8)}`;
+}
+
+/**
+ * Checks whether an application ID belongs to the isolated test namespace.
+ * @param id - Application ID to check.
+ * @returns Whether the ID belongs to the test namespace.
+ */
+export function isClientDetailsTestApplicationId(id: string): boolean {
+  return id.startsWith(`${CLIENT_DETAILS_TEST_APPLICATION_ID_PREFIX}-`);
+}
 
 const CLIENT_DETAILS = {
   clientDetails: {

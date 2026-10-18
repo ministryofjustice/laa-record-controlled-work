@@ -94,9 +94,14 @@ describe("Edit client details check answers step", () => {
   const updateApplicationStatusStub = sinon
     .stub()
     .resolves({ status: 204, data: undefined });
+  const updateApplicationDetailsStub = sinon
+    .stub()
+    .resolves({ status: 204, data: undefined });
 
   beforeEach(() => {
     getApplicationStub.resolves({ status: 200, data: ukApplication });
+    updateApplicationDetailsStub.reset();
+    updateApplicationDetailsStub.resolves({ status: 204, data: undefined });
   });
 
   const renderer = new NunjucksRenderer({ nunjucksEnv: setupNunjucks(express()) });
@@ -111,6 +116,7 @@ describe("Edit client details check answers step", () => {
       disableReachabilityChecks: false,
       dependencies: {
         getApplication: getApplicationStub,
+        updateApplicationDetails: updateApplicationDetailsStub,
         updateApplicationStatus: updateApplicationStatusStub,
       },
     },
@@ -240,7 +246,7 @@ describe("Edit client details check answers step", () => {
 
       expect(key?.nextElementSibling?.text.trim()).to.equal("<b>Client</b>");
       expect(html.querySelector("b")).to.equal(null);
-      expect(html.querySelector(".govuk-tag--blue")?.text.trim()).to.equal("INCOMPLETE");
+      expect(html.querySelector(".govuk-tag--blue")?.text.trim()).to.equal("Incomplete");
     });
 
     const cases = [
@@ -271,7 +277,7 @@ describe("Edit client details check answers step", () => {
         const row = rows.find((item) => item.key.text === label);
         expect(incompleteTag(row)).to.include({
           classes: "govuk-tag--blue",
-          text: "INCOMPLETE",
+          text: "Incomplete",
         });
 
         const result = await editApplicationClient.post(
@@ -291,7 +297,7 @@ describe("Edit client details check answers step", () => {
         const row = rows.find((item) => item.key.text === label);
         expect(incompleteTag(row)).to.include({
           classes: "govuk-tag--blue",
-          text: "INCOMPLETE",
+          text: "Incomplete",
         });
       }
       expect(rows.filter((row) => row.visibleWhen !== false).some((row) =>
@@ -304,78 +310,135 @@ describe("Edit client details check answers step", () => {
         ...complete,
         familyLawClassification: "public",
         careProceedingsStarted: undefined,
-      } } };
+      } }, journeyDraftVersions: { [draftKey]: '"23"' } };
       const rows = await getCheckAnswersRows(session);
       const row = rows.find((item) => item.actions?.items[0].href.startsWith("care-proceedings"));
       expect(incompleteTag(row)).to.include({
         classes: "govuk-tag--blue",
-        text: "INCOMPLETE",
+        text: "Incomplete",
       });
-      expect((await editApplicationClient.post(
+      const incompleteSubmit = await editApplicationClient.post(
         `/cases/${applicationId}/task-list/details/check-answers`, { session },
-      )).type).to.equal("render");
+      );
+      expect(incompleteSubmit.type).to.equal("render");
+      expect(updateApplicationDetailsStub.called).to.equal(false);
 
       const result = await editApplicationClient.post(
         `/cases/${applicationId}/task-list/details/care-proceedings`,
-        { session, query: { returnTo: "check-answers" }, body: { careProceedingsStarted: "no" } },
+        {
+          session,
+          query: { returnTo: "check-answers" },
+          body: { careProceedingsStarted: "no" },
+        },
       );
       expect(result.type).to.equal("redirect");
-      await expectDraftValue(session, "Local authority is initiating care proceedings", "No");
-      expect((await editApplicationClient.post(
-        `/cases/${applicationId}/task-list/details/check-answers`, { session },
-      )).type).to.equal("redirect");
+      await expectDraftValue(
+        session,
+        "Local authority is initiating care proceedings",
+        "No",
+      );
+      const submit = await editApplicationClient.post(
+        `/cases/${applicationId}/task-list/details/check-answers`,
+        { session },
+      );
+      expect(submit.type).to.equal("redirect");
+      expect(updateApplicationDetailsStub.calledOnce).to.equal(true);
+      expect(session.journeyDrafts[draftKey]).to.be.undefined;
+      expect(session.journeyDraftVersions[draftKey]).to.be.undefined;
     });
 
     it("hides and ignores inactive answers, including an injunction skipped by maintenance", async () => {
-      const session = { journeyDrafts: { [draftKey]: {
-        ...complete,
-        legalAidBefore: "no",
-        legalAidLast6Months: "yes",
-        reasonForYes: undefined,
-        needsAdviceOnEUOrInternationalMaintenance: "yes",
-        needsProtectiveInjunction: undefined,
-        careProceedingsStarted: undefined,
-        haveAHomeAddress: "no",
-        ukAddressLine1: undefined,
-        ukTownOrCity: undefined,
-        ukPostcode: undefined,
-      } } };
+      const session = {
+        journeyDrafts: {
+          [draftKey]: {
+            ...complete,
+            legalAidBefore: "no",
+            legalAidLast6Months: "yes",
+            reasonForYes: undefined,
+            needsAdviceOnEUOrInternationalMaintenance: "yes",
+            needsProtectiveInjunction: undefined,
+            careProceedingsStarted: undefined,
+            haveAHomeAddress: "no",
+            ukAddressLine1: undefined,
+            ukTownOrCity: undefined,
+            ukPostcode: undefined,
+          },
+        },
+        journeyDraftVersions: { [draftKey]: '"23"' },
+      };
       const rows = await getCheckAnswersRows(session);
       const visible = rows.filter((row) => row.visibleWhen !== false);
-      expect(visible.some((row) => row.key.text === "Legal aid to get a protective injunction order")).to.equal(false);
-      expect(visible.some((row) => row.key.text === "Reason for new application for same matter")).to.equal(false);
-      expect(visible.some((row) => incompleteTag(row)?.text === "INCOMPLETE")).to.equal(false);
-      expect((await editApplicationClient.post(
-        `/cases/${applicationId}/task-list/details/check-answers`, { session },
-      )).type).to.equal("redirect");
+      expect(
+        visible.some(
+          (row) =>
+            row.key.text ===
+            "Legal aid to get a protective injunction order",
+        ),
+      ).to.equal(false);
+      expect(
+        visible.some(
+          (row) => row.key.text === "Reason for new application for same matter",
+        ),
+      ).to.equal(false);
+      expect(
+        visible.some((row) => incompleteTag(row)?.text === "Incomplete"),
+      ).to.equal(false);
+      const submit = await editApplicationClient.post(
+        `/cases/${applicationId}/task-list/details/check-answers`,
+        { session },
+      );
+      expect(submit.type).to.equal("redirect");
     });
 
     it("requires only the reached overseas address fields", async () => {
       for (const key of ["osAddressLine1", "osCountry"] as const) {
-        const session = { journeyDrafts: { [draftKey]: {
-          ...ApplicationDto.toAnswers(overseasApplication), [key]: "",
-        } } };
+        const session = {
+          journeyDrafts: {
+            [draftKey]: {
+              ...ApplicationDto.toAnswers(overseasApplication),
+              [key]: "",
+            },
+          },
+        };
         const rows = await getCheckAnswersRows(session);
         const row = rows.find((item) => item.key.text === "Address");
         expect(incompleteTag(row)).to.include({
           classes: "govuk-tag--blue",
-          text: "INCOMPLETE",
+          text: "Incomplete",
         });
-        expect((await editApplicationClient.post(
+        const submit = await editApplicationClient.post(
           `/cases/${applicationId}/task-list/details/check-answers`, { session },
-        )).type).to.equal("render");
+        );
+        expect(submit.type).to.equal("render");
       }
     });
 
     it("requires explicit ECF and removes the tag after answering", async () => {
-      const session = { journeyDrafts: { [draftKey]: { ...complete, ecf: undefined } } };
+      const session = {
+        journeyDrafts: {
+          [draftKey]: { ...complete, ecf: undefined },
+        },
+        journeyDraftVersions: { [draftKey]: '"23"' },
+      };
+      const incompleteSubmit = await editApplicationClient.post(
+        `/cases/${applicationId}/task-list/details/check-answers`, { session },
+      );
+      expect(incompleteSubmit.type).to.equal("render");
+      expect(updateApplicationDetailsStub.called).to.equal(false);
+      expect(session.journeyDraftVersions[draftKey]).to.equal('"23"');
+
       await editApplicationClient.post(`/cases/${applicationId}/task-list/details/ecf`, {
         session, query: { returnTo: "check-answers" }, body: { ecf: "no" },
       });
       await expectDraftValue(session, "ECF", "No");
-      expect((await editApplicationClient.post(
-        `/cases/${applicationId}/task-list/details/check-answers`, { session },
-      )).type).to.equal("redirect");
+      const submit = await editApplicationClient.post(
+        `/cases/${applicationId}/task-list/details/check-answers`,
+        { session },
+      );
+      expect(submit.type).to.equal("redirect");
+      expect(updateApplicationDetailsStub.calledOnce).to.equal(true);
+      expect(session.journeyDrafts[draftKey]).to.be.undefined;
+      expect(session.journeyDraftVersions[draftKey]).to.be.undefined;
     });
   });
 
@@ -939,15 +1002,49 @@ describe("Edit client details check answers step", () => {
   });
 
   describe("POST /cases/:applicationID/task-list/details/check-answers", () => {
-    it("redirects to the task list", async () => {
+    it("saves a versioned complete draft before redirecting to the task list", async () => {
+      const session = {
+        journeyDrafts: {
+          [draftKey]: ApplicationDto.toAnswers(ukApplication),
+        },
+        journeyDraftVersions: { [draftKey]: '"00023"' },
+      };
       const result = await editApplicationClient.post(
         `/cases/${applicationId}/task-list/details/check-answers`,
-        { session: {} },
+        { session },
       );
 
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
       expect(redirectResult.url).to.equal(`/cases/${applicationId}/task-list`);
+      expect(updateApplicationDetailsStub.calledOnce).to.equal(true);
+      const options = updateApplicationDetailsStub.firstCall.args[2] as RequestInit;
+      expect(new Headers(options.headers).get("If-Match")).to.equal('"00023"');
+      expect(session.journeyDrafts[draftKey]).to.be.undefined;
+      expect(session.journeyDraftVersions[draftKey]).to.be.undefined;
+    });
+
+    it("retains the original draft when the API rejects the update", async () => {
+      updateApplicationDetailsStub.resolves({
+        status: 412,
+        data: {},
+        headers: new Headers(),
+      });
+      const answers = ApplicationDto.toAnswers(ukApplication);
+      const session = {
+        journeyDrafts: { [draftKey]: answers },
+        journeyDraftVersions: { [draftKey]: '"00023"' },
+      };
+
+      const result = await editApplicationClient.post(
+        `/cases/${applicationId}/task-list/details/check-answers`,
+        { session },
+      );
+
+      expect(result.type).to.not.equal("redirect");
+      expect(updateApplicationDetailsStub.calledOnce).to.equal(true);
+      expect(session.journeyDrafts[draftKey]).to.deep.equal(answers);
+      expect(session.journeyDraftVersions[draftKey]).to.equal('"00023"');
     });
   });
 });

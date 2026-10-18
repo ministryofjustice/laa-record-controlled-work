@@ -94,11 +94,13 @@ describe("closeIneligibleCase", () => {
     it(`logs an error with the reason when ETag ${etag} is invalid`, async () => {
       (context.getData as sinon.SinonStub).returns(etag);
       const errorStub = sinon.stub(logger, "error");
+      let validationError: unknown;
 
       try {
         await closeIneligibleCase(deps)(context);
         expect.fail("expected a rejected close");
       } catch (error) {
+        validationError = error;
         expect((error as Error).message).to.equal(reason);
       }
 
@@ -106,7 +108,7 @@ describe("closeIneligibleCase", () => {
       expect(
         errorStub.calledOnceWith(
           "Cannot close ineligible case with an invalid application ETag",
-          undefined,
+          validationError,
           {
             correlationId: "test-correlation-id",
             reason,

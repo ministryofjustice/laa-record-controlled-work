@@ -508,7 +508,7 @@
       },
       "checkAnswers": {
         "title": "Check your answers",
-        "incomplete": "INCOMPLETE",
+        "incomplete": "Incomplete",
         "validation": {
           "incomplete": "You must complete all required answers to continue"
         },
