@@ -70,6 +70,13 @@ function getIfMatchVersion(version: string | undefined): string {
   return version;
 }
 
+/**
+ * Updates client details from the saved draft using its original strong ETag
+ * as the `If-Match` version.
+ * The draft answers and version remain in the session if the update fails.
+ * @param deps Journey dependencies.
+ * @returns The effect function.
+ */
 export const updateClientDetails =
   (deps: EditApplicationEffectsDeps) =>
   async (
