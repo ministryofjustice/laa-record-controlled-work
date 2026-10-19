@@ -805,3 +805,119 @@ test("omits outgoing details when the category was not calculated", async ({
     meansAssessment.getByRole("heading", { level: 3, name: "Your answers" }),
   ).toBeVisible();
 });
+
+test("renders saved property values and layout from the export route", async ({
+  withSelectedOffice: page,
+}) => {
+  const application =
+    meansAssessmentApplications[
+      MeansAssessmentScenarioName.CapitalPropertiesReady
+    ];
+  const response = await page.goto(`/cases/${application.id}/export`);
+  expect(response?.ok()).toBe(true);
+
+  const meansAssessment = page.locator(".app-means-assessment");
+  const capitalHeading = meansAssessment.getByRole("heading", {
+    level: 3,
+    name: "Capital calculation",
+  });
+  const tables = meansAssessment.locator(
+    "table.app-means-assessment__calculation-table",
+  );
+  const homeTable = page.getByRole("table", { name: "Home client lives in" });
+  await expect(capitalHeading).toBeVisible();
+  await expect(tables).toHaveCount(12);
+  await expect(homeTable).toContainText("-£100,000.00");
+  await expect(homeTable).toContainText("-£7,500.00");
+  await expect(homeTable).toContainText("£93,456.78");
+  await expect(
+    page.getByRole("table", { name: "Client other property 2" }),
+  ).toContainText("Client’s 50% share of home equity");
+  await expect(
+    page.getByRole("table", { name: "Partner other property 2" }),
+  ).toContainText("-£1,000.00");
+  await expect(
+    page.getByRole("table", { name: "Partner other property 2" }),
+  ).toContainText("Other disregards");
+
+  const headings = (await meansAssessment.locator("h3").allTextContents()).map(
+    (text) => text.replace(/\s+/g, " ").trim(),
+  );
+  expect(headings.indexOf("Income calculation")).toBeLessThan(
+    headings.indexOf("Outgoings calculation"),
+  );
+  expect(headings.indexOf("Outgoings calculation")).toBeLessThan(
+    headings.indexOf("Capital calculation"),
+  );
+  expect(headings.indexOf("Capital calculation")).toBeLessThan(
+    headings.indexOf("Your answers"),
+  );
+});
+
+test("keeps other export sections when saved property details are incompatible", async ({
+  withSelectedOffice: page,
+}) => {
+  const application =
+    meansAssessmentApplications[
+      MeansAssessmentScenarioName.CapitalPropertiesUnavailable
+    ];
+  const response = await page.goto(`/cases/${application.id}/export`);
+  const meansAssessment = page.locator(".app-means-assessment");
+
+  expect(response?.ok()).toBe(true);
+  await expect(
+    meansAssessment.getByRole("heading", {
+      level: 3,
+      name: "Capital calculation",
+    }),
+  ).toBeVisible();
+  await expect(meansAssessment).toContainText(
+    "Capital calculation details are unavailable.",
+  );
+  await expect(
+    meansAssessment.getByRole("heading", {
+      level: 3,
+      name: "Income calculation",
+    }),
+  ).toBeVisible();
+  await expect(
+    meansAssessment.getByRole("heading", {
+      level: 3,
+      name: "Outgoings calculation",
+    }),
+  ).toBeVisible();
+  await expect(
+    meansAssessment.getByRole("heading", { level: 3, name: "Your answers" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("table", { name: "Home client lives in" }),
+  ).toHaveCount(0);
+});
+
+test("omits property details when the saved capital category was not calculated", async ({
+  withSelectedOffice: page,
+}) => {
+  const application =
+    meansAssessmentApplications[
+      MeansAssessmentScenarioName.CapitalPropertiesNotCalculated
+    ];
+  const response = await page.goto(`/cases/${application.id}/export`);
+  const meansAssessment = page.locator(".app-means-assessment");
+
+  expect(response?.ok()).toBe(true);
+  await expect(
+    meansAssessment.getByRole("heading", {
+      level: 3,
+      name: "Capital calculation",
+    }),
+  ).toHaveCount(0);
+  await expect(
+    meansAssessment.getByRole("heading", {
+      level: 3,
+      name: "Income calculation",
+    }),
+  ).toBeVisible();
+  await expect(
+    meansAssessment.getByRole("heading", { level: 3, name: "Your answers" }),
+  ).toBeVisible();
+});

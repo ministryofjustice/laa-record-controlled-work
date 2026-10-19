@@ -2,6 +2,9 @@
 
 {% for breakdown in meansAssessment.calculationBreakdowns %}
   <h3 class="govuk-heading-m">{{ breakdown.heading }}</h3>
+  {% for description in breakdown.description %}
+    <p class="govuk-body">{{ description }}</p>
+  {% endfor %}
   {% if breakdown.message %}
     <p class="govuk-body">{{ breakdown.message }}</p>
   {% endif %}

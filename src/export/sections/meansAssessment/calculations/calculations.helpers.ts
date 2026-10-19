@@ -1,5 +1,8 @@
+import { CFE_MAX_VALUE } from "#/export/sections/meansAssessment/calculations/calculations.constants.js";
+
 const EMPTY_PARTNER_CAPITAL_SIZE = 0;
 const NO_CFE_PROCEEDING_TYPES = 0;
+const ZERO_AMOUNT = 0;
 
 /**
  * Uses saved result presence to decide whether CCQ renders partner tables.
@@ -22,6 +25,26 @@ export function hasSavedPartner(partnerCapital: unknown): boolean | null {
   // Match CfeResult#has_partner? using saved results, not answer selectors.
   // CCQ: laa-check-client-qualifies/app/models/cfe_result.rb#has_partner?.
   return Object.keys(partnerCapital).length > EMPTY_PARTNER_CAPITAL_SIZE;
+}
+
+/**
+ * Negates a saved deduction while preserving missing, zero, and sentinel values.
+ * CCQ: laa-check-client-qualifies/app/models/cfe_result.rb#employment_deduction.
+ * @param amount Saved CFE deduction amount.
+ * @returns The negative amount, or the unchanged nullish, zero, or sentinel value.
+ */
+export function negate(
+  amount: null | number | undefined,
+): null | number | undefined {
+  if (
+    amount === null ||
+    amount === undefined ||
+    amount === ZERO_AMOUNT ||
+    amount === CFE_MAX_VALUE
+  ) {
+    return amount;
+  }
+  return -amount;
 }
 
 /**

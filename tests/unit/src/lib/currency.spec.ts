@@ -17,6 +17,7 @@ describe("formatGBP", () => {
 
   it("preserves zero and negative amount formatting", () => {
     expect(formatGBP(0)).to.equal("£0.00");
+    expect(formatGBP(-0)).to.equal("£0.00");
     expect(formatGBP(-12.5)).to.equal("-£12.50");
   });
 });

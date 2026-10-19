@@ -14,6 +14,7 @@ import { toMeansAssessmentAnswerSummaries } from "#/export/sections/meansAssessm
 import { toCalculationBreakdowns } from "#/export/sections/meansAssessment/calculations/calculations.format.js";
 import { toMeansAssessmentCalculations } from "#/export/sections/meansAssessment/calculations/calculations.mapper.js";
 import { MeansAssessmentStatus } from "#/export/sections/meansAssessment/calculations/calculations.types.js";
+import { toMeansAssessmentCapitalBreakdown } from "#/export/sections/meansAssessment/calculations/capital/capital.mapper.js";
 import { toMeansAssessmentIncomeBreakdown } from "#/export/sections/meansAssessment/calculations/income/income.mapper.js";
 import { toMeansAssessmentOutgoingsBreakdown } from "#/export/sections/meansAssessment/calculations/outgoings/outgoings.mapper.js";
 import { formatGBP } from "#/lib/currency.js";
@@ -50,14 +51,20 @@ export function toMeansAssessmentSection(
     eligibility?.data,
     calculations,
   );
+  const capitalBreakdown = toMeansAssessmentCapitalBreakdown(
+    eligibility?.result,
+    calculations,
+  );
 
   return {
     answerSummaries: toMeansAssessmentAnswerSummaries(eligibility?.data),
     calculationBreakdowns: toCalculationBreakdowns([
       incomeBreakdown,
       outgoingsBreakdown,
+      capitalBreakdown,
     ]),
     calculations,
+    capitalBreakdown,
     incomeBreakdown,
     outcomeSummary: toMeansAssessmentOutcomeSummary(calculations),
     outgoingsBreakdown,

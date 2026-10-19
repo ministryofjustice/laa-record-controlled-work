@@ -9,6 +9,7 @@ import {
   DEPENDANT_MONTHLY_ALLOWANCE_HINT,
   HOUSING_COSTS_CAP_HINT_THRESHOLD,
 } from "#/export/sections/meansAssessment/calculations/calculations.constants.js";
+import { negate } from "#/export/sections/meansAssessment/calculations/calculations.helpers.js";
 import {
   outgoingDetailsSchema,
   partnerOutgoingSummarySchema,
@@ -230,16 +231,4 @@ function housingCapHint(
     !activeDependants;
 
   return hasHint ? outgoings.t("housingCapHint") : null;
-}
-
-/**
- * Negates a saved deduction while preserving missing values.
- * @param amount Saved deduction amount.
- * @returns The negated amount, or the original nullish value.
- */
-function negate(amount: null | number | undefined): null | number | undefined {
-  // Match CfeResult#employment_deduction; saved deductions are displayed with
-  // CCQ's negative sign, not recalculated from entered answers.
-  // CCQ: laa-check-client-qualifies/app/models/cfe_result.rb#employment_deduction.
-  return amount === null || amount === undefined ? amount : -amount;
 }

@@ -23,7 +23,6 @@ const means = { t: fixedT("pages.export.meansAssessment") };
 const income = {
   t: fixedT("pages.export.meansAssessment.calculations.income"),
 };
-const ZERO_AMOUNT = 0;
 
 /**
  * Maps saved income details independently from key eligibility totals.
@@ -126,7 +125,7 @@ function formatCurrency(amount: null | number | undefined): string {
     return means.t("calculations.notApplicable");
   }
 
-  return formatGBP(amount === ZERO_AMOUNT ? ZERO_AMOUNT : amount);
+  return formatGBP(amount);
 }
 
 /**

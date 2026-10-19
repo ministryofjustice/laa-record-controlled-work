@@ -24,6 +24,12 @@ const MEANS_ASSESSMENT_APPLICATION_IDS: Record<
     "00000000-0000-4000-8000-000000000102",
   [MeansAssessmentScenarioName.CalculationStates]:
     "00000000-0000-4000-8000-000000000103",
+  [MeansAssessmentScenarioName.CapitalPropertiesNotCalculated]:
+    "00000000-0000-4000-8000-000000000127",
+  [MeansAssessmentScenarioName.CapitalPropertiesReady]:
+    "00000000-0000-4000-8000-000000000125",
+  [MeansAssessmentScenarioName.CapitalPropertiesUnavailable]:
+    "00000000-0000-4000-8000-000000000126",
   [MeansAssessmentScenarioName.EmployedHousehold]:
     "00000000-0000-4000-8000-000000000104",
   [MeansAssessmentScenarioName.FormattingVariants]:
