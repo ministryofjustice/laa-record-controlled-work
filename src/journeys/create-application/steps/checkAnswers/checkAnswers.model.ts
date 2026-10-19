@@ -125,7 +125,12 @@ export function checkAnswersModel(): Record<SummaryFieldKey, SummaryField> {
     }),
     laspoEvidenceScope: field({
       completeWhen: required(AnswerKey.laspoEvidenceScope),
-      visibleWhen: isPrivateLaw,
+      visibleWhen: and(
+        isInjunction,
+        Answer(AnswerKey.needsProtectiveInjunction).match(
+          Condition.Equals("no"),
+        ),
+      ),
     }),
     lastName: field({
       completeWhen: required(AnswerKey.lastName),
