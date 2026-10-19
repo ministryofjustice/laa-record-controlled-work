@@ -77,6 +77,40 @@
               "studentFinance": "Student finance",
               "other": "Other sources"
             }
+          },
+          "outgoings": {
+            "heading": "Outgoings calculation",
+            "unavailable": "Outgoings calculation details are unavailable.",
+            "monthlyHint": "All figures have been converted into a monthly amount.",
+            "clientHeading": "Client's monthly outgoings",
+            "partnerHeading": "Partner's monthly outgoings",
+            "householdHeading": "Household monthly outgoings",
+            "totalHeading": "Total",
+            "clientTotal": "Total monthly outgoings",
+            "combinedTotal": "Total client and partner monthly outgoings",
+            "disposableIncome": "Assessed disposable monthly income",
+            "disposableIncomeHint": "Total monthly income minus total monthly outgoings",
+            "upperThreshold": "Disposable monthly income upper limit",
+            "clientPartnerAllowanceHint": "A fixed allowance if your client has a partner",
+            "clientEmploymentExpensesHint": "A fixed allowance if your client gets a salary or wage",
+            "partnerEmploymentExpensesHint": "A fixed allowance if the partner gets a salary or wage",
+            "clientHousingHint": "Housing costs minus any Housing Benefit payments your client gets",
+            "clientHousingHintSharedOwnership": "Rent and mortgage costs minus any Housing Benefit payments your client gets",
+            "householdHousingHint": "Housing costs minus any Housing Benefit payments the household gets",
+            "householdHousingHintSharedOwnership": "Rent and mortgage costs minus any Housing Benefit payments the household gets",
+            "housingCapHint": "Housing costs are capped at £545 for single clients without dependants",
+            "dependantsAllowanceHint": "An allowance of {dependantAllowance} applied for each dependant, minus any income they receive",
+            "rows": {
+              "childcare": "Childcare payments",
+              "maintenance": "Maintenance payments to a former partner",
+              "legalAid": "Payments towards legal aid in a criminal case",
+              "incomeTax": "Income tax",
+              "nationalInsurance": "National Insurance",
+              "employmentExpenses": "Employment expenses",
+              "partnerAllowance": "Partner allowance",
+              "housing": "Housing payments",
+              "dependantsAllowance": "Dependants allowance"
+            }
           }
         },
         "sections": {

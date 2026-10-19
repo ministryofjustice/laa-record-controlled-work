@@ -13,7 +13,10 @@ import {
   partner,
 } from "#/export/sections/meansAssessment/answers/answers.selections.js";
 import { paymentFrequencies } from "#/export/sections/meansAssessment/answers/questions/frequencies.js";
-import { isIncomeAssessmentRelevant } from "#/export/sections/meansAssessment/answers/questions/question.helpers.js";
+import {
+  isChildcareAvailable,
+  isIncomeAssessmentRelevant,
+} from "#/export/sections/meansAssessment/answers/questions/question.helpers.js";
 interface OutgoingsLabels {
   childcare: string;
   heading: string;
@@ -25,19 +28,6 @@ interface PaymentQuestion {
   isAvailable: (answers: EligibilityData) => boolean;
   label: string;
   selectors: PaymentAnswerSelectors;
-}
-
-/**
- * Determines whether every adult in the household qualifies for childcare costs, using the same derived logic as CCQ
- * @param answers Trusted saved CCQ answers.
- * @returns Whether childcare questions were available in the saved journey.
- */
-function isChildcareAvailable(answers: EligibilityData): boolean {
-  return (
-    answers.child_dependants === true &&
-    qualifiesForChildcare(answers, client) &&
-    (!partner.isPresent(answers) || qualifiesForChildcare(answers, partner))
-  );
 }
 
 /**
@@ -76,24 +66,6 @@ function paymentQuestions(
       select: (answers) => payment.selectors.frequency(answers)!,
     },
   ];
-}
-
-/**
- * Checks an adult's saved income or student-finance childcare qualification.
- * @param answers Trusted saved CCQ answers.
- * @param answer Explicit client or partner answer selectors.
- * @returns Whether the adult has a qualifying income source.
- */
-function qualifiesForChildcare(
-  answers: EligibilityData,
-  answer: AnswerSelection,
-): boolean {
-  return (
-    answer.otherIncome.studentFinance.relevant(answers) === true ||
-    answer
-      .employmentIncomes(answers)
-      ?.some((income) => income.income_type !== "statutory_pay") === true
-  );
 }
 
 /**

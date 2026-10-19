@@ -65,6 +65,57 @@ function mapScenario(name: MeansAssessmentScenarioName) {
 describe("toMeansAssessmentSection", () => {
   before(initializeI18nextSync);
 
+  it("omits calculation breakdowns when results are unavailable or exempt", () => {
+    for (const name of [
+      MeansAssessmentScenarioName.MissingEligibility,
+      MeansAssessmentScenarioName.Passporting,
+      MeansAssessmentScenarioName.Under18NoMeans,
+      MeansAssessmentScenarioName.UnavailableResult,
+    ]) {
+      expect(mapScenario(name)?.calculationBreakdowns, name).to.deep.equal([]);
+    }
+  });
+
+  it("presents unavailable breakdowns in income then outgoings order", () => {
+    expect(mapSection(CALCULATED_RESULT)?.calculationBreakdowns).to.deep.equal([
+      {
+        heading: "Income calculation",
+        message: "Income calculation details are unavailable.",
+        tables: [],
+      },
+      {
+        heading: "Outgoings calculation",
+        message: "Outgoings calculation details are unavailable.",
+        tables: [],
+      },
+    ]);
+  });
+
+  it("prepares income table captions, row headers and total emphasis", () => {
+    const breakdown = mapScenario(
+      MeansAssessmentScenarioName.IncomeBreakdownReady,
+    )?.calculationBreakdowns.find((item) => item.heading === "Income calculation");
+
+    expect(breakdown?.message).to.equal(null);
+    expect(breakdown?.tables.map((table) => table.caption)).to.deep.equal([
+      "Client's monthly income",
+      "Total",
+    ]);
+    expect(breakdown?.tables[0]?.firstCellIsHeader).to.equal(true);
+    expect(breakdown?.tables[0]?.rows[0]?.[0]).to.deep.equal({
+      classes: "app-calculation__row-heading",
+      text: "Employment income",
+    });
+    expect(breakdown?.tables[0]?.rows[1]?.[0]).to.deep.equal({
+      classes: "app-calculation__row-heading",
+      html: 'Benefits received<span class="govuk-hint govuk-!-margin-bottom-0">This does not include Housing Benefit</span>',
+    });
+    expect(breakdown?.tables[1]?.rows[0]?.map((cell) => cell.classes)).to.deep.equal([
+      "app-calculation__row-heading app-calculation__cell--emphasis",
+      "app-calculation__amount app-calculation__cell--emphasis",
+    ]);
+  });
+
   it("returns unavailable calculations for null or empty results", () => {
     for (const result of [null, {}]) {
       expect(mapSection(result)?.calculations).to.deep.equal({

@@ -46,6 +46,14 @@ const MEANS_ASSESSMENT_APPLICATION_IDS: Record<
     "00000000-0000-4000-8000-000000000108",
   [MeansAssessmentScenarioName.OtherIncomeAndOutgoings]:
     "00000000-0000-4000-8000-000000000109",
+  [MeansAssessmentScenarioName.OutgoingsBreakdownNotCalculated]:
+    "00000000-0000-4000-8000-000000000124",
+  [MeansAssessmentScenarioName.OutgoingsBreakdownPartner]:
+    "00000000-0000-4000-8000-000000000122",
+  [MeansAssessmentScenarioName.OutgoingsBreakdownReady]:
+    "00000000-0000-4000-8000-000000000121",
+  [MeansAssessmentScenarioName.OutgoingsBreakdownUnavailable]:
+    "00000000-0000-4000-8000-000000000123",
   [MeansAssessmentScenarioName.Passporting]:
     "00000000-0000-4000-8000-000000000110",
   [MeansAssessmentScenarioName.PropertiesAndAssets]:

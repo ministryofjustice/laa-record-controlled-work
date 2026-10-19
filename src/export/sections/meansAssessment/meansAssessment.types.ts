@@ -1,7 +1,30 @@
 import type { MeansAssessmentAnswerSummary } from "#/export/sections/meansAssessment/answers/answers.types.js";
 import type { MeansAssessmentCalculations } from "#/export/sections/meansAssessment/calculations/calculations.types.js";
 
+export type MeansAssessmentCalculationBreakdown =
+  | {
+      heading: string;
+      status: "ready";
+      tables: MeansAssessmentCalculationTable[];
+    }
+  | {
+      heading?: string;
+      message?: string;
+      status: "unavailable";
+    }
+  | { status: "not-calculated" };
+
+export type MeansAssessmentCalculationCell =
+  { classes: string; html: string } | { classes: string; text: string };
+
+export interface MeansAssessmentCalculationPresentation {
+  heading: string;
+  message: null | string;
+  tables: MeansAssessmentCalculationTablePresentation[];
+}
+
 export interface MeansAssessmentCalculationRow {
+  additionalHint?: null | string;
   amount: string;
   emphasis?: boolean;
   heading: string;
@@ -14,18 +37,14 @@ export interface MeansAssessmentCalculationTable {
   rows: MeansAssessmentCalculationRow[];
 }
 
-export type MeansAssessmentIncomeBreakdown =
-  | {
-      heading: string;
-      status: "ready";
-      tables: MeansAssessmentCalculationTable[];
-    }
-  | {
-      heading?: string;
-      message?: string;
-      status: "unavailable";
-    }
-  | { status: "not-calculated" };
+export interface MeansAssessmentCalculationTablePresentation {
+  caption: string;
+  captionClasses: string;
+  classes: string;
+  firstCellIsHeader: boolean;
+  hint: null | string;
+  rows: MeansAssessmentCalculationCell[][];
+}
 
 export interface MeansAssessmentOutcomePresentation {
   contributions: string[];
@@ -42,9 +61,11 @@ export interface MeansAssessmentOutcomeSummary {
 
 export interface MeansAssessmentSection {
   answerSummaries: MeansAssessmentAnswerSummary[];
+  calculationBreakdowns: MeansAssessmentCalculationPresentation[];
   calculations: MeansAssessmentCalculations;
-  incomeBreakdown: MeansAssessmentIncomeBreakdown;
+  incomeBreakdown: MeansAssessmentCalculationBreakdown;
   outcomeSummary: MeansAssessmentOutcomeSummary;
+  outgoingsBreakdown: MeansAssessmentCalculationBreakdown;
 }
 
 export interface MeansAssessmentTotalPresentation {

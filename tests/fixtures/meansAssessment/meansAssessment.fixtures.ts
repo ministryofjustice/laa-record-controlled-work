@@ -17,6 +17,12 @@ import {
   createUncalculatedIncomeScenario,
 } from "#tests/fixtures/meansAssessment/calculations/income.fixtures.js";
 import {
+  createOutgoingsCalculationScenario,
+  createPartnerOutgoingsCalculationScenario,
+  createUnavailableOutgoingsCalculationScenario,
+  createUncalculatedOutgoingsScenario,
+} from "#tests/fixtures/meansAssessment/calculations/outgoings.fixtures.js";
+import {
   createAsylumSupportScenario,
   createCalculationStatesScenario,
   createMeansAssessmentNotRequiredScenario,
@@ -44,6 +50,10 @@ export enum MeansAssessmentScenarioName {
   MeansAssessmentNotRequired = "meansAssessmentNotRequired",
   MissingEligibility = "missingEligibility",
   OtherIncomeAndOutgoings = "otherIncomeAndOutgoings",
+  OutgoingsBreakdownNotCalculated = "outgoingsBreakdownNotCalculated",
+  OutgoingsBreakdownPartner = "outgoingsBreakdownPartner",
+  OutgoingsBreakdownReady = "outgoingsBreakdownReady",
+  OutgoingsBreakdownUnavailable = "outgoingsBreakdownUnavailable",
   Passporting = "passporting",
   PropertiesAndAssets = "propertiesAndAssets",
   StaleInactiveAnswers = "staleInactiveAnswers",
@@ -81,6 +91,14 @@ export const meansAssessmentScenarios: Record<
     createMissingEligibilityScenario,
   [MeansAssessmentScenarioName.OtherIncomeAndOutgoings]:
     createOtherIncomeAndOutgoingsScenario,
+  [MeansAssessmentScenarioName.OutgoingsBreakdownNotCalculated]:
+    createUncalculatedOutgoingsScenario,
+  [MeansAssessmentScenarioName.OutgoingsBreakdownPartner]:
+    createPartnerOutgoingsCalculationScenario,
+  [MeansAssessmentScenarioName.OutgoingsBreakdownReady]:
+    createOutgoingsCalculationScenario,
+  [MeansAssessmentScenarioName.OutgoingsBreakdownUnavailable]:
+    createUnavailableOutgoingsCalculationScenario,
   [MeansAssessmentScenarioName.Passporting]: createPassportingScenario,
   [MeansAssessmentScenarioName.PropertiesAndAssets]:
     createPropertiesAndAssetsScenario,

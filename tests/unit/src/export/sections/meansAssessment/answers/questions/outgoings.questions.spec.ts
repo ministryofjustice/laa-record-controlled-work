@@ -244,4 +244,35 @@ describe("saved outgoings answers", () => {
       }).map(({ heading }) => heading),
     ).to.deep.equal(["Client outgoings and deductions"]);
   });
+
+  it("ignores stale income arrays for unemployed adults", () => {
+    expect(
+      childcareRows({
+        child_dependants: true,
+        childcare_payments_relevant: true,
+        employment_status: "unemployed",
+        incomes: [
+          {
+            gross_income: 500,
+            income_frequency: "monthly",
+            income_tax: 0,
+            income_type: "employment",
+            national_insurance: 0,
+          },
+        ],
+        partner: true,
+        partner_childcare_payments_relevant: true,
+        partner_employment_status: "unemployed",
+        partner_incomes: [
+          {
+            gross_income: 500,
+            income_frequency: "monthly",
+            income_tax: 0,
+            income_type: "employment",
+            national_insurance: 0,
+          },
+        ],
+      }),
+    ).to.deep.equal([]);
+  });
 });

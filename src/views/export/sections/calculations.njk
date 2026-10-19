@@ -1,0 +1,14 @@
+{% from "govuk/components/table/macro.njk" import govukTable %}
+
+{% for breakdown in meansAssessment.calculationBreakdowns %}
+  <h3 class="govuk-heading-m">{{ breakdown.heading }}</h3>
+  {% if breakdown.message %}
+    <p class="govuk-body">{{ breakdown.message }}</p>
+  {% endif %}
+  {% for table in breakdown.tables %}
+    {% if table.hint %}
+      <p class="govuk-body">{{ table.hint }}</p>
+    {% endif %}
+    {{ govukTable(table) }}
+  {% endfor %}
+{% endfor %}

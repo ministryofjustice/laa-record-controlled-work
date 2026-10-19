@@ -1,10 +1,15 @@
 import type { MeansAssessmentCalculations } from "#/export/sections/meansAssessment/calculations/calculations.types.js";
 import type {
+  MeansAssessmentCalculationBreakdown,
   MeansAssessmentCalculationRow,
   MeansAssessmentCalculationTable,
-  MeansAssessmentIncomeBreakdown,
 } from "#/export/sections/meansAssessment/meansAssessment.types.js";
 
+import { CFE_MAX_VALUE } from "#/export/sections/meansAssessment/calculations/calculations.constants.js";
+import {
+  hasSavedPartner,
+  toMinimumUpperThreshold,
+} from "#/export/sections/meansAssessment/calculations/calculations.helpers.js";
 import { MeansAssessmentStatus } from "#/export/sections/meansAssessment/calculations/calculations.types.js";
 import {
   employmentIncomeSchema,
@@ -14,13 +19,10 @@ import {
 import { formatGBP } from "#/lib/currency.js";
 import { fixedT } from "#/lib/i18n.js";
 
-const CFE_MAX_VALUE = 999_999_999_999;
-const EMPTY_PARTNER_CAPITAL_SIZE = 0;
 const means = { t: fixedT("pages.export.meansAssessment") };
 const income = {
   t: fixedT("pages.export.meansAssessment.calculations.income"),
 };
-const NO_CFE_PROCEEDING_TYPES = 0;
 const ZERO_AMOUNT = 0;
 
 /**
@@ -32,7 +34,7 @@ const ZERO_AMOUNT = 0;
 export function toMeansAssessmentIncomeBreakdown(
   result: null | Record<string, unknown> | undefined,
   calculations: MeansAssessmentCalculations,
-): MeansAssessmentIncomeBreakdown {
+): MeansAssessmentCalculationBreakdown {
   if (calculations.status !== MeansAssessmentStatus.Ready) {
     return { status: "unavailable" };
   }
@@ -132,24 +134,6 @@ function formatCurrency(amount: null | number | undefined): string {
  * @param partnerCapital Saved partner capital object.
  * @returns Whether a partner table is required, or null for incompatible data.
  */
-function hasSavedPartner(partnerCapital: unknown): boolean | null {
-  if (
-    partnerCapital === undefined ||
-    partnerCapital === null ||
-    partnerCapital === false ||
-    partnerCapital === ""
-  ) {
-    return false;
-  }
-  if (typeof partnerCapital !== "object" || Array.isArray(partnerCapital)) {
-    return null;
-  }
-
-  // Match CfeResult#has_partner? using saved results, not answer selectors.
-  // laa-check-client-qualifies/app/models/cfe_result.rb
-  return Object.keys(partnerCapital).length > EMPTY_PARTNER_CAPITAL_SIZE;
-}
-
 /**
  * Validates and formats the saved rows for one adult.
  * @param sources Saved gross-income assessment details.
@@ -199,26 +183,11 @@ function toIncomeRows(
  * @param proceedingTypes Saved gross-income proceeding thresholds.
  * @returns The minimum threshold, or null when no threshold exists.
  */
-function toMinimumUpperThreshold(
-  proceedingTypes: Array<{ upper_threshold: number }>,
-): null | number {
-  if (proceedingTypes.length === NO_CFE_PROCEEDING_TYPES) {
-    return null;
-  }
-
-  // Detailed limits use the minimum; key totals retain their first entry.
-  // CCQ: app/models/cfe_result.rb#raw_gross_income_upper_threshold;
-  // app/models/calculation_result.rb#summary_data.
-  return Math.min(
-    ...proceedingTypes.map((proceeding) => proceeding.upper_threshold),
-  );
-}
-
 /**
  * Prepares the neutral fallback when saved income details are incompatible.
  * @returns The income section heading and fallback message.
  */
-function unavailableIncomeBreakdown(): MeansAssessmentIncomeBreakdown {
+function unavailableIncomeBreakdown(): MeansAssessmentCalculationBreakdown {
   return {
     heading: income.t("heading"),
     message: income.t("unavailable"),
