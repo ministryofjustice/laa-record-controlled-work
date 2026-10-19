@@ -14,13 +14,7 @@ tests/e2e/
 ├── assertions/            # Reusable page assertion helpers (e.g. task-list status)
 ├── fixtures/              # Playwright fixture definitions (actor.fixture.ts)
 ├── flows/                 # Page-interaction helpers composed into specs
-│   ├── auth.flow.ts
-│   ├── case-list.flow.ts
-│   ├── ccq.flow.ts
-│   ├── create-case.flow.ts
-│   ├── evidence.flow.ts
-│   ├── office.flow.ts
-│   └── task-list.flow.ts
+│   └── *.flow.ts
 └── specs/
     ├── smoke/             # Critical-path serial tests (full happy path)
     ├── guards/            # Task-gating / access-control tests

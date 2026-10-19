@@ -22,6 +22,7 @@ import {
   formatInternationalMaintenanceAgreementLabel,
   formatLegalAidBeforeLabel,
   formatLegalAidLast6MonthsLabel,
+  formatLetterFromLocalAuthority,
   formatNeedsProtectiveInjunctionLabel,
 } from "#/journeys/create-application/steps/checkAnswers/checkAnswers.formatters.js";
 import { fixedT, t } from "#/lib/i18n.js";
@@ -68,6 +69,14 @@ export function summaryList(): GovUKSummaryList {
     href: "family-type-of-case?returnTo=check-answers",
     label: answerLabelT("familyLawClassification"),
     value: { text: formatFamilyLawClassificationLabel() },
+  });
+  const letterFromLocalAuthority = summaryRow({
+    href: "care-proceedings?returnTo=check-answers",
+    label: answerLabelT("letterFromLocalAuthority"),
+    value: { text: formatLetterFromLocalAuthority() },
+    visibleWhen: Answer(AnswerKey.familyLawClassification).match(
+      Condition.Equals("public"),
+    ),
   });
   const needsAdviceOnEUOrInternationalMaintenance = summaryRow({
     href: "international-maintenance-agreement?returnTo=check-answers",
@@ -150,6 +159,7 @@ export function summaryList(): GovUKSummaryList {
       ecf,
       familyLawClassification,
       needsAdviceOnEUOrInternationalMaintenance,
+      letterFromLocalAuthority,
       needsProtectiveInjunction,
       legalAidBefore,
       legalAidLast6Months,

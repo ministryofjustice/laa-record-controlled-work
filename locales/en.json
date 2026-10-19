@@ -363,6 +363,16 @@
           "reasonTooLong": "Reason must not exceed 500 characters"
         }
       },
+      "letterFromLocalAuthority": {
+        "title": "Has your client received a letter saying the local authority is initiating care proceedings?",
+        "body": [
+          "The local authority starts care proceedings under Section 31 of the Children Act 1989 when they think a child is at risk of serious harm.",
+          "Your client must provide evidence of this."
+        ],
+        "validation": {
+          "required": "Select if your client received a letter saying the local authority is initiating care proceedings"
+        }
+      },
       "clientDetails": {
         "title": "Your client's details",
         "firstName": {
@@ -478,6 +488,7 @@
           "legalAidBefore": "Accessed legal aid before",
           "legalAidLast6Months": "Did your client get legal help for this matter in the last 6 months?",
           "legalAidLast6MonthsReasonForYes": "Reason for new application for same matter",
+          "letterFromLocalAuthority": "Local authority is initiating care proceedings",
           "firstName": "First name",
           "lastName": "Last name",
           "dateOfBirth": "Date of birth",

@@ -8,6 +8,7 @@ export enum AnswerKey {
   lastName = "lastName",
   legalAidBefore = "legalAidBefore",
   legalAidLast6Months = "legalAidLast6Months",
+  letterFromLocalAuthority = "letterFromLocalAuthority",
   needsAdviceOnEUOrInternationalMaintenance = "needsAdviceOnEUOrInternationalMaintenance",
   needsProtectiveInjunction = "needsProtectiveInjunction",
   niNumber = "niNumber",

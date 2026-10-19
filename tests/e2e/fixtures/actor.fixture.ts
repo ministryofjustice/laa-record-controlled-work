@@ -20,9 +20,10 @@ import {
   submitCheckAnswers,
 } from "#tests/e2e/flows/ccq.flow.js";
 import {
-  completeCreateCaseShortestPath,
+  completeCreateCasePrivateFamilyLawPath,
   startNewCase,
-} from "#tests/e2e/flows/create-case.flow.js";
+} from "#tests/e2e/flows/create-application/familyLawPrivate.flow.js";
+import { completeCreateCasePublicFamilyLawPath } from "#tests/e2e/flows/create-application/familyLawPublic.flow.js";
 import { completeDeclaration } from "#tests/e2e/flows/declaration.flow.js";
 import {
   completeEvidenceNoPath,
@@ -42,6 +43,7 @@ export interface Actor {
   assertTaskStatus: (taskName: string, expectedStatus: string) => Promise<void>;
   changeBankBalance: (applicationId: string) => Promise<void>;
   completeCcqShortestEligiblePath: (applicationId: string) => Promise<void>;
+  completeCreateApplicationWithFamilyLawPublicPath: () => Promise<void>;
   completeCreateCaseShortestPath: () => Promise<string>;
   completeDeclaration: (applicationId: string) => Promise<void>;
   completeEvidenceNoPath: (applicationId: string) => Promise<void>;
@@ -83,8 +85,11 @@ export const createActor = (page: Page): Actor => ({
   completeCcqShortestEligiblePath: async (applicationId: string) => {
     await completeCcqShortestEligiblePath(page, applicationId);
   },
+  completeCreateApplicationWithFamilyLawPublicPath: async () => {
+    await completeCreateCasePublicFamilyLawPath(page);
+  },
   completeCreateCaseShortestPath: async () =>
-    await completeCreateCaseShortestPath(page),
+    await completeCreateCasePrivateFamilyLawPath(page),
   completeDeclaration: async (applicationId: string) => {
     await completeDeclaration(page, applicationId);
   },
