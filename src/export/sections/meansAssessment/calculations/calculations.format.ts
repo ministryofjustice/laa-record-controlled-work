@@ -70,7 +70,7 @@ function toTableRow(
           hints
             .map(
               (hint) =>
-                `<span class="govuk-hint govuk-!-margin-bottom-0">${escapeHtml(hint)}</span>`,
+                ` <span class="govuk-hint govuk-!-margin-bottom-0">${escapeHtml(hint)}</span>`,
             )
             .join(""),
       }
