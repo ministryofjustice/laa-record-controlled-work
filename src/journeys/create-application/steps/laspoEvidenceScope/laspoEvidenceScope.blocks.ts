@@ -60,12 +60,12 @@ export function scopeQuestion(): GovUKRadioInput {
         value: "childAbuse",
       },
       {
-        text: questionT("radioButton.clientUnder18"),
-        value: "clientUnder18",
+        text: questionT("radioButton.under18"),
+        value: "under18",
       },
       {
-        text: questionT("radioButton.clientHasParentalResponsibility"),
-        value: "clientHasParentalResponsibility",
+        text: questionT("radioButton.parentOrGuardian"),
+        value: "parentOrGuardian",
       },
       {
         divider: questionT("radioButton.or"),

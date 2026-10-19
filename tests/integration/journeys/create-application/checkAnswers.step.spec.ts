@@ -95,7 +95,7 @@ describe("Check answers step", () => {
           key: "Transitional EU arrangements or an international maintenance agreement",
           value: "No",
         },
-        { key: "Legal aid to get a protective injunction order", value: "Yes" },
+        { key: "Legal aid to get a protective injunction order", value: "No" },
         { key: "Evidence case is in scope", value: "Evidence of domestic abuse (Schedule 1)" },
         {
           key: "Accessed legal aid before",

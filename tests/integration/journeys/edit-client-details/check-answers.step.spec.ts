@@ -65,7 +65,7 @@ describe("Edit client details check answers step", () => {
       familyLawClassification: "private",
       needsAdviceOnEUOrInternationalMaintenance: false,
       needsProtectiveInjunction: false,
-      evidenceCaseInScope: "domesticAbuse",
+      laspoEvidenceScope: "domesticAbuse",
     },
   });
   const overseasApplication: Application = getGetApplicationResponseMock({
@@ -655,7 +655,7 @@ describe("Edit client details check answers step", () => {
     });
 
     it("renders the API client data in a summary list", () => {
-      expect(summaryList.properties.rows).to.have.lengthOf(14);
+  expect(summaryList.properties.rows).to.have.lengthOf(15);
       const values = [
         { key: "ECF", value: "No" },
         { key: "Type of family law", value: "Private" },
