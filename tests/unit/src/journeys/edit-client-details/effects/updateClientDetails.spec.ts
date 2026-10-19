@@ -12,27 +12,52 @@ import type {
 } from "#/journeys/edit-application/editApplication.types.js";
 import { JourneyCode } from "#/journeys/JourneyCode.enum.js";
 import { logger } from "#/logger.js";
+import { createValidApplicationAnswers } from "#tests/fixtures/application.fixtures.js";
 
 describe("updateClientDetails", () => {
   const applicationId = "123e4567-e89b-12d3-a456-426614174000";
   const journeyCode = JourneyCode.EDIT_CLIENT_DETAILS;
   const draftKey = `${journeyCode}:${applicationId}`;
-  const answers = {
-    careProceedingsStarted: "no",
-    dateOfBirth: "1990-01-01",
+  const answers = createValidApplicationAnswers({
     ecf: "no",
-    familyLawClassification: "public",
-    firstName: "Jane",
     hasNINumber: "no",
     haveAHomeAddress: "no",
-    lastName: "Bloggs",
     legalAidBefore: "no",
+  });
+  const expectedActiveUkAddress = {
+    addressLine1: "123 Test Street",
+    addressLine2: "Test Area",
+    addressLine3: null,
+    addressLine4: null,
+    townOrCity: "Manchester",
+    county: "Greater Manchester",
+    postCode: "A12 3BC",
+    country: "GB",
   };
-  const expectedRequest = {
+  const expectedActiveScopingQuestions = {
+    priorLegalAid: "yesSameMatter",
+    familyLawClassification: "public",
+    careProceedingsStarted: false,
+    caseMeetsMeritsCriteria: true,
+  };
+  const expectedActiveRequest = {
     clientDetails: {
       firstName: "Jane",
       lastName: "Bloggs",
       dateOfBirth: "1990-01-01",
+      niNumber: "AB123456C", // gitleaks:allow - fake NI number used in test fixture
+      hasFixedAddress: true,
+      address: expectedActiveUkAddress,
+    },
+    legalAidLast6Months: true,
+    reasonForReapplication: "here is a reason",
+    scopingQuestions: expectedActiveScopingQuestions,
+    ecfFlag: true,
+  };
+  const expectedRequest = {
+    ...expectedActiveRequest,
+    clientDetails: {
+      ...expectedActiveRequest.clientDetails,
       niNumber: null,
       hasFixedAddress: false,
       address: null,
@@ -40,10 +65,8 @@ describe("updateClientDetails", () => {
     legalAidLast6Months: false,
     reasonForReapplication: null,
     scopingQuestions: {
+      ...expectedActiveScopingQuestions,
       priorLegalAid: "no",
-      familyLawClassification: "public",
-      careProceedingsStarted: false,
-      caseMeetsMeritsCriteria: true,
     },
     ecfFlag: false,
   };
@@ -108,6 +131,21 @@ describe("updateClientDetails", () => {
     expectUpdateMetric(distributionStub, "success", 204);
     expect(session.journeyDrafts[draftKey]).to.deep.equal(answers);
     expect(session.journeyDraftVersions[draftKey]).to.equal('"00023"');
+  });
+
+  it("sends active UK address, NI, recent-aid, and ECF answers", async () => {
+    session.journeyDrafts[draftKey] = createValidApplicationAnswers();
+    updateApplicationDetailsStub.resolves({
+      status: 204,
+      data: undefined,
+      headers: new Headers(),
+    });
+
+    await updateClientDetails(deps)(context, journeyCode);
+
+    expect(updateApplicationDetailsStub.firstCall.args[1]).to.deep.equal(
+      expectedActiveRequest,
+    );
   });
 
   it("preserves versions above the JavaScript safe-integer range", async () => {

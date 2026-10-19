@@ -2,17 +2,17 @@ import { expect } from "chai";
 import { describe, it } from "mocha";
 import sinon from "sinon";
 
-import type { Application } from "#/api/clients/rcw/model/application.zod.gen.js";
 import type { EditApplicationContext } from "#/journeys/edit-application/editApplication.types.js";
 
 import { ApplicationDto } from "#/api/dto/application/application.dto.js";
 import { loadApplicationAsAnswers } from "#/journeys/edit-client-details/effects/loadApplicationAsAnswers.js";
 import { CONTEXT_DATA_KEYS, PARAMS_KEYS } from "#/journeys/journey.constants.js";
 import { AnswersOutput } from "#/journeys/create-application/data/answers.zod.js";
+import { createSavedApplication } from "#tests/fixtures/application.fixtures.js";
 
 describe("loadApplicationAsAnswers", () => {
   const journeyCode = "editClientDetails";
-  const application = {} as Application;
+  const application = createSavedApplication();
   const answers = {
     familyLawClassification: "public",
     careProceedingsStarted: "yes",

@@ -16,7 +16,7 @@ import { editApplicationJourney } from "#/journeys/edit-application/editApplicat
 import { editApplicationTransformersRegistry } from "#/journeys/edit-application/editApplication.transformers.js";
 import { JourneyCode } from "#/journeys/JourneyCode.enum.js";
 import { setupNunjucks } from "#/middleware/setupNunjucks.js";
-import { getGetApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
+import { createSavedApplication } from "#tests/fixtures/application.fixtures.js";
 import { createForgeTestClient } from "../../utils/helpers.js";
 
 type SummaryRow = {
@@ -35,11 +35,10 @@ type SummaryRow = {
 
 describe("Edit client details check answers step", () => {
   const applicationId = "123e4567-e89b-12d3-a456-426614174000";
-  const ukApplication: Application = getGetApplicationResponseMock({
+  const ukApplication: Application = createSavedApplication({
     applicationRefNumber: "CW-123456",
     ecfFlag: false,
     clientDetails: {
-      ...getGetApplicationResponseMock().clientDetails,
       firstName: "John",
       lastName: "Doe",
       dateOfBirth: "1990-01-01",
@@ -68,7 +67,7 @@ describe("Edit client details check answers step", () => {
       laspoEvidenceScope: "domesticAbuse",
     },
   });
-  const overseasApplication: Application = getGetApplicationResponseMock({
+  const overseasApplication: Application = createSavedApplication({
     ...ukApplication,
     clientDetails: {
       ...ukApplication.clientDetails,

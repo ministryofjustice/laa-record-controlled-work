@@ -9,7 +9,7 @@ import type {
 } from "#/journeys/edit-application/editApplication.types.js";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import { logger } from "#/logger.js";
-import { getGetApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
+import { createSavedApplication } from "#tests/fixtures/application.fixtures.js";
 import {
   ApiResponseError,
   ApiValidationError,
@@ -53,7 +53,7 @@ describe("loadApplication", () => {
   afterEach(() => sinon.restore());
 
   it("sets application in context from getApplication response", async () => {
-    const mockApplication = getGetApplicationResponseMock();
+    const mockApplication = createSavedApplication();
 
     getApplicationStub.resolves({ status: 200, data: mockApplication });
 
@@ -77,7 +77,7 @@ describe("loadApplication", () => {
     it(`preserves the raw ETag ${etag}`, async () => {
       getApplicationStub.resolves({
         status: 200,
-        data: getGetApplicationResponseMock(),
+        data: createSavedApplication(),
         headers: new Headers({ etag }),
       });
 
@@ -92,7 +92,7 @@ describe("loadApplication", () => {
   it("sets an absent ETag to undefined", async () => {
     getApplicationStub.resolves({
       status: 200,
-      data: getGetApplicationResponseMock(),
+      data: createSavedApplication(),
     });
 
     await loadApplication(deps)(context);
@@ -103,13 +103,14 @@ describe("loadApplication", () => {
   });
 
   it("preserves null scoping question answers when validating the response", async () => {
-    const mockApplication = getGetApplicationResponseMock();
-    mockApplication.scopingQuestions = {
-      priorLegalAid: "no",
-      familyLawClassification: "private",
-      needsAdviceOnEUOrInternationalMaintenance: false,
-      needsProtectiveInjunction: null,
-    };
+    const mockApplication = createSavedApplication({
+      scopingQuestions: {
+        priorLegalAid: "no",
+        familyLawClassification: "private",
+        needsAdviceOnEUOrInternationalMaintenance: false,
+        needsProtectiveInjunction: null,
+      },
+    });
 
     getApplicationStub.resolves({ status: 200, data: mockApplication });
 
