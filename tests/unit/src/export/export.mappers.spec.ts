@@ -66,4 +66,20 @@ describe("toExportApplicationViewModel", () => {
       value: { text: "Doe" },
     });
   });
+
+  it("omits means assessment when it is explicitly not required", () => {
+    const application = getGetApplicationResponseMock({
+      eligibility: {
+        data: { passporting: true },
+        result: {
+          result_summary: { overall_result: { result: "eligible" } },
+        },
+      },
+      meansAssessmentRequired: false,
+    });
+
+    const viewModel = toExportApplicationViewModel(application);
+
+    expect(viewModel.meansAssessment).to.equal(null);
+  });
 });

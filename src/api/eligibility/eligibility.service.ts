@@ -1,7 +1,11 @@
+import type { EligibilityData } from "#/api/clients/rcw/model/eligibilityData.zod.gen.js";
 import type {
-  getApplication,
-  updateApplicationMeans,
-} from "#/api/clients/rcw/schema/applications/applications.gen.js";
+  EligibilityAssessment,
+  LoadEligibilityAssessmentDeps,
+  LoadEligibilityAssessmentParams,
+  SaveEligibilityAssessmentDeps,
+  SaveEligibilityAssessmentParams,
+} from "#/api/eligibility/eligibility.types.js";
 
 import { getRcwApiDefaultOptions } from "#/api/clients/getRcwApiDefaultOptions.js";
 import { Application } from "#/api/clients/rcw/model/application.zod.gen.js";
@@ -9,40 +13,13 @@ import {
   LoadEligibilityAssessmentError,
   SaveEligibilityAssessmentError,
 } from "#/api/eligibility/eligibility.errors.js";
+import { ClientAgeRange } from "#/api/eligibility/eligibility.types.js";
 import { getAuthDebugHeaders } from "#/auth/auth.debug.js";
 import { NotAuthenticatedError } from "#/auth/auth.errors.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { type Either, failure, success } from "#/lib/either.js";
 import * as metrics from "#/lib/metrics.js";
 import { logger } from "#/logger.js";
-
-export interface EligibilityAssessment {
-  data: Record<string, unknown>;
-  result?: Record<string, unknown>;
-}
-
-export interface LoadEligibilityAssessmentDeps {
-  getApplication: typeof getApplication;
-}
-
-export interface LoadEligibilityAssessmentParams {
-  applicationId: string;
-  homeAccountId: string | undefined;
-  sessionId: string | undefined;
-}
-
-export interface SaveEligibilityAssessmentDeps {
-  updateApplicationMeans: typeof updateApplicationMeans;
-}
-
-export interface SaveEligibilityAssessmentParams {
-  applicationId: string;
-  eligibilityAssessment: Record<string, unknown>;
-  homeAccountId: string | undefined;
-  sessionId: string | undefined;
-}
-
-type ClientAgeRange = "over_60" | "standard" | "under_18";
 
 const AGE_ADJUSTMENT = 1;
 const NO_AGE_ADJUSTMENT = 0;
@@ -66,11 +43,15 @@ export async function loadEligibilityAssessment(
     EligibilityAssessment
   >
 > {
-  const { applicationId, homeAccountId, sessionId } = params;
+  const { applicationId, correlationId, homeAccountId, sessionId } = params;
 
   let response;
   try {
-    const opts = await getRcwApiDefaultOptions({ homeAccountId, sessionId });
+    const opts = await getRcwApiDefaultOptions({
+      correlationId,
+      homeAccountId,
+      sessionId,
+    });
 
     response = await metrics.time(
       "getApplication",
@@ -119,11 +100,14 @@ export async function loadEligibilityAssessment(
   );
 
   const { data, result } = parsed.data.eligibility ?? {};
-  if (!isRecord(data) || !isRecord(result)) {
+  if (!data || !result) {
     return success({ data: { client_age: clientAgeRange } });
   }
 
-  return success({ data: { ...data, client_age: clientAgeRange }, result });
+  return success({
+    data: { ...data, client_age: clientAgeRange },
+    result,
+  });
 }
 
 /**
@@ -138,14 +122,20 @@ export async function saveEligibilityAssessment(
 ): Promise<
   Either<NotAuthenticatedError | SaveEligibilityAssessmentError, void>
 > {
-  const { applicationId, eligibilityAssessment, homeAccountId, sessionId } =
-    params;
+  const {
+    applicationId,
+    correlationId,
+    eligibilityAssessment,
+    homeAccountId,
+    sessionId,
+  } = params;
 
   const { data, result } = splitEligibilityAssessment(eligibilityAssessment);
 
   let response;
   try {
     const opts = await getRcwApiDefaultOptions({
+      correlationId,
       homeAccountId,
       sessionId,
     });
@@ -206,14 +196,14 @@ function deriveClientAgeRange(dateOfBirth: string): ClientAgeRange {
     (birthdayHasPassed ? NO_AGE_ADJUSTMENT : AGE_ADJUSTMENT);
 
   if (age < EIGHTEEN_YEARS) {
-    return "under_18";
+    return ClientAgeRange.Under18;
   }
 
   if (age < SIXTY_YEARS) {
-    return "standard";
+    return ClientAgeRange.Standard;
   }
 
-  return "over_60";
+  return ClientAgeRange.Over60;
 }
 
 /**
@@ -230,9 +220,10 @@ function isRecord(value: unknown): value is Record<string, unknown> {
  * @param eligibilityAssessment - Full CCQ session data (Q&A answers plus the CFE response).
  * @returns `data` (Q&A content) and `result` (the CFE response held under `api_response`).
  */
-function splitEligibilityAssessment(
-  eligibilityAssessment: Record<string, unknown>,
-): { data: Record<string, unknown>; result: Record<string, unknown> } {
+function splitEligibilityAssessment(eligibilityAssessment: EligibilityData): {
+  data: Omit<EligibilityData, "api_response">;
+  result: Record<string, unknown>;
+} {
   const { api_response: apiResponse, ...data } = eligibilityAssessment;
   return {
     data,

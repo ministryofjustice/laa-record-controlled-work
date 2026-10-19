@@ -2,9 +2,14 @@ import {
   ConfidentialClientApplication,
   CryptoProvider,
   InteractionRequiredAuthError,
+  ProtocolMode,
   type AccountInfo,
   type AuthenticationResult,
+  type AuthorizationCodeRequest,
+  type INetworkModule,
+  type NetworkRequestOptions,
 } from "@azure/msal-node";
+import { createSign, generateKeyPairSync } from "node:crypto";
 import { EntraService } from "#/auth/entra.service.js";
 import type {
   AuthCodeFlowState,
@@ -22,6 +27,7 @@ import {
   TokenAcquisitionError,
   TokenRefreshError,
 } from "#/auth/auth.errors.js";
+import { MINUTE } from "#/lib/constants/time.js";
 
 describe("EntraService", () => {
   let msalStub: Partial<ConfidentialClientApplication>;
@@ -43,11 +49,162 @@ describe("EntraService", () => {
   };
   const DOWNSTREAM_SCOPES = ["api://rcw/Applications.Read"];
   const TOKEN_EXPIRY = new Date(Date.now() + 3600 * 1000);
+  const FLOW_EXPIRY = Date.now() + 10 * MINUTE;
   const SESSION_SECRET = process.env.SESSION_SECRET as string;
   const REDIRECT_URI_HOSTNAME = new URL(authRequestDefaults.redirectUri)
     .hostname;
   const EPHEMERAL_HOSTNAME =
     "el-257-laa-record-controlled-work-uat.cloud-platform.service.justice.gov.uk";
+  const OIDC_NONCE = "expected-oidc-nonce";
+
+  const syntheticAuthority = "https://nonce.test/tenant";
+  const syntheticIssuer = `${syntheticAuthority}/v2.0`;
+  const syntheticTokenEndpoint = `${syntheticAuthority}/oauth2/v2.0/token`;
+  const syntheticJwksUri = "https://nonce.test/keys";
+  const syntheticClientId = "synthetic-client-id";
+  const syntheticKeyId = "synthetic-signing-key";
+  const { privateKey: syntheticPrivateKey, publicKey: syntheticPublicKey } =
+    generateKeyPairSync("rsa", { modulusLength: 2048 });
+  const syntheticPublicJwk = {
+    ...syntheticPublicKey.export({ format: "jwk" }),
+    alg: "RS256",
+    kid: syntheticKeyId,
+    use: "sig",
+  };
+
+  function createSyntheticIdToken(
+    claims: Record<string, unknown>,
+  ): string {
+    const encodedHeader = Buffer.from(
+      JSON.stringify({ alg: "RS256", kid: syntheticKeyId, typ: "JWT" }),
+    ).toString("base64url");
+    const encodedClaims = Buffer.from(JSON.stringify(claims)).toString(
+      "base64url",
+    );
+    const signer = createSign("RSA-SHA256");
+    signer.update(`${encodedHeader}.${encodedClaims}`);
+    signer.end();
+
+    return `${encodedHeader}.${encodedClaims}.${signer
+      .sign(syntheticPrivateKey)
+      .toString("base64url")}`;
+  }
+
+  function createSyntheticIdTokenWithNonce(
+    nonce: unknown,
+    includeNonce = true,
+  ): string {
+    const now = Math.floor(Date.now() / 1000);
+    const claims: Record<string, unknown> = {
+      aud: syntheticClientId,
+      exp: now + 3600,
+      iat: now,
+      iss: syntheticIssuer,
+      sub: "synthetic-subject",
+      tid: "synthetic-tenant",
+      ver: "2.0",
+    };
+    if (includeNonce) claims.nonce = nonce;
+    return createSyntheticIdToken(claims);
+  }
+
+  function createSyntheticTokenResponse(
+    idToken?: string,
+  ): Record<string, unknown> {
+    return {
+      access_token: "synthetic-access-token",
+      expires_in: 3600,
+      ...(idToken === undefined ? {} : { id_token: idToken }),
+      refresh_token: "synthetic-refresh-token",
+      scope: "openid profile",
+      token_type: "Bearer",
+    };
+  }
+
+  function createSyntheticMsalClient(
+    tokenResponse: Record<string, unknown>,
+    tokenRequests: string[],
+  ): ConfidentialClientApplication {
+    const metadata = JSON.stringify({
+      authorization_endpoint: `${syntheticAuthority}/oauth2/v2.0/authorize`,
+      code_challenge_methods_supported: ["S256"],
+      end_session_endpoint: `${syntheticAuthority}/oauth2/v2.0/logout`,
+      id_token_signing_alg_values_supported: ["RS256"],
+      issuer: syntheticIssuer,
+      jwks_uri: syntheticJwksUri,
+      response_modes_supported: ["query"],
+      response_types_supported: ["code"],
+      subject_types_supported: ["pairwise"],
+      token_endpoint: syntheticTokenEndpoint,
+    });
+    const cloudDiscoveryMetadata = JSON.stringify({
+      metadata: [
+        {
+          aliases: ["nonce.test"],
+          preferred_cache: "nonce.test",
+          preferred_network: "nonce.test",
+        },
+      ],
+      tenant_discovery_endpoint: `${syntheticAuthority}/v2.0/.well-known/openid-configuration`,
+    });
+    const networkClient: INetworkModule = {
+      async sendGetRequestAsync<T>() {
+        return {
+          body: { keys: [syntheticPublicJwk] } as T,
+          headers: {},
+          status: 200,
+        };
+      },
+      async sendPostRequestAsync<T>(
+        _url: string,
+        options?: NetworkRequestOptions,
+      ) {
+        tokenRequests.push(options?.body ?? "");
+        return {
+          body: tokenResponse as T,
+          headers: {},
+          status: 200,
+        };
+      },
+    };
+
+    return new ConfidentialClientApplication({
+      auth: {
+        authority: syntheticAuthority,
+        authorityMetadata: metadata,
+        clientId: syntheticClientId,
+        clientSecret: "synthetic-client-secret",
+        cloudDiscoveryMetadata,
+        knownAuthorities: ["nonce.test"],
+      },
+      system: { networkClient, protocolMode: ProtocolMode.OIDC },
+    });
+  }
+
+  function createSyntheticAuthCodeRequest(
+    nonce: unknown = OIDC_NONCE,
+    includeNonce = true,
+  ): AuthorizationCodeRequest {
+    return {
+      code: "synthetic-authorization-code",
+      codeVerifier: "synthetic-code-verifier",
+      redirectUri: "http://localhost/auth/code/callback",
+      scopes: ["openid", "profile"],
+      ...(includeNonce ? { nonce } : {}),
+    } as AuthorizationCodeRequest;
+  }
+
+  function expectEmptyTokenCache(
+    msalClient: ConfidentialClientApplication,
+  ): void {
+    const cache = JSON.parse(
+      msalClient.getTokenCache().serialize(),
+    ) as Record<string, Record<string, unknown>>;
+
+    for (const key of ["Account", "IdToken", "AccessToken", "RefreshToken"]) {
+      expect(cache[key] ?? {}, `${key} cache`).to.be.empty;
+    }
+  }
 
   beforeEach(() => {
     tokenCacheStub = {
@@ -120,6 +277,7 @@ describe("EntraService", () => {
         (await service.initiateAuthCodeFlow()) as Success<AuthCodeFlowState>;
       expect(result.error).to.be.undefined;
       expect(result.value.authCodeUrl).to.equal(AUTH_CODE_URL);
+      expect(result.value).to.not.have.property("authCodeUrlRequest");
     });
 
     it("returns a random authState and passes it as the state parameter", async () => {
@@ -130,6 +288,13 @@ describe("EntraService", () => {
         .with.length.greaterThan(0);
       const [requestArg] = (msalStub.getAuthCodeUrl as sinon.SinonStub).args[0];
       expect(requestArg.state).to.equal(result.value.authState);
+      expect(requestArg.nonce).to.be.a("string").with.length.greaterThan(0);
+      expect(result.value.authCodeRequest.nonce).to.equal(requestArg.nonce);
+
+      const stateNonce = JSON.parse(
+        new CryptoProvider().base64Decode(requestArg.state),
+      ).nonce as string;
+      expect(stateNonce).to.not.equal(requestArg.nonce);
     });
 
     it("defaults returnTo to / when no returnTo is provided", async () => {
@@ -157,6 +322,32 @@ describe("EntraService", () => {
         "//external.com",
       )) as Success<AuthCodeFlowState>;
       expect(result.value.returnTo).to.equal("/");
+    });
+
+    for (const returnTo of [
+      "/auth",
+      "/AUTH/code/callback",
+      "/%61uth/code/callback",
+      "/cases/%2e%2e/auth/code/callback",
+      "/cases/%252f%252fauth",
+      "/cases/%ZZ",
+    ]) {
+      it(`falls back to / for unsafe returnTo ${returnTo}`, async () => {
+        const result = (await service.initiateAuthCodeFlow(
+          returnTo,
+        )) as Success<AuthCodeFlowState>;
+
+        expect(result.value.returnTo).to.equal("/");
+      });
+    }
+
+    it("preserves an authentication-like prefix and escaped query data", async () => {
+      const returnTo = "/authentication?next=%2Fauth#summary";
+      const result = (await service.initiateAuthCodeFlow(
+        returnTo,
+      )) as Success<AuthCodeFlowState>;
+
+      expect(result.value.returnTo).to.equal(returnTo);
     });
 
     it("returns a MsalError failure when MSAL throws", async () => {
@@ -202,6 +393,7 @@ describe("EntraService", () => {
       const result =
         (await ephemeralService.initiateAuthCodeFlow(undefined, {
           callbackHostname: EPHEMERAL_HOSTNAME,
+          expiresAt: FLOW_EXPIRY,
         })) as Success<AuthCodeFlowState>;
       const parsed = parseRelayState(result.value.authState);
       expect(parsed).to.not.be.null;
@@ -309,6 +501,7 @@ describe("EntraService", () => {
       codeVerifier: string;
       scopes: string[];
       redirectUri: string;
+      nonce: string;
     };
 
     beforeEach(() => {
@@ -317,6 +510,7 @@ describe("EntraService", () => {
         codeVerifier: VERIFIER,
         scopes: [],
         redirectUri: "http://localhost/auth/code/callback",
+        nonce: OIDC_NONCE,
       };
       msalStub.acquireTokenByCode = sinon.stub().resolves({
         account: ACCOUNT,
@@ -354,6 +548,85 @@ describe("EntraService", () => {
         .to.be.an("error")
         .and.to.be.instanceOf(TokenAcquisitionError);
     });
+
+    it("rejects missing, empty, or non-string expected nonces before contacting MSAL", async () => {
+      for (const [label, request] of [
+        ["missing", createSyntheticAuthCodeRequest(undefined, false)],
+        ["empty", createSyntheticAuthCodeRequest("")],
+        ["non-string", createSyntheticAuthCodeRequest(17)],
+      ] as const) {
+        const tokenRequests: string[] = [];
+        const tokenResponse = createSyntheticTokenResponse(
+          createSyntheticIdTokenWithNonce(undefined, false),
+        );
+        const msalClient = createSyntheticMsalClient(
+          tokenResponse,
+          tokenRequests,
+        );
+        const result = await EntraService.create({ msalClient }).exchangeAuthCode(
+          "synthetic-authorization-code",
+          request,
+        );
+
+        expect(result.error, label).to.be.instanceOf(TokenAcquisitionError);
+        expect(tokenRequests, label).to.be.empty;
+        expectEmptyTokenCache(msalClient);
+      }
+    });
+
+    it("accepts a matching ID-token nonce through MSAL", async () => {
+      const tokenRequests: string[] = [];
+      const idToken = createSyntheticIdTokenWithNonce(OIDC_NONCE);
+      const msalClient = createSyntheticMsalClient(
+        createSyntheticTokenResponse(idToken),
+        tokenRequests,
+      );
+      const result = await EntraService.create({ msalClient }).exchangeAuthCode(
+        "synthetic-authorization-code",
+        createSyntheticAuthCodeRequest(),
+      );
+
+      expect(result.error).to.be.undefined;
+      if (result.error) throw result.error;
+      expect(result.value.idToken).to.equal(idToken);
+      expect(tokenRequests).to.have.length(1);
+      const cache = JSON.parse(
+        msalClient.getTokenCache().serialize(),
+      ) as Record<string, Record<string, unknown>>;
+      for (const key of ["Account", "IdToken", "AccessToken", "RefreshToken"]) {
+        expect(cache[key] ?? {}, `${key} cache`).to.not.be.empty;
+      }
+    });
+
+    for (const [label, idToken] of [
+      ["missing ID token", undefined],
+      [
+        "missing nonce claim",
+        createSyntheticIdTokenWithNonce(undefined, false),
+      ],
+      ["mismatched nonce", createSyntheticIdTokenWithNonce("wrong-nonce")],
+      ["non-string nonce", createSyntheticIdTokenWithNonce(17)],
+      [
+        "nonce from another flow",
+        createSyntheticIdTokenWithNonce("another-flow-nonce"),
+      ],
+    ] as const) {
+      it(`rejects ${label} without caching tokens`, async () => {
+        const tokenRequests: string[] = [];
+        const msalClient = createSyntheticMsalClient(
+          createSyntheticTokenResponse(idToken),
+          tokenRequests,
+        );
+        const result = await EntraService.create({ msalClient }).exchangeAuthCode(
+          "synthetic-authorization-code",
+          createSyntheticAuthCodeRequest(),
+        );
+
+        expect(result.error, label).to.be.instanceOf(TokenAcquisitionError);
+        expect(tokenRequests).to.have.length(1);
+        expectEmptyTokenCache(msalClient);
+      });
+    }
   });
 
   describe("acquireDownstreamAccessToken()", () => {

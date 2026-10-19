@@ -124,6 +124,27 @@ export const getGetApplicationMockHandler = (
   );
 };
 
+export const getUpdateApplicationDetailsMockHandler = (
+  overrideResponse?:
+    | void
+    | ((
+        info: Parameters<Parameters<typeof http.put>[1]>[0],
+      ) => Promise<void> | void),
+  options?: RequestHandlerOptions,
+) => {
+  return http.put(
+    "*/api/v1/applications/:id/details",
+    async (info: Parameters<Parameters<typeof http.put>[1]>[0]) => {
+      if (typeof overrideResponse === "function") {
+        await overrideResponse(info);
+      }
+
+      return new HttpResponse(null, { status: 204 });
+    },
+    options,
+  );
+};
+
 export const getUpdateApplicationEvidenceMockHandler = (
   overrideResponse?:
     | void
@@ -211,6 +232,7 @@ export const getApplicationsMock = () => [
   getGetApplicationsMockHandler(),
   getCreateApplicationMockHandler(),
   getGetApplicationMockHandler(),
+  getUpdateApplicationDetailsMockHandler(),
   getUpdateApplicationEvidenceMockHandler(),
   getUpdateApplicationMeansMockHandler(),
   getUpdateApplicationDeclarationMockHandler(),

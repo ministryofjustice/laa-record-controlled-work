@@ -37,6 +37,16 @@ jobs:
         if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: yarn playwright install chromium --with-deps
 
+      - name: Select API image matching the generated client for pull requests
+        if: github.event_name == 'pull_request'
+        run: |
+          api_sha="$(tr -d '\r\n' < .rcw-api-version)"
+          if [[ ! "$api_sha" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "Invalid API commit in .rcw-api-version: $api_sha" >&2
+            exit 1
+          fi
+          echo "RCW_API_IMAGE_TAG=sha-${api_sha}" >> "$GITHUB_ENV"
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@21162887f0d6e25b4e8eafb0cf44cf9bf7f6acd3
 
@@ -99,7 +109,7 @@ jobs:
 
       - name: Upload dependency image metadata
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: e2e-image-metadata
           path: container-logs/image-metadata.txt
@@ -125,7 +135,7 @@ jobs:
 
       - name: Upload ZAP scan reports
         if: github.event_name == 'pull_request' && always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: zap-scan-reports
           path: |
@@ -206,7 +216,7 @@ jobs:
 
       - name: Upload container logs
         if: failure()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: e2e-container-logs
           path: container-logs/
@@ -214,7 +224,7 @@ jobs:
 
       - name: Upload test report
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: e2e-report
           path: |

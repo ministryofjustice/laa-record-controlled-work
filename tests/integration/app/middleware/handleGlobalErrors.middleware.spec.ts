@@ -1,5 +1,6 @@
 import express, { Express } from "express";
 import { handleGlobalErrors } from "#/app/middleware/handleGlobalErrors.middleware.js";
+import { BadAuthenticationRequestError } from "#/auth/auth.errors.js";
 import request from "supertest";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
 import { NotFoundError } from "#/app/errors/NotFoundError.js";
@@ -97,6 +98,17 @@ describe("HandleGlobalErrors middleware", () => {
 
     const res = await request(app).get("/throws");
     expect(res.status).to.equal(HTTP_STATUS.INTERNAL_SERVER_ERROR);
+  });
+
+  it("Returns HTTP 400 when `BadAuthenticationRequestError` is thrown", async () => {
+    app.get("/throws", () => {
+      throw new BadAuthenticationRequestError("Bad request");
+    });
+    app.use(handleGlobalErrors());
+
+    const res = await request(app).get("/throws");
+    expect(res.status).to.equal(HTTP_STATUS.BAD_REQUEST);
+    expect(res.text).to.equal("Bad request");
   });
 
   it("Displays the 500 error page when `ApplicationError` is thrown", async () => {

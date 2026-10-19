@@ -3,6 +3,7 @@
 The suite in `tests/e2e/` is a Playwright-based end-to-end test suite that drives the full docker-compose stack (RCW front-end, RCW API, datastore API, CCQ embedded, mock OAuth2 server).
 
 It is distinct from `tests/ui/`, which is a single-service UI test suite that uses MSW to mock all upstream APIs.
+Pull-request e2e runs use the immutable RCW API image selected by `.rcw-api-version`, keeping the test API aligned with the client generated for the PR. Main-branch, merge-queue, and manually triggered runs leave the image tag unset and use `latest`, so mainline e2e coverage exercises the latest API image.
 
 ## Structure
 
@@ -13,13 +14,7 @@ tests/e2e/
 ├── assertions/            # Reusable page assertion helpers (e.g. task-list status)
 ├── fixtures/              # Playwright fixture definitions (actor.fixture.ts)
 ├── flows/                 # Page-interaction helpers composed into specs
-│   ├── auth.flow.ts
-│   ├── case-list.flow.ts
-│   ├── ccq.flow.ts
-│   ├── create-case.flow.ts
-│   ├── evidence.flow.ts
-│   ├── office.flow.ts
-│   └── task-list.flow.ts
+│   └── *.flow.ts
 └── specs/
     ├── smoke/             # Critical-path serial tests (full happy path)
     ├── guards/            # Task-gating / access-control tests
@@ -64,7 +59,7 @@ Environment variables:
 
 In `mock` mode the harness authenticates once per Playwright worker (not per test) by navigating to `/auth/signin`, submitting the mock sign-in form, and storing the resulting session cookies as `storageState`. Each test context is then created with that pre-authenticated storage state, so tests start already signed in.
 
-The mock sign-in form is served by the mock OAuth2 server container at `https://localhost:9090`.
+The mock sign-in form is served by the mock OAuth2 server container at `https://localhost:9090`. Playwright maps `host.docker.internal` to the host loopback address so Chromium can follow the authorization redirect without depending on host DNS configuration.
 
 ### Auth mode abstraction
 

@@ -1,0 +1,220 @@
+name: Snyk Security Gates
+
+on:
+  workflow_call:
+    inputs:
+      source_sha:
+        description: Full source commit SHA to scan
+        required: true
+        type: string
+      scan_mode:
+        description: Open Source scan mode
+        required: false
+        type: string
+        default: absolute
+      image_digest:
+        description: SHA-256 digest returned by the image push
+        required: false
+        type: string
+        default: ''
+      image_repo:
+        description: ECR repository containing the pushed image
+        required: false
+        type: string
+        default: ''
+      report_to_snyk:
+        description: Publish scan snapshots to Snyk for the main branch
+        required: false
+        type: boolean
+        default: false
+      fail_on_findings:
+        description: Fail scans when vulnerabilities are found
+        required: false
+        type: boolean
+        default: false
+    secrets:
+      ECR_ROLE_TO_ASSUME:
+        required: false
+      ECR_REGISTRY_URL:
+        required: false
+      SNYK_CLIENT_ID:
+        required: true
+      SNYK_CLIENT_SECRET:
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    name: '[Code/Container/OSS/Monitoring]'
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_URI: ${{ secrets.ECR_REGISTRY_URL }}/${{ inputs.image_repo }}@${{ inputs.image_digest }}
+      IMAGE_REFERENCE: ${{ inputs.image_repo }}@${{ inputs.image_digest }}
+      REPORT_TO_SNYK: ${{ inputs.report_to_snyk }}
+      FAIL_ON_FINDINGS: ${{ inputs.fail_on_findings }}
+    permissions:
+      actions: read
+      contents: read
+      id-token: write
+      security-events: write
+    steps:
+      - name: Require main for Snyk UI reporting
+        if: ${{ (inputs.report_to_snyk || inputs.scan_mode == 'monitor') && github.ref != 'refs/heads/main' }}
+        shell: bash
+        run: |
+          echo "::error::Snyk UI reporting is restricted to main"
+          exit 1
+
+      - name: Checkout scanned source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ inputs.source_sha }}
+          persist-credentials: false
+
+      - name: Initialise scan reports
+        env:
+          SOURCE_SHA: ${{ inputs.source_sha }}
+        run: |
+          mkdir -p sarif rendered-templates
+          run_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/attempts/${GITHUB_RUN_ATTEMPT}"
+          {
+            echo "## Snyk security gate"
+            echo
+            printf -- '- Source SHA: %s\n' "$SOURCE_SHA"
+            printf -- '- Image: %s\n' "$IMAGE_REFERENCE"
+            printf -- '- Run: [%s](%s)\n' "$GITHUB_RUN_ID" "$run_url"
+          } > "$GITHUB_STEP_SUMMARY"
+
+      - name: Set up Node and dependencies
+        id: setup-node
+        continue-on-error: true
+        uses: ./.github/actions/setup-node
+
+      - name: Configure AWS credentials for ECR
+        if: ${{ inputs.scan_mode != 'monitor' }}
+        id: ecr-auth
+        continue-on-error: true
+        uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
+        with:
+          role-to-assume: ${{ secrets.ECR_ROLE_TO_ASSUME }}
+          aws-region: ${{ vars.ECR_REGION }}
+
+      - name: Log in to ECR
+        if: ${{ inputs.scan_mode != 'monitor' }}
+        id: ecr-login
+        continue-on-error: true
+        uses: aws-actions/amazon-ecr-login@f2e9fc6c2b355c1890b65e6f6f0e2ac3e6e22f78
+
+      - name: Set up Helm
+        if: ${{ inputs.scan_mode != 'monitor' }}
+        id: helm
+        continue-on-error: true
+        uses: azure/setup-helm@9bc31f4ebc9c6b171d7bfbaa5d006ae7abdb4310 # v5
+
+      - name: Install pinned Snyk CLI
+        id: snyk-cli
+        continue-on-error: true
+        env:
+          SNYK_CLI_VERSION: 1.1308.0
+        run: |
+          npm install --global "snyk@$SNYK_CLI_VERSION"
+          test "$(snyk --version)" = "$SNYK_CLI_VERSION"
+
+      - name: Install pinned Snyk Delta
+        id: snyk-delta
+        if: ${{ inputs.scan_mode == 'delta' }}
+        continue-on-error: true
+        env:
+          SNYK_DELTA_VERSION: 1.14.0
+        run: npm install --global "snyk-delta@$SNYK_DELTA_VERSION"
+
+      - name: Obtain Snyk OAuth token
+        id: snyk-auth
+        continue-on-error: true
+        uses: ministryofjustice/laa-reusable-github-actions/.github/actions/snyk-auth@6db001458db30ae747d9eb8eb25707ce52b359bc
+        with:
+          client_id: ${{ secrets.SNYK_CLIENT_ID }}
+          client_secret: ${{ secrets.SNYK_CLIENT_SECRET }}
+
+      - name: Mask Snyk OAuth token
+        id: snyk-token-mask
+        continue-on-error: true
+        env:
+          SNYK_OAUTH_TOKEN: ${{ steps.snyk-auth.outputs.token }}
+        run: |
+          set -euo pipefail
+          if [[ "$SNYK_OAUTH_TOKEN" == *$'\n'* || "$SNYK_OAUTH_TOKEN" == *$'\r'* ]]; then
+            echo "::error::Snyk OAuth token cannot be safely masked"
+            exit 1
+          fi
+          if [[ -n "$SNYK_OAUTH_TOKEN" ]]; then
+            printf '::add-mask::%s\n' "$SNYK_OAUTH_TOKEN"
+          fi
+
+      - name: Run all Snyk scans
+        env:
+          SCAN_MODE: ${{ inputs.scan_mode }}
+          SOURCE_SHA: ${{ inputs.source_sha }}
+          SNYK_OAUTH_TOKEN: ${{ steps.snyk-auth.outputs.token }}
+          SNYK_TOKEN: ${{ steps.snyk-auth.outputs.token }}
+          SNYK_ORG_ID: ${{ vars.SNYK_ORG_ID }}
+          SNYK_REPORT_DIR: sarif
+          SNYK_RENDER_DIR: rendered-templates
+          SETUP_NODE_OUTCOME: ${{ steps.setup-node.outcome }}
+          ECR_AUTH_OUTCOME: ${{ steps.ecr-auth.outcome }}
+          ECR_LOGIN_OUTCOME: ${{ steps.ecr-login.outcome }}
+          HELM_SETUP_OUTCOME: ${{ steps.helm.outcome }}
+          SNYK_CLI_INSTALL_OUTCOME: ${{ steps.snyk-cli.outcome }}
+          SNYK_DELTA_INSTALL_OUTCOME: ${{ steps.snyk-delta.outcome }}
+          SNYK_AUTH_OUTCOME: ${{ steps.snyk-auth.outcome }}
+          SNYK_TOKEN_MASK_OUTCOME: ${{ steps.snyk-token-mask.outcome }}
+        run: bash .github/scripts/run-snyk-scans.sh
+
+
+      - name: Upload Open Source SARIF
+        if: always() && hashFiles('sarif/snyk-open-source.sarif') != ''
+        uses: github/codeql-action/upload-sarif@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4
+        with:
+          sarif_file: sarif/snyk-open-source.sarif
+          category: snyk-open-source
+
+      - name: Upload Container SARIF
+        if: always() && hashFiles('sarif/snyk-container.sarif') != ''
+        uses: github/codeql-action/upload-sarif@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4
+        with:
+          sarif_file: sarif/snyk-container.sarif
+          category: snyk-container
+
+      - name: Upload Code SARIF
+        if: always() && hashFiles('sarif/snyk-code.sarif') != ''
+        uses: github/codeql-action/upload-sarif@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4
+        with:
+          sarif_file: sarif/snyk-code.sarif
+          category: snyk-code
+
+      - name: Upload IaC SARIF
+        if: always() && hashFiles('sarif/snyk-iac.sarif') != ''
+        uses: github/codeql-action/upload-sarif@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4
+        with:
+          sarif_file: sarif/snyk-iac.sarif
+          category: snyk-iac
+
+      - name: Upload scan reports
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: snyk-scan-reports
+          path: sarif/
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Upload rendered templates
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: rendered-templates
+          path: rendered-templates/
+          if-no-files-found: ignore
+          retention-days: 14

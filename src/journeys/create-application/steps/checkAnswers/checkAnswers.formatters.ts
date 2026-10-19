@@ -91,6 +91,19 @@ export function formatFamilyLawClassificationLabel(): ResolvableString {
 }
 
 /**
+ * Formats the International Maintenance Agreement answer label.
+ * @returns The International Maintenance Agreement answer label.
+ */
+export function formatInternationalMaintenanceAgreementLabel(): ResolvableString {
+  const yes = t("common.yes");
+  const no = t("common.no");
+
+  return match(Answer(AnswerKey.needsAdviceOnEUOrInternationalMaintenance))
+    .branch(Condition.Equals("yes"), yes)
+    .otherwise(no);
+}
+
+/**
  * Formats the previous legal aid answer label.
  * @returns The previous legal aid answer label.
  */
@@ -118,6 +131,32 @@ export function formatLegalAidLast6MonthsLabel(): ResolvableString {
   const no = t("common.no");
 
   return match(Answer(AnswerKey.legalAidLast6Months))
+    .branch(Condition.Equals("yes"), yes)
+    .otherwise(no);
+}
+
+/**
+ * Formats the Letter from Local Authority value.
+ * @returns The formatted value.
+ */
+export function formatLetterFromLocalAuthority(): ResolvableString {
+  const yes = t("common.yes");
+  const no = t("common.no");
+
+  return match(Answer(AnswerKey.letterFromLocalAuthority))
+    .branch(Condition.Equals("yes"), yes)
+    .otherwise(no);
+}
+
+/**
+ * Formats the needs protective injunction answer label.
+ * @returns The needs protective injunction answer label.
+ */
+export function formatNeedsProtectiveInjunctionLabel(): ResolvableString {
+  const yes = t("common.yes");
+  const no = t("common.no");
+
+  return match(Answer(AnswerKey.needsProtectiveInjunction))
     .branch(Condition.Equals("yes"), yes)
     .otherwise(no);
 }

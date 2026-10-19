@@ -89,7 +89,7 @@ export const getGetApplicationResponseMock = <
       firstName: faker.string.alpha({ length: { min: 10, max: 20 } }),
       lastName: faker.string.alpha({ length: { min: 10, max: 20 } }),
       dateOfBirth: faker.date.past().toISOString().slice(0, 10),
-      niNumber: faker.helpers.fromRegExp("AA[0-9]{6}[A-D]"),
+      niNumber: (() => faker.helpers.fromRegExp("AA[0-9]{6}[A-D]"))(),
       hasFixedAddress: faker.datatype.boolean(),
       address: faker.helpers.arrayElement([
         {
@@ -465,6 +465,7 @@ export const getGetApplicationResponseMock = <
     reasonForReapplication: faker.string.alpha({
       length: { min: 10, max: 20 },
     }),
+    ecfFlag: faker.datatype.boolean(),
     meansAssessmentRequired: faker.datatype.boolean(),
     typeOfNonMeans: faker.datatype.boolean(),
     contribution: faker.string.alpha({ length: { min: 10, max: 20 } }),
@@ -479,6 +480,8 @@ export const getGetApplicationResponseMock = <
           faker.helpers.arrayElement(["public", "private"] as const),
           null,
         ]),
+        needsAdviceOnEUOrInternationalMaintenance: faker.datatype.boolean(),
+        needsProtectiveInjunction: faker.datatype.boolean(),
       },
       null,
     ]),

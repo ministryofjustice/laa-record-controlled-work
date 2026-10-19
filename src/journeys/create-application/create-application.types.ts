@@ -15,6 +15,7 @@ export interface CreateApplicationAnswers extends Record<string, unknown> {
   [AnswerKey.lastName]?: string;
   [AnswerKey.legalAidBefore]?: string;
   [AnswerKey.legalAidLast6Months]?: string;
+  [AnswerKey.needsAdviceOnEUOrInternationalMaintenance]?: string;
   [AnswerKey.niNumber]?: string;
   [AnswerKey.osAddressLine1]?: string;
   [AnswerKey.osAddressLine2]?: string;

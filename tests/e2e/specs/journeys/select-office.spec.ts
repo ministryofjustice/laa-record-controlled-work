@@ -10,13 +10,14 @@ import {
   signInWithSingleOffice,
 } from "#tests/e2e/flows/auth.flow.js";
 import { CASE_LIST_URL_PATTERN } from "#tests/e2e/flows/case-list.flow.js";
-import { completeCreateCaseShortestPath } from "#tests/e2e/flows/create-case.flow.js";
+import { completeCreateCasePrivateFamilyLawPath } from "#tests/e2e/flows/create-application/familyLawPrivate.flow.js";
 import { selectOfficeByCode } from "#tests/e2e/flows/office.flow.js";
 
 const SELECT_OFFICE_URL_PATTERN = new RegExp("/select-office/?$");
 const LANDING_URL_PATTERN = new RegExp("/$");
 const OFFICE_ONE_CODE = "R1XEVG";
 const OFFICE_TWO_CODE = "VGHVEY";
+const OFFICE_WITH_FAILED_LOOKUP = "E2EFAIL";
 
 const gotoInProgressCases = async (page: Page): Promise<void> => {
   await page.goto("/cases");
@@ -39,13 +40,10 @@ test.describe("@e2e single office user", () => {
     await context.close();
   });
 
-  test(
-    "is redirected to landing page on sign in",
-    async () => {
-      await signInWithSingleOffice(page, OFFICE_ONE_CODE);
-      await expect(page).toHaveURL(LANDING_URL_PATTERN);
-    },
-  );
+  test("is redirected to landing page on sign in", async () => {
+    await signInWithSingleOffice(page, OFFICE_ONE_CODE);
+    await expect(page).toHaveURL(LANDING_URL_PATTERN);
+  });
 });
 
 test.describe("@e2e multi office user", () => {
@@ -63,63 +61,75 @@ test.describe("@e2e multi office user", () => {
     await context.close();
   });
 
-  test(
-    "is redirected to landing page on sign in",
-    async () => {
-      await signInWithMultiOffice(page, [OFFICE_ONE_CODE, OFFICE_TWO_CODE]);
-      await expect(page).toHaveURL(SELECT_OFFICE_URL_PATTERN);
-    },
-  );
+  test("is redirected to landing page on sign in", async () => {
+    await signInWithMultiOffice(page, [OFFICE_ONE_CODE, OFFICE_TWO_CODE]);
+    await expect(page).toHaveURL(SELECT_OFFICE_URL_PATTERN);
+  });
 
-  test(
-    "can change office and is redirected to the landing page",
-    async () => {
-      await signInWithMultiOffice(page, [OFFICE_ONE_CODE, OFFICE_TWO_CODE]);
-      await selectOfficeByCode(page, OFFICE_ONE_CODE);
+  test("keeps an office selectable when its lookup returns no content", async () => {
+    await signInWithMultiOffice(page, [
+      OFFICE_WITH_FAILED_LOOKUP,
+      OFFICE_ONE_CODE,
+    ]);
 
-      await page.getByRole("link", { name: "Change" }).click();
-      await expect(page).toHaveURL(SELECT_OFFICE_URL_PATTERN);
+    const failedOfficeOption = page.locator(".govuk-radios__item", {
+      hasText: OFFICE_WITH_FAILED_LOOKUP,
+    });
+    await expect(failedOfficeOption).toHaveText(OFFICE_WITH_FAILED_LOOKUP);
 
-      await selectOfficeByCode(page, OFFICE_TWO_CODE);
-      await expect(page).toHaveURL(CASE_LIST_URL_PATTERN);
-      await expect(page.locator("p", { hasText: "Office:" })).toContainText(
-        OFFICE_TWO_CODE,
-      );
-    },
-  );
+    await selectOfficeByCode(page, OFFICE_WITH_FAILED_LOOKUP);
+    await expect(page.locator("p", { hasText: "Office:" })).toContainText(
+      `Office: ${OFFICE_WITH_FAILED_LOOKUP}`,
+    );
+  });
 
-  test(
-    "can only see cases for the selected office after changing offices",
-    async () => {
-      await signInWithMultiOffice(page, [OFFICE_ONE_CODE, OFFICE_TWO_CODE]);
-      await selectOfficeByCode(page, OFFICE_ONE_CODE);
-      const officeOneApplicationId = await completeCreateCaseShortestPath(page);
+  test("can change office and is redirected to the landing page", async () => {
+    await signInWithMultiOffice(page, [OFFICE_ONE_CODE, OFFICE_TWO_CODE]);
+    await selectOfficeByCode(page, OFFICE_ONE_CODE);
 
-      await page.goto("/cases");
-      await page.getByRole("link", { name: "Change" }).click();
-      await selectOfficeByCode(page, OFFICE_TWO_CODE);
-      const officeTwoApplicationId = await completeCreateCaseShortestPath(page);
+    await page.getByRole("link", { name: "Change" }).click();
+    await expect(page).toHaveURL(SELECT_OFFICE_URL_PATTERN);
 
-      await gotoInProgressCases(page);
-      await expect(
-        page.locator(`a[href='/cases/${officeTwoApplicationId}/task-list']`).first(),
-      ).toBeVisible();
-      await expect(
-        page.locator(`a[href='/cases/${officeOneApplicationId}/task-list']`),
-      ).toHaveCount(0);
+    await selectOfficeByCode(page, OFFICE_TWO_CODE);
+    await expect(page).toHaveURL(CASE_LIST_URL_PATTERN);
+    await expect(page.locator("p", { hasText: "Office:" })).toContainText(
+      OFFICE_TWO_CODE,
+    );
+  });
 
-      await page.getByRole("link", { name: "Change" }).click();
-      await selectOfficeByCode(page, OFFICE_ONE_CODE);
+  test("can only see cases for the selected office after changing offices", async () => {
+    await signInWithMultiOffice(page, [OFFICE_ONE_CODE, OFFICE_TWO_CODE]);
+    await selectOfficeByCode(page, OFFICE_ONE_CODE);
+    const officeOneApplicationId =
+      await completeCreateCasePrivateFamilyLawPath(page);
 
-      await gotoInProgressCases(page);
-      await expect(
-        page.locator(`a[href='/cases/${officeOneApplicationId}/task-list']`).first(),
-      ).toBeVisible();
-      await expect(
-        page.locator(`a[href='/cases/${officeTwoApplicationId}/task-list']`),
-      ).toHaveCount(0);
-    },
-  );
+    await page.goto("/cases");
+    await page.getByRole("link", { name: "Change" }).click();
+    await selectOfficeByCode(page, OFFICE_TWO_CODE);
+    const officeTwoApplicationId =
+      await completeCreateCasePrivateFamilyLawPath(page);
+
+    await gotoInProgressCases(page);
+    await expect(
+      page
+        .locator(`a[href='/cases/${officeTwoApplicationId}/task-list']`)
+        .first(),
+    ).toBeVisible();
+    await expect(
+      page.locator(`a[href='/cases/${officeOneApplicationId}/task-list']`),
+    ).toHaveCount(0);
+
+    await page.getByRole("link", { name: "Change" }).click();
+    await selectOfficeByCode(page, OFFICE_ONE_CODE);
+
+    await gotoInProgressCases(page);
+    await expect(
+      page
+        .locator(`a[href='/cases/${officeOneApplicationId}/task-list']`)
+        .first(),
+    ).toBeVisible();
+    await expect(
+      page.locator(`a[href='/cases/${officeTwoApplicationId}/task-list']`),
+    ).toHaveCount(0);
+  });
 });
-
-

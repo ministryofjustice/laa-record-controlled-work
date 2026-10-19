@@ -18,7 +18,7 @@ const mockData = getGetApplicationsResponseMock();
 const session = {
   selectedOffice: {
     address: "1 High Street, Leeds, LS1 1AA",
-    code: "LEEDS-01",
+    code: "AB12CD",
   },
 };
 
@@ -52,7 +52,18 @@ describe("LoadYourCaseList", () => {
       await client.get("/cases", { session });
       expect(
         getApplicationsStub.calledWith(
-          sinon.match({ officeId: "LEEDS-01", status: "DRAFT" }),
+          sinon.match({ officeId: "AB12CD", status: "DRAFT" }),
+        ),
+      ).to.be.true;
+    });
+
+    it("loads applications using the code-only selected office", async () => {
+      await client.get("/cases", {
+        session: { selectedOffice: { code: "AB12CD" } },
+      });
+      expect(
+        getApplicationsStub.calledWith(
+          sinon.match({ officeId: "AB12CD", status: "DRAFT" }),
         ),
       ).to.be.true;
     });
@@ -61,7 +72,7 @@ describe("LoadYourCaseList", () => {
       await client.get("/cases/recorded", { session });
       expect(
         getApplicationsStub.calledWith(
-          sinon.match({ officeId: "LEEDS-01", status: "COMPLETED" }),
+          sinon.match({ officeId: "AB12CD", status: "COMPLETED" }),
         ),
       ).to.be.true;
     });
@@ -70,7 +81,7 @@ describe("LoadYourCaseList", () => {
       await client.get("/cases/ineligible", { session });
       expect(
         getApplicationsStub.calledWith(
-          sinon.match({ officeId: "LEEDS-01", status: "COMPLETED" }),
+          sinon.match({ officeId: "AB12CD", status: "COMPLETED" }),
         ),
       ).to.be.true;
     });

@@ -1,7 +1,7 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 
 const zodFilePath =
-  "src/api/clients/pda/model/providerFirmOfficeListDto.zod.gen.ts";
+  "src/api/clients/pda/model/providerFirmOfficeDto.zod.gen.ts";
 
 convertOptionalToNullish(zodFilePath);
 

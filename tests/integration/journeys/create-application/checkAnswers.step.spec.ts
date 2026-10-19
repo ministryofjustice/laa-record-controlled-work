@@ -3,9 +3,7 @@ import {
   TestRedirectResult,
 } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
-import {
-  createApplicationEffectsRegistry,
-} from "#/journeys/create-application/create-application.effects.js";
+import { createApplicationEffectsRegistry } from "#/journeys/create-application/create-application.effects.js";
 import { createApplicationTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import sinon from "sinon";
@@ -14,13 +12,11 @@ import { createApplicationJourney } from "#/journeys/create-application/create-a
 
 describe("Check answers step", () => {
   const uuid = "123e4567-e89b-12d3-a456-426614174000";
-  const createApplicationStub = sinon
-    .stub()
-    .resolves({
-      status: 201,
-      data: getCreateApplicationResponseMock({ id: uuid }),
-      headers: new Headers(),
-    });
+  const createApplicationStub = sinon.stub().resolves({
+    status: 201,
+    data: getCreateApplicationResponseMock({ id: uuid }),
+    headers: new Headers(),
+  });
 
   const client = createApplicationTestClient(
     createApplicationJourney,
@@ -29,7 +25,7 @@ describe("Check answers step", () => {
       dependencies: { createApplication: createApplicationStub },
     },
   );
-  
+
   const createSession = (answerOverrides: Record<string, unknown> = {}) => ({
     journeyDrafts: {
       createApplication: {
@@ -37,7 +33,10 @@ describe("Check answers step", () => {
         familyLawClassification: "private",
         legalAidBefore: "yesSameMatter",
         legalAidLast6Months: "yes",
+        needsAdviceOnEUOrInternationalMaintenance: "no",
+        needsProtectiveInjunction: "yes",
         reasonForHelp: "Some reason for help",
+        reasonForYes: "Some reason for help",
         firstName: "John",
         lastName: "Doe",
         dateOfBirth: "1990-01-01",
@@ -77,27 +76,44 @@ describe("Check answers step", () => {
     });
 
     it("renders a summary list", () => {
-      const rows = summaryList.properties.rows as Array<{
+      const initialRows = summaryList.properties.rows as {
         key: { text: string };
         value: { text: string };
-      }>;
-      expect(rows.length).to.equal(11);
-      expect(rows[0].key.text).to.equal("ECF");
-      expect(rows[1].key.text).to.equal("Type of family law");
-      expect(rows[1].value.text).to.equal("Private");
-      expect(rows[2].key.text).to.equal("Accessed legal aid before");
-      expect(rows[2].value.text).to.equal(
-        "Yes, about the same matter",
-      );
-      expect(rows[3].key.text).to.equal("Did your client get legal help for this matter in the last 6 months?");
-      expect(rows[4].key.text).to.equal("Reason for new application for same matter");
-      expect(rows[5].key.text).to.equal("First name");
-      expect(rows[6].key.text).to.equal("Last name");
-      expect(rows[7].key.text).to.equal("Date of birth");
-      expect(rows[8].key.text).to.equal("National Insurance number");
-      expect(rows[9].key.text).to.equal("Has a home address");
-      expect(rows[9].value.text).to.equal("Yes");
-      expect(rows[10].key.text).to.equal("Address");
+      }[];
+
+      const rows = initialRows.map((row) => ({
+        key: row.key.text,
+        value: row.value.text,
+      }));
+
+      expect(rows.length).to.equal(14);
+      expect(rows).to.deep.include.members([
+        { key: "ECF", value: "No" },
+        { key: "Type of family law", value: "Private" },
+        {
+          key: "Transitional EU arrangements or an international maintenance agreement",
+          value: "No",
+        },
+        { key: "Legal aid to get a protective injunction order", value: "Yes" },
+        {
+          key: "Accessed legal aid before",
+          value: "Yes, about the same matter",
+        },
+        {
+          key: "Did your client get legal help for this matter in the last 6 months?",
+          value: "Yes",
+        },
+        {
+          key: "Reason for new application for same matter",
+          value: "Some reason for help",
+        },
+        { key: "First name", value: "John" },
+        { key: "Last name", value: "Doe" },
+        { key: "Date of birth", value: "1 January 1990" },
+        { key: "National Insurance number", value: "AB123456C" },
+        { key: "Has a home address", value: "Yes" },
+        { key: "Address", value: undefined },
+      ]);
     });
 
     it("links the home address row to the home address question", () => {
@@ -174,9 +190,8 @@ describe("Check answers step", () => {
 
       expect(result.type).to.equal("render");
       const noNiRender = result as TestRenderResult;
-      const [noNiSummaryList] = noNiRender.getBlocksByVariant(
-        "govukSummaryList",
-      );
+      const [noNiSummaryList] =
+        noNiRender.getBlocksByVariant("govukSummaryList");
       const rows = noNiSummaryList.properties.rows as Array<{
         key: { text: string };
         value: { text: string };
@@ -227,9 +242,8 @@ describe("Check answers step", () => {
 
       expect(result.type).to.equal("render");
       const noAddressRender = result as TestRenderResult;
-      const [noAddressSummaryList] = noAddressRender.getBlocksByVariant(
-        "govukSummaryList",
-      );
+      const [noAddressSummaryList] =
+        noAddressRender.getBlocksByVariant("govukSummaryList");
 
       const rows = noAddressSummaryList.properties.rows as Array<{
         actions?: {
@@ -251,7 +265,6 @@ describe("Check answers step", () => {
         "have-a-home-address?returnTo=check-answers",
       );
     });
-
   });
 
   describe("POST /cases/new/check-answers", () => {

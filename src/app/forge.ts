@@ -8,7 +8,7 @@ import {
 import { govukComponents } from "@ministryofjustice/hmpps-forge/govuk-components";
 import { mojComponents } from "@ministryofjustice/hmpps-forge/moj-components";
 
-import { getAllProviderOffices } from "#/api/clients/pda/schema/provider-firms-endpoints/provider-firms-endpoints.gen.js";
+import { getFirmOffice } from "#/api/clients/pda/schema/provider-firm-offices/provider-firm-offices.gen.js";
 import {
   createApplication,
   getApplication,
@@ -43,7 +43,7 @@ export function initForge(app: Express): void {
     .registerGlobalComponents([autocomplete])
     .registerGlobalFunctions(nunjucksFunctions)
     .registerPackage(yourCasesPackage, { getApplications })
-    .registerPackage(selectOfficePackage, { getAllProviderOffices })
+    .registerPackage(selectOfficePackage, { getFirmOffice })
     .registerPackage(editApplicationPackage, {
       getApplication,
       updateApplicationStatus,

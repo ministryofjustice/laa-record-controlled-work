@@ -48,7 +48,12 @@ describe("Edit client details check answers step", () => {
       },
     },
     reasonForReapplication: "Some reason for help",
-    scopingQuestions: { priorLegalAid: "yesSameMatter", familyLawClassification: "public" },
+    scopingQuestions: {
+      priorLegalAid: "yesSameMatter",
+      familyLawClassification: "private",
+      needsAdviceOnEUOrInternationalMaintenance: false,
+      needsProtectiveInjunction: true,
+    },
   });
   const overseasApplication: Application = getGetApplicationResponseMock({
     ...ukApplication,
@@ -147,9 +152,7 @@ describe("Edit client details check answers step", () => {
       expect((result as TestRedirectResult).url).to.equal(
         `/cases/${applicationId}/task-list/details/check-answers`,
       );
-      expect(
-        session.journeyDrafts?.[draftKey]?.niNumber,
-      ).to.equal("JN123456A");
+      expect(session.journeyDrafts?.[draftKey]?.niNumber).to.equal("JN123456A");
     });
 
     it("renders API client data for direct check answers access", async () => {
@@ -167,8 +170,9 @@ describe("Edit client details check answers step", () => {
         value: { text: string };
       }>;
 
-      expect(rows.find((row) => row.key.text === "First name")?.value.text).to
-        .equal("John");
+      expect(
+        rows.find((row) => row.key.text === "First name")?.value.text,
+      ).to.equal("John");
     });
 
     it("redirects to check answers", async () => {
@@ -233,9 +237,9 @@ describe("Edit client details check answers step", () => {
       );
 
       const rows = await getCheckAnswersRows(session);
-      expect(rows.find((row) => row.key.text === "Address")?.value.html).to.equal(
-        "No fixed address",
-      );
+      expect(
+        rows.find((row) => row.key.text === "Address")?.value.html,
+      ).to.equal("No fixed address");
     });
 
     it("redirect to UK address capture when 'has fixed address' is 'yes'", async () => {
@@ -372,7 +376,8 @@ describe("Edit client details check answers step", () => {
       ).to.equal(false);
       expect(
         visibleRows.some(
-          (row) => row.key.text === "Reason for new application for same matter",
+          (row) =>
+            row.key.text === "Reason for new application for same matter",
         ),
       ).to.equal(false);
     });
@@ -414,36 +419,44 @@ describe("Edit client details check answers step", () => {
     });
 
     it("renders the API client data in a summary list", () => {
-      const rows = summaryList.properties.rows as Array<{
+      const initialRows = summaryList.properties.rows as {
         key: { text: string };
         value: { text: string };
-      }>;
+      }[];
 
-      expect(rows.length).to.equal(11);
-      expect(rows[0].key.text).to.equal("ECF");
-      expect(rows[1].key.text).to.equal("Type of family law");
-      expect(rows[1].value.text).to.equal("Public");
-      expect(rows[2].key.text).to.equal("Accessed legal aid before");
-      expect(rows[2].value.text).to.equal("Yes, about the same matter");
-      expect(rows[3].key.text).to.equal(
-        "Did your client get legal help for this matter in the last 6 months?",
-      );
-      expect(rows[3].value.text).to.equal("Yes");
-      expect(rows[4].key.text).to.equal(
-        "Reason for new application for same matter",
-      );
-      expect(rows[4].value.text).to.equal("Some reason for help");
-      expect(rows[5].key.text).to.equal("First name");
-      expect(rows[5].value.text).to.equal("John");
-      expect(rows[6].key.text).to.equal("Last name");
-      expect(rows[6].value.text).to.equal("Doe");
-      expect(rows[7].key.text).to.equal("Date of birth");
-      expect(rows[7].value.text).to.equal("1 January 1990");
-      expect(rows[8].key.text).to.equal("National Insurance number");
-      expect(rows[8].value.text).to.equal("AB123456C");
-      expect(rows[9].key.text).to.equal("Has a home address");
-      expect(rows[9].value.text).to.equal("Yes");
-      expect(rows[10].key.text).to.equal("Address");
+      const rows = initialRows.map((row) => ({
+        key: row.key.text,
+        value: row.value.text,
+      }));
+
+      expect(rows.length).to.equal(14);
+      expect(rows).to.deep.include.members([
+        { key: "ECF", value: "No" },
+        { key: "Type of family law", value: "Private" },
+        {
+          key: "Transitional EU arrangements or an international maintenance agreement",
+          value: "No",
+        },
+        { key: "Legal aid to get a protective injunction order", value: "Yes" },
+        {
+          key: "Accessed legal aid before",
+          value: "Yes, about the same matter",
+        },
+        {
+          key: "Did your client get legal help for this matter in the last 6 months?",
+          value: "Yes",
+        },
+        {
+          key: "Reason for new application for same matter",
+          value: "Some reason for help",
+        },
+        { key: "First name", value: "John" },
+        { key: "Last name", value: "Doe" },
+        { key: "Date of birth", value: "1 January 1990" },
+        { key: "National Insurance number", value: "AB123456C" },
+        { key: "Has a home address", value: "Yes" },
+        { key: "Address", value: undefined },
+      ]);
     });
 
     it("links the home address row to the home address question", () => {
@@ -583,9 +596,8 @@ describe("Edit client details check answers step", () => {
       );
       expect(result.type).to.equal("render");
       const renderResult = result as TestRenderResult;
-      const [savedSummaryList] = renderResult.getBlocksByVariant(
-        "govukSummaryList",
-      );
+      const [savedSummaryList] =
+        renderResult.getBlocksByVariant("govukSummaryList");
       const rows = savedSummaryList.properties.rows as Array<{
         actions?: { items: Array<{ href: string }> };
         key: { text: string };
@@ -618,8 +630,9 @@ describe("Edit client details check answers step", () => {
       expect(clientDetailsResult.type).to.equal("render");
 
       const rows = await getCheckAnswersRows(session);
-      expect(rows.find((row) => row.key.text === "First name")?.value.text).to
-        .equal("Edited");
+      expect(
+        rows.find((row) => row.key.text === "First name")?.value.text,
+      ).to.equal("Edited");
     });
   });
 

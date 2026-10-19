@@ -44,7 +44,6 @@ describe("fromAnswers method", () => {
           country: "GB",
         },
       },
-      legalAidBefore: "yesSameMatter",
       legalAidLast6Months: true,
       providerOfficeCode,
       reasonForReapplication: "here is a reason",
@@ -59,6 +58,24 @@ describe("fromAnswers method", () => {
       providerOfficeCode,
     ).toRcwApi();
     expect(result).to.deep.equal(expected);
+  });
+
+  it("maps no and different-matter legal aid without recent aid details", () => {
+    for (const priorLegalAid of ["no", "yesDifferentMatter"] as const) {
+      const result = ApplicationDto.fromAnswers(
+        {
+          ...answers,
+          legalAidBefore: priorLegalAid,
+          legalAidLast6Months: undefined,
+          reasonForYes: undefined,
+        },
+        "test-office",
+      ).toRcwApi();
+
+      expect(result.scopingQuestions.priorLegalAid).to.equal(priorLegalAid);
+      expect(result).to.not.have.property("legalAidLast6Months");
+      expect(result).to.not.have.property("reasonForReapplication");
+    }
   });
 
   it("omits client address when client has no fixed address", () => {
@@ -95,6 +112,61 @@ describe("fromAnswers method", () => {
       county: "Greater Manchester",
       postCode: "A12 3BC",
       country: "GB",
+    });
+  });
+
+  it("correctly maps scoping questions for private family law classification", () => {
+    const providerOfficeCode = "22439e72-68d3-4770-b435-c352d883d21e";
+    const result = ApplicationDto.fromAnswers(
+      {
+        ...answers,
+        familyLawClassification: "private",
+        needsAdviceOnEUOrInternationalMaintenance: "no",
+        needsProtectiveInjunction: "no",
+      },
+      providerOfficeCode,
+    ).toRcwApi();
+
+    expect(result.scopingQuestions).to.deep.equal({
+      priorLegalAid: "yesSameMatter",
+      familyLawClassification: "private",
+      needsAdviceOnEUOrInternationalMaintenance: false,
+      needsProtectiveInjunction: false,
+    });
+  });
+
+  it("preserves a negative maintenance advice answer for private family law", () => {
+    const result = ApplicationDto.fromAnswers(
+      {
+        ...answers,
+        familyLawClassification: "private",
+        needsAdviceOnEUOrInternationalMaintenance: "no",
+        needsProtectiveInjunction: "yes",
+      },
+      "test-office",
+    ).toRcwApi();
+
+    expect(result.scopingQuestions).to.deep.equal({
+      priorLegalAid: "yesSameMatter",
+      familyLawClassification: "private",
+      needsAdviceOnEUOrInternationalMaintenance: false,
+      needsProtectiveInjunction: true,
+    });
+  });
+
+  it("correctly maps scoping questions for public family law classification", () => {
+    const providerOfficeCode = "22439e72-68d3-4770-b435-c352d883d21e";
+    const result = ApplicationDto.fromAnswers(
+      {
+        ...answers,
+        familyLawClassification: "public",
+      },
+      providerOfficeCode,
+    ).toRcwApi();
+
+    expect(result.scopingQuestions).to.deep.equal({
+      priorLegalAid: "yesSameMatter",
+      familyLawClassification: "public",
     });
   });
 });
@@ -145,6 +217,7 @@ describe("toAnswers method", () => {
     createdBy: "test-user",
     modifiedAt: "2025-01-01T00:00:00Z",
     modifiedBy: "test-user",
+    ecfFlag: null
   } satisfies Application;
 
   it("maps a UK API address to only the UK answer fields", () => {
@@ -249,6 +322,44 @@ describe("toAnswers method", () => {
       "osAddressLine3",
       "osAddressLine4",
       "osCountry",
+    );
+  });
+
+  it("maps scoping questions correctly for private family law classification", () => {
+    const result = ApplicationDto.toAnswers({
+      ...application,
+      scopingQuestions: {
+        priorLegalAid: "yesSameMatter",
+        familyLawClassification: "private",
+        needsAdviceOnEUOrInternationalMaintenance: false,
+        needsProtectiveInjunction: true,
+      },
+    });
+
+    expect(result).to.include({
+      legalAidBefore: "yesSameMatter",
+      familyLawClassification: "private",
+      needsAdviceOnEUOrInternationalMaintenance: "no",
+      needsProtectiveInjunction: "yes",
+    });
+  });
+
+  it("maps scoping questions correctly for public family law classification", () => {
+    const result = ApplicationDto.toAnswers({
+      ...application,
+      scopingQuestions: {
+        priorLegalAid: "no",
+        familyLawClassification: "public",
+      },
+    });
+
+    expect(result).to.include({
+      legalAidBefore: "no",
+      familyLawClassification: "public",
+    });
+
+    expect(result).to.not.have.any.keys(
+      "needsAdviceOnEUOrInternationalMaintenance",
     );
   });
 });

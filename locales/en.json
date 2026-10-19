@@ -23,6 +23,160 @@
       "logoAlt": "Legal Aid Agency logo",
       "notProvided": "Not provided",
       "referenceNumber": "Reference number",
+      "meansAssessment": {
+        "frequencies": {
+          "everyWeek": "Every week",
+          "everyTwoWeeks": "Every 2 weeks",
+          "everyFourWeeks": "Every 4 weeks",
+          "monthly": "Monthly",
+          "everyMonth": "Every month",
+          "threeMonths": "Total in last 3 months"
+        },
+        "client": {
+          "heading": "Client details",
+          "age": {
+            "label": "What age is your client?",
+            "under18": "Under 18",
+            "standard": "18 to 59",
+            "over60": "60 or over"
+          },
+          "partner": "Does your client have a partner?",
+          "passporting": "Does your client receive a passporting benefit?"
+        },
+        "dependants": {
+          "heading": "Dependants",
+          "childDependants": "Does your client have any child dependants?",
+          "childDependantsCount": "How many child dependants are there?",
+          "adultDependants": "Does your client have any adult dependants?",
+          "adultDependantsCount": "How many adult dependants are there?",
+          "getIncome": "Do any of the dependants aged 16 or over get regular income?",
+          "income": {
+            "heading": "Dependant {index} income",
+            "frequency": "When does the dependant normally get this income?",
+            "amount": "Income"
+          }
+        },
+        "employment": {
+          "statuses": {
+            "inWork": "Employed or self-employed",
+            "unemployed": "Unemployed"
+          },
+          "client": {
+            "heading": "Client income",
+            "status": "What is your client's employment status?"
+          },
+          "partnerAge": {
+            "heading": "Partner age",
+            "label": "Is the partner aged 60 or over?"
+          },
+          "partner": {
+            "heading": "Partner income",
+            "status": "What is the partner's employment status?"
+          }
+        },
+        "income": {
+          "client": {
+            "entryHeading": "Client employment income {index}",
+            "frequency": "When does your client normally get this income?"
+          },
+          "partner": {
+            "entryHeading": "Partner employment income {index}",
+            "frequency": "When does your partner normally get this income?"
+          },
+          "incomeType": "Type of employment income",
+          "grossIncome": "Income before any deductions",
+          "incomeTax": "Income tax",
+          "nationalInsurance": "National Insurance",
+          "types": {
+            "employment": "A salary or wage",
+            "statutoryPay": "Statutory Sick Pay or Statutory Maternity Pay",
+            "selfEmployment": "Self-employment income"
+          }
+        },
+        "benefits": {
+          "client": {
+            "heading": "Client benefits",
+            "receivesBenefits": "Does your client get any non-passporting benefits?",
+            "entryHeading": "Client benefit {index} details"
+          },
+          "partner": {
+            "heading": "Partner benefits",
+            "receivesBenefits": "Does the partner get any benefits?",
+            "entryHeading": "Partner benefit {index} details"
+          },
+          "type": "Benefit name",
+          "amount": "Benefit amount",
+          "frequency": "Frequency"
+        },
+        "otherIncome": {
+          "client": {
+            "heading": "Client other income",
+            "friendsOrFamily": "Does your client get financial help from friends or family?",
+            "maintenance": "Does your client get maintenance from a former partner?",
+            "propertyOrLodger": "Does your client get income from a property or lodger?",
+            "pension": "Does your client get income from pensions?",
+            "studentFinance": "Does your client get income from student finance?",
+            "other": "Does your client get income from other sources?"
+          },
+          "partner": {
+            "heading": "Partner other income",
+            "friendsOrFamily": "Does the partner get financial help from friends or family?",
+            "maintenance": "Does the partner get maintenance from a former partner?",
+            "propertyOrLodger": "Does the partner get income from a property or lodger?",
+            "pension": "Does the partner get income from pensions?",
+            "studentFinance": "Does the partner get income from student finance?",
+            "other": "Does the partner get income from other sources?"
+          },
+          "amount": "Amount",
+          "frequency": "Frequency"
+        },
+        "outgoings": {
+          "client": {
+            "heading": "Your client's outgoings and deductions",
+            "childcare": "Does your client pay for childcare?",
+            "maintenance": "Does your client pay maintenance to a former partner?",
+            "legalAid": "Does your client make payments towards legal aid for a criminal case?"
+          },
+          "partner": {
+            "heading": "The partner's outgoings and deductions",
+            "childcare": "Does the partner pay for childcare?",
+            "maintenance": "Does the partner pay maintenance to a former partner?",
+            "legalAid": "Does the partner make payments towards legal aid for a criminal case?"
+          },
+          "amount": "Amount",
+          "frequency": "Frequency"
+        },
+        "housing": {
+          "property": {
+            "heading": "Home client usually lives in",
+            "clientOwned": "Does your client own the home the client usually lives in?",
+            "partnerOwned": "Does your client or their partner own the home the client lives in?",
+            "landlordOnlyOtherOwner": "Is the landlord the only other joint-owner?",
+            "ownership": {
+              "none": "No",
+              "outright": "Yes, owned outright",
+              "sharedOwnership": "Yes, through a shared ownership scheme",
+              "withMortgage": "Yes, with a mortgage or loan"
+            }
+          },
+          "costs": {
+            "heading": "Housing costs",
+            "housingPayments": "Housing payments",
+            "mortgagePayments": "What are the mortgage or loan payments for the home the client usually lives in?",
+            "rent": "Rent",
+            "sharedOwnershipMortgage": "Mortgage",
+            "housingBenefitQuestion": "Is Housing Benefit claimed at the home the client lives in?",
+            "housingBenefit": "Housing Benefit",
+            "frequency": "Frequency"
+          },
+          "propertyEntry": {
+            "heading": "Home client lives in equity",
+            "houseValue": "Estimated value",
+            "mortgage": "Outstanding mortgage",
+            "percentageOwned": "Percentage share owned"
+          }
+        }
+      },
       "clientAndCaseDetails": {
         "heading": "Client and case details",
         "ecf": "ECF",
@@ -67,6 +221,13 @@
         "title": "Service not accessible",
         "body": [
           "Your Legal Aid Services user account must be assigned to an office with an active Controlled Work contract in order to use this service.",
+          "Contact your LAA Liaison or a Legal Aid Services administrator within your firm for more information."
+        ]
+      },
+      "noAssignedRole": {
+        "title": "Service not accessible",
+        "body": [
+          "Your Legal Aid Services user account has not been assigned access to this service.",
           "Contact your LAA Liaison or a Legal Aid Services administrator within your firm for more information."
         ]
       }
@@ -157,6 +318,30 @@
           "required": "Please select an option"
         }
       },
+      "internationalMaintenanceAgreement": {
+        "title": "Does your client need advice about transitional EU arrangements or an international maintenance agreement?",
+        "guidance": "The following must all apply:",
+        "guidanceList": [
+          "This case relates to a maintenance decision under Article 56(1) of the EU Maintenance Regulation or Article 10 of the 2007 Hague Convention.",
+          "My client is the person entitled to receive maintenance (the creditor), not the person who must pay it.",
+          "The child or young person is under 21 years old."
+        ],
+        "validation": {
+          "required": "Select whether your client needs advice about transitional EU arrangements or an international maintenance agreement."
+        }
+      },
+      "protectThemself": {
+        "title": "Does your client need legal aid to get a protective injunction order for themselves or their children?",
+        "guidance": "This includes things like:",
+        "guidanceList": [
+          "non-molestation orders",
+          "occupation orders",
+          "prohibited steps orders"
+        ],
+        "validation": {
+          "required": "Select whether your client needs legal aid to get a protective injunction order for themselves or their children."
+        }
+      },
       "legalAidBefore": {
         "title": "Has your client accessed legal aid before?",
         "radioButton": {
@@ -176,6 +361,16 @@
           "required": "Select if your client got legal help for this matter in the last 6 months",
           "reasonRequired": "Enter the reason you're creating a new case for the same matter",
           "reasonTooLong": "Reason must not exceed 500 characters"
+        }
+      },
+      "letterFromLocalAuthority": {
+        "title": "Has your client received a letter saying the local authority is initiating care proceedings?",
+        "body": [
+          "The local authority starts care proceedings under Section 31 of the Children Act 1989 when they think a child is at risk of serious harm.",
+          "Your client must provide evidence of this."
+        ],
+        "validation": {
+          "required": "Select if your client received a letter saying the local authority is initiating care proceedings"
         }
       },
       "clientDetails": {
@@ -288,9 +483,12 @@
         "answerLabels": {
           "ecf": "ECF",
           "familyLawClassification": "Type of family law",
+          "internationalMaintenanceAgreement": "Transitional EU arrangements or an international maintenance agreement",
+          "protectThemselves": "Legal aid to get a protective injunction order",
           "legalAidBefore": "Accessed legal aid before",
           "legalAidLast6Months": "Did your client get legal help for this matter in the last 6 months?",
           "legalAidLast6MonthsReasonForYes": "Reason for new application for same matter",
+          "letterFromLocalAuthority": "Local authority is initiating care proceedings",
           "firstName": "First name",
           "lastName": "Last name",
           "dateOfBirth": "Date of birth",

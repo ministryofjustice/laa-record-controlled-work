@@ -14,6 +14,14 @@ inputs:
   message:
     description: "Slack message body text"
     required: true
+  unfurl-links:
+    description: "Enable link previews"
+    required: false
+    default: 'true'
+  unfurl-media:
+    description: "Enable media previews"
+    required: false
+    default: 'true'
 
 runs:
   using: "composite"
@@ -25,6 +33,8 @@ runs:
         SLACK_CHANNEL_ID: ${{ inputs.slack-channel-id }}
         SLACK_MENTION: ${{ inputs.slack-mention }}
         SLACK_MESSAGE: ${{ inputs.message }}
+        SLACK_UNFURL_LINKS: ${{ inputs.unfurl-links }}
+        SLACK_UNFURL_MEDIA: ${{ inputs.unfurl-media }}
       run: |
         MESSAGE_TEXT="$SLACK_MESSAGE"
 
@@ -35,7 +45,9 @@ runs:
         PAYLOAD=$(jq -n \
           --arg channel "$SLACK_CHANNEL_ID" \
           --arg text "$MESSAGE_TEXT" \
-          '{channel: $channel, text: $text}')
+          --argjson unfurl_links "$SLACK_UNFURL_LINKS" \
+          --argjson unfurl_media "$SLACK_UNFURL_MEDIA" \
+          '{channel: $channel, text: $text, unfurl_links: $unfurl_links, unfurl_media: $unfurl_media}')
 
         RESPONSE=$(curl --silent --show-error --fail-with-body \
           -X POST "https://slack.com/api/chat.postMessage" \

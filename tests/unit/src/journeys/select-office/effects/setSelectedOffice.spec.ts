@@ -7,8 +7,8 @@ import type { Office, SelectOfficeContext } from "#/journeys/select-office/selec
 import { InvalidSessionError, InvalidSelectedOfficeError } from "#/journeys/journey.errors.js";
 
 const mockOffices: Office[] = [
-  { address: "1 High Street, Leeds, LS1 1AA", code: "LEEDS-01" },
-  { address: "2 King Street, Manchester, M1 1BB", code: "MCR-01"},
+  { address: "1 High Street, Leeds, LS1 1AA", code: "AB12CD" },
+  { address: "2 King Street, Manchester, M1 1BB", code: "EF34GH" },
 ];
 
 describe("setSelectedOffice", () => {
@@ -21,7 +21,7 @@ describe("setSelectedOffice", () => {
 
   beforeEach(() => {
     session = {};
-    getAnswer = sinon.stub().withArgs("selectOffice").returns("LEEDS-01");
+    getAnswer = sinon.stub().withArgs("selectOffice").returns("AB12CD");
     getData = sinon
       .stub()
       .withArgs(CONTEXT_DATA_KEYS.availableOffices)
@@ -53,8 +53,24 @@ describe("setSelectedOffice", () => {
     ).to.equal(true);
   });
 
+  it("stores a selected code-only office unchanged", () => {
+    const office: Office = { code: "ZX98QW" };
+    getAnswer.withArgs("selectOffice").returns(office.code);
+    getData.withArgs(CONTEXT_DATA_KEYS.availableOffices).returns([office]);
+
+    setSelectedOffice()(context);
+
+    expect(session.selectedOffice).to.deep.equal(office);
+    expect(
+      setData.calledOnceWithExactly(
+        CONTEXT_DATA_KEYS.selectedOffice,
+        office,
+      ),
+    ).to.equal(true);
+  });
+
   it("throws InvalidSelectedOfficeError when the selected office code is not in the office list", () => {
-    getAnswer.withArgs("selectOffice").returns("UNKNOWN-CODE");
+    getAnswer.withArgs("selectOffice").returns("UNKNWN");
 
     expect(() => setSelectedOffice()(context))
       .to.throw(InvalidSelectedOfficeError);

@@ -24,7 +24,11 @@ export const closeIneligibleCase =
     }
 
     const session = context.getSession();
+    const correlationId = context
+      .getRequestHeader("x-correlation-id")
+      ?.toString();
     const options = await getRcwApiDefaultOptions({
+      correlationId,
       homeAccountId: session?.msal?.homeAccountId,
       sessionId: session?.id,
     });

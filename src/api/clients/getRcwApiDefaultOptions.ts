@@ -4,12 +4,14 @@ import config from "#/config.js";
 import { logger } from "#/logger.js";
 
 export interface RcwApiAuthParams {
+  correlationId?: string;
   homeAccountId: string | undefined;
   sessionId: string | undefined;
 }
 
 const EMPTY_STRING_LENGTH = 0;
 const TEST_ACCESS_TOKEN = "test-access-token";
+
 
 /**
  * Builds default authenticated options for downstream RCW API requests.
@@ -19,10 +21,20 @@ const TEST_ACCESS_TOKEN = "test-access-token";
 export async function getRcwApiDefaultOptions(
   params: RcwApiAuthParams,
 ): Promise<RequestInit> {
+  const correlationHeaders: Record<string, string> = {};
+  const correlationId = params.correlationId?.trim();
+  if (
+    correlationId !== undefined &&
+    correlationId.length !== EMPTY_STRING_LENGTH
+  ) {
+    correlationHeaders["X-Correlation-Id"] = correlationId;
+  }
+
   if (config.api.useMockAccessToken) {
     return {
       headers: {
         Authorization: `Bearer ${TEST_ACCESS_TOKEN}`,
+        ...correlationHeaders,
       },
     };
   }
@@ -60,6 +72,7 @@ export async function getRcwApiDefaultOptions(
   return {
     headers: {
       Authorization: `Bearer ${tokenResult.value}`,
+      ...correlationHeaders,
     },
   };
 }

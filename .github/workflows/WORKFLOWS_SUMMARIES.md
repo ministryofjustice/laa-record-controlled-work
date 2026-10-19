@@ -1,18 +1,57 @@
-# Deploy Workflow Summary
+# CICD Workflow Summary
 
-Triggers on push to any branch and can be triggered manually.
+Runs for pull requests, main pushes, merge groups, and manual dispatches.
 
-`code-linting` - ESLint checks 
-`code-security-audit` - Yarn npm audit for vulnerabilities
-`snyk` - Snyk Docker image security scan
-`mocha-unit-tests` - Unit tests 
-`playwright` - E2E/accessibility tests
-`build-image` - Build & push Docker image to ECR
-`deploy-uat` - Deploy to UAT environment when all above flows pass.
+`code-linting` - ESLint and Knip dependency checks.
+`verify-api-code-generation` - Checks generated RCW API client code matches the OpenAPI specification.
+`code-security-audit` - Runs `yarn npm audit`.
+`snyk` - Runs the PR regression gate or observational main Snyk scans.
+`mocha-tests` - Unit and integration tests.
+`playwright` - Browser and accessibility tests.
+`e2e` - End-to-end tests.
+`build-image` - Builds and pushes the candidate image to ECR, then exposes its confirmed digest.
+`deploy-uat` - Deploys to UAT after the required CI, scan, and test jobs pass.
+`deploy-staging` - Deploys to staging after UAT succeeds on main.
+`notify-main-ci-failure` - Sends a Slack notification when main CI jobs fail.
+
+## Snyk Security Gates
+
+`snyk` calls `.github/workflows/snyk.yml`, the sole Snyk scan owner. PR and
+merge-group Open Source checks pipe JSON results into `snyk-delta`, failing on
+new high-severity findings. The main branch scans all projects and publishes
+SARIF, but findings alone do not fail CI. Nightly runs the same scans in strict mode.
+Both modes also scan the pushed ECR image, Snyk Code, and rendered UAT,
+staging, and production manifests. The CLI is pinned to `1.1307.4`;
+`snyk-delta` is pinned to `1.14.0`. CICD scans the immutable image digest
+returned by Docker push.
+
+PR Delta tests and post-merge monitoring use the same explicit `SNYK_ORG_ID`,
+project name, and `main` target reference. Configure `SNYK_ORG_ID` as a
+repository Actions variable so Delta compares against the intended baseline.
+
+After main deploys to staging, `snyk-monitor` runs `snyk monitor` to update the
+accepted Open Source baseline. Nightly scans do not update that baseline.
+
+## Nightly Snyk Gate
+
+`.github/workflows/nightly.yml` runs at 06:00 UTC, after Renovate's
+`before 5am Europe/London` merge window, and supports manual dispatch on main.
+It resolves the existing main image by commit tag and calls `snyk.yml` without
+building, deploying, or publishing Snyk snapshots. Findings fail the strict
+scan and trigger a Slack alert; SARIF reports are attached to the run.
+The workflow summary and Slack alert include a concise list of findings from
+Open Source, Container, Code, and IaC scans. Each finding includes its
+description and severity; Snyk vulnerability IDs link to their database entry.
+Empty scan categories are omitted.
+
+Fork provenance: `.github/workflows/sast.yml` from
+`laa-reusable-github-actions@a7cbc9ed08d5ab503a21b24297b697797866dc14`,
+adapted for the RCW four-scan and digest contract.
 
 ## Environment & Secrets
 
-`SNYK_TOKEN` - In order to use snyk you need a api token which you can get by asking in #snyk channel
+`SNYK_CLIENT_ID` and `SNYK_CLIENT_SECRET` - Snyk OAuth credentials used to obtain a short-lived scan token
+`SNYK_ORG_ID` - Snyk organization ID used by Delta and baseline monitoring
 `ECR_ROLE_TO_ASSUME`,`ECR_REGION`,`ECR_REGISTRY_URL`,`ECR_REPOSITORY`,`KUBE_NAMESPACE`,`KUBE_CLUSTER`,`KUBE_TOKEN`,`KUBE_CERT` - These are automated generated in github repo during namespace/container deployment set up see deployment readme
 
 `environment: uat` - We are using env specific environment secrets and variables via our deployment script/values.ylm files and our github environment.
@@ -39,33 +78,7 @@ OpenSSF Scorecard - Repository security posture - JSON, Markdown
 Syft - SBOM generation - CycloneDX JSON
 
 ## Hidden setup steps
-You need to acquire and add a snyk api token in your github secrets under SNYK_TOKEN you can request this in #snyk channel for a API key **DO NOT USE PERSONAL API TOKEN**
+Add the Snyk OAuth client ID and secret to GitHub repository secrets as `SNYK_CLIENT_ID` and `SNYK_CLIENT_SECRET`.
 You need to add renovate application to you github repo you can request this via #ask-operations-engineering
-
-# Snyk infra Workflow Summary
-
-snyk iac action docs - https://github.com/snyk/actions/tree/master/iac
-
-Triggers on weekly on 21:30 on Monday evening and can be triggered manually.
-
-Synk iac action checks out your Infrastructure as Code Configuration files, and scans them for any security issues. The results are then uploaded to GitHub Security Code Scanning
-
-## Other setup steps
-
-Helm template files need to be rendered prior to scanning as they will fail to parse within the action.
-
-```yml
-run: |
-    helm template deploy/laa-record-controlled-work \
-    -f deploy/laa-record-controlled-work/values/uat.yaml \
-    > rendered-values.yaml
-```
-
-The action autogenerates a sarif file to be uploaded to github under snyk.sarif which means when you scan different directories this will overwrite the previous sarif file to avoid this and  handle multiple different sarifs you set sarif to false and pass in the file output to be a customised name to avoid being overwritten
-
-```yml
-sarif: false
-args: --sarif-file-output=snyk-deploy.sarif
-```
 
 

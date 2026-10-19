@@ -68,7 +68,7 @@ describe("metrics", () => {
     const response = { status: 302 };
 
     await metrics.time(
-      "getAllProviderOffices",
+      "getFirmOffice",
       async () => response,
       (status) => status === 200,
     );
@@ -76,7 +76,7 @@ describe("metrics", () => {
     expect(
       distributionStub.calledOnceWithExactly("api_response_time", 10, {
         attributes: {
-          endpoint: "getAllProviderOffices",
+          endpoint: "getFirmOffice",
           outcome: "error",
           status: 302,
         },

@@ -6,6 +6,7 @@ import type {
 } from "express";
 
 import { HTTP_STATUS } from "#/lib/constants/http.js";
+import { logger } from "#/logger.js";
 
 import type { ApplicationError } from "../errors/ApplicationError.js";
 
@@ -20,14 +21,19 @@ import type { ApplicationError } from "../errors/ApplicationError.js";
 export const handleGlobalErrors = (): ErrorRequestHandler => {
   return function handleGlobalErrors(
     err: ApplicationError,
-    req: Request,
+    _req: Request,
     res: Response,
-    next: NextFunction,
+    _next: NextFunction,
   ): void {
     const statusCode: number =
       err.statusCode ?? HTTP_STATUS.INTERNAL_SERVER_ERROR;
 
+    logger.error("Error caught by global error handler", err);
+
     switch (true) {
+      case statusCode === HTTP_STATUS.BAD_REQUEST:
+        res.status(statusCode).send(err.message);
+        return;
       // If unauthorised, redirect to the sign-in page.
       case statusCode === HTTP_STATUS.UNAUTHORIZED:
         res.redirect("/auth/signin");

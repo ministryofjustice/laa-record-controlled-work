@@ -1,4 +1,4 @@
-import type { AuthenticationResult } from "@azure/msal-node";
+import { AuthError, type AuthenticationResult } from "@azure/msal-node";
 
 import { expect } from "chai";
 import type { Request, Response } from "express";
@@ -117,6 +117,31 @@ describe("requireAuth", () => {
     expect(redirect.calledOnceWithExactly("/auth/signin")).to.be.true;
     expect(next.called).to.be.false;
     expect(session.account).to.equal(undefined);
+  });
+
+  it("renders the no-assigned-role error page when Entra reports the user has no role", async () => {
+    const refreshTokenMock = sinon
+      .stub()
+      .rejects(
+        new AuthError("1003009", "test-correlation-id", "No assigned role"),
+      );
+
+    sinon.stub(EntraService, "create").returns({
+      refreshToken: refreshTokenMock,
+    } as unknown as EntraService);
+
+    const { req, res, next, redirect, render, status } = createMocks({
+      account: createAccount({ exp: getNowInSeconds() - 10 }),
+      selectedOffice: createOffice("OFFICE-1"),
+    });
+
+    await requireAuth()(req, res, next);
+
+    expect(status.calledOnceWithExactly(HTTP_STATUS.FORBIDDEN)).to.be.true;
+    expect(render.calledOnceWithExactly("main/error-no-assigned-role")).to.be
+      .true;
+    expect(redirect.called).to.be.false;
+    expect(next.called).to.be.false;
   });
 
   it("redirects to /select-office when no office is selected", async () => {

@@ -2,12 +2,12 @@ import type { EffectFunctionContext } from "@ministryofjustice/hmpps-forge/core"
 
 import z from "zod";
 
-import type { getAllProviderOffices } from "#/api/clients/pda/schema/provider-firms-endpoints/provider-firms-endpoints.gen.js";
+import type { getFirmOffice } from "#/api/clients/pda/schema/provider-firm-offices/provider-firm-offices.gen.js";
 import type { JourneySession } from "#/journeys/context.type.js";
 import type { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 
 export const OfficeSchema = z.object({
-  address: z.string(),
+  address: z.string().optional(),
   code: z.string(),
   firmName: z.string().optional(),
 });
@@ -32,5 +32,5 @@ export interface SelectOfficeData extends Record<string, unknown> {
 }
 
 export interface SelectOfficeEffectsDeps {
-  getAllProviderOffices: typeof getAllProviderOffices;
+  getFirmOffice: typeof getFirmOffice;
 }

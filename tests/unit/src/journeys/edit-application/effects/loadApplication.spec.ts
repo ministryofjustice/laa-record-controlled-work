@@ -23,6 +23,7 @@ describe("loadApplication", () => {
   let deps: EditApplicationEffectsDeps;
   let getSession: sinon.SinonStub;
   let getRequestParam: sinon.SinonStub;
+  let getRequestHeader: sinon.SinonStub;
   let setData: sinon.SinonStub;
 
   beforeEach(() => {
@@ -38,10 +39,12 @@ describe("loadApplication", () => {
       msal: { homeAccountId: "home-account-id" },
     });
     getRequestParam = sinon.stub().returns(applicationId);
+    getRequestHeader = sinon.stub().returns("test-correlation-id"),
 
     context = {
       getSession,
       getRequestParam,
+      getRequestHeader,
       setData,
     } as unknown as EditApplicationContext;
   });
@@ -59,6 +62,30 @@ describe("loadApplication", () => {
     expect(
       setData.calledWith(CONTEXT_DATA_KEYS.application, mockApplication),
     ).to.equal(true);
+  });
+
+  it("preserves null scoping question answers when validating the response", async () => {
+    const mockApplication = getGetApplicationResponseMock();
+    mockApplication.scopingQuestions = {
+      priorLegalAid: "no",
+      familyLawClassification: "private",
+      needsAdviceOnEUOrInternationalMaintenance: false,
+      needsProtectiveInjunction: null,
+    };
+
+    getApplicationStub.resolves({ status: 200, data: mockApplication });
+
+    await loadApplication(deps)(context);
+
+    const parsedApplication = setData.firstCall.args[1];
+    expect(parsedApplication).to.have.nested.property(
+      "scopingQuestions.needsAdviceOnEUOrInternationalMaintenance",
+      false,
+    );
+    expect(parsedApplication).to.have.nested.property(
+      "scopingQuestions.needsProtectiveInjunction",
+      null,
+    );
   });
 
   it("throws ApiResponseError when getApplication responds with non-200", async () => {

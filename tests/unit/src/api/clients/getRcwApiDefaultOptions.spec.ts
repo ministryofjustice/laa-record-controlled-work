@@ -15,11 +15,16 @@ import { logger } from "#/logger.js";
 const ORIGINAL_NODE_ENV = process.env.NODE_ENV;
 const SESSION_ID = "session-id";
 const HOME_ACCOUNT_ID = "uid.tenant";
+const CORRELATION_ID = "test-correlation-id";
+
+let useMockAccessTokenStub: sinon.SinonStub;
+
 
 function createParams(
   overrides: Partial<RcwApiAuthParams> = {},
 ): RcwApiAuthParams {
   return {
+    correlationId: CORRELATION_ID,
     homeAccountId: HOME_ACCOUNT_ID,
     sessionId: SESSION_ID,
     ...overrides,
@@ -40,18 +45,46 @@ afterEach(() => {
 });
 
 describe("getRcwApiDefaultOptions", () => {
-  beforeEach(() => {
-    sinon.stub(config.api, "useMockAccessToken").value(false);
-  })
+beforeEach(() => {
+  useMockAccessTokenStub = sinon
+    .stub(config.api, "useMockAccessToken")
+    .value(false);
+});
+
+it("returns the bearer Authorization header without a correlation ID", async () => {
+  useMockAccessTokenStub.value(true);
+
+  const options = await getRcwApiDefaultOptions(createParams({correlationId: undefined}));
+
+  expect(options.headers).to.deep.equal({
+    Authorization: "Bearer test-access-token",
+  });
+});
+
+it("includes the correlation ID header when provided", async () => {
+  useMockAccessTokenStub.value(true);
+
+  const options = await getRcwApiDefaultOptions(
+    createParams({ correlationId: CORRELATION_ID }),
+  );
+
+  expect(options.headers).to.deep.equal({
+    Authorization: "Bearer test-access-token",
+    "X-Correlation-Id": CORRELATION_ID,
+  });
+});
 
   it("returns a bearer Authorization header in test environment", async () => {
     process.env.NODE_ENV = "test";
-    sinon.stub(config.api, "useMockAccessToken").value(true);
+    useMockAccessTokenStub.value(true);
 
-    const options = await getRcwApiDefaultOptions(createParams());
+    const options = await getRcwApiDefaultOptions(
+      createParams({ correlationId: CORRELATION_ID }),
+    );
 
     expect(options.headers).to.deep.equal({
       Authorization: "Bearer test-access-token",
+      "X-Correlation-Id": CORRELATION_ID,
     });
   });
 
@@ -110,6 +143,7 @@ describe("getRcwApiDefaultOptions", () => {
     ).to.be.true;
     expect(options.headers).to.deep.equal({
       Authorization: "Bearer downstream-access-token",
+      "X-Correlation-Id": CORRELATION_ID,
     });
   });
 

@@ -10,7 +10,7 @@ import { Office } from "#/journeys/select-office/select-office.types.js";
 
 const validOffice: Office = {
   address: "1 High Street, Leeds, LS1 1AA",
-  code: "LEEDS-01",
+  code: "AB12CD",
 };
 
 describe("loadSelectedOffice", () => {
@@ -46,11 +46,33 @@ describe("loadSelectedOffice", () => {
     expect(setData.called).to.equal(false);
   });
 
+  it("accepts a selected office containing only its code", () => {
+    const codeOnlyOffice = { code: "AB12CD" };
+    getSession.returns({ selectedOffice: codeOnlyOffice });
+
+    loadSelectedOffice()(context);
+
+    expect(
+      setData.calledWithExactly(
+        CONTEXT_DATA_KEYS.selectedOffice,
+        codeOnlyOffice,
+      ),
+    ).to.equal(true);
+  });
+
   it("throws InvalidSelectedOfficeError when selectedOffice in session fails schema validation", () => {
     sinon.stub(logger, "error");
     getSession.returns({
-      selectedOffice: { code: "LEEDS-01" }, // missing required fields
+      selectedOffice: { address: 123, code: "AB12CD" },
     });
+
+    expect(() => loadSelectedOffice()(context))
+      .to.throw(InvalidSelectedOfficeError);
+  });
+
+  it("throws InvalidSelectedOfficeError when selectedOffice code is not a string", () => {
+    sinon.stub(logger, "error");
+    getSession.returns({ selectedOffice: { code: 123 } });
 
     expect(() => loadSelectedOffice()(context))
       .to.throw(InvalidSelectedOfficeError);

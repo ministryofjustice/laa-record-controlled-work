@@ -2,6 +2,7 @@ import {
   Condition,
   Data,
   Format,
+  when,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 import {
   GovUKBody,
@@ -19,11 +20,24 @@ export const heading = GovUKHeading({
   text: t("pages.yourCases.heading"),
 });
 
+const selectedOfficeLabel = when(
+  Data(CONTEXT_DATA_KEYS.selectedOffice)
+    .path(OFFICE_KEY.address)
+    .match(Condition.IsRequired()),
+)
+  .then(
+    Format(
+      "%1 (%2)",
+      Data(CONTEXT_DATA_KEYS.selectedOffice).path(OFFICE_KEY.address),
+      Data(CONTEXT_DATA_KEYS.selectedOffice).path(OFFICE_KEY.code),
+    ),
+  )
+  .else(Data(CONTEXT_DATA_KEYS.selectedOffice).path(OFFICE_KEY.code));
+
 export const selectedOfficeSingle = GovUKBody({
   text: Format(
-    `<p class="govuk-body">${t("pages.yourCases.office")}: %1 (%2)</p>`,
-    Data(CONTEXT_DATA_KEYS.selectedOffice).path(OFFICE_KEY.address),
-    Data(CONTEXT_DATA_KEYS.selectedOffice).path(OFFICE_KEY.code),
+    `<p class="govuk-body">${t("pages.yourCases.office")}: %1</p>`,
+    selectedOfficeLabel,
   ),
   visibleWhen: Data(CONTEXT_DATA_KEYS.singleOffice).match(
     Condition.Equals(true),
@@ -32,9 +46,8 @@ export const selectedOfficeSingle = GovUKBody({
 
 export const selectedOfficeMultiple = GovUKBody({
   text: Format(
-    `<p class="govuk-body">${t("pages.yourCases.office")}: %1 (%2) <a class="govuk-link govuk-!-margin-left-2" href="/select-office/">${t("common.change")}</a></p>`,
-    Data(CONTEXT_DATA_KEYS.selectedOffice).path(OFFICE_KEY.address),
-    Data(CONTEXT_DATA_KEYS.selectedOffice).path(OFFICE_KEY.code),
+    `<p class="govuk-body">${t("pages.yourCases.office")}: %1 <a class="govuk-link govuk-!-margin-left-2" href="/select-office/">${t("common.change")}</a></p>`,
+    selectedOfficeLabel,
   ),
   visibleWhen: Data(CONTEXT_DATA_KEYS.singleOffice).match(
     Condition.Equals(false),
