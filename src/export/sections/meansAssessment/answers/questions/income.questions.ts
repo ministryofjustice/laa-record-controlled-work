@@ -9,12 +9,11 @@ import {
 } from "#/export/sections/meansAssessment/answers/answers.selections.js";
 import { incomeFrequencies } from "#/export/sections/meansAssessment/answers/questions/frequencies.js";
 import { isIncomeAssessmentRelevant } from "#/export/sections/meansAssessment/answers/questions/question.helpers.js";
-import { STATUTORY_PAY_INCOME_TYPE } from "#/export/sections/meansAssessment/calculations/calculations.constants.js";
 
 const incomeTypes = {
   employment: "income.types.employment",
   self_employment: "income.types.selfEmployment",
-  [STATUTORY_PAY_INCOME_TYPE]: "income.types.statutoryPay",
+  statutory_pay: "income.types.statutoryPay",
 };
 
 /**

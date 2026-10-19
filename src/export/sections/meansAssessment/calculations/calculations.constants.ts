@@ -11,6 +11,3 @@ export const DEPENDANT_MONTHLY_ALLOWANCE_HINT = "£381.86";
 
 // CCQ CfeResult#raw_total_calculated_capital floors this display value at zero.
 export const MINIMUM_ASSESSED_CAPITAL = 0;
-
-// CCQ ChildcareEligibilityService#in_work? excludes this income type.
-export const STATUTORY_PAY_INCOME_TYPE = "statutory_pay";

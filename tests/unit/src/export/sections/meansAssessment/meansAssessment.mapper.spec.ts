@@ -108,7 +108,7 @@ describe("toMeansAssessmentSection", () => {
     });
     expect(breakdown?.tables[0]?.rows[1]?.[0]).to.deep.equal({
       classes: "app-calculation__row-heading",
-      html: 'Benefits received<span class="govuk-hint govuk-!-margin-bottom-0">This does not include Housing Benefit</span>',
+      html: 'Benefits received <span class="govuk-hint govuk-!-margin-bottom-0">This does not include Housing Benefit</span>',
     });
     expect(breakdown?.tables[1]?.rows[0]?.map((cell) => cell.classes)).to.deep.equal([
       "app-calculation__row-heading app-calculation__cell--emphasis",

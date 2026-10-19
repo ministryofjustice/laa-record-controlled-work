@@ -6,7 +6,6 @@ import {
   client,
   partner,
 } from "#/export/sections/meansAssessment/answers/answers.selections.js";
-import { STATUTORY_PAY_INCOME_TYPE } from "#/export/sections/meansAssessment/calculations/calculations.constants.js";
 
 /**
  * Determines whether either dependant branch is active.
@@ -91,7 +90,7 @@ function qualifiesForChildcare(
     (answer.employmentStatus(answers) === "in_work" &&
       answer
         .employmentIncomes(answers)
-        ?.some((income) => income.income_type !== STATUTORY_PAY_INCOME_TYPE) ===
-        true)
+        // CCQ ChildcareEligibilityService#in_work? excludes this income type.
+        ?.some((income) => income.income_type !== "statutory_pay") === true)
   );
 }
