@@ -87,7 +87,7 @@ describe("Check answers step", () => {
         value: row.value.text,
       }));
 
-      expect(rows.length).to.equal(14);
+      expect(rows.length).to.equal(15);
       expect(rows).to.deep.include.members([
         { key: "ECF", value: "No" },
         { key: "Type of family law", value: "Private" },

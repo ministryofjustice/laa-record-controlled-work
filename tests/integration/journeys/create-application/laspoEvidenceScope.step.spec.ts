@@ -33,7 +33,7 @@ describe("LASPO Evidence Scope step", () => {
 
     it("renders all radio options", () => {
       const buttons = radioInput.properties.items as { text: string, value: string }[];
-      expect(buttons.length).to.equal(5);
+      expect(buttons.length).to.equal(6); // counts the "or" row even though it is not a selectable option
       expect(buttons).to.have.deep.include.members([
         { text: "Evidence of domestic abuse (Schedule 1)", value: "domesticAbuse" },
         { text: "Evidence of child abuse (Schedule 2)", value: "childAbuse" },
