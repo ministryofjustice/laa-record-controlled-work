@@ -43,6 +43,7 @@ const CLIENT_DETAILS = {
     familyLawClassification: FamilyLawClassification.enum.private,
     laspoEvidenceScope: PrivateFamilyCaseScope.enum.domesticAbuse,
     needsAdviceOnEUOrInternationalMaintenance: false,
+    needsProtectiveInjunction: false,
     priorLegalAid: PriorLegalAid.enum.no,
   },
 };
