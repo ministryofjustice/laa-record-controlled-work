@@ -41,10 +41,10 @@ const CLIENT_DETAILS = {
   },
   scopingQuestions: {
     familyLawClassification: FamilyLawClassification.enum.private,
-    privateFamilyCaseScope: PrivateFamilyCaseScope.enum.domesticAbuse,
     needsAdviceOnEUOrInternationalMaintenance: false,
     needsProtectiveInjunction: false,
     priorLegalAid: PriorLegalAid.enum.no,
+    privateFamilyCaseScope: PrivateFamilyCaseScope.enum.domesticAbuse,
   },
 };
 
