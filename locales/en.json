@@ -111,6 +111,36 @@
               "housing": "Housing payments",
               "dependantsAllowance": "Dependants allowance"
             }
+          },
+          "capital": {
+            "heading": "Capital calculation",
+            "unavailable": "Capital calculation details are unavailable.",
+            "clientPropertyDescription": "The calculations below assess the value of any property the client owns.",
+            "partnerPropertyDescription": "The calculations below assess the value of any property the client and their partner own.",
+            "clientTotalDescription": "The assessed values are used to calculate the total disposable capital for your client.",
+            "partnerTotalDescription": "The assessed values are used to calculate the total disposable capital for your client and their partner.",
+            "tables": {
+              "mainHome": "Home client lives in",
+              "clientAdditional": "Client other property {counter}",
+              "partnerAdditional": "Partner other property {counter}"
+            },
+            "rows": {
+              "value": "Estimated value",
+              "additionalValue": "Value",
+              "mortgage": "Outstanding mortgage",
+              "transactionAllowance": "Deductions",
+              "smodAllowance": "Disputed asset disregard",
+              "mainHomeDisregard": "Disregards",
+              "otherDisregards": "Other disregards",
+              "netEquity": "{percentage}% share of home equity",
+              "assessedValue": "Assessed value",
+              "partialClientHint": "Client’s {percentage}% share of home equity",
+              "partialPartnerHint": "Partner’s {percentage}% share of home equity"
+            },
+            "hints": {
+              "transactionAllowance": "3% of property value deducted for cost of sale",
+              "mainHomeDisregard": "Applied to the home equity and capped at £100,000"
+            }
           }
         },
         "sections": {
