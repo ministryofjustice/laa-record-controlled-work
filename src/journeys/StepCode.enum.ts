@@ -9,6 +9,5 @@ export enum StepCode {
   LEGAL_AID_BEFORE = "legal-aid-before",
   LEGAL_AID_LAST_6_MONTHS = "legal-aid-last-6-months",
   LETTER_FROM_LOCAL_AUTHORITY = "letter-from-local-authority",
-  PRIVATE_FAMILY_CASE_SCOPE = "private-family-case-scope",
   PROTECT_THEMSELF = "protect-themself",
 }
