@@ -56,7 +56,7 @@ test("Edit Application - Client details journey", async ({
   await expect(rows.locator(".govuk-summary-list__value")).toContainText(
     [
       // ECF
-      "INCOMPLETE",
+      "Incomplete",
       // Type of family law
       "Private",
       // Transitional EU arrangements or an international maintenance agreement
@@ -80,6 +80,7 @@ test("Edit Application - Client details journey", async ({
       }),
       // National insurance number
       clientDetailsApplication.clientDetails.niNumber ?? "",
+      "Yes",
       // Address
       clientDetailsApplication.clientDetails.address?.addressLine1 ?? "",
     ],
@@ -139,8 +140,8 @@ for (const viewport of [
     const injunction = rows.filter({
       has: page.getByText("Legal aid to get a protective injunction order", { exact: true }),
     });
-    await expect(ecf.locator(".govuk-tag")).toHaveText("INCOMPLETE");
-    await expect(injunction.locator(".govuk-tag")).toHaveText("INCOMPLETE");
+    await expect(ecf.locator(".govuk-tag")).toHaveText("Incomplete");
+    await expect(injunction.locator(".govuk-tag")).toHaveText("Incomplete");
     await page.getByRole("button", { name: "Save and continue" }).click();
     await expect(page).toHaveURL(path);
     await expect(page.locator(".govuk-error-summary")).toContainText(
@@ -152,7 +153,7 @@ for (const viewport of [
     await expect(page.locator(".govuk-error-summary")).toHaveCount(0);
 
     await answerNoFromSummaryRow(page, injunction, path);
-    await expect(page.locator(".govuk-tag").filter({ hasText: "INCOMPLETE" })).toHaveCount(0);
+    await expect(page.locator(".govuk-tag").filter({ hasText: "Incomplete" })).toHaveCount(0);
 
     await rows.filter({ has: page.getByText("Type of family law", { exact: true }) })
       .getByRole("link", { name: /Change/ }).click();
@@ -161,9 +162,9 @@ for (const viewport of [
     await expect(page).toHaveURL(path);
     await expect(injunction).toHaveCount(0);
     const care = rows.filter({ has: page.locator('a[href="care-proceedings?returnTo=check-answers"]') });
-    await expect(care.locator(".govuk-tag")).toHaveText("INCOMPLETE");
+    await expect(care.locator(".govuk-tag")).toHaveText("Incomplete");
     await answerNoFromSummaryRow(page, care, path);
-    await expect(page.locator(".govuk-tag").filter({ hasText: "INCOMPLETE" })).toHaveCount(0);
+    await expect(page.locator(".govuk-tag").filter({ hasText: "Incomplete" })).toHaveCount(0);
 
     const nationalInsurance = rows.filter({
       has: page.getByText("National Insurance number", { exact: true }),
