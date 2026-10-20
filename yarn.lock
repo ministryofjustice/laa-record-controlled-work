@@ -4873,15 +4873,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"i18next@npm:^26.4.3":
-  version: 26.4.3
-  resolution: "i18next@npm:26.4.3"
+"i18next@npm:^26.4.4":
+  version: 26.4.4
+  resolution: "i18next@npm:26.4.4"
   peerDependencies:
     typescript: ^5 || ^6 || ^7
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: 10c0/099480c24c18039d78c9cadb04cdcb24a2aca579a21678bfdde89a2007c7109cc41afc34d74ede73aed6fa51fa3ee44752dc042b9e10e144fe13d367a777ed40
+  checksum: 10c0/7d94bb6cea2bdbf293547565d565b12fb0f2a24f462f06f6cc1cd08367f14cc36bd488c7abb01d2b9b827bd46e7d4b0713b44543f7ed0c43f32d1371f85dd305
   languageName: node
   linkType: hard
 
@@ -5362,7 +5362,7 @@ __metadata:
     globals: "npm:^17.13.0"
     govuk-frontend: "npm:^6.5.1"
     helmet: "npm:^8.3.0"
-    i18next: "npm:^26.4.3"
+    i18next: "npm:^26.4.4"
     knip: "npm:^6.41.0"
     mocha: "npm:^12.0.3"
     moment: "npm:^2.31.0"
