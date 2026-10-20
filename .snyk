@@ -11,6 +11,11 @@ version: v1.25.0
 #         expires: "YYYY-MM-DDT00:00:00.000Z" 
 
 ignore:
+  SNYK-JS-PICOMATCH-21248802:
+    - "*":
+        reason: >
+          No fixed picomatch release available.
+        expires: "2026-11-02T08:00:00.000Z"
   SNYK-JS-ZOD-20510278:
     - "*":
         reason: >
