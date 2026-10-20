@@ -3,10 +3,7 @@ import type { AnswerSelection } from "#/export/sections/meansAssessment/answers/
 /** Selectors for the client fields saved by CCQ. */
 export const client: AnswerSelection = {
   additionalProperties: (answers) => answers.additional_properties ?? [],
-  additionalPropertyOwned: (answers) => {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- CCQ validates completed ownership answers.
-    return answers.additional_property_owned!;
-  },
+  additionalPropertyOwned: (answers) => answers.additional_property_owned,
   assets: {
     bankAccounts: (answers) => answers.bank_accounts,
     investments: {
@@ -78,10 +75,8 @@ export const client: AnswerSelection = {
 export const partner: AnswerSelection = {
   additionalProperties: (answers) =>
     answers.partner_additional_properties ?? [],
-  additionalPropertyOwned: (answers) => {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- CCQ validates completed partner ownership answers.
-    return answers.partner_additional_property_owned!;
-  },
+  additionalPropertyOwned: (answers) =>
+    answers.partner_additional_property_owned,
   assets: {
     bankAccounts: (answers) => answers.partner_bank_accounts,
     investments: {

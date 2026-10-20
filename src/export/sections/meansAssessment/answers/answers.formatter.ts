@@ -29,19 +29,24 @@ export function formatAnswer<TAnswerContext>(
     case "choice":
     case "frequency": {
       const value = question.select(answerContext, index);
+      if (value === null || value === undefined) {
+        return question.kind === "choice"
+          ? t("pages.export.notProvided")
+          : meansAssessment.t("notApplicable");
+      }
       return meansAssessment.t(question.choices[value]);
     }
-    case "gbp": {
-      const value = question.select(answerContext, index);
-      return formatGBP(value);
-    }
+    case "gbp":
     case "percentage": {
       const value = question.select(answerContext, index);
-      return `${String(value)}%`;
+      if (value === null || value === undefined) {
+        return meansAssessment.t("notApplicable");
+      }
+      return question.kind === "gbp" ? formatGBP(value) : `${String(value)}%`;
     }
     case "text": {
       const value = question.select(answerContext, index);
-      return value;
+      return value ?? meansAssessment.t("notApplicable");
     }
   }
 }

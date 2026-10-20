@@ -25,6 +25,7 @@
       "referenceNumber": "Reference number",
       "meansAssessment": {
         "heading": "Means assessment",
+        "notApplicable": "Not applicable",
         "yourAnswers": "Your answers",
         "totalsHeading": "Your client's key eligibility totals",
         "outcomes": {

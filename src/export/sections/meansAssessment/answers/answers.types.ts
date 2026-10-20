@@ -29,7 +29,7 @@ export interface QuestionSection<TAnswerContext> {
 type AnswerSelector<TAnswerContext, TValue> = (
   answerContext: TAnswerContext,
   index: number,
-) => TValue;
+) => null | TValue | undefined;
 
 interface BooleanQuestionFormat<TAnswerContext> {
   kind: "boolean";

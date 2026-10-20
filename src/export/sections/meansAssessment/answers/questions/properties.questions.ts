@@ -72,46 +72,42 @@ function toAdditionalPropertySections(params: {
         kind: "gbp",
         label: "housing.additionalProperties.houseValue",
         select: (answers, index) =>
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- CCQ validates saved property values.
-          answer.additionalProperties(answers)[index].house_value!,
+          answer.additionalProperties(answers)[index]?.house_value,
       },
       {
         isRelevant: (_answers, _context, index) => index > FIRST_PROPERTY_INDEX,
         kind: "boolean",
         label: "housing.additionalProperties.inlineMortgage",
         select: (answers, index) =>
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- CCQ validates inline ownership on later entries.
           answer.additionalProperties(answers)[index]
-            .inline_owned_with_mortgage!,
+            ?.inline_owned_with_mortgage,
       },
       {
         isRelevant: (answers, _context, index) =>
           index === FIRST_PROPERTY_INDEX
             ? answer.additionalPropertyOwned(answers) === "with_mortgage"
             : answer.additionalProperties(answers)[index]
-                .inline_owned_with_mortgage === true,
+                ?.inline_owned_with_mortgage === true,
         kind: "gbp",
         label: "housing.additionalProperties.mortgage",
         select: (answers, index) =>
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- CCQ validates mortgage amounts when applicable.
-          answer.additionalProperties(answers)[index].mortgage!,
+          answer.additionalProperties(answers)[index]?.mortgage,
       },
       {
         kind: "percentage",
         label: labels.percentageOwned,
         select: (answers, index) =>
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- CCQ validates saved ownership shares.
-          answer.additionalProperties(answers)[index].percentage_owned!,
+          answer.additionalProperties(answers)[index]?.percentage_owned,
       },
       {
         isRelevant: (answers, _context, index) =>
           answer.isDisputeApplicable(answers) &&
-          answer.additionalProperties(answers)[index].house_in_dispute === true,
+          answer.additionalProperties(answers)[index]?.house_in_dispute ===
+            true,
         kind: "boolean",
         label: "housing.additionalProperties.disputedAsset",
         select: (answers, index) =>
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- CCQ persists applicable dispute markers.
-          answer.additionalProperties(answers)[index].house_in_dispute!,
+          answer.additionalProperties(answers)[index]?.house_in_dispute,
       },
     ],
   };

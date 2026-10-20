@@ -13,7 +13,7 @@ import type { EligibilityDataProperty } from "#/api/clients/rcw/model/eligibilit
 
 export interface AnswerSelection {
   additionalProperties: SavedAdditionalPropertiesSelector;
-  additionalPropertyOwned: SavedStringSelector;
+  additionalPropertyOwned: SavedNullableStringSelector;
   assets: AssetAnswerSelectors;
   benefits: SavedBenefitsSelector;
   employmentIncomes: SavedEmploymentIncomesSelector;
@@ -64,8 +64,6 @@ type SavedNullableNumberSelector = (
 type SavedNullableStringSelector = (
   answers: EligibilityData,
 ) => null | string | undefined;
-
-type SavedStringSelector = (answers: EligibilityData) => string;
 
 export const propertyOwnershipChoices = {
   none: "housing.property.ownership.none",

@@ -4,6 +4,7 @@ import { before, describe, it } from "mocha";
 import type { EligibilityData } from "#/api/clients/rcw/model/eligibilityData.zod.gen.js";
 
 import { answerCards } from "#tests/unit/src/export/sections/meansAssessment/answers/answers.fixtures.js";
+import { additionalPropertyQuestionSections } from "#/export/sections/meansAssessment/answers/questions/properties.questions.js";
 import { toMeansAssessmentSection } from "#/export/sections/meansAssessment/meansAssessment.mapper.js";
 import { initializeI18nextSync } from "#/lib/i18n.js";
 import { getGetApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
@@ -41,6 +42,121 @@ function propertySummaries(overrides: Partial<EligibilityData> = {}) {
 
 describe("saved additional property answers", () => {
   before(initializeI18nextSync);
+
+  for (const { name, value } of [
+    { name: "null", value: null },
+    { name: "undefined", value: undefined },
+  ]) {
+    const property = {
+      house_in_dispute: value,
+      house_value: value,
+      inline_owned_with_mortgage: value,
+      mortgage: value,
+      percentage_owned: value,
+    };
+
+    it(`preserves ${name} answers in every property selector`, () => {
+      const answers = {
+        ...BASE_ANSWERS,
+        additional_properties: [property],
+        additional_property_owned: value,
+        partner_additional_properties: [property],
+        partner_additional_property_owned: value,
+      };
+
+      for (const { questions } of additionalPropertyQuestionSections) {
+        for (const question of questions) {
+          expect(question.select(answers, 0)).to.equal(value);
+        }
+      }
+    });
+
+    it(`handles ${name} property lists without creating detail cards`, () => {
+      const answers = {
+        additional_properties: value,
+        additional_property_owned: "with_mortgage",
+        partner: true,
+        partner_additional_properties: value,
+        partner_additional_property_owned: "with_mortgage",
+      };
+
+      for (const { questions } of additionalPropertyQuestionSections) {
+        for (const question of questions) {
+          if (question.kind !== "choice") {
+            expect(question.select(answers, 0)).to.equal(undefined);
+          }
+        }
+      }
+      expect(
+        propertySummaries(answers).map(({ heading }) => heading),
+      ).to.deep.equal(["Client other property", "Partner other property"]);
+    });
+
+    it(`formats ${name} property values as CCQ does for both owners`, () => {
+      expect(
+        propertySummaries({
+          additional_properties: [property, property],
+          additional_property_owned: "with_mortgage",
+          partner: true,
+          partner_additional_properties: [property, property],
+          partner_additional_property_owned: "with_mortgage",
+        })
+          .filter(({ heading }) => heading.endsWith("details"))
+          .map(({ heading, rows }) => ({
+            heading,
+            values: rows.map(({ value: answer }) => answer),
+          })),
+      ).to.deep.equal([
+        {
+          heading: "Client other property 1 details",
+          values: ["Not applicable", "Not applicable", "Not applicable"],
+        },
+        {
+          heading: "Client other property 2 details",
+          values: ["Not applicable", "No", "Not applicable"],
+        },
+        {
+          heading: "Partner other property 1 details",
+          values: ["Not applicable", "Not applicable", "Not applicable"],
+        },
+        {
+          heading: "Partner other property 2 details",
+          values: ["Not applicable", "No", "Not applicable"],
+        },
+      ]);
+    });
+
+    it(`shows ${name} ownership as not provided and hides saved entries`, () => {
+      expect(
+        propertySummaries({
+          additional_properties: [property],
+          additional_property_owned: value,
+          partner: true,
+          partner_additional_properties: [property],
+          partner_additional_property_owned: value,
+        }),
+      ).to.deep.equal([
+        {
+          heading: "Client other property",
+          rows: [
+            {
+              key: "Does your client own any other property, a holiday home or land?",
+              value: "Not provided",
+            },
+          ],
+        },
+        {
+          heading: "Partner other property",
+          rows: [
+            {
+              key: "Does the partner own any other property, a holiday home or land?",
+              value: "Not provided",
+            },
+          ],
+        },
+      ]);
+    });
+  }
 
   it("preserves client property order and uses the first selector before inline mortgage answers", () => {
     expect(

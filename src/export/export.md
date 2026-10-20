@@ -27,6 +27,8 @@ Entered answers come from `eligibility.data`; saved calculations come from `elig
 
 Asset summaries retain saved bank-account order and zero balances, then show relevant investments and valuables for the client and any present partner. Dispute annotations follow CCQ's applicable controls. Vehicles are omitted because RCW exports controlled-work journeys only. CCQ owns answer validation; RCW formats trusted saved answers without validating or recalculating them.
 
+Question selectors may return `null` or `undefined` when an answer is absent. Formatting follows CCQ: missing choices show "Not provided"; missing amounts, percentages, frequencies, and text show "Not applicable". Missing booleans display "No", matching CCQ's yes/no helper. Saved zero values and explicit `false` answers are preserved.
+
 Expected mapper states use synthetic fixtures: `meansAssessmentRequired: false` returns no section even if stored answers/results say passported and eligible; a supported `eligible` or `contribution_required` result with a valid calculated category is ready, while missing, malformed, unknown, or overall-ineligible results are unavailable. An eligible result with no calculation categories is ready only when saved answers indicate passporting, asylum support with immigration/asylum, or the controlled-work under-18 no-means-test route (`passporting`, `immigration_or_asylum`, `asylum_support`, `client_age`, `controlled_legal_representation`, `aggregated_means`, `regular_income`, and `under_eighteen_assets`); its categories remain `not_calculated`. Zero and pence values are copied unchanged, and ordinary assessments with no calculated categories are unavailable.
 
 ## Means assessment modules
