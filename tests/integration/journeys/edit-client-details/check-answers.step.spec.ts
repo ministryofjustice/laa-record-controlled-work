@@ -221,7 +221,10 @@ describe("Edit client details check answers step", () => {
   describe("Incomplete saved details", () => {
     const complete = ApplicationDto.toAnswers(ukApplication);
     it("renders completed text safely beside incomplete tags", async () => {
-      const session = { journeyDrafts: { [draftKey]: {
+      // TODO: why is there HTML in the parameter?
+      const session = {
+        journeyDrafts: {
+          [draftKey]: {
         ...complete, firstName: "<b>Client</b>", ecf: undefined,
       } } };
       const result = await editApplicationClient.get(

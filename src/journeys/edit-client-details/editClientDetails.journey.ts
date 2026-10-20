@@ -19,6 +19,11 @@ import { JourneyCode } from "#/journeys/JourneyCode.enum.js";
 
 const editJourneyCode = JourneyCode.EDIT_CLIENT_DETAILS;
 
+// TODO: direct entry disables Forge's answer clearing for
+// unreachable branches. Figure out if this is the right way
+// to enable editing.
+// TODO: this map needs refactoring so that steps have a
+// reachability override.
 const stepsDirectlyEnterableWhileEditing = [
   ecfStep(editJourneyCode),
   familyLawClassificationStep(editJourneyCode),
