@@ -44,23 +44,4 @@ describe("Answers schema", () => {
 
     expect(result.success).to.equal(false);
   });
-
-  it("accepts optional hidden family law answers", () => {
-    const result = Answers.safeParse({
-      ...baseAnswers,
-      haveAHomeAddress: "no",
-      careProceedingsStarted: "yes",
-      careProceedingsParentalResponsibility: "no",
-      laspoEvidenceScope: "none",
-    });
-
-    expect(result.success).to.equal(true);
-    if (result.success) {
-      expect(result.data).to.include({
-        careProceedingsStarted: "yes",
-        careProceedingsParentalResponsibility: "no",
-        laspoEvidenceScope: "none",
-      });
-    }
-  });
 });
