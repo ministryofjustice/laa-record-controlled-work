@@ -1,11 +1,18 @@
 import * as Sentry from "@sentry/node";
 import { expect } from "chai";
 
-import { createSentryOptions } from "#/app/middleware/sentry.middleware.js";
+import {
+  createBrowserSentryOptions,
+  createSentryOptions,
+} from "#/app/middleware/sentry.middleware.js";
 
 const ENVIRONMENT_KEYS = [
   "SENTRY_ENABLED",
   "SENTRY_DSN",
+  "SENTRY_ENV",
+  "SENTRY_KEY",
+  "SENTRY_PROJECT",
+  "SENTRY_RELEASE",
   "SENTRY_LOGGING_ENABLED",
   "SENTRY_TRACING_ENABLED",
   "SENTRY_TRACES_SAMPLE_RATE",
@@ -31,6 +38,31 @@ describe("Sentry middleware", () => {
         process.env[key] = value;
       }
     }
+  });
+
+  it("omits browser configuration when Sentry is disabled", () => {
+    process.env.SENTRY_ENABLED = "false";
+    expect(createBrowserSentryOptions()).to.be.undefined;
+  });
+
+  it("omits browser configuration when no DSN is configured", () => {
+    process.env.SENTRY_ENABLED = "true";
+    delete process.env.SENTRY_DSN;
+    delete process.env.SENTRY_KEY;
+    delete process.env.SENTRY_PROJECT;
+    expect(createBrowserSentryOptions()).to.be.undefined;
+  });
+
+  it("exposes only the public DSN and deployment metadata to the browser", () => {
+    process.env.SENTRY_ENABLED = "true";
+    process.env.SENTRY_DSN = "https://example@sentry.io/123";
+    process.env.SENTRY_ENV = "test";
+    process.env.SENTRY_RELEASE = "test-release";
+    expect(createBrowserSentryOptions()).to.deep.equal({
+      dsn: "https://example@sentry.io/123",
+      environment: "test",
+      release: "test-release",
+    });
   });
 
   it("enables logging and tracing by default", () => {
