@@ -122,7 +122,11 @@
             "tables": {
               "mainHome": "Home client lives in",
               "clientAdditional": "Client other property {counter}",
-              "partnerAdditional": "Partner other property {counter}"
+              "partnerAdditional": "Partner other property {counter}",
+              "clientDisposableCapital": "Client's disposable capital",
+              "partnerDisposableCapital": "Partner's disposable capital",
+              "pensionerDisregard": "60 or over disregard (also known as pensioner disregard)",
+              "total": "Total"
             },
             "rows": {
               "value": "Estimated value",
@@ -135,11 +139,26 @@
               "netEquity": "{percentage}% share of home equity",
               "assessedValue": "Assessed value",
               "partialClientHint": "Client’s {percentage}% share of home equity",
-              "partialPartnerHint": "Partner’s {percentage}% share of home equity"
+              "partialPartnerHint": "Partner’s {percentage}% share of home equity",
+              "property": "Assessed property value",
+              "liquid": "Money in bank accounts",
+              "nonLiquid": "Investments and valuables",
+              "totalCapital": "Total capital",
+              "smodNonPropertyDisregard": "Disputed asset disregard",
+              "pensionerDisregard": "60 or over disregard (also known as pensioner disregard)",
+              "disposableCapital": "Disposable capital",
+              "combinedDisposableCapital": "Total client and partner disposable capital",
+              "combinedAssessedCapital": "Total assessed disposable capital",
+              "upperThreshold": "Disposable capital upper limit"
             },
             "hints": {
               "transactionAllowance": "3% of property value deducted for cost of sale",
-              "mainHomeDisregard": "Applied to the home equity and capped at £100,000"
+              "mainHomeDisregard": "Applied to the home equity and capped at £100,000",
+              "smodDisregard": "Equal to the assessed value of all assets marked as disputed and capped at £100,000",
+              "smodDisregardAlt": "Equal to the assessed value of all assets marked as disputed and capped at £100,000",
+              "pensionerDisregard": "Applied to total capital up to a maximum of £100,000",
+              "pensionerDisregardAlt": "Applied to remaining capital after disputed asset disregard has been applied, and up to a maximum of £100,000",
+              "pensionerTable": "Applied to the total of the client and partner's disposable capital, and capped at £100,000."
             }
           }
         },

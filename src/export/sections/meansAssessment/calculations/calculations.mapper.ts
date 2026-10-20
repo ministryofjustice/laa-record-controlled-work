@@ -8,10 +8,8 @@ import type {
 } from "#/export/sections/meansAssessment/calculations/calculations.types.js";
 
 import { ClientAgeRange } from "#/api/eligibility/eligibility.types.js";
-import {
-  CFE_MAX_VALUE,
-  MINIMUM_ASSESSED_CAPITAL,
-} from "#/export/sections/meansAssessment/calculations/calculations.constants.js";
+import { CFE_MAX_VALUE } from "#/export/sections/meansAssessment/calculations/calculations.constants.js";
+import { floorCombinedAssessedCapital } from "#/export/sections/meansAssessment/calculations/calculations.helpers.js";
 import {
   MeansAssessmentStatus,
   MeansAssessmentTotalField,
@@ -181,11 +179,8 @@ function toCategory(
 
   const total = category[totalKey];
   let mappedTotal = total ?? null;
-  if (
-    mappedTotal !== null &&
-    totalKey === MeansAssessmentTotalField.CombinedAssessedCapital
-  ) {
-    mappedTotal = Math.max(mappedTotal, MINIMUM_ASSESSED_CAPITAL);
+  if (totalKey === MeansAssessmentTotalField.CombinedAssessedCapital) {
+    mappedTotal = floorCombinedAssessedCapital(mappedTotal);
   }
 
   return {

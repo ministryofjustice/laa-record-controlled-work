@@ -118,6 +118,41 @@ const meansAssessmentData = {
           },
         ],
       },
+      {
+        heading: "Client's disposable capital",
+        hint: null,
+        rows: [
+          { amount: "£12,345.67", heading: "Assessed property value", hint: null },
+          { amount: "£2,000.00", heading: "Money in bank accounts", hint: null },
+          { amount: "£14,345.67", emphasis: true, heading: "Disposable capital", hint: null },
+        ],
+      },
+      {
+        heading: "Partner's disposable capital",
+        hint: null,
+        rows: [
+          { amount: "£4,500.00", heading: "Assessed property value", hint: null },
+          { amount: "£400.00", heading: "Money in bank accounts", hint: null },
+          { amount: "£4,900.00", emphasis: true, heading: "Disposable capital", hint: null },
+        ],
+      },
+      {
+        heading: "60 or over disregard (also known as pensioner disregard)",
+        hint: "Applied to the total of the client and partner's disposable capital, and capped at £100,000.",
+        rows: [
+          { amount: "£20,000.00", heading: "Total client and partner disposable capital", hint: null },
+          { amount: "-£500.00", heading: "60 or over disregard (also known as pensioner disregard)", hint: null },
+          { amount: "£19,500.00", emphasis: true, heading: "Total assessed disposable capital", hint: null },
+        ],
+      },
+      {
+        heading: "Total",
+        hint: null,
+        rows: [
+          { amount: "£19,500.00", emphasis: true, heading: "Total assessed disposable capital", hint: null },
+          { amount: "£300,000.00", heading: "Disposable capital upper limit", hint: null },
+        ],
+      },
     ],
   },
   incomeBreakdown: {
@@ -418,6 +453,14 @@ describe("export application view", () => {
     expect(response.text).to.match(
       /<td class="govuk-table__cell app-calculation__amount">\s*£300,000\.00\s*<\/td>/,
     );
+    expect(response.text).to.match(
+      /<caption[^>]*>Client&#39;s disposable capital<\/caption>/,
+    );
+    expect(response.text).to.match(
+      /<th scope="row" class="govuk-table__header app-calculation__row-heading app-calculation__cell--emphasis">\s*Disposable capital/,
+    );
+    expect(response.text).to.include("Total client and partner disposable capital");
+    expect(response.text).to.include("Applied to the total of the client and partner&#39;s disposable capital");
     expect(response.text.indexOf("Outgoings calculation")).to.be.lessThan(
       response.text.indexOf("Capital calculation"),
     );

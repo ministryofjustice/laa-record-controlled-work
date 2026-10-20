@@ -5,6 +5,7 @@ export type MeansAssessmentCalculationBreakdown =
   | {
       description?: string[];
       heading: string;
+      message?: null | string;
       status: "ready";
       tables: MeansAssessmentCalculationTable[];
     }

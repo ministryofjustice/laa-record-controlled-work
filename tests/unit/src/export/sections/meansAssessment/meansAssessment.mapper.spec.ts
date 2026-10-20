@@ -96,7 +96,7 @@ describe("toMeansAssessmentSection", () => {
           "The assessed values are used to calculate the total disposable capital for your client.",
         ],
         heading: "Capital calculation",
-        message: null,
+        message: "Capital calculation details are unavailable.",
         tables: [],
       },
     ]);
