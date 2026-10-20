@@ -8,6 +8,7 @@ import type { EditApplicationContext } from "#/journeys/edit-application/editApp
 import { ApplicationDto } from "#/api/dto/application/application.dto.js";
 import { loadApplicationAsAnswers } from "#/journeys/edit-client-details/effects/loadApplicationAsAnswers.js";
 import { CONTEXT_DATA_KEYS, PARAMS_KEYS } from "#/journeys/journey.constants.js";
+import { AnswersOutput } from "#/journeys/create-application/data/answers.zod.js";
 
 describe("loadApplicationAsAnswers", () => {
   const journeyCode = "editClientDetails";
@@ -18,7 +19,7 @@ describe("loadApplicationAsAnswers", () => {
     careProceedingsParentalResponsibility: "no",
     firstName: "Jane",
     hasNINumber: "no",
-  } as ReturnType<typeof ApplicationDto.toAnswers>;
+  } as Partial<AnswersOutput>;
 
   let context: EditApplicationContext;
   let getData: sinon.SinonStub;
