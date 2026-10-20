@@ -42,7 +42,7 @@ test("Edit Application - Client details journey", async ({
       // Transitional EU arrangements or an international maintenance agreement
       "No",
       // Needs protective injunction
-      "INCOMPLETE",
+      "No",
       "Evidence of domestic abuse (Schedule 1)",
       // Accessed legal aid before
       "No",

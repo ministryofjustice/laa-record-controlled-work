@@ -62,7 +62,7 @@ function saveNeedsProtectiveInjunction(journeyCode: string): SubmitHook {
       next: [
         redirectToCheckAnswers,
         redirectToLegalAidBefore,
-        redirectToPrivateFamilyCaseScope,
+        redirectToLaspoEvidenceScope,
       ],
     },
     validate: true,
@@ -76,7 +76,7 @@ const redirectToLegalAidBefore = redirect({
   ),
 });
 
-const redirectToPrivateFamilyCaseScope = redirect({
+const redirectToLaspoEvidenceScope = redirect({
   goto: "prove-in-scope",
   when: Answer(AnswerKey.needsProtectiveInjunction).match(
     Condition.Equals("no"),

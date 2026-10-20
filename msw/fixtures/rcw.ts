@@ -2,8 +2,8 @@
 import { faker } from "@faker-js/faker";
 
 import { FamilyLawClassification } from "#/api/clients/rcw/model/familyLawClassification.zod.gen.js";
+import { LaspoEvidenceScope } from "#/api/clients/rcw/model/laspoEvidenceScope.zod.gen.js";
 import { PriorLegalAid } from "#/api/clients/rcw/model/priorLegalAid.zod.gen.js";
-import { PrivateFamilyCaseScope } from "#/api/clients/rcw/model/privateFamilyCaseScope.zod.gen.js";
 import {
   getCreateApplicationResponseMock,
   getGetApplicationResponseMock,
@@ -41,10 +41,10 @@ const CLIENT_DETAILS = {
   },
   scopingQuestions: {
     familyLawClassification: FamilyLawClassification.enum.private,
+    laspoEvidenceScope: LaspoEvidenceScope.enum.domesticAbuse,
     needsAdviceOnEUOrInternationalMaintenance: false,
     needsProtectiveInjunction: false,
     priorLegalAid: PriorLegalAid.enum.no,
-    privateFamilyCaseScope: PrivateFamilyCaseScope.enum.domesticAbuse,
   },
 };
 

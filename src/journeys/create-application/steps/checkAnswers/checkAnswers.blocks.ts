@@ -24,11 +24,11 @@ import {
   formatEcfLabel,
   formatFamilyLawClassificationLabel,
   formatInternationalMaintenanceAgreementLabel,
+  formatLaspoEvidenceScopeLabel,
   formatLegalAidBeforeLabel,
   formatLegalAidLast6MonthsLabel,
   formatLetterFromLocalAuthority,
   formatNeedsProtectiveInjunctionLabel,
-  formatPrivateFamilyCaseScopeLabel,
 } from "#/journeys/create-application/steps/checkAnswers/checkAnswers.formatters.js";
 import { fixedT, t } from "#/lib/i18n.js";
 
@@ -137,7 +137,7 @@ function createSummaryList(
       field: AnswerKey.laspoEvidenceScope,
       href: "prove-in-scope?returnTo=check-answers",
       label: answerLabelT("laspoEvidenceScope"),
-      value: { text: formatPrivateFamilyCaseScopeLabel() },
+      value: { text: formatLaspoEvidenceScopeLabel() },
     },
     {
       field: AnswerKey.legalAidBefore,

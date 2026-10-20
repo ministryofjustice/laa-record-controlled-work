@@ -40,7 +40,7 @@ export function laspoEvidenceScopeStep(journeyCode: string): StepDefinition {
       continueButton(),
     ],
     code: StepCode.LASPO_EVIDENCE_SCOPE,
-    onSubmission: [savePrivateFamilyCaseScope(journeyCode)],
+    onSubmission: [saveLaspoEvidenceScope(journeyCode)],
     path: "prove-in-scope",
     title: TITLE,
   });
@@ -53,7 +53,7 @@ export function laspoEvidenceScopeStep(journeyCode: string): StepDefinition {
  * @param {string} journeyCode - The journey code for saving draft answers
  * @returns {SubmitHook} A submit hook with validation and conditional routing logic
  */
-function savePrivateFamilyCaseScope(journeyCode: string): SubmitHook {
+function saveLaspoEvidenceScope(journeyCode: string): SubmitHook {
   return submit({
     onValid: {
       effects: [CreateApplicationEffects.saveDraftAnswers(journeyCode)],
