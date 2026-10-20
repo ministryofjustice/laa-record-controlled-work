@@ -180,6 +180,7 @@ export class ApplicationDto {
     answers: AnswersOutput,
   ): ScopingQuestions {
     if (answers.familyLawClassification === "private") {
+      // TODO: refactor this to improve branching readability and mental model
       const common = {
         caseMeetsMeritsCriteria: true as const,
         familyLawClassification: "private" as const,
@@ -244,6 +245,10 @@ export class ApplicationDto {
       ? this.getAnswersFromAddress(application)
       : {};
     const priorLegalAid = application.scopingQuestions?.priorLegalAid;
+
+    // TODO: category_of_law:family should have specific handling here
+    // so that the API can return familyLawClassification as non-null,
+    // to avoid the null coalescing
     const applicationScopingQuestions = application.scopingQuestions ?? {};
     const familyLawClassification =
       applicationScopingQuestions.familyLawClassification ?? undefined;
