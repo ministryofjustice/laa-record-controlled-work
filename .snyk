@@ -11,17 +11,11 @@ version: v1.25.0
 #         expires: "YYYY-MM-DDT00:00:00.000Z" 
 
 ignore:
-  SNYK-JS-ZOD-20510278:
+  SNYK-JS-PICOMATCH-21248802:
     - "*":
         reason: >
-          No fixed Zod release is available. Reassess this advisory when the
-          seven-day exception expires.
-        expires: "2026-10-12T08:00:00.000Z"
-  SNYK-JS-FOLLOWREDIRECTS-16032162:
-    - "*":
-        reason: >
-          Axios 1.15.2 vulnerabilities fixed in 1.16.0 which isn't released yet.
-        expires: "2026-05-04T12:00:00.000Z"
+          No fixed picomatch release available.
+        expires: "2026-11-02T08:00:00.000Z"
 exclude:
   code:
     - msw/handlers/entra.ts
