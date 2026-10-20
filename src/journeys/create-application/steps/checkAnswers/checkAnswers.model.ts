@@ -42,111 +42,135 @@ export function checkAnswersComplete(): PredicateExpr {
   );
 }
 
+const yesNo = (key: AnswerKey): PredicateExpr =>
+  Answer(key).match(Condition.Array.IsIn(["yes", "no"]));
+const required = (key: AnswerKey): PredicateExpr =>
+  Answer(key).match(Condition.IsRequired());
+
 /**
  * Defines visibility and completeness for the exposed summary fields.
  * @returns The rules for each summary field.
  */
 export function checkAnswersModel(): Record<SummaryFieldKey, SummaryField> {
-  const privateLaw = Answer(AnswerKey.familyLawClassification).match(
+  const isPrivateLaw = Answer(AnswerKey.familyLawClassification).match(
     Condition.Equals("private"),
   );
-  const publicLaw = Answer(AnswerKey.familyLawClassification).match(
+  const isPublicLaw = Answer(AnswerKey.familyLawClassification).match(
     Condition.Equals("public"),
   );
-  const yesSameMatter = Answer(AnswerKey.legalAidBefore).match(
+
+  const isYesSameMatter = Answer(AnswerKey.legalAidBefore).match(
     Condition.Equals("yesSameMatter"),
   );
-  const recentLegalAid = and(
-    yesSameMatter,
+  const isRecentLegalAid = and(
+    isYesSameMatter,
     Answer(AnswerKey.legalAidLast6Months).match(Condition.Equals("yes")),
   );
-  const injunction = and(
-    privateLaw,
+
+  const isInjunction = and(
+    isPrivateLaw,
     Answer(AnswerKey.needsAdviceOnEUOrInternationalMaintenance).match(
       Condition.Equals("no"),
     ),
   );
-  const fixedAddress = Answer(AnswerKey.haveAHomeAddress).match(
+  const hasFixedAddress = Answer(AnswerKey.haveAHomeAddress).match(
     Condition.Equals("yes"),
   );
-  const ukAddress = Answer(AnswerKey.ukCountry).match(
+  const isUkAddress = Answer(AnswerKey.ukCountry).match(
     Condition.Equals("United Kingdom"),
   );
-  const yesNo = (key: AnswerKey): PredicateExpr =>
-    Answer(key).match(Condition.Array.IsIn(["yes", "no"]));
-  const required = (key: AnswerKey): PredicateExpr =>
-    Answer(key).match(Condition.IsRequired());
 
   return {
-    address: field(
-      or(
-        not(fixedAddress),
+    address: field({
+      completeWhen: or(
+        not(hasFixedAddress),
         and(
-          ukAddress,
+          isUkAddress,
           required(AnswerKey.ukAddressLine1),
           required(AnswerKey.ukTownOrCity),
           required(AnswerKey.ukPostcode),
         ),
         and(
-          not(ukAddress),
+          not(isUkAddress),
           required(AnswerKey.osAddressLine1),
           required(AnswerKey.osCountry),
         ),
       ),
-    ),
-    careProceedingsStarted: field(
-      yesNo(AnswerKey.careProceedingsStarted),
-      publicLaw,
-    ),
-    dateOfBirth: field(required(AnswerKey.dateOfBirth)),
-    ecf: field(yesNo(AnswerKey.ecf)),
-    familyLawClassification: field(
-      Answer(AnswerKey.familyLawClassification).match(
-        Condition.Array.IsIn(["private", "public"]),
-      ),
-    ),
-    firstName: field(required(AnswerKey.firstName)),
-    haveAHomeAddress: field(yesNo(AnswerKey.haveAHomeAddress)),
-    lastName: field(required(AnswerKey.lastName)),
-    legalAidBefore: field(
-      Answer(AnswerKey.legalAidBefore).match(
+      visibleWhen: true,
+    }),
+    careProceedingsStarted: field({
+      completeWhen: yesNo(AnswerKey.careProceedingsStarted),
+      visibleWhen: isPublicLaw,
+    }),
+    dateOfBirth: field({
+      completeWhen: required(AnswerKey.dateOfBirth),
+      visibleWhen: true,
+    }),
+    ecf: field({
+      completeWhen: yesNo(AnswerKey.ecf),
+      visibleWhen: true,
+    }),
+    familyLawClassification: field({
+      completeWhen: or(isPrivateLaw, isPublicLaw),
+      visibleWhen: true,
+    }),
+    firstName: field({
+      completeWhen: required(AnswerKey.firstName),
+      visibleWhen: true,
+    }),
+    haveAHomeAddress: field({
+      completeWhen: yesNo(AnswerKey.haveAHomeAddress),
+      visibleWhen: true,
+    }),
+    lastName: field({
+      completeWhen: required(AnswerKey.lastName),
+      visibleWhen: true,
+    }),
+    legalAidBefore: field({
+      completeWhen: Answer(AnswerKey.legalAidBefore).match(
         Condition.Array.IsIn(["no", "yesSameMatter", "yesDifferentMatter"]),
       ),
-    ),
-    legalAidLast6Months: field(
-      yesNo(AnswerKey.legalAidLast6Months),
-      yesSameMatter,
-    ),
-    needsAdviceOnEUOrInternationalMaintenance: field(
-      yesNo(AnswerKey.needsAdviceOnEUOrInternationalMaintenance),
-      privateLaw,
-    ),
-    needsProtectiveInjunction: field(
-      yesNo(AnswerKey.needsProtectiveInjunction),
-      injunction,
-    ),
-    niNumber: field(
-      and(
+      visibleWhen: true,
+    }),
+    legalAidLast6Months: field({
+      completeWhen: yesNo(AnswerKey.legalAidLast6Months),
+      visibleWhen: isYesSameMatter,
+    }),
+    needsAdviceOnEUOrInternationalMaintenance: field({
+      completeWhen: yesNo(AnswerKey.needsAdviceOnEUOrInternationalMaintenance),
+      visibleWhen: isPrivateLaw,
+    }),
+    needsProtectiveInjunction: field({
+      completeWhen: yesNo(AnswerKey.needsProtectiveInjunction),
+      visibleWhen: isInjunction,
+    }),
+    niNumber: field({
+      // field is completed when both conditions are true
+      completeWhen: and(
         yesNo(AnswerKey.hasNINumber),
+        // AND
         or(
           Answer(AnswerKey.hasNINumber).match(Condition.Equals("no")),
+          // OR
           required(AnswerKey.niNumber),
         ),
       ),
-    ),
-    reasonForYes: field(required(AnswerKey.reasonForYes), recentLegalAid),
+      visibleWhen: true,
+    }),
+    reasonForYes: field({
+      completeWhen: required(AnswerKey.reasonForYes),
+      visibleWhen: isRecentLegalAid,
+    }),
   };
 }
 
 /**
  * Pairs a field's completeness rule with its visibility rule.
- * @param completeWhen Whether the field has all required answers.
- * @param visibleWhen Whether the field applies to the current answers.
+ * @param rules The field's completeness and visibility rules.
+ * @param rules.completeWhen Whether the field has all required answers.
+ * @param rules.visibleWhen Whether the field applies to the current answers.
  * @returns The field's summary rules.
  */
-function field(
-  completeWhen: PredicateExpr,
-  visibleWhen: PredicateExpr | true = true,
-): SummaryField {
+function field({ completeWhen, visibleWhen }: SummaryField): SummaryField {
   return { completeWhen, visibleWhen };
 }
