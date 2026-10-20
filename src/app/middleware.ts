@@ -10,7 +10,10 @@ import { cspNonce } from "#/app/middleware/cspNonce.middleware.js";
 import { addCsrfToLocals, csrf } from "#/app/middleware/csrf.middleware.js";
 import { helmet } from "#/app/middleware/helmet.middleware.js";
 import { locale } from "#/app/middleware/locale.middleware.js";
-import { setupSentry } from "#/app/middleware/sentry.middleware.js";
+import {
+  createBrowserSentryOptions,
+  setupSentry,
+} from "#/app/middleware/sentry.middleware.js";
 import { isEnv } from "#/app/utils/isEnv.js";
 import config from "#/config.js";
 import { createSession } from "#/lib/session.js";
@@ -65,6 +68,7 @@ export async function initMiddleware(
   app.use(locale());
 
   setupSentry();
+  Object.assign(app.locals, { browserSentry: createBrowserSentryOptions() });
   // Setup CSRF protection.
   app.use(csrf);
   app.use(addCsrfToLocals);

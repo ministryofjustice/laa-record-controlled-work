@@ -35,5 +35,5 @@
 
 {% block bodyEnd %}
   {# Run JavaScript at end of the <body>, to avoid blocking the initial render. #}
-  <script type="module" nonce="{{ cspNonce }}" src="/js/{{getAsset('frontend-packages','min.js')}}"></script>
+  <script type="module" nonce="{{ cspNonce }}" src="/js/{{getAsset('frontend-packages','min.js')}}"{% if browserSentry %} data-sentry-dsn="{{ browserSentry.dsn }}" data-sentry-environment="{{ browserSentry.environment }}"{% if browserSentry.release %} data-sentry-release="{{ browserSentry.release }}"{% endif %}{% endif %}></script>
 {% endblock %}
