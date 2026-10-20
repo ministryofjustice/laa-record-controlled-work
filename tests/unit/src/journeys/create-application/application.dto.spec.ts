@@ -344,12 +344,22 @@ describe("toAnswers method", () => {
     }
   });
 
-  it("preserves explicit ECF answers without defaulting missing values", () => {
-    for (const ecfFlag of [true, false, null]) {
-      expect(ApplicationDto.toAnswers({ ...application, ecfFlag }).ecf).to.equal(
-        ecfFlag === null ? undefined : ecfFlag ? "yes" : "no",
-      );
-    }
+  it("maps a true ECF flag to yes", () => {
+    const result = ApplicationDto.toAnswers({ ...application, ecfFlag: true });
+
+    expect(result.ecf).to.equal("yes");
+  });
+
+  it("maps a false ECF flag to no", () => {
+    const result = ApplicationDto.toAnswers({ ...application, ecfFlag: false });
+
+    expect(result.ecf).to.equal("no");
+  });
+
+  it("leaves a null ECF flag unanswered", () => {
+    const result = ApplicationDto.toAnswers({ ...application, ecfFlag: null });
+
+    expect(result.ecf).to.equal(undefined);
   });
 
   it("allows a fixed address to be corrected when its details are missing", () => {
