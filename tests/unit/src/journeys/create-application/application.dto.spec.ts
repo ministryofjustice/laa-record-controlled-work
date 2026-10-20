@@ -327,7 +327,7 @@ describe("toAnswers method", () => {
     return { ...application, scopingQuestions } as Application;
   }
 
-  it("leaves missing exposed scoping and ECF answers unanswered", () => {
+  it("doesn't set default values for answers which don't exist", () => {
     for (const scopingQuestions of [null, {}]) {
       const result = ApplicationDto.toAnswers({ ...application, scopingQuestions });
 
@@ -338,8 +338,8 @@ describe("toAnswers method", () => {
         "needsAdviceOnEUOrInternationalMaintenance",
         "needsProtectiveInjunction",
         "ecf",
-      ]) {
-        expect(result[key as keyof typeof result], key).to.equal(undefined);
+      ] as const) {
+        expect(result[key], key).to.equal(undefined);
       }
     }
   });
