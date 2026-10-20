@@ -362,7 +362,7 @@ describe("toAnswers method", () => {
     expect(result.ecf).to.equal(undefined);
   });
 
-  it("allows a fixed address to be corrected when its details are missing", () => {
+  it("doesn't default required answers for missing address data", () => {
     const result = ApplicationDto.toAnswers({
       ...application,
       clientDetails: { ...application.clientDetails, address: null },
@@ -373,7 +373,7 @@ describe("toAnswers method", () => {
     expect(result.osAddressLine1).to.equal(undefined);
   });
 
-  it("does not select family law classification when classification is missing", () => {
+  it("doesn't select family law classification when classification is missing", () => {
     const result = ApplicationDto.toAnswers(applicationWithScopingQuestions({
       priorLegalAid: "no",
       careProceedingsStarted: true,
@@ -383,7 +383,7 @@ describe("toAnswers method", () => {
     expect(result.careProceedingsStarted).to.equal(undefined);
   });
 
-  it("leaves null or absent reached scoping answers unanswered", () => {
+  it("doesn't default scoping question answers if data is missing", () => {
     for (const missing of [undefined, null]) {
       const privateResult = ApplicationDto.toAnswers(applicationWithScopingQuestions({
         priorLegalAid: "no",
@@ -404,7 +404,7 @@ describe("toAnswers method", () => {
     }
   });
 
-  it("preserves explicit negative public scoping answers without reaching responsibility", () => {
+  it("doesn't allow public branch parental responsibility to be set if care proceedings started is false", () => {
     const result = ApplicationDto.toAnswers(applicationWithScopingQuestions({
       priorLegalAid: "no",
       familyLawClassification: "public",
