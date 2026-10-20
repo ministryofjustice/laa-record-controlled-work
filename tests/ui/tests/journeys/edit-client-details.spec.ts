@@ -36,13 +36,13 @@ test("Edit Application - Client details journey", async ({
   await expect(rows.locator(".govuk-summary-list__value")).toContainText(
     [
       // ECF
-      "No",
+      "INCOMPLETE",
       // Type of family law
       "Private",
       // Transitional EU arrangements or an international maintenance agreement
       "No",
       // Needs protective injunction
-      "No",
+      "INCOMPLETE",
       // Accessed legal aid before
       "No",
       // First name

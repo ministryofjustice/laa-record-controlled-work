@@ -53,7 +53,7 @@ describe("Letter from Local Authority step", () => {
       const result = (await client.post(stepUrl)) as TestRenderResult;
       // Map complex validation error objects to just message strings for clearer assertion.
       const errorMessages = result
-        .getValidationErrorsByFieldCode(AnswerKey.letterFromLocalAuthority)
+        .getValidationErrorsByFieldCode(AnswerKey.careProceedingsStarted)
         .map((item) => item.message);
 
       expect(errorMessages).to.include(
@@ -65,7 +65,7 @@ describe("Letter from Local Authority step", () => {
     it.skip("redirects to the Parental Responsibility step when answer is 'Yes'", async () => {
       const result = (await client.post(stepUrl, {
         body: {
-          [AnswerKey.letterFromLocalAuthority]: "yes",
+          [AnswerKey.careProceedingsStarted]: "yes",
         },
       })) as TestRedirectResult;
 
@@ -77,7 +77,7 @@ describe("Letter from Local Authority step", () => {
     it.skip("redirects to Confirm Merits step when answer is 'No'", async () => {
       const result = (await client.post("/cases/new/ecf", {
         body: {
-          [AnswerKey.letterFromLocalAuthority]: "no",
+          [AnswerKey.careProceedingsStarted]: "no",
         },
       })) as TestRedirectResult;
 
@@ -89,7 +89,7 @@ describe("Letter from Local Authority step", () => {
       const result = (await client.post(stepUrl, {
         query: { returnTo: "check-answers" },
         body: {
-          [AnswerKey.letterFromLocalAuthority]: "no",
+          [AnswerKey.careProceedingsStarted]: "no",
         },
       })) as TestRedirectResult;
 

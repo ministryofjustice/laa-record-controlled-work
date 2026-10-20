@@ -17,7 +17,132 @@ export const updateApplicationDetailsBodyClientDetailsAddressOneCountryMin = 2;
 export const updateApplicationDetailsBodyClientDetailsAddressOneCountryMax = 2;
 
 export const UpdateApplicationDetailsBody = zod.object({
-  priorLegalAid: zod.enum(["no", "yesDifferentMatter", "yesSameMatter"]),
+  scopingQuestions: zod
+    .union([
+      zod
+        .object({
+          familyLawClassification: zod.enum(["private"]),
+          needsAdviceOnEUOrInternationalMaintenance: zod.union([
+            zod.literal(true),
+            zod.literal(false),
+          ]),
+        })
+        .and(
+          zod.union([
+            zod
+              .object({
+                familyLawClassification: zod.enum(["private"]).optional(),
+                needsAdviceOnEUOrInternationalMaintenance: zod.literal(false),
+              })
+              .and(
+                zod.object({
+                  needsProtectiveInjunction: zod.union([
+                    zod.literal(true),
+                    zod.literal(false),
+                  ]),
+                }),
+              ),
+            zod.object({
+              needsProtectiveInjunction: zod.literal(null).optional(),
+            }),
+          ]),
+        )
+        .and(
+          zod.union([
+            zod
+              .object({
+                familyLawClassification: zod.enum(["private"]).optional(),
+                needsAdviceOnEUOrInternationalMaintenance: zod.literal(false),
+              })
+              .and(
+                zod.object({
+                  needsProtectiveInjunction: zod.literal(false),
+                }),
+              )
+              .and(
+                zod.object({
+                  laspoEvidenceScope: zod.unknown(),
+                }),
+              ),
+            zod.object({
+              laspoEvidenceScope: zod.literal(null).optional(),
+            }),
+          ]),
+        )
+        .and(
+          zod.object({
+            careProceedingsStarted: zod.literal(null).optional(),
+            careProceedingsParentalResponsibility: zod.literal(null).optional(),
+          }),
+        ),
+      zod
+        .object({
+          familyLawClassification: zod.enum(["public"]),
+          careProceedingsStarted: zod.union([
+            zod.literal(true),
+            zod.literal(false),
+          ]),
+        })
+        .and(
+          zod.object({
+            needsAdviceOnEUOrInternationalMaintenance: zod
+              .literal(null)
+              .optional(),
+            needsProtectiveInjunction: zod.literal(null).optional(),
+            laspoEvidenceScope: zod.literal(null).optional(),
+          }),
+        )
+        .and(
+          zod.union([
+            zod
+              .object({
+                familyLawClassification: zod.enum(["public"]).optional(),
+                careProceedingsStarted: zod.literal(true),
+              })
+              .and(
+                zod.object({
+                  careProceedingsParentalResponsibility: zod.union([
+                    zod.literal(true),
+                    zod.literal(false),
+                  ]),
+                }),
+              ),
+            zod.object({
+              careProceedingsParentalResponsibility: zod
+                .literal(null)
+                .optional(),
+            }),
+          ]),
+        ),
+    ])
+    .and(
+      zod.object({
+        caseMeetsMeritsCriteria: zod.literal(true),
+      }),
+    )
+    .and(
+      zod.object({
+        priorLegalAid: zod.enum(["no", "yesDifferentMatter", "yesSameMatter"]),
+        familyLawClassification: zod.enum(["public", "private"]),
+        needsAdviceOnEUOrInternationalMaintenance: zod.boolean().nullish(),
+        needsProtectiveInjunction: zod.boolean().nullish(),
+        laspoEvidenceScope: zod
+          .union([
+            zod.enum([
+              "none",
+              "domesticAbuse",
+              "childAbuse",
+              "under18",
+              "parentOrGuardian",
+            ]),
+            zod.null(),
+          ])
+          .optional(),
+        careProceedingsStarted: zod.boolean().nullish(),
+        careProceedingsParentalResponsibility: zod.boolean().nullish(),
+        caseMeetsMeritsCriteria: zod.boolean().nullable(),
+      }),
+    ),
   legalAidLast6Months: zod
     .boolean()
     .describe("Journey answer; not persisted as a separate field."),

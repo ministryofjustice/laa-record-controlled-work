@@ -1,7 +1,9 @@
 import { expect } from "chai";
+import { ApplicationScopingQuestions } from "#/api/clients/rcw/model/applicationScopingQuestions.zod.gen.js";
 import { ApplicationDto } from "#/api/dto/application/application.dto.js";
 import type { Application } from "#/api/clients/rcw/model/application.zod.gen.js";
 import type { Answers } from "#/journeys/create-application/data/answers.zod.js";
+import { ScopingQuestions } from "#/api/clients/rcw/model/scopingQuestions.zod.gen.js";
 
 const answers: Answers = {
   ecf: "yes",
@@ -50,6 +52,8 @@ describe("fromAnswers method", () => {
       scopingQuestions: {
         priorLegalAid: "yesSameMatter",
         familyLawClassification: "public",
+        careProceedingsStarted: false,
+        caseMeetsMeritsCriteria: true,
       },
     };
 
@@ -58,6 +62,9 @@ describe("fromAnswers method", () => {
       providerOfficeCode,
     ).toRcwApi();
     expect(result).to.deep.equal(expected);
+    expect(ScopingQuestions.safeParse(result.scopingQuestions).success).to.equal(
+      true,
+    );
   });
 
   it("maps no and different-matter legal aid without recent aid details", () => {
@@ -132,7 +139,12 @@ describe("fromAnswers method", () => {
       familyLawClassification: "private",
       needsAdviceOnEUOrInternationalMaintenance: false,
       needsProtectiveInjunction: false,
+      laspoEvidenceScope: "none",
+      caseMeetsMeritsCriteria: true,
     });
+    expect(ScopingQuestions.safeParse(result.scopingQuestions).success).to.equal(
+      true,
+    );
   });
 
   it("preserves a negative maintenance advice answer for private family law", () => {
@@ -142,6 +154,7 @@ describe("fromAnswers method", () => {
         familyLawClassification: "private",
         needsAdviceOnEUOrInternationalMaintenance: "no",
         needsProtectiveInjunction: "yes",
+        laspoEvidenceScope: "domesticAbuse",
       },
       "test-office",
     ).toRcwApi();
@@ -151,6 +164,53 @@ describe("fromAnswers method", () => {
       familyLawClassification: "private",
       needsAdviceOnEUOrInternationalMaintenance: false,
       needsProtectiveInjunction: true,
+      caseMeetsMeritsCriteria: true,
+    });
+  });
+
+  it("preserves a reached private case scope", () => {
+    const privateAnswers = {
+      ...answers,
+      familyLawClassification: "private" as const,
+      needsAdviceOnEUOrInternationalMaintenance: "no",
+      needsProtectiveInjunction: "no",
+      laspoEvidenceScope: "domesticAbuse" as const,
+    };
+
+    const result = ApplicationDto.fromAnswers(
+      privateAnswers,
+      "test-office",
+    ).toRcwApi();
+
+    expect(result.scopingQuestions).to.deep.equal({
+      priorLegalAid: "yesSameMatter",
+      familyLawClassification: "private",
+      needsAdviceOnEUOrInternationalMaintenance: false,
+      needsProtectiveInjunction: false,
+      laspoEvidenceScope: "domesticAbuse",
+      caseMeetsMeritsCriteria: true,
+    });
+  });
+
+  it("omits skipped private answers after the maintenance shortcut", () => {
+    const privateAnswers = {
+      ...answers,
+      familyLawClassification: "private" as const,
+      needsAdviceOnEUOrInternationalMaintenance: "yes",
+      needsProtectiveInjunction: "no",
+      laspoEvidenceScope: "domesticAbuse" as const,
+    };
+
+    const result = ApplicationDto.fromAnswers(
+      privateAnswers,
+      "test-office",
+    ).toRcwApi();
+
+    expect(result.scopingQuestions).to.deep.equal({
+      priorLegalAid: "yesSameMatter",
+      familyLawClassification: "private",
+      needsAdviceOnEUOrInternationalMaintenance: true,
+      caseMeetsMeritsCriteria: true,
     });
   });
 
@@ -167,6 +227,47 @@ describe("fromAnswers method", () => {
     expect(result.scopingQuestions).to.deep.equal({
       priorLegalAid: "yesSameMatter",
       familyLawClassification: "public",
+      careProceedingsStarted: false,
+      caseMeetsMeritsCriteria: true,
+    });
+  });
+
+  it("preserves reached public answers", () => {
+    const publicAnswers = {
+      ...answers,
+      familyLawClassification: "public" as const,
+      careProceedingsStarted: "yes",
+      careProceedingsParentalResponsibility: "yes",
+    };
+
+    const result = ApplicationDto.fromAnswers(
+      publicAnswers,
+      "test-office",
+    ).toRcwApi();
+
+    expect(result.scopingQuestions).to.deep.equal({
+      priorLegalAid: "yesSameMatter",
+      familyLawClassification: "public",
+      careProceedingsStarted: true,
+      careProceedingsParentalResponsibility: true,
+      caseMeetsMeritsCriteria: true,
+    });
+  });
+
+  it("defaults reached public responsibility to false", () => {
+    const result = ApplicationDto.fromAnswers(
+      {
+        ...answers,
+        familyLawClassification: "public",
+        careProceedingsStarted: "yes",
+      },
+      "test-office",
+    ).toRcwApi();
+
+    expect(result.scopingQuestions).to.include({
+      careProceedingsStarted: true,
+      careProceedingsParentalResponsibility: false,
+      caseMeetsMeritsCriteria: true,
     });
   });
 });
@@ -219,6 +320,100 @@ describe("toAnswers method", () => {
     modifiedBy: "test-user",
     ecfFlag: null
   } satisfies Application;
+
+  function applicationWithScopingQuestions(
+    scopingQuestions: Record<string, unknown>,
+  ): Application {
+    return { ...application, scopingQuestions } as Application;
+  }
+
+  it("doesn't set default values for answers which don't exist", () => {
+    for (const scopingQuestions of [null, {}]) {
+      const result = ApplicationDto.toAnswers({ ...application, scopingQuestions });
+
+      for (const key of [
+        "legalAidBefore",
+        "familyLawClassification",
+        "careProceedingsStarted",
+        "needsAdviceOnEUOrInternationalMaintenance",
+        "needsProtectiveInjunction",
+        "ecf",
+      ] as const) {
+        expect(result[key], key).to.equal(undefined);
+      }
+    }
+  });
+
+  it("maps a true ECF flag to yes", () => {
+    const result = ApplicationDto.toAnswers({ ...application, ecfFlag: true });
+
+    expect(result.ecf).to.equal("yes");
+  });
+
+  it("maps a false ECF flag to no", () => {
+    const result = ApplicationDto.toAnswers({ ...application, ecfFlag: false });
+
+    expect(result.ecf).to.equal("no");
+  });
+
+  it("leaves a null ECF flag unanswered", () => {
+    const result = ApplicationDto.toAnswers({ ...application, ecfFlag: null });
+
+    expect(result.ecf).to.equal(undefined);
+  });
+
+  it("doesn't default required answers for missing address data", () => {
+    const result = ApplicationDto.toAnswers({
+      ...application,
+      clientDetails: { ...application.clientDetails, address: null },
+    });
+
+    expect(result.haveAHomeAddress).to.equal("yes");
+    expect(result.ukAddressLine1).to.equal(undefined);
+    expect(result.osAddressLine1).to.equal(undefined);
+  });
+
+  it("doesn't select family law classification when classification is missing", () => {
+    const result = ApplicationDto.toAnswers(applicationWithScopingQuestions({
+      priorLegalAid: "no",
+      careProceedingsStarted: true,
+    }));
+
+    expect(result.familyLawClassification).to.equal(undefined);
+    expect(result.careProceedingsStarted).to.equal(undefined);
+  });
+
+  it("doesn't default scoping question answers if data is missing", () => {
+    for (const missing of [undefined, null]) {
+      const privateResult = ApplicationDto.toAnswers(applicationWithScopingQuestions({
+        priorLegalAid: "no",
+        familyLawClassification: "private",
+        needsAdviceOnEUOrInternationalMaintenance: false,
+        needsProtectiveInjunction: missing,
+      }));
+      expect(privateResult.needsAdviceOnEUOrInternationalMaintenance).to.equal("no");
+      expect(privateResult.needsProtectiveInjunction).to.equal(undefined);
+
+      const publicResult = ApplicationDto.toAnswers(applicationWithScopingQuestions({
+        priorLegalAid: "no",
+        familyLawClassification: "public",
+        careProceedingsStarted: missing,
+      }));
+      expect(publicResult.careProceedingsStarted).to.equal(undefined);
+      expect(publicResult.careProceedingsParentalResponsibility).to.equal(undefined);
+    }
+  });
+
+  it("doesn't allow public branch parental responsibility to be set if care proceedings started is false", () => {
+    const result = ApplicationDto.toAnswers(applicationWithScopingQuestions({
+      priorLegalAid: "no",
+      familyLawClassification: "public",
+      careProceedingsStarted: false,
+      careProceedingsParentalResponsibility: true,
+    }));
+    expect(result.careProceedingsStarted).to.equal("no");
+    expect(result.careProceedingsParentalResponsibility).to.equal(undefined);
+  });
 
   it("maps a UK API address to only the UK answer fields", () => {
     const result = ApplicationDto.toAnswers(application);
@@ -326,15 +521,14 @@ describe("toAnswers method", () => {
   });
 
   it("maps scoping questions correctly for private family law classification", () => {
-    const result = ApplicationDto.toAnswers({
-      ...application,
-      scopingQuestions: {
+    const result = ApplicationDto.toAnswers(
+      applicationWithScopingQuestions({
         priorLegalAid: "yesSameMatter",
         familyLawClassification: "private",
         needsAdviceOnEUOrInternationalMaintenance: false,
         needsProtectiveInjunction: true,
-      },
-    });
+      }),
+    );
 
     expect(result).to.include({
       legalAidBefore: "yesSameMatter",
@@ -345,13 +539,12 @@ describe("toAnswers method", () => {
   });
 
   it("maps scoping questions correctly for public family law classification", () => {
-    const result = ApplicationDto.toAnswers({
-      ...application,
-      scopingQuestions: {
+    const result = ApplicationDto.toAnswers(
+      applicationWithScopingQuestions({
         priorLegalAid: "no",
         familyLawClassification: "public",
-      },
-    });
+      }),
+    );
 
     expect(result).to.include({
       legalAidBefore: "no",
@@ -360,6 +553,97 @@ describe("toAnswers method", () => {
 
     expect(result).to.not.have.any.keys(
       "needsAdviceOnEUOrInternationalMaintenance",
+    );
+  });
+
+  it("leaves exposed private answers missing for sparse historical applications", () => {
+    const scopingQuestions = {
+      priorLegalAid: "no",
+      familyLawClassification: "private",
+    };
+    expect(
+      ApplicationScopingQuestions.safeParse(scopingQuestions).success,
+    ).to.equal(true);
+
+    const result = ApplicationDto.toAnswers(
+      applicationWithScopingQuestions(scopingQuestions),
+    );
+
+    expect(result.needsAdviceOnEUOrInternationalMaintenance).to.equal(undefined);
+    expect(result.needsProtectiveInjunction).to.equal(undefined);
+    expect(result.laspoEvidenceScope).to.equal(undefined);
+  });
+
+  it("preserves a saved private scope when the question was reached", () => {
+    const result = ApplicationDto.toAnswers(
+      applicationWithScopingQuestions({
+        priorLegalAid: "no",
+        familyLawClassification: "private",
+        needsAdviceOnEUOrInternationalMaintenance: false,
+        needsProtectiveInjunction: false,
+        laspoEvidenceScope: "childAbuse",
+      }),
+    );
+
+    expect(result).to.include({
+      needsAdviceOnEUOrInternationalMaintenance: "no",
+      needsProtectiveInjunction: "no",
+      laspoEvidenceScope: "childAbuse",
+    });
+  });
+
+  it("omits a skipped scope answer when a protective injunction applies", () => {
+    const result = ApplicationDto.toAnswers(
+      applicationWithScopingQuestions({
+        priorLegalAid: "no",
+        familyLawClassification: "private",
+        needsAdviceOnEUOrInternationalMaintenance: false,
+        needsProtectiveInjunction: true,
+        laspoEvidenceScope: "domesticAbuse",
+      }),
+    );
+
+    expect(result).to.include({ needsProtectiveInjunction: "yes" });
+    expect(result).to.not.have.any.keys("laspoEvidenceScope");
+  });
+
+  it("omits skipped answers when hydrating a maintenance shortcut", () => {
+    const result = ApplicationDto.toAnswers(
+      applicationWithScopingQuestions({
+        priorLegalAid: "no",
+        familyLawClassification: "private",
+        needsAdviceOnEUOrInternationalMaintenance: true,
+        needsProtectiveInjunction: false,
+        laspoEvidenceScope: "domesticAbuse",
+      }),
+    );
+
+    expect(result).to.include({
+      needsAdviceOnEUOrInternationalMaintenance: "yes",
+    });
+    expect(result).to.not.have.any.keys(
+      "needsProtectiveInjunction",
+      "laspoEvidenceScope",
+    );
+  });
+
+  it("defaults public answers only along the reached path", () => {
+    const result = ApplicationDto.toAnswers(
+      applicationWithScopingQuestions({
+        priorLegalAid: "no",
+        familyLawClassification: "public",
+        careProceedingsStarted: true,
+      }),
+    );
+
+    expect(result).to.include({
+      careProceedingsStarted: "yes",
+      careProceedingsParentalResponsibility: "no",
+    });
+    expect(result).to.not.have.any.keys(
+      "needsAdviceOnEUOrInternationalMaintenance",
+      "needsProtectiveInjunction",
+      "laspoEvidenceScope",
     );
   });
 });

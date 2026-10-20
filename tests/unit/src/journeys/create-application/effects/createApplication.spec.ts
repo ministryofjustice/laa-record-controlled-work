@@ -45,6 +45,9 @@ describe("CreateApplicationEffect", () => {
           dateOfBirth: "1990-01-01",
           ecf: "no",
           familyLawClassification: "public",
+          needsAdviceOnEUOrInternationalMaintenance: "no",
+          needsProtectiveInjunction: "no",
+          laspoEvidenceScope: "domesticAbuse",
           firstName: "Jane",
           hasNINumber: "yes",
           haveAHomeAddress: "yes",
@@ -87,6 +90,14 @@ describe("CreateApplicationEffect", () => {
 
     expect(createApplicationStub.calledOnce).to.equal(true);
     expect(
+      createApplicationStub.firstCall.args[0].scopingQuestions,
+    ).to.deep.equal({
+      priorLegalAid: "yesSameMatter",
+      familyLawClassification: "public",
+      careProceedingsStarted: false,
+      caseMeetsMeritsCriteria: true,
+    });
+    expect(
       setData.calledOnceWithExactly(
         CONTEXT_DATA_KEYS.applicationID,
         applicationId,
@@ -95,6 +106,60 @@ describe("CreateApplicationEffect", () => {
 
     expect(session.journeyDrafts[journeyCode]).to.be.undefined;
     expect(session.journeyDrafts.anotherJourney).to.deep.equal({ keep: "yes" });
+  });
+
+  it("sends only reached private answers and always sends positive merits", async () => {
+    session.journeyDrafts[journeyCode] = {
+      ...(session.journeyDrafts[journeyCode] as Record<string, unknown>),
+      familyLawClassification: "private",
+      needsAdviceOnEUOrInternationalMaintenance: "yes",
+      needsProtectiveInjunction: "no",
+      laspoEvidenceScope: "domesticAbuse",
+    };
+    createApplicationStub.resolves({
+      data: getCreateApplicationResponseMock({ id: applicationId }),
+      status: 201,
+      headers: new Headers(),
+    });
+
+    await createApplication(deps)(context, journeyCode);
+
+    expect(
+      createApplicationStub.firstCall.args[0].scopingQuestions,
+    ).to.deep.equal({
+      priorLegalAid: "yesSameMatter",
+      familyLawClassification: "private",
+      needsAdviceOnEUOrInternationalMaintenance: true,
+      caseMeetsMeritsCriteria: true,
+    });
+  });
+
+  it("submits a reached private LASPO evidence scope", async () => {
+    session.journeyDrafts[journeyCode] = {
+      ...(session.journeyDrafts[journeyCode] as Record<string, unknown>),
+      familyLawClassification: "private",
+      needsAdviceOnEUOrInternationalMaintenance: "no",
+      needsProtectiveInjunction: "no",
+      laspoEvidenceScope: "domesticAbuse",
+    };
+    createApplicationStub.resolves({
+      data: getCreateApplicationResponseMock({ id: applicationId }),
+      status: 201,
+      headers: new Headers(),
+    });
+
+    await createApplication(deps)(context, journeyCode);
+
+    expect(
+      createApplicationStub.firstCall.args[0].scopingQuestions,
+    ).to.deep.equal({
+      priorLegalAid: "yesSameMatter",
+      familyLawClassification: "private",
+      needsAdviceOnEUOrInternationalMaintenance: false,
+      needsProtectiveInjunction: false,
+      laspoEvidenceScope: "domesticAbuse",
+      caseMeetsMeritsCriteria: true,
+    });
   });
 
   it("returns an ApiResponseError when createApplication responds with non-201", async () => {

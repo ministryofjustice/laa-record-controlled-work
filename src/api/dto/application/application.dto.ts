@@ -2,12 +2,13 @@ import type { Application as ApplicationSchema } from "#/api/clients/rcw/model/a
 import type { ApplicationScopingQuestions } from "#/api/clients/rcw/model/applicationScopingQuestions.zod.gen.js";
 import type { CreateApplicationRequestBody } from "#/api/clients/rcw/model/createApplicationRequestBody.zod.gen.js";
 import type { CreateClientDetailsRequestBody } from "#/api/clients/rcw/model/createClientDetailsRequestBody.zod.gen.js";
-import type { CreateScopingQuestions as ScopingQuestions } from "#/api/clients/rcw/model/createScopingQuestions.zod.gen.js";
 import type { NoOrDifferentMatterBranch } from "#/api/clients/rcw/model/noOrDifferentMatterBranch.zod.gen.js";
 import type { RecentLegalAidRule } from "#/api/clients/rcw/model/recentLegalAidRule.zod.gen.js";
+import type { ScopingQuestions } from "#/api/clients/rcw/model/scopingQuestions.zod.gen.js";
 import type { YesSameMatterBranch } from "#/api/clients/rcw/model/yesSameMatterBranch.zod.gen.js";
 import type { AnswersOutput } from "#/journeys/create-application/data/answers.zod.js";
 
+import { LaspoEvidenceScope } from "#/api/clients/rcw/model/laspoEvidenceScope.zod.gen.js";
 import { PriorLegalAid } from "#/api/clients/rcw/model/priorLegalAid.zod.gen.js";
 import { AnswerKey } from "#/journeys/AnswerKey.enum.js";
 import {
@@ -161,7 +162,7 @@ export class ApplicationDto {
     const { address } = application.clientDetails;
 
     if (!address) {
-      throw new Error("Address is not defined in the application.");
+      return {};
     }
 
     return address.country === "GB"
@@ -178,19 +179,57 @@ export class ApplicationDto {
   public static getScopingQuestionsFromAnswers(
     answers: AnswersOutput,
   ): ScopingQuestions {
-    const scopingQuestions: ScopingQuestions = {
-      familyLawClassification: answers.familyLawClassification,
+    if (answers.familyLawClassification === "private") {
+      // TODO: refactor this to improve branching readability and mental model
+      const common = {
+        caseMeetsMeritsCriteria: true as const,
+        familyLawClassification: "private" as const,
+        priorLegalAid: answers.legalAidBefore,
+      };
+
+      if (answers.needsAdviceOnEUOrInternationalMaintenance === "yes") {
+        return {
+          ...common,
+          needsAdviceOnEUOrInternationalMaintenance: true,
+        };
+      }
+
+      const needsProtectiveInjunction =
+        answers.needsProtectiveInjunction === "yes";
+      if (needsProtectiveInjunction) {
+        return {
+          ...common,
+          needsAdviceOnEUOrInternationalMaintenance: false,
+          needsProtectiveInjunction: true,
+        };
+      }
+
+      return {
+        ...common,
+        laspoEvidenceScope: LaspoEvidenceScope.parse(
+          answers.laspoEvidenceScope ?? "none",
+        ),
+        needsAdviceOnEUOrInternationalMaintenance: false,
+        needsProtectiveInjunction: false,
+      };
+    }
+
+    const common = {
+      caseMeetsMeritsCriteria: true as const,
+      familyLawClassification: "public" as const,
       priorLegalAid: answers.legalAidBefore,
     };
 
-    if (answers.familyLawClassification === "private") {
-      scopingQuestions.needsAdviceOnEUOrInternationalMaintenance =
-        answers.needsAdviceOnEUOrInternationalMaintenance === "yes";
-      scopingQuestions.needsProtectiveInjunction =
-        answers.needsProtectiveInjunction === "yes";
+    if (answers.careProceedingsStarted !== "yes") {
+      return { ...common, careProceedingsStarted: false };
     }
 
-    return scopingQuestions;
+    return {
+      ...common,
+      careProceedingsParentalResponsibility:
+        answers.careProceedingsParentalResponsibility === "yes",
+      careProceedingsStarted: true,
+    };
   }
 
   /**
@@ -199,24 +238,35 @@ export class ApplicationDto {
    * @returns AnswersOutput instance.
    */
   // eslint-disable-next-line complexity -- Got a lot of checks to do here.
-  public static toAnswers(application: ApplicationSchema): AnswersOutput {
+  public static toAnswers(
+    application: ApplicationSchema,
+  ): Partial<AnswersOutput> {
     const addressAnswers = application.clientDetails.hasFixedAddress
       ? this.getAnswersFromAddress(application)
       : {};
-    const priorLegalAid = PriorLegalAid.parse(
-      application.scopingQuestions?.priorLegalAid,
-    );
+    const priorLegalAid = application.scopingQuestions?.priorLegalAid;
+
+    // TODO: category_of_law:family should have specific handling here
+    // so that the API can return familyLawClassification as non-null,
+    // to avoid the null coalescing
+    const applicationScopingQuestions = application.scopingQuestions ?? {};
+    const familyLawClassification =
+      applicationScopingQuestions.familyLawClassification ?? undefined;
     const scopingAnswers = this.getAnswersFromScopingQuestions(
-      application.scopingQuestions ?? {},
+      applicationScopingQuestions,
     );
 
     return {
       ...addressAnswers,
       ...scopingAnswers,
       [AnswerKey.dateOfBirth]: application.clientDetails.dateOfBirth,
-      [AnswerKey.ecf]: "no",
-      [AnswerKey.familyLawClassification]:
-        application.scopingQuestions?.familyLawClassification ?? "public",
+      [AnswerKey.ecf]:
+        application.ecfFlag === null
+          ? undefined
+          : application.ecfFlag
+            ? "yes"
+            : "no",
+      [AnswerKey.familyLawClassification]: familyLawClassification,
       [AnswerKey.firstName]: application.clientDetails.firstName,
       [AnswerKey.hasNINumber]: application.clientDetails.niNumber
         ? "yes"
@@ -263,18 +313,14 @@ export class ApplicationDto {
   private static getAnswersFromScopingQuestions(
     scopingQuestions: ApplicationScopingQuestions,
   ): Partial<AnswersOutput> {
-    const scopingAnswers: Partial<AnswersOutput> = {};
-
-    if (scopingQuestions.familyLawClassification === "private") {
-      scopingAnswers[AnswerKey.needsAdviceOnEUOrInternationalMaintenance] =
-        scopingQuestions.needsAdviceOnEUOrInternationalMaintenance
-          ? "yes"
-          : "no";
-      scopingAnswers[AnswerKey.needsProtectiveInjunction] =
-        scopingQuestions.needsProtectiveInjunction ? "yes" : "no";
+    switch (scopingQuestions.familyLawClassification) {
+      case "private":
+        return this.getPrivateFamilyLawAnswers(scopingQuestions);
+      case "public":
+        return this.getPublicFamilyLawAnswers(scopingQuestions);
+      default:
+        return {};
     }
-
-    return scopingAnswers;
   }
 
   /**
@@ -313,6 +359,79 @@ export class ApplicationDto {
       addressLine4: answers[AnswerKey.osAddressLine4],
       country: countryName ? mapCountryNameToIsoCode(countryName) : "",
     };
+  }
+
+  /**
+   * Extracts reached private-law answers.
+   * @param scopingQuestions - The scoping questions from the application.
+   * @returns Partial AnswersOutput containing reached private-law answers.
+   */
+  private static getPrivateFamilyLawAnswers(
+    scopingQuestions: ApplicationScopingQuestions,
+  ): Partial<AnswersOutput> {
+    const needsAdviceOnMaintenance =
+      scopingQuestions.needsAdviceOnEUOrInternationalMaintenance;
+    if (
+      needsAdviceOnMaintenance === null ||
+      needsAdviceOnMaintenance === undefined
+    ) {
+      return {};
+    }
+    const answers: Partial<AnswersOutput> = {
+      [AnswerKey.needsAdviceOnEUOrInternationalMaintenance]:
+        needsAdviceOnMaintenance ? "yes" : "no",
+    };
+
+    if (needsAdviceOnMaintenance) {
+      return answers;
+    }
+
+    const { needsProtectiveInjunction } = scopingQuestions;
+    if (
+      needsProtectiveInjunction === null ||
+      needsProtectiveInjunction === undefined
+    ) {
+      return answers;
+    }
+    answers[AnswerKey.needsProtectiveInjunction] = needsProtectiveInjunction
+      ? "yes"
+      : "no";
+
+    if (!needsProtectiveInjunction) {
+      answers[AnswerKey.laspoEvidenceScope] =
+        scopingQuestions.laspoEvidenceScope ?? "none";
+    }
+
+    return answers;
+  }
+
+  /**
+   * Extracts reached public-law answers.
+   * @param scopingQuestions - The scoping questions from the application.
+   * @returns Partial AnswersOutput containing reached public-law answers.
+   */
+  private static getPublicFamilyLawAnswers(
+    scopingQuestions: ApplicationScopingQuestions,
+  ): Partial<AnswersOutput> {
+    const { careProceedingsStarted } = scopingQuestions;
+    if (
+      careProceedingsStarted === null ||
+      careProceedingsStarted === undefined
+    ) {
+      return {};
+    }
+    const answers: Partial<AnswersOutput> = {
+      [AnswerKey.careProceedingsStarted]: careProceedingsStarted ? "yes" : "no",
+    };
+
+    if (careProceedingsStarted) {
+      const careProceedingsParentalResponsibility =
+        scopingQuestions.careProceedingsParentalResponsibility ?? false;
+      answers[AnswerKey.careProceedingsParentalResponsibility] =
+        careProceedingsParentalResponsibility ? "yes" : "no";
+    }
+
+    return answers;
   }
 
   /**

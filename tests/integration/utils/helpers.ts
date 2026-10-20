@@ -8,6 +8,7 @@ import {
   type ForgeTestClient,
   ForgeTestHarness,
 } from "@ministryofjustice/hmpps-forge/core/testing";
+import type { ForgeRenderer } from "@ministryofjustice/hmpps-forge/core/framework";
 import { nunjucksFunctions } from "@ministryofjustice/hmpps-forge/express-nunjucks";
 import { govukComponents } from "@ministryofjustice/hmpps-forge/govuk-components";
 import { mojComponents } from "@ministryofjustice/hmpps-forge/moj-components";
@@ -32,6 +33,7 @@ export function createForgeTestClient<TDeps>(
     additionalFunctions?: BaseFunctionRegistry<TDeps>[];
     dependencies?: TDeps;
     disableReachabilityChecks?: boolean;
+    renderer?: ForgeRenderer<unknown>;
   },
 ): ForgeTestClient {
 
@@ -58,7 +60,7 @@ export function createForgeTestClient<TDeps>(
     .registerGlobalComponents([autocomplete])
     .registerGlobalFunctions(nunjucksFunctions)
     .registerPackage(testPackage, overrides?.dependencies)
-    .createClient();
+    .createClient(overrides?.renderer);
 }
 
 export function createApplicationTestClient(

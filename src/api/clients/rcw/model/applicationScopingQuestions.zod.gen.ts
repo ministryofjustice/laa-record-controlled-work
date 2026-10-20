@@ -15,6 +15,21 @@ export const ApplicationScopingQuestions = zod.object({
     .optional(),
   needsAdviceOnEUOrInternationalMaintenance: zod.boolean().nullish(),
   needsProtectiveInjunction: zod.boolean().nullish(),
+  laspoEvidenceScope: zod
+    .union([
+      zod.enum([
+        "none",
+        "domesticAbuse",
+        "childAbuse",
+        "under18",
+        "parentOrGuardian",
+      ]),
+      zod.null(),
+    ])
+    .optional(),
+  careProceedingsStarted: zod.boolean().nullish(),
+  careProceedingsParentalResponsibility: zod.boolean().nullish(),
+  caseMeetsMeritsCriteria: zod.boolean().nullish(),
 });
 
 export type ApplicationScopingQuestions = zod.input<

@@ -1,16 +1,20 @@
 import { z as zod } from "zod";
 
 import { FamilyLawClassification } from "#/api/clients/rcw/model/familyLawClassification.zod.gen.js";
+import { LaspoEvidenceScope } from "#/api/clients/rcw/model/laspoEvidenceScope.zod.gen.js";
 import { PriorLegalAid } from "#/api/clients/rcw/model/priorLegalAid.zod.gen.js";
 
 export const Answers = zod
   .object({
+    careProceedingsParentalResponsibility: zod.string().optional(),
+    careProceedingsStarted: zod.string().optional(),
     dateOfBirth: zod.string(),
     ecf: zod.string(),
     familyLawClassification: FamilyLawClassification,
     firstName: zod.string(),
     hasNINumber: zod.string(),
     haveAHomeAddress: zod.string(),
+    laspoEvidenceScope: LaspoEvidenceScope.optional(),
     lastName: zod.string(),
     legalAidBefore: PriorLegalAid,
     legalAidLast6Months: zod.string().optional(),
