@@ -557,7 +557,7 @@ describe("toAnswers method", () => {
     expect(result).to.not.have.any.keys(
       "needsAdviceOnEUOrInternationalMaintenance",
       "needsProtectiveInjunction",
-      "privateFamilyCaseScope",
+      "laspoEvidenceScope",
     );
   });
 
