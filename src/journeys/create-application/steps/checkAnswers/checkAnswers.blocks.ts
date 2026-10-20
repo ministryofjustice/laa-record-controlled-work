@@ -48,7 +48,7 @@ interface SummaryRow {
  * @returns The editable check-answers summary list.
  */
 export function editSummaryListBlock(): GovUKSummaryList {
-  return createSummaryList(createIncompleteSummaryValue);
+  return createSummaryList(createConditionalSummaryValue);
 }
 
 /**
@@ -66,7 +66,7 @@ export function summaryList(): GovUKSummaryList {
  * @param completed The condition that determines whether answers are complete.
  * @returns A summary value with completion and incomplete states.
  */
-function createIncompleteSummaryValue(
+function createConditionalSummaryValue(
   value: SummaryListValue,
   completed: PredicateExpr,
 ): SummaryListValue {
