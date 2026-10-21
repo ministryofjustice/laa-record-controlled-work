@@ -337,11 +337,41 @@ test("missing Container mappings fail before scans, including on clean inputs", 
   }
 });
 
+test("malformed organization UUIDs fail before scans", () => {
+  const run = runAction({
+    inputs: { "org-id": "aaaaaaaa-aaaa-4aaa-[aaa-aaaaaaaaaaaa" },
+  });
+  try {
+    assert.equal(run.outcome, "failed");
+    assert.doesNotMatch(run.commands, /snyk test/);
+    assert.equal(run.deltaCalls, 0);
+  } finally {
+    rmSync(run.directory, { force: true, recursive: true });
+  }
+});
+
 test("Container mappings cannot omit the application dependency result", () => {
   const run = runAction({
     inputs: {
       "container-projects-json": JSON.stringify([containerProjects[0]]),
     },
+  });
+  try {
+    assert.equal(run.outcome, "failed");
+    assert.doesNotMatch(run.commands, /snyk test/);
+    assert.equal(run.deltaCalls, 0);
+  } finally {
+    rmSync(run.directory, { force: true, recursive: true });
+  }
+});
+
+test("a monitored project UUID cannot be reused for distinct Container results", () => {
+  const mappings = containerProjects.map((project) => ({
+    ...project,
+    projectId: projectId,
+  }));
+  const run = runAction({
+    inputs: { "container-projects-json": JSON.stringify(mappings) },
   });
   try {
     assert.equal(run.outcome, "failed");

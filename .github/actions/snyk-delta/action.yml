@@ -46,7 +46,7 @@ runs:
         [[ "$IMAGE_REF" =~ @sha256:[[:xdigit:]]{64}$ ]] || { echo '::error::Container image must use a sha256 digest'; exit 1; }
         [[ -f "$DOCKERFILE" ]] || { echo '::error::Dockerfile path does not exist'; exit 1; }
         [[ -f .snyk ]] || { echo '::error::The repository Snyk policy file is missing'; exit 1; }
-        jq -e '
+        jq -e --arg open_source_project_id "$OPEN_SOURCE_PROJECT_ID" '
           def uuid: type == "string" and test("^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$");
           type == "array" and length > 0 and
           all(.[];
@@ -56,7 +56,8 @@ runs:
           ) and
           any(.[]; .identityType == "apk" and .targetFile == "") and
           any(.[]; .targetFile != "") and
-          ([.[] | [.identityType, .targetFile] | @json] | unique | length) == length
+          ([.[] | [.identityType, .targetFile] | @json] | unique | length) == length and
+          ([.[] | .projectId] + [$open_source_project_id] | unique | length) == ([.[] | .projectId] + [$open_source_project_id] | length)
         ' <<< "$CONTAINER_PROJECTS_JSON" >/dev/null || { echo '::error::Container project mappings are invalid or incomplete'; exit 1; }
       shell: bash
 

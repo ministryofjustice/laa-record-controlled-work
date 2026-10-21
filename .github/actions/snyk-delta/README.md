@@ -34,7 +34,8 @@ corresponding action inputs:
 - `SNYK_CONTAINER_PROJECTS_JSON`: JSON array with one entry per required
   Container result. `identityType` and `targetFile` must match the CLI result
   exactly. The Alpine OS result has an empty target file; application results
-  use their reported target file. Each entry names its own monitored project ID.
+  use their reported target file. Each entry names a distinct monitored project
+  ID, different from Open Source and every other Container mapping.
 
 Example shape, using non-live identifiers:
 
