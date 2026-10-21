@@ -60,7 +60,7 @@ function saveLaspoEvidenceScope(journeyCode: string): SubmitHook {
       next: [
         redirectToNotInScope,
         redirectToCheckAnswers,
-        tempTedirectToLegalAidBefore,
+        tempRedirectToLegalAidBefore,
         redirectToConfirmMerits,
       ],
     },
@@ -79,7 +79,7 @@ const redirectToNotInScope = redirect({
 /**
  * Redirects to the "Legal Aid Before" page while the next pages are being built.
  */
-const tempTedirectToLegalAidBefore = redirect({
+const tempRedirectToLegalAidBefore = redirect({
   goto: "legal-aid-before",
   when: Answer(AnswerKey.laspoEvidenceScope).not.match(
     Condition.Equals("none"),
