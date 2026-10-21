@@ -60,6 +60,7 @@ function saveLaspoEvidenceScope(journeyCode: string): SubmitHook {
       next: [
         redirectToNotInScope,
         redirectToCheckAnswers,
+        tempTedirectToLegalAidBefore,
         redirectToConfirmMerits,
       ],
     },
@@ -73,6 +74,16 @@ function saveLaspoEvidenceScope(journeyCode: string): SubmitHook {
 const redirectToNotInScope = redirect({
   goto: "not-in-scope",
   when: Answer(AnswerKey.laspoEvidenceScope).match(Condition.Equals("none")),
+});
+
+/**
+ * Redirects to the "Legal Aid Before" page while the next pages are being built.
+ */
+const tempTedirectToLegalAidBefore = redirect({
+  goto: "legal-aid-before",
+  when: Answer(AnswerKey.laspoEvidenceScope).not.match(
+    Condition.Equals("none"),
+  ),
 });
 
 /**

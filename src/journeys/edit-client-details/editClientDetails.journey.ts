@@ -6,6 +6,7 @@ import { ineligibleStep } from "#/journeys/create-application/steps/ecfDropout/e
 import { enterAddressManuallyStep } from "#/journeys/create-application/steps/enterAddressManually/enterAddressManually.step.js";
 import { enterOverseasAddressStep } from "#/journeys/create-application/steps/enterOverseasAddress/enterOverseasAddress.step.js";
 import { familyLawClassificationStep } from "#/journeys/create-application/steps/familyLawClassification/familyLawClassification.step.js";
+import { familyPrivateNotInScopeStep } from "#/journeys/create-application/steps/familyPrivateNotInScope/familyPrivateNotInScope.step.js";
 import { haveAHomeAddressStep } from "#/journeys/create-application/steps/haveAHomeAddress/haveAHomeAddress.step.js";
 import { internationalMaintenanceAgreementStep } from "#/journeys/create-application/steps/internationalMaintenanceAgreement/internationalMaintenanceAgreement.step.js";
 import { laspoEvidenceScopeStep } from "#/journeys/create-application/steps/laspoEvidenceScope/laspoEvidenceScope.step.js";
@@ -17,7 +18,6 @@ import { niNumberStep } from "#/journeys/create-application/steps/niNumber/niNum
 import { editClientDetailsEffects } from "#/journeys/edit-client-details/editClientDetails.effects.js";
 import { checkAnswersStep } from "#/journeys/edit-client-details/steps/check-answers/check-answers.step.js";
 import { JourneyCode } from "#/journeys/JourneyCode.enum.js";
-import { familyPrivateNotInScopeStep } from "#/journeys/create-application/steps/familyPrivateNotInScope/familyPrivateNotInScope.step.js";
 
 const editJourneyCode = JourneyCode.EDIT_CLIENT_DETAILS;
 
