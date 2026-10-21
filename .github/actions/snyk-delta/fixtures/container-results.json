@@ -1,0 +1,104 @@
+[
+  {
+    "vulnerabilities": [
+      {
+        "id": "SNYK-EXAMPLE-OS-001",
+        "severity": "high",
+        "package": "openssl/openssl",
+        "packageName": "openssl",
+        "name": "openssl/openssl",
+        "version": "3.0.0-r0",
+        "from": ["docker-image|rcw@latest", "openssl/openssl@3.0.0-r0"],
+        "upgradePath": [],
+        "isUpgradable": false,
+        "isPatchable": false
+      },
+      {
+        "id": "SNYK-EXAMPLE-BASE-001",
+        "severity": "high",
+        "package": "alpine-baselayout/alpine-baselayout",
+        "packageName": "alpine-baselayout",
+        "name": "alpine-baselayout/alpine-baselayout",
+        "version": "3.2.0-r7",
+        "from": [
+          "docker-image|rcw@latest",
+          "alpine-baselayout/alpine-baselayout@3.2.0-r7"
+        ],
+        "upgradePath": [],
+        "isUpgradable": false,
+        "isPatchable": false
+      }
+    ],
+    "ok": false,
+    "dependencyCount": 1,
+    "org": "sanitized-org",
+    "packageManager": "apk",
+    "docker": {
+      "baseImage": "alpine:3.22"
+    },
+    "projectName": "docker-image|rcw",
+    "platform": "linux/amd64",
+    "scanResult": {
+      "facts": [
+        {
+          "type": "imageId",
+          "data": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+      ],
+      "identity": {
+        "type": "apk",
+        "args": {
+          "platform": "linux/amd64"
+        }
+      },
+      "target": {
+        "image": "docker-image|rcw"
+      }
+    },
+    "path": "rcw"
+  },
+  {
+    "vulnerabilities": [
+      {
+        "id": "SNYK-EXAMPLE-NPM-001",
+        "severity": "critical",
+        "package": "example-app-dependency",
+        "packageName": "example-app-dependency",
+        "name": "example-app-dependency",
+        "version": "1.0.0",
+        "from": [
+          "rcw@1.0.0",
+          "web-framework@4.0.0",
+          "example-app-dependency@1.0.0"
+        ],
+        "upgradePath": [],
+        "isUpgradable": false,
+        "isPatchable": false
+      }
+    ],
+    "ok": false,
+    "dependencyCount": 2,
+    "org": "sanitized-org",
+    "packageManager": "npm",
+    "docker": {},
+    "projectName": "rcw",
+    "targetFile": "/package.json",
+    "platform": "linux/amd64",
+    "scanResult": {
+      "facts": [
+        {
+          "type": "imageId",
+          "data": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+      ],
+      "identity": {
+        "type": "npm",
+        "targetFile": "/package.json"
+      },
+      "target": {
+        "image": "docker-image|rcw"
+      }
+    },
+    "path": "rcw"
+  }
+]
