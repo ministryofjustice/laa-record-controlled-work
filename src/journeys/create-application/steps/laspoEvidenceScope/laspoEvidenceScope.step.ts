@@ -58,8 +58,8 @@ function saveLaspoEvidenceScope(journeyCode: string): SubmitHook {
     onValid: {
       effects: [CreateApplicationEffects.saveDraftAnswers(journeyCode)],
       next: [
-        redirectToCheckAnswers,
         redirectToNotInScope,
+        redirectToCheckAnswers,
         redirectToConfirmMerits,
       ],
     },
