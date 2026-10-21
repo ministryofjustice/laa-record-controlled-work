@@ -11,16 +11,24 @@ const ZERO_LENGTH = 0;
 export function getOfficeClaimsFromSession(
   session: SessionData,
 ): string[] | undefined {
-  const offices = session.account?.idTokenClaims?.LAA_ACCOUNTS;
-
-  // Allow an empty array to fall through to `undefined` to simplify checks, as
-  // semantically it's the same thing.
-  if (Array.isArray(offices) && offices.length !== ZERO_LENGTH) {
-    return offices;
-  }
+  const offices: unknown = session.account?.idTokenClaims?.LAA_ACCOUNTS;
 
   if (typeof offices === "string") {
-    return [offices];
+    return offices.length > ZERO_LENGTH ? [offices] : undefined;
+  }
+
+  if (Array.isArray(offices)) {
+    const validOffices = offices.filter(
+      (office): office is string =>
+        typeof office === "string" && office.length > ZERO_LENGTH,
+    );
+
+    if (
+      validOffices.length === offices.length &&
+      validOffices.length !== ZERO_LENGTH
+    ) {
+      return validOffices;
+    }
   }
 
   return undefined;

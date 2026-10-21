@@ -41,7 +41,6 @@ export function requireAuth(): RequestHandler {
       const { id: sessionId } = session;
       const { homeAccountId, idToken } = session.account ?? {};
       const { exp } = session.account?.idTokenClaims ?? {};
-      const allowedOffices = getOfficeClaimsFromSession(session);
 
       logger.info("requireAuth(): Checking user auth");
 
@@ -55,6 +54,7 @@ export function requireAuth(): RequestHandler {
       if (!homeAccountId || !idToken) {
         logger.info("requireAuth(): No auth token");
         destroySessionAuth(session);
+        destroySessionOffice(session);
         res.redirect("/auth/signin");
         return;
       }
@@ -65,7 +65,8 @@ export function requireAuth(): RequestHandler {
         const result = await refreshToken(homeAccountId, sessionId);
 
         if (result.error) {
-          delete req.session.account;
+          destroySessionAuth(session);
+          destroySessionOffice(session);
           res.redirect("/auth/signin");
           return;
         }
@@ -73,8 +74,11 @@ export function requireAuth(): RequestHandler {
         updateSessionAuth(session, result.value);
       }
 
+      const allowedOffices = getOfficeClaimsFromSession(session);
+
       // If the user does not have offices available, then they will be unable to access the service.
       if (allowedOffices === undefined) {
+        destroySessionOffice(session);
         logger.info("requireAuth(): User has no assigned office");
         res
           .status(HTTP_STATUS.FORBIDDEN)
@@ -84,24 +88,25 @@ export function requireAuth(): RequestHandler {
 
       // Only check selected office if not on the office selection page.
       const officePathRegex = /^\/select-office(\/.*)?$/;
+      const isOfficeSelectionPath = officePathRegex.exec(req.path) !== null;
 
-      if (officePathRegex.exec(req.path) === null) {
-        // Does the user have a selected office? If not, redirect to the office selection page.
-        if (session.selectedOffice === undefined) {
-          logger.info("requireAuth(): No selected office");
-          if (req.url !== "/select-office") {
-            res.redirect("/select-office");
-          }
-          return;
-        }
-
-        // Does the selected office match the user's allowed offices? If not, redirect to the office selection page.
-        if (!allowedOffices.includes(session.selectedOffice.code)) {
-          logger.warn("requireAuth(): Office is not in claims");
-          destroySessionOffice(session);
+      if (
+        session.selectedOffice !== undefined &&
+        !allowedOffices.includes(session.selectedOffice.code)
+      ) {
+        logger.warn("requireAuth(): Office is not in claims");
+        destroySessionOffice(session);
+        if (!isOfficeSelectionPath) {
           res.redirect("/select-office");
           return;
         }
+      }
+
+      // Does the user have a selected office? If not, redirect to the office selection page.
+      if (!isOfficeSelectionPath && session.selectedOffice === undefined) {
+        logger.info("requireAuth(): No selected office");
+        res.redirect("/select-office");
+        return;
       }
 
       // Add auth to locals for use in templates.
@@ -116,6 +121,8 @@ export function requireAuth(): RequestHandler {
         error instanceof AuthError &&
         error.errorCode === EntraErrorCode.CUSTOM_AUTH_ERROR.valueOf()
       ) {
+        destroySessionAuth(req.session);
+        destroySessionOffice(req.session);
         logger.info(
           `Received Entra error "${error.errorCode}" when authenticating user: ${error.message}`,
         );
