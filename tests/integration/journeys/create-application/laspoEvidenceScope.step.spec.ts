@@ -49,7 +49,6 @@ describe("LASPO Evidence Scope step", () => {
 
     it("should show validation error if no option is selected", async () => {
       const result = await client.post("/cases/new/prove-in-scope");
-      expect(result.type).to.equal("render");
       const renderResult = result as TestRenderResult;
       expect(renderResult.context.showValidationFailures).to.equal(true);
       expect(
@@ -57,7 +56,6 @@ describe("LASPO Evidence Scope step", () => {
       ).to.deep.equal("Select how can you prove this case is in scope");
     });
 
-    // TODO: Update when next step is added
     it("should redirect to legal aid before step if an option is selected", async () => {
       const result = await client.post("/cases/new/prove-in-scope", {
         body: {
@@ -69,8 +67,7 @@ describe("LASPO Evidence Scope step", () => {
       expect(redirectResult.url).to.equal("/cases/new/legal-aid-before");
     });
 
-    // TODO: Update when next step is added
-    it("should redirect to legal aid before step if none is selected", async () => {
+    it("should redirect to the private family drop out step if none is selected", async () => {
       const result = await client.post("/cases/new/prove-in-scope", {
         body: {
           laspoEvidenceScope: "none",
@@ -78,7 +75,7 @@ describe("LASPO Evidence Scope step", () => {
       });
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
-      expect(redirectResult.url).to.equal("/cases/new/legal-aid-before");
+      expect(redirectResult.url).to.equal("/cases/new/not-in-scope");
     });
   });
 });

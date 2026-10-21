@@ -6,6 +6,7 @@ import { ineligibleStep } from "#/journeys/create-application/steps/ecfDropout/e
 import { enterAddressManuallyStep } from "#/journeys/create-application/steps/enterAddressManually/enterAddressManually.step.js";
 import { enterOverseasAddressStep } from "#/journeys/create-application/steps/enterOverseasAddress/enterOverseasAddress.step.js";
 import { familyLawClassificationStep } from "#/journeys/create-application/steps/familyLawClassification/familyLawClassification.step.js";
+import { familyPrivateNotInScopeStep } from "#/journeys/create-application/steps/familyPrivateNotInScope/familyPrivateNotInScope.step.js";
 import { haveAHomeAddressStep } from "#/journeys/create-application/steps/haveAHomeAddress/haveAHomeAddress.step.js";
 import { internationalMaintenanceAgreementStep } from "#/journeys/create-application/steps/internationalMaintenanceAgreement/internationalMaintenanceAgreement.step.js";
 import { laspoEvidenceScopeStep } from "#/journeys/create-application/steps/laspoEvidenceScope/laspoEvidenceScope.step.js";
@@ -57,6 +58,7 @@ export const editClientDetailsJourney = journey({
   steps: [
     ...stepsDirectlyEnterableWhileEditing,
     ineligibleStep(editJourneyCode),
+    familyPrivateNotInScopeStep(editJourneyCode),
     enterAddressManuallyStep(editJourneyCode),
     enterOverseasAddressStep(editJourneyCode),
     checkAnswersStep(editJourneyCode),

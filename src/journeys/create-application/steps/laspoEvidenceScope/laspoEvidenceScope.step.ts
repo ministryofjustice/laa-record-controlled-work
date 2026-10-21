@@ -58,9 +58,9 @@ function saveLaspoEvidenceScope(journeyCode: string): SubmitHook {
     onValid: {
       effects: [CreateApplicationEffects.saveDraftAnswers(journeyCode)],
       next: [
-        redirectToCheckAnswers,
-        tempTedirectToLegalAidBefore,
         redirectToNotInScope,
+        redirectToCheckAnswers,
+        tempRedirectToLegalAidBefore,
         redirectToConfirmMerits,
       ],
     },
@@ -69,18 +69,21 @@ function saveLaspoEvidenceScope(journeyCode: string): SubmitHook {
 }
 
 /**
- * Redirects to the "Legal Aid Before" page while the next pages are being built.
- */
-const tempTedirectToLegalAidBefore = redirect({
-  goto: "legal-aid-before",
-});
-
-/**
  * Redirects to the "Not in Scope" page if the private family case scope is "none".
  */
 const redirectToNotInScope = redirect({
   goto: "not-in-scope",
   when: Answer(AnswerKey.laspoEvidenceScope).match(Condition.Equals("none")),
+});
+
+/**
+ * Redirects to the "Legal Aid Before" page while the next pages are being built.
+ */
+const tempRedirectToLegalAidBefore = redirect({
+  goto: "legal-aid-before",
+  when: Answer(AnswerKey.laspoEvidenceScope).not.match(
+    Condition.Equals("none"),
+  ),
 });
 
 /**
