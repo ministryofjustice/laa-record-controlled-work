@@ -55,6 +55,8 @@ function resolveExpression(value, inputs, outcomes, outputs) {
 }
 
 function runAction({
+  baselineExit = 0,
+  baselineOutput,
   clean = true,
   deltaCodes = "0",
   failedExternalActions = [],
@@ -87,6 +89,14 @@ function runAction({
     inputOverrides,
   );
   const scanVulnerability = !clean;
+  const baselineResult = {
+    id: projectId,
+    isMonitored: true,
+    lastTestedDate: "2026-10-21T00:00:00.000Z",
+    origin: "cli",
+    targetReference: "main",
+    type: "npm",
+  };
   const ossResult = {
     packageManager: "npm",
     projectName: "rcw",
@@ -106,6 +116,10 @@ function runAction({
   writeFileSync(
     join(directory, "oss.json"),
     ossOutput ?? JSON.stringify(ossResult),
+  );
+  writeFileSync(
+    join(directory, "baseline.json"),
+    baselineOutput ?? JSON.stringify(baselineResult),
   );
   writeFileSync(tracePath, "");
   writeFileSync(deltaCountPath, "0");
@@ -131,8 +145,16 @@ printf '%s' "$count" > "$DELTA_COUNT"
 exit_code=$(printf '%s' "$DELTA_CODES" | awk -F, -v index="$count" '{ print $index }')
 exit "\${exit_code:-0}"
 `;
+  const curl = `#!/bin/bash
+set -eu
+printf '%s\\n' "curl $*" >> "$COMMAND_TRACE"
+for argument in "$@"; do [[ "$argument" == --output=* ]] && output=\${argument#*=}; done
+cp "$BASELINE_RESULT" "$output"
+exit "$BASELINE_EXIT"
+`;
   makeExecutable(join(bin, "snyk"), shell);
   makeExecutable(join(bin, "snyk-delta"), delta);
+  makeExecutable(join(bin, "curl"), curl);
   makeExecutable(join(bin, "npm"), "#!/bin/bash\nexit 0\n");
   try {
     const steps = action.runs.steps;
@@ -168,6 +190,8 @@ exit "\${exit_code:-0}"
         env[name] = resolveExpression(value, inputs, outcomes, outputs);
       }
       Object.assign(env, {
+        BASELINE_EXIT: String(baselineExit),
+        BASELINE_RESULT: join(directory, "baseline.json"),
         COMMAND_TRACE: tracePath,
         DELTA_CODES: deltaCodes,
         DELTA_COUNT: deltaCountPath,
@@ -265,6 +289,61 @@ test("clean scans read the explicitly configured OSS baseline", () => {
       run.commands,
       /container|monitor|sarif|security-events/i,
     );
+  } finally {
+    rmSync(run.directory, { force: true, recursive: true });
+  }
+});
+
+test("clean scans validate the explicit OSS main baseline before comparison", () => {
+  const run = runAction();
+  try {
+    assert.equal(run.outcome, "passed", run.diagnostics);
+    assert.match(run.commands, /curl/);
+    assert.ok(run.commands.includes(`/v1/org/${orgId}/project/${projectId}`));
+    assert.equal(run.deltaCalls, 1);
+  } finally {
+    rmSync(run.directory, { force: true, recursive: true });
+  }
+});
+
+test("clean scans fail closed on missing or mismatched OSS baseline metadata", () => {
+  const baselineResult = {
+    id: projectId,
+    isMonitored: true,
+    lastTestedDate: "2026-10-21T00:00:00.000Z",
+    origin: "cli",
+    targetReference: "main",
+    type: "npm",
+  };
+  const invalidBaselineOutputs = [
+    "not-json",
+    JSON.stringify({
+      ...baselineResult,
+      id: "22222222-2222-4222-8222-222222222222",
+    }),
+    JSON.stringify({ ...baselineResult, isMonitored: false }),
+    JSON.stringify({ ...baselineResult, lastTestedDate: null }),
+    JSON.stringify({ ...baselineResult, origin: "github" }),
+    JSON.stringify({ ...baselineResult, targetReference: "release" }),
+    JSON.stringify({ ...baselineResult, type: "docker" }),
+  ];
+
+  for (const baselineOutput of invalidBaselineOutputs) {
+    const run = runAction({ baselineOutput });
+    try {
+      assert.equal(run.outcome, "failed", run.diagnostics);
+      assert.equal(run.deltaCalls, 0, run.diagnostics);
+    } finally {
+      rmSync(run.directory, { force: true, recursive: true });
+    }
+  }
+});
+
+test("a clean scan fails closed when the OSS baseline project is unreadable", () => {
+  const run = runAction({ baselineExit: 22 });
+  try {
+    assert.equal(run.outcome, "failed", run.diagnostics);
+    assert.equal(run.deltaCalls, 0, run.diagnostics);
   } finally {
     rmSync(run.directory, { force: true, recursive: true });
   }

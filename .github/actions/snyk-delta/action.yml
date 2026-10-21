@@ -96,6 +96,7 @@ runs:
         ORG_ID: ${{ inputs.org-id }}
         OPEN_SOURCE_PROJECT_ID: ${{ inputs.open-source-project-id }}
         SNYK_OAUTH_TOKEN: ${{ steps.snyk-auth.outputs.token }}
+        SNYK_API: ${{ env.SNYK_API }}
       run: |
         set -uo pipefail
         export SNYK_TOKEN="$SNYK_OAUTH_TOKEN"
@@ -130,6 +131,45 @@ runs:
           ' "$oss_json" >/dev/null
         }
 
+        validate_open_source_baseline() {
+          local baseline_json="$scan_dir/open-source-baseline.json"
+          local package_manager
+          local snyk_api="${SNYK_API:-https://api.snyk.io}"
+
+          package_manager="$(jq -r '.packageManager' "$oss_json")"
+          snyk_api="${snyk_api%/}"
+          snyk_api="${snyk_api%/v1}"
+
+          if ! curl \
+            --fail \
+            --location \
+            --silent \
+            --show-error \
+            --header "Authorization: Bearer $SNYK_OAUTH_TOKEN" \
+            --header 'Accept: application/json' \
+            --output="$baseline_json" \
+            "$snyk_api/v1/org/$ORG_ID/project/$OPEN_SOURCE_PROJECT_ID"; then
+            echo '::error::Open Source baseline project cannot be read'
+            return 1
+          fi
+
+          if ! jq -e \
+            --arg project_id "$OPEN_SOURCE_PROJECT_ID" \
+            --arg package_manager "$package_manager" \
+            '
+              type == "object" and
+              ((.id | ascii_downcase) == ($project_id | ascii_downcase)) and
+              .origin == "cli" and
+              .type == $package_manager and
+              .targetReference == "main" and
+              .isMonitored == true and
+              (.lastTestedDate | type == "string" and length > 0)
+            ' "$baseline_json" >/dev/null; then
+            echo '::error::Open Source baseline is not the monitored main project for this package manager'
+            return 1
+          fi
+        }
+
         run_open_source_delta() {
           local delta_status
 
@@ -140,6 +180,10 @@ runs:
 
           if ! is_valid_open_source_output; then
             echo '::error::Open Source scan output is missing or unsupported'
+            return 1
+          fi
+
+          if ! validate_open_source_baseline; then
             return 1
           fi
 

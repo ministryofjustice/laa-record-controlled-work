@@ -14,13 +14,16 @@ refresh baselines, or upload GitHub Security results.
 - Open Source scans include development dependencies, use high severity and
   apply the repository `.snyk` policy.
 
-Delta receives the configured organization and project UUID directly. It reads
-that monitored baseline even when the current scan is clean. The compatibility
-check verifies the exact lookup coordinates and uses sanitized Open Source CLI
-JSON with the pinned Delta package. Delta compares issue IDs and dependency
-paths, so unchanged findings and version-only changes on the same package-name
-path pass. New high or critical findings and qualifying new paths fail. The
-explicit `--type vuln` option excludes license findings.
+Before comparison, the action reads the project by its configured UUID and
+validates that it belongs to the configured organization, is an active CLI
+project, matches the scan's package manager, targets `main` and has a recorded
+test date. This check runs even when the current scan is clean. Delta then reads
+the same explicit project baseline. The compatibility check verifies the
+lookup coordinates and uses sanitized Open Source CLI JSON with the pinned
+Delta package. Delta compares issue IDs and dependency paths, so unchanged
+findings and version-only changes on the same package-name path pass. New high
+or critical findings and qualifying new paths fail. The explicit `--type vuln`
+option excludes license findings.
 
 A Snyk test exit code of 1 means findings and does not skip comparison. Other
 scan errors, invalid or incomplete output, baseline-read errors and comparison
@@ -40,7 +43,8 @@ Set the project UUID to the Open Source project refreshed by trusted-main
 monitoring. The action does not discover a project by name or require the
 snapshot to match the PR base commit. Main, nightly and their trusted manual
 paths refresh the same monitored baseline. A lagging snapshot is not evidence
-that its findings are fixed.
+that its findings are fixed. The action rejects an inaccessible, inactive,
+untested, non-CLI, non-main or package-manager-mismatched project.
 
 Pass OAuth credentials through the existing `SNYK_CLIENT_ID` and
 `SNYK_CLIENT_SECRET` repository secrets. Callers pass both variables and those
