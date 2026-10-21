@@ -127,39 +127,19 @@ runs:
       run: |
         set -uo pipefail
         export SNYK_TOKEN="$SNYK_OAUTH_TOKEN"
-        overall_status=0
         scan_dir="$(mktemp -d)"
         trap 'rm -rf "$scan_dir"' EXIT
         oss_json="$scan_dir/open-source.json"
 
-        compare_with_baseline() {
-          local project_id="$1"
-          local result_json="$2"
-          local product="$3"
-          local context="${4-}"
+        snyk_delta_open_source() {
           local delta_status
 
-          if snyk-delta \
-            --baselineOrg "$ORG_ID" \
-            --baselineProject "$project_id" \
-            --type vuln < "$result_json"; then
-            echo "$product delta passed$context"
-          else
-            delta_status=$?
-            if (( delta_status == 1 )); then
-              echo "::error::$product delta found a new high or critical vulnerability$context"
-            else
-              echo "::error::$product delta failed with exit code $delta_status$context"
-            fi
-            overall_status=1
-          fi
-        }
-
-        snyk_delta_open_source() {
           if (( oss_scan_status > 1 )); then
             echo "::error::Open Source scan failed with exit code $oss_scan_status"
-            overall_status=1
-          elif ! jq -e '
+            return 1
+          fi
+
+          if ! jq -e '
             type == "object" and
             (.vulnerabilities | type == "array") and
             .severityThreshold == "high" and
@@ -176,9 +156,22 @@ runs:
             )
           ' "$oss_json" >/dev/null; then
             echo '::error::Open Source scan output is missing or unsupported'
-            overall_status=1
+            return 1
+          fi
+
+          if snyk-delta \
+            --baselineOrg "$ORG_ID" \
+            --baselineProject "$OPEN_SOURCE_PROJECT_ID" \
+            --type vuln < "$oss_json"; then
+            echo 'Open Source delta passed'
           else
-            compare_with_baseline "$OPEN_SOURCE_PROJECT_ID" "$oss_json" "Open Source"
+            delta_status=$?
+            if (( delta_status == 1 )); then
+              echo '::error::Open Source delta found a new high or critical vulnerability'
+            else
+              echo "::error::Open Source delta failed with exit code $delta_status"
+            fi
+            return 1
           fi
         }
 
@@ -195,7 +188,6 @@ runs:
         fi
 
         snyk_delta_open_source
-        exit "$overall_status"
       shell: bash
 
     - name: Assess Container delta
