@@ -49,16 +49,22 @@ runs:
         jq -e --arg open_source_project_id "$OPEN_SOURCE_PROJECT_ID" '
           def uuid: type == "string" and test("^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$");
           def safe_text: type == "string" and all(explode[]; . >= 32 and . != 127);
+
           type == "array" and length > 0 and
           all(.[];
             (.identityType | safe_text and length > 0) and
             (.targetFile | safe_text) and
             (.projectId | uuid)
           ) and
+
           any(.[]; .identityType == "apk" and .targetFile == "") and
           any(.[]; .targetFile != "") and
+
           ([.[] | [.identityType, .targetFile] | @json] | unique | length) == length and
-          ([.[] | .projectId | ascii_downcase] + [$open_source_project_id | ascii_downcase] | unique | length) == ([.[] | .projectId | ascii_downcase] + [$open_source_project_id | ascii_downcase] | length)
+          (
+            ([.[] | .projectId | ascii_downcase] + [$open_source_project_id | ascii_downcase]) as $project_ids |
+            ($project_ids | unique | length) == ($project_ids | length)
+          )
         ' <<< "$CONTAINER_PROJECTS_JSON" >/dev/null || { echo '::error::Container project mappings are invalid or incomplete'; exit 1; }
       shell: bash
 
@@ -140,20 +146,20 @@ runs:
           fi
 
           if ! jq -e '
+            def non_empty_string: type == "string" and length > 0;
+            def valid_vulnerability:
+              (.id | non_empty_string) and
+              (.severity | IN("low", "medium", "high", "critical")) and
+              ((.type // "vuln") | IN("vuln", "license")) and
+              (.from | type == "array" and length > 0 and all(.[]; non_empty_string));
+
             type == "object" and
             (.vulnerabilities | type == "array") and
             .severityThreshold == "high" and
-            (.packageManager | type == "string" and length > 0) and
-            (.projectName | type == "string" and length > 0) and
-            all(.vulnerabilities[];
-              (.id | type == "string" and length > 0) and
-              (.severity | IN("low", "medium", "high", "critical")) and
-              ((.type // "vuln") | IN("vuln", "license")) and
-              (.from |
-                type == "array" and length > 0 and
-                all(.[]; type == "string" and length > 0)
-              )
-            )
+            (.packageManager | non_empty_string) and
+            (.projectName | non_empty_string) and
+
+            all(.vulnerabilities[]; valid_vulnerability)
           ' "$oss_json" >/dev/null; then
             echo '::error::Open Source scan output is missing or unsupported'
             return 1
@@ -254,26 +260,27 @@ runs:
           echo "::error::Container scan failed with exit code $container_scan_status"
           overall_status=1
         elif ! jq -e '
+          def non_empty_string: type == "string" and length > 0;
+          def valid_vulnerability:
+            (.id | non_empty_string) and
+            (.severity | IN("low", "medium", "high", "critical")) and
+            (.from | type == "array" and length > 0 and all(.[]; non_empty_string));
+
           type == "array" and length > 0 and
           all(.[ ];
             type == "object" and
             (.vulnerabilities | type == "array") and
-            (.packageManager | type == "string" and length > 0) and
-            (.projectName | type == "string" and length > 0) and
-            (.scanResult.identity.type | type == "string" and length > 0) and
-            (.scanResult.target.image | type == "string" and length > 0) and
-            all(.vulnerabilities[];
-              (.id | type == "string" and length > 0) and
-              (.severity | IN("low", "medium", "high", "critical")) and
-              (.from |
-                type == "array" and length > 0 and
-                all(.[]; type == "string" and length > 0)
-              )
-            )
+            (.packageManager | non_empty_string) and
+            (.projectName | non_empty_string) and
+            (.scanResult.identity.type | non_empty_string) and
+            (.scanResult.target.image | non_empty_string) and
+
+            all(.vulnerabilities[]; valid_vulnerability)
           ) and
+
           any(.[ ];
             .scanResult.identity.type == "apk" and
-            (.docker.baseImage | type == "string" and length > 0)
+            (.docker.baseImage | non_empty_string)
           )
         ' "$container_json" >/dev/null; then
           echo '::error::Container scan output is malformed or unsupported'
