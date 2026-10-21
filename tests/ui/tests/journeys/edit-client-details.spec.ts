@@ -80,6 +80,7 @@ test("Edit Application - Client details journey", async ({
       }),
       // National insurance number
       clientDetailsApplication.clientDetails.niNumber ?? "",
+      // Has fixed address
       "Yes",
       // Address
       clientDetailsApplication.clientDetails.address?.addressLine1 ?? "",
