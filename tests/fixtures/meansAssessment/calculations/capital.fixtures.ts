@@ -109,12 +109,24 @@ function createCapitalResult({
     result_summary: {
       capital: {
         combined_assessed_capital: 126_802.45,
+        disputed_non_property_disregard: 350,
+        pensioner_disregard_applied: 500,
         proceeding_types: [
           {
             result: uncalculated ? "not_calculated" : "eligible",
             upper_threshold: 400_000,
           },
+          {
+            result: uncalculated ? "not_calculated" : "eligible",
+            upper_threshold: 350_000,
+          },
         ],
+        subject_matter_of_dispute_disregard: 500,
+        total_capital: 137_050.51,
+        total_capital_with_smod: 136_700.5,
+        total_liquid: 10_200.01,
+        total_non_liquid: 150,
+        total_property: 126_700.5,
       },
       disposable_income: {
         allowed_housing_costs: 0,
@@ -136,6 +148,13 @@ function createCapitalResult({
         proceeding_types: [{ result: "eligible", upper_threshold: 2_657 }],
       },
       overall_result: { result: "eligible" },
+      partner_capital: {
+        pensioner_disregard_applied: 250,
+        total_capital_with_smod: 51_500,
+        total_liquid: 1_000,
+        total_non_liquid: 500,
+        total_property: 50_000,
+      },
       partner_disposable_income: {
         employment_income: {
           fixed_employment_deduction: 0,

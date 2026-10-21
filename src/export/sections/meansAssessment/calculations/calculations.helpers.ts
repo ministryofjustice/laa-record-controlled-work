@@ -1,8 +1,26 @@
-import { CFE_MAX_VALUE } from "#/export/sections/meansAssessment/calculations/calculations.constants.js";
+import {
+  CFE_MAX_VALUE,
+  MINIMUM_ASSESSED_CAPITAL,
+} from "#/export/sections/meansAssessment/calculations/calculations.constants.js";
 
 const EMPTY_PARTNER_CAPITAL_SIZE = 0;
 const NO_CFE_PROCEEDING_TYPES = 0;
 const ZERO_AMOUNT = 0;
+
+/**
+ * Applies CCQ's zero floor to saved combined assessed capital for display.
+ * CCQ: laa-check-client-qualifies/app/models/cfe_result.rb#raw_total_calculated_capital.
+ * @param amount Saved combined assessed capital, if present.
+ * @returns The saved amount floored at zero, or null when missing.
+ */
+export function floorCombinedAssessedCapital(
+  amount: null | number | undefined,
+): null | number {
+  if (amount === null || amount === undefined) {
+    return null;
+  }
+  return Math.max(amount, MINIMUM_ASSESSED_CAPITAL);
+}
 
 /**
  * Uses saved result presence to decide whether CCQ renders partner tables.

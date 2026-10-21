@@ -806,7 +806,7 @@ test("omits outgoing details when the category was not calculated", async ({
   ).toBeVisible();
 });
 
-test("renders saved property values and layout from the export route", async ({
+test("renders saved capital calculation values from the export route", async ({
   withSelectedOffice: page,
 }) => {
   const application =
@@ -825,11 +825,45 @@ test("renders saved property values and layout from the export route", async ({
     "table.app-means-assessment__calculation-table",
   );
   const homeTable = page.getByRole("table", { name: "Home client lives in" });
+  const clientCapital = page.getByRole("table", {
+    name: "Client's disposable capital",
+  });
+  const partnerCapital = page.getByRole("table", {
+    name: "Partner's disposable capital",
+  });
+  const pensionerCapital = page.getByRole("table", {
+    name: "60 or over disregard (also known as pensioner disregard)",
+  });
   await expect(capitalHeading).toBeVisible();
-  await expect(tables).toHaveCount(12);
+  await expect(tables).toHaveCount(16);
   await expect(homeTable).toContainText("-£100,000.00");
   await expect(homeTable).toContainText("-£7,500.00");
   await expect(homeTable).toContainText("£93,456.78");
+  await expect(clientCapital.locator(".app-calculation__amount")).toHaveText([
+    "£126,700.50",
+    "£10,200.01",
+    "£150.00",
+    "£137,050.51",
+    "-£350.00",
+    "-£500.00",
+    "£136,700.50",
+  ]);
+  await expect(partnerCapital.locator(".app-calculation__amount")).toHaveText([
+    "£50,000.00",
+    "£1,000.00",
+    "£500.00",
+    "£51,500.00",
+  ]);
+  await expect(pensionerCapital.locator(".app-calculation__amount")).toHaveText([
+    "£188,200.50",
+    "-£750.00",
+    "£126,802.45",
+  ]);
+  const finalCapitalTable = page.getByRole("table", { name: "Total" }).last();
+  await expect(finalCapitalTable.locator(".app-calculation__amount")).toHaveText([
+    "£126,802.45",
+    "£350,000.00",
+  ]);
   await expect(
     page.getByRole("table", { name: "Client other property 2" }),
   ).toContainText("Client’s 50% share of home equity");

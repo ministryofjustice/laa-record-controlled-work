@@ -22,7 +22,7 @@ export function toCalculationBreakdowns(
           {
             description: breakdown.description ?? [],
             heading: breakdown.heading,
-            message: null,
+            message: breakdown.message ?? null,
             tables: breakdown.tables.map((table) => ({
               caption: table.heading,
               captionClasses: "govuk-table__caption--m",
