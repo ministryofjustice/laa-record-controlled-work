@@ -193,6 +193,24 @@
             "mortgage": "Value of outstanding mortgage",
             "disputedAsset": "Disputed asset"
           }
+        },
+        "assets": {
+          "client": {
+            "heading": "Client assets",
+            "bankAccountHeading": "Client bank account {index}",
+            "investmentsRelevant": "Does your client have any investments?",
+            "valuablesRelevant": "Does your client have valuable items worth £500 or more?"
+          },
+          "partner": {
+            "heading": "Partner assets",
+            "bankAccountHeading": "Partner bank account {index}",
+            "investmentsRelevant": "Does the partner have any investments?",
+            "valuablesRelevant": "Does the partner have valuable items worth £500 or more?"
+          },
+          "bankAccountAmount": "Money in bank account",
+          "investments": "Investments",
+          "valuables": "Valuable items",
+          "disputedAsset": "Disputed asset"
         }
       },
       "clientAndCaseDetails": {
