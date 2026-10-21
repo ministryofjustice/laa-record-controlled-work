@@ -1541,7 +1541,7 @@ describe("Auth Handlers", () => {
         expect(res.headers.location).to.include(
           `state=${encodeURIComponent(state)}`,
         );
-        expect(res.headers["cache-control"]).to.equal("no-store");
+        expect(res.headers["cache-control"]).to.equal("private, no-store");
         expect(authServiceStub.exchangeAuthCode.called).to.be.false;
       });
 

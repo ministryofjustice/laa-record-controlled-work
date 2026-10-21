@@ -70,9 +70,7 @@ describe("GET /cases/:applicationId/export", () => {
     const response = await request(buildApp()).get(exportPath("not-a-uuid"));
 
     expect(response.status).to.equal(400);
-    expect(response.headers["cache-control"]).to.equal(
-      "no-cache, no-store, must-revalidate",
-    );
+    expect(response.headers["cache-control"]).to.equal("private, no-store");
     expect(getApplicationStub.called).to.equal(false);
   });
 
@@ -116,9 +114,7 @@ describe("GET /cases/:applicationId/export", () => {
     const response = await agent.get(exportPath(applicationId));
 
     expect(response.status).to.equal(200);
-    expect(response.headers["cache-control"]).to.equal(
-      "no-cache, no-store, must-revalidate",
-    );
+    expect(response.headers["cache-control"]).to.equal("private, no-store");
     expect(response.headers.pragma).to.equal("no-cache");
     expect(response.headers.expires).to.equal("0");
     expect(JSON.parse(response.text)).to.deep.equal({
@@ -133,9 +129,7 @@ describe("GET /cases/:applicationId/export", () => {
     const response = await request(buildApp()).get(exportPath(applicationId));
 
     expect(response.status).to.equal(401);
-    expect(response.headers["cache-control"]).to.equal(
-      "no-cache, no-store, must-revalidate",
-    );
+    expect(response.headers["cache-control"]).to.equal("private, no-store");
     expect(getApplicationStub.called).to.equal(false);
   });
 
@@ -146,9 +140,7 @@ describe("GET /cases/:applicationId/export", () => {
       const response = await request(buildApp()).get(exportPath(applicationId));
 
       expect(response.status).to.equal(404);
-      expect(response.headers["cache-control"]).to.equal(
-        "no-cache, no-store, must-revalidate",
-      );
+      expect(response.headers["cache-control"]).to.equal("private, no-store");
       expect(response.headers.pragma).to.equal("no-cache");
       expect(response.headers.expires).to.equal("0");
     });
@@ -160,9 +152,7 @@ describe("GET /cases/:applicationId/export", () => {
     const response = await request(buildApp()).get(exportPath(applicationId));
 
     expect(response.status).to.equal(500);
-    expect(response.headers["cache-control"]).to.equal(
-      "no-cache, no-store, must-revalidate",
-    );
+    expect(response.headers["cache-control"]).to.equal("private, no-store");
     expect(response.headers.pragma).to.equal("no-cache");
     expect(response.headers.expires).to.equal("0");
   });

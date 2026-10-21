@@ -96,12 +96,16 @@ server {
   # match anything with `/eligibility` and forward the whole thing to CCQ
   location ~ /eligibility(/|$) {
     include     /etc/nginx/proxy.conf;
+    proxy_hide_header Cache-Control;
+    add_header Cache-Control "private, no-store" always;
     proxy_pass  http://${NGINX_UPSTREAM_CCQ};
   }
 
   # match anything with `/documents` and forward to CCQ
   location ~ ^/documents(/|$) {
     include     /etc/nginx/proxy.conf;
+    proxy_hide_header Cache-Control;
+    add_header Cache-Control "private, no-store" always;
     proxy_pass  http://${NGINX_UPSTREAM_CCQ};
   }
 }
