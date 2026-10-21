@@ -40,6 +40,7 @@ export function ecfLink(): GovUKBody {
  */
 export function ecfTitle(): GovUKHeading {
   return GovUKHeading({
+    classes: "govuk-heading-m",
     level: H2,
     text: ECF_TITLE,
   });

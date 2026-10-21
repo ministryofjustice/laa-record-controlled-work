@@ -17,6 +17,7 @@ import { niNumberStep } from "#/journeys/create-application/steps/niNumber/niNum
 import { editClientDetailsEffects } from "#/journeys/edit-client-details/editClientDetails.effects.js";
 import { checkAnswersStep } from "#/journeys/edit-client-details/steps/check-answers/check-answers.step.js";
 import { JourneyCode } from "#/journeys/JourneyCode.enum.js";
+import { familyPrivateNotInScopeStep } from "#/journeys/create-application/steps/familyPrivateNotInScope/familyPrivateNotInScope.step.js";
 
 const editJourneyCode = JourneyCode.EDIT_CLIENT_DETAILS;
 
@@ -57,6 +58,7 @@ export const editClientDetailsJourney = journey({
   steps: [
     ...stepsDirectlyEnterableWhileEditing,
     ineligibleStep(editJourneyCode),
+    familyPrivateNotInScopeStep(editJourneyCode),
     enterAddressManuallyStep(editJourneyCode),
     enterOverseasAddressStep(editJourneyCode),
     checkAnswersStep(editJourneyCode),

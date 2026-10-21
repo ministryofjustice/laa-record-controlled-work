@@ -5,7 +5,6 @@ import {
   submit,
   type SubmitHook,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
-import { t } from "i18next";
 
 import { CreateApplicationEffects } from "#/journeys/create-application/create-application.effects.js";
 import {
@@ -15,8 +14,9 @@ import {
   guidance,
   heading,
 } from "#/journeys/create-application/steps/familyPrivateNotInScope/familyPrivateNotInScope.blocks.js";
-import { button, clientDetailsCaption } from "#/journeys/shared.blocks.js";
+import { button } from "#/journeys/shared.blocks.js";
 import { StepCode } from "#/journeys/StepCode.enum.js";
+import { t } from "#/lib/i18n.js";
 
 const TITLE = t("journeys.createApplication.familyPrivateNotInScope.title");
 
@@ -30,7 +30,6 @@ export function familyPrivateNotInScopeStep(
 ): StepDefinition {
   return step({
     blocks: [
-      clientDetailsCaption(),
       heading(),
       ...guidance(),
       ecfTitle(),
@@ -39,7 +38,7 @@ export function familyPrivateNotInScopeStep(
       button(t("journeys.createApplication.familyPrivateNotInScope.button")),
     ],
     code: StepCode.FAMILY_PRIVATE_NOT_IN_SCOPE,
-    onSubmission: [gotoHome(journeyCode)],
+    onSubmission: [goToCases(journeyCode)],
     path: "not-in-scope",
     title: TITLE,
   });
@@ -52,14 +51,13 @@ export function familyPrivateNotInScopeStep(
  * @param {string} journeyCode - The journey code for clearing draft answers
  * @returns {SubmitHook} A submit hook that clears answers and redirects home
  */
-function gotoHome(journeyCode: string): SubmitHook {
+function goToCases(journeyCode: string): SubmitHook {
   return submit({
-    onValid: {
+    onAlways: {
       effects: [CreateApplicationEffects.clearAllDraftAnswers(journeyCode)],
-      next: [redirectToHome],
+      next: [redirectToCases],
     },
-    validate: true,
   });
 }
 
-const redirectToHome = redirect({ goto: "/" });
+const redirectToCases = redirect({ goto: "/cases" });
