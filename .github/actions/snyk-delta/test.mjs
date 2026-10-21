@@ -79,6 +79,7 @@ function runAction({
   failedActions = [],
   inputs: inputOverrides = {},
   ossExit = 0,
+  ossOutput,
 } = {}) {
   const action = loadAction();
   const directory = mkdtempSync(join(tmpdir(), "snyk-delta-action-"));
@@ -131,7 +132,10 @@ function runAction({
     vulnerabilities: scanVulnerability ? result.vulnerabilities : [],
   }));
 
-  writeFileSync(join(directory, "oss.json"), JSON.stringify(ossResult));
+  writeFileSync(
+    join(directory, "oss.json"),
+    ossOutput ?? JSON.stringify(ossResult),
+  );
   writeFileSync(
     join(directory, "container.json"),
     containerOutput ?? JSON.stringify(containerResults),
@@ -321,6 +325,32 @@ test("scan operational errors fail while the other product is still assessed", (
   try {
     assert.equal(run.outcome, "failed");
     assert.match(run.commands, /snyk container test/);
+  } finally {
+    rmSync(run.directory, { force: true, recursive: true });
+  }
+});
+
+test("malformed Open Source vulnerability records fail closed", () => {
+  const run = runAction({
+    ossOutput: JSON.stringify({
+      packageManager: "npm",
+      projectName: "rcw",
+      severityThreshold: "high",
+      vulnerabilities: [
+        {
+          from: ["rcw@1.0.0", "example-package@1.0.0"],
+          id: "SNYK-EXAMPLE-MALFORMED",
+        },
+      ],
+    }),
+  });
+  try {
+    assert.equal(run.outcome, "failed");
+    assert.equal(run.deltaCalls, 2);
+    assert.match(
+      run.diagnostics,
+      /Open Source scan output is missing or unsupported/,
+    );
   } finally {
     rmSync(run.directory, { force: true, recursive: true });
   }

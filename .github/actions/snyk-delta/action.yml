@@ -143,7 +143,19 @@ runs:
         if (( oss_scan_status > 1 )); then
           echo "::error::Open Source scan failed with exit code $oss_scan_status"
           overall_status=1
-        elif ! jq -e 'type == "object" and (.vulnerabilities | type == "array") and .severityThreshold == "high" and (.packageManager | type == "string") and (.projectName | type == "string")' "$oss_json" >/dev/null; then
+        elif ! jq -e '
+          type == "object" and
+          (.vulnerabilities | type == "array") and
+          .severityThreshold == "high" and
+          (.packageManager | type == "string" and length > 0) and
+          (.projectName | type == "string" and length > 0) and
+          all(.vulnerabilities[];
+            (.id | type == "string" and length > 0) and
+            (.severity | IN("low", "medium", "high", "critical")) and
+            ((.type // "vuln") | IN("vuln", "license")) and
+            (.from | type == "array" and length > 0 and all(.[]; type == "string" and length > 0))
+          )
+        ' "$oss_json" >/dev/null; then
           echo '::error::Open Source scan output is missing or unsupported'
           overall_status=1
         else
