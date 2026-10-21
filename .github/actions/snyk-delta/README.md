@@ -14,8 +14,8 @@ refresh baselines, or upload GitHub Security results.
 - Open Source scans include development dependencies, use high severity and
   apply the repository `.snyk` policy.
 
-Before comparison, the action reads the project by its configured UUID and
-validates that it belongs to the configured organization, is an active CLI
+Before comparison, the action requests the project by its configured UUID
+within the configured organization, then validates that it is an active CLI
 project, matches the scan's package manager, targets `main` and has a recorded
 test date. This check runs even when the current scan is clean. Delta then reads
 the same explicit project baseline. The compatibility check verifies the
