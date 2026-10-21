@@ -184,7 +184,11 @@ runs:
             (.projectName | type == "string" and length > 0) and
             (.scanResult.identity.type | type == "string" and length > 0) and
             (.scanResult.target.image | type == "string" and length > 0) and
-            all(.vulnerabilities[]; (.id | type == "string") and (.severity | IN("low", "medium", "high", "critical")) and (.from | type == "array"))
+            all(.vulnerabilities[];
+              (.id | type == "string" and length > 0) and
+              (.severity | IN("low", "medium", "high", "critical")) and
+              (.from | type == "array" and length > 0 and all(.[]; type == "string" and length > 0))
+            )
           ) and
           any(.[]; .scanResult.identity.type == "apk" and (.docker.baseImage | type == "string" and length > 0))
         ' "$container_json" >/dev/null; then

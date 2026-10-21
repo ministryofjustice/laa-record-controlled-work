@@ -356,6 +356,40 @@ test("malformed Open Source vulnerability records fail closed", () => {
   }
 });
 
+test("Open Source findings require IDs and non-empty dependency paths", () => {
+  const vulnerabilities = [
+    {
+      from: ["rcw@1.0.0", "example-package@1.0.0"],
+      severity: "high",
+    },
+    {
+      from: [],
+      id: "SNYK-EXAMPLE-EMPTY-PATH",
+      severity: "high",
+    },
+  ];
+  for (const vulnerability of vulnerabilities) {
+    const run = runAction({
+      ossOutput: JSON.stringify({
+        packageManager: "npm",
+        projectName: "rcw",
+        severityThreshold: "high",
+        vulnerabilities: [vulnerability],
+      }),
+    });
+    try {
+      assert.equal(run.outcome, "failed");
+      assert.equal(run.deltaCalls, 2);
+      assert.match(
+        run.diagnostics,
+        /Open Source scan output is missing or unsupported/,
+      );
+    } finally {
+      rmSync(run.directory, { force: true, recursive: true });
+    }
+  }
+});
+
 test("missing Container mappings fail before scans, including on clean inputs", () => {
   const run = runAction({ inputs: { "container-projects-json": "[]" } });
   try {
@@ -480,6 +514,31 @@ test("Container results missing project identity metadata fail closed", () => {
     );
   } finally {
     rmSync(run.directory, { force: true, recursive: true });
+  }
+});
+
+test("Container findings require IDs and non-empty dependency paths", () => {
+  for (const vulnerability of [
+    { from: ["docker-image|rcw@latest"], severity: "low" },
+    { from: [], id: "SNYK-EXAMPLE-EMPTY-PATH", severity: "low" },
+  ]) {
+    const containerResults = JSON.parse(
+      readFileSync(containerFixturePath, "utf8"),
+    );
+    containerResults[0].vulnerabilities = [vulnerability];
+    const run = runAction({
+      containerOutput: JSON.stringify(containerResults),
+    });
+    try {
+      assert.equal(run.outcome, "failed");
+      assert.equal(run.deltaCalls, 1);
+      assert.match(
+        run.diagnostics,
+        /Container scan output is malformed or unsupported/,
+      );
+    } finally {
+      rmSync(run.directory, { force: true, recursive: true });
+    }
   }
 });
 
