@@ -36,6 +36,7 @@ Expected mapper states use synthetic fixtures: `meansAssessmentRequired: false` 
 - `answers/answers.mapper.ts` maps saved answers into translated summaries.
 - `answers/answers.formatter.ts` formats saved values as plain text.
 - `calculations/calculations.mapper.ts` parses and maps saved calculation results independently of answer summaries.
+- `calculations/calculations.format.ts` prepares ordered, displayable income and outgoings breakdowns as `calculationBreakdowns`. It omits uncalculated sections, preserves unavailable messages, and supplies GOV.UK table options with escaped heading and hint HTML. The shared calculation template renders these prepared breakdowns without checking saved calculation states.
 - `calculations/calculations.zod.ts` defines calculation and exemption schemas with their inferred result types.
 - Answer types live in `answers/answers.types.ts`; calculation types live in `calculations/calculations.types.ts`.
 - Only section composition remains at the section root. Unit tests mirror module names and assert exported behaviour.

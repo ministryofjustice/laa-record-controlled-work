@@ -7,7 +7,15 @@ import { describe, it } from "mocha";
 
 import config from "#/config.js";
 import type { ClientAndCaseDetailsSection } from "#/export/sections/clientAndCaseDetails/clientAndCaseDetails.types.js";
+import type { MeansAssessmentSection } from "#/export/sections/meansAssessment/meansAssessment.types.js";
+
+import { toCalculationBreakdowns } from "#/export/sections/meansAssessment/calculations/calculations.format.js";
 import { setupNunjucks } from "#/middleware/setupNunjucks.js";
+
+type MeansAssessmentView = Pick<
+  MeansAssessmentSection,
+  "answerSummaries" | "calculationBreakdowns" | "outcomeSummary"
+>;
 
 const formattedAddress = [
   faker.location.streetAddress(),
@@ -72,7 +80,7 @@ const clientAndCaseDetails: ClientAndCaseDetailsSection = {
   ],
 };
 
-const meansAssessment = {
+const meansAssessmentData = {
   answerSummaries: [
     {
       cards: [
@@ -89,7 +97,6 @@ const meansAssessment = {
       heading: "Client details",
     },
   ],
-  calculations: { status: "ready" },
   incomeBreakdown: {
     heading: "Income calculation",
     status: "ready",
@@ -129,6 +136,42 @@ const meansAssessment = {
       },
     ],
   },
+  outgoingsBreakdown: {
+    heading: "Outgoings calculation",
+    status: "ready",
+    tables: [
+      {
+        heading: "Client's monthly outgoings",
+        hint: "All figures have been converted into a monthly amount.",
+        rows: [
+          {
+            amount: "-£20.00",
+            heading: "Income tax",
+            hint: null,
+          },
+          {
+            additionalHint:
+              "Housing costs are capped at £545 for single clients without dependants",
+            amount: "£400.00",
+            heading: "Housing payments",
+            hint: "Housing costs minus any Housing Benefit payments your client gets",
+          },
+        ],
+      },
+      {
+        heading: "Total",
+        hint: null,
+        rows: [
+          {
+            amount: "£700.00",
+            emphasis: true,
+            heading: "Total monthly outgoings",
+            hint: null,
+          },
+        ],
+      },
+    ],
+  },
   outcomeSummary: {
     heading: "Means assessment",
     outcome: {
@@ -149,9 +192,17 @@ const meansAssessment = {
     },
     yourAnswersHeading: "Your answers",
   },
+} satisfies Omit<MeansAssessmentSection, "calculationBreakdowns" | "calculations">;
+
+const meansAssessment: MeansAssessmentView = {
+  ...meansAssessmentData,
+  calculationBreakdowns: toCalculationBreakdowns([
+    meansAssessmentData.incomeBreakdown,
+    meansAssessmentData.outgoingsBreakdown,
+  ]),
 };
 
-function createViewApp() {
+function createViewApp(section: MeansAssessmentView = meansAssessment) {
   const app = express();
   setupNunjucks(app);
   app.use((_req, res, next) => {
@@ -163,7 +214,7 @@ function createViewApp() {
       applicationRefNumber: req.query.reference ?? null,
       clientAndCaseDetails,
       clientName: req.query.client ?? null,
-      meansAssessment,
+      meansAssessment: section,
     });
   });
   return app;
@@ -288,8 +339,14 @@ describe("export application view", () => {
     expect(response.text).to.match(
       /<th scope="row" class="govuk-table__header app-calculation__row-heading">\s*Employment income/,
     );
-    expect(response.text).to.include(
-      '<td class="govuk-table__cell app-calculation__amount">£500.00</td>',
+    expect(response.text).to.match(
+      /<td class="govuk-table__cell app-calculation__amount">\s*£500\.00\s*<\/td>/,
+    );
+    expect(response.text).to.match(
+      /<th scope="row" class="govuk-table__header app-calculation__row-heading app-calculation__cell--emphasis">\s*Total monthly income/,
+    );
+    expect(response.text).to.match(
+      /<td class="govuk-table__cell app-calculation__amount app-calculation__cell--emphasis">\s*£500\.00\s*<\/td>/,
     );
     expect(
       response.text.indexOf("Your client's key eligibility totals"),
@@ -297,5 +354,97 @@ describe("export application view", () => {
     expect(response.text.indexOf("Income calculation")).to.be.lessThan(
       response.text.indexOf("Your answers"),
     );
+  });
+
+  it("renders outgoing tables with additional hints before saved answers", async () => {
+    const response = await request(createViewApp()).get("/export");
+
+    expect(response.status).to.equal(200);
+    expect(response.text).to.include("Outgoings calculation");
+    expect(response.text).to.include("Client&#39;s monthly outgoings");
+    expect(response.text).to.include("Housing costs are capped at £545");
+    expect(response.text).to.match(
+      /<th scope="row" class="govuk-table__header app-calculation__row-heading">\s*Income tax/,
+    );
+    expect(response.text).to.match(
+      /<td class="govuk-table__cell app-calculation__amount">\s*-£20\.00\s*<\/td>/,
+    );
+    expect(response.text.indexOf("Income calculation")).to.be.lessThan(
+      response.text.indexOf("Outgoings calculation"),
+    );
+    expect(response.text.indexOf("Outgoings calculation")).to.be.lessThan(
+      response.text.indexOf("Your answers"),
+    );
+  });
+
+  it("omits calculation headings and tables when no breakdowns are displayable", async () => {
+    const response = await request(createViewApp({
+      ...meansAssessment,
+      calculationBreakdowns: [],
+    })).get("/export");
+
+    expect(response.status).to.equal(200);
+    expect(response.text).not.to.include("Income calculation");
+    expect(response.text).not.to.include("Outgoings calculation");
+    expect(response.text).not.to.include("app-means-assessment__calculation-table");
+    expect(response.text).to.include("Your answers");
+  });
+
+  it("renders an unavailable breakdown beside ready calculation tables", async () => {
+    const response = await request(createViewApp({
+      ...meansAssessment,
+      calculationBreakdowns: [
+        {
+          heading: "Income calculation",
+          message: "Income calculation details are unavailable.",
+          tables: [],
+        },
+        ...meansAssessment.calculationBreakdowns.filter(
+          (breakdown) => breakdown.heading === "Outgoings calculation",
+        ),
+      ],
+    })).get("/export");
+
+    expect(response.status).to.equal(200);
+    expect(response.text).to.include("Income calculation details are unavailable.");
+    expect(response.text).not.to.include("Client&#39;s monthly income");
+    expect(response.text).to.include("Client&#39;s monthly outgoings");
+    expect(response.text.indexOf("Income calculation")).to.be.lessThan(
+      response.text.indexOf("Outgoings calculation"),
+    );
+  });
+
+  it("escapes calculation headings, amounts and both hint lines", async () => {
+    const unsafe = '<script>"unsafe" & \'saved\'</script>';
+    const escaped = "&lt;script&gt;&quot;unsafe&quot; &amp; &#39;saved&#39;&lt;/script&gt;";
+    const response = await request(createViewApp({
+      ...meansAssessment,
+      calculationBreakdowns: toCalculationBreakdowns([{
+        heading: unsafe,
+        status: "ready",
+        tables: [{
+          heading: unsafe,
+          hint: unsafe,
+          rows: [{
+            additionalHint: `Additional ${unsafe}`,
+            amount: unsafe,
+            heading: `Heading ${unsafe}`,
+            hint: `Hint ${unsafe}`,
+          }, {
+            amount: "£0.00",
+            heading: `Plain ${unsafe}`,
+            hint: null,
+          }],
+        }],
+      }]),
+    })).get("/export");
+
+    expect(response.status).to.equal(200);
+    expect(response.text).not.to.include(unsafe);
+    expect(response.text).to.include(`Heading ${escaped}`);
+    expect(response.text).to.include(`Hint ${escaped}</span>`);
+    expect(response.text).to.include(`Additional ${escaped}</span>`);
+    expect(response.text).to.include(`Plain ${escaped}`);
+    expect(response.text).not.to.include("&amp;lt;script&amp;gt;");
   });
 });

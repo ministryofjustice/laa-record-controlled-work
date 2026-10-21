@@ -11,9 +11,11 @@ import type {
 } from "#/export/sections/meansAssessment/meansAssessment.types.js";
 
 import { toMeansAssessmentAnswerSummaries } from "#/export/sections/meansAssessment/answers/answers.mapper.js";
+import { toCalculationBreakdowns } from "#/export/sections/meansAssessment/calculations/calculations.format.js";
 import { toMeansAssessmentCalculations } from "#/export/sections/meansAssessment/calculations/calculations.mapper.js";
 import { MeansAssessmentStatus } from "#/export/sections/meansAssessment/calculations/calculations.types.js";
 import { toMeansAssessmentIncomeBreakdown } from "#/export/sections/meansAssessment/calculations/income/income.mapper.js";
+import { toMeansAssessmentOutgoingsBreakdown } from "#/export/sections/meansAssessment/calculations/outgoings/outgoings.mapper.js";
 import { formatGBP } from "#/lib/currency.js";
 import { fixedT } from "#/lib/i18n.js";
 
@@ -39,15 +41,26 @@ export function toMeansAssessmentSection(
     eligibility?.result,
     eligibility?.data,
   );
+  const incomeBreakdown = toMeansAssessmentIncomeBreakdown(
+    eligibility?.result,
+    calculations,
+  );
+  const outgoingsBreakdown = toMeansAssessmentOutgoingsBreakdown(
+    eligibility?.result,
+    eligibility?.data,
+    calculations,
+  );
 
   return {
     answerSummaries: toMeansAssessmentAnswerSummaries(eligibility?.data),
+    calculationBreakdowns: toCalculationBreakdowns([
+      incomeBreakdown,
+      outgoingsBreakdown,
+    ]),
     calculations,
-    incomeBreakdown: toMeansAssessmentIncomeBreakdown(
-      eligibility?.result,
-      calculations,
-    ),
+    incomeBreakdown,
     outcomeSummary: toMeansAssessmentOutcomeSummary(calculations),
+    outgoingsBreakdown,
   };
 }
 

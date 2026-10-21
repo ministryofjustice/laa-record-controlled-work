@@ -5,6 +5,7 @@ import type {
 } from "#/export/sections/clientAndCaseDetails/clientAndCaseDetails.types.js";
 
 import { PriorLegalAid } from "#/api/clients/rcw/model/priorLegalAid.zod.gen.js";
+import { escapeHtml } from "#/export/export.helpers.js";
 import {
   formatClientAddress,
   formatDateOfBirth,
@@ -86,20 +87,6 @@ export function toClientAndCaseDetailsSection(
     heading: clientDetailsT("heading"),
     rows,
   };
-}
-
-/**
- * Escapes an address line for use in summary-list HTML.
- * @param value Address text from application data.
- * @returns HTML-escaped address text.
- */
-function escapeHtml(value: string): string {
-  return value
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
 }
 
 /**

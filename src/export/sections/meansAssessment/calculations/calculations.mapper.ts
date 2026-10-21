@@ -9,6 +9,10 @@ import type {
 
 import { ClientAgeRange } from "#/api/eligibility/eligibility.types.js";
 import {
+  CFE_MAX_VALUE,
+  MINIMUM_ASSESSED_CAPITAL,
+} from "#/export/sections/meansAssessment/calculations/calculations.constants.js";
+import {
   MeansAssessmentStatus,
   MeansAssessmentTotalField,
 } from "#/export/sections/meansAssessment/calculations/calculations.types.js";
@@ -19,8 +23,6 @@ import {
   type CfeResultSummary,
 } from "#/export/sections/meansAssessment/calculations/calculations.zod.js";
 
-const CFE_MAX_VALUE = 999_999_999_999;
-const MINIMUM_ASSESSED_CAPITAL = 0;
 const NO_CFE_PROCEEDING_TYPES = 0;
 
 /**
