@@ -271,7 +271,7 @@ test("clean scans still compare OSS and every configured Container result", () =
   const run = runAction();
   try {
     assert.equal(run.outcome, "passed", run.diagnostics);
-    assert.equal(run.deltaCalls, 3);
+    assert.equal(run.deltaCalls, 3, run.diagnostics);
     assert.match(run.commands, /--severity-threshold=high/);
     assert.equal((run.commands.match(/--policy-path=\.snyk/g) ?? []).length, 2);
     assert.match(run.commands, /--dev/);
@@ -324,7 +324,20 @@ test("scan operational errors fail while the other product is still assessed", (
   const run = runAction({ ossExit: 2 });
   try {
     assert.equal(run.outcome, "failed");
+    assert.equal(run.deltaCalls, 2);
     assert.match(run.commands, /snyk container test/);
+  } finally {
+    rmSync(run.directory, { force: true, recursive: true });
+  }
+});
+
+test("Container scan operational errors do not prevent the Open Source comparison", () => {
+  const run = runAction({ containerExit: 2 });
+  try {
+    assert.equal(run.outcome, "failed");
+    assert.equal(run.deltaCalls, 1);
+    assert.match(run.commands, /snyk test/);
+    assert.ok(run.commands.includes(`--baselineProject ${projectId}`));
   } finally {
     rmSync(run.directory, { force: true, recursive: true });
   }

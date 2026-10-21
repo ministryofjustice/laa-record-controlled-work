@@ -110,13 +110,106 @@ runs:
         printf '::add-mask::%s\n' "$SNYK_OAUTH_TOKEN"
       shell: bash
 
-    - name: Assess Snyk delta
-      if: steps.validate.outcome == 'success' && steps.setup-node.outcome == 'success' && steps.snyk-cli.outcome == 'success' && steps.snyk-delta.outcome == 'success' && steps.snyk-auth.outcome == 'success' && steps.mask-token.outcome == 'success'
-      id: assess
+    - name: Assess Open Source delta
+      if: >-
+        steps.validate.outcome == 'success' &&
+        steps.setup-node.outcome == 'success' &&
+        steps.snyk-cli.outcome == 'success' &&
+        steps.snyk-delta.outcome == 'success' &&
+        steps.snyk-auth.outcome == 'success' &&
+        steps.mask-token.outcome == 'success'
+      id: assess-open-source
       continue-on-error: true
       env:
         ORG_ID: ${{ inputs.org-id }}
         OPEN_SOURCE_PROJECT_ID: ${{ inputs.open-source-project-id }}
+        SNYK_OAUTH_TOKEN: ${{ steps.snyk-auth.outputs.token }}
+      run: |
+        set -uo pipefail
+        export SNYK_TOKEN="$SNYK_OAUTH_TOKEN"
+        overall_status=0
+        scan_dir="$(mktemp -d)"
+        trap 'rm -rf "$scan_dir"' EXIT
+        oss_json="$scan_dir/open-source.json"
+
+        compare_with_baseline() {
+          local project_id="$1"
+          local result_json="$2"
+          local product="$3"
+          local context="${4-}"
+          local delta_status
+
+          if snyk-delta \
+            --baselineOrg "$ORG_ID" \
+            --baselineProject "$project_id" \
+            --type vuln < "$result_json"; then
+            echo "$product delta passed$context"
+          else
+            delta_status=$?
+            if (( delta_status == 1 )); then
+              echo "::error::$product delta found a new high or critical vulnerability$context"
+            else
+              echo "::error::$product delta failed with exit code $delta_status$context"
+            fi
+            overall_status=1
+          fi
+        }
+
+        snyk_delta_open_source() {
+          if (( oss_scan_status > 1 )); then
+            echo "::error::Open Source scan failed with exit code $oss_scan_status"
+            overall_status=1
+          elif ! jq -e '
+            type == "object" and
+            (.vulnerabilities | type == "array") and
+            .severityThreshold == "high" and
+            (.packageManager | type == "string" and length > 0) and
+            (.projectName | type == "string" and length > 0) and
+            all(.vulnerabilities[];
+              (.id | type == "string" and length > 0) and
+              (.severity | IN("low", "medium", "high", "critical")) and
+              ((.type // "vuln") | IN("vuln", "license")) and
+              (.from |
+                type == "array" and length > 0 and
+                all(.[]; type == "string" and length > 0)
+              )
+            )
+          ' "$oss_json" >/dev/null; then
+            echo '::error::Open Source scan output is missing or unsupported'
+            overall_status=1
+          else
+            compare_with_baseline "$OPEN_SOURCE_PROJECT_ID" "$oss_json" "Open Source"
+          fi
+        }
+
+        if snyk test \
+          --org="$ORG_ID" \
+          --dev \
+          --severity-threshold=high \
+          --policy-path=.snyk \
+          --print-deps \
+          --json-file-output="$oss_json"; then
+          oss_scan_status=0
+        else
+          oss_scan_status=$?
+        fi
+
+        snyk_delta_open_source
+        exit "$overall_status"
+      shell: bash
+
+    - name: Assess Container delta
+      if: >-
+        steps.validate.outcome == 'success' &&
+        steps.setup-node.outcome == 'success' &&
+        steps.snyk-cli.outcome == 'success' &&
+        steps.snyk-delta.outcome == 'success' &&
+        steps.snyk-auth.outcome == 'success' &&
+        steps.mask-token.outcome == 'success'
+      id: assess-container
+      continue-on-error: true
+      env:
+        ORG_ID: ${{ inputs.org-id }}
         CONTAINER_PROJECTS_JSON: ${{ inputs.container-projects-json }}
         IMAGE_REF: ${{ inputs.image-ref }}
         DOCKERFILE: ${{ inputs.dockerfile }}
@@ -127,50 +220,19 @@ runs:
         overall_status=0
         scan_dir="$(mktemp -d)"
         trap 'rm -rf "$scan_dir"' EXIT
-        oss_json="$scan_dir/open-source.json"
         container_json="$scan_dir/container.json"
 
-        if snyk test --org="$ORG_ID" --dev --severity-threshold=high --policy-path=.snyk --print-deps --json-file-output="$oss_json"; then
-          oss_scan_status=0
-        else
-          oss_scan_status=$?
-        fi
-        if snyk container test --org="$ORG_ID" --severity-threshold=high --policy-path=.snyk --print-deps --file="$DOCKERFILE" --json-file-output="$container_json" "$IMAGE_REF"; then
+        if snyk container test \
+          --org="$ORG_ID" \
+          --severity-threshold=high \
+          --policy-path=.snyk \
+          --print-deps \
+          --file="$DOCKERFILE" \
+          --json-file-output="$container_json" \
+          "$IMAGE_REF"; then
           container_scan_status=0
         else
           container_scan_status=$?
-        fi
-
-        if (( oss_scan_status > 1 )); then
-          echo "::error::Open Source scan failed with exit code $oss_scan_status"
-          overall_status=1
-        elif ! jq -e '
-          type == "object" and
-          (.vulnerabilities | type == "array") and
-          .severityThreshold == "high" and
-          (.packageManager | type == "string" and length > 0) and
-          (.projectName | type == "string" and length > 0) and
-          all(.vulnerabilities[];
-            (.id | type == "string" and length > 0) and
-            (.severity | IN("low", "medium", "high", "critical")) and
-            ((.type // "vuln") | IN("vuln", "license")) and
-            (.from | type == "array" and length > 0 and all(.[]; type == "string" and length > 0))
-          )
-        ' "$oss_json" >/dev/null; then
-          echo '::error::Open Source scan output is missing or unsupported'
-          overall_status=1
-        else
-          if snyk-delta --baselineOrg "$ORG_ID" --baselineProject "$OPEN_SOURCE_PROJECT_ID" --type vuln < "$oss_json"; then
-            echo 'Open Source delta passed'
-          else
-            delta_status=$?
-            if (( delta_status == 1 )); then
-              echo '::error::Open Source delta found a new high or critical vulnerability'
-            else
-              echo "::error::Open Source delta failed with exit code $delta_status"
-            fi
-            overall_status=1
-          fi
         fi
 
         if (( container_scan_status > 1 )); then
@@ -178,7 +240,7 @@ runs:
           overall_status=1
         elif ! jq -e '
           type == "array" and length > 0 and
-          all(.[];
+          all(.[ ];
             type == "object" and
             (.vulnerabilities | type == "array") and
             (.packageManager | type == "string" and length > 0) and
@@ -188,22 +250,29 @@ runs:
             all(.vulnerabilities[];
               (.id | type == "string" and length > 0) and
               (.severity | IN("low", "medium", "high", "critical")) and
-              (.from | type == "array" and length > 0 and all(.[]; type == "string" and length > 0))
+              (.from |
+                type == "array" and length > 0 and
+                all(.[]; type == "string" and length > 0)
+              )
             )
           ) and
-          any(.[]; .scanResult.identity.type == "apk" and (.docker.baseImage | type == "string" and length > 0))
+          any(.[ ];
+            .scanResult.identity.type == "apk" and
+            (.docker.baseImage | type == "string" and length > 0)
+          )
         ' "$container_json" >/dev/null; then
           echo '::error::Container scan output is malformed or unsupported'
           overall_status=1
         else
           result_count="$(jq 'length' "$container_json")"
           mapping_count="$(jq 'length' <<< "$CONTAINER_PROJECTS_JSON")"
+
           if [[ "$result_count" != "$mapping_count" ]]; then
             echo '::error::Container scan results do not match the required project mappings'
             overall_status=1
           fi
-          result_index=0
 
+          result_index=0
           while IFS= read -r mapping; do
             result_index=$((result_index + 1))
             identity_type="$(jq -r '.identityType' <<< "$mapping")"
@@ -211,15 +280,28 @@ runs:
             project_id="$(jq -r '.projectId' <<< "$mapping")"
             current_json="$scan_dir/container-result-$result_index.json"
             matches_json="$scan_dir/container-matches-$result_index.json"
-            jq --arg identity_type "$identity_type" --arg target_file "$target_file" '[.[] | select(.scanResult.identity.type == $identity_type and (.scanResult.identity.targetFile // .targetFile // "") == $target_file)]' "$container_json" > "$matches_json"
+
+            jq \
+              --arg identity_type "$identity_type" \
+              --arg target_file "$target_file" \
+              '[.[] | select(
+                .scanResult.identity.type == $identity_type and
+                (.scanResult.identity.targetFile // .targetFile // "") == $target_file
+              )]' \
+              "$container_json" > "$matches_json"
+
             matches="$(jq 'length' "$matches_json")"
             if [[ "$matches" != '1' ]]; then
               echo "::error::Container result mapping is missing or ambiguous for $identity_type:$target_file"
               overall_status=1
               continue
             fi
+
             jq '.[0] + {severityThreshold: "high"}' "$matches_json" > "$current_json"
-            if snyk-delta --baselineOrg "$ORG_ID" --baselineProject "$project_id" --type vuln < "$current_json"; then
+            if snyk-delta \
+              --baselineOrg "$ORG_ID" \
+              --baselineProject "$project_id" \
+              --type vuln < "$current_json"; then
               echo "Container delta passed for $identity_type:$target_file"
             else
               delta_status=$?
@@ -246,10 +328,18 @@ runs:
         DELTA_SETUP_OUTCOME: ${{ steps.snyk-delta.outcome }}
         AUTH_OUTCOME: ${{ steps.snyk-auth.outcome }}
         TOKEN_MASK_OUTCOME: ${{ steps.mask-token.outcome }}
-        ASSESS_OUTCOME: ${{ steps.assess.outcome }}
+        OPEN_SOURCE_ASSESS_OUTCOME: ${{ steps.assess-open-source.outcome }}
+        CONTAINER_ASSESS_OUTCOME: ${{ steps.assess-container.outcome }}
       run: |
         set -euo pipefail
-        if [[ "$VALIDATION_OUTCOME" == 'success' && "$NODE_SETUP_OUTCOME" == 'success' && "$SNYK_CLI_OUTCOME" == 'success' && "$DELTA_SETUP_OUTCOME" == 'success' && "$AUTH_OUTCOME" == 'success' && "$TOKEN_MASK_OUTCOME" == 'success' && "$ASSESS_OUTCOME" == 'success' ]]; then
+        if [[ "$VALIDATION_OUTCOME" == 'success' &&
+          "$NODE_SETUP_OUTCOME" == 'success' &&
+          "$SNYK_CLI_OUTCOME" == 'success' &&
+          "$DELTA_SETUP_OUTCOME" == 'success' &&
+          "$AUTH_OUTCOME" == 'success' &&
+          "$TOKEN_MASK_OUTCOME" == 'success' &&
+          "$OPEN_SOURCE_ASSESS_OUTCOME" == 'success' &&
+          "$CONTAINER_ASSESS_OUTCOME" == 'success' ]]; then
           echo 'outcome=passed' >> "$GITHUB_OUTPUT"
         else
           echo 'outcome=failed' >> "$GITHUB_OUTPUT"
