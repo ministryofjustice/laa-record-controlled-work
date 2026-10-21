@@ -60,22 +60,21 @@ describe("Legal aid before 6 months step", () => {
       );
     });
 
-    it("should show validation error if yes is selected but no reason is given", async () => {
-      const result = await client.post(
-        "/cases/new/legal-aid-last-6-months",
-        {
-          body: { legalAidLast6Months: "yes" },
-        },
-      );
-      expect(result.type).to.equal("render");
-      const renderResult = result as TestRenderResult;
-      expect(renderResult.context.showValidationFailures).to.equal(true);
-      expect(
-        renderResult.getValidationErrorsByFieldCode(reasonForYesFieldCode)[0].message,
-      ).to.deep.equal(
-        "Enter the reason you're creating a new case for the same matter",
-      );
-    });
+    for (const reason of ["", "   ", "\t\n", "\u0085", "\uFEFF"]) {
+      it(`should show validation error if yes is selected but no reason is given, rejects a blank reason: ${JSON.stringify(reason)}`, async () => {
+        const result = await client.post("/cases/new/legal-aid-last-6-months", {
+          body: { legalAidLast6Months: "yes", reasonForYes: reason },
+        });
+
+        expect(result.type).to.equal("render");
+        const rendered = result as TestRenderResult;
+        expect(rendered.context.showValidationFailures).to.equal(true);
+        const errors = rendered.getValidationErrorsByFieldCode("reasonForYes");
+        expect(errors.map(({ message }) => message)).to.deep.equal([
+          "Enter the reason you're creating a new case for the same matter",
+        ]);
+      });
+    }
 
     it("should show validation error if the reason is longer than 500 characters", async () => {
       const result = await client.post(
