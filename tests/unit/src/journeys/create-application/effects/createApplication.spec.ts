@@ -15,6 +15,7 @@ import type {
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import { logger } from "#/logger.js";
 import { getCreateApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
+import { createValidApplicationAnswers } from "#tests/fixtures/application.fixtures.js";
 
 describe("CreateApplicationEffect", () => {
   const journeyCode = "testJourney";
@@ -39,26 +40,7 @@ describe("CreateApplicationEffect", () => {
     setData = sinon.stub();
     session = {
       journeyDrafts: {
-        [journeyCode]: {
-          ukAddressLine1: "123 Test Street",
-          ukCountry: "United Kingdom",
-          dateOfBirth: "1990-01-01",
-          ecf: "no",
-          familyLawClassification: "public",
-          needsAdviceOnEUOrInternationalMaintenance: "no",
-          needsProtectiveInjunction: "no",
-          laspoEvidenceScope: "domesticAbuse",
-          firstName: "Jane",
-          hasNINumber: "yes",
-          haveAHomeAddress: "yes",
-          lastName: "Bloggs",
-          legalAidBefore: "yesSameMatter",
-          legalAidLast6Months: "yes",
-          niNumber: "AB123456C", // gitleaks:allow - fake NI number used in test fixture
-          ukPostcode: "A12 3BC",
-          reasonForYes: "here is a reason",
-          ukTownOrCity: "Manchester",
-        },
+        [journeyCode]: createValidApplicationAnswers(),
         anotherJourney: { keep: "yes" },
       },
       selectedOffice: {
@@ -90,22 +72,56 @@ describe("CreateApplicationEffect", () => {
 
     expect(createApplicationStub.calledOnce).to.equal(true);
     expect(
-      createApplicationStub.firstCall.args[0].scopingQuestions,
-    ).to.deep.equal({
-      priorLegalAid: "yesSameMatter",
-      familyLawClassification: "public",
-      careProceedingsStarted: false,
-      caseMeetsMeritsCriteria: true,
-    });
-    expect(
       setData.calledOnceWithExactly(
         CONTEXT_DATA_KEYS.applicationID,
         applicationId,
       ),
     ).to.equal(true);
-
     expect(session.journeyDrafts[journeyCode]).to.be.undefined;
     expect(session.journeyDrafts.anotherJourney).to.deep.equal({ keep: "yes" });
+  });
+
+  it("sends the complete create request without ECF", async () => {
+    createApplicationStub.resolves({
+      data: getCreateApplicationResponseMock({ id: applicationId }),
+      status: 201,
+      headers: new Headers(),
+    });
+
+    await createApplication(deps)(context, journeyCode);
+
+    expect(createApplicationStub.calledOnce).to.equal(true);
+    expect(createApplicationStub.firstCall.args[0]).to.deep.equal({
+      clientDetails: {
+        firstName: "Jane",
+        lastName: "Bloggs",
+        dateOfBirth: "1990-01-01",
+        niNumber: "AB123456C", // gitleaks:allow - fake NI number used in test fixture
+        hasFixedAddress: true,
+        address: {
+          addressLine1: "123 Test Street",
+          addressLine2: "Test Area",
+          addressLine3: undefined,
+          addressLine4: undefined,
+          townOrCity: "Manchester",
+          county: "Greater Manchester",
+          postCode: "A12 3BC",
+          country: "GB",
+        },
+      },
+      legalAidLast6Months: true,
+      providerOfficeCode: "22439e72-68d3-4770-b435-c352d883d21e",
+      reasonForReapplication: "here is a reason",
+      scopingQuestions: {
+        priorLegalAid: "yesSameMatter",
+        familyLawClassification: "public",
+        careProceedingsStarted: false,
+        caseMeetsMeritsCriteria: true,
+      },
+    });
+    expect(createApplicationStub.firstCall.args[0]).not.to.have.property(
+      "ecfFlag",
+    );
   });
 
   it("sends only reached private answers and always sends positive merits", async () => {
@@ -217,23 +233,7 @@ describe("CreateApplicationEffect", () => {
   it("returns an ApiResponseError with ApiValidationError cause when selected office is missing", async () => {
     getSession.returns({
       journeyDrafts: {
-        [journeyCode]: {
-          ukAddressLine1: "123 Test Street",
-          ukCountry: "United Kingdom",
-          dateOfBirth: "1990-01-01",
-          ecf: "no",
-          familyLawClassification: "public",
-          firstName: "Jane",
-          hasNINumber: "yes",
-          haveAHomeAddress: "yes",
-          lastName: "Bloggs",
-          legalAidBefore: "yesSameMatter",
-          legalAidLast6Months: "yes",
-          niNumber: "AB123456C", // gitleaks:allow - fake NI number used in test fixture
-          ukPostcode: "A12 3BC",
-          reasonForYes: "here is a reason",
-          ukTownOrCity: "Manchester",
-        },
+        [journeyCode]: createValidApplicationAnswers(),
       },
     });
 

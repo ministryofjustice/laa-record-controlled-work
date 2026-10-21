@@ -14,6 +14,7 @@ import {
   getApplication,
   getApplications,
   updateApplicationDeclaration,
+  updateApplicationDetails,
   updateApplicationEvidence,
   updateApplicationStatus,
 } from "#/api/clients/rcw/schema/applications/applications.gen.js";
@@ -46,6 +47,7 @@ export function initForge(app: Express): void {
     .registerPackage(selectOfficePackage, { getFirmOffice })
     .registerPackage(editApplicationPackage, {
       getApplication,
+      updateApplicationDetails,
       updateApplicationStatus,
     })
     .registerPackage(createApplicationJourney, { createApplication })

@@ -5,6 +5,7 @@ import type { CreateClientDetailsRequestBody } from "#/api/clients/rcw/model/cre
 import type { NoOrDifferentMatterBranch } from "#/api/clients/rcw/model/noOrDifferentMatterBranch.zod.gen.js";
 import type { RecentLegalAidRule } from "#/api/clients/rcw/model/recentLegalAidRule.zod.gen.js";
 import type { ScopingQuestions } from "#/api/clients/rcw/model/scopingQuestions.zod.gen.js";
+import type { UpdateApplicationDetailsRequestBody } from "#/api/clients/rcw/model/updateApplicationDetailsRequestBody.zod.gen.js";
 import type { YesSameMatterBranch } from "#/api/clients/rcw/model/yesSameMatterBranch.zod.gen.js";
 import type { AnswersOutput } from "#/journeys/create-application/data/answers.zod.js";
 
@@ -129,7 +130,7 @@ export class ApplicationDto {
       hasFixedAddress,
       lastName: answers.lastName,
       legalAidLast6Months,
-      niNumber: answers.niNumber,
+      niNumber: answers.hasNINumber === "yes" ? answers.niNumber : undefined,
       providerOfficeCode,
       reasonForReapplication,
       scopingQuestions: this.getScopingQuestionsFromAnswers(answers),
@@ -453,6 +454,41 @@ export class ApplicationDto {
   }
 
   /**
+   * Converts the DTO to the complete editable details request body.
+   * @param ecfFlag - The validated ECF answer.
+   * @returns UpdateApplicationDetailsRequestBody.
+   */
+  public toDetailsRequest(
+    ecfFlag: boolean,
+  ): UpdateApplicationDetailsRequestBody {
+    const {
+      clientDetails,
+      legalAidLast6Months = false,
+      reasonForReapplication,
+      scopingQuestions,
+    } = this.toRcwApi();
+
+    return {
+      clientDetails: {
+        address: clientDetails.hasFixedAddress
+          ? toDetailsAddress(clientDetails.address)
+          : null,
+        dateOfBirth: clientDetails.dateOfBirth,
+        firstName: clientDetails.firstName,
+        hasFixedAddress: clientDetails.hasFixedAddress,
+        lastName: clientDetails.lastName,
+        niNumber: clientDetails.niNumber ?? null,
+      },
+      ecfFlag,
+      legalAidLast6Months,
+      reasonForReapplication: legalAidLast6Months
+        ? (reasonForReapplication ?? null)
+        : null,
+      scopingQuestions,
+    };
+  }
+
+  /**
    * Converts the ApplicationDto instance to an object that conforms to the data structure expected by the RCW API.
    * @returns CreateApplicationRequestBody.
    */
@@ -543,4 +579,24 @@ export class ApplicationDto {
 
     return reason;
   }
+}
+
+/** Maps a fixed address and emits null for every cleared optional field.
+ * @param address - Address from the create-request projection.
+ * @returns The complete nullable update address.
+ */
+function toDetailsAddress(
+  address: CreateApplicationRequestBody["clientDetails"]["address"],
+): UpdateApplicationDetailsRequestBody["clientDetails"]["address"] {
+  const details = address ?? { addressLine1: "", country: "" };
+  return {
+    addressLine1: details.addressLine1,
+    addressLine2: details.addressLine2 ?? null,
+    addressLine3: details.addressLine3 ?? null,
+    addressLine4: details.addressLine4 ?? null,
+    country: details.country,
+    county: details.county ?? null,
+    postCode: details.postCode ?? null,
+    townOrCity: details.townOrCity ?? null,
+  };
 }

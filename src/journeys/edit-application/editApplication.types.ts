@@ -4,6 +4,7 @@ import type { Application } from "#/api/clients/rcw/model/application.zod.gen.js
 import type { ApplicationState } from "#/api/clients/rcw/model/applicationState.zod.gen.js";
 import type {
   getApplication,
+  updateApplicationDetails,
   updateApplicationStatus,
 } from "#/api/clients/rcw/schema/applications/applications.gen.js";
 import type { JourneySession } from "#/journeys/context.type.js";
@@ -20,6 +21,7 @@ export type EditApplicationContext = EffectFunctionContext<
 
 export interface EditApplicationData extends Record<string, unknown> {
   [CONTEXT_DATA_KEYS.application]: Application;
+  [CONTEXT_DATA_KEYS.applicationETag]?: string;
   [CONTEXT_DATA_KEYS.applicationStatus]: ApplicationState;
   [CONTEXT_DATA_KEYS.clientDetailsStatus]: Status;
   [CONTEXT_DATA_KEYS.declarationStatus]: Status;
@@ -29,5 +31,6 @@ export interface EditApplicationData extends Record<string, unknown> {
 
 export interface EditApplicationEffectsDeps {
   getApplication: typeof getApplication;
+  updateApplicationDetails: typeof updateApplicationDetails;
   updateApplicationStatus: typeof updateApplicationStatus;
 }

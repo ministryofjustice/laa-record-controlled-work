@@ -38,6 +38,10 @@ export function checkAnswersStep(journeyCode: string): StepDefinition {
     onSubmission: [
       submit({
         onValid: {
+          effects: [
+            editClientDetailsEffects.updateClientDetails(journeyCode),
+            editClientDetailsEffects.clearAllDraftAnswers(journeyCode),
+          ],
           next: [
             redirect({
               goto: Format(

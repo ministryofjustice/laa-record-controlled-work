@@ -3,5 +3,7 @@ export {
   clientDetailsApplication,
   completeApplication,
   createApplicationResponse,
+  createClientDetailsTestApplicationId,
   incompleteApplication,
+  isClientDetailsTestApplicationId,
 } from "#msw/fixtures/rcw.js";

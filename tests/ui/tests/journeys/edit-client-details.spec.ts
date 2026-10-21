@@ -1,9 +1,29 @@
+import type { Locator, Page } from "@playwright/test";
+
 import { expect, test } from "../../fixtures/index.js";
-import { clientDetailsApplication } from "#msw/fixtures/rcw.js";
+import {
+  clientDetailsApplication,
+  createClientDetailsTestApplicationId,
+} from "#msw/fixtures/rcw.js";
+
+async function answerNoFromSummaryRow(
+  page: Page,
+  row: Locator,
+  checkAnswersPath: string,
+): Promise<void> {
+  await row.getByRole("link", { name: /Change/ }).click();
+  const noRadio = page.getByRole("radio", { name: "No", exact: true });
+  await expect(noRadio).not.toBeChecked();
+  await noRadio.check();
+  await page.getByRole("button", { name: "Continue", exact: true }).click();
+  await expect(page).toHaveURL(checkAnswersPath);
+  await expect(row.locator(".govuk-summary-list__value")).toHaveText("No");
+}
+
 test("Edit Application - Client details journey", async ({
   withSelectedOffice: page,
 }) => {
-  const applicationId = clientDetailsApplication.id;
+  const applicationId = createClientDetailsTestApplicationId();
 
   // ==========================================================================
   // Task list page
@@ -36,7 +56,7 @@ test("Edit Application - Client details journey", async ({
   await expect(rows.locator(".govuk-summary-list__value")).toContainText(
     [
       // ECF
-      "INCOMPLETE",
+      "Incomplete",
       // Type of family law
       "Private",
       // Transitional EU arrangements or an international maintenance agreement
@@ -60,6 +80,8 @@ test("Edit Application - Client details journey", async ({
       }),
       // National insurance number
       clientDetailsApplication.clientDetails.niNumber ?? "",
+      // Has fixed address
+      "Yes",
       // Address
       clientDetailsApplication.clientDetails.address?.addressLine1 ?? "",
     ],
@@ -100,3 +122,4 @@ test("Edit Application - Client details journey", async ({
     { useInnerText: true },
   );
 });
+

@@ -27,6 +27,15 @@ export function clearAllDraftAnswers() {
       session.journeyDrafts = otherJourneyDrafts;
     }
 
+    if (session.journeyDraftVersions) {
+      const {
+        [draftKey]: _selectedJourneyDraftVersion,
+        ...otherJourneyDraftVersions
+      } = session.journeyDraftVersions;
+
+      session.journeyDraftVersions = otherJourneyDraftVersions;
+    }
+
     for (const key of Object.keys(context.getAllAnswers())) {
       context.clearAnswer(key);
     }

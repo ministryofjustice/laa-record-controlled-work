@@ -4,26 +4,12 @@ import { ApplicationDto } from "#/api/dto/application/application.dto.js";
 import type { Application } from "#/api/clients/rcw/model/application.zod.gen.js";
 import type { Answers } from "#/journeys/create-application/data/answers.zod.js";
 import { ScopingQuestions } from "#/api/clients/rcw/model/scopingQuestions.zod.gen.js";
+import {
+  createSavedApplication,
+  createValidApplicationAnswers,
+} from "#tests/fixtures/application.fixtures.js";
 
-const answers: Answers = {
-  ecf: "yes",
-  familyLawClassification: "public",
-  legalAidBefore: "yesSameMatter",
-  legalAidLast6Months: "yes",
-  reasonForYes: "here is a reason",
-  firstName: "Jane",
-  lastName: "Bloggs",
-  dateOfBirth: "1990-01-01",
-  hasNINumber: "yes",
-  niNumber: "AB123456C", // gitleaks:allow - fake NI number used to test data mapping
-  haveAHomeAddress: "yes",
-  ukAddressLine1: "123 Test Street",
-  ukAddressLine2: "Test Area",
-  ukTownOrCity: "Manchester",
-  ukCounty: "Greater Manchester",
-  ukPostcode: "A12 3BC",
-  ukCountry: "United Kingdom",
-};
+const answers: Answers = createValidApplicationAnswers();
 
 describe("fromAnswers method", () => {
   it("should map answers to API request format", () => {
@@ -85,6 +71,21 @@ describe("fromAnswers method", () => {
     }
   });
 
+  it("rejects blank reasons for same-matter recent aid", () => {
+    for (const reasonForYes of ["", " \t\n"]) {
+      const answersWithBlankReason = createValidApplicationAnswers({
+        reasonForYes,
+      });
+
+      expect(() =>
+        ApplicationDto.fromAnswers(
+          answersWithBlankReason,
+          "test-office",
+        ).toRcwApi(),
+      ).to.throw("A non-blank reason is required");
+    }
+  });
+
   it("omits client address when client has no fixed address", () => {
     const providerOfficeCode = "22439e72-68d3-4770-b435-c352d883d21e";
     const result = ApplicationDto.fromAnswers(
@@ -97,6 +98,15 @@ describe("fromAnswers method", () => {
 
     expect(result.clientDetails.hasFixedAddress).to.equal(false);
     expect(result.clientDetails).to.not.have.property("address");
+  });
+
+  it("omits a stale NI number when the client has no NI number", () => {
+    const result = ApplicationDto.fromAnswers(
+      { ...answers, hasNINumber: "no" },
+      "test-office",
+    ).toRcwApi();
+
+    expect(result.clientDetails.niNumber).to.be.undefined;
   });
 
   it("includes client address when client has a fixed address", () => {
@@ -273,60 +283,147 @@ describe("fromAnswers method", () => {
   });
 });
 
-describe("toAnswers method", () => {
-  const application = {
-    id: "00000000-0000-0000-0000-000000000001",
-    individualLegalAidNumber: "00000000-0000-0000-0000-000000000002",
-    providerFirmCode: "provider-firm",
-    providerOfficeCode: "22439e72-68d3-4770-b435-c352d883d21e",
-    clientDetails: {
-      id: null,
+describe("toDetailsRequest method", () => {
+  it("maps a complete snapshot with explicit nullable fields and no create-only data", () => {
+    const result = ApplicationDto.fromAnswers(
+      answers,
+      "test-office",
+    ).toDetailsRequest(true);
+
+    expect(result).to.deep.equal({
+      clientDetails: {
+        firstName: "Jane",
+        lastName: "Bloggs",
+        dateOfBirth: "1990-01-01",
+        niNumber: "AB123456C", // gitleaks:allow - fake NI number used to test data mapping
+        hasFixedAddress: true,
+        address: {
+          addressLine1: "123 Test Street",
+          addressLine2: "Test Area",
+          addressLine3: null,
+          addressLine4: null,
+          townOrCity: "Manchester",
+          county: "Greater Manchester",
+          postCode: "A12 3BC",
+          country: "GB",
+        },
+      },
+      legalAidLast6Months: true,
+      reasonForReapplication: "here is a reason",
+      scopingQuestions: {
+        priorLegalAid: "yesSameMatter",
+        familyLawClassification: "public",
+        careProceedingsStarted: false,
+        caseMeetsMeritsCriteria: true,
+      },
+      ecfFlag: true,
+    });
+  });
+
+  it("clears inactive NI, address, and recent-aid answers", () => {
+    const result = ApplicationDto.fromAnswers(
+      {
+        ...answers,
+        hasNINumber: "no",
+        haveAHomeAddress: "no",
+        legalAidBefore: "no",
+        legalAidLast6Months: "yes",
+        reasonForYes: "stale reason",
+      },
+      "test-office",
+    ).toDetailsRequest(false);
+
+    expect(result.clientDetails).to.deep.equal({
       firstName: "Jane",
       lastName: "Bloggs",
       dateOfBirth: "1990-01-01",
       niNumber: null,
-      hasFixedAddress: true,
-      address: {
-        id: null,
-        addressLine1: "123 Test Street",
-        addressLine2: "Test Area",
-        addressLine3: null,
-        addressLine4: null,
-        townOrCity: "Manchester",
-        postCode: "A12 3BC",
-        county: "Greater Manchester",
-        country: "GB",
-        createdAt: null,
-        modifiedAt: null,
+      hasFixedAddress: false,
+      address: null,
+    });
+    expect(result.legalAidLast6Months).to.equal(false);
+    expect(result.reasonForReapplication).to.equal(null);
+    expect(result.ecfFlag).to.equal(false);
+  });
+
+  it("clears a retracted reason when same-matter recent aid is no", () => {
+    const result = ApplicationDto.fromAnswers(
+      {
+        ...answers,
+        legalAidLast6Months: "no",
+        reasonForYes: "retracted reason",
       },
-      createdAt: null,
-      modifiedAt: null,
-    },
-    applicationState: "DRAFT",
-    declaration: null,
-    evidence: null,
-    eligibility: null,
-    reasonForReapplication: null,
-    meansAssessmentRequired: null,
-    typeOfNonMeans: null,
-    contribution: null,
-    scopingQuestions: {
-      priorLegalAid: "yesSameMatter",
-      familyLawClassification: "public",
-    },
-    applicationType: "new",
-    createdAt: "2025-01-01T00:00:00Z",
-    createdBy: "test-user",
-    modifiedAt: "2025-01-01T00:00:00Z",
-    modifiedBy: "test-user",
-    ecfFlag: null
-  } satisfies Application;
+      "test-office",
+    ).toDetailsRequest(true);
+
+    expect(result.legalAidLast6Months).to.equal(false);
+    expect(result.reasonForReapplication).to.equal(null);
+  });
+
+  it("uses only the active country address when switching between UK and overseas", () => {
+    const overseas = ApplicationDto.fromAnswers(
+      {
+        ...answers,
+        ukCountry: "France",
+        osAddressLine1: "10 Overseas Street",
+        osAddressLine3: "Paris",
+        osCountry: "France",
+      },
+      "test-office",
+    ).toDetailsRequest(true);
+    expect(overseas.clientDetails.address).to.deep.equal({
+      addressLine1: "10 Overseas Street",
+      addressLine2: null,
+      addressLine3: "Paris",
+      addressLine4: null,
+      townOrCity: null,
+      county: null,
+      postCode: null,
+      country: "FR",
+    });
+
+    const uk = ApplicationDto.fromAnswers(
+      {
+        ...answers,
+        osAddressLine1: "Stale overseas address",
+        osCountry: "France",
+        ukAddressLine1: "22 Current Street",
+        ukAddressLine2: undefined,
+        ukCountry: "United Kingdom",
+        ukCounty: undefined,
+      },
+      "test-office",
+    ).toDetailsRequest(true);
+    expect(uk.clientDetails.address).to.deep.equal({
+      addressLine1: "22 Current Street",
+      addressLine2: null,
+      addressLine3: null,
+      addressLine4: null,
+      townOrCity: "Manchester",
+      county: null,
+      postCode: "A12 3BC",
+      country: "GB",
+    });
+  });
+});
+
+describe("toAnswers method", () => {
+  const application = createSavedApplication();
 
   function applicationWithScopingQuestions(
     scopingQuestions: Record<string, unknown>,
   ): Application {
     return { ...application, scopingQuestions } as Application;
   }
+
+  it("does not mutate the saved application while restoring answers", () => {
+    const savedApplication = createSavedApplication();
+    const originalApplication = structuredClone(savedApplication);
+
+    ApplicationDto.toAnswers(savedApplication);
+
+    expect(savedApplication).to.deep.equal(originalApplication);
+  });
 
   it("doesn't set default values for answers which don't exist", () => {
     for (const scopingQuestions of [null, {}]) {
@@ -442,15 +539,17 @@ describe("toAnswers method", () => {
       clientDetails: {
         ...application.clientDetails,
         address: {
-          ...application.clientDetails.address,
+          id: null,
           addressLine1: "10 Rue de Rivoli",
           addressLine2: null,
           addressLine3: "Paris",
           addressLine4: null,
-          townOrCity: null,
-          postCode: null,
-          county: null,
           country: "FR",
+          county: null,
+          createdAt: null,
+          modifiedAt: null,
+          postCode: null,
+          townOrCity: null,
         },
       },
     });

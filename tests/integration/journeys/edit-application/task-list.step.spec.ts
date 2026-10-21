@@ -43,6 +43,7 @@ describe("Task list step", () => {
       additionalFunctions: [editApplicationTransformersRegistry],
       dependencies: {
         getApplication: getApplicationStub,
+        updateApplicationDetails: sinon.stub().resolves({ status: 204 }),
         updateApplicationStatus: updateApplicationStatusStub,
       },
     },
@@ -416,6 +417,7 @@ describe("Task list step", () => {
             },
           },
         }),
+        headers: new Headers({ etag: '"0"' }),
       });
 
       const result = await client.post(`/cases/${uuid}/task-list`, {

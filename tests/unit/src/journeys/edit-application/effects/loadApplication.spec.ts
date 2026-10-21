@@ -9,7 +9,7 @@ import type {
 } from "#/journeys/edit-application/editApplication.types.js";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import { logger } from "#/logger.js";
-import { getGetApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
+import { createSavedApplication } from "#tests/fixtures/application.fixtures.js";
 import {
   ApiResponseError,
   ApiValidationError,
@@ -31,6 +31,7 @@ describe("loadApplication", () => {
     getApplicationStub = sinon.stub();
     deps = {
       getApplication: getApplicationStub,
+      updateApplicationDetails: sinon.stub(),
       updateApplicationStatus: sinon.stub(),
     };
     setData = sinon.stub();
@@ -52,7 +53,7 @@ describe("loadApplication", () => {
   afterEach(() => sinon.restore());
 
   it("sets application in context from getApplication response", async () => {
-    const mockApplication = getGetApplicationResponseMock();
+    const mockApplication = createSavedApplication();
 
     getApplicationStub.resolves({ status: 200, data: mockApplication });
 
@@ -64,14 +65,52 @@ describe("loadApplication", () => {
     ).to.equal(true);
   });
 
+  for (const etag of [
+    '"17"',
+    '"0"',
+    '"00017"',
+    '"9007199254740992"',
+    '17suffix',
+    'W/"17"',
+    "*",
+  ]) {
+    it(`preserves the raw ETag ${etag}`, async () => {
+      getApplicationStub.resolves({
+        status: 200,
+        data: createSavedApplication(),
+        headers: new Headers({ etag }),
+      });
+
+      await loadApplication(deps)(context);
+
+      expect(
+        setData.calledWith(CONTEXT_DATA_KEYS.applicationETag, etag),
+      ).to.equal(true);
+    });
+  }
+
+  it("sets an absent ETag to undefined", async () => {
+    getApplicationStub.resolves({
+      status: 200,
+      data: createSavedApplication(),
+    });
+
+    await loadApplication(deps)(context);
+
+    expect(
+      setData.calledWith(CONTEXT_DATA_KEYS.applicationETag, undefined),
+    ).to.equal(true);
+  });
+
   it("preserves null scoping question answers when validating the response", async () => {
-    const mockApplication = getGetApplicationResponseMock();
-    mockApplication.scopingQuestions = {
-      priorLegalAid: "no",
-      familyLawClassification: "private",
-      needsAdviceOnEUOrInternationalMaintenance: false,
-      needsProtectiveInjunction: null,
-    };
+    const mockApplication = createSavedApplication({
+      scopingQuestions: {
+        priorLegalAid: "no",
+        familyLawClassification: "private",
+        needsAdviceOnEUOrInternationalMaintenance: false,
+        needsProtectiveInjunction: null,
+      },
+    });
 
     getApplicationStub.resolves({ status: 200, data: mockApplication });
 

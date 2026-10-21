@@ -73,6 +73,10 @@ describe("ClearAllDraftAnswers", () => {
       "editClientDetails:application-1": { ecf: "yes" },
       "editClientDetails:application-2": { ecf: "no" },
     };
+    session.journeyDraftVersions = {
+      "editClientDetails:application-1": '"23"',
+      "editClientDetails:application-2": '"42"',
+    };
 
     clearAllDraftAnswers()(context, "editClientDetails");
 
@@ -80,6 +84,9 @@ describe("ClearAllDraftAnswers", () => {
     expect(drafts["editClientDetails:application-1"]).to.be.undefined;
     expect(drafts["editClientDetails:application-2"]).to.deep.equal({
       ecf: "no",
+    });
+    expect(session.journeyDraftVersions).to.deep.equal({
+      "editClientDetails:application-2": '"42"',
     });
   });
 
@@ -95,5 +102,19 @@ describe("ClearAllDraftAnswers", () => {
     const drafts = session.journeyDrafts as Record<string, unknown>;
     expect(drafts["evidence:application-1"]).to.be.undefined;
     expect(drafts["evidence:application-2"]).to.deep.equal({ ecf: "no" });
+  });
+
+  it("clears orphaned version metadata without disturbing other versions", () => {
+    getRequestParam.withArgs(PARAMS_KEYS.applicationID).returns("application-1");
+    session.journeyDraftVersions = {
+      "editClientDetails:application-1": '"23"',
+      "editClientDetails:application-2": '"42"',
+    };
+
+    clearAllDraftAnswers()(context, "editClientDetails");
+
+    expect(session.journeyDraftVersions).to.deep.equal({
+      "editClientDetails:application-2": '"42"',
+    });
   });
 });
