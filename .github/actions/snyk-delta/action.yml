@@ -131,7 +131,7 @@ runs:
         trap 'rm -rf "$scan_dir"' EXIT
         oss_json="$scan_dir/open-source.json"
 
-        snyk_delta_open_source() {
+        run_open_source_delta() {
           local delta_status
 
           if (( oss_scan_status > 1 )); then
@@ -187,7 +187,7 @@ runs:
           oss_scan_status=$?
         fi
 
-        snyk_delta_open_source
+        run_open_source_delta
       shell: bash
 
     - name: Assess Container delta
@@ -213,6 +213,29 @@ runs:
         scan_dir="$(mktemp -d)"
         trap 'rm -rf "$scan_dir"' EXIT
         container_json="$scan_dir/container.json"
+
+        run_container_delta() {
+          local project_id="$1"
+          local current_json="$2"
+          local identity_type="$3"
+          local target_file="$4"
+          local delta_status
+
+          if snyk-delta \
+            --baselineOrg "$ORG_ID" \
+            --baselineProject "$project_id" \
+            --type vuln < "$current_json"; then
+            echo "Container delta passed for $identity_type:$target_file"
+          else
+            delta_status=$?
+            if (( delta_status == 1 )); then
+              echo "::error::Container delta found a new high or critical vulnerability for $identity_type:$target_file"
+            else
+              echo "::error::Container delta failed for $identity_type:$target_file with exit code $delta_status"
+            fi
+            overall_status=1
+          fi
+        }
 
         if snyk container test \
           --org="$ORG_ID" \
@@ -290,20 +313,11 @@ runs:
             fi
 
             jq '.[0] + {severityThreshold: "high"}' "$matches_json" > "$current_json"
-            if snyk-delta \
-              --baselineOrg "$ORG_ID" \
-              --baselineProject "$project_id" \
-              --type vuln < "$current_json"; then
-              echo "Container delta passed for $identity_type:$target_file"
-            else
-              delta_status=$?
-              if (( delta_status == 1 )); then
-                echo "::error::Container delta found a new high or critical vulnerability for $identity_type:$target_file"
-              else
-                echo "::error::Container delta failed for $identity_type:$target_file with exit code $delta_status"
-              fi
-              overall_status=1
-            fi
+            run_container_delta \
+              "$project_id" \
+              "$current_json" \
+              "$identity_type" \
+              "$target_file"
           done < <(jq -c '.[]' <<< "$CONTAINER_PROJECTS_JSON")
         fi
 
