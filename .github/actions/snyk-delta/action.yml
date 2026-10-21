@@ -1,20 +1,11 @@
 name: Snyk vulnerability delta
-description: Compare Open Source and all configured Container results with monitored main baselines
+description: Compare Open Source findings with an explicitly configured monitored main baseline
 inputs:
   org-id:
     description: Snyk organization UUID
     required: true
   open-source-project-id:
     description: Explicit monitored Open Source project UUID
-    required: true
-  container-projects-json:
-    description: JSON array mapping each Container result identity to its monitored project UUID
-    required: true
-  image-ref:
-    description: Immutable Container image reference using a sha256 digest
-    required: true
-  dockerfile:
-    description: Dockerfile path used to assess base-image vulnerabilities
     required: true
   snyk-client-id:
     description: Snyk OAuth client ID
@@ -35,37 +26,12 @@ runs:
       env:
         ORG_ID: ${{ inputs.org-id }}
         OPEN_SOURCE_PROJECT_ID: ${{ inputs.open-source-project-id }}
-        CONTAINER_PROJECTS_JSON: ${{ inputs.container-projects-json }}
-        IMAGE_REF: ${{ inputs.image-ref }}
-        DOCKERFILE: ${{ inputs.dockerfile }}
       run: |
         set -euo pipefail
         uuid_regex='^[[:xdigit:]]{8}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{12}$'
         [[ "$ORG_ID" =~ $uuid_regex ]] || { echo '::error::Snyk organization UUID is invalid'; exit 1; }
         [[ "$OPEN_SOURCE_PROJECT_ID" =~ $uuid_regex ]] || { echo '::error::Open Source project UUID is invalid'; exit 1; }
-        [[ "$IMAGE_REF" =~ @sha256:[[:xdigit:]]{64}$ ]] || { echo '::error::Container image must use a sha256 digest'; exit 1; }
-        [[ -f "$DOCKERFILE" ]] || { echo '::error::Dockerfile path does not exist'; exit 1; }
         [[ -f .snyk ]] || { echo '::error::The repository Snyk policy file is missing'; exit 1; }
-        jq -e --arg open_source_project_id "$OPEN_SOURCE_PROJECT_ID" '
-          def uuid: type == "string" and test("^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$");
-          def safe_text: type == "string" and all(explode[]; . >= 32 and . != 127);
-
-          type == "array" and length > 0 and
-          all(.[];
-            (.identityType | safe_text and length > 0) and
-            (.targetFile | safe_text) and
-            (.projectId | uuid)
-          ) and
-
-          any(.[]; .identityType == "apk" and .targetFile == "") and
-          any(.[]; .targetFile != "") and
-
-          ([.[] | [.identityType, .targetFile] | @json] | unique | length) == length and
-          (
-            ([.[] | .projectId | ascii_downcase] + [$open_source_project_id | ascii_downcase]) as $project_ids |
-            ($project_ids | unique | length) == ($project_ids | length)
-          )
-        ' <<< "$CONTAINER_PROJECTS_JSON" >/dev/null || { echo '::error::Container project mappings are invalid or incomplete'; exit 1; }
       shell: bash
 
     - name: Set up Node and dependencies
@@ -208,157 +174,6 @@ runs:
         run_open_source_delta
       shell: bash
 
-    - name: Assess Container delta
-      if: >-
-        steps.validate.outcome == 'success' &&
-        steps.setup-node.outcome == 'success' &&
-        steps.snyk-cli.outcome == 'success' &&
-        steps.snyk-delta.outcome == 'success' &&
-        steps.snyk-auth.outcome == 'success' &&
-        steps.mask-token.outcome == 'success'
-      id: assess-container
-      continue-on-error: true
-      env:
-        ORG_ID: ${{ inputs.org-id }}
-        CONTAINER_PROJECTS_JSON: ${{ inputs.container-projects-json }}
-        IMAGE_REF: ${{ inputs.image-ref }}
-        DOCKERFILE: ${{ inputs.dockerfile }}
-        SNYK_OAUTH_TOKEN: ${{ steps.snyk-auth.outputs.token }}
-      run: |
-        set -uo pipefail
-        export SNYK_TOKEN="$SNYK_OAUTH_TOKEN"
-        scan_dir="$(mktemp -d)"
-        trap 'rm -rf "$scan_dir"' EXIT
-        container_json="$scan_dir/container.json"
-
-        is_operational_scan_error() {
-          (( $1 > 1 ))
-        }
-
-        is_delta_regression() {
-          (( $1 == 1 ))
-        }
-
-        is_valid_container_output() {
-          jq -e '
-            def non_empty_string: type == "string" and length > 0;
-            def valid_vulnerability:
-              (.id | non_empty_string) and
-              (.severity | IN("low", "medium", "high", "critical")) and
-              (.from | type == "array" and length > 0 and all(.[]; non_empty_string));
-
-            type == "array" and length > 0 and
-            all(.[ ];
-              type == "object" and
-              (.vulnerabilities | type == "array") and
-              (.packageManager | non_empty_string) and
-              (.projectName | non_empty_string) and
-              (.scanResult.identity.type | non_empty_string) and
-              (.scanResult.target.image | non_empty_string) and
-
-              all(.vulnerabilities[]; valid_vulnerability)
-            ) and
-
-            any(.[ ];
-              .scanResult.identity.type == "apk" and
-              (.docker.baseImage | non_empty_string)
-            )
-          ' "$container_json" >/dev/null
-        }
-
-        run_container_delta() {
-          local project_id="$1"
-          local current_json="$2"
-          local identity_type="$3"
-          local target_file="$4"
-          local delta_status
-
-          if snyk-delta \
-            --baselineOrg "$ORG_ID" \
-            --baselineProject "$project_id" \
-            --type vuln < "$current_json"; then
-            echo "Container delta passed for $identity_type:$target_file"
-          else
-            delta_status=$?
-            if is_delta_regression "$delta_status"; then
-              echo "::error::Container delta found a new high or critical vulnerability for $identity_type:$target_file"
-            else
-              echo "::error::Container delta failed for $identity_type:$target_file with exit code $delta_status"
-            fi
-            return 1
-          fi
-        }
-
-        if snyk container test \
-          --org="$ORG_ID" \
-          --severity-threshold=high \
-          --policy-path=.snyk \
-          --print-deps \
-          --file="$DOCKERFILE" \
-          --json-file-output="$container_json" \
-          "$IMAGE_REF"; then
-          container_scan_status=0
-        else
-          container_scan_status=$?
-        fi
-
-        if is_operational_scan_error "$container_scan_status"; then
-          echo "::error::Container scan failed with exit code $container_scan_status"
-          exit 1
-        fi
-
-        if ! is_valid_container_output; then
-          echo '::error::Container scan output is malformed or unsupported'
-          exit 1
-        fi
-
-        overall_status=0
-        result_count="$(jq 'length' "$container_json")"
-        projects_count="$(jq 'length' <<< "$CONTAINER_PROJECTS_JSON")"
-
-        if [[ "$result_count" != "$projects_count" ]]; then
-          echo '::error::Container scan results do not match the required project mappings'
-          overall_status=1
-        fi
-
-        result_index=0
-        while IFS= read -r mapping; do
-          result_index=$((result_index + 1))
-          identity_type="$(jq -r '.identityType' <<< "$mapping")"
-          target_file="$(jq -r '.targetFile' <<< "$mapping")"
-          project_id="$(jq -r '.projectId' <<< "$mapping")"
-          current_json="$scan_dir/container-result-$result_index.json"
-          container_results_for_mapping_json="$scan_dir/container-results-for-mapping-$result_index.json"
-
-          jq \
-            --arg identity_type "$identity_type" \
-            --arg target_file "$target_file" \
-            '[.[] | select(
-              .scanResult.identity.type == $identity_type and
-              (.scanResult.identity.targetFile // .targetFile // "") == $target_file
-            )]' \
-            "$container_json" > "$container_results_for_mapping_json"
-
-          container_result_count_for_mapping="$(jq 'length' "$container_results_for_mapping_json")"
-          if [[ "$container_result_count_for_mapping" != '1' ]]; then
-            echo "::error::Container result mapping is missing or ambiguous for $identity_type:$target_file"
-            overall_status=1
-            continue
-          fi
-
-          jq '.[0] + {severityThreshold: "high"}' "$container_results_for_mapping_json" > "$current_json"
-          if ! run_container_delta \
-            "$project_id" \
-            "$current_json" \
-            "$identity_type" \
-            "$target_file"; then
-            overall_status=1
-          fi
-        done < <(jq -c '.[]' <<< "$CONTAINER_PROJECTS_JSON")
-
-        exit "$overall_status"
-      shell: bash
-
     - name: Set aggregate outcome
       if: always()
       id: aggregate
@@ -370,7 +185,6 @@ runs:
         AUTH_OUTCOME: ${{ steps.snyk-auth.outcome }}
         TOKEN_MASK_OUTCOME: ${{ steps.mask-token.outcome }}
         OPEN_SOURCE_ASSESS_OUTCOME: ${{ steps.assess-open-source.outcome }}
-        CONTAINER_ASSESS_OUTCOME: ${{ steps.assess-container.outcome }}
       run: |
         set -euo pipefail
         if [[ "$VALIDATION_OUTCOME" == 'success' &&
@@ -379,8 +193,7 @@ runs:
           "$DELTA_SETUP_OUTCOME" == 'success' &&
           "$AUTH_OUTCOME" == 'success' &&
           "$TOKEN_MASK_OUTCOME" == 'success' &&
-          "$OPEN_SOURCE_ASSESS_OUTCOME" == 'success' &&
-          "$CONTAINER_ASSESS_OUTCOME" == 'success' ]]; then
+          "$OPEN_SOURCE_ASSESS_OUTCOME" == 'success' ]]; then
           echo 'outcome=passed' >> "$GITHUB_OUTPUT"
         else
           echo 'outcome=failed' >> "$GITHUB_OUTPUT"

@@ -1,15 +1,9 @@
 import assert from "node:assert/strict";
-import { execFileSync, spawnSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { spawnSync } from "node:child_process";
 import { createRequire } from "node:module";
 import { dirname, join, resolve } from "node:path";
 import { test } from "node:test";
-import { fileURLToPath } from "node:url";
 
-const directory = dirname(fileURLToPath(import.meta.url));
-const containerResults = JSON.parse(
-  readFileSync(join(directory, "fixtures", "container-results.json"), "utf8"),
-);
 const orgId = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
 const projectId = "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb";
 
@@ -57,8 +51,10 @@ async function compare({ baseline, current, delta, snyk }) {
     ["NODE_ENV", "TYPE"].map((key) => [key, process.env[key]]),
   );
   let baselineReads = 0;
-  snyk.getProjectIssues = async () => {
+  let baselineRequest;
+  snyk.getProjectIssues = async (...request) => {
     baselineReads += 1;
+    baselineRequest = request;
     return { issues: { licenses: [], vulnerabilities: baseline } };
   };
   process.env.NODE_ENV = "test";
@@ -77,6 +73,7 @@ async function compare({ baseline, current, delta, snyk }) {
     return {
       ...(await delta.getDelta(JSON.stringify(current))),
       baselineReads,
+      baselineRequest,
     };
   } finally {
     process.argv = savedArgv;
@@ -89,7 +86,7 @@ async function compare({ baseline, current, delta, snyk }) {
 }
 
 test(
-  "pinned Delta accepts sanitized CLI Container results and preserves its comparison policy",
+  "pinned Delta accepts OSS CLI output and preserves its comparison policy",
   { timeout: 120000 },
   async () => {
     const installed = spawnSync(
@@ -114,16 +111,6 @@ test(
     assert.equal(version.status, 0, `${version.stdout}${version.stderr}`);
     assert.equal(version.stdout.trim(), "1.14.0");
 
-    for (const result of containerResults) {
-      const comparison = await compare({
-        baseline: [],
-        current: result,
-        delta,
-        snyk,
-      });
-      assert.equal(comparison.result, 1, JSON.stringify(comparison.newVulns));
-    }
-
     const template = {
       packageManager: "npm",
       projectName: "rcw",
@@ -142,6 +129,24 @@ test(
         },
       ],
     });
+    for (const severity of ["high", "critical"]) {
+      const regression = current(
+        `SNYK-EXAMPLE-NEW-${severity.toUpperCase()}`,
+        severity,
+        "1.0.0",
+        ["rcw@1.0.0", "example-package@1.0.0"],
+      );
+      const comparison = await compare({
+        baseline: [],
+        current: regression,
+        delta,
+        snyk,
+      });
+      assert.equal(comparison.baselineReads, 1);
+      assert.deepEqual(comparison.baselineRequest, [orgId, projectId]);
+      assert.equal(comparison.result, 1, JSON.stringify(comparison.newVulns));
+    }
+
     const existing = current("SNYK-EXAMPLE-SAME", "high", "2.0.0", [
       "rcw@1.0.0",
       "example-package@2.0.0",
@@ -192,22 +197,27 @@ test(
       snyk,
     });
     assert.equal(cleanComparison.baselineReads, 1);
+    assert.deepEqual(cleanComparison.baselineRequest, [orgId, projectId]);
     assert.equal(cleanComparison.result, 0);
 
-    const mediumComparison = await compare({
-      baseline: [],
-      current: current("SNYK-EXAMPLE-MEDIUM", "medium", "1.0.0", [
-        "rcw@1.0.0",
-        "example-package@1.0.0",
-      ]),
-      delta,
-      snyk,
-    });
-    assert.equal(
-      mediumComparison.result,
-      0,
-      "A lower-severity issue should pass",
-    );
+    for (const severity of ["low", "medium"]) {
+      const lowerSeverityComparison = await compare({
+        baseline: [],
+        current: current(
+          `SNYK-EXAMPLE-${severity.toUpperCase()}`,
+          severity,
+          "1.0.0",
+          ["rcw@1.0.0", "example-package@1.0.0"],
+        ),
+        delta,
+        snyk,
+      });
+      assert.equal(
+        lowerSeverityComparison.result,
+        0,
+        `${severity} findings should pass`,
+      );
+    }
     const licenseComparison = await compare({
       baseline: [],
       current: current(

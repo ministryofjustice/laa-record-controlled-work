@@ -15,25 +15,8 @@ import { fileURLToPath } from "node:url";
 
 const actionDirectory = dirname(fileURLToPath(import.meta.url));
 const actionPath = join(actionDirectory, "action.yml");
-const containerFixturePath = join(
-  actionDirectory,
-  "fixtures",
-  "container-results.json",
-);
+const orgId = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
 const projectId = "11111111-1111-4111-8111-111111111111";
-const image = "registry.example.test/rcw@sha256:" + "a".repeat(64);
-const containerProjects = [
-  {
-    identityType: "apk",
-    projectId: "22222222-2222-4222-8222-222222222222",
-    targetFile: "",
-  },
-  {
-    identityType: "npm",
-    projectId: "33333333-3333-4333-8333-333333333333",
-    targetFile: "/package.json",
-  },
-];
 
 function loadAction() {
   assert.ok(
@@ -73,10 +56,8 @@ function resolveExpression(value, inputs, outcomes, outputs) {
 
 function runAction({
   clean = true,
-  containerExit = 0,
-  containerOutput,
-  deltaCodes = "0,0,0",
-  failedActions = [],
+  deltaCodes = "0",
+  failedExternalActions = [],
   inputs: inputOverrides = {},
   ossExit = 0,
   ossOutput,
@@ -98,11 +79,8 @@ function runAction({
   Object.assign(
     inputs,
     {
-      "container-projects-json": JSON.stringify(containerProjects),
-      dockerfile: "Dockerfile",
-      "image-ref": image,
       "open-source-project-id": projectId,
-      "org-id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      "org-id": orgId,
       "snyk-client-id": "client-id",
       "snyk-client-secret": "client-secret",
     },
@@ -125,20 +103,9 @@ function runAction({
         ]
       : [],
   };
-  const containerResults = JSON.parse(
-    readFileSync(containerFixturePath, "utf8"),
-  ).map((result) => ({
-    ...result,
-    vulnerabilities: scanVulnerability ? result.vulnerabilities : [],
-  }));
-
   writeFileSync(
     join(directory, "oss.json"),
     ossOutput ?? JSON.stringify(ossResult),
-  );
-  writeFileSync(
-    join(directory, "container.json"),
-    containerOutput ?? JSON.stringify(containerResults),
   );
   writeFileSync(tracePath, "");
   writeFileSync(deltaCountPath, "0");
@@ -147,11 +114,6 @@ function runAction({
 set -eu
 printf '%s\\n' "snyk $*" >> "$COMMAND_TRACE"
 if [[ "\${1:-}" == "version" ]]; then printf '%s\\n' '1.1308.0'; exit 0; fi
-if [[ "\${1:-}" == "container" && "\${2:-}" == "test" ]]; then
-  for argument in "$@"; do [[ "$argument" == --json-file-output=* ]] && output=\${argument#*=}; done
-  cp "$CONTAINER_RESULT" "$output"
-  exit "$CONTAINER_EXIT"
-fi
 if [[ "\${1:-}" == "test" ]]; then
   for argument in "$@"; do [[ "$argument" == --json-file-output=* ]] && output=\${argument#*=}; done
   cp "$OSS_RESULT" "$output"
@@ -183,7 +145,8 @@ exit "\${exit_code:-0}"
         continue;
       }
       if (!step.run) {
-        outcomes[stepId] = failedActions.includes(stepId)
+        const actionName = step.uses?.split("@")[0];
+        outcomes[stepId] = failedExternalActions.includes(actionName)
           ? "failure"
           : "success";
         diagnostics.push(
@@ -206,8 +169,6 @@ exit "\${exit_code:-0}"
       }
       Object.assign(env, {
         COMMAND_TRACE: tracePath,
-        CONTAINER_EXIT: String(containerExit),
-        CONTAINER_RESULT: join(directory, "container.json"),
         DELTA_CODES: deltaCodes,
         DELTA_COUNT: deltaCountPath,
         GITHUB_OUTPUT: stepOutputPath,
@@ -267,77 +228,84 @@ function shouldRun(condition, outcomes) {
   return requiredSteps.every(([, stepId]) => outcomes[stepId] === "success");
 }
 
-test("clean scans still compare OSS and every configured Container result", () => {
+test("the public delta action accepts only Open Source inputs", () => {
+  const action = loadAction();
+  assert.deepEqual(Object.keys(action.inputs).sort(), [
+    "open-source-project-id",
+    "org-id",
+    "snyk-client-id",
+    "snyk-client-secret",
+  ]);
+});
+
+test("Open Source delta needs no Container prerequisites or assessment", () => {
   const run = runAction();
   try {
     assert.equal(run.outcome, "passed", run.diagnostics);
-    assert.equal(run.deltaCalls, 3, run.diagnostics);
+    assert.equal(run.deltaCalls, 1, run.diagnostics);
+    assert.match(run.commands, /snyk test/);
+    assert.doesNotMatch(run.commands, /container/);
+  } finally {
+    rmSync(run.directory, { force: true, recursive: true });
+  }
+});
+
+test("clean scans read the explicitly configured OSS baseline", () => {
+  const run = runAction();
+  try {
+    assert.equal(run.outcome, "passed", run.diagnostics);
+    assert.equal(run.deltaCalls, 1, run.diagnostics);
     assert.match(run.commands, /--severity-threshold=high/);
-    assert.equal((run.commands.match(/--policy-path=\.snyk/g) ?? []).length, 2);
+    assert.equal((run.commands.match(/--policy-path=\.snyk/g) ?? []).length, 1);
     assert.match(run.commands, /--dev/);
     assert.match(run.commands, /--type vuln/);
-    for (const baselineId of [
-      projectId,
-      ...containerProjects.map((project) => project.projectId),
-    ]) {
-      assert.ok(
-        run.commands.includes(`--baselineProject ${baselineId}`),
-        `Missing comparison for ${baselineId}`,
-      );
-    }
+    assert.ok(run.commands.includes(`--baselineOrg ${orgId}`));
+    assert.ok(run.commands.includes(`--baselineProject ${projectId}`));
+    assert.doesNotMatch(
+      run.commands,
+      /container|monitor|sarif|security-events/i,
+    );
   } finally {
     rmSync(run.directory, { force: true, recursive: true });
   }
 });
 
-test("scan exit 1 passes when each comparison finds no regression", () => {
-  const run = runAction({ clean: false, containerExit: 1, ossExit: 1 });
+test("scan exit 1 passes when OSS comparison finds no regression", () => {
+  const run = runAction({ clean: false, ossExit: 1 });
   try {
     assert.equal(run.outcome, "passed");
-    assert.equal(run.deltaCalls, 3);
+    assert.equal(run.deltaCalls, 1);
   } finally {
     rmSync(run.directory, { force: true, recursive: true });
   }
 });
 
-test("a later Container regression fails without hiding remaining results", () => {
-  const run = runAction({ deltaCodes: "0,1,0" });
-  try {
-    assert.equal(run.outcome, "failed");
-    assert.equal(run.deltaCalls, 3);
-  } finally {
-    rmSync(run.directory, { force: true, recursive: true });
-  }
-});
-
-test("a baseline comparison error fails while later results are still assessed", () => {
-  const run = runAction({ deltaCodes: "2,0,0" });
-  try {
-    assert.equal(run.outcome, "failed");
-    assert.equal(run.deltaCalls, 3);
-  } finally {
-    rmSync(run.directory, { force: true, recursive: true });
-  }
-});
-
-test("scan operational errors fail while the other product is still assessed", () => {
-  const run = runAction({ ossExit: 2 });
-  try {
-    assert.equal(run.outcome, "failed");
-    assert.equal(run.deltaCalls, 2);
-    assert.match(run.commands, /snyk container test/);
-  } finally {
-    rmSync(run.directory, { force: true, recursive: true });
-  }
-});
-
-test("Container scan operational errors do not prevent the Open Source comparison", () => {
-  const run = runAction({ containerExit: 2 });
+test("a new OSS regression fails the aggregate outcome", () => {
+  const run = runAction({ deltaCodes: "1" });
   try {
     assert.equal(run.outcome, "failed");
     assert.equal(run.deltaCalls, 1);
-    assert.match(run.commands, /snyk test/);
+  } finally {
+    rmSync(run.directory, { force: true, recursive: true });
+  }
+});
+
+test("a clean scan still fails when the OSS baseline cannot be read", () => {
+  const run = runAction({ deltaCodes: "2" });
+  try {
+    assert.equal(run.outcome, "failed");
+    assert.equal(run.deltaCalls, 1);
     assert.ok(run.commands.includes(`--baselineProject ${projectId}`));
+  } finally {
+    rmSync(run.directory, { force: true, recursive: true });
+  }
+});
+
+test("OSS scan operational errors fail without running comparison", () => {
+  const run = runAction({ ossExit: 2 });
+  try {
+    assert.equal(run.outcome, "failed");
+    assert.equal(run.deltaCalls, 0);
   } finally {
     rmSync(run.directory, { force: true, recursive: true });
   }
@@ -359,13 +327,33 @@ test("malformed Open Source vulnerability records fail closed", () => {
   });
   try {
     assert.equal(run.outcome, "failed");
-    assert.equal(run.deltaCalls, 2);
+    assert.equal(run.deltaCalls, 0);
     assert.match(
       run.diagnostics,
       /Open Source scan output is missing or unsupported/,
     );
   } finally {
     rmSync(run.directory, { force: true, recursive: true });
+  }
+});
+
+test("malformed or incomplete OSS scan output fails closed", () => {
+  for (const ossOutput of [
+    "not-json",
+    "[]",
+    JSON.stringify({
+      packageManager: "npm",
+      severityThreshold: "high",
+      vulnerabilities: [],
+    }),
+  ]) {
+    const run = runAction({ ossOutput });
+    try {
+      assert.equal(run.outcome, "failed");
+      assert.equal(run.deltaCalls, 0);
+    } finally {
+      rmSync(run.directory, { force: true, recursive: true });
+    }
   }
 });
 
@@ -392,7 +380,7 @@ test("Open Source findings require IDs and non-empty dependency paths", () => {
     });
     try {
       assert.equal(run.outcome, "failed");
-      assert.equal(run.deltaCalls, 2);
+      assert.equal(run.deltaCalls, 0);
       assert.match(
         run.diagnostics,
         /Open Source scan output is missing or unsupported/,
@@ -400,17 +388,6 @@ test("Open Source findings require IDs and non-empty dependency paths", () => {
     } finally {
       rmSync(run.directory, { force: true, recursive: true });
     }
-  }
-});
-
-test("missing Container mappings fail before scans, including on clean inputs", () => {
-  const run = runAction({ inputs: { "container-projects-json": "[]" } });
-  try {
-    assert.equal(run.outcome, "failed");
-    assert.doesNotMatch(run.commands, /snyk test/);
-    assert.equal(run.deltaCalls, 0);
-  } finally {
-    rmSync(run.directory, { force: true, recursive: true });
   }
 });
 
@@ -427,11 +404,9 @@ test("malformed organization UUIDs fail before scans", () => {
   }
 });
 
-test("Container mappings cannot omit the application dependency result", () => {
+test("malformed OSS project UUIDs fail before scans", () => {
   const run = runAction({
-    inputs: {
-      "container-projects-json": JSON.stringify([containerProjects[0]]),
-    },
+    inputs: { "open-source-project-id": "not-a-project-id" },
   });
   try {
     assert.equal(run.outcome, "failed");
@@ -439,154 +414,15 @@ test("Container mappings cannot omit the application dependency result", () => {
     assert.equal(run.deltaCalls, 0);
   } finally {
     rmSync(run.directory, { force: true, recursive: true });
-  }
-});
-
-test("Container mapping identities reject workflow-command control characters", () => {
-  const mappings = [
-    [
-      containerProjects[0],
-      { ...containerProjects[1], identityType: "npm\n::error::injected" },
-    ],
-    [
-      containerProjects[0],
-      {
-        ...containerProjects[1],
-        targetFile: "/package.json\n::error::injected",
-      },
-    ],
-  ];
-  for (const containerProjectsJson of mappings) {
-    const run = runAction({
-      inputs: {
-        "container-projects-json": JSON.stringify(containerProjectsJson),
-      },
-    });
-    try {
-      assert.equal(run.outcome, "failed");
-      assert.doesNotMatch(run.commands, /snyk test/);
-      assert.equal(run.deltaCalls, 0);
-    } finally {
-      rmSync(run.directory, { force: true, recursive: true });
-    }
-  }
-});
-
-test("a monitored project UUID cannot be reused for distinct Container results", () => {
-  const mappings = containerProjects.map((project) => ({
-    ...project,
-    projectId: projectId,
-  }));
-  const run = runAction({
-    inputs: { "container-projects-json": JSON.stringify(mappings) },
-  });
-  try {
-    assert.equal(run.outcome, "failed");
-    assert.doesNotMatch(run.commands, /snyk test/);
-    assert.equal(run.deltaCalls, 0);
-  } finally {
-    rmSync(run.directory, { force: true, recursive: true });
-  }
-});
-
-test("project UUID reuse differing only by hex casing fails closed", () => {
-  const repeatedId = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
-  const mappings = containerProjects.map((project, index) => ({
-    ...project,
-    projectId: index === 0 ? repeatedId.toUpperCase() : repeatedId,
-  }));
-  const run = runAction({
-    inputs: {
-      "container-projects-json": JSON.stringify(mappings),
-      "open-source-project-id": "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
-    },
-  });
-  try {
-    assert.equal(run.outcome, "failed");
-    assert.doesNotMatch(run.commands, /snyk test/);
-    assert.equal(run.deltaCalls, 0);
-  } finally {
-    rmSync(run.directory, { force: true, recursive: true });
-  }
-});
-
-test("a Container project mapped to the wrong result identity fails closed", () => {
-  const mappings = [
-    containerProjects[0],
-    { ...containerProjects[1], targetFile: "/wrong.json" },
-  ];
-  const run = runAction({
-    inputs: { "container-projects-json": JSON.stringify(mappings) },
-  });
-  try {
-    assert.equal(run.outcome, "failed");
-    assert.equal(run.deltaCalls, 2);
-  } finally {
-    rmSync(run.directory, { force: true, recursive: true });
-  }
-});
-
-test("malformed Container scan output fails closed", () => {
-  const run = runAction({ containerOutput: "not-json" });
-  try {
-    assert.equal(run.outcome, "failed");
-    assert.equal(run.deltaCalls, 1);
-    assert.match(
-      run.diagnostics,
-      /Container scan output is malformed or unsupported/,
-    );
-  } finally {
-    rmSync(run.directory, { force: true, recursive: true });
-  }
-});
-
-test("Container results missing project identity metadata fail closed", () => {
-  const containerResults = JSON.parse(
-    readFileSync(containerFixturePath, "utf8"),
-  );
-  delete containerResults[0].projectName;
-  const run = runAction({
-    containerOutput: JSON.stringify(containerResults),
-  });
-  try {
-    assert.equal(run.outcome, "failed");
-    assert.equal(run.deltaCalls, 1);
-    assert.match(
-      run.diagnostics,
-      /Container scan output is malformed or unsupported/,
-    );
-  } finally {
-    rmSync(run.directory, { force: true, recursive: true });
-  }
-});
-
-test("Container findings require IDs and non-empty dependency paths", () => {
-  for (const vulnerability of [
-    { from: ["docker-image|rcw@latest"], severity: "low" },
-    { from: [], id: "SNYK-EXAMPLE-EMPTY-PATH", severity: "low" },
-  ]) {
-    const containerResults = JSON.parse(
-      readFileSync(containerFixturePath, "utf8"),
-    );
-    containerResults[0].vulnerabilities = [vulnerability];
-    const run = runAction({
-      containerOutput: JSON.stringify(containerResults),
-    });
-    try {
-      assert.equal(run.outcome, "failed");
-      assert.equal(run.deltaCalls, 1);
-      assert.match(
-        run.diagnostics,
-        /Container scan output is malformed or unsupported/,
-      );
-    } finally {
-      rmSync(run.directory, { force: true, recursive: true });
-    }
   }
 });
 
 test("OAuth authentication failure fails the aggregate result", () => {
-  const run = runAction({ failedActions: ["snyk-auth"] });
+  const run = runAction({
+    failedExternalActions: [
+      "ministryofjustice/laa-reusable-github-actions/.github/actions/snyk-auth",
+    ],
+  });
   try {
     assert.equal(run.outcome, "failed");
     assert.doesNotMatch(run.commands, /snyk test/);
