@@ -285,7 +285,7 @@ runs:
             else
               echo "::error::Container delta failed for $identity_type:$target_file with exit code $delta_status"
             fi
-            overall_status=1
+            return 1
           fi
         }
 
@@ -314,9 +314,9 @@ runs:
 
         overall_status=0
         result_count="$(jq 'length' "$container_json")"
-        mapping_count="$(jq 'length' <<< "$CONTAINER_PROJECTS_JSON")"
+        projects_count="$(jq 'length' <<< "$CONTAINER_PROJECTS_JSON")"
 
-        if [[ "$result_count" != "$mapping_count" ]]; then
+        if [[ "$result_count" != "$projects_count" ]]; then
           echo '::error::Container scan results do not match the required project mappings'
           overall_status=1
         fi
@@ -347,11 +347,13 @@ runs:
           fi
 
           jq '.[0] + {severityThreshold: "high"}' "$container_results_for_mapping_json" > "$current_json"
-          run_container_delta \
+          if ! run_container_delta \
             "$project_id" \
             "$current_json" \
             "$identity_type" \
-            "$target_file"
+            "$target_file"; then
+            overall_status=1
+          fi
         done < <(jq -c '.[]' <<< "$CONTAINER_PROJECTS_JSON")
 
         exit "$overall_status"
