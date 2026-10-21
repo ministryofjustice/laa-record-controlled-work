@@ -7,6 +7,7 @@ import { clearFieldAnswers } from "#/journeys/effects/clearFieldAnswers.js";
 import { loadDraftAnswers } from "#/journeys/effects/loadDraftAnswers.js";
 import { saveDraftAnswers } from "#/journeys/effects/saveDraftAnswers.js";
 import { updateEvidence } from "#/journeys/evidence/effects/updateEvidence.js";
+import { loadEvidenceAsAnswers } from "#/journeys/evidence/effects/loadEvidenceAsAnswers.js";
 
 export const evidenceEffectsRegistry =
   new EffectRegistry<EvidenceEffectsDeps>();
@@ -17,4 +18,7 @@ export const evidenceEffects = {
   loadDraftAnswers: evidenceEffectsRegistry.register(loadDraftAnswers),
   saveDraftAnswers: evidenceEffectsRegistry.register(saveDraftAnswers),
   updateEvidence: evidenceEffectsRegistry.register(updateEvidence),
+  loadEvidenceAsAnswers: evidenceEffectsRegistry.register(
+    loadEvidenceAsAnswers,
+  ),
 };

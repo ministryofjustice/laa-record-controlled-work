@@ -4,6 +4,7 @@ import {
   redirect,
   step,
   submit,
+  tieBreaker,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
 import { evidenceEffects } from "#/journeys/evidence/evidence.effects.js";
@@ -35,6 +36,10 @@ export const checkAnswersStep = (): ReturnType<typeof step> =>
         validate: false,
       }),
     ],
+    reachability: {
+      entryWhen: true,
+      tieBreakers: [tieBreaker({ priority: 100 })],
+    },
     path: "check-answers",
     title: t("journeys.createApplication.checkAnswers.title"),
   });

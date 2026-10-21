@@ -19,6 +19,8 @@ export interface EvidenceAnswers extends Record<string, unknown> {
   selfEmployedEvidence?: string[];
   stateBenefitsEvidence?: string[];
   taxCreditsEvidence?: string[];
+  haveEvidenceOfCapital?: "no" | "yes";
+  haveEvidenceOfExpenditure?: "no" | "yes";
 }
 
 export type EvidenceContext = EffectFunctionContext<
@@ -33,7 +35,7 @@ export interface EvidenceEffectsDeps {
   updateApplicationEvidence: typeof updateApplicationEvidence;
 }
 
-type EvidenceExemptionReasonCode =
+export type EvidenceExemptionReasonCode =
   "adviceOverPhone" | "notPossibleBeforeStart" | "personalCircumstances";
 
 /**

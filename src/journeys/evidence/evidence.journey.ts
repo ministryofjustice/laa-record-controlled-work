@@ -16,11 +16,14 @@ export const evidenceJourney = journey({
   code: journeyCode,
   onAccess: [
     access({
-      effects: [evidenceEffects.loadDraftAnswers(journeyCode)],
+      effects: [
+        evidenceEffects.loadEvidenceAsAnswers(journeyCode),
+        evidenceEffects.loadDraftAnswers(journeyCode),
+      ],
     }),
   ],
   path: "/cases/:applicationID/evidence",
-  reachability: { disableReachabilityChecks: false },
+  reachability: { disableReachabilityChecks: true },
   steps: [
     doYouHaveEvidence(journeyCode),
     reasonForNoEvidence(journeyCode),

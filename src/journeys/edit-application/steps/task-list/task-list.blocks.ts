@@ -109,10 +109,20 @@ export function taskList(): BlockDefinition[] {
           t(
             "journeys.editApplication.taskList.EvidenceAndDeclaration.taskItem.evidence.label",
           ),
-          Format(
-            "/cases/%1/evidence/have-evidence",
-            Params(PARAMS_KEYS.applicationID),
-          ),
+          match(Data(CONTEXT_DATA_KEYS.evidenceStatus))
+            .branch(
+              Condition.Equals(Status.COMPLETED),
+              Format(
+                "/cases/%1/evidence/check-answers",
+                Params(PARAMS_KEYS.applicationID),
+              ),
+            )
+            .otherwise(
+              Format(
+                "/cases/%1/evidence/",
+                Params(PARAMS_KEYS.applicationID),
+              ),
+            ),
           Data(CONTEXT_DATA_KEYS.evidenceStatus),
         ),
         taskItem(
