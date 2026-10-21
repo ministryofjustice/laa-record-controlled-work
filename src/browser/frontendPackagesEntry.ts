@@ -3,6 +3,10 @@ import { initAll as initMOJ } from "@ministryofjustice/frontend";
 // Import GOV.UK Frontend
 import { initAll as initGOVUK } from "govuk-frontend";
 
+import { setupSentry } from "./sentry.js";
+
+setupSentry();
+
 /**
  * Initialises both GOV.UK Frontend and MOJ Frontend packages.
  * Only runs in browser environment and includes error handling.

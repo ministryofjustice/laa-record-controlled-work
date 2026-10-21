@@ -39,4 +39,36 @@ describe("helmet middleware", () => {
       "report-uri https://sentry.example/security",
     );
   });
+
+  it("allows the Sentry origin and Replay workers when Sentry is enabled", async () => {
+    process.env.SENTRY_ENABLED = "true";
+    process.env.SENTRY_DSN = "https://example@sentry.io/123";
+
+    const app = express();
+    app.use(helmet());
+    app.get("/", (req, res) => res.send("ok"));
+
+    const response = await request(app).get("/");
+    const policy = response.headers["content-security-policy"];
+
+    expect(policy).to.include("connect-src 'self' https://sentry.io");
+    expect(policy).to.include("worker-src 'self' blob:");
+    expect(policy).to.not.include("example@");
+  });
+
+  it("does not allow Sentry connections or blob workers when disabled", async () => {
+    process.env.SENTRY_ENABLED = "false";
+    process.env.SENTRY_DSN = "https://example@sentry.io/123";
+
+    const app = express();
+    app.use(helmet());
+    app.get("/", (req, res) => res.send("ok"));
+
+    const response = await request(app).get("/");
+    const policy = response.headers["content-security-policy"];
+
+    expect(policy).to.include("connect-src 'self';");
+    expect(policy).to.match(/worker-src 'self'(;|$)/);
+    expect(policy).to.not.include("https://sentry.io");
+  });
 });

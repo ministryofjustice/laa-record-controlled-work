@@ -3,6 +3,7 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 
 import helmet from "helmet";
 
+import { createBrowserSentryOptions } from "#/app/middleware/sentry.middleware.js";
 import config from "#/config.js";
 
 /**
@@ -13,11 +14,18 @@ import config from "#/config.js";
  * @returns {RequestHandler}  The configured Helmet middleware.
  */
 function helmetMiddleware(): RequestHandler {
+  const browserSentry = createBrowserSentryOptions();
+  const connectSrc = ["'self'"];
+
+  if (browserSentry) {
+    connectSrc.push(new URL(browserSentry.dsn).origin);
+  }
+
   return helmet({
     contentSecurityPolicy: {
       directives: {
         baseUri: ["'self'"], // Restrict base URI
-        connectSrc: ["'self'"],
+        connectSrc,
         defaultSrc: ["'self'"],
         fontSrc: ["'self'", "data:"], // Allow data: URIs for fonts
         formAction: ["'self'", config.entra.authority], // Restrict form submissions but allows redirects to Entra after signout
@@ -45,6 +53,7 @@ function helmetMiddleware(): RequestHandler {
           },
         ],
         styleSrc: ["'self'", "'unsafe-inline'"], // Allow inline styles if needed
+        workerSrc: browserSentry ? ["'self'", "blob:"] : ["'self'"],
         ...(process.env.SENTRY_CSP_REPORT_ENDPOINT
           ? { reportUri: [process.env.SENTRY_CSP_REPORT_ENDPOINT] }
           : {}),

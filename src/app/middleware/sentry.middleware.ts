@@ -13,7 +13,39 @@ const SENSITIVE_LOG_ATTRIBUTES = new Set([
   "niNumber",
 ]);
 
+interface BrowserSentryOptions {
+  dsn: string;
+  environment: string;
+  release?: string;
+}
+
 type SentryLog = Sentry.Log;
+
+/**
+ * Resolves the public browser configuration when Sentry is enabled.
+ * @returns The browser configuration, or undefined when disabled or unconfigured.
+ */
+export function createBrowserSentryOptions(): BrowserSentryOptions | undefined {
+  if (process.env.SENTRY_ENABLED !== "true") {
+    return undefined;
+  }
+
+  const dsn = resolveSentryDsn();
+  if (!dsn) {
+    return undefined;
+  }
+
+  const options: BrowserSentryOptions = {
+    dsn,
+    environment: process.env.SENTRY_ENV ?? "production",
+  };
+
+  if (process.env.SENTRY_RELEASE) {
+    options.release = process.env.SENTRY_RELEASE;
+  }
+
+  return options;
+}
 
 /**
  * Creates the Sentry options from the current feature flag configuration.
