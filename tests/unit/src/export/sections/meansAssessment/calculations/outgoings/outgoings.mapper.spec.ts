@@ -183,6 +183,47 @@ describe("toMeansAssessmentSection outgoings breakdown", () => {
     });
   });
 
+  it("does not display zero employment deductions as negative zero", () => {
+    const mapped = breakdown(result());
+
+    expect(mapped?.status).to.equal("ready");
+    if (mapped?.status === "ready") {
+      const deductions = mapped.tables[0].rows.filter(({ heading }) =>
+        ["Income tax", "National Insurance", "Employment expenses"].includes(
+          heading,
+        ),
+      );
+
+      expect(deductions.map(({ amount }) => amount)).to.deep.equal([
+        "£0.00",
+        "£0.00",
+        "£0.00",
+      ]);
+    }
+  });
+
+  it("preserves unlimited deduction sentinels for not-applicable formatting", () => {
+    const mapped = breakdown(
+      result({
+        disposableIncome: {
+          employment_income: {
+            fixed_employment_deduction: 0,
+            national_insurance: 0,
+            tax: 999_999_999_999,
+          },
+        },
+      }),
+    );
+
+    expect(mapped?.status).to.equal("ready");
+    if (mapped?.status === "ready") {
+      const incomeTax = mapped.tables[0].rows.find(
+        ({ heading }) => heading === "Income tax",
+      );
+      expect(incomeTax?.amount).to.equal("Not applicable");
+    }
+  });
+
   it("shows missing and unlimited saved values as not applicable", () => {
     const result = {
       assessment: {

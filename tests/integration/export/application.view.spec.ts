@@ -97,6 +97,29 @@ const meansAssessmentData = {
       heading: "Client details",
     },
   ],
+  capitalBreakdown: {
+    description: [
+      "The calculations below assess the value of any property the client owns.",
+      "The assessed values are used to calculate the total disposable capital for your client.",
+    ],
+    heading: "Capital calculation",
+    status: "ready",
+    tables: [
+      {
+        heading: "Home client lives in",
+        hint: null,
+        rows: [
+          { amount: "£300,000.00", heading: "Estimated value", hint: null },
+          {
+            amount: "£93,456.78",
+            emphasis: true,
+            heading: "Assessed value",
+            hint: null,
+          },
+        ],
+      },
+    ],
+  },
   incomeBreakdown: {
     heading: "Income calculation",
     status: "ready",
@@ -199,6 +222,7 @@ const meansAssessment: MeansAssessmentView = {
   calculationBreakdowns: toCalculationBreakdowns([
     meansAssessmentData.incomeBreakdown,
     meansAssessmentData.outgoingsBreakdown,
+    meansAssessmentData.capitalBreakdown,
   ]),
 };
 
@@ -377,6 +401,31 @@ describe("export application view", () => {
     );
   });
 
+  it("renders capital property tables after other calculations and before answers", async () => {
+    const response = await request(createViewApp()).get("/export");
+
+    expect(response.status).to.equal(200);
+    expect(response.text).to.include("Capital calculation");
+    expect(response.text).to.include(
+      "The calculations below assess the value of any property the client owns.",
+    );
+    expect(response.text).to.match(
+      /<caption[^>]*>Home client lives in<\/caption>/,
+    );
+    expect(response.text).to.match(
+      /<th scope="row" class="govuk-table__header app-calculation__row-heading">\s*Estimated value/,
+    );
+    expect(response.text).to.match(
+      /<td class="govuk-table__cell app-calculation__amount">\s*£300,000\.00\s*<\/td>/,
+    );
+    expect(response.text.indexOf("Outgoings calculation")).to.be.lessThan(
+      response.text.indexOf("Capital calculation"),
+    );
+    expect(response.text.indexOf("Capital calculation")).to.be.lessThan(
+      response.text.indexOf("Your answers"),
+    );
+  });
+
   it("omits calculation headings and tables when no breakdowns are displayable", async () => {
     const response = await request(createViewApp({
       ...meansAssessment,
@@ -395,6 +444,7 @@ describe("export application view", () => {
       ...meansAssessment,
       calculationBreakdowns: [
         {
+          description: [],
           heading: "Income calculation",
           message: "Income calculation details are unavailable.",
           tables: [],

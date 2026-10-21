@@ -11,6 +11,11 @@ import {
 } from "#tests/fixtures/meansAssessment/answers.fixtures.js";
 import { createMeansAssessment } from "#tests/fixtures/meansAssessment/builders.js";
 import {
+  createCapitalPropertiesScenario,
+  createUnavailableCapitalPropertiesScenario,
+  createUncalculatedCapitalScenario,
+} from "#tests/fixtures/meansAssessment/calculations/capital.fixtures.js";
+import {
   createIncomeCalculationScenario,
   createPartnerIncomeCalculationScenario,
   createUnavailableIncomeCalculationScenario,
@@ -39,6 +44,9 @@ export enum MeansAssessmentScenarioName {
   AsylumSupport = "asylumSupport",
   Baseline = "baseline",
   CalculationStates = "calculationStates",
+  CapitalPropertiesNotCalculated = "capitalPropertiesNotCalculated",
+  CapitalPropertiesReady = "capitalPropertiesReady",
+  CapitalPropertiesUnavailable = "capitalPropertiesUnavailable",
   EmployedHousehold = "employedHousehold",
   FormattingVariants = "formattingVariants",
   HousingMortgage = "housingMortgage",
@@ -70,6 +78,12 @@ export const meansAssessmentScenarios: Record<
   [MeansAssessmentScenarioName.Baseline]: () => createMeansAssessment(),
   [MeansAssessmentScenarioName.CalculationStates]:
     createCalculationStatesScenario,
+  [MeansAssessmentScenarioName.CapitalPropertiesNotCalculated]:
+    createUncalculatedCapitalScenario,
+  [MeansAssessmentScenarioName.CapitalPropertiesReady]:
+    createCapitalPropertiesScenario,
+  [MeansAssessmentScenarioName.CapitalPropertiesUnavailable]:
+    createUnavailableCapitalPropertiesScenario,
   [MeansAssessmentScenarioName.EmployedHousehold]:
     createEmployedHouseholdScenario,
   [MeansAssessmentScenarioName.FormattingVariants]:

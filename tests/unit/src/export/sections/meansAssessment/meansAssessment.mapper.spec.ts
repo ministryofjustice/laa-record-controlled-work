@@ -76,16 +76,27 @@ describe("toMeansAssessmentSection", () => {
     }
   });
 
-  it("presents unavailable breakdowns in income then outgoings order", () => {
+  it("presents breakdowns in income, outgoings, and capital order", () => {
     expect(mapSection(CALCULATED_RESULT)?.calculationBreakdowns).to.deep.equal([
       {
+        description: [],
         heading: "Income calculation",
         message: "Income calculation details are unavailable.",
         tables: [],
       },
       {
+        description: [],
         heading: "Outgoings calculation",
         message: "Outgoings calculation details are unavailable.",
+        tables: [],
+      },
+      {
+        description: [
+          "The calculations below assess the value of any property the client owns.",
+          "The assessed values are used to calculate the total disposable capital for your client.",
+        ],
+        heading: "Capital calculation",
+        message: null,
         tables: [],
       },
     ]);

@@ -3,6 +3,7 @@ import type { MeansAssessmentCalculations } from "#/export/sections/meansAssessm
 
 export type MeansAssessmentCalculationBreakdown =
   | {
+      description?: string[];
       heading: string;
       status: "ready";
       tables: MeansAssessmentCalculationTable[];
@@ -18,6 +19,7 @@ export type MeansAssessmentCalculationCell =
   { classes: string; html: string } | { classes: string; text: string };
 
 export interface MeansAssessmentCalculationPresentation {
+  description: string[];
   heading: string;
   message: null | string;
   tables: MeansAssessmentCalculationTablePresentation[];
@@ -63,6 +65,7 @@ export interface MeansAssessmentSection {
   answerSummaries: MeansAssessmentAnswerSummary[];
   calculationBreakdowns: MeansAssessmentCalculationPresentation[];
   calculations: MeansAssessmentCalculations;
+  capitalBreakdown: MeansAssessmentCalculationBreakdown;
   incomeBreakdown: MeansAssessmentCalculationBreakdown;
   outcomeSummary: MeansAssessmentOutcomeSummary;
   outgoingsBreakdown: MeansAssessmentCalculationBreakdown;

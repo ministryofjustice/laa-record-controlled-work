@@ -20,6 +20,7 @@ export function toCalculationBreakdowns(
       if (breakdown.status === "ready") {
         return [
           {
+            description: breakdown.description ?? [],
             heading: breakdown.heading,
             message: null,
             tables: breakdown.tables.map((table) => ({
@@ -37,6 +38,7 @@ export function toCalculationBreakdowns(
       if (breakdown.status === "unavailable" && breakdown.heading) {
         return [
           {
+            description: [],
             heading: breakdown.heading,
             message: breakdown.message ?? null,
             tables: [],
