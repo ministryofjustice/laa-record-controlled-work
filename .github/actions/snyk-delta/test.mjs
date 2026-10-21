@@ -429,6 +429,36 @@ test("Container mappings cannot omit the application dependency result", () => {
   }
 });
 
+test("Container mapping identities reject workflow-command control characters", () => {
+  const mappings = [
+    [
+      containerProjects[0],
+      { ...containerProjects[1], identityType: "npm\n::error::injected" },
+    ],
+    [
+      containerProjects[0],
+      {
+        ...containerProjects[1],
+        targetFile: "/package.json\n::error::injected",
+      },
+    ],
+  ];
+  for (const containerProjectsJson of mappings) {
+    const run = runAction({
+      inputs: {
+        "container-projects-json": JSON.stringify(containerProjectsJson),
+      },
+    });
+    try {
+      assert.equal(run.outcome, "failed");
+      assert.doesNotMatch(run.commands, /snyk test/);
+      assert.equal(run.deltaCalls, 0);
+    } finally {
+      rmSync(run.directory, { force: true, recursive: true });
+    }
+  }
+});
+
 test("a monitored project UUID cannot be reused for distinct Container results", () => {
   const mappings = containerProjects.map((project) => ({
     ...project,

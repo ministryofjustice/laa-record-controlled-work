@@ -48,10 +48,11 @@ runs:
         [[ -f .snyk ]] || { echo '::error::The repository Snyk policy file is missing'; exit 1; }
         jq -e --arg open_source_project_id "$OPEN_SOURCE_PROJECT_ID" '
           def uuid: type == "string" and test("^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$");
+          def safe_text: type == "string" and all(explode[]; . >= 32 and . != 127);
           type == "array" and length > 0 and
           all(.[];
-            (.identityType | type == "string" and length > 0) and
-            (.targetFile | type == "string") and
+            (.identityType | safe_text and length > 0) and
+            (.targetFile | safe_text) and
             (.projectId | uuid)
           ) and
           any(.[]; .identityType == "apk" and .targetFile == "") and
