@@ -64,7 +64,8 @@ describe("Edit client details check answers step", () => {
       priorLegalAid: "yesSameMatter",
       familyLawClassification: "private",
       needsAdviceOnEUOrInternationalMaintenance: false,
-      needsProtectiveInjunction: true,
+      needsProtectiveInjunction: false,
+      laspoEvidenceScope: "domesticAbuse",
     },
   });
   const overseasApplication: Application = getGetApplicationResponseMock({
@@ -654,7 +655,7 @@ describe("Edit client details check answers step", () => {
     });
 
     it("renders the API client data in a summary list", () => {
-      expect(summaryList.properties.rows).to.have.lengthOf(14);
+  expect(summaryList.properties.rows).to.have.lengthOf(15);
       const values = [
         { key: "ECF", value: "No" },
         { key: "Type of family law", value: "Private" },
@@ -662,7 +663,8 @@ describe("Edit client details check answers step", () => {
           key: "Transitional EU arrangements or an international maintenance agreement",
           value: "No",
         },
-        { key: "Legal aid to get a protective injunction order", value: "Yes" },
+        { key: "Legal aid to get a protective injunction order", value: "No" },
+        { key: "Evidence case is in scope", value: "Evidence of domestic abuse (Schedule 1)" },
         {
           key: "Accessed legal aid before",
           value: "Yes, about the same matter",

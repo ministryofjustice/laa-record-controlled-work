@@ -1,4 +1,6 @@
 import {
+  Answer,
+  Condition,
   redirect,
   step,
   type StepDefinition,
@@ -7,6 +9,7 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 import { t } from "i18next";
 
+import { AnswerKey } from "#/journeys/AnswerKey.enum.js";
 import { CreateApplicationEffects } from "#/journeys/create-application/create-application.effects.js";
 import {
   guidance,
@@ -39,8 +42,8 @@ export function needsProtectiveInjunctionStep(
       continueButton(),
     ],
     code: StepCode.PROTECT_THEMSELF,
-    onSubmission: [saveNeedsProtectiveInjunction(journeyCode)],
-    path: StepCode.PROTECT_THEMSELF,
+    onSubmission: [saveNeedsProtectiveInjunction(journeyCode), submitInvalid],
+    path: "protect-themself",
     title: TITLE,
   });
 }
@@ -56,7 +59,11 @@ function saveNeedsProtectiveInjunction(journeyCode: string): SubmitHook {
   return submit({
     onValid: {
       effects: [CreateApplicationEffects.saveDraftAnswers(journeyCode)],
-      next: [redirectToCheckAnswers, redirectToLegalAidBefore],
+      next: [
+        redirectToCheckAnswers,
+        redirectToLegalAidBefore,
+        redirectToLaspoEvidenceScope,
+      ],
     },
     validate: true,
   });
@@ -64,4 +71,19 @@ function saveNeedsProtectiveInjunction(journeyCode: string): SubmitHook {
 
 const redirectToLegalAidBefore = redirect({
   goto: "legal-aid-before",
+  when: Answer(AnswerKey.needsProtectiveInjunction).match(
+    Condition.Equals("yes"),
+  ),
+});
+
+const redirectToLaspoEvidenceScope = redirect({
+  goto: "prove-in-scope",
+  when: Answer(AnswerKey.needsProtectiveInjunction).match(
+    Condition.Equals("no"),
+  ),
+});
+
+const submitInvalid = submit({
+  onInvalid: {},
+  validate: true,
 });

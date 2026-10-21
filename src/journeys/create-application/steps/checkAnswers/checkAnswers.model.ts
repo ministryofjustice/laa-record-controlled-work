@@ -22,6 +22,7 @@ type SummaryFieldKey =
   | AnswerKey.familyLawClassification
   | AnswerKey.firstName
   | AnswerKey.haveAHomeAddress
+  | AnswerKey.laspoEvidenceScope
   | AnswerKey.lastName
   | AnswerKey.legalAidBefore
   | AnswerKey.legalAidLast6Months
@@ -121,6 +122,15 @@ export function checkAnswersModel(): Record<SummaryFieldKey, SummaryField> {
     haveAHomeAddress: field({
       completeWhen: yesNo(AnswerKey.haveAHomeAddress),
       visibleWhen: true,
+    }),
+    laspoEvidenceScope: field({
+      completeWhen: required(AnswerKey.laspoEvidenceScope),
+      visibleWhen: and(
+        isInjunction,
+        Answer(AnswerKey.needsProtectiveInjunction).match(
+          Condition.Equals("no"),
+        ),
+      ),
     }),
     lastName: field({
       completeWhen: required(AnswerKey.lastName),

@@ -34,7 +34,8 @@ describe("Check answers step", () => {
         legalAidBefore: "yesSameMatter",
         legalAidLast6Months: "yes",
         needsAdviceOnEUOrInternationalMaintenance: "no",
-        needsProtectiveInjunction: "yes",
+        needsProtectiveInjunction: "no",
+        laspoEvidenceScope: "domesticAbuse",
         reasonForHelp: "Some reason for help",
         reasonForYes: "Some reason for help",
         firstName: "John",
@@ -86,7 +87,7 @@ describe("Check answers step", () => {
         value: row.value.text,
       }));
 
-      expect(rows.length).to.equal(14);
+      expect(rows.length).to.equal(15);
       expect(rows).to.deep.include.members([
         { key: "ECF", value: "No" },
         { key: "Type of family law", value: "Private" },
@@ -94,7 +95,8 @@ describe("Check answers step", () => {
           key: "Transitional EU arrangements or an international maintenance agreement",
           value: "No",
         },
-        { key: "Legal aid to get a protective injunction order", value: "Yes" },
+        { key: "Legal aid to get a protective injunction order", value: "No" },
+        { key: "Evidence case is in scope", value: "Evidence of domestic abuse (Schedule 1)" },
         {
           key: "Accessed legal aid before",
           value: "Yes, about the same matter",

@@ -24,6 +24,7 @@ import {
   formatEcfLabel,
   formatFamilyLawClassificationLabel,
   formatInternationalMaintenanceAgreementLabel,
+  formatLaspoEvidenceScopeLabel,
   formatLegalAidBeforeLabel,
   formatLegalAidLast6MonthsLabel,
   formatLetterFromLocalAuthority,
@@ -131,6 +132,12 @@ function createSummaryList(
       href: "protect-themself?returnTo=check-answers",
       label: answerLabelT("protectThemselves"),
       value: { text: formatNeedsProtectiveInjunctionLabel() },
+    },
+    {
+      field: AnswerKey.laspoEvidenceScope,
+      href: "prove-in-scope?returnTo=check-answers",
+      label: answerLabelT("laspoEvidenceScope"),
+      value: { text: formatLaspoEvidenceScopeLabel() },
     },
     {
       field: AnswerKey.legalAidBefore,
