@@ -84,5 +84,7 @@ verify hosted credentials, live projects or a real image scan.
 - Run `snyk container test` against the actual immutable CI image and verify all
   returned identities map exactly once, including OS/base-image and application
   results.
+- Confirm the supported `.snyk` ignores are applied to both scans and the
+  monitored baselines.
 - Confirm high/critical regressions fail and comparison/API failures fail in the
   hosted runner. Do not treat successful baseline monitoring as remediation.

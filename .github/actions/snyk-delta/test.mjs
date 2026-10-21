@@ -269,7 +269,7 @@ test("clean scans still compare OSS and every configured Container result", () =
     assert.equal(run.outcome, "passed", run.diagnostics);
     assert.equal(run.deltaCalls, 3);
     assert.match(run.commands, /--severity-threshold=high/);
-    assert.match(run.commands, /--policy-path=\.snyk/);
+    assert.equal((run.commands.match(/--policy-path=\.snyk/g) ?? []).length, 2);
     assert.match(run.commands, /--dev/);
     assert.match(run.commands, /--type vuln/);
     for (const baselineId of [
@@ -382,6 +382,27 @@ test("a monitored project UUID cannot be reused for distinct Container results",
   }
 });
 
+test("project UUID reuse differing only by hex casing fails closed", () => {
+  const repeatedId = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
+  const mappings = containerProjects.map((project, index) => ({
+    ...project,
+    projectId: index === 0 ? repeatedId.toUpperCase() : repeatedId,
+  }));
+  const run = runAction({
+    inputs: {
+      "container-projects-json": JSON.stringify(mappings),
+      "open-source-project-id": "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+    },
+  });
+  try {
+    assert.equal(run.outcome, "failed");
+    assert.doesNotMatch(run.commands, /snyk test/);
+    assert.equal(run.deltaCalls, 0);
+  } finally {
+    rmSync(run.directory, { force: true, recursive: true });
+  }
+});
+
 test("a Container project mapped to the wrong result identity fails closed", () => {
   const mappings = [
     containerProjects[0],
@@ -400,6 +421,26 @@ test("a Container project mapped to the wrong result identity fails closed", () 
 
 test("malformed Container scan output fails closed", () => {
   const run = runAction({ containerOutput: "not-json" });
+  try {
+    assert.equal(run.outcome, "failed");
+    assert.equal(run.deltaCalls, 1);
+    assert.match(
+      run.diagnostics,
+      /Container scan output is malformed or unsupported/,
+    );
+  } finally {
+    rmSync(run.directory, { force: true, recursive: true });
+  }
+});
+
+test("Container results missing project identity metadata fail closed", () => {
+  const containerResults = JSON.parse(
+    readFileSync(containerFixturePath, "utf8"),
+  );
+  delete containerResults[0].projectName;
+  const run = runAction({
+    containerOutput: JSON.stringify(containerResults),
+  });
   try {
     assert.equal(run.outcome, "failed");
     assert.equal(run.deltaCalls, 1);

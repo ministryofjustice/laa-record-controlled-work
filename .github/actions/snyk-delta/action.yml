@@ -57,7 +57,7 @@ runs:
           any(.[]; .identityType == "apk" and .targetFile == "") and
           any(.[]; .targetFile != "") and
           ([.[] | [.identityType, .targetFile] | @json] | unique | length) == length and
-          ([.[] | .projectId] + [$open_source_project_id] | unique | length) == ([.[] | .projectId] + [$open_source_project_id] | length)
+          ([.[] | .projectId | ascii_downcase] + [$open_source_project_id | ascii_downcase] | unique | length) == ([.[] | .projectId | ascii_downcase] + [$open_source_project_id | ascii_downcase] | length)
         ' <<< "$CONTAINER_PROJECTS_JSON" >/dev/null || { echo '::error::Container project mappings are invalid or incomplete'; exit 1; }
       shell: bash
 
@@ -168,7 +168,10 @@ runs:
           all(.[];
             type == "object" and
             (.vulnerabilities | type == "array") and
+            (.packageManager | type == "string" and length > 0) and
+            (.projectName | type == "string" and length > 0) and
             (.scanResult.identity.type | type == "string" and length > 0) and
+            (.scanResult.target.image | type == "string" and length > 0) and
             all(.vulnerabilities[]; (.id | type == "string") and (.severity | IN("low", "medium", "high", "critical")) and (.from | type == "array"))
           ) and
           any(.[]; .scanResult.identity.type == "apk" and (.docker.baseImage | type == "string" and length > 0))
@@ -190,13 +193,15 @@ runs:
             target_file="$(jq -r '.targetFile' <<< "$mapping")"
             project_id="$(jq -r '.projectId' <<< "$mapping")"
             current_json="$scan_dir/container-result-$result_index.json"
-            matches="$(jq --arg identity_type "$identity_type" --arg target_file "$target_file" '[.[] | select(.scanResult.identity.type == $identity_type and (.scanResult.identity.targetFile // .targetFile // "") == $target_file)] | length' "$container_json")"
+            matches_json="$scan_dir/container-matches-$result_index.json"
+            jq --arg identity_type "$identity_type" --arg target_file "$target_file" '[.[] | select(.scanResult.identity.type == $identity_type and (.scanResult.identity.targetFile // .targetFile // "") == $target_file)]' "$container_json" > "$matches_json"
+            matches="$(jq 'length' "$matches_json")"
             if [[ "$matches" != '1' ]]; then
               echo "::error::Container result mapping is missing or ambiguous for $identity_type:$target_file"
               overall_status=1
               continue
             fi
-            jq --arg identity_type "$identity_type" --arg target_file "$target_file" '.[] | select(.scanResult.identity.type == $identity_type and (.scanResult.identity.targetFile // .targetFile // "") == $target_file) | . + {severityThreshold: "high"}' "$container_json" > "$current_json"
+            jq '.[0] + {severityThreshold: "high"}' "$matches_json" > "$current_json"
             if snyk-delta --baselineOrg "$ORG_ID" --baselineProject "$project_id" --type vuln < "$current_json"; then
               echo "Container delta passed for $identity_type:$target_file"
             else
