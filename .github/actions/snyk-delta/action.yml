@@ -137,15 +137,15 @@ runs:
         trap 'rm -rf "$scan_dir"' EXIT
         oss_json="$scan_dir/open-source.json"
 
-        scan_status_is_operational_error() {
+        is_operational_scan_error() {
           (( $1 > 1 ))
         }
 
-        delta_status_is_regression() {
+        is_delta_regression() {
           (( $1 == 1 ))
         }
 
-        open_source_output_is_valid() {
+        is_valid_open_source_output() {
           jq -e '
             def non_empty_string: type == "string" and length > 0;
             def valid_vulnerability:
@@ -167,12 +167,12 @@ runs:
         run_open_source_delta() {
           local delta_status
 
-          if scan_status_is_operational_error "$oss_scan_status"; then
+          if is_operational_scan_error "$oss_scan_status"; then
             echo "::error::Open Source scan failed with exit code $oss_scan_status"
             return 1
           fi
 
-          if ! open_source_output_is_valid; then
+          if ! is_valid_open_source_output; then
             echo '::error::Open Source scan output is missing or unsupported'
             return 1
           fi
@@ -184,7 +184,7 @@ runs:
             echo 'Open Source delta passed'
           else
             delta_status=$?
-            if delta_status_is_regression "$delta_status"; then
+            if is_delta_regression "$delta_status"; then
               echo '::error::Open Source delta found a new high or critical vulnerability'
             else
               echo "::error::Open Source delta failed with exit code $delta_status"
@@ -227,20 +227,19 @@ runs:
       run: |
         set -uo pipefail
         export SNYK_TOKEN="$SNYK_OAUTH_TOKEN"
-        overall_status=0
         scan_dir="$(mktemp -d)"
         trap 'rm -rf "$scan_dir"' EXIT
         container_json="$scan_dir/container.json"
 
-        scan_status_is_operational_error() {
+        is_operational_scan_error() {
           (( $1 > 1 ))
         }
 
-        delta_status_is_regression() {
+        is_delta_regression() {
           (( $1 == 1 ))
         }
 
-        container_output_is_valid() {
+        is_valid_container_output() {
           jq -e '
             def non_empty_string: type == "string" and length > 0;
             def valid_vulnerability:
@@ -281,7 +280,7 @@ runs:
             echo "Container delta passed for $identity_type:$target_file"
           else
             delta_status=$?
-            if delta_status_is_regression "$delta_status"; then
+            if is_delta_regression "$delta_status"; then
               echo "::error::Container delta found a new high or critical vulnerability for $identity_type:$target_file"
             else
               echo "::error::Container delta failed for $identity_type:$target_file with exit code $delta_status"
@@ -303,54 +302,57 @@ runs:
           container_scan_status=$?
         fi
 
-        if scan_status_is_operational_error "$container_scan_status"; then
+        if is_operational_scan_error "$container_scan_status"; then
           echo "::error::Container scan failed with exit code $container_scan_status"
-          overall_status=1
-        elif ! container_output_is_valid; then
-          echo '::error::Container scan output is malformed or unsupported'
-          overall_status=1
-        else
-          result_count="$(jq 'length' "$container_json")"
-          mapping_count="$(jq 'length' <<< "$CONTAINER_PROJECTS_JSON")"
+          exit 1
+        fi
 
-          if [[ "$result_count" != "$mapping_count" ]]; then
-            echo '::error::Container scan results do not match the required project mappings'
+        if ! is_valid_container_output; then
+          echo '::error::Container scan output is malformed or unsupported'
+          exit 1
+        fi
+
+        overall_status=0
+        result_count="$(jq 'length' "$container_json")"
+        mapping_count="$(jq 'length' <<< "$CONTAINER_PROJECTS_JSON")"
+
+        if [[ "$result_count" != "$mapping_count" ]]; then
+          echo '::error::Container scan results do not match the required project mappings'
+          overall_status=1
+        fi
+
+        result_index=0
+        while IFS= read -r mapping; do
+          result_index=$((result_index + 1))
+          identity_type="$(jq -r '.identityType' <<< "$mapping")"
+          target_file="$(jq -r '.targetFile' <<< "$mapping")"
+          project_id="$(jq -r '.projectId' <<< "$mapping")"
+          current_json="$scan_dir/container-result-$result_index.json"
+          container_results_for_mapping_json="$scan_dir/container-results-for-mapping-$result_index.json"
+
+          jq \
+            --arg identity_type "$identity_type" \
+            --arg target_file "$target_file" \
+            '[.[] | select(
+              .scanResult.identity.type == $identity_type and
+              (.scanResult.identity.targetFile // .targetFile // "") == $target_file
+            )]' \
+            "$container_json" > "$container_results_for_mapping_json"
+
+          container_result_count_for_mapping="$(jq 'length' "$container_results_for_mapping_json")"
+          if [[ "$container_result_count_for_mapping" != '1' ]]; then
+            echo "::error::Container result mapping is missing or ambiguous for $identity_type:$target_file"
             overall_status=1
+            continue
           fi
 
-          result_index=0
-          while IFS= read -r mapping; do
-            result_index=$((result_index + 1))
-            identity_type="$(jq -r '.identityType' <<< "$mapping")"
-            target_file="$(jq -r '.targetFile' <<< "$mapping")"
-            project_id="$(jq -r '.projectId' <<< "$mapping")"
-            current_json="$scan_dir/container-result-$result_index.json"
-            matches_json="$scan_dir/container-matches-$result_index.json"
-
-            jq \
-              --arg identity_type "$identity_type" \
-              --arg target_file "$target_file" \
-              '[.[] | select(
-                .scanResult.identity.type == $identity_type and
-                (.scanResult.identity.targetFile // .targetFile // "") == $target_file
-              )]' \
-              "$container_json" > "$matches_json"
-
-            matches="$(jq 'length' "$matches_json")"
-            if [[ "$matches" != '1' ]]; then
-              echo "::error::Container result mapping is missing or ambiguous for $identity_type:$target_file"
-              overall_status=1
-              continue
-            fi
-
-            jq '.[0] + {severityThreshold: "high"}' "$matches_json" > "$current_json"
-            run_container_delta \
-              "$project_id" \
-              "$current_json" \
-              "$identity_type" \
-              "$target_file"
-          done < <(jq -c '.[]' <<< "$CONTAINER_PROJECTS_JSON")
-        fi
+          jq '.[0] + {severityThreshold: "high"}' "$container_results_for_mapping_json" > "$current_json"
+          run_container_delta \
+            "$project_id" \
+            "$current_json" \
+            "$identity_type" \
+            "$target_file"
+        done < <(jq -c '.[]' <<< "$CONTAINER_PROJECTS_JSON")
 
         exit "$overall_status"
       shell: bash
