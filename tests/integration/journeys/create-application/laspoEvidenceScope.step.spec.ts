@@ -64,7 +64,7 @@ describe("LASPO Evidence Scope step", () => {
       });
       expect(result.type).to.equal("redirect");
       const redirectResult = result as TestRedirectResult;
-      expect(redirectResult.url).to.equal("/cases/new/confirm-merits");
+      expect(redirectResult.url).to.equal("/cases/new/legal-aid-before");
     });
 
     it("should redirect to the private family drop out step if none is selected", async () => {
