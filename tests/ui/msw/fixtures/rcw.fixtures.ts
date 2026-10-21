@@ -3,7 +3,7 @@ import type { Application } from "#/api/clients/rcw/model/application.zod.gen.js
 import {
   MeansAssessmentScenarioName,
   meansAssessmentScenarios,
-} from "#tests/fixtures/meansAssessment.fixtures.js";
+} from "#tests/fixtures/meansAssessment/meansAssessment.fixtures.js";
 export {
   applications,
   clientDetailsApplication,
@@ -32,6 +32,14 @@ const MEANS_ASSESSMENT_APPLICATION_IDS: Record<
     "00000000-0000-4000-8000-000000000106",
   [MeansAssessmentScenarioName.HousingSharedOwnership]:
     "00000000-0000-4000-8000-000000000107",
+  [MeansAssessmentScenarioName.IncomeBreakdownNotCalculated]:
+    "00000000-0000-4000-8000-000000000120",
+  [MeansAssessmentScenarioName.IncomeBreakdownPartner]:
+    "00000000-0000-4000-8000-000000000118",
+  [MeansAssessmentScenarioName.IncomeBreakdownReady]:
+    "00000000-0000-4000-8000-000000000117",
+  [MeansAssessmentScenarioName.IncomeBreakdownUnavailable]:
+    "00000000-0000-4000-8000-000000000119",
   [MeansAssessmentScenarioName.MeansAssessmentNotRequired]:
     "00000000-0000-4000-8000-000000000116",
   [MeansAssessmentScenarioName.MissingEligibility]:
@@ -53,10 +61,6 @@ const MEANS_ASSESSMENT_APPLICATION_IDS: Record<
 };
 
 /**
- *
- * @param scenarioName
- */
-/**
  * Creates a test application with one shared means-assessment scenario.
  * @param scenarioName The scenario supplying saved answers and results.
  * @returns A complete application response with a stable synthetic ID.
@@ -74,58 +78,11 @@ function meansAssessmentApplication(
   });
 }
 
-export const meansAssessmentApplications = {
-  [MeansAssessmentScenarioName.AsylumSupport]: meansAssessmentApplication(
-    MeansAssessmentScenarioName.AsylumSupport,
+export const meansAssessmentApplications = Object.fromEntries(
+  Object.values(MeansAssessmentScenarioName).map(
+    (name): [MeansAssessmentScenarioName, Application] => [
+      name,
+      meansAssessmentApplication(name),
+    ],
   ),
-  [MeansAssessmentScenarioName.Baseline]: meansAssessmentApplication(
-    MeansAssessmentScenarioName.Baseline,
-  ),
-  [MeansAssessmentScenarioName.CalculationStates]: meansAssessmentApplication(
-    MeansAssessmentScenarioName.CalculationStates,
-  ),
-  [MeansAssessmentScenarioName.EmployedHousehold]: meansAssessmentApplication(
-    MeansAssessmentScenarioName.EmployedHousehold,
-  ),
-  [MeansAssessmentScenarioName.FormattingVariants]: meansAssessmentApplication(
-    MeansAssessmentScenarioName.FormattingVariants,
-  ),
-  [MeansAssessmentScenarioName.HousingMortgage]: meansAssessmentApplication(
-    MeansAssessmentScenarioName.HousingMortgage,
-  ),
-  [MeansAssessmentScenarioName.HousingSharedOwnership]:
-    meansAssessmentApplication(
-      MeansAssessmentScenarioName.HousingSharedOwnership,
-    ),
-  [MeansAssessmentScenarioName.MeansAssessmentNotRequired]:
-    meansAssessmentApplication(
-      MeansAssessmentScenarioName.MeansAssessmentNotRequired,
-    ),
-  [MeansAssessmentScenarioName.MissingEligibility]: meansAssessmentApplication(
-    MeansAssessmentScenarioName.MissingEligibility,
-  ),
-  [MeansAssessmentScenarioName.OtherIncomeAndOutgoings]:
-    meansAssessmentApplication(
-      MeansAssessmentScenarioName.OtherIncomeAndOutgoings,
-    ),
-  [MeansAssessmentScenarioName.Passporting]: meansAssessmentApplication(
-    MeansAssessmentScenarioName.Passporting,
-  ),
-  [MeansAssessmentScenarioName.PropertiesAndAssets]: meansAssessmentApplication(
-    MeansAssessmentScenarioName.PropertiesAndAssets,
-  ),
-  [MeansAssessmentScenarioName.StaleInactiveAnswers]:
-    meansAssessmentApplication(
-      MeansAssessmentScenarioName.StaleInactiveAnswers,
-    ),
-  [MeansAssessmentScenarioName.UnavailableResult]: meansAssessmentApplication(
-    MeansAssessmentScenarioName.UnavailableResult,
-  ),
-  [MeansAssessmentScenarioName.Under18ControlledClr]:
-    meansAssessmentApplication(
-      MeansAssessmentScenarioName.Under18ControlledClr,
-    ),
-  [MeansAssessmentScenarioName.Under18NoMeans]: meansAssessmentApplication(
-    MeansAssessmentScenarioName.Under18NoMeans,
-  ),
-};
+);

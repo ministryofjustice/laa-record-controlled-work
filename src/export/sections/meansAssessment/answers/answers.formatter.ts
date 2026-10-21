@@ -1,11 +1,7 @@
 import type { Question } from "#/export/sections/meansAssessment/answers/answers.types.js";
 
+import { formatGBP } from "#/lib/currency.js";
 import { fixedT, t } from "#/lib/i18n.js";
-
-const currency = new Intl.NumberFormat("en-GB", {
-  currency: "GBP",
-  style: "currency",
-});
 
 const meansAssessment = {
   t: fixedT("pages.export.meansAssessment"),
@@ -37,7 +33,7 @@ export function formatAnswer<TAnswerContext>(
     }
     case "gbp": {
       const value = question.select(answerContext, index);
-      return currency.format(value);
+      return formatGBP(value);
     }
     case "percentage": {
       const value = question.select(answerContext, index);
