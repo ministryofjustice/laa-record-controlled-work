@@ -6,7 +6,7 @@ import { isMeansTested } from "#/export/sections/meansAssessment/answers/questio
 export const clientQuestionSections: Array<QuestionSection<EligibilityData>> = [
   {
     answerContexts: (answers: EligibilityData) => [answers],
-    heading: "client.heading",
+    heading: "client.age.heading",
     questions: [
       {
         choices: {
@@ -19,15 +19,20 @@ export const clientQuestionSections: Array<QuestionSection<EligibilityData>> = [
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- CCQ validates completed saved answers.
         select: (answerContext: EligibilityData) => answerContext.client_age!,
       },
+    ],
+  },
+  {
+    answerContexts: (answers: EligibilityData) => [answers],
+    heading: "client.partner.heading",
+    isRelevant: isMeansTested,
+    questions: [
       {
-        isRelevant: isMeansTested,
         kind: "boolean",
-        label: "client.partner",
+        label: "client.partner.label",
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- CCQ validates completed saved answers.
         select: (answerContext: EligibilityData) => answerContext.partner!,
       },
       {
-        isRelevant: isMeansTested,
         kind: "boolean",
         label: "client.passporting",
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- CCQ validates completed saved answers.

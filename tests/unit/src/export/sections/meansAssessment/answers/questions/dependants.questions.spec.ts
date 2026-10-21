@@ -3,18 +3,10 @@ import { before, describe, it } from "mocha";
 
 import type { EligibilityData } from "#/api/clients/rcw/model/eligibilityData.zod.gen.js";
 
+import { answerCards } from "#tests/unit/src/export/sections/meansAssessment/answers/answers.fixtures.js";
 import { toMeansAssessmentSection } from "#/export/sections/meansAssessment/meansAssessment.mapper.js";
 import { initializeI18nextSync } from "#/lib/i18n.js";
 import { getGetApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
-
-const CLIENT_SUMMARY = {
-  heading: "Client details",
-  rows: [
-    { key: "What age is your client?", value: "18 to 59" },
-    { key: "Does your client have a partner?", value: "No" },
-    { key: "Does your client receive a passporting benefit?", value: "No" },
-  ],
-};
 
 const BASE_ANSWERS = {
   client_age: "standard",
@@ -70,19 +62,23 @@ const NON_MEANS_TESTED_ROUTES: ReadonlyArray<{
 ];
 
 function summaries(overrides: Partial<EligibilityData> = {}) {
-  return toMeansAssessmentSection(
-    getGetApplicationResponseMock({
-      eligibility: { data: { ...BASE_ANSWERS, ...overrides }, result: null },
-      meansAssessmentRequired: true,
-    }),
-  )?.answerSummaries;
+  return answerCards(
+    toMeansAssessmentSection(
+      getGetApplicationResponseMock({
+        eligibility: { data: { ...BASE_ANSWERS, ...overrides }, result: null },
+        meansAssessmentRequired: true,
+      }),
+    )?.answerSummaries,
+  );
 }
 
 function dependantSummaries(overrides: Partial<EligibilityData> = {}) {
   return (
     summaries(overrides)?.filter(
       ({ heading }) =>
-        heading === "Dependants" || heading.startsWith("Dependant "),
+        heading === "Number of dependants" ||
+        heading === "Dependant income" ||
+        heading.startsWith("Dependant "),
     ) ?? []
   );
 }
@@ -106,13 +102,21 @@ describe("saved dependant answers", () => {
       }),
     ).to.deep.equal([
       {
-        heading: "Dependants",
+        heading: "Number of dependants",
         rows: [
           { key: "Does your client have any child dependants?", value: "Yes" },
           { key: "How many child dependants are there?", value: "2" },
           { key: "Does your client have any adult dependants?", value: "Yes" },
           { key: "How many adult dependants are there?", value: "1" },
-          { key: "Do any of the dependants aged 16 or over get regular income?", value: "Yes" },
+        ],
+      },
+      {
+        heading: "Dependant income",
+        rows: [
+          {
+            key: "Do any of the dependants aged 16 or over get regular income?",
+            value: "Yes",
+          },
         ],
       },
       {
@@ -160,11 +164,16 @@ describe("saved dependant answers", () => {
       }),
     ).to.deep.equal([
       {
-        heading: "Dependants",
+        heading: "Number of dependants",
         rows: [
           { key: "Does your client have any child dependants?", value: "No" },
           { key: "Does your client have any adult dependants?", value: "Yes" },
           { key: "How many adult dependants are there?", value: "2" },
+        ],
+      },
+      {
+        heading: "Dependant income",
+        rows: [
           {
             key: "Do any of the dependants aged 16 or over get regular income?",
             value: "No",
@@ -184,7 +193,7 @@ describe("saved dependant answers", () => {
       }),
     ).to.deep.equal([
       {
-        heading: "Dependants",
+        heading: "Number of dependants",
         rows: [
           { key: "Does your client have any child dependants?", value: "No" },
           { key: "Does your client have any adult dependants?", value: "No" },
@@ -207,7 +216,7 @@ describe("saved dependant answers", () => {
         }),
       ).to.deep.equal([
         {
-          heading: "Client details",
+          heading: "Client age",
           rows: [{ key: "What age is your client?", value: age }],
         },
       ]);
@@ -226,5 +235,32 @@ describe("saved dependant answers", () => {
         passporting: true,
       }),
     ).to.deep.equal([]);
+  });
+
+  it("includes the partner in child and adult dependant questions", () => {
+    const dependantCard = dependantSummaries({
+      adult_dependants: false,
+      child_dependants: false,
+      partner: true,
+      partner_additional_property_owned: "none",
+      partner_childcare_payments_relevant: false,
+      partner_employment_status: "unemployed",
+      partner_investments_relevant: false,
+      partner_legal_aid_payments_relevant: false,
+      partner_maintenance_payments_relevant: false,
+      partner_maintenance_relevant: false,
+      partner_other_relevant: false,
+      partner_over_60: false,
+      partner_pension_relevant: false,
+      partner_property_or_lodger_relevant: false,
+      partner_receives_benefits: false,
+      partner_student_finance_relevant: false,
+      partner_valuables_relevant: false,
+    }).find(({ heading }) => heading === "Number of dependants");
+
+    expect(dependantCard?.rows.map(({ key }) => key)).to.deep.equal([
+      "Does your client or their partner have any child dependants?",
+      "Does your client or their partner have any adult dependants?",
+    ]);
   });
 });

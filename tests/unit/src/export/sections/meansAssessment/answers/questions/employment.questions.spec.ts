@@ -3,6 +3,7 @@ import { before, describe, it } from "mocha";
 
 import type { EligibilityData } from "#/api/clients/rcw/model/eligibilityData.zod.gen.js";
 
+import { answerCards } from "#tests/unit/src/export/sections/meansAssessment/answers/answers.fixtures.js";
 import { toMeansAssessmentSection } from "#/export/sections/meansAssessment/meansAssessment.mapper.js";
 import { initializeI18nextSync } from "#/lib/i18n.js";
 import { getGetApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
@@ -25,7 +26,7 @@ const BASE_ANSWERS = {
 } satisfies EligibilityData;
 
 function summaries(overrides: Partial<EligibilityData> = {}) {
-  return (
+  return answerCards(
     toMeansAssessmentSection(
       getGetApplicationResponseMock({
         eligibility: {
@@ -34,7 +35,7 @@ function summaries(overrides: Partial<EligibilityData> = {}) {
         },
         meansAssessmentRequired: true,
       }),
-    )?.answerSummaries ?? []
+    )?.answerSummaries,
   );
 }
 
@@ -50,12 +51,16 @@ describe("saved employment answers", () => {
         partner_over_60: true,
       })
         .filter(({ heading }) =>
-          ["Client income", "Partner age", "Partner income"].includes(heading),
+          [
+            "Employment status",
+            "Partner age",
+            "Partner employment status",
+          ].includes(heading),
         )
         .map(({ heading, rows }) => ({ heading, rows })),
     ).to.deep.equal([
       {
-        heading: "Client income",
+        heading: "Employment status",
         rows: [
           {
             key: "What is your client's employment status?",
@@ -68,7 +73,7 @@ describe("saved employment answers", () => {
         rows: [{ key: "Is the partner aged 60 or over?", value: "Yes" }],
       },
       {
-        heading: "Partner income",
+        heading: "Partner employment status",
         rows: [
           {
             key: "What is the partner's employment status?",
@@ -95,7 +100,11 @@ describe("saved employment answers", () => {
             national_insurance: 0,
           },
         ],
-      }).filter(({ heading }) => heading.startsWith("Partner")),
+      }).filter(({ heading }) =>
+        ["Partner age", "Partner other property", "Partner assets"].includes(
+          heading,
+        ),
+      ),
     ).to.deep.equal([
       {
         heading: "Partner age",
@@ -138,7 +147,11 @@ describe("saved employment answers", () => {
             national_insurance: 0,
           },
         ],
-      }).filter(({ heading }) => heading.startsWith("Partner")),
+      }).filter(
+        ({ heading }) =>
+          heading.startsWith("Partner") &&
+          heading !== "Partner and passporting",
+      ),
     ).to.deep.equal([]);
   });
 });

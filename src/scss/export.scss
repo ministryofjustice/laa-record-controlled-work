@@ -3,6 +3,44 @@
   margin: 0;
 }
 
+.app-means-assessment__outcome {
+  margin-bottom: 2rem;
+}
+
+.app-means-assessment__totals {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.app-means-assessment__total {
+  border: 1px solid #b1b4b6;
+  break-inside: avoid;
+  min-width: 0;
+  padding: 0.9375rem 0.625rem;
+}
+
+.app-means-assessment__total-heading {
+  margin-bottom: 0;
+}
+
+.app-means-assessment__summary-list .govuk-summary-list__value {
+  text-align: left;
+}
+
+@media (max-width: 40.0525em) {
+  .app-means-assessment__totals {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (min-width: 40.0625em) {
+  .app-means-assessment__summary-list .govuk-summary-list__key {
+    width: 40%;
+  }
+}
+
 @media print {
   .app-export {
     color: #000;
