@@ -20,7 +20,7 @@ const BASE_ANSWERS = {
   valuables_relevant: false,
 } satisfies EligibilityData;
 
-function assetSummaries(overrides: Partial<EligibilityData> = {}) {
+function allCards(overrides: Partial<EligibilityData> = {}) {
   return answerCards(
     toMeansAssessmentSection(
       getGetApplicationResponseMock({
@@ -31,7 +31,11 @@ function assetSummaries(overrides: Partial<EligibilityData> = {}) {
         meansAssessmentRequired: true,
       }),
     )?.answerSummaries,
-  ).filter(
+  );
+}
+
+function assetSummaries(overrides: Partial<EligibilityData> = {}) {
+  return allCards(overrides).filter(
     ({ heading }) =>
       heading.toLowerCase().includes("asset") ||
       heading.toLowerCase().includes("account"),
@@ -82,10 +86,43 @@ describe("saved asset answers", () => {
     ]);
   });
 
-  it("shows passported client assets and hides removed partner assets", () => {
+  it("shows saved client assets for a passported assessment", () => {
     const answers = {
       ...BASE_ANSWERS,
       bank_accounts: [{ amount: 100 }],
+      partner: true,
+      partner_bank_accounts: [{ amount: 200 }],
+      partner_investments_relevant: true,
+      partner_investments: 300,
+      partner_valuables_relevant: false,
+      passporting: true,
+    } satisfies EligibilityData;
+
+    expect(
+      assetSummaries(answers).filter(({ heading }) =>
+        heading.startsWith("Client"),
+      ),
+    ).to.deep.equal([
+      {
+        heading: "Client bank account 1",
+        rows: [{ key: "Money in bank account", value: "£100.00" }],
+      },
+      {
+        heading: "Client assets",
+        rows: [
+          { key: "Does your client have any investments?", value: "No" },
+          {
+            key: "Does your client have valuable items worth £500 or more?",
+            value: "No",
+          },
+        ],
+      },
+    ]);
+  });
+
+  it("omits saved partner assets after partner removal", () => {
+    const answers = {
+      ...BASE_ANSWERS,
       partner: true,
       partner_bank_accounts: [{ amount: 200 }],
       partner_investments_relevant: true,
@@ -98,8 +135,8 @@ describe("saved asset answers", () => {
       "Partner assets",
     );
     expect(
-      assetSummaries({ ...answers, partner: false }).some(({ heading }) =>
-        heading.startsWith("Partner"),
+      allCards({ ...answers, partner: false }).some(({ heading }) =>
+        heading.startsWith("Partner") && heading.toLowerCase().includes("asset"),
       ),
     ).to.equal(false);
   });
@@ -144,11 +181,16 @@ describe("saved asset answers", () => {
         vehicles: [{ vehicle_value: 10000 }],
       }),
     ).to.deep.equal([]);
+    const cards = allCards({
+      vehicle_owned: true,
+      vehicles: [{ vehicle_value: 10000 }],
+    });
     expect(
-      assetSummaries({
-        vehicle_owned: true,
-        vehicles: [{ vehicle_value: 10000 }],
-      }).flatMap(({ rows }) => rows.map(({ key }) => key)),
-    ).not.to.include("Vehicle value");
+      cards.filter(
+        ({ heading, rows }) =>
+          /vehicle/i.test(heading) ||
+          rows.some(({ key }) => /vehicle/i.test(key)),
+      ),
+    ).to.deep.equal([]);
   });
 });

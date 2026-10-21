@@ -128,6 +128,7 @@ export const expectedAnswerSummaries: MeansAssessmentAnswerSummary[] = [
         heading: "Housing costs",
         rows: [
           { key: "Housing payments", value: "£0.00" },
+          { key: "Frequency", value: "Every month" },
           {
             key: "Is Housing Benefit claimed at the home the client lives in?",
             value: "No",
