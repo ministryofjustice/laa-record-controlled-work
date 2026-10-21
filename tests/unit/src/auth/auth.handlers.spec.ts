@@ -943,9 +943,10 @@ describe("Auth Handlers", () => {
     it("returns a generic error when the provider rejects authentication", async () => {
       const agent = request.agent(mockApp);
       await startSignIn(agent);
+      const providerError = '<script>alert("provider")</script>';
       const res = await agent.get("/auth/code/callback").query({
-        error: "invalid_scope",
-        error_description: "<script>alert(1)</script>",
+        error: providerError,
+        error_description: '<img src=x onerror="alert(1)">',
         state: CALLBACK_STATE,
       });
 
@@ -953,6 +954,8 @@ describe("Auth Handlers", () => {
       expect(res.status).to.equal(BAD_REQUEST);
       expect(res.body.message).to.equal("Entra sign-in failed");
       expect(res.headers["content-type"]).to.match(/^application\/json/);
+      expect(JSON.stringify(res.body)).not.to.include(providerError);
+      expect(JSON.stringify(res.body)).not.to.include("onerror");
     });
 
     it("does not authenticate or restore state when token exchange fails", async () => {
