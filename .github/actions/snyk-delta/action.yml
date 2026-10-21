@@ -137,15 +137,16 @@ runs:
         trap 'rm -rf "$scan_dir"' EXIT
         oss_json="$scan_dir/open-source.json"
 
-        run_open_source_delta() {
-          local delta_status
+        scan_status_is_operational_error() {
+          (( $1 > 1 ))
+        }
 
-          if (( oss_scan_status > 1 )); then
-            echo "::error::Open Source scan failed with exit code $oss_scan_status"
-            return 1
-          fi
+        delta_status_is_regression() {
+          (( $1 == 1 ))
+        }
 
-          if ! jq -e '
+        open_source_output_is_valid() {
+          jq -e '
             def non_empty_string: type == "string" and length > 0;
             def valid_vulnerability:
               (.id | non_empty_string) and
@@ -160,7 +161,18 @@ runs:
             (.projectName | non_empty_string) and
 
             all(.vulnerabilities[]; valid_vulnerability)
-          ' "$oss_json" >/dev/null; then
+          ' "$oss_json" >/dev/null
+        }
+
+        run_open_source_delta() {
+          local delta_status
+
+          if scan_status_is_operational_error "$oss_scan_status"; then
+            echo "::error::Open Source scan failed with exit code $oss_scan_status"
+            return 1
+          fi
+
+          if ! open_source_output_is_valid; then
             echo '::error::Open Source scan output is missing or unsupported'
             return 1
           fi
@@ -172,7 +184,7 @@ runs:
             echo 'Open Source delta passed'
           else
             delta_status=$?
-            if (( delta_status == 1 )); then
+            if delta_status_is_regression "$delta_status"; then
               echo '::error::Open Source delta found a new high or critical vulnerability'
             else
               echo "::error::Open Source delta failed with exit code $delta_status"
@@ -220,6 +232,41 @@ runs:
         trap 'rm -rf "$scan_dir"' EXIT
         container_json="$scan_dir/container.json"
 
+        scan_status_is_operational_error() {
+          (( $1 > 1 ))
+        }
+
+        delta_status_is_regression() {
+          (( $1 == 1 ))
+        }
+
+        container_output_is_valid() {
+          jq -e '
+            def non_empty_string: type == "string" and length > 0;
+            def valid_vulnerability:
+              (.id | non_empty_string) and
+              (.severity | IN("low", "medium", "high", "critical")) and
+              (.from | type == "array" and length > 0 and all(.[]; non_empty_string));
+
+            type == "array" and length > 0 and
+            all(.[ ];
+              type == "object" and
+              (.vulnerabilities | type == "array") and
+              (.packageManager | non_empty_string) and
+              (.projectName | non_empty_string) and
+              (.scanResult.identity.type | non_empty_string) and
+              (.scanResult.target.image | non_empty_string) and
+
+              all(.vulnerabilities[]; valid_vulnerability)
+            ) and
+
+            any(.[ ];
+              .scanResult.identity.type == "apk" and
+              (.docker.baseImage | non_empty_string)
+            )
+          ' "$container_json" >/dev/null
+        }
+
         run_container_delta() {
           local project_id="$1"
           local current_json="$2"
@@ -234,7 +281,7 @@ runs:
             echo "Container delta passed for $identity_type:$target_file"
           else
             delta_status=$?
-            if (( delta_status == 1 )); then
+            if delta_status_is_regression "$delta_status"; then
               echo "::error::Container delta found a new high or critical vulnerability for $identity_type:$target_file"
             else
               echo "::error::Container delta failed for $identity_type:$target_file with exit code $delta_status"
@@ -256,33 +303,10 @@ runs:
           container_scan_status=$?
         fi
 
-        if (( container_scan_status > 1 )); then
+        if scan_status_is_operational_error "$container_scan_status"; then
           echo "::error::Container scan failed with exit code $container_scan_status"
           overall_status=1
-        elif ! jq -e '
-          def non_empty_string: type == "string" and length > 0;
-          def valid_vulnerability:
-            (.id | non_empty_string) and
-            (.severity | IN("low", "medium", "high", "critical")) and
-            (.from | type == "array" and length > 0 and all(.[]; non_empty_string));
-
-          type == "array" and length > 0 and
-          all(.[ ];
-            type == "object" and
-            (.vulnerabilities | type == "array") and
-            (.packageManager | non_empty_string) and
-            (.projectName | non_empty_string) and
-            (.scanResult.identity.type | non_empty_string) and
-            (.scanResult.target.image | non_empty_string) and
-
-            all(.vulnerabilities[]; valid_vulnerability)
-          ) and
-
-          any(.[ ];
-            .scanResult.identity.type == "apk" and
-            (.docker.baseImage | non_empty_string)
-          )
-        ' "$container_json" >/dev/null; then
+        elif ! container_output_is_valid; then
           echo '::error::Container scan output is malformed or unsupported'
           overall_status=1
         else
