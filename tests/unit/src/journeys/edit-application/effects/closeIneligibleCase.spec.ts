@@ -18,7 +18,11 @@ describe("closeIneligibleCase", () => {
   beforeEach(() => {
     sinon.stub(config.api, "useMockAccessToken").value(true);
     updateApplicationStatus = sinon.stub();
-    deps = { updateApplicationStatus } as unknown as EditApplicationEffectsDeps;
+    deps = {
+      getApplication: sinon.stub(),
+      updateApplicationEvidence: sinon.stub(),
+      updateApplicationStatus,
+    };
     context = {
       getPostData: sinon.stub().returns("close"),
       getRequestParam: sinon.stub().returns("application-id"),

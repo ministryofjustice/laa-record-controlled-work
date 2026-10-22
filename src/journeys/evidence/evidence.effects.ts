@@ -1,24 +1,13 @@
 import { EffectRegistry } from "@ministryofjustice/hmpps-forge/core/authoring";
 
-import type { EvidenceEffectsDeps } from "#/journeys/evidence/evidence.types.js";
+import type { EditApplicationEffectsDeps } from "#/journeys/edit-application/editApplication.types.js";
 
-import { clearAllDraftAnswers } from "#/journeys/effects/clearAllDraftAnswers.js";
-import { clearFieldAnswers } from "#/journeys/effects/clearFieldAnswers.js";
-import { loadDraftAnswers } from "#/journeys/effects/loadDraftAnswers.js";
-import { saveDraftAnswers } from "#/journeys/effects/saveDraftAnswers.js";
-import { loadEvidenceAsAnswers } from "#/journeys/evidence/effects/loadEvidenceAsAnswers.js";
+import { editApplicationEffects } from "#/journeys/edit-application/editApplication.effects.js";
 import { updateEvidence } from "#/journeys/evidence/effects/updateEvidence.js";
 
 export const evidenceEffectsRegistry =
-  new EffectRegistry<EvidenceEffectsDeps>();
-
+  new EffectRegistry<EditApplicationEffectsDeps>();
 export const evidenceEffects = {
-  clearAllDraftAnswers: evidenceEffectsRegistry.register(clearAllDraftAnswers),
-  clearFieldAnswers: evidenceEffectsRegistry.register(clearFieldAnswers),
-  loadDraftAnswers: evidenceEffectsRegistry.register(loadDraftAnswers),
-  loadEvidenceAsAnswers: evidenceEffectsRegistry.register(
-    loadEvidenceAsAnswers,
-  ),
-  saveDraftAnswers: evidenceEffectsRegistry.register(saveDraftAnswers),
+  ...editApplicationEffects,
   updateEvidence: evidenceEffectsRegistry.register(updateEvidence),
 };

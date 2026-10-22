@@ -5,15 +5,12 @@ import { EvidenceDto } from "#/api/dto/evidence/evidence.dto.js";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import { getJourneyDraftKey } from "#/journeys/journeyDraftKey.js";
 import { getSessionDataOrThrow } from "#/journeys/shared.helper.js";
-import { logger } from "#/logger.js";
 
 export const loadEvidenceAsAnswers =
   () =>
   (context: EditApplicationContext, journeyCode: string): void => {
     const session = getSessionDataOrThrow(context);
     const draftKey = getJourneyDraftKey(context, journeyCode);
-
-    logger.error("MMMMMM: session:", session.journeyDrafts);
 
     if (session.journeyDrafts?.[draftKey]) {
       return;
@@ -26,8 +23,6 @@ export const loadEvidenceAsAnswers =
     const answersArray = application.evidence
       ? EvidenceDto.toAnswers(application.evidence)
       : {};
-
-    logger.error("MMMMMM: Answers array:", answersArray);
 
     for (const [code, value] of Object.entries(answersArray)) {
       context.setAnswer(code, value);

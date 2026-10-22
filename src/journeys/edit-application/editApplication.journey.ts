@@ -4,13 +4,14 @@ import { editApplicationEffects } from "#/journeys/edit-application/editApplicat
 import { confirmationStep } from "#/journeys/edit-application/steps/confirmation/confirmation.step.js";
 import { taskListStep } from "#/journeys/edit-application/steps/task-list/task-list.step.js";
 import { editClientDetailsJourney } from "#/journeys/edit-client-details/editClientDetails.journey.js";
+import { evidenceJourney } from "#/journeys/evidence/evidence.journey.js";
 
 const loadApiAnswers = access({
   effects: [editApplicationEffects.loadApplication()],
 });
 
 export const editApplicationJourney = journey({
-  children: [editClientDetailsJourney],
+  children: [editClientDetailsJourney, evidenceJourney],
   code: "editApplication",
   onAccess: [loadApiAnswers],
   path: "/cases/:applicationID",

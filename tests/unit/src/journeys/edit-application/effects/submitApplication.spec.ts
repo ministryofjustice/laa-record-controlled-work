@@ -30,6 +30,7 @@ describe("submitApplication", () => {
     deps = {
       getApplication: sinon.stub(),
       updateApplicationDetails: sinon.stub(),
+      updateApplicationEvidence: sinon.stub(),
       updateApplicationStatus: updateApplicationStatusStub,
     };
     getData = sinon.stub().returns(mockApplication);
