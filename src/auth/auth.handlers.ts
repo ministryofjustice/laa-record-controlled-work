@@ -137,26 +137,36 @@ export async function signIn(
  * @param res - The Express response.
  * @param next - The Express next function.
  */
-export function signOut(req: Request, res: Response, next: NextFunction): void {
+export async function signOut(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   const sessionId = req.sessionID;
+  let cleanupFailed = false;
 
   try {
-    req.session.destroy((error: Error | null) => {
-      if (error) {
-        next(error);
-        return;
-      }
-
-      void deleteMsalCache(sessionId)
-        .then(() => {
-          res.clearCookie(config.session.name);
-          res.redirect("/");
-        })
-        .catch(next);
-    });
+    await destroySession(req);
   } catch (error) {
-    next(error);
+    cleanupFailed = true;
+    logger.error("Failed to destroy local session during sign-out", error);
   }
+
+  res.clearCookie(config.session.name);
+
+  try {
+    await deleteMsalCache(sessionId);
+  } catch (error) {
+    cleanupFailed = true;
+    logger.error("Failed to delete local MSAL cache during sign-out", error);
+  }
+
+  if (cleanupFailed) {
+    next(new Error("Unable to complete sign-out"));
+    return;
+  }
+
+  res.redirect("/");
 }
 
 /**
