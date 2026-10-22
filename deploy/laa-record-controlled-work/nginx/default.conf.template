@@ -67,7 +67,12 @@ server {
     access_log  off;
   }
 
-  # Kubernetes probes call the RCW service directly, not through public ingress.
+  # Expose only the exact status endpoint; keep health checks and subpaths private.
+  location = /status {
+    include     /etc/nginx/proxy.conf;
+    proxy_pass  http://${NGINX_UPSTREAM_RCW};
+  }
+
   location ~* ^/(health|status)(/|$) {
     return 404;
   }
