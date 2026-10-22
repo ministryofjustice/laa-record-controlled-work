@@ -160,17 +160,12 @@ runs:
         SNYK_OAUTH_TOKEN: ${{ steps.snyk-auth.outputs.token }}
       run: |
         set -euo pipefail
-        token_is_missing=false
-        if [[ -z "$SNYK_OAUTH_TOKEN" ]]; then
-          token_is_missing=true
+        token_is_safe_to_mask=true
+        if [[ -z "$SNYK_OAUTH_TOKEN" || "$SNYK_OAUTH_TOKEN" == *$'\n'* || "$SNYK_OAUTH_TOKEN" == *$'\r'* ]]; then
+          token_is_safe_to_mask=false
         fi
 
-        token_has_line_break=false
-        if [[ "$SNYK_OAUTH_TOKEN" == *$'\n'* || "$SNYK_OAUTH_TOKEN" == *$'\r'* ]]; then
-          token_has_line_break=true
-        fi
-
-        if [[ "$token_is_missing" == 'true' || "$token_has_line_break" == 'true' ]]; then
+        if [[ "$token_is_safe_to_mask" != 'true' ]]; then
           echo '::error::Snyk OAuth token is missing or cannot be safely masked'
           exit 1
         fi
@@ -197,7 +192,8 @@ runs:
         scan_file="$(mktemp)"
         trap 'rm -f "$scan_file"' EXIT
 
-        if snyk test \
+        scan_status=0
+        snyk test \
           --all-projects \
           --fail-fast \
           --dev \
@@ -205,11 +201,7 @@ runs:
           --severity-threshold=high \
           --policy-path=.snyk \
           --json-file-output="$scan_file" \
-          --sarif-file-output=sarif/snyk-open-source.sarif; then
-          scan_status=0
-        else
-          scan_status=$?
-        fi
+          --sarif-file-output=sarif/snyk-open-source.sarif || scan_status=$?
 
         scan_output_valid=false
         if jq -e 'type == "object" or type == "array"' "$scan_file" >/dev/null; then
@@ -219,10 +211,10 @@ runs:
         fi
 
         sarif_valid=false
-        if jq -e "$SARIF_VALIDATION_FILTER" sarif/snyk-open-source.sarif >/dev/null; then
-          if [[ "$scan_output_valid" == 'true' ]]; then sarif_valid=true; fi
-        else
+        if ! jq -e "$SARIF_VALIDATION_FILTER" sarif/snyk-open-source.sarif >/dev/null; then
           echo '::error::Open Source SARIF output is missing or malformed'
+        elif [[ "$scan_output_valid" == 'true' ]]; then
+          sarif_valid=true
         fi
         echo "sarif-valid=$sarif_valid" >> "$GITHUB_OUTPUT"
 
@@ -248,11 +240,7 @@ runs:
         set -euo pipefail
         git fetch --no-tags origin main
         latest_main_sha="$(git rev-parse FETCH_HEAD)"
-        source_is_current=false
-        if [[ "$SOURCE_SHA" == "$latest_main_sha" ]]; then
-          source_is_current=true
-        fi
-        if [[ "$source_is_current" != 'true' ]]; then
+        if [[ "$SOURCE_SHA" != "$latest_main_sha" ]]; then
           echo "::notice::Skipping superseded main publication for $SOURCE_SHA"
           echo 'publication-state=stale' >> "$GITHUB_OUTPUT"
           exit 0
@@ -340,7 +328,8 @@ runs:
         result_file="$(mktemp)"
         trap 'rm -f "$result_file"' EXIT
 
-        if snyk container test \
+        scan_status=0
+        snyk container test \
           --org="$ORG_ID" \
           --severity-threshold=high \
           --policy-path=.snyk \
@@ -348,11 +337,7 @@ runs:
           --file="$DOCKERFILE" \
           --json-file-output="$result_file" \
           --sarif-file-output=sarif/snyk-container.sarif \
-          "$IMAGE_REF"; then
-          scan_status=0
-        else
-          scan_status=$?
-        fi
+          "$IMAGE_REF" || scan_status=$?
 
         results_valid=false
         if jq -e '
@@ -400,10 +385,10 @@ runs:
         fi
 
         sarif_valid=false
-        if jq -e "$SARIF_VALIDATION_FILTER" sarif/snyk-container.sarif >/dev/null; then
-          if [[ "$results_valid" == 'true' ]]; then sarif_valid=true; fi
-        else
+        if ! jq -e "$SARIF_VALIDATION_FILTER" sarif/snyk-container.sarif >/dev/null; then
           echo '::error::Container SARIF output is missing or malformed'
+        elif [[ "$results_valid" == 'true' ]]; then
+          sarif_valid=true
         fi
         echo "sarif-valid=$sarif_valid" >> "$GITHUB_OUTPUT"
 
@@ -461,7 +446,8 @@ runs:
         mkdir -p sarif
         report_output="$(mktemp)"
         trap 'rm -f "$report_output"' EXIT
-        if snyk code test \
+        scan_status=0
+        snyk code test \
           --org="$ORG_ID" \
           --severity-threshold=high \
           --policy-path=.snyk \
@@ -469,11 +455,7 @@ runs:
           --project-name=laa-record-controlled-work-code \
           --target-reference=main \
           --sarif-file-output=sarif/snyk-code.sarif \
-          > "$report_output" 2>&1; then
-          scan_status=0
-        else
-          scan_status=$?
-        fi
+          > "$report_output" 2>&1 || scan_status=$?
         cat "$report_output"
 
         sarif_valid=false
@@ -529,13 +511,14 @@ runs:
             > "$rendered_file"; then
             echo "::error::Failed to render $environment manifests"
             overall_status=1
-              echo "sarif-${environment}=false" >> "$GITHUB_OUTPUT"
+            echo "sarif-${environment}=false" >> "$GITHUB_OUTPUT"
             rm -f "$rendered_file" "$report_output"
             continue
           fi
 
           sarif_file="sarif/snyk-iac-${environment}.sarif"
-          if snyk iac test "$rendered_file" \
+          scan_status=0
+          snyk iac test "$rendered_file" \
             --org="$ORG_ID" \
             --severity-threshold=high \
             --policy-path=.snyk \
@@ -543,11 +526,7 @@ runs:
             --target-name="laa-record-controlled-work-iac-${environment}" \
             --target-reference=main \
             --sarif-file-output="$sarif_file" \
-            > "$report_output" 2>&1; then
-            scan_status=0
-          else
-            scan_status=$?
-          fi
+            > "$report_output" 2>&1 || scan_status=$?
           cat "$report_output"
 
           sarif_valid=false
