@@ -151,20 +151,31 @@ run_scan() {
 run_delta_scan() {
   local snyk_status
   local delta_status
+  local output_status
+  local delta_output="$report_dir/snyk-open-source-delta.log"
   local -a pipeline_status
 
   echo "::group::Snyk Open Source Delta"
+  : > "$delta_output"
   snyk test --org="$SNYK_ORG_ID" \
     --project-name=laa-record-controlled-work-open-source \
     --target-reference=main \
     --dev --severity-threshold=high --json --print-deps "${policy_args[@]}" \
-    | snyk-delta --targetReference main
+    | snyk-delta --targetReference main --type vuln 2>&1 \
+    | tee "$delta_output"
   pipeline_status=("${PIPESTATUS[@]}")
   echo "::endgroup::"
 
   snyk_status=${pipeline_status[0]}
   delta_status=${pipeline_status[1]}
-  if (( snyk_status > 1 )); then
+  output_status=${pipeline_status[2]}
+  if grep -Fq 'Could not find a matching monitored Snyk project.' "$delta_output"; then
+    echo "::error::Snyk Delta could not find the monitored main Open Source baseline"
+    record_status "Open Source Delta" "baseline unavailable"
+  elif (( output_status != 0 )); then
+    echo "::error::Failed to preserve Snyk Delta comparison output"
+    record_status "Open Source Delta" "report error ($output_status)"
+  elif (( snyk_status > 1 )); then
     echo "::error::Snyk Open Source test failed with exit code $snyk_status"
     record_status "Open Source Delta" "tool error ($snyk_status)"
   elif (( delta_status == 0 )); then
