@@ -71,20 +71,20 @@ runs:
         sarif_filter+='.version == "2.1.0" and has_valid_runs'
         printf 'sarif-filter=%s\n' "$sarif_filter" >> "$GITHUB_OUTPUT"
 
-        is_supported_publication_event=false
-        if [[ "$GITHUB_EVENT_NAME" == 'push' || "$GITHUB_EVENT_NAME" == 'workflow_dispatch' ]]; then
-          is_supported_publication_event=true
-        fi
-        if [[ "$is_supported_publication_event" != 'true' ]]; then
+        is_supported_publication_event() {
+          [[ "$GITHUB_EVENT_NAME" == 'push' || "$GITHUB_EVENT_NAME" == 'workflow_dispatch' ]]
+        }
+
+        is_trusted_main_source() {
+          [[ "$GITHUB_REF" == 'refs/heads/main' && "$GITHUB_SHA" == "$SOURCE_SHA" ]]
+        }
+
+        if ! is_supported_publication_event; then
           echo '::error::Snyk results can only be published from main pushes or manual main refreshes'
           exit 1
         fi
 
-        is_trusted_main_source=false
-        if [[ "$GITHUB_REF" == 'refs/heads/main' && "$GITHUB_SHA" == "$SOURCE_SHA" ]]; then
-          is_trusted_main_source=true
-        fi
-        if [[ "$is_trusted_main_source" != 'true' ]]; then
+        if ! is_trusted_main_source; then
           echo '::error::Snyk baselines can only be published from the trusted main commit'
           exit 1
         fi
@@ -160,12 +160,13 @@ runs:
         SNYK_OAUTH_TOKEN: ${{ steps.snyk-auth.outputs.token }}
       run: |
         set -euo pipefail
-        token_is_safe_to_mask=true
-        if [[ -z "$SNYK_OAUTH_TOKEN" || "$SNYK_OAUTH_TOKEN" == *$'\n'* || "$SNYK_OAUTH_TOKEN" == *$'\r'* ]]; then
-          token_is_safe_to_mask=false
-        fi
+        token_is_safe_to_mask() {
+          [[ -n "$SNYK_OAUTH_TOKEN" ]] &&
+            [[ "$SNYK_OAUTH_TOKEN" != *$'\n'* ]] &&
+            [[ "$SNYK_OAUTH_TOKEN" != *$'\r'* ]]
+        }
 
-        if [[ "$token_is_safe_to_mask" != 'true' ]]; then
+        if ! token_is_safe_to_mask; then
           echo '::error::Snyk OAuth token is missing or cannot be safely masked'
           exit 1
         fi
@@ -371,10 +372,16 @@ runs:
             has_required_metadata and
             all(.vulnerabilities[]; is_valid_vulnerability);
 
-          type == "array" and length > 0 and
-          all(.[]; is_valid_container_result) and
-          any(.[]; has_base_image_coverage) and
-          any(.[]; has_application_coverage)
+          def has_required_container_coverage:
+            any(.[]; has_base_image_coverage) and
+            any(.[]; has_application_coverage);
+
+          def is_complete_container_scan:
+            type == "array" and length > 0 and
+            all(.[]; is_valid_container_result) and
+            has_required_container_coverage;
+
+          is_complete_container_scan
         ' "$result_file" >/dev/null; then
           results_valid=true
         else
