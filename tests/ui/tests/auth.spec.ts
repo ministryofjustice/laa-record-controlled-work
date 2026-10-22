@@ -20,16 +20,22 @@ test("unauthenticated user visiting landing page is redirected to microsoft entr
   await expect(page).toHaveURL(ENTRA_URL_PATTERN);
 });
 
-test.describe("GET /auth/signout", () => {
-  test("signing out destroys the session and redirects to /", async ({ page }) => {
+test.describe("POST /auth/signout", () => {
+  test("signing out uses the accessible form and redirects locally", async ({
+    page,
+  }) => {
     const signoutRedirect = page.waitForResponse(
-      (resp) => resp.url().endsWith("/auth/signout") && resp.status() === 302,
+      (resp) =>
+        resp.url().endsWith("/auth/signout") &&
+        resp.request().method() === "POST" &&
+        resp.status() === 302,
     );
 
     await page.goto("/");
-    await page.getByRole("link", { name: "Sign out" }).click();
-    await signoutRedirect;
+    await page.getByRole("button", { name: "Sign out" }).click();
+    const response = await signoutRedirect;
 
+    expect(response.headers().location).toBe("/");
     await expect(page).toHaveURL(ENTRA_URL_PATTERN);
   });
 });
