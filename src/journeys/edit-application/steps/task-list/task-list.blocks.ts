@@ -118,10 +118,7 @@ export function taskList(): BlockDefinition[] {
               ),
             )
             .otherwise(
-              Format(
-                "/cases/%1/evidence/",
-                Params(PARAMS_KEYS.applicationID),
-              ),
+              Format("/cases/%1/evidence/", Params(PARAMS_KEYS.applicationID)),
             ),
           Data(CONTEXT_DATA_KEYS.evidenceStatus),
         ),

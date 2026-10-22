@@ -36,10 +36,10 @@ export const checkAnswersStep = (): ReturnType<typeof step> =>
         validate: false,
       }),
     ],
+    path: "check-answers",
     reachability: {
       entryWhen: true,
       tieBreakers: [tieBreaker({ priority: 100 })],
     },
-    path: "check-answers",
     title: t("journeys.createApplication.checkAnswers.title"),
   });

@@ -1,6 +1,7 @@
 import type { Application } from "#/api/clients/rcw/model/application.zod.gen.js";
-import type { EditApplicationContext } from "#/journeys/edit-application/editApplication.types.js";import { EvidenceDto } from "#/api/dto/evidence/evidence.dto.js";
+import type { EditApplicationContext } from "#/journeys/edit-application/editApplication.types.js";
 
+import { EvidenceDto } from "#/api/dto/evidence/evidence.dto.js";
 import { CONTEXT_DATA_KEYS } from "#/journeys/journey.constants.js";
 import { getJourneyDraftKey } from "#/journeys/journeyDraftKey.js";
 import { getSessionDataOrThrow } from "#/journeys/shared.helper.js";

@@ -1,8 +1,8 @@
 import type { UpdateEvidenceRequestBody } from "#/api/clients/rcw/model/updateEvidenceRequestBody.zod.gen.js";
-import { EvidenceDto } from "#/api/dto/evidence/evidence.dto.js";
 
 import { ApiResponseError } from "#/api/clients/api.errors.js";
 import { getRcwApiDefaultOptions } from "#/api/clients/getRcwApiDefaultOptions.js";
+import { EvidenceDto } from "#/api/dto/evidence/evidence.dto.js";
 import { getAuthDebugHeaders } from "#/auth/auth.debug.js";
 import {
   type EvidenceContext,

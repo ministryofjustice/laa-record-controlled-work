@@ -10,6 +10,8 @@ export interface EvidenceAnswers extends Record<string, unknown> {
   childCareEvidence?: string[];
   doYouHaveEvidence: "no" | "yes";
   employedEvidence?: string[];
+  haveEvidenceOfCapital?: "no" | "yes";
+  haveEvidenceOfExpenditure?: "no" | "yes";
   housingCostsEvidence?: string[];
   incomeEvidence?: string[];
   maintenanceEvidence?: string[];
@@ -19,8 +21,6 @@ export interface EvidenceAnswers extends Record<string, unknown> {
   selfEmployedEvidence?: string[];
   stateBenefitsEvidence?: string[];
   taxCreditsEvidence?: string[];
-  haveEvidenceOfCapital?: "no" | "yes";
-  haveEvidenceOfExpenditure?: "no" | "yes";
 }
 
 export type EvidenceContext = EffectFunctionContext<

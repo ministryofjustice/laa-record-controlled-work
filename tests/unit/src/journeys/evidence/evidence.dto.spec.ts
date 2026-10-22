@@ -61,4 +61,29 @@ describe("EvidenceAnswers DTO", () => {
     const result = EvidenceDto.fromAnswers(noEvidenceAnswers).toRcwApi();
     expect(result).to.deep.equal(expectedNoEvidence);
   });
+
+  it("should handle no capital or expenditure evidence scenario", () => {
+    const noCapitalOrExpenditureEvidenceAnswers: EvidenceAnswers = {
+      doYouHaveEvidence: "yes",
+      asylumSupportEvidence: ["some-evidence"],
+      benefitsInKindEvidence: ["some-evidence"],
+      haveEvidenceOfCapital: "no",
+      haveEvidenceOfExpenditure: "no",
+    };
+
+    const expectedNoCapitalOrExpenditureEvidence = {
+      capitalEvidence: undefined,
+      childCareEvidence: undefined,
+      housingCostsEvidence: undefined,
+      incomeEvidence: undefined,
+      maintenanceEvidence: undefined,
+    };
+
+    const result = EvidenceDto.fromAnswers(
+      noCapitalOrExpenditureEvidenceAnswers,
+    ).toRcwApi();
+    expect(result.expenditureCapitalEvidenceChecklist).to.deep.equal(
+      expectedNoCapitalOrExpenditureEvidence,
+    );
+  });
 });

@@ -27,10 +27,10 @@ export const editApplicationEffects = {
   loadApplicationAsAnswers: editApplicationEffectsRegistry.register(
     loadApplicationAsAnswers,
   ),
-  loadEvidenceAsAnswers: editApplicationEffectsRegistry.register(
-    loadEvidenceAsAnswers
-  ),
   loadDraftAnswers: editApplicationEffectsRegistry.register(loadDraftAnswers),
+  loadEvidenceAsAnswers: editApplicationEffectsRegistry.register(
+    loadEvidenceAsAnswers,
+  ),
   saveDraftAnswers: editApplicationEffectsRegistry.register(saveDraftAnswers),
   setTaskListStatuses:
     editApplicationEffectsRegistry.register(setTaskListStatuses),
