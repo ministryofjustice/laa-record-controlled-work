@@ -38,12 +38,15 @@ Container publication fails while valid Open Source, Code, IaC, and SARIF work
 continues.
 
 Set `SNYK_ORG_ID` and `SNYK_OPEN_SOURCE_PROJECT_ID` as repository Actions
-variables. The workflow passes them to the composite action as `org-id` and
-`open-source-project-id`. The main publisher verifies that the project UUID in
-Snyk's monitor snapshot URL matches the configured Open Source baseline. The
-CLI does not accept a project UUID selector, so a mismatch fails the refresh.
-The OSS project is the only configured delta baseline; Container project UUID
-mappings are not used.
+variables. The contributor delta runner passes the configured project UUID to
+`snyk-delta` as `--baselineProject`; it does not select the baseline by project
+name or target reference. The main publisher passes both variables to the
+baseline composite as `org-id` and `open-source-project-id`, then verifies that
+the project UUID in Snyk's monitor snapshot URL matches the configured Open
+Source baseline. The `snyk monitor` command has no project UUID selector, so the
+publisher verifies the returned project and fails on mismatch. The OSS project
+is the only configured delta baseline. Container project UUID mappings are not
+used.
 
 The Snyk CLI is pinned to `1.1308.0`. Main refresh and nightly SARIF publication
 share the non-cancelling `snyk-publication-${{ github.repository }}` queue.

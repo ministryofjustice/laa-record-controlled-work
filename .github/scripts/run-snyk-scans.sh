@@ -32,6 +32,19 @@ if [[ "$scan_mode" == "delta" || "$scan_mode" == "monitor" ]] && [[ -z "${SNYK_O
   exit 1
 fi
 
+if [[ "$scan_mode" == "delta" ]]; then
+  if [[ -z "${SNYK_OPEN_SOURCE_PROJECT_ID:-}" ]]; then
+    echo "::error::SNYK_OPEN_SOURCE_PROJECT_ID is required for Snyk Delta"
+    exit 1
+  fi
+
+  uuid_regex='^[[:xdigit:]]{8}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{12}$'
+  if [[ ! "$SNYK_OPEN_SOURCE_PROJECT_ID" =~ $uuid_regex ]]; then
+    echo "::error::SNYK_OPEN_SOURCE_PROJECT_ID must be a UUID"
+    exit 1
+  fi
+fi
+
 if [[ "$scan_mode" != "monitor" && ! "$image_uri" =~ ^[^[:space:]@]+@sha256:[a-f0-9]{64}$ ]]; then
   echo "::error::image_uri must reference an immutable sha256 digest"
   exit 1
@@ -156,7 +169,10 @@ run_delta_scan() {
     --project-name=laa-record-controlled-work-open-source \
     --target-reference=main \
     --dev --severity-threshold=high --json --print-deps "${policy_args[@]}" \
-    | snyk-delta --targetReference main
+    | snyk-delta \
+      --baselineOrg "$SNYK_ORG_ID" \
+      --baselineProject "$SNYK_OPEN_SOURCE_PROJECT_ID" \
+      --type vuln
   pipeline_status=("${PIPESTATUS[@]}")
   echo "::endgroup::"
 

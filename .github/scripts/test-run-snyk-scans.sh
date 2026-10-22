@@ -108,6 +108,7 @@ run_case() {
   local fail_on_findings=${6:-false}
   local report_to_snyk=${7:-false}
   local empty_scans=${8:-}
+  local open_source_project_id=${9-00000000-0000-0000-0000-000000000001}
   local image_uri=registry.example/app@sha256:$(printf 'a%.0s' {1..64})
 
   if [[ "$scan_mode" == "monitor" ]]; then
@@ -125,6 +126,7 @@ run_case() {
     REPORT_TO_SNYK="$report_to_snyk" \
     SNYK_TOKEN=test-token \
     SNYK_ORG_ID="$snyk_org_id" \
+    SNYK_OPEN_SOURCE_PROJECT_ID="$open_source_project_id" \
     SNYK_CALL_LOG="$tmp_dir/calls.log" \
     SNYK_TEST_EXIT="$snyk_test_exit" \
     SNYK_EMPTY_SCANS="$empty_scans" \
@@ -166,7 +168,7 @@ if grep -Fq '## Findings' "$tmp_dir/summary.md"; then
   exit 1
 fi
 assert_logged 'snyk test --org=test-org-id --project-name=laa-record-controlled-work-open-source --target-reference=main --dev --severity-threshold=high --json --print-deps'
-assert_logged 'snyk-delta --targetReference main'
+assert_logged 'snyk-delta --baselineOrg test-org-id --baselineProject 00000000-0000-0000-0000-000000000001 --type vuln'
 
 if run_case delta 1 1; then
   echo 'A new high or critical finding should fail' >&2
@@ -192,6 +194,32 @@ if run_case delta 1 0 0 ''; then
 fi
 if ! grep -Fq 'SNYK_ORG_ID is required' "$tmp_dir/output.log"; then
   echo 'The missing organization should be reported clearly' >&2
+  exit 1
+fi
+
+if run_case delta 1 0 0 test-org-id false false '' ''; then
+  echo 'Delta mode should require an explicit OSS project UUID' >&2
+  exit 1
+fi
+if ! grep -Fq 'SNYK_OPEN_SOURCE_PROJECT_ID is required' "$tmp_dir/output.log"; then
+  echo 'The missing OSS project UUID should be reported clearly' >&2
+  exit 1
+fi
+if [[ -s "$tmp_dir/calls.log" ]]; then
+  echo 'Delta mode should validate the OSS project UUID before scanning' >&2
+  exit 1
+fi
+
+if run_case delta 1 0 0 test-org-id false false '' not-a-project-uuid; then
+  echo 'Delta mode should reject an invalid OSS project UUID' >&2
+  exit 1
+fi
+if ! grep -Fq 'SNYK_OPEN_SOURCE_PROJECT_ID must be a UUID' "$tmp_dir/output.log"; then
+  echo 'An invalid OSS project UUID should be reported clearly' >&2
+  exit 1
+fi
+if [[ -s "$tmp_dir/calls.log" ]]; then
+  echo 'Delta mode should reject invalid UUIDs before scanning' >&2
   exit 1
 fi
 
