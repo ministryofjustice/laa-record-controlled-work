@@ -91,6 +91,7 @@ jobs:
 
   snyk:
     name: Snyk
+    if: github.ref != 'refs/heads/main'
     needs: build-image
     permissions:
       actions: read
@@ -109,8 +110,6 @@ jobs:
   snyk-monitor:
     name: Update Snyk Open Source baseline
     if: github.ref == 'refs/heads/main'
-    needs:
-      - snyk
     permissions:
       actions: read
       contents: read
@@ -220,7 +219,7 @@ jobs:
 
   deploy-uat:
     name: Deploy
-    if: github.event_name != 'merge_group' && !(github.event_name == 'pull_request' && github.actor == 'renovate[bot]')
+    if: ${{ !failure() && !cancelled() && github.event_name != 'merge_group' && !(github.event_name == 'pull_request' && github.actor == 'renovate[bot]') }}
     uses: ./.github/workflows/deploy-environment.yml
     with:
       app-environment: uat

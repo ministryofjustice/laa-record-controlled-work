@@ -119,6 +119,10 @@ run_scan() {
   local name=$1
   shift
   local exit_code
+  local monitor_operation=false
+  case "${1:-}:${2:-}:${3:-}" in
+    snyk:monitor:*|snyk:container:monitor) monitor_operation=true ;;
+  esac
 
   echo "::group::Snyk $name"
   if "$@"; then
@@ -128,22 +132,20 @@ run_scan() {
   fi
   echo "::endgroup::"
 
-  case "$exit_code" in
-    0) record_status "$name" passed ;;
-    1)
-      if [[ "$findings_are_errors" == "true" ]]; then
-        echo "::error::Snyk $name found high-severity findings"
-        overall_status=1
-      else
-        echo "::warning::Snyk $name found high-severity findings"
-      fi
-      record_status "$name" findings
-      ;;
-    *)
-      echo "::error::Snyk $name failed with exit code $exit_code"
-      record_status "$name" "tool error ($exit_code)"
-      ;;
-  esac
+  if [[ "$exit_code" == "0" ]]; then
+    record_status "$name" passed
+  elif [[ "$exit_code" == "1" && "$monitor_operation" != "true" ]]; then
+    if [[ "$findings_are_errors" == "true" ]]; then
+      echo "::error::Snyk $name found high-severity findings"
+      overall_status=1
+    else
+      echo "::warning::Snyk $name found high-severity findings"
+    fi
+    record_status "$name" findings
+  else
+    echo "::error::Snyk $name failed with exit code $exit_code"
+    record_status "$name" "tool error ($exit_code)"
+  fi
 }
 
 run_delta_scan() {
