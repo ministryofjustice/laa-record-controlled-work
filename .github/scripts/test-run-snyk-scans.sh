@@ -22,7 +22,10 @@ if [[ -n "$report_file" ]]; then
   scan=${scan#snyk-}
   scan=${scan%.sarif}
   scan_exit=$SNYK_TEST_EXIT
-  if [[ ",${SNYK_EMPTY_SCANS:-}," == *",$scan,"* || "$SNYK_TEST_EXIT" == "0" ]]; then
+  if [[ ",${SNYK_EMPTY_SCANS:-}," == *",$scan,"* ]] || {
+    [[ "$SNYK_TEST_EXIT" == "0" ]] &&
+      [[ ",${SNYK_LOW_SEVERITY_SCANS:-}," != *",$scan,"* ]]
+  }; then
     jq -n '{runs:[{tool:{driver:{rules:[]}},results:[]}]}' > "$report_file"
     scan_exit=0
   else
@@ -50,6 +53,11 @@ if [[ -n "$report_file" ]]; then
         level=warning
         score=
         path=src/query.ts
+        if [[ "$SNYK_HIGH_FINDINGS" == "true" ]]; then
+          title='High severity - NoSQL injection'
+          level=error
+          score=7.5
+        fi
         ;;
       iac)
         rule_id=SNYK-CC-K8S-123
@@ -58,6 +66,11 @@ if [[ -n "$report_file" ]]; then
         level=note
         score=
         path=deploy/main.yaml
+        if [[ "$SNYK_HIGH_FINDINGS" == "true" ]]; then
+          title='High severity - Publicly accessible resource'
+          level=error
+          score=7.5
+        fi
         ;;
     esac
     jq -n \
@@ -69,13 +82,17 @@ if [[ -n "$report_file" ]]; then
       --arg path "$path" \
       '{runs:[{tool:{driver:{rules:[{id:$id,shortDescription:{text:$title},properties:(if $score == "" then {} else {"security-severity":$score} end)}]}},results:[{ruleId:$id,level:$level,message:{text:$description},locations:[{physicalLocation:{artifactLocation:{uri:$path},region:{startLine:12}}}]}]}]}' \
       > "$report_file"
+    if [[ ",${SNYK_LOW_SEVERITY_SCANS:-}," == *",$scan,"* ]]; then
+      scan_exit=0
+    fi
   fi
 fi
 if [[ "$1" == "test" ]]; then
   if [[ "$SCAN_MODE" == "delta" ]]; then
     printf '{"ok":true}\n'
+    exit "$SNYK_TEST_EXIT"
   fi
-  exit "$SNYK_TEST_EXIT"
+  exit "$scan_exit"
 fi
 if [[ "$1" == "container" && "${2:-}" == "monitor" ]]; then
   exit "$SNYK_CONTAINER_MONITOR_EXIT"
@@ -93,6 +110,9 @@ cat > "$tmp_dir/bin/snyk-delta" <<'MOCK'
 #!/usr/bin/env bash
 cat >/dev/null
 printf 'snyk-delta %s\n' "$*" >> "$SNYK_CALL_LOG"
+if [[ "$SNYK_DELTA_NO_BASELINE" == "true" ]]; then
+  echo "Could not find a matching monitored Snyk project. Proceeding without a baseline."
+fi
 exit "$SNYK_DELTA_EXIT"
 MOCK
 
@@ -132,6 +152,9 @@ run_case() {
     SNYK_CALL_LOG="$tmp_dir/calls.log" \
     SNYK_TEST_EXIT="$snyk_test_exit" \
     SNYK_EMPTY_SCANS="$empty_scans" \
+    SNYK_DELTA_NO_BASELINE="${SNYK_DELTA_NO_BASELINE:-false}" \
+    SNYK_LOW_SEVERITY_SCANS="${SNYK_LOW_SEVERITY_SCANS:-}" \
+    SNYK_HIGH_FINDINGS="${SNYK_HIGH_FINDINGS:-false}" \
     GITHUB_SERVER_URL=https://github.com \
     GITHUB_REPOSITORY=ministryofjustice/laa-record-controlled-work \
     GITHUB_RUN_ID=123456789 \
@@ -148,7 +171,7 @@ run_case() {
     HELM_SETUP_OUTCOME=success \
     SNYK_CLI_INSTALL_OUTCOME=success \
     SNYK_DELTA_INSTALL_OUTCOME=success \
-    SNYK_AUTH_OUTCOME=success \
+    SNYK_AUTH_OUTCOME="${SNYK_AUTH_OUTCOME:-success}" \
     SNYK_TOKEN_MASK_OUTCOME=success \
     bash "$script" > "$tmp_dir/output.log" 2>&1
 }
@@ -172,6 +195,62 @@ if grep -Fq '## Findings' "$tmp_dir/summary.md"; then
 fi
 assert_logged 'snyk test --org=test-org-id --project-name=laa-record-controlled-work-open-source --target-reference=main --dev --severity-threshold=high --json --print-deps'
 assert_logged 'snyk-delta --targetReference main'
+assert_logged 'snyk-delta --targetReference main --type vuln'
+if [[ -f "$tmp_dir/reports/snyk-open-source.sarif" ]]; then
+  echo 'The JSON-based OSS delta gate must not require or produce SARIF' >&2
+  exit 1
+fi
+
+if ! run_case delta 0 0; then
+  cat "$tmp_dir/output.log" >&2
+  echo 'A clean OSS scan should pass when the main baseline is available' >&2
+  exit 1
+fi
+
+if SNYK_DELTA_NO_BASELINE=true run_case delta 0 0; then
+  echo 'A clean OSS scan should fail when the main baseline is unavailable' >&2
+  exit 1
+fi
+if ! grep -Fq 'Proceeding without a baseline' "$tmp_dir/output.log";
+then
+  echo 'The missing baseline should be identified as a comparison failure' >&2
+  exit 1
+fi
+for scan in 'snyk container test' 'snyk code test' 'snyk iac test'; do
+  assert_logged "$scan"
+done
+for environment in uat staging production; do
+  if [[ ! -f "$tmp_dir/rendered/$environment.yaml" ]]; then
+    printf 'Expected %s manifests to render after a baseline failure\n' "$environment" >&2
+    exit 1
+  fi
+done
+if [[ ! -f "$tmp_dir/reports/snyk-open-source-delta.log" ]]; then
+  echo 'The Delta comparison output should be retained after baseline failure' >&2
+  exit 1
+fi
+
+if SNYK_AUTH_OUTCOME=failure run_case delta 0 0; then
+  echo 'An OAuth setup failure should fail the comparison workflow' >&2
+  exit 1
+fi
+if ! grep -Fq 'Snyk OAuth action failed' "$tmp_dir/output.log"; then
+  echo 'An authentication failure should be reported' >&2
+  exit 1
+fi
+assert_logged 'snyk-delta --targetReference main --type vuln'
+
+if run_case delta 2 0; then
+  echo 'An OSS scan error should fail the workflow' >&2
+  exit 1
+fi
+if ! grep -Fq 'Snyk Open Source test failed with exit code 2' "$tmp_dir/output.log"; then
+  echo 'An OSS scan error should be reported' >&2
+  exit 1
+fi
+for scan in 'snyk container test' 'snyk code test' 'snyk iac test'; do
+  assert_logged "$scan"
+done
 
 if run_case delta 1 1; then
   echo 'A new high or critical finding should fail' >&2
@@ -308,10 +387,28 @@ fi
 assert_logged 'snyk code test --severity-threshold=high --report --project-name=laa-record-controlled-work-code --target-reference=main --sarif-file-output='
 assert_logged '--severity-threshold=high --report --target-name=laa-record-controlled-work-iac --target-reference=main --sarif-file-output='
 
-if run_case absolute 1 0 0 test-org-id true; then
+if SNYK_HIGH_FINDINGS=true run_case absolute 1 0 0 test-org-id true; then
   echo 'High findings should fail when strict findings are enabled' >&2
   exit 1
 fi
+for scan in Open\ Source Container Code IaC; do
+  if ! grep -Fq "| $scan | findings |" "$tmp_dir/summary.md"; then
+    printf 'High-threshold findings should be gated for %s\n' "$scan" >&2
+    exit 1
+  fi
+done
+
+if ! SNYK_LOW_SEVERITY_SCANS=code,iac run_case absolute 1 0 0 test-org-id true false 'open-source,container'; then
+  cat "$tmp_dir/output.log" >&2
+  echo 'Medium and low findings should pass the high-threshold gate' >&2
+  exit 1
+fi
+for scan in Code IaC; do
+  if ! grep -Fq "| $scan | passed |" "$tmp_dir/summary.md"; then
+    printf 'Lower-severity findings should not fail the %s gate\n' "$scan" >&2
+    exit 1
+  fi
+done
 
 if ! run_case monitor 0 0; then
   cat "$tmp_dir/output.log" >&2
@@ -346,6 +443,32 @@ if ! grep -Fq 'Snyk Open Source monitoring failed with exit code 2' "$tmp_dir/ou
   echo 'The monitoring failure should identify the operational exit code' >&2
   exit 1
 fi
+ruby -r yaml - "$repo_root" <<'RUBY'
+repo_root = ARGV.fetch(0)
+cicd = YAML.load_file(File.join(repo_root, ".github/workflows/cicd.yml"))
+snyk = YAML.load_file(File.join(repo_root, ".github/workflows/snyk.yml"))
+events = cicd.fetch(cicd.key?("on") ? "on" : true)
+raise "CICD must run Snyk on pull requests" unless events.key?("pull_request")
+raise "CICD must run Snyk on merge queues" unless events.key?("merge_group")
+
+snyk_inputs = cicd.dig("jobs", "snyk", "with")
+expected_mode = "${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 'delta' || 'absolute' }}"
+expected_gate = "${{ github.event_name == 'pull_request' || github.event_name == 'merge_group' }}"
+raise "PR and merge-group runs must select OSS delta" unless snyk_inputs["scan_mode"] == expected_mode
+raise "PR and merge-group runs must gate absolute findings" unless snyk_inputs["fail_on_findings"] == expected_gate
+raise "Contributor runs must not publish Snyk snapshots" unless snyk_inputs["report_to_snyk"] == false
+
+uploads = snyk.dig("jobs", "scan", "steps").select do |step|
+  step["uses"]&.include?("upload-sarif")
+end
+raise "All four available SARIF reports should retain upload steps" unless uploads.length == 4
+uploads.each do |step|
+  condition = step.fetch("if", "")
+  unless condition.include?("always()") && condition.include?("github.event_name != 'merge_group'") && condition.include?("hashFiles(")
+    raise "SARIF upload must attempt available PR reports and exclude merge groups"
+  end
+end
+RUBY
 node --test "$repo_root/.github/scripts/test-format-snyk-findings.mjs"
 
 echo 'Snyk scan mode checks passed'
