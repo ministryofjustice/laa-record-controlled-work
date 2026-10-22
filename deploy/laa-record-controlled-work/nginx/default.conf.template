@@ -67,6 +67,11 @@ server {
     access_log  off;
   }
 
+  # Kubernetes probes call the RCW service directly, not through public ingress.
+  location ~* ^/(health|status)(/|$) {
+    return 404;
+  }
+
   # Never expose internal-only RCW eligibility API routes via ingress;
   # only the CCQ pod may call these directly (see rcw.networkpolicy.yaml).
 
