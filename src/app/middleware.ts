@@ -14,6 +14,7 @@ import {
   createBrowserSentryOptions,
   setupSentry,
 } from "#/app/middleware/sentry.middleware.js";
+import { setupHealthChecks } from "#/app/middleware/setupHealthChecks.js";
 import { isEnv } from "#/app/utils/isEnv.js";
 import config from "#/config.js";
 import { createSession } from "#/lib/session.js";
@@ -59,6 +60,19 @@ export async function initMiddleware(
   // Setup Helmet for security headers.
   app.use(helmet());
 
+  // TODO Refactor these to pure middleware, rather than setup methods.
+  // Set up rate limiting.
+  setupRateLimit(app, config);
+
+  // Set up application-specific configurations.
+  setupConfig(app);
+
+  // Set up request logging based on environment.
+  setupRequestLogging(app);
+
+  // Set up health probes for EKS
+  setupHealthChecks(app);
+
   // Setup express-session using Redis as datastore.
   app.use(
     session(await createSession(config, getRedisClient, createRedisStore)),
@@ -72,18 +86,6 @@ export async function initMiddleware(
   // Setup CSRF protection.
   app.use(csrf);
   app.use(addCsrfToLocals);
-
-  // Set up rate limiting
-  // TODO Refactor to pure middleware, rather than a setup method.
-  setupRateLimit(app, config);
-
-  // Set up application-specific configurations
-  // TODO Refactor to pure middleware, rather than a setup method.
-  setupConfig(app);
-
-  // Set up request logging based on environment
-  // TODO Refactor to pure middleware, rather than a setup method.
-  setupRequestLogging(app);
 
   // Auth.
   // app.use(requireAuth);

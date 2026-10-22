@@ -24,8 +24,8 @@ router.get("/signin", (req, res, next) => {
     homeAccountId: "test.user@example.com",
   };
 
-  req.session.save((err: unknown) => {
-    if (err !== undefined) {
+  req.session.save((err: Error | null | undefined) => {
+    if (err instanceof Error) {
       next(err);
       return;
     }
@@ -48,8 +48,8 @@ router.get("/select-office", (req, res, next) => {
     firmName: FIRM_NAME,
   };
 
-  req.session.save((err: unknown) => {
-    if (err !== undefined) {
+  req.session.save((err: Error | null | undefined) => {
+    if (err instanceof Error) {
       next(err);
       return;
     }

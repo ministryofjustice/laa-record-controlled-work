@@ -9,6 +9,7 @@ import {
   FORBIDDEN,
   FOUND,
   INTERNAL_SERVER_ERROR,
+  METHOD_NOT_ALLOWED,
   UNAUTHORIZED,
 } from "#/lib/constants/http.js";
 import sinon from "sinon";
@@ -1926,21 +1927,24 @@ describe("Auth Handlers", () => {
   });
 
   describe("signOut()", () => {
-    it("redirects to /", async () => {
+    it("returns method not allowed for GET", async () => {
       const res = await request(mockApp).get("/auth/signout");
+
+      expect(res.status).to.equal(METHOD_NOT_ALLOWED);
+      expect(res.headers.allow).to.equal("POST");
+    });
+
+    it("destroys the session and clears the cookie after a valid POST", async () => {
+      const agent = request.agent(mockApp);
+      await agent.get("/auth/signin"); // establishes a session cookie
+      const { body } = await agent.get("/csrf-token");
+
+      const res = await agent.post("/auth/signout").send({
+        _csrf: body.csrfToken,
+      });
 
       expect(res.status).to.equal(FOUND);
       expect(res.headers.location).to.equal("/");
-      expectAllowedLocalLocation(res.headers.location);
-    });
-
-    it("destroys the session and clears the cookie before redirecting", async () => {
-      const agent = request.agent(mockApp);
-      await agent.get("/auth/signin"); // establishes a session cookie
-
-      const res = await agent.get("/auth/signout");
-
-      expect(res.status).to.equal(FOUND);
       expectAllowedLocalLocation(res.headers.location);
       const rawCookies = res.headers["set-cookie"];
       const cookies: string[] = Array.isArray(rawCookies)
@@ -1958,13 +1962,40 @@ describe("Auth Handlers", () => {
 
       const agent = request.agent(mockApp);
       await agent.get("/auth/signin");
-      const res = await agent.get("/auth/signout");
+      const { body } = await agent.get("/csrf-token");
+      const res = await agent.post("/auth/signout").send({
+        _csrf: body.csrfToken,
+      });
 
       expect(res.status).to.equal(FOUND);
       expectAllowedLocalLocation(res.headers.location);
       expect(del.calledOnce).to.be.true;
       const [key] = del.firstCall.args as [string];
       expect(key.startsWith("msal:")).to.be.true;
+    });
+
+    it("reports cache cleanup failures without exposing backend details", async () => {
+      const redisClient = redis.getRedisClient();
+      sinon.stub(redisClient, "del").rejects(new Error("cache backend details"));
+      sinon.stub(config.redis, "enabled").value(true);
+
+      const agent = request.agent(mockApp);
+      await agent.get("/auth/signin");
+      const { body } = await agent.get("/csrf-token");
+      const res = await agent.post("/auth/signout").send({
+        _csrf: body.csrfToken,
+      });
+
+      expect(res.status).to.equal(INTERNAL_SERVER_ERROR);
+      expect(res.body.message).to.equal("Unable to complete sign-out");
+      expect(JSON.stringify(res.body)).not.to.include("cache backend details");
+      const rawCookies = res.headers["set-cookie"];
+      const cookies: string[] = Array.isArray(rawCookies)
+        ? rawCookies
+        : [rawCookies].filter(Boolean);
+      expect(
+        cookies.some((cookie) => cookie.includes("Expires=Thu, 01 Jan 1970")),
+      ).to.be.true;
     });
   });
 });

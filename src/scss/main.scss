@@ -3,3 +3,17 @@
 @import "../journeys/components/autocomplete/autocomplete.scss";
 @import "./eligibility-result-box.scss";
 @import "./export.scss";
+
+// design system has link styling but no button
+.moj-header__navigation-link--button {
+  padding: 0;
+  border: 0;
+  background-color: transparent;
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  font-style: inherit;
+  line-height: inherit;
+  text-align: inherit;
+  cursor: pointer;
+}

@@ -14,7 +14,13 @@ import { Agent, request as undiciRequest, setGlobalDispatcher } from "undici";
 import type { RedisClientType } from "redis";
 import { createClient } from "redis";
 import { createRedisClient as createAppRedisClient } from "#/lib/redis.js";
-import { BAD_REQUEST, FOUND, OK } from "#/lib/constants/http.js";
+import {
+  BAD_REQUEST,
+  FOUND,
+  METHOD_NOT_ALLOWED,
+  NOT_FOUND,
+  OK,
+} from "#/lib/constants/http.js";
 import { createAuthFlowStore } from "#/auth/authCodeFlow/factory.js";
 import { EntraService } from "#/auth/entra.service.js";
 import { type Either, success } from "#/lib/either.js";
@@ -22,6 +28,7 @@ import sinon from "sinon";
 
 const REDIS_PORT = 6379;
 const IDP_PORT = 8080;
+const PROBE_SESSION_TTL_MS = 30_000;
 
 type MockMsalMetadata = {
   authorityMetadata: string;
@@ -151,6 +158,7 @@ describe("Auth Integration", () => {
 
     config.redis.enabled = true;
     config.redis.url = redisUrl;
+    process.env.NODE_ENV = "test";
     process.env.PLAYWRIGHT_TEST_SIGNIN = "true";
 
     app = await createApp({
@@ -182,7 +190,8 @@ describe("Auth Integration", () => {
 
   beforeEach(async () => {
     authenticatedUser = request.agent(app);
-    await authenticatedUser.get("/test/signin");
+    const signIn = await authenticatedUser.get("/test/signin");
+    expect(signIn.status).to.equal(OK);
     unauthenticatedUser = request.agent(app);
   });
 
@@ -192,9 +201,155 @@ describe("Auth Integration", () => {
 
   describe("GET /health", () => {
     it("returns healthy without auth", async () => {
+      const sessionKeysBefore = await sessionRedisClient.keys("sess:*");
       const res = await request(app).get("/health");
       expect(res.status).to.equal(OK);
       expect(res.text).to.equal("Healthy");
+      expect(
+        getSetCookieHeaders(res.headers["set-cookie"]).some((cookie) =>
+          cookie.startsWith(`${config.session.name}=`),
+        ),
+      ).to.equal(false);
+      expect(await sessionRedisClient.keys("sess:*")).to.deep.equal(
+        sessionKeysBefore,
+      );
+    });
+
+    it("does not destroy or renew an existing session", async () => {
+      const [sessionKey] = await sessionRedisClient.keys("sess:*");
+      expect(sessionKey).to.be.a("string");
+      await sessionRedisClient.pExpire(sessionKey!, PROBE_SESSION_TTL_MS);
+      const ttlBefore = await sessionRedisClient.pTTL(sessionKey!);
+
+      const res = await authenticatedUser.get("/health");
+
+      expect(res.status).to.equal(OK);
+      expect(res.text).to.equal("Healthy");
+      expect(await sessionRedisClient.exists(sessionKey!)).to.equal(1);
+      expect(await sessionRedisClient.pTTL(sessionKey!)).to.be.lessThan(
+        PROBE_SESSION_TTL_MS,
+      );
+      expect(ttlBefore).to.be.greaterThan(0);
+      expect(
+        getSetCookieHeaders(res.headers["set-cookie"]).some((cookie) =>
+          cookie.startsWith(`${config.session.name}=`),
+        ),
+      ).to.equal(false);
+    });
+  });
+
+  describe("GET /status", () => {
+    it("returns OK without creating a session or cookie", async () => {
+      const sessionKeysBefore = await sessionRedisClient.keys("sess:*");
+
+      const res = await request(app).get("/status");
+
+      expect(res.status).to.equal(OK);
+      expect(res.text).to.equal("OK");
+      expect(
+        getSetCookieHeaders(res.headers["set-cookie"]).some((cookie) =>
+          cookie.startsWith(`${config.session.name}=`),
+        ),
+      ).to.equal(false);
+      expect(await sessionRedisClient.keys("sess:*")).to.deep.equal(
+        sessionKeysBefore,
+      );
+    });
+
+    it("does not destroy or renew an existing session", async () => {
+      const [sessionKey] = await sessionRedisClient.keys("sess:*");
+      expect(sessionKey).to.be.a("string");
+      await sessionRedisClient.pExpire(sessionKey!, PROBE_SESSION_TTL_MS);
+      const ttlBefore = await sessionRedisClient.pTTL(sessionKey!);
+
+      const res = await authenticatedUser.get("/status");
+
+      expect(res.status).to.equal(OK);
+      expect(res.text).to.equal("OK");
+      expect(await sessionRedisClient.exists(sessionKey!)).to.equal(1);
+      expect(await sessionRedisClient.pTTL(sessionKey!)).to.be.lessThan(
+        PROBE_SESSION_TTL_MS,
+      );
+      expect(ttlBefore).to.be.greaterThan(0);
+      expect(
+        getSetCookieHeaders(res.headers["set-cookie"]).some((cookie) =>
+          cookie.startsWith(`${config.session.name}=`),
+        ),
+      ).to.equal(false);
+    });
+  });
+
+  describe("GET /auth/signout", () => {
+    it("rejects the request without destroying the current session", async () => {
+      const [sessionKey] = await sessionRedisClient.keys("sess:*");
+      expect(sessionKey).to.be.a("string");
+
+      const res = await authenticatedUser.get("/auth/signout");
+
+      expect(res.status).to.equal(METHOD_NOT_ALLOWED);
+      expect(res.headers.allow).to.equal("POST");
+      expect(await sessionRedisClient.exists(sessionKey!)).to.equal(1);
+      expect(
+        getSetCookieHeaders(res.headers["set-cookie"]).some(
+          (cookie) =>
+            cookie.startsWith(`${config.session.name}=`) &&
+            cookie.includes("Expires=Thu, 01 Jan 1970"),
+        ),
+      ).to.equal(false);
+    });
+  });
+
+  describe("POST /auth/signout", () => {
+    it("rejects a missing CSRF token without destroying the session", async () => {
+      const [sessionKey] = await sessionRedisClient.keys("sess:*");
+      expect(sessionKey).to.be.a("string");
+
+      const res = await authenticatedUser.post("/auth/signout");
+
+      expect(res.status).to.equal(NOT_FOUND);
+      expect(await sessionRedisClient.exists(sessionKey!)).to.equal(1);
+    });
+
+    it("rejects an invalid CSRF token without destroying the session", async () => {
+      const [sessionKey] = await sessionRedisClient.keys("sess:*");
+      expect(sessionKey).to.be.a("string");
+
+      const res = await authenticatedUser
+        .post("/auth/signout")
+        .type("form")
+        .send({ _csrf: "invalid-token" });
+
+      expect(res.status).to.equal(NOT_FOUND);
+      expect(await sessionRedisClient.exists(sessionKey!)).to.equal(1);
+    });
+
+    it("destroys the local session and cache with a valid CSRF token", async () => {
+      const page = await authenticatedUser.get("/");
+      const csrfToken = /name="_csrf" value="([^"]+)"/.exec(page.text)?.[1];
+      expect(csrfToken).to.be.a("string");
+
+      const [sessionKey] = await sessionRedisClient.keys("sess:*");
+      expect(sessionKey).to.be.a("string");
+      const sessionId = sessionKey!.replace(/^sess:/, "");
+      const cacheKey = `msal:${sessionId}`;
+      await sessionRedisClient.set(cacheKey, "test-cache");
+
+      const res = await authenticatedUser
+        .post("/auth/signout")
+        .type("form")
+        .send({ _csrf: csrfToken });
+
+      expect(res.status).to.equal(FOUND);
+      expect(res.headers.location).to.equal("/");
+      expect(await sessionRedisClient.exists(sessionKey!)).to.equal(0);
+      expect(await sessionRedisClient.exists(cacheKey)).to.equal(0);
+      expect(
+        getSetCookieHeaders(res.headers["set-cookie"]).some(
+          (cookie) =>
+            cookie.startsWith(`${config.session.name}=`) &&
+            cookie.includes("Expires=Thu, 01 Jan 1970"),
+        ),
+      ).to.equal(true);
     });
   });
 

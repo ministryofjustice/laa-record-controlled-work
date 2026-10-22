@@ -16,7 +16,10 @@
                 {{ user.username }}
               </li>
               <li class="moj-header__navigation-item">
-                <a class="moj-header__navigation-link govuk-!-font-weight-bold" href="/auth/signout">{{t('common.signOut')}}</a>
+                <form action="/auth/signout" method="post">
+                  <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+                  <button class="moj-header__navigation-link moj-header__navigation-link--button govuk-!-font-weight-bold" type="submit">{{t('common.signOut')}}</button>
+                </form>
               </li>
             </ul>
           </nav>
@@ -47,4 +50,3 @@
     html: t('components.phaseBanner.feedbackText') + t('components.phaseBanner.feedbackLinkTextHTML')
   }) }}
 {% endblock %}
-

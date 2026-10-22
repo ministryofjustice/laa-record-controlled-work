@@ -5,7 +5,6 @@ import authRouter from "#/auth/auth.routes.js";
 import { requireAuth } from "#/auth/middleware/requireAuth.middleware.js";
 import config from "#/config.js";
 import exportRouter from "#/export/export.routes.js";
-import { OK } from "#/lib/constants/http.js";
 import { createAuthLimiter } from "#/middleware/setupRateLimit.js";
 
 import testRoutes from "./routes/test.js";
@@ -18,19 +17,6 @@ export function initRoutes(app: Express): void {
   // Root endpoint - serves the main page of the application.
   app.get("/", requireAuth(), (req: Request, res: Response): void => {
     res.render("main/index");
-  });
-
-  // Health endpoints - used for liveness and readiness probes.
-  app.get("/status", (req: Request, res: Response): void => {
-    req.session.destroy(() => {
-      res.status(OK).send("OK");
-    });
-  });
-
-  app.get("/health", (req: Request, res: Response): void => {
-    req.session.destroy(() => {
-      res.status(OK).send("Healthy");
-    });
   });
 
   // Auth.
