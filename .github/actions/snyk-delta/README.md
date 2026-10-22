@@ -61,14 +61,3 @@ node --test .github/actions/snyk-delta/test.mjs .github/actions/snyk-delta/compa
 The compatibility check runs the real Delta 1.14.0 module with sanitized OSS
 results and a stub at the baseline API boundary. It does not verify hosted
 credentials or live project configuration.
-
-## Hosted Acceptance Still Required
-
-- Confirm the configured project UUID identifies the intended monitored OSS
-  project in the configured organization.
-- Confirm the existing OAuth identity can read its latest monitored baseline,
-  including when the current scan is clean.
-- Confirm trusted-main monitoring uses development dependencies and the same
-  `.snyk` policy as the delta scan.
-- Confirm high/critical regressions fail and comparison/API failures fail in the
-  hosted runner. Do not treat baseline lag as evidence of remediation.
