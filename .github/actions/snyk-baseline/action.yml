@@ -271,17 +271,14 @@ runs:
 
         monitor_output="$(mktemp)"
         trap 'rm -f "$monitor_output"' EXIT
-        if snyk monitor \
+        monitor_status=0
+        snyk monitor \
           --org="$ORG_ID" \
           --dev \
           --project-name=laa-record-controlled-work-open-source \
           --target-reference=main \
           --policy-path=.snyk \
-          > "$monitor_output" 2>&1; then
-          monitor_status=0
-        else
-          monitor_status=$?
-        fi
+          > "$monitor_output" 2>&1 || monitor_status=$?
         cat "$monitor_output"
         if (( monitor_status != 0 )); then
           echo "::error::Open Source monitor failed with exit code $monitor_status"
@@ -575,12 +572,7 @@ runs:
         IAC_OUTCOME: ${{ steps.iac.outcome }}
       run: |
         set -euo pipefail
-        publication_is_stale=false
         if [[ "$SOURCE_STATE" == 'stale' || "$PUBLICATION_STATE" == 'stale' ]]; then
-          publication_is_stale=true
-        fi
-
-        if [[ "$publication_is_stale" == 'true' ]]; then
           echo 'outcome=skipped' >> "$GITHUB_OUTPUT"
           echo 'publication-state=stale' >> "$GITHUB_OUTPUT"
           exit 0
@@ -607,20 +599,14 @@ runs:
           "$IAC_OUTCOME"
         )
 
-        all_required_steps_succeeded=true
         for step_outcome in "${required_step_outcomes[@]}"; do
           if [[ "$step_outcome" != 'success' ]]; then
-            all_required_steps_succeeded=false
-            break
+            echo 'outcome=failed' >> "$GITHUB_OUTPUT"
+            echo 'publication-state=current' >> "$GITHUB_OUTPUT"
+            exit 1
           fi
         done
 
-        if [[ "$all_required_steps_succeeded" == 'true' ]]; then
-          echo 'outcome=passed' >> "$GITHUB_OUTPUT"
-          echo 'publication-state=current' >> "$GITHUB_OUTPUT"
-        else
-          echo 'outcome=failed' >> "$GITHUB_OUTPUT"
-          echo 'publication-state=current' >> "$GITHUB_OUTPUT"
-          exit 1
-        fi
+        echo 'outcome=passed' >> "$GITHUB_OUTPUT"
+        echo 'publication-state=current' >> "$GITHUB_OUTPUT"
       shell: bash
