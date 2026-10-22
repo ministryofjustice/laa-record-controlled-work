@@ -49,8 +49,12 @@ export const casesTable = (cases: ChainableRef): GovUKTable =>
         {
           html: Format(
             '<a class="govuk-link" href="/cases/%1/task-list">%2</a>',
-            Item().path(APPLICATIONS_DATA_KEYS.id),
-            Item().path(APPLICATIONS_DATA_KEYS.name),
+            Item()
+              .path(APPLICATIONS_DATA_KEYS.id)
+              .pipe(Transformer.String.EscapeHtml()),
+            Item()
+              .path(APPLICATIONS_DATA_KEYS.name)
+              .pipe(Transformer.String.EscapeHtml()),
           ),
         },
         { text: Item().path(APPLICATIONS_DATA_KEYS.applicationRefNumber) },

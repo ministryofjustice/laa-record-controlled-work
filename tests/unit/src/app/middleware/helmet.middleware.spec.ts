@@ -26,6 +26,34 @@ describe("helmet middleware", () => {
     );
   });
 
+  it("does not allow inline scripts when the CSP nonce is missing", async () => {
+    const app = express();
+    app.use(helmet());
+    app.get("/", (req, res) => res.send("ok"));
+
+    const response = await request(app).get("/");
+    const policy = response.headers["content-security-policy"];
+
+    expect(policy).to.include("script-src 'self'");
+    expect(policy).to.not.include("script-src 'self' 'unsafe-inline'");
+    expect(policy).to.include("style-src 'self' 'unsafe-inline'");
+  });
+
+  it("allows nonce-bearing local scripts", async () => {
+    const app = express();
+    app.use((req, res, next) => {
+      res.locals.cspNonce = "test-nonce";
+      next();
+    });
+    app.use(helmet());
+    app.get("/", (req, res) => res.send("ok"));
+
+    const response = await request(app).get("/");
+    const policy = response.headers["content-security-policy"];
+
+    expect(policy).to.include("script-src 'self' 'nonce-test-nonce'");
+  });
+
   it("includes report-uri when SENTRY_CSP_REPORT_ENDPOINT is set", async () => {
     process.env.SENTRY_CSP_REPORT_ENDPOINT = "https://sentry.example/security";
 

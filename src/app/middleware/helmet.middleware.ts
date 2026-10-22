@@ -47,9 +47,9 @@ function helmetMiddleware(): RequestHandler {
                 "cspNonce" in res.locals ? res.locals.cspNonce : undefined;
               return typeof cspNonce === "string"
                 ? `'nonce-${cspNonce}'`
-                : "'unsafe-inline'";
+                : "'none'";
             }
-            return "'unsafe-inline'";
+            return "'none'";
           },
         ],
         styleSrc: ["'self'", "'unsafe-inline'"], // Allow inline styles if needed

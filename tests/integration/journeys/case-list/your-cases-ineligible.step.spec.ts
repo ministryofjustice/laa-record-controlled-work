@@ -1,5 +1,6 @@
 import { TestRenderResult } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
+import { parse } from "node-html-parser";
 import { type ForgeTestClient } from "@ministryofjustice/hmpps-forge/core/testing";
 import { createForgeTestClient } from "../../utils/helpers.js";
 import { yourCasesEffectsRegistry } from "#/journeys/your-cases/your-cases.effects.js";
@@ -150,6 +151,30 @@ describe("Your Cases Ineligible step", () => {
           dateFormatter.format(new Date(modifiedAt)),
         );
       }
+    });
+
+    it("renders stored client names as text inside their case links", async () => {
+      const application = mockData[0];
+      const clientName = `O'Neil & Sons <img src=x onerror="alert(1)">`;
+      getApplicationsStub.resolves({
+        status: 200,
+        data: [{ ...application, name: clientName }],
+      });
+
+      const result = await client.get("/cases/ineligible", { session });
+      expect(result.type).to.equal("render");
+
+      const [renderedTable] = (result as TestRenderResult).getBlocksByVariant(
+        "govukTable",
+      );
+      const rows = renderedTable.properties.rows as { html?: string }[][];
+      const [firstRow] = rows;
+      const [clientNameCell] = firstRow;
+      const html = parse(clientNameCell.html ?? "");
+      const link = html.querySelector("a");
+
+      expect(link?.text).to.equal(clientName);
+      expect(link?.querySelector("img, script")).to.equal(null);
     });
 
     it("renders empty value string when getApplications returns an empty array", async () => {
