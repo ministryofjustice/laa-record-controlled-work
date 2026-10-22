@@ -7,7 +7,7 @@ export class EvidenceDto {
   public benefitsInKindEvidence?: string[];
   public capitalEvidence?: string[];
   public childCareEvidence?: string[];
-  public doYouHaveEvidence = false;
+  public doYouHaveEvidence?: boolean;
   public employedEvidence?: string[];
   public housingCostsEvidence?: string[];
   public incomeEvidence?: string[];
@@ -57,7 +57,7 @@ export class EvidenceDto {
         benefitsInKindEvidence: answers.benefitsInKindEvidence,
         capitalEvidence: answers.capitalEvidence,
         childCareEvidence: answers.childCareEvidence,
-        doYouHaveEvidence: answers.doYouHaveEvidence,
+        doYouHaveEvidence: answers.doYouHaveEvidence === "yes" ? true : false,
         employedEvidence: answers.employedEvidence,
         housingCostsEvidence: answers.housingCostsEvidence,
         incomeEvidence: answers.incomeEvidence,
