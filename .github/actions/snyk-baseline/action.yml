@@ -103,6 +103,7 @@ runs:
           echo 'source-state=stale' >> "$GITHUB_OUTPUT"
           exit 1
         fi
+
         echo 'source-state=current' >> "$GITHUB_OUTPUT"
       shell: bash
 
@@ -170,6 +171,7 @@ runs:
           echo '::error::Snyk OAuth token is missing or cannot be safely masked'
           exit 1
         fi
+
         printf '::add-mask::%s\n' "$SNYK_OAUTH_TOKEN"
       shell: bash
 
@@ -217,15 +219,18 @@ runs:
         elif [[ "$scan_output_valid" == 'true' ]]; then
           sarif_valid=true
         fi
+
         echo "sarif-valid=$sarif_valid" >> "$GITHUB_OUTPUT"
 
         if (( scan_status > 1 )); then
           echo "::error::Open Source scan failed with exit code $scan_status"
           exit 1
         fi
+
         if [[ "$scan_output_valid" != 'true' || "$sarif_valid" != 'true' ]]; then
           exit 1
         fi
+
         if (( scan_status == 1 )); then
           echo '::warning::Open Source scan completed with findings'
         fi
@@ -246,6 +251,7 @@ runs:
           echo 'publication-state=stale' >> "$GITHUB_OUTPUT"
           exit 0
         fi
+
         echo 'publication-state=current' >> "$GITHUB_OUTPUT"
       shell: bash
 
@@ -394,15 +400,18 @@ runs:
         elif [[ "$results_valid" == 'true' ]]; then
           sarif_valid=true
         fi
+
         echo "sarif-valid=$sarif_valid" >> "$GITHUB_OUTPUT"
 
         if (( scan_status > 1 )); then
           echo "::error::Container preflight scan failed with exit code $scan_status"
           exit 1
         fi
+
         if [[ "$results_valid" != 'true' || "$sarif_valid" != 'true' ]]; then
           exit 1
         fi
+
         if (( scan_status == 1 )); then
           echo '::warning::Container scan completed with findings'
         fi
@@ -450,6 +459,7 @@ runs:
         mkdir -p sarif
         report_output="$(mktemp)"
         trap 'rm -f "$report_output"' EXIT
+
         scan_status=0
         snyk code test \
           --org="$ORG_ID" \
@@ -468,19 +478,23 @@ runs:
         else
           echo '::error::Code SARIF output is missing or malformed'
         fi
+
         echo "sarif-valid=$sarif_valid" >> "$GITHUB_OUTPUT"
 
         if (( scan_status > 1 )); then
           echo "::error::Code scan or publication failed with exit code $scan_status"
           exit 1
         fi
+
         if ! grep -Eq 'https://app\.snyk\.io/org/[^[:space:]]+' "$report_output"; then
           echo '::error::Code scan did not confirm Snyk dashboard publication'
           exit 1
         fi
+
         if [[ "$sarif_valid" != 'true' ]]; then
           exit 1
         fi
+
         if (( scan_status == 1 )); then
           echo '::warning::Code scan completed with findings'
         fi
@@ -538,6 +552,7 @@ runs:
           else
             echo "::error::IaC $environment SARIF output is missing or malformed"
           fi
+
           echo "sarif-${environment}=$sarif_valid" >> "$GITHUB_OUTPUT"
 
           if (( scan_status > 1 )); then
