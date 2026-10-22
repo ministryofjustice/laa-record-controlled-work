@@ -91,6 +91,10 @@ jobs:
 
   snyk:
     name: Snyk
+    if: >-
+      github.event_name == 'pull_request' ||
+      github.event_name == 'merge_group' ||
+      (github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main')
     needs: build-image
     permissions:
       actions: read
@@ -107,19 +111,20 @@ jobs:
     secrets: inherit
 
   snyk-monitor:
-    name: Update Snyk Open Source baseline
-    if: github.ref == 'refs/heads/main'
+    name: Publish Snyk main baselines
+    if: ${{ always() && github.ref == 'refs/heads/main' }}
     needs:
-      - snyk
+      - build-image
     permissions:
       actions: read
       contents: read
       id-token: write
       security-events: write
-    uses: ./.github/workflows/snyk.yml
+    uses: ./.github/workflows/snyk-monitor.yml
     with:
       source_sha: ${{ github.sha }}
-      scan_mode: monitor
+      ci_run_id: ${{ github.run_id }}
+      image_digest: ${{ needs.build-image.outputs.image_digest }}
     secrets: inherit
 
   mocha-tests:
@@ -195,11 +200,11 @@ jobs:
       - code-linting
       - code-security-audit
       - snyk
+      - snyk-monitor
       - mocha-tests
       - playwright
       - e2e
       - build-image
-      - snyk-monitor
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -214,13 +219,23 @@ jobs:
             :red_circle: *CI failed for RCW `main` branch*
 
             Jobs monitored: 
-            `code-linting`, `code-security-audit`, `snyk`, `mocha-unit-tests`, `playwright`, `build-image`
+            `code-linting`, `code-security-audit`, `snyk`, `snyk-monitor`, `mocha-unit-tests`, `playwright`, `build-image`
             
             Run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/attempts/${{ github.run_attempt }}
 
   deploy-uat:
     name: Deploy
-    if: github.event_name != 'merge_group' && !(github.event_name == 'pull_request' && github.actor == 'renovate[bot]')
+    if: >-
+      always() &&
+      github.event_name != 'merge_group' &&
+      !(github.event_name == 'pull_request' && github.actor == 'renovate[bot]') &&
+      needs.code-linting.result == 'success' &&
+      needs.code-security-audit.result == 'success' &&
+      needs.build-image.result == 'success' &&
+      needs.mocha-tests.result == 'success' &&
+      needs.playwright.result == 'success' &&
+      needs.e2e.result == 'success' &&
+      (github.ref == 'refs/heads/main' || needs.snyk.result == 'success')
     uses: ./.github/workflows/deploy-environment.yml
     with:
       app-environment: uat

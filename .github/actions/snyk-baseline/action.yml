@@ -1,0 +1,585 @@
+name: Refresh trusted-main Snyk results
+description: Scan and publish trusted-main Snyk results for all products
+inputs:
+  source-sha:
+    description: Full commit SHA from the trusted main run
+    required: true
+  org-id:
+    description: Snyk organization UUID
+    required: true
+  open-source-project-id:
+    description: Explicit monitored Open Source project UUID
+    required: true
+  image-ref:
+    description: CI-built immutable image reference using a sha256 digest
+    required: false
+    default: ''
+  container-setup-outcome:
+    description: Outcome of the workflow's AWS and registry prerequisites
+    required: false
+    default: success
+  dockerfile:
+    description: Dockerfile path used to assess base-image vulnerabilities
+    required: true
+  snyk-client-id:
+    description: Snyk OAuth client ID
+    required: true
+  snyk-client-secret:
+    description: Snyk OAuth client secret
+    required: true
+outputs:
+  outcome:
+    description: Aggregate result, either passed or failed
+    value: ${{ steps.aggregate.outputs.outcome }}
+  publication-state:
+    description: Whether the source was current when publication began
+    value: ${{ steps.aggregate.outputs.publication-state }}
+  open-source-sarif-valid:
+    description: Whether the Open Source SARIF report is valid
+    value: ${{ steps.open-source-scan.outputs.sarif-valid }}
+  container-sarif-valid:
+    description: Whether the Container SARIF report is valid
+    value: ${{ steps.container-results.outputs.sarif-valid }}
+  code-sarif-valid:
+    description: Whether the Code SARIF report is valid
+    value: ${{ steps.code.outputs.sarif-valid }}
+  iac-uat-sarif-valid:
+    description: Whether the UAT IaC SARIF report is valid
+    value: ${{ steps.iac.outputs.sarif-uat }}
+  iac-staging-sarif-valid:
+    description: Whether the staging IaC SARIF report is valid
+    value: ${{ steps.iac.outputs.sarif-staging }}
+  iac-production-sarif-valid:
+    description: Whether the production IaC SARIF report is valid
+    value: ${{ steps.iac.outputs.sarif-production }}
+runs:
+  using: composite
+  steps:
+    - name: Validate trusted main source
+      id: validate
+      continue-on-error: true
+      env:
+        SOURCE_SHA: ${{ inputs.source-sha }}
+        ORG_ID: ${{ inputs.org-id }}
+      run: |
+        set -euo pipefail
+        uuid_regex='^[[:xdigit:]]{8}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{12}$'
+        if [[ "$GITHUB_EVENT_NAME" != 'push' && "$GITHUB_EVENT_NAME" != 'workflow_dispatch' ]]; then
+          echo '::error::Snyk results can only be published from main pushes or manual main refreshes'
+          exit 1
+        fi
+        [[ "$GITHUB_REF" == 'refs/heads/main' && "$GITHUB_SHA" == "$SOURCE_SHA" ]] || {
+          echo '::error::Snyk baselines can only be published from the trusted main commit'
+          exit 1
+        }
+        [[ "$SOURCE_SHA" =~ ^[0-9a-fA-F]{40}$ ]] || { echo '::error::Source SHA is invalid'; exit 1; }
+        [[ "$ORG_ID" =~ $uuid_regex ]] || { echo '::error::Snyk organization UUID is invalid'; exit 1; }
+        [[ -f .snyk ]] || { echo '::error::The repository Snyk policy file is missing'; exit 1; }
+        git fetch --no-tags origin main
+        latest_main_sha="$(git rev-parse FETCH_HEAD)"
+        if [[ "$SOURCE_SHA" != "$latest_main_sha" ]]; then
+          echo "::notice::Skipping superseded main baseline for $SOURCE_SHA"
+          echo 'source-state=stale' >> "$GITHUB_OUTPUT"
+          exit 1
+        fi
+        echo 'source-state=current' >> "$GITHUB_OUTPUT"
+      shell: bash
+
+    - name: Validate Container publication prerequisites
+      if: steps.validate.outcome == 'success'
+      id: validate-container
+      continue-on-error: true
+      env:
+        CONTAINER_SETUP_OUTCOME: ${{ inputs.container-setup-outcome }}
+        DOCKERFILE: ${{ inputs.dockerfile }}
+        IMAGE_REF: ${{ inputs.image-ref }}
+      run: |
+        set -euo pipefail
+        [[ "$CONTAINER_SETUP_OUTCOME" == 'success' ]] || { echo '::error::Container registry prerequisites failed'; exit 1; }
+        [[ -f "$DOCKERFILE" ]] || { echo '::error::Dockerfile path does not exist'; exit 1; }
+        [[ "$IMAGE_REF" =~ ^[^[:space:]@]+@sha256:[a-f0-9]{64}$ ]] || { echo '::error::Container image must use its CI-built sha256 digest'; exit 1; }
+      shell: bash
+
+    - name: Set up Node and dependencies
+      if: steps.validate.outcome == 'success'
+      id: setup-node
+      continue-on-error: true
+      uses: ./.github/actions/setup-node
+
+    - name: Set up Helm
+      if: steps.validate.outcome == 'success'
+      id: helm
+      continue-on-error: true
+      uses: azure/setup-helm@9bc31f4ebc9c6b171d7bfbaa5d006ae7abdb4310 # v5
+
+    - name: Set up pinned Snyk CLI
+      if: steps.validate.outcome == 'success'
+      id: snyk-cli
+      continue-on-error: true
+      uses: snyk/actions/setup@aa6e70d07856828c0902d53c649eb82dea5e04be
+      with:
+        snyk-version: v1.1308.0
+
+    - name: Obtain Snyk OAuth token
+      if: steps.validate.outcome == 'success'
+      id: snyk-auth
+      continue-on-error: true
+      uses: ministryofjustice/laa-reusable-github-actions/.github/actions/snyk-auth@6db001458db30ae747d9eb8eb25707ce52b359bc
+      with:
+        client_id: ${{ inputs.snyk-client-id }}
+        client_secret: ${{ inputs.snyk-client-secret }}
+
+    - name: Mask Snyk OAuth token
+      if: steps.validate.outcome == 'success' && steps.snyk-auth.outcome == 'success'
+      id: mask-token
+      continue-on-error: true
+      env:
+        SNYK_OAUTH_TOKEN: ${{ steps.snyk-auth.outputs.token }}
+      run: |
+        set -euo pipefail
+        if [[ -z "$SNYK_OAUTH_TOKEN" || "$SNYK_OAUTH_TOKEN" == *$'\n'* || "$SNYK_OAUTH_TOKEN" == *$'\r'* ]]; then
+          echo '::error::Snyk OAuth token is missing or cannot be safely masked'
+          exit 1
+        fi
+        printf '::add-mask::%s\n' "$SNYK_OAUTH_TOKEN"
+      shell: bash
+
+    - name: Assess Open Source and prepare SARIF
+      if: >-
+        steps.validate.outcome == 'success' &&
+        steps.setup-node.outcome == 'success' &&
+        steps.snyk-cli.outcome == 'success' &&
+        steps.snyk-auth.outcome == 'success' &&
+        steps.mask-token.outcome == 'success'
+      id: open-source-scan
+      continue-on-error: true
+      env:
+        ORG_ID: ${{ inputs.org-id }}
+        SNYK_OAUTH_TOKEN: ${{ steps.snyk-auth.outputs.token }}
+      run: |
+        set -uo pipefail
+        export SNYK_TOKEN="$SNYK_OAUTH_TOKEN"
+        mkdir -p sarif
+        scan_file="$(mktemp)"
+        trap 'rm -f "$scan_file"' EXIT
+
+        if snyk test \
+          --all-projects \
+          --fail-fast \
+          --dev \
+          --org="$ORG_ID" \
+          --severity-threshold=high \
+          --policy-path=.snyk \
+          --json-file-output="$scan_file" \
+          --sarif-file-output=sarif/snyk-open-source.sarif; then
+          scan_status=0
+        else
+          scan_status=$?
+        fi
+
+        scan_output_valid=false
+        if jq -e 'type == "object" or type == "array"' "$scan_file" >/dev/null; then
+          scan_output_valid=true
+        else
+          echo '::error::Open Source scan output is missing or malformed'
+        fi
+        sarif_valid=false
+        if jq -e '
+          .version == "2.1.0" and
+          (.runs | type == "array" and length > 0) and
+          all(.runs[]; (.tool.driver.name | (type == "string" and length > 0)))
+        ' sarif/snyk-open-source.sarif >/dev/null; then
+          if [[ "$scan_output_valid" == 'true' ]]; then sarif_valid=true; fi
+        else
+          echo '::error::Open Source SARIF output is missing or malformed'
+        fi
+        echo "sarif-valid=$sarif_valid" >> "$GITHUB_OUTPUT"
+
+        if (( scan_status > 1 )); then
+          echo "::error::Open Source scan failed with exit code $scan_status"
+          exit 1
+        fi
+        if [[ "$scan_output_valid" != 'true' || "$sarif_valid" != 'true' ]]; then
+          exit 1
+        fi
+        if (( scan_status == 1 )); then
+          echo '::warning::Open Source scan completed with findings'
+        fi
+      shell: bash
+
+    - name: Revalidate trusted main before publication
+      if: steps.validate.outcome == 'success'
+      id: publication-source
+      continue-on-error: true
+      env:
+        SOURCE_SHA: ${{ inputs.source-sha }}
+      run: |
+        set -euo pipefail
+        git fetch --no-tags origin main
+        latest_main_sha="$(git rev-parse FETCH_HEAD)"
+        if [[ "$SOURCE_SHA" != "$latest_main_sha" ]]; then
+          echo "::notice::Skipping superseded main publication for $SOURCE_SHA"
+          echo 'publication-state=stale' >> "$GITHUB_OUTPUT"
+          exit 0
+        fi
+        echo 'publication-state=current' >> "$GITHUB_OUTPUT"
+      shell: bash
+
+    - name: Publish Open Source baseline
+      if: >-
+        steps.validate.outcome == 'success' &&
+        steps.publication-source.outputs.publication-state == 'current' &&
+        steps.open-source-scan.outcome == 'success' &&
+        steps.setup-node.outcome == 'success' &&
+        steps.snyk-cli.outcome == 'success' &&
+        steps.snyk-auth.outcome == 'success' &&
+        steps.mask-token.outcome == 'success'
+      id: monitor-open-source
+      continue-on-error: true
+      env:
+        ORG_ID: ${{ inputs.org-id }}
+        OPEN_SOURCE_PROJECT_ID: ${{ inputs.open-source-project-id }}
+        SNYK_OAUTH_TOKEN: ${{ steps.snyk-auth.outputs.token }}
+      run: |
+        set -euo pipefail
+        export SNYK_TOKEN="$SNYK_OAUTH_TOKEN"
+        uuid_regex='^[[:xdigit:]]{8}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{12}$'
+        [[ "$OPEN_SOURCE_PROJECT_ID" =~ $uuid_regex ]] || { echo '::error::Open Source project UUID is invalid'; exit 1; }
+        monitor_output="$(mktemp)"
+        trap 'rm -f "$monitor_output"' EXIT
+        if snyk monitor \
+          --org="$ORG_ID" \
+          --dev \
+          --project-name=laa-record-controlled-work-open-source \
+          --target-reference=main \
+          --policy-path=.snyk \
+          > "$monitor_output" 2>&1; then
+          monitor_status=0
+        else
+          monitor_status=$?
+        fi
+        cat "$monitor_output"
+        if (( monitor_status != 0 )); then
+          echo "::error::Open Source monitor failed with exit code $monitor_status"
+          exit 1
+        fi
+
+        published_project_id=
+        while IFS= read -r line; do
+          if [[ "$line" =~ https://app\.snyk\.io/org/[^/[:space:]]+/project/([[:xdigit:]]{8}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{12})/history/ ]]; then
+            published_project_id=${BASH_REMATCH[1]}
+            break
+          fi
+        done < "$monitor_output"
+        published_project_id_lower="$(printf '%s' "$published_project_id" | tr '[:upper:]' '[:lower:]')"
+        open_source_project_id_lower="$(printf '%s' "$OPEN_SOURCE_PROJECT_ID" | tr '[:upper:]' '[:lower:]')"
+        if [[ "$published_project_id_lower" != "$open_source_project_id_lower" ]]; then
+          echo '::error::Open Source monitor did not confirm the configured project'
+          exit 1
+        fi
+      shell: bash
+
+    - name: Validate Container scan results
+      if: >-
+        steps.validate.outcome == 'success' &&
+        steps.publication-source.outputs.publication-state == 'current' &&
+        steps.validate-container.outcome == 'success' &&
+        steps.setup-node.outcome == 'success' &&
+        steps.snyk-cli.outcome == 'success' &&
+        steps.snyk-auth.outcome == 'success' &&
+        steps.mask-token.outcome == 'success'
+      id: container-results
+      continue-on-error: true
+      env:
+        ORG_ID: ${{ inputs.org-id }}
+        IMAGE_REF: ${{ inputs.image-ref }}
+        DOCKERFILE: ${{ inputs.dockerfile }}
+        SNYK_OAUTH_TOKEN: ${{ steps.snyk-auth.outputs.token }}
+      run: |
+        set -uo pipefail
+        export SNYK_TOKEN="$SNYK_OAUTH_TOKEN"
+        mkdir -p sarif
+        result_file="$(mktemp)"
+        trap 'rm -f "$result_file"' EXIT
+
+        if snyk container test \
+          --org="$ORG_ID" \
+          --severity-threshold=high \
+          --policy-path=.snyk \
+          --print-deps \
+          --file="$DOCKERFILE" \
+          --json-file-output="$result_file" \
+          --sarif-file-output=sarif/snyk-container.sarif \
+          "$IMAGE_REF"; then
+          scan_status=0
+        else
+          scan_status=$?
+        fi
+
+        results_valid=false
+        if jq -e '
+          def non_empty_string: type == "string" and length > 0;
+          def valid_vulnerability:
+            (.id | non_empty_string) and
+            (.severity | IN("low", "medium", "high", "critical")) and
+            (.from | type == "array" and length > 0 and all(.[]; non_empty_string));
+
+          type == "array" and length > 0 and
+          all(.[ ];
+            type == "object" and
+            (.vulnerabilities | type == "array") and
+            (.packageManager | non_empty_string) and
+            (.projectName | non_empty_string) and
+            (.scanResult.identity.type | non_empty_string) and
+            (.scanResult.target.image | non_empty_string) and
+            all(.vulnerabilities[]; valid_vulnerability)
+          ) and
+          any(.[ ];
+            .scanResult.identity.type == "apk" and
+            (.docker.baseImage | non_empty_string)
+          ) and
+          any(.[ ];
+            .scanResult.identity.type != "apk" and
+            ((.scanResult.identity.targetFile // .targetFile // "") | non_empty_string)
+          )
+        ' "$result_file" >/dev/null; then
+          results_valid=true
+        else
+          echo '::error::Container output is malformed or lacks OS/base-image or application coverage'
+        fi
+        sarif_valid=false
+        if jq -e '
+          .version == "2.1.0" and
+          (.runs | type == "array" and length > 0) and
+          all(.runs[]; (.tool.driver.name | (type == "string" and length > 0)))
+        ' sarif/snyk-container.sarif >/dev/null; then
+          if [[ "$results_valid" == 'true' ]]; then sarif_valid=true; fi
+        else
+          echo '::error::Container SARIF output is missing or malformed'
+        fi
+        echo "sarif-valid=$sarif_valid" >> "$GITHUB_OUTPUT"
+
+        if (( scan_status > 1 )); then
+          echo "::error::Container preflight scan failed with exit code $scan_status"
+          exit 1
+        fi
+        if [[ "$results_valid" != 'true' || "$sarif_valid" != 'true' ]]; then
+          exit 1
+        fi
+        if (( scan_status == 1 )); then
+          echo '::warning::Container scan completed with findings'
+        fi
+      shell: bash
+
+    - name: Publish Container baseline
+      if: >-
+        steps.publication-source.outputs.publication-state == 'current' &&
+        steps.container-results.outcome == 'success'
+      id: monitor-container
+      continue-on-error: true
+      env:
+        ORG_ID: ${{ inputs.org-id }}
+        IMAGE_REF: ${{ inputs.image-ref }}
+        DOCKERFILE: ${{ inputs.dockerfile }}
+        SNYK_OAUTH_TOKEN: ${{ steps.snyk-auth.outputs.token }}
+      run: |
+        set -euo pipefail
+        export SNYK_TOKEN="$SNYK_OAUTH_TOKEN"
+        snyk container monitor "$IMAGE_REF" \
+          --org="$ORG_ID" \
+          --file="$DOCKERFILE" \
+          --project-name=laa-record-controlled-work-container \
+          --target-reference=main \
+          --policy-path=.snyk
+      shell: bash
+
+    - name: Scan and publish Code results
+      if: >-
+        steps.validate.outcome == 'success' &&
+        steps.publication-source.outputs.publication-state == 'current' &&
+        steps.setup-node.outcome == 'success' &&
+        steps.snyk-cli.outcome == 'success' &&
+        steps.snyk-auth.outcome == 'success' &&
+        steps.mask-token.outcome == 'success'
+      id: code
+      continue-on-error: true
+      env:
+        ORG_ID: ${{ inputs.org-id }}
+        SNYK_OAUTH_TOKEN: ${{ steps.snyk-auth.outputs.token }}
+      run: |
+        set -uo pipefail
+        export SNYK_TOKEN="$SNYK_OAUTH_TOKEN"
+        mkdir -p sarif
+        report_output="$(mktemp)"
+        trap 'rm -f "$report_output"' EXIT
+        if snyk code test \
+          --org="$ORG_ID" \
+          --severity-threshold=high \
+          --policy-path=.snyk \
+          --report \
+          --project-name=laa-record-controlled-work-code \
+          --target-reference=main \
+          --sarif-file-output=sarif/snyk-code.sarif \
+          > "$report_output" 2>&1; then
+          scan_status=0
+        else
+          scan_status=$?
+        fi
+        cat "$report_output"
+        sarif_valid=false
+        if jq -e '
+          .version == "2.1.0" and
+          (.runs | type == "array" and length > 0) and
+          all(.runs[]; (.tool.driver.name | (type == "string" and length > 0)))
+        ' sarif/snyk-code.sarif >/dev/null; then
+          sarif_valid=true
+        else
+          echo '::error::Code SARIF output is missing or malformed'
+        fi
+        echo "sarif-valid=$sarif_valid" >> "$GITHUB_OUTPUT"
+
+        if (( scan_status > 1 )); then
+          echo "::error::Code scan or publication failed with exit code $scan_status"
+          exit 1
+        fi
+        if ! grep -Eq 'https://app\.snyk\.io/org/[^[:space:]]+' "$report_output"; then
+          echo '::error::Code scan did not confirm Snyk dashboard publication'
+          exit 1
+        fi
+        if [[ "$sarif_valid" != 'true' ]]; then
+          exit 1
+        fi
+        if (( scan_status == 1 )); then
+          echo '::warning::Code scan completed with findings'
+        fi
+      shell: bash
+
+    - name: Render, scan and publish IaC environments
+      if: >-
+        steps.validate.outcome == 'success' &&
+        steps.publication-source.outputs.publication-state == 'current' &&
+        steps.setup-node.outcome == 'success' &&
+        steps.snyk-cli.outcome == 'success' &&
+        steps.snyk-auth.outcome == 'success' &&
+        steps.mask-token.outcome == 'success' &&
+        steps.helm.outcome == 'success'
+      id: iac
+      continue-on-error: true
+      env:
+        ORG_ID: ${{ inputs.org-id }}
+        SNYK_OAUTH_TOKEN: ${{ steps.snyk-auth.outputs.token }}
+      run: |
+        set -uo pipefail
+        export SNYK_TOKEN="$SNYK_OAUTH_TOKEN"
+        mkdir -p sarif
+        overall_status=0
+
+        for environment in uat staging production; do
+          rendered_file="$(mktemp)"
+          report_output="$(mktemp)"
+          if ! helm template deploy/laa-record-controlled-work \
+            -f "deploy/laa-record-controlled-work/values/${environment}.yaml" \
+            > "$rendered_file"; then
+            echo "::error::Failed to render $environment manifests"
+            overall_status=1
+              echo "sarif-${environment}=false" >> "$GITHUB_OUTPUT"
+            rm -f "$rendered_file" "$report_output"
+            continue
+          fi
+
+          sarif_file="sarif/snyk-iac-${environment}.sarif"
+          if snyk iac test "$rendered_file" \
+            --org="$ORG_ID" \
+            --severity-threshold=high \
+            --policy-path=.snyk \
+            --report \
+            --target-name="laa-record-controlled-work-iac-${environment}" \
+            --target-reference=main \
+            --sarif-file-output="$sarif_file" \
+            > "$report_output" 2>&1; then
+            scan_status=0
+          else
+            scan_status=$?
+          fi
+          cat "$report_output"
+
+          sarif_valid=false
+          if jq -e '
+            .version == "2.1.0" and
+            (.runs | type == "array" and length > 0) and
+            all(.runs[]; (.tool.driver.name | (type == "string" and length > 0)))
+          ' "$sarif_file" >/dev/null; then
+            sarif_valid=true
+          else
+            echo "::error::IaC $environment SARIF output is missing or malformed"
+            overall_status=1
+          fi
+          echo "sarif-${environment}=$sarif_valid" >> "$GITHUB_OUTPUT"
+
+          if (( scan_status > 1 )); then
+            echo "::error::IaC $environment scan or publication failed with exit code $scan_status"
+            overall_status=1
+          elif ! grep -Eq 'https://app\.snyk\.io/org/[^[:space:]]+' "$report_output"; then
+            echo "::error::IaC $environment scan did not confirm Snyk dashboard publication"
+            overall_status=1
+          elif [[ "$sarif_valid" != 'true' ]]; then
+            overall_status=1
+          elif (( scan_status == 1 )); then
+            echo "::warning::IaC $environment scan completed with findings"
+          fi
+          rm -f "$rendered_file" "$report_output"
+        done
+
+        exit "$overall_status"
+      shell: bash
+
+    - name: Set aggregate outcome
+      if: always()
+      id: aggregate
+      env:
+        VALIDATION_OUTCOME: ${{ steps.validate.outcome }}
+        SOURCE_STATE: ${{ steps.validate.outputs.source-state }}
+        PUBLICATION_STATE: ${{ steps.publication-source.outputs.publication-state }}
+        NODE_SETUP_OUTCOME: ${{ steps.setup-node.outcome }}
+        SNYK_CLI_OUTCOME: ${{ steps.snyk-cli.outcome }}
+        AUTH_OUTCOME: ${{ steps.snyk-auth.outcome }}
+        TOKEN_MASK_OUTCOME: ${{ steps.mask-token.outcome }}
+        OPEN_SOURCE_SCAN_OUTCOME: ${{ steps.open-source-scan.outcome }}
+        OPEN_SOURCE_OUTCOME: ${{ steps.monitor-open-source.outcome }}
+        CONTAINER_VALIDATION_OUTCOME: ${{ steps.validate-container.outcome }}
+        CONTAINER_RESULTS_OUTCOME: ${{ steps.container-results.outcome }}
+        CONTAINER_MONITOR_OUTCOME: ${{ steps.monitor-container.outcome }}
+        CODE_OUTCOME: ${{ steps.code.outcome }}
+        IAC_OUTCOME: ${{ steps.iac.outcome }}
+      run: |
+        set -euo pipefail
+        if [[ "$SOURCE_STATE" == 'stale' || "$PUBLICATION_STATE" == 'stale' ]]; then
+          echo 'outcome=skipped' >> "$GITHUB_OUTPUT"
+          echo 'publication-state=stale' >> "$GITHUB_OUTPUT"
+          exit 0
+        fi
+        if [[ "$PUBLICATION_STATE" != 'current' ]]; then
+          echo 'outcome=failed' >> "$GITHUB_OUTPUT"
+          echo 'publication-state=unavailable' >> "$GITHUB_OUTPUT"
+          exit 1
+        fi
+        if [[ "$VALIDATION_OUTCOME" == 'success' &&
+          "$NODE_SETUP_OUTCOME" == 'success' &&
+          "$SNYK_CLI_OUTCOME" == 'success' &&
+          "$AUTH_OUTCOME" == 'success' &&
+          "$TOKEN_MASK_OUTCOME" == 'success' &&
+          "$OPEN_SOURCE_SCAN_OUTCOME" == 'success' &&
+          "$OPEN_SOURCE_OUTCOME" == 'success' &&
+          "$CONTAINER_VALIDATION_OUTCOME" == 'success' &&
+          "$CONTAINER_RESULTS_OUTCOME" == 'success' &&
+          "$CONTAINER_MONITOR_OUTCOME" == 'success' &&
+          "$CODE_OUTCOME" == 'success' &&
+          "$IAC_OUTCOME" == 'success' ]]; then
+          echo 'outcome=passed' >> "$GITHUB_OUTPUT"
+          echo 'publication-state=current' >> "$GITHUB_OUTPUT"
+        else
+          echo 'outcome=failed' >> "$GITHUB_OUTPUT"
+          echo 'publication-state=current' >> "$GITHUB_OUTPUT"
+          exit 1
+        fi
+      shell: bash

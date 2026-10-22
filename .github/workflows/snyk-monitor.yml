@@ -1,0 +1,301 @@
+name: Publish Snyk main baselines
+
+on:
+  workflow_call:
+    inputs:
+      source_sha:
+        description: Trusted main commit built by this CI run
+        required: true
+        type: string
+      ci_run_id:
+        description: CICD workflow run that produced the image
+        required: false
+        type: string
+        default: ''
+      image_digest:
+        description: Immutable digest returned by this CI run's image build
+        required: false
+        type: string
+        default: ''
+    secrets:
+      ECR_ROLE_TO_ASSUME:
+        required: true
+      ECR_REGISTRY_URL:
+        required: true
+      SNYK_CLIENT_ID:
+        required: true
+      SNYK_CLIENT_SECRET:
+        required: true
+  workflow_dispatch:
+    inputs:
+      ci_run_id:
+        description: CI run that successfully built the current main image
+        required: true
+        type: string
+      image_digest:
+        description: Immutable image digest returned by that CI run
+        required: true
+        type: string
+
+permissions:
+  actions: read
+  contents: read
+  id-token: write
+  security-events: write
+
+jobs:
+  publish:
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    concurrency:
+      group: snyk-publication-${{ github.repository }}
+      queue: max
+      cancel-in-progress: false
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      id-token: write
+      security-events: write
+    steps:
+      - name: Checkout trusted source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: true
+
+      - name: Validate trusted source identity
+        id: source
+        env:
+          SOURCE_SHA: ${{ inputs.source_sha || github.sha }}
+        run: |
+          set -euo pipefail
+          if [[ "$GITHUB_REF" != 'refs/heads/main' ||
+            ( "$GITHUB_EVENT_NAME" != 'push' && "$GITHUB_EVENT_NAME" != 'workflow_dispatch' ) ||
+            "$SOURCE_SHA" != "$GITHUB_SHA" || ! "$SOURCE_SHA" =~ ^[a-f0-9]{40}$ ]]; then
+            echo '::error::Snyk baseline publication requires the current main commit'
+            exit 1
+          fi
+        shell: bash
+
+      - name: Configure AWS credentials
+        if: steps.source.outcome == 'success'
+        id: ecr-auth
+        continue-on-error: true
+        uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
+        with:
+          role-to-assume: ${{ secrets.ECR_ROLE_TO_ASSUME }}
+          aws-region: ${{ vars.ECR_REGION }}
+
+      - name: Resolve immutable Container image
+        id: resolve-image
+        continue-on-error: true
+        env:
+          AWS_AUTH_OUTCOME: ${{ steps.ecr-auth.outcome }}
+          CI_RUN_ID: ${{ inputs.ci_run_id }}
+          ECR_REGISTRY_URL: ${{ secrets.ECR_REGISTRY_URL }}
+          ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
+          GITHUB_API_URL: ${{ github.api_url }}
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          GH_TOKEN: ${{ github.token }}
+          IMAGE_DIGEST: ${{ inputs.image_digest }}
+          SOURCE_SHA: ${{ inputs.source_sha || github.sha }}
+        run: |
+          set -uo pipefail
+          output_path=${GITHUB_OUTPUT:-/dev/null}
+          source_sha=${SOURCE_SHA:-}
+          ci_run_id=${CI_RUN_ID:-}
+          image_digest_input=${IMAGE_DIGEST:-}
+          image_repo=${ECR_REPOSITORY:-}
+          registry_url=${ECR_REGISTRY_URL:-}
+          api_url=${GITHUB_API_URL:-https://api.github.com}
+
+          write_image_status() {
+            printf 'image_ref=%s\nimage_status=%s\n' "$1" "$2" >> "$output_path"
+          }
+
+          no_image() {
+            echo "::warning::$1; Container publication will fail while independent scans continue"
+            write_image_status '' failure
+            exit 0
+          }
+
+          if [[ ! "$source_sha" =~ ^[a-f0-9]{40}$ ||
+            "$GITHUB_REF" != 'refs/heads/main' || "$source_sha" != "$GITHUB_SHA" ]]; then
+            no_image 'Image resolution requires the trusted main commit'
+          fi
+          if [[ ! "$image_repo" =~ ^[a-z0-9]+([._-][a-z0-9]+)*(\/[a-z0-9]+([._-][a-z0-9]+)*)*$ ||
+            ! "$registry_url" =~ ^[A-Za-z0-9.-]+(:[0-9]+)?$ ]]; then
+            no_image 'Container repository configuration is missing or invalid'
+          fi
+          if [[ "${AWS_AUTH_OUTCOME:-failure}" != 'success' || -z "${GH_TOKEN:-}" ]]; then
+            no_image 'AWS or GitHub read access is unavailable'
+          fi
+          if [[ ! "$ci_run_id" =~ ^[0-9]+$ || ! "$image_digest_input" =~ ^sha256:[a-f0-9]{64}$ ]]; then
+            no_image 'A CI run id and image digest are required to verify the image'
+          fi
+
+          headers=(
+            -H 'Accept: application/vnd.github+json'
+            -H "Authorization: Bearer $GH_TOKEN"
+            -H 'X-GitHub-Api-Version: 2022-11-28'
+          )
+          api_base="${api_url%/}/repos/$GITHUB_REPOSITORY/actions"
+          if ! run=$(curl -fsSL "${headers[@]}" "${api_base}/runs/$ci_run_id"); then
+            no_image 'The caller CI run could not be verified'
+          fi
+          if ! jq -e --arg source_sha "$source_sha" '
+            .head_sha == $source_sha and
+            .head_branch == "main" and
+            (.event == "push" or .event == "workflow_dispatch") and
+            ((.path // "") | split("@")[0]) == ".github/workflows/cicd.yml"
+          ' <<< "$run" >/dev/null; then
+            no_image 'The caller CI run does not match trusted main source'
+          fi
+
+          jobs_url="${api_base}/runs/$ci_run_id/jobs?per_page=100"
+          if ! jobs=$(curl -fsSL "${headers[@]}" "$jobs_url") ||
+            ! jq -e 'any(.jobs[]?; .name == "Build Docker Image" and .conclusion == "success")' \
+              <<< "$jobs" >/dev/null; then
+            no_image 'No successful CI image build exists for this main commit'
+          fi
+
+          if ! image_digest=$(aws ecr describe-images \
+            --repository-name "$image_repo" \
+            --image-ids "imageTag=$source_sha" \
+            --query 'imageDetails[0].imageDigest' \
+            --output text) || [[ ! "$image_digest" =~ ^sha256:[a-f0-9]{64}$ ]]; then
+            no_image 'The CI-built image for this main commit is unavailable'
+          fi
+          if [[ "$image_digest_input" != "$image_digest" ]]; then
+            no_image 'The caller image digest does not match the CI image for this source'
+          fi
+
+          write_image_status "$registry_url/$image_repo@$image_digest" success
+
+      - name: Log in to ECR
+        if: steps.ecr-auth.outcome == 'success' && steps.resolve-image.outputs.image_ref != ''
+        id: ecr-login
+        continue-on-error: true
+        uses: aws-actions/amazon-ecr-login@f2e9fc6c2b355c1890b65e6f6f0e2ac3e6e22f78
+
+      - name: Publish independent Snyk baselines
+        id: refresh
+        continue-on-error: true
+        uses: ./.github/actions/snyk-baseline
+        with:
+          source-sha: ${{ inputs.source_sha || github.sha }}
+          org-id: ${{ vars.SNYK_ORG_ID }}
+          open-source-project-id: ${{ vars.SNYK_OPEN_SOURCE_PROJECT_ID }}
+          image-ref: ${{ steps.resolve-image.outputs.image_ref }}
+          container-setup-outcome: ${{ steps.ecr-auth.outcome == 'success' && steps.ecr-login.outcome == 'success' && steps.resolve-image.outputs.image_status == 'success' && 'success' || 'failure' }}
+          dockerfile: Dockerfile
+          snyk-client-id: ${{ secrets.SNYK_CLIENT_ID }}
+          snyk-client-secret: ${{ secrets.SNYK_CLIENT_SECRET }}
+
+      - name: Upload Open Source SARIF
+        if: >-
+          always() &&
+          steps.refresh.outputs.publication-state == 'current' &&
+          steps.refresh.outputs.open-source-sarif-valid == 'true' &&
+          hashFiles('sarif/snyk-open-source.sarif') != ''
+        id: upload-open-source
+        continue-on-error: true
+        uses: github/codeql-action/upload-sarif@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4
+        with:
+          sarif_file: sarif/snyk-open-source.sarif
+          category: snyk-open-source
+
+      - name: Upload Container SARIF
+        if: >-
+          always() &&
+          steps.refresh.outputs.publication-state == 'current' &&
+          steps.refresh.outputs.container-sarif-valid == 'true' &&
+          hashFiles('sarif/snyk-container.sarif') != ''
+        id: upload-container
+        continue-on-error: true
+        uses: github/codeql-action/upload-sarif@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4
+        with:
+          sarif_file: sarif/snyk-container.sarif
+          category: snyk-container
+
+      - name: Upload Code SARIF
+        if: >-
+          always() &&
+          steps.refresh.outputs.publication-state == 'current' &&
+          steps.refresh.outputs.code-sarif-valid == 'true' &&
+          hashFiles('sarif/snyk-code.sarif') != ''
+        id: upload-code
+        continue-on-error: true
+        uses: github/codeql-action/upload-sarif@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4
+        with:
+          sarif_file: sarif/snyk-code.sarif
+          category: snyk-code
+
+      - name: Upload IaC UAT SARIF
+        if: >-
+          always() &&
+          steps.refresh.outputs.publication-state == 'current' &&
+          steps.refresh.outputs.iac-uat-sarif-valid == 'true' &&
+          hashFiles('sarif/snyk-iac-uat.sarif') != ''
+        id: upload-iac-uat
+        continue-on-error: true
+        uses: github/codeql-action/upload-sarif@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4
+        with:
+          sarif_file: sarif/snyk-iac-uat.sarif
+          category: snyk-iac-uat
+
+      - name: Upload IaC staging SARIF
+        if: >-
+          always() &&
+          steps.refresh.outputs.publication-state == 'current' &&
+          steps.refresh.outputs.iac-staging-sarif-valid == 'true' &&
+          hashFiles('sarif/snyk-iac-staging.sarif') != ''
+        id: upload-iac-staging
+        continue-on-error: true
+        uses: github/codeql-action/upload-sarif@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4
+        with:
+          sarif_file: sarif/snyk-iac-staging.sarif
+          category: snyk-iac-staging
+
+      - name: Upload IaC production SARIF
+        if: >-
+          always() &&
+          steps.refresh.outputs.publication-state == 'current' &&
+          steps.refresh.outputs.iac-production-sarif-valid == 'true' &&
+          hashFiles('sarif/snyk-iac-production.sarif') != ''
+        id: upload-iac-production
+        continue-on-error: true
+        uses: github/codeql-action/upload-sarif@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4
+        with:
+          sarif_file: sarif/snyk-iac-production.sarif
+          category: snyk-iac-production
+
+      - name: Confirm refresh and upload outcomes
+        if: always()
+        env:
+          REFRESH_OUTCOME: ${{ steps.refresh.outputs.outcome }}
+          OSS_UPLOAD_OUTCOME: ${{ steps.upload-open-source.outcome }}
+          CONTAINER_UPLOAD_OUTCOME: ${{ steps.upload-container.outcome }}
+          CODE_UPLOAD_OUTCOME: ${{ steps.upload-code.outcome }}
+          IAC_UAT_UPLOAD_OUTCOME: ${{ steps.upload-iac-uat.outcome }}
+          IAC_STAGING_UPLOAD_OUTCOME: ${{ steps.upload-iac-staging.outcome }}
+          IAC_PRODUCTION_UPLOAD_OUTCOME: ${{ steps.upload-iac-production.outcome }}
+        run: |
+          set -euo pipefail
+          if [[ "$REFRESH_OUTCOME" != 'passed' && "$REFRESH_OUTCOME" != 'skipped' ]]; then
+            echo '::error::Snyk main refresh did not complete successfully'
+            exit 1
+          fi
+          for outcome in \
+            "$OSS_UPLOAD_OUTCOME" \
+            "$CONTAINER_UPLOAD_OUTCOME" \
+            "$CODE_UPLOAD_OUTCOME" \
+            "$IAC_UAT_UPLOAD_OUTCOME" \
+            "$IAC_STAGING_UPLOAD_OUTCOME" \
+            "$IAC_PRODUCTION_UPLOAD_OUTCOME"; do
+            if [[ "$outcome" == 'failure' ]]; then
+              echo '::error::A native GitHub Security upload failed'
+              exit 1
+            fi
+          done
+        shell: bash

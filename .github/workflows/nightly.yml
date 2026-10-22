@@ -76,6 +76,10 @@ jobs:
   snyk:
     name: Snyk report
     needs: resolve-main-image
+    concurrency:
+      group: snyk-publication-${{ github.repository }}
+      queue: max
+      cancel-in-progress: false
     permissions:
       actions: read
       contents: read

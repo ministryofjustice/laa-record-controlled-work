@@ -5,7 +5,7 @@ Runs for pull requests, main pushes, merge groups, and manual dispatches.
 `code-linting` - ESLint and Knip dependency checks.
 `verify-api-code-generation` - Checks generated RCW API client code matches the OpenAPI specification.
 `code-security-audit` - Runs `yarn npm audit`.
-`snyk` - Runs the PR regression gate or observational main Snyk scans.
+`snyk` - Runs the PR regression gate or absolute scans for manual non-main dispatches.
 `mocha-tests` - Unit and integration tests.
 `playwright` - Browser and accessibility tests.
 `e2e` - End-to-end tests.
@@ -16,33 +16,53 @@ Runs for pull requests, main pushes, merge groups, and manual dispatches.
 
 ## Snyk Security Gates
 
-`snyk` calls `.github/workflows/snyk.yml`, the sole Snyk scan owner. PR and
-merge-group Open Source checks pipe JSON results into `snyk-delta`, failing on
-new high-severity findings. The main branch scans all projects and publishes
-SARIF, but findings alone do not fail CI. Nightly runs the same scans in strict mode.
-Both modes also scan the pushed ECR image, Snyk Code, and rendered UAT,
-staging, and production manifests. The CLI is pinned to `1.1307.4`;
-`snyk-delta` is pinned to `1.14.0`. CICD scans the immutable image digest
-returned by Docker push.
+`snyk` calls `.github/workflows/snyk.yml` for pull requests and merge groups.
+Open Source uses `snyk-delta` against the configured main baseline; Container,
+Code, and UAT/staging/production IaC run absolute assessments. `snyk-delta` is
+pinned to `1.14.0`.
 
-PR Delta tests and post-merge monitoring use the same explicit `SNYK_ORG_ID`,
-project name, and `main` target reference. Configure `SNYK_ORG_ID` as a
-repository Actions variable so Delta compares against the intended baseline.
+Main pushes call `.github/workflows/snyk-monitor.yml` independently of deploy
+jobs. It scans Open Source, Container, Code, and each rendered IaC environment.
+Open Source and Container use their monitor commands; Code and IaC use
+`test --report`. Findings do not fail this refresh. Command, report, publication,
+and required SARIF upload failures do. Each product and IaC environment uploads
+to its own GitHub Security category.
 
-After main deploys to staging, `snyk-monitor` runs `snyk monitor` to update the
-accepted Open Source baseline. Nightly scans do not update that baseline.
+The main publisher validates the current main SHA and the matching CI image
+build. It compares the caller's digest with the digest stored under that SHA's
+ECR tag. Manual dispatch is restricted to main and requires the CI run ID and
+image digest from a successful `Build Docker Image` job for that source. The
+workflow verifies the run, source SHA, build result, and ECR tag digest. It never
+rebuilds or falls back to a floating tag. If the image is unavailable,
+Container publication fails while valid Open Source, Code, IaC, and SARIF work
+continues.
+
+Set `SNYK_ORG_ID` and `SNYK_OPEN_SOURCE_PROJECT_ID` as repository Actions
+variables. The workflow passes them to the composite action as `org-id` and
+`open-source-project-id`. The main publisher verifies that the project UUID in
+Snyk's monitor snapshot URL matches the configured Open Source baseline. The
+CLI does not accept a project UUID selector, so a mismatch fails the refresh.
+The OSS project is the only configured delta baseline; Container project UUID
+mappings are not used.
+
+The Snyk CLI is pinned to `1.1308.0`. Main refresh and nightly SARIF publication
+share the non-cancelling `snyk-publication-${{ github.repository }}` queue.
+Products publish independently, so partial failures can leave dashboards at
+different main commits. The OSS delta baseline is the latest successful OSS
+refresh and can lag the other product snapshots. Refreshes are not deployment
+prerequisites. Main CI's generic failure notification still includes a failed
+refresh.
 
 ## Nightly Snyk Gate
 
 `.github/workflows/nightly.yml` runs at 06:00 UTC, after Renovate's
 `before 5am Europe/London` merge window, and supports manual dispatch on main.
-It resolves the existing main image by commit tag and calls `snyk.yml` without
-building, deploying, or publishing Snyk snapshots. Findings fail the strict
-scan and trigger a Slack alert; SARIF reports are attached to the run.
-The workflow summary and Slack alert include a concise list of findings from
-Open Source, Container, Code, and IaC scans. Each finding includes its
-description and severity; Snyk vulnerability IDs link to their database entry.
-Empty scan categories are omitted.
+It resolves the existing main image by commit tag and calls `snyk.yml` in
+absolute mode without building, deploying, or publishing Snyk dashboard
+snapshots. Findings fail the scan and trigger the existing Snyk-specific Slack
+alert. SARIF and formatted findings are retained by this legacy nightly path.
+Its Snyk job shares the main publication queue. Nightly dashboard refresh and
+reporting behavior remains to be migrated separately.
 
 Fork provenance: `.github/workflows/sast.yml` from
 `laa-reusable-github-actions@a7cbc9ed08d5ab503a21b24297b697797866dc14`,
