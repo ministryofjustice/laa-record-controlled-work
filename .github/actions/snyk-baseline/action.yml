@@ -64,19 +64,40 @@ runs:
       run: |
         set -euo pipefail
         uuid_regex='^[[:xdigit:]]{8}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{12}$'
-        if [[ "$GITHUB_EVENT_NAME" != 'push' && "$GITHUB_EVENT_NAME" != 'workflow_dispatch' ]]; then
+
+        sarif_filter='def is_non_empty_string: type == "string" and length > 0; '
+        sarif_filter+='def has_valid_driver: (.tool.driver.name | is_non_empty_string); '
+        sarif_filter+='def has_valid_runs: (.runs | type == "array" and length > 0) and all(.runs[]; has_valid_driver); '
+        sarif_filter+='.version == "2.1.0" and has_valid_runs'
+        printf 'sarif-filter=%s\n' "$sarif_filter" >> "$GITHUB_OUTPUT"
+
+        is_supported_publication_event=false
+        if [[ "$GITHUB_EVENT_NAME" == 'push' || "$GITHUB_EVENT_NAME" == 'workflow_dispatch' ]]; then
+          is_supported_publication_event=true
+        fi
+        if [[ "$is_supported_publication_event" != 'true' ]]; then
           echo '::error::Snyk results can only be published from main pushes or manual main refreshes'
           exit 1
         fi
-        [[ "$GITHUB_REF" == 'refs/heads/main' && "$GITHUB_SHA" == "$SOURCE_SHA" ]] || {
+
+        is_trusted_main_source=false
+        if [[ "$GITHUB_REF" == 'refs/heads/main' && "$GITHUB_SHA" == "$SOURCE_SHA" ]]; then
+          is_trusted_main_source=true
+        fi
+        if [[ "$is_trusted_main_source" != 'true' ]]; then
           echo '::error::Snyk baselines can only be published from the trusted main commit'
           exit 1
-        }
+        fi
+
         [[ "$SOURCE_SHA" =~ ^[0-9a-fA-F]{40}$ ]] || { echo '::error::Source SHA is invalid'; exit 1; }
+
         [[ "$ORG_ID" =~ $uuid_regex ]] || { echo '::error::Snyk organization UUID is invalid'; exit 1; }
+
         [[ -f .snyk ]] || { echo '::error::The repository Snyk policy file is missing'; exit 1; }
+
         git fetch --no-tags origin main
         latest_main_sha="$(git rev-parse FETCH_HEAD)"
+
         if [[ "$SOURCE_SHA" != "$latest_main_sha" ]]; then
           echo "::notice::Skipping superseded main baseline for $SOURCE_SHA"
           echo 'source-state=stale' >> "$GITHUB_OUTPUT"
@@ -96,7 +117,9 @@ runs:
       run: |
         set -euo pipefail
         [[ "$CONTAINER_SETUP_OUTCOME" == 'success' ]] || { echo '::error::Container registry prerequisites failed'; exit 1; }
+
         [[ -f "$DOCKERFILE" ]] || { echo '::error::Dockerfile path does not exist'; exit 1; }
+
         [[ "$IMAGE_REF" =~ ^[^[:space:]@]+@sha256:[a-f0-9]{64}$ ]] || { echo '::error::Container image must use its CI-built sha256 digest'; exit 1; }
       shell: bash
 
@@ -137,7 +160,17 @@ runs:
         SNYK_OAUTH_TOKEN: ${{ steps.snyk-auth.outputs.token }}
       run: |
         set -euo pipefail
-        if [[ -z "$SNYK_OAUTH_TOKEN" || "$SNYK_OAUTH_TOKEN" == *$'\n'* || "$SNYK_OAUTH_TOKEN" == *$'\r'* ]]; then
+        token_is_missing=false
+        if [[ -z "$SNYK_OAUTH_TOKEN" ]]; then
+          token_is_missing=true
+        fi
+
+        token_has_line_break=false
+        if [[ "$SNYK_OAUTH_TOKEN" == *$'\n'* || "$SNYK_OAUTH_TOKEN" == *$'\r'* ]]; then
+          token_has_line_break=true
+        fi
+
+        if [[ "$token_is_missing" == 'true' || "$token_has_line_break" == 'true' ]]; then
           echo '::error::Snyk OAuth token is missing or cannot be safely masked'
           exit 1
         fi
@@ -155,6 +188,7 @@ runs:
       continue-on-error: true
       env:
         ORG_ID: ${{ inputs.org-id }}
+        SARIF_VALIDATION_FILTER: ${{ steps.validate.outputs.sarif-filter }}
         SNYK_OAUTH_TOKEN: ${{ steps.snyk-auth.outputs.token }}
       run: |
         set -uo pipefail
@@ -183,12 +217,9 @@ runs:
         else
           echo '::error::Open Source scan output is missing or malformed'
         fi
+
         sarif_valid=false
-        if jq -e '
-          .version == "2.1.0" and
-          (.runs | type == "array" and length > 0) and
-          all(.runs[]; (.tool.driver.name | (type == "string" and length > 0)))
-        ' sarif/snyk-open-source.sarif >/dev/null; then
+        if jq -e "$SARIF_VALIDATION_FILTER" sarif/snyk-open-source.sarif >/dev/null; then
           if [[ "$scan_output_valid" == 'true' ]]; then sarif_valid=true; fi
         else
           echo '::error::Open Source SARIF output is missing or malformed'
@@ -217,7 +248,11 @@ runs:
         set -euo pipefail
         git fetch --no-tags origin main
         latest_main_sha="$(git rev-parse FETCH_HEAD)"
-        if [[ "$SOURCE_SHA" != "$latest_main_sha" ]]; then
+        source_is_current=false
+        if [[ "$SOURCE_SHA" == "$latest_main_sha" ]]; then
+          source_is_current=true
+        fi
+        if [[ "$source_is_current" != 'true' ]]; then
           echo "::notice::Skipping superseded main publication for $SOURCE_SHA"
           echo 'publication-state=stale' >> "$GITHUB_OUTPUT"
           exit 0
@@ -245,6 +280,7 @@ runs:
         export SNYK_TOKEN="$SNYK_OAUTH_TOKEN"
         uuid_regex='^[[:xdigit:]]{8}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{12}$'
         [[ "$OPEN_SOURCE_PROJECT_ID" =~ $uuid_regex ]] || { echo '::error::Open Source project UUID is invalid'; exit 1; }
+
         monitor_output="$(mktemp)"
         trap 'rm -f "$monitor_output"' EXIT
         if snyk monitor \
@@ -271,6 +307,7 @@ runs:
             break
           fi
         done < "$monitor_output"
+
         published_project_id_lower="$(printf '%s' "$published_project_id" | tr '[:upper:]' '[:lower:]')"
         open_source_project_id_lower="$(printf '%s' "$OPEN_SOURCE_PROJECT_ID" | tr '[:upper:]' '[:lower:]')"
         if [[ "$published_project_id_lower" != "$open_source_project_id_lower" ]]; then
@@ -294,6 +331,7 @@ runs:
         ORG_ID: ${{ inputs.org-id }}
         IMAGE_REF: ${{ inputs.image-ref }}
         DOCKERFILE: ${{ inputs.dockerfile }}
+        SARIF_VALIDATION_FILTER: ${{ steps.validate.outputs.sarif-filter }}
         SNYK_OAUTH_TOKEN: ${{ steps.snyk-auth.outputs.token }}
       run: |
         set -uo pipefail
@@ -318,41 +356,51 @@ runs:
 
         results_valid=false
         if jq -e '
-          def non_empty_string: type == "string" and length > 0;
-          def valid_vulnerability:
-            (.id | non_empty_string) and
-            (.severity | IN("low", "medium", "high", "critical")) and
-            (.from | type == "array" and length > 0 and all(.[]; non_empty_string));
+          def is_non_empty_string: type == "string" and length > 0;
 
-          type == "array" and length > 0 and
-          all(.[ ];
+          def has_supported_severity:
+            (.severity | IN("low", "medium", "high", "critical"));
+
+          def has_dependency_path:
+            (.from | type == "array" and length > 0 and all(.[]; is_non_empty_string));
+
+          def is_valid_vulnerability:
+            (.id | is_non_empty_string) and
+            has_supported_severity and
+            has_dependency_path;
+
+          def has_required_metadata:
+            (.packageManager | is_non_empty_string) and
+            (.projectName | is_non_empty_string) and
+            (.scanResult.identity.type | is_non_empty_string) and
+            (.scanResult.target.image | is_non_empty_string);
+
+          def has_base_image_coverage:
+            .scanResult.identity.type == "apk" and
+            (.docker.baseImage | is_non_empty_string);
+
+          def has_application_coverage:
+            .scanResult.identity.type != "apk" and
+            ((.scanResult.identity.targetFile // .targetFile // "") | is_non_empty_string);
+
+          def is_valid_container_result:
             type == "object" and
             (.vulnerabilities | type == "array") and
-            (.packageManager | non_empty_string) and
-            (.projectName | non_empty_string) and
-            (.scanResult.identity.type | non_empty_string) and
-            (.scanResult.target.image | non_empty_string) and
-            all(.vulnerabilities[]; valid_vulnerability)
-          ) and
-          any(.[ ];
-            .scanResult.identity.type == "apk" and
-            (.docker.baseImage | non_empty_string)
-          ) and
-          any(.[ ];
-            .scanResult.identity.type != "apk" and
-            ((.scanResult.identity.targetFile // .targetFile // "") | non_empty_string)
-          )
+            has_required_metadata and
+            all(.vulnerabilities[]; is_valid_vulnerability);
+
+          type == "array" and length > 0 and
+          all(.[]; is_valid_container_result) and
+          any(.[]; has_base_image_coverage) and
+          any(.[]; has_application_coverage)
         ' "$result_file" >/dev/null; then
           results_valid=true
         else
           echo '::error::Container output is malformed or lacks OS/base-image or application coverage'
         fi
+
         sarif_valid=false
-        if jq -e '
-          .version == "2.1.0" and
-          (.runs | type == "array" and length > 0) and
-          all(.runs[]; (.tool.driver.name | (type == "string" and length > 0)))
-        ' sarif/snyk-container.sarif >/dev/null; then
+        if jq -e "$SARIF_VALIDATION_FILTER" sarif/snyk-container.sarif >/dev/null; then
           if [[ "$results_valid" == 'true' ]]; then sarif_valid=true; fi
         else
           echo '::error::Container SARIF output is missing or malformed'
@@ -405,6 +453,7 @@ runs:
       continue-on-error: true
       env:
         ORG_ID: ${{ inputs.org-id }}
+        SARIF_VALIDATION_FILTER: ${{ steps.validate.outputs.sarif-filter }}
         SNYK_OAUTH_TOKEN: ${{ steps.snyk-auth.outputs.token }}
       run: |
         set -uo pipefail
@@ -426,12 +475,9 @@ runs:
           scan_status=$?
         fi
         cat "$report_output"
+
         sarif_valid=false
-        if jq -e '
-          .version == "2.1.0" and
-          (.runs | type == "array" and length > 0) and
-          all(.runs[]; (.tool.driver.name | (type == "string" and length > 0)))
-        ' sarif/snyk-code.sarif >/dev/null; then
+        if jq -e "$SARIF_VALIDATION_FILTER" sarif/snyk-code.sarif >/dev/null; then
           sarif_valid=true
         else
           echo '::error::Code SARIF output is missing or malformed'
@@ -467,6 +513,7 @@ runs:
       continue-on-error: true
       env:
         ORG_ID: ${{ inputs.org-id }}
+        SARIF_VALIDATION_FILTER: ${{ steps.validate.outputs.sarif-filter }}
         SNYK_OAUTH_TOKEN: ${{ steps.snyk-auth.outputs.token }}
       run: |
         set -uo pipefail
@@ -504,11 +551,7 @@ runs:
           cat "$report_output"
 
           sarif_valid=false
-          if jq -e '
-            .version == "2.1.0" and
-            (.runs | type == "array" and length > 0) and
-            all(.runs[]; (.tool.driver.name | (type == "string" and length > 0)))
-          ' "$sarif_file" >/dev/null; then
+          if jq -e "$SARIF_VALIDATION_FILTER" "$sarif_file" >/dev/null; then
             sarif_valid=true
           else
             echo "::error::IaC $environment SARIF output is missing or malformed"
@@ -553,28 +596,47 @@ runs:
         IAC_OUTCOME: ${{ steps.iac.outcome }}
       run: |
         set -euo pipefail
+        publication_is_stale=false
         if [[ "$SOURCE_STATE" == 'stale' || "$PUBLICATION_STATE" == 'stale' ]]; then
+          publication_is_stale=true
+        fi
+
+        if [[ "$publication_is_stale" == 'true' ]]; then
           echo 'outcome=skipped' >> "$GITHUB_OUTPUT"
           echo 'publication-state=stale' >> "$GITHUB_OUTPUT"
           exit 0
         fi
+
         if [[ "$PUBLICATION_STATE" != 'current' ]]; then
           echo 'outcome=failed' >> "$GITHUB_OUTPUT"
           echo 'publication-state=unavailable' >> "$GITHUB_OUTPUT"
           exit 1
         fi
-        if [[ "$VALIDATION_OUTCOME" == 'success' &&
-          "$NODE_SETUP_OUTCOME" == 'success' &&
-          "$SNYK_CLI_OUTCOME" == 'success' &&
-          "$AUTH_OUTCOME" == 'success' &&
-          "$TOKEN_MASK_OUTCOME" == 'success' &&
-          "$OPEN_SOURCE_SCAN_OUTCOME" == 'success' &&
-          "$OPEN_SOURCE_OUTCOME" == 'success' &&
-          "$CONTAINER_VALIDATION_OUTCOME" == 'success' &&
-          "$CONTAINER_RESULTS_OUTCOME" == 'success' &&
-          "$CONTAINER_MONITOR_OUTCOME" == 'success' &&
-          "$CODE_OUTCOME" == 'success' &&
-          "$IAC_OUTCOME" == 'success' ]]; then
+
+        required_step_outcomes=(
+          "$VALIDATION_OUTCOME"
+          "$NODE_SETUP_OUTCOME"
+          "$SNYK_CLI_OUTCOME"
+          "$AUTH_OUTCOME"
+          "$TOKEN_MASK_OUTCOME"
+          "$OPEN_SOURCE_SCAN_OUTCOME"
+          "$OPEN_SOURCE_OUTCOME"
+          "$CONTAINER_VALIDATION_OUTCOME"
+          "$CONTAINER_RESULTS_OUTCOME"
+          "$CONTAINER_MONITOR_OUTCOME"
+          "$CODE_OUTCOME"
+          "$IAC_OUTCOME"
+        )
+
+        all_required_steps_succeeded=true
+        for step_outcome in "${required_step_outcomes[@]}"; do
+          if [[ "$step_outcome" != 'success' ]]; then
+            all_required_steps_succeeded=false
+            break
+          fi
+        done
+
+        if [[ "$all_required_steps_succeeded" == 'true' ]]; then
           echo 'outcome=passed' >> "$GITHUB_OUTPUT"
           echo 'publication-state=current' >> "$GITHUB_OUTPUT"
         else
