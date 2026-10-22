@@ -5,7 +5,7 @@ Runs for pull requests, main pushes, merge groups, and manual dispatches.
 `code-linting` - ESLint and Knip dependency checks.
 `verify-api-code-generation` - Checks generated RCW API client code matches the OpenAPI specification.
 `code-security-audit` - Runs `yarn npm audit`.
-`snyk` - Runs the PR regression gate or observational main Snyk scans.
+`snyk` - Runs contributor Snyk gates; main runs Open Source monitoring independently.
 `mocha-tests` - Unit and integration tests.
 `playwright` - Browser and accessibility tests.
 `e2e` - End-to-end tests.
@@ -18,10 +18,11 @@ Runs for pull requests, main pushes, merge groups, and manual dispatches.
 
 `snyk` calls `.github/workflows/snyk.yml`, the sole Snyk scan owner. PR and
 merge-group Open Source checks pipe JSON results into `snyk-delta`, failing on
-new high-severity findings. The main branch scans all projects and publishes
-SARIF, but findings alone do not fail CI. Nightly runs the same scans in strict mode.
-Both modes also scan the pushed ECR image, Snyk Code, and rendered UAT,
-staging, and production manifests. The CLI is pinned to `1.1307.4`;
+new high-severity findings. Main skips the full scan suite and runs Open Source
+monitoring only, independently of image build and deployment. Nightly runs the
+same scans in strict mode. Contributor and nightly scans also scan the pushed ECR
+image, Snyk Code, and rendered UAT, staging, and production manifests. The CLI
+is pinned to `1.1307.4`;
 `snyk-delta` is pinned to `1.14.0`. CICD scans the immutable image digest
 returned by Docker push.
 
@@ -29,8 +30,8 @@ PR Delta tests and post-merge monitoring use the same explicit `SNYK_ORG_ID`,
 project name, and `main` target reference. Configure `SNYK_ORG_ID` as a
 repository Actions variable so Delta compares against the intended baseline.
 
-After main deploys to staging, `snyk-monitor` runs `snyk monitor` to update the
-accepted Open Source baseline. Nightly scans do not update that baseline.
+On main, `snyk-monitor` runs `snyk monitor` independently of deployment to update
+the accepted Open Source baseline. Nightly scans do not update that baseline.
 
 ## Nightly Snyk Gate
 

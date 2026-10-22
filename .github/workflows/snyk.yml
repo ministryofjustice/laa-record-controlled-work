@@ -60,11 +60,11 @@ jobs:
       id-token: write
       security-events: write
     steps:
-      - name: Require main for Snyk UI reporting
-        if: ${{ (inputs.report_to_snyk || inputs.scan_mode == 'monitor') && github.ref != 'refs/heads/main' }}
+      - name: Require trusted main source for Snyk UI reporting
+        if: ${{ (inputs.report_to_snyk || inputs.scan_mode == 'monitor') && (github.ref != 'refs/heads/main' || inputs.source_sha != github.sha) }}
         shell: bash
         run: |
-          echo "::error::Snyk UI reporting is restricted to main"
+          echo "::error::Snyk UI reporting requires the current trusted main commit"
           exit 1
 
       - name: Checkout scanned source
