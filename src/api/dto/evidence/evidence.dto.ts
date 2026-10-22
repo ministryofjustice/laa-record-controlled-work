@@ -66,61 +66,65 @@ export class EvidenceDto {
    * @returns The application's evidence answers format.
    */
   public static toAnswers(evidence: Evidence): EvidenceAnswers {
-    const expenditureEvidence = evidence.expenditureCapitalEvidenceChecklist;
-    const hasCapitalEvidence = expenditureEvidence?.capitalEvidence !== undefined;
-    const hasExpenditureEvidence = [
-      expenditureEvidence?.childCareEvidence,
-      expenditureEvidence?.housingCostsEvidence,
-      expenditureEvidence?.incomeEvidence,
-      expenditureEvidence?.maintenanceEvidence,
-    ].every((answer) => answer !== undefined);
-
     return {
-      [E.asylumSupportEvidence]: EvidenceDto.toEvidenceArray(
-        evidence.incomeEvidenceChecklist?.asylumSupportEvidence,
-      ),
-      [E.benefitsInKindEvidence]: EvidenceDto.toEvidenceArray(
-        evidence.incomeEvidenceChecklist?.benefitsInKindEvidence,
-      ),
-      [E.capitalEvidence]: EvidenceDto.toEvidenceArray(
-        evidence.expenditureCapitalEvidenceChecklist?.capitalEvidence,
-      ),
-      [E.childCareEvidence]: EvidenceDto.toEvidenceArray(
-        evidence.expenditureCapitalEvidenceChecklist?.childCareEvidence,
-      ),
-      [E.doYouHaveEvidence]:
-        evidence.evidenceExemptionCode === undefined ? "yes" : "no",
-      [E.employedEvidence]: EvidenceDto.toEvidenceArray(
-        evidence.expenditureCapitalEvidenceChecklist?.employedEvidence,
-      ),
-      [E.haveEvidenceOfCapital]: hasCapitalEvidence ? "yes" : "no",
-      [E.haveEvidenceOfExpenditure]: hasExpenditureEvidence ? "yes" : "no",
-      [E.housingCostsEvidence]: EvidenceDto.toEvidenceArray(
-        evidence.expenditureCapitalEvidenceChecklist?.housingCostsEvidence,
-      ),
-      [E.incomeEvidence]: EvidenceDto.toEvidenceArray(
-        evidence.expenditureCapitalEvidenceChecklist?.incomeEvidence,
-      ),
-      [E.maintenanceEvidence]: EvidenceDto.toEvidenceArray(
-        evidence.expenditureCapitalEvidenceChecklist?.maintenanceEvidence,
-      ),
+      ...EvidenceDto.toIncomeAnswers(evidence),
+      ...EvidenceDto.toExpenditureAnswers(evidence),
+      [E.doYouHaveEvidence]: EvidenceDto.hasEvidenceExemption(evidence)
+        ? "no"
+        : "yes",
+      [E.haveEvidenceOfCapital]: EvidenceDto.hasCapitalEvidence(evidence)
+        ? "yes"
+        : "no",
+      [E.haveEvidenceOfExpenditure]: EvidenceDto.hasExpenditureEvidence(
+        evidence,
+      )
+        ? "yes"
+        : "no",
       [E.moreDetailsForNoEvidence]:
         evidence.evidenceExemptionReason ?? undefined,
-      [E.otherEvidence]: EvidenceDto.toEvidenceArray(
-        evidence.expenditureCapitalEvidenceChecklist?.otherEvidence,
-      ),
-      [E.reasonForNoEvidence]: (evidence.evidenceExemptionCode ??
-        undefined) as EvidenceExemptionReasonCode | undefined,
-      [E.selfEmployedEvidence]: EvidenceDto.toEvidenceArray(
-        evidence.expenditureCapitalEvidenceChecklist?.selfEmployedEvidence,
-      ),
-      [E.stateBenefitsEvidence]: EvidenceDto.toEvidenceArray(
-        evidence.incomeEvidenceChecklist?.stateBenefitsEvidence,
-      ),
-      [E.taxCreditsEvidence]: EvidenceDto.toEvidenceArray(
-        evidence.incomeEvidenceChecklist?.taxCreditsEvidence,
+      [E.reasonForNoEvidence]: EvidenceDto.toEvidenceExemptionReasonCode(
+        evidence.evidenceExemptionCode,
       ),
     };
+  }
+
+  /**
+   * Checks whether the API includes capital evidence.
+   * @param evidence The API evidence object.
+   * @returns Whether capital evidence is present.
+   */
+  private static hasCapitalEvidence(evidence: Evidence): boolean {
+    return (
+      evidence.expenditureCapitalEvidenceChecklist?.capitalEvidence !==
+      undefined
+    );
+  }
+
+  /**
+   * Checks whether the API records a reason for having no evidence.
+   * @param evidence The API evidence object.
+   * @returns Whether an exemption reason is present.
+   */
+  private static hasEvidenceExemption(evidence: Evidence): boolean {
+    const exemptionCode = evidence.evidenceExemptionCode;
+
+    return exemptionCode !== null && exemptionCode !== "none";
+  }
+
+  /**
+   * Checks whether all expenditure checklist fields are present.
+   * @param evidence The API evidence object.
+   * @returns Whether all expenditure fields are present.
+   */
+  private static hasExpenditureEvidence(evidence: Evidence): boolean {
+    const checklist = evidence.expenditureCapitalEvidenceChecklist;
+
+    return [
+      checklist?.childCareEvidence,
+      checklist?.housingCostsEvidence,
+      checklist?.incomeEvidence,
+      checklist?.maintenanceEvidence,
+    ].every((answer) => answer !== undefined);
   }
 
   /**
@@ -136,6 +140,102 @@ export class EvidenceDto {
     return Object.values(evidence).filter(
       (value): value is string => typeof value === "string",
     );
+  }
+
+  /**
+   * Converts an API exemption code to a supported evidence answer.
+   * @param code The API exemption code.
+   * @returns The supported reason code, if present.
+   */
+  private static toEvidenceExemptionReasonCode(
+    code: null | string,
+  ): EvidenceExemptionReasonCode | undefined {
+    switch (code) {
+      case "adviceOverPhone":
+      case "notPossibleBeforeStart":
+      case "personalCircumstances":
+        return code;
+      default:
+        return undefined;
+    }
+  }
+
+  /**
+   * Maps expenditure and capital checklist values to evidence answers.
+   * @param evidence The API evidence object.
+   * @returns The expenditure and capital answers.
+   */
+  private static toExpenditureAnswers(
+    evidence: Evidence,
+  ): Pick<
+    EvidenceAnswers,
+    | "capitalEvidence"
+    | "childCareEvidence"
+    | "housingCostsEvidence"
+    | "incomeEvidence"
+    | "maintenanceEvidence"
+  > {
+    const checklist = evidence.expenditureCapitalEvidenceChecklist;
+
+    return {
+      [E.capitalEvidence]: EvidenceDto.toEvidenceArray(
+        checklist?.capitalEvidence,
+      ),
+      [E.childCareEvidence]: EvidenceDto.toEvidenceArray(
+        checklist?.childCareEvidence,
+      ),
+      [E.housingCostsEvidence]: EvidenceDto.toEvidenceArray(
+        checklist?.housingCostsEvidence,
+      ),
+      [E.incomeEvidence]: EvidenceDto.toEvidenceArray(
+        checklist?.incomeEvidence,
+      ),
+      [E.maintenanceEvidence]: EvidenceDto.toEvidenceArray(
+        checklist?.maintenanceEvidence,
+      ),
+    };
+  }
+
+  /**
+   * Maps income checklist values to evidence answers.
+   * @param evidence The API evidence object.
+   * @returns The income answers.
+   */
+  private static toIncomeAnswers(
+    evidence: Evidence,
+  ): Pick<
+    EvidenceAnswers,
+    | "asylumSupportEvidence"
+    | "benefitsInKindEvidence"
+    | "employedEvidence"
+    | "otherEvidence"
+    | "selfEmployedEvidence"
+    | "stateBenefitsEvidence"
+    | "taxCreditsEvidence"
+  > {
+    const checklist = evidence.incomeEvidenceChecklist;
+
+    return {
+      [E.asylumSupportEvidence]: EvidenceDto.toEvidenceArray(
+        checklist?.asylumSupportEvidence,
+      ),
+      [E.benefitsInKindEvidence]: EvidenceDto.toEvidenceArray(
+        checklist?.benefitsInKindEvidence,
+      ),
+      [E.employedEvidence]: EvidenceDto.toEvidenceArray(
+        checklist?.employedEvidence,
+      ),
+      [E.otherEvidence]: EvidenceDto.toEvidenceArray(checklist?.otherEvidence),
+      [E.selfEmployedEvidence]: EvidenceDto.toEvidenceArray(
+        checklist?.selfEmployedEvidence,
+      ),
+      [E.stateBenefitsEvidence]: EvidenceDto.toEvidenceArray(
+        checklist?.stateBenefitsEvidence,
+      ),
+      [E.taxCreditsEvidence]: EvidenceDto.toEvidenceArray(
+        checklist?.taxCreditsEvidence,
+      ),
+    };
   }
 
   /**

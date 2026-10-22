@@ -16,7 +16,12 @@ import { mojComponents } from "@ministryofjustice/hmpps-forge/moj-components";
 import { autocomplete } from "#/journeys/components/autocomplete/autocomplete.component.js";
 import type { CreateApplicationEffectsDeps } from "#/journeys/create-application/create-application.types.js";
 import { createApplicationTransformersRegistry } from "#/journeys/create-application/create-application.transformers.js";
-
+import type { EditApplicationEffectsDeps } from "#/journeys/edit-application/editApplication.types.js";
+import { editApplicationEffectsRegistry } from "#/journeys/edit-application/editApplication.effects.js";
+import { editApplicationJourney } from "#/journeys/edit-application/editApplication.journey.js";
+import { editApplicationTransformersRegistry } from "#/journeys/edit-application/editApplication.transformers.js";
+import { evidenceEffectsRegistry } from "#/journeys/evidence/evidence.effects.js";
+import { getGetApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
 
 /**
  * Creates an integration test client from a journey definition.
@@ -61,6 +66,27 @@ export function createForgeTestClient<TDeps>(
     .registerGlobalFunctions(nunjucksFunctions)
     .registerPackage(testPackage, overrides?.dependencies)
     .createClient(overrides?.renderer);
+}
+
+export function createEvidenceJourneyTestClient(
+  dependencies: Partial<EditApplicationEffectsDeps> = {},
+): ForgeTestClient {
+  const application = getGetApplicationResponseMock({ evidence: null });
+
+  return createForgeTestClient(
+    editApplicationJourney,
+    [editApplicationEffectsRegistry, evidenceEffectsRegistry],
+    {
+      additionalFunctions: [editApplicationTransformersRegistry],
+      dependencies: {
+        getApplication: async () => ({ status: 200, data: application }),
+        updateApplicationDetails: async () => ({ status: 204 }),
+        updateApplicationEvidence: async () => ({ status: 204 }),
+        updateApplicationStatus: async () => ({ status: 204 }),
+        ...dependencies,
+      },
+    },
+  );
 }
 
 export function createApplicationTestClient(
