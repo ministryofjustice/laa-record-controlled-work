@@ -1,9 +1,11 @@
 import { AuthError, type AuthenticationResult } from "@azure/msal-node";
 
 import { expect } from "chai";
+import express from "express";
 import type { Request, Response } from "express";
 import { afterEach, describe, it } from "mocha";
 import sinon from "sinon";
+import request from "supertest";
 
 import { TokenRefreshError } from "#/auth/auth.errors.js";
 import { EntraService } from "#/auth/entra.service.js";
@@ -12,6 +14,7 @@ import config from "#/config.js";
 import type { Office } from "#/journeys/select-office/select-office.types.js";
 import { failure, success } from "#/lib/either.js";
 import { HTTP_STATUS } from "#/lib/constants/http.js";
+import { createMockApp } from "../../../utils.js";
 
 const SESSION_ID = "session-id";
 const HOME_ACCOUNT_ID = "uid.tenant";
@@ -47,13 +50,23 @@ describe("requireAuth", () => {
   it("redirects to /auth/signin when auth token is missing", async () => {
     const { req, res, next, redirect, session } = createMocks({
       account: undefined,
+      selectedOffice: createOffice("OFFICE-1"),
     });
+    session.singleOffice = true;
+    session.journeyDrafts = { application: { clientName: "Draft client" } };
+    session.journeyDraftVersions = { application: "version-1" };
+    session.journeySubmitted = { application: true };
 
     await requireAuth()(req, res, next);
 
     expect(redirect.calledOnceWithExactly("/auth/signin")).to.be.true;
     expect(next.called).to.be.false;
     expect(session.account).to.equal(undefined);
+    expect(session.selectedOffice).to.be.undefined;
+    expect(session.singleOffice).to.be.undefined;
+    expect(session.journeyDrafts).to.be.undefined;
+    expect(session.journeyDraftVersions).to.be.undefined;
+    expect(session.journeySubmitted).to.be.undefined;
   });
 
   it("refreshes expired auth and continues when refresh succeeds", async () => {
@@ -75,6 +88,10 @@ describe("requireAuth", () => {
       account: createAccount({ exp: getNowInSeconds() - 10 }),
       selectedOffice: createOffice("OFFICE-1"),
     });
+    session.singleOffice = true;
+    session.journeyDrafts = { application: { clientName: "Draft client" } };
+    session.journeyDraftVersions = { application: "version-1" };
+    session.journeySubmitted = { application: true };
 
     await requireAuth()(req, res, next);
 
@@ -86,6 +103,136 @@ describe("requireAuth", () => {
         config.entra.scopes,
       ),
     ).to.be.true;
+    expect(session.account).to.equal(refreshedAccount);
+    expect(redirect.called).to.be.false;
+    expect(next.calledOnceWithExactly()).to.be.true;
+    expect(session.selectedOffice).to.deep.equal(createOffice("OFFICE-1"));
+    expect(session.singleOffice).to.be.true;
+    expect(session.journeyDrafts).to.deep.equal({
+      application: { clientName: "Draft client" },
+    });
+    expect(session.journeyDraftVersions).to.deep.equal({
+      application: "version-1",
+    });
+    expect(session.journeySubmitted).to.deep.equal({ application: true });
+  });
+
+  it("denies a protected request when refresh removes the selected office", async () => {
+    const refreshedAccount = createAccount({
+      exp: getNowInSeconds() + 600,
+      offices: ["OFFICE-2"],
+    });
+    stubSuccessfulRefresh(refreshedAccount);
+    const agent = request.agent(createProtectedApp());
+
+    await agent.post("/test/setup-auth").expect(200);
+    const response = await agent.get("/protected");
+
+    expect(response.status).to.equal(302);
+    expect(response.headers.location).to.equal("/select-office");
+    expect(response.text).not.to.equal("protected");
+
+    const sessionResponse = await agent.get("/test/session");
+    expect(sessionResponse.body.selectedOffice).to.be.undefined;
+    expect(sessionResponse.body.singleOffice).to.be.undefined;
+    expect(sessionResponse.body.journeyDrafts).to.be.undefined;
+    expect(sessionResponse.body.journeyDraftVersions).to.be.undefined;
+    expect(sessionResponse.body.journeySubmitted).to.be.undefined;
+  });
+
+  it("clears a removed office while allowing the office selection page", async () => {
+    const refreshedAccount = createAccount({
+      exp: getNowInSeconds() + 600,
+      offices: ["OFFICE-2"],
+    });
+    stubSuccessfulRefresh(refreshedAccount);
+    const { req, res, next, redirect, session } = createMocks({
+      account: createAccount({
+        exp: getNowInSeconds() - 10,
+        offices: ["OFFICE-1"],
+      }),
+      originalUrl: "/select-office",
+      path: "/select-office",
+      selectedOffice: createOffice("OFFICE-1"),
+      url: "/select-office",
+    });
+    session.journeyDrafts = { application: { clientName: "Draft client" } };
+
+    await requireAuth()(req, res, next);
+
+    expect(session.account).to.equal(refreshedAccount);
+    expect(session.selectedOffice).to.be.undefined;
+    expect(session.journeyDrafts).to.be.undefined;
+    expect(redirect.called).to.be.false;
+    expect(next.calledOnceWithExactly()).to.be.true;
+  });
+
+  it("denies access when refreshed claims omit office entitlements", async () => {
+    const refreshedAccount = createAccount({
+      exp: getNowInSeconds() + 600,
+      offices: [],
+    });
+    delete refreshedAccount.idTokenClaims?.LAA_ACCOUNTS;
+    stubSuccessfulRefresh(refreshedAccount);
+    const { req, res, next, render, session, status } = createMocks({
+      account: createAccount({ exp: getNowInSeconds() - 10 }),
+      selectedOffice: createOffice("OFFICE-1"),
+    });
+    session.journeyDrafts = { application: { clientName: "Draft client" } };
+
+    await requireAuth()(req, res, next);
+
+    expect(session.account).to.equal(refreshedAccount);
+    expect(status.calledOnceWithExactly(HTTP_STATUS.FORBIDDEN)).to.be.true;
+    expect(render.calledOnceWithExactly("main/error-no-assigned-office")).to.be
+      .true;
+    expect(next.called).to.be.false;
+    expect(session.selectedOffice).to.be.undefined;
+    expect(session.journeyDrafts).to.be.undefined;
+  });
+
+  it("denies access when refreshed office entitlements are malformed", async () => {
+    const refreshedAccount = createAccount({
+      exp: getNowInSeconds() + 600,
+      offices: ["OFFICE-1"],
+    });
+    if (refreshedAccount.idTokenClaims !== undefined) {
+      Object.assign(refreshedAccount.idTokenClaims, {
+        LAA_ACCOUNTS: ["OFFICE-1", 42],
+      });
+    }
+    stubSuccessfulRefresh(refreshedAccount);
+    const { req, res, next, render, status, session } = createMocks({
+      account: createAccount({ exp: getNowInSeconds() - 10 }),
+      selectedOffice: createOffice("OFFICE-1"),
+    });
+
+    await requireAuth()(req, res, next);
+
+    expect(session.account).to.equal(refreshedAccount);
+    expect(status.calledOnceWithExactly(HTTP_STATUS.FORBIDDEN)).to.be.true;
+    expect(render.calledOnceWithExactly("main/error-no-assigned-office")).to.be
+      .true;
+    expect(next.called).to.be.false;
+    expect(session.selectedOffice).to.be.undefined;
+  });
+
+  it("allows an office newly granted by a successful refresh", async () => {
+    const refreshedAccount = createAccount({
+      exp: getNowInSeconds() + 600,
+      offices: ["OFFICE-2"],
+    });
+    stubSuccessfulRefresh(refreshedAccount);
+    const { req, res, next, redirect, session } = createMocks({
+      account: createAccount({
+        exp: getNowInSeconds() - 10,
+        offices: ["OFFICE-1"],
+      }),
+      selectedOffice: createOffice("OFFICE-2"),
+    });
+
+    await requireAuth()(req, res, next);
+
     expect(session.account).to.equal(refreshedAccount);
     expect(redirect.called).to.be.false;
     expect(next.calledOnceWithExactly()).to.be.true;
@@ -103,6 +250,10 @@ describe("requireAuth", () => {
       account: createAccount({ exp: getNowInSeconds() - 10 }),
       selectedOffice: createOffice("OFFICE-1"),
     });
+    session.singleOffice = true;
+    session.journeyDrafts = { application: { clientName: "Draft client" } };
+    session.journeyDraftVersions = { application: "version-1" };
+    session.journeySubmitted = { application: true };
 
     await requireAuth()(req, res, next);
 
@@ -117,6 +268,11 @@ describe("requireAuth", () => {
     expect(redirect.calledOnceWithExactly("/auth/signin")).to.be.true;
     expect(next.called).to.be.false;
     expect(session.account).to.equal(undefined);
+    expect(session.selectedOffice).to.be.undefined;
+    expect(session.singleOffice).to.be.undefined;
+    expect(session.journeyDrafts).to.be.undefined;
+    expect(session.journeyDraftVersions).to.be.undefined;
+    expect(session.journeySubmitted).to.be.undefined;
   });
 
   it("renders the no-assigned-role error page when Entra reports the user has no role", async () => {
@@ -130,10 +286,11 @@ describe("requireAuth", () => {
       refreshToken: refreshTokenMock,
     } as unknown as EntraService);
 
-    const { req, res, next, redirect, render, status } = createMocks({
+    const { req, res, next, redirect, render, session, status } = createMocks({
       account: createAccount({ exp: getNowInSeconds() - 10 }),
       selectedOffice: createOffice("OFFICE-1"),
     });
+    session.journeyDrafts = { application: { clientName: "Draft client" } };
 
     await requireAuth()(req, res, next);
 
@@ -142,6 +299,9 @@ describe("requireAuth", () => {
       .true;
     expect(redirect.called).to.be.false;
     expect(next.called).to.be.false;
+    expect(session.account).to.be.undefined;
+    expect(session.selectedOffice).to.be.undefined;
+    expect(session.journeyDrafts).to.be.undefined;
   });
 
   it("redirects to /select-office when no office is selected", async () => {
@@ -246,13 +406,51 @@ function createOffice(code: string): Office {
   };
 }
 
+function createProtectedApp(): express.Application {
+  const router = express.Router();
+
+  router.post("/test/setup-auth", (req, res) => {
+    req.session.account = createAccount({
+      exp: getNowInSeconds() - 10,
+      offices: ["OFFICE-1"],
+    });
+    req.session.selectedOffice = createOffice("OFFICE-1");
+    req.session.singleOffice = true;
+    req.session.journeyDrafts = {
+      application: { clientName: "Draft client" },
+    };
+    req.session.journeyDraftVersions = { application: "version-1" };
+    req.session.journeySubmitted = { application: true };
+    res.end();
+  });
+  router.get("/protected", requireAuth(), (_req, res) => {
+    res.send("protected");
+  });
+
+  return createMockApp({ mountPath: "/", router, useCsrf: false });
+}
+
+function stubSuccessfulRefresh(
+  account: NonNullable<Request["session"]["account"]>,
+): void {
+  const serviceRefreshToken = sinon.stub().resolves(
+    success({
+      accessToken: "new-access-token",
+      account,
+    } as AuthenticationResult),
+  );
+  sinon.stub(EntraService, "create").returns({
+    refreshToken: serviceRefreshToken,
+  } as unknown as EntraService);
+}
+
 function createAccount({
   exp,
   offices = ["OFFICE-1"],
 }: {
   exp: number;
   offices?: string[];
-}): Request["session"]["account"] {
+}): NonNullable<Request["session"]["account"]> {
   return {
     homeAccountId: HOME_ACCOUNT_ID,
     idToken: "id-token",
@@ -260,7 +458,7 @@ function createAccount({
       LAA_ACCOUNTS: offices,
       exp,
     },
-  } as Request["session"]["account"];
+  } as NonNullable<Request["session"]["account"]>;
 }
 
 function createMocks({
