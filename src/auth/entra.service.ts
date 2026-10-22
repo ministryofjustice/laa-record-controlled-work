@@ -32,6 +32,7 @@ import { getRedisClient } from "#/lib/redis.js";
 import { logger } from "#/logger.js";
 
 interface EntraServiceConfig {
+  cacheExpiresAt?: number;
   msalClient?: ConfidentialClientApplication;
   sessionId?: string;
 }
@@ -39,6 +40,7 @@ interface EntraServiceConfig {
 interface InitiateAuthCodeFlowOptions {
   callbackHostname?: string;
   expiresAt?: number;
+  prompt?: "login";
 }
 
 interface PreparedAuthCodeFlowState extends Omit<
@@ -77,7 +79,7 @@ export class EntraService {
         ? new RedisCachePlugin(
             getRedisClient(),
             options.sessionId,
-            config.redis.maxAge,
+            options.cacheExpiresAt,
           )
         : undefined;
 
@@ -211,12 +213,7 @@ export class EntraService {
       return failure(PkceGenerationError.from(error));
     }
 
-    const prepared = this.prepareFlowState(
-      pkceCodes,
-      returnTo,
-      options.callbackHostname,
-      options.expiresAt,
-    );
+    const prepared = this.prepareFlowState(pkceCodes, { ...options, returnTo });
     const { authCodeUrlRequest, ...authCodeFlowState } = prepared;
     try {
       const authCodeUrl =
@@ -266,17 +263,14 @@ export class EntraService {
    * When the callback hostname differs from the configured redirect URI hostname (ephemeral environments),
    * the state parameter includes a signed relay target so UAT can forward the callback.
    * @param pkceCodes - The PKCE code verifier, challenge, and challenge method.
-   * @param returnTo - The post-authentication redirect path to validate.
-   * @param callbackHostname - Optional current request hostname used for relay-state targeting.
-   * @param expiresAt - Fixed reservation deadline for signed relay state.
+   * @param options - Optional validated destination, callback hostname, and relay state deadline.
    * @returns The auth flow state (excluding the auth code URL, which requires an MSAL call).
    */
   private prepareFlowState(
     pkceCodes: PKCECodes,
-    returnTo?: string,
-    callbackHostname?: string,
-    expiresAt?: number,
+    options: InitiateAuthCodeFlowOptions & { returnTo?: string },
   ): PreparedAuthCodeFlowState {
+    const { callbackHostname, expiresAt, prompt, returnTo } = options;
     const { challenge, challengeMethod, verifier } = pkceCodes;
 
     const validReturnTo = getValidatedReturnTo(returnTo);
@@ -323,7 +317,7 @@ export class EntraService {
         codeChallenge: challenge,
         codeChallengeMethod: challengeMethod,
         nonce: oidcNonce,
-        prompt: authRequestDefaults.prompt,
+        prompt: prompt ?? authRequestDefaults.prompt,
         redirectUri: config.entra.redirectUri,
         responseMode: authRequestDefaults.responseMode,
         scopes: authRequestDefaults.scopes,

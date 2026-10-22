@@ -11,6 +11,7 @@ import type {
   RedisConfig,
 } from "#/config.types.js";
 
+import { SESSION_IDLE_TIMEOUT_MS } from "#/auth/session.lifecycle.js";
 import { HOUR, MINUTE, SECOND } from "#/lib/constants/time.js";
 import { optional, required } from "#/lib/env.js";
 import { resolveApiMode } from "#/lib/resolveApiMode.js";
@@ -122,7 +123,7 @@ export default {
   session: {
     cookie: {
       httpOnly: true,
-      maxAge: SESSION_AGE_MAX,
+      maxAge: SESSION_IDLE_TIMEOUT_MS,
       sameSite: "lax",
       secure: useHttps || "auto",
     },

@@ -3,6 +3,8 @@ import type { RedisClientType } from "redis";
 
 import { getMsalCacheKey } from "#/auth/msal.cache-key.js";
 
+const NO_EXPIRATION_TIMESTAMP = 0;
+
 /**
  * MSAL cache plugin that persists the token cache to Redis.
  * Implements the ICachePlugin interface to intercept MSAL cache operations
@@ -15,12 +17,12 @@ export class RedisCachePlugin implements ICachePlugin {
    * Creates a RedisCachePlugin instance.
    * @param redisClient - The Redis client instance.
    * @param sessionId - The express-session ID to use as the cache key suffix.
-   * @param ttlSeconds - The TTL for the Redis key (should match session TTL).
+   * @param expiresAt - Optional absolute expiry time in milliseconds.
    */
   constructor(
     private readonly redisClient: RedisClientType,
     sessionId: string,
-    private readonly ttlSeconds: number,
+    private readonly expiresAt?: number,
   ) {
     this.key = getMsalCacheKey(sessionId);
   }
@@ -32,12 +34,18 @@ export class RedisCachePlugin implements ICachePlugin {
    */
   async afterCacheAccess(cacheContext: TokenCacheContext): Promise<void> {
     if (cacheContext.cacheHasChanged) {
+      const expiresAt =
+        this.expiresAt ?? (await this.redisClient.pExpireTime(this.key));
+      if (expiresAt <= NO_EXPIRATION_TIMESTAMP) {
+        throw new Error(
+          "Cannot persist MSAL cache without an expiring session",
+        );
+      }
+
       await this.redisClient.set(
         this.key,
         cacheContext.tokenCache.serialize(),
-        {
-          EX: this.ttlSeconds,
-        },
+        { PXAT: expiresAt },
       );
     }
   }
@@ -51,7 +59,9 @@ export class RedisCachePlugin implements ICachePlugin {
     const cached = await this.redisClient.get(this.key);
     if (cached) {
       cacheContext.tokenCache.deserialize(cached);
-      await this.redisClient.expire(this.key, this.ttlSeconds);
+      if (this.expiresAt !== undefined) {
+        await this.redisClient.pExpireAt(this.key, this.expiresAt);
+      }
     }
   }
 }
