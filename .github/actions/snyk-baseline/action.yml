@@ -498,23 +498,23 @@ runs:
         set -uo pipefail
         export SNYK_TOKEN="$SNYK_OAUTH_TOKEN"
         mkdir -p sarif
-        overall_status=0
+        scan_iac_environment() {
+          local environment="$1"
+          local temporary_directory="$2"
+          local rendered_file="$temporary_directory/rendered.yaml"
+          local report_output="$temporary_directory/report.txt"
+          local sarif_file="sarif/snyk-iac-${environment}.sarif"
+          local scan_status=0
+          local sarif_valid=false
 
-        for environment in uat staging production; do
-          rendered_file="$(mktemp)"
-          report_output="$(mktemp)"
           if ! helm template deploy/laa-record-controlled-work \
             -f "deploy/laa-record-controlled-work/values/${environment}.yaml" \
             > "$rendered_file"; then
             echo "::error::Failed to render $environment manifests"
-            overall_status=1
             echo "sarif-${environment}=false" >> "$GITHUB_OUTPUT"
-            rm -f "$rendered_file" "$report_output"
-            continue
+            return 1
           fi
 
-          sarif_file="sarif/snyk-iac-${environment}.sarif"
-          scan_status=0
           snyk iac test "$rendered_file" \
             --org="$ORG_ID" \
             --severity-threshold=high \
@@ -526,27 +526,48 @@ runs:
             > "$report_output" 2>&1 || scan_status=$?
           cat "$report_output"
 
-          sarif_valid=false
           if jq -e "$SARIF_VALIDATION_FILTER" "$sarif_file" >/dev/null; then
             sarif_valid=true
           else
             echo "::error::IaC $environment SARIF output is missing or malformed"
-            overall_status=1
           fi
           echo "sarif-${environment}=$sarif_valid" >> "$GITHUB_OUTPUT"
 
           if (( scan_status > 1 )); then
             echo "::error::IaC $environment scan or publication failed with exit code $scan_status"
-            overall_status=1
-          elif ! grep -Eq 'https://app\.snyk\.io/org/[^[:space:]]+' "$report_output"; then
+            return 1
+          fi
+
+          if ! grep -Eq 'https://app\.snyk\.io/org/[^[:space:]]+' "$report_output"; then
             echo "::error::IaC $environment scan did not confirm Snyk dashboard publication"
-            overall_status=1
-          elif [[ "$sarif_valid" != 'true' ]]; then
-            overall_status=1
-          elif (( scan_status == 1 )); then
+            return 1
+          fi
+
+          if [[ "$sarif_valid" != 'true' ]]; then
+            return 1
+          fi
+
+          if (( scan_status == 1 )); then
             echo "::warning::IaC $environment scan completed with findings"
           fi
-          rm -f "$rendered_file" "$report_output"
+
+          return 0
+        }
+
+        overall_status=0
+        for environment in uat staging production; do
+          temporary_directory="$(mktemp -d)" || {
+            echo "::error::Failed to create temporary files for IaC $environment"
+            echo "sarif-${environment}=false" >> "$GITHUB_OUTPUT"
+            overall_status=1
+            continue
+          }
+
+          if ! scan_iac_environment "$environment" "$temporary_directory"; then
+            overall_status=1
+          fi
+
+          rm -rf "$temporary_directory"
         done
 
         exit "$overall_status"
