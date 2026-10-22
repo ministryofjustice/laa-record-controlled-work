@@ -29,7 +29,7 @@ on:
   workflow_dispatch:
     inputs:
       ci_run_id:
-        description: CI run that successfully built the current main image
+        description: CICD workflow run that produced the image
         required: true
         type: string
       image_digest:
