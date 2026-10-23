@@ -11,6 +11,12 @@ version: v1.25.0
 #         expires: "YYYY-MM-DDT00:00:00.000Z" 
 
 ignore:
+  SNYK-JS-BODYPARSER-21431495:
+    - "*":
+        reason: >
+          Temporary three-day exception while the fixed body-parser release
+          continues to age behind the package age gate.
+        expires: "2026-10-25T23:57:08.807Z"
   SNYK-JS-PICOMATCH-21248802:
     - "*":
         reason: >

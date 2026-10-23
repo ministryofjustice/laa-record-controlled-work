@@ -1,13 +1,20 @@
 import type { SessionData } from "express-session";
 
+/* eslint-disable no-param-reassign -- Clear office-related session state. */
+
 /**
- * Destroy the session selected office.
+ * Clear the selected office and its associated session context.
  *
- * Removes the user's selected office from the session. Typically used when the user has an invlaid office.
+ * Used when the user's selected office is no longer valid.
  *
  * @param session  Express session.
  */
 export function destroySessionOffice(session: SessionData): void {
-  // eslint-disable-next-line no-param-reassign -- We need to remove the account from the session.
   delete session.selectedOffice;
+  delete session.singleOffice;
+  delete session.journeyDrafts;
+  delete session.journeyDraftVersions;
+  delete session.journeySubmitted;
 }
+
+/* eslint-enable no-param-reassign */
