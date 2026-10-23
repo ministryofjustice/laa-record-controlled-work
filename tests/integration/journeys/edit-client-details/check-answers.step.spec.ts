@@ -14,6 +14,7 @@ import { ApplicationDto } from "#/api/dto/application/application.dto.js";
 import { editApplicationEffectsRegistry } from "#/journeys/edit-application/editApplication.effects.js";
 import { editApplicationJourney } from "#/journeys/edit-application/editApplication.journey.js";
 import { editApplicationTransformersRegistry } from "#/journeys/edit-application/editApplication.transformers.js";
+import { evidenceEffectsRegistry } from "#/journeys/evidence/evidence.effects.js";
 import { JourneyCode } from "#/journeys/JourneyCode.enum.js";
 import { setupNunjucks } from "#/middleware/setupNunjucks.js";
 import { createSavedApplication } from "#tests/fixtures/application.fixtures.js";
@@ -110,12 +111,16 @@ describe("Edit client details check answers step", () => {
     editApplicationJourney,
     editApplicationEffectsRegistry,
     {
-      additionalFunctions: [editApplicationTransformersRegistry],
+      additionalFunctions: [
+        editApplicationTransformersRegistry,
+        evidenceEffectsRegistry,
+      ],
       renderer,
       disableReachabilityChecks: false,
       dependencies: {
         getApplication: getApplicationStub,
         updateApplicationDetails: updateApplicationDetailsStub,
+        updateApplicationEvidence: async () => ({ status: 204 }),
         updateApplicationStatus: updateApplicationStatusStub,
       },
     },

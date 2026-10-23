@@ -1,4 +1,5 @@
 import { EvidenceDto } from "#/api/dto/evidence/evidence.dto.js";
+import type { Evidence } from "#/api/clients/rcw/model/evidence.zod.gen.js";
 import { EvidenceAnswers } from "#/journeys/evidence/evidence.types.js";
 import { expect } from "chai";
 
@@ -22,6 +23,20 @@ const evidenceAnswers: EvidenceAnswers = {
 };
 
 describe("EvidenceAnswers DTO", () => {
+  it("maps evidence without an exemption to the yes answer", () => {
+    const evidence: Evidence = {
+      evidenceExemptionCode: "none",
+      evidenceExemptionReason: "Not exempt",
+      incomeEvidenceChecklist: null,
+      expenditureCapitalEvidenceChecklist: null,
+    };
+
+    expect(EvidenceDto.toAnswers(evidence)).to.include({
+      doYouHaveEvidence: "yes",
+      reasonForNoEvidence: undefined,
+    });
+  });
+
   it("should map answers to API request format", () => {
     const expected = {
       expenditureCapitalEvidenceChecklist: {

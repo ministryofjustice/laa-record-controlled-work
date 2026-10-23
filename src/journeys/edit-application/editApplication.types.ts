@@ -5,6 +5,7 @@ import type { ApplicationState } from "#/api/clients/rcw/model/applicationState.
 import type {
   getApplication,
   updateApplicationDetails,
+  updateApplicationEvidence,
   updateApplicationStatus,
 } from "#/api/clients/rcw/schema/applications/applications.gen.js";
 import type { JourneySession } from "#/journeys/context.type.js";
@@ -32,5 +33,6 @@ export interface EditApplicationData extends Record<string, unknown> {
 export interface EditApplicationEffectsDeps {
   getApplication: typeof getApplication;
   updateApplicationDetails: typeof updateApplicationDetails;
+  updateApplicationEvidence: typeof updateApplicationEvidence;
   updateApplicationStatus: typeof updateApplicationStatus;
 }

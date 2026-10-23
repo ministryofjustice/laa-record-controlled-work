@@ -11,6 +11,7 @@ import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
 import { editApplicationEffectsRegistry } from "#/journeys/edit-application/editApplication.effects.js";
 import { editApplicationJourney } from "#/journeys/edit-application/editApplication.journey.js";
 import { editApplicationTransformersRegistry } from "#/journeys/edit-application/editApplication.transformers.js";
+import { evidenceEffectsRegistry } from "#/journeys/evidence/evidence.effects.js";
 import { faker } from "@faker-js/faker";
 
 describe("Confirmation step", () => {
@@ -25,10 +26,14 @@ describe("Confirmation step", () => {
     editApplicationJourney,
     editApplicationEffectsRegistry,
     {
-      additionalFunctions: [editApplicationTransformersRegistry],
+      additionalFunctions: [
+        editApplicationTransformersRegistry,
+        evidenceEffectsRegistry,
+      ],
       dependencies: {
         getApplication: getApplicationStub,
         updateApplicationDetails: sinon.stub().resolves({ status: 204 }),
+        updateApplicationEvidence: async () => ({ status: 204 }),
         updateApplicationStatus: updateApplicationStatusStub,
       },
     },
