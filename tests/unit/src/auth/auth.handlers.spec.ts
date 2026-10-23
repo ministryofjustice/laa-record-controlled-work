@@ -142,7 +142,13 @@ describe("Auth Handlers", () => {
   });
 
   function createHandlerRequest(request: object): Request {
-    return Object.assign(request, { app: mockApp }) as unknown as Request;
+    const req = Object.assign(request, { app: mockApp }) as unknown as Request;
+    if (req.session !== undefined) {
+      Object.assign(req.session, {
+        cookie: { maxAge: config.session.cookie.maxAge },
+      });
+    }
+    return req;
   }
 
   describe("signin()", () => {
@@ -649,6 +655,28 @@ describe("Auth Handlers", () => {
 
       expect(res.status).to.equal(FOUND);
       expect(res.headers.location).to.equal(AUTH_CODE_URL);
+      expect(
+        authServiceStub.initiateAuthCodeFlow.calledOnceWithExactly("/", {
+          callbackHostname: "127.0.0.1",
+          expiresAt: sinon.match.number,
+          prompt: undefined,
+        }),
+      ).to.be.true;
+    });
+
+    it("requests interactive authentication when prompt=login is supplied", async () => {
+      const res = await request(mockApp)
+        .get("/auth/signin")
+        .query({ prompt: "login" });
+
+      expect(res.status).to.equal(FOUND);
+      expect(
+        authServiceStub.initiateAuthCodeFlow.calledOnceWithExactly("/", {
+          callbackHostname: "127.0.0.1",
+          expiresAt: sinon.match.number,
+          prompt: "login",
+        }),
+      ).to.be.true;
     });
 
     it("uses returnTo query parameter when it is a safe app-relative path", async () => {
@@ -695,6 +723,7 @@ describe("Auth Handlers", () => {
           authServiceStub.initiateAuthCodeFlow.calledOnceWithExactly("/", {
             callbackHostname: "127.0.0.1",
             expiresAt: sinon.match.number,
+            prompt: undefined,
           }),
         ).to.be.true;
       });
@@ -719,6 +748,7 @@ describe("Auth Handlers", () => {
         authServiceStub.initiateAuthCodeFlow.calledOnceWith("/", {
           callbackHostname: "127.0.0.1",
           expiresAt: sinon.match.number,
+          prompt: undefined,
         }),
       ).to.be.true;
     });
@@ -772,6 +802,7 @@ describe("Auth Handlers", () => {
         authServiceStub.initiateAuthCodeFlow.calledOnceWith("/", {
           callbackHostname: "localhost",
           expiresAt: sinon.match.number,
+          prompt: undefined,
         }),
       ).to.be.true;
     });
@@ -929,6 +960,22 @@ describe("Auth Handlers", () => {
       expect(sessionResponse.body).to.not.have.property("idToken");
     });
 
+    it("starts the authenticated session lifetime on successful callback", async () => {
+      const now = Date.now();
+      sinon.useFakeTimers({ now, toFake: ["Date"] });
+      const agent = request.agent(mockApp);
+      await startSignIn(agent);
+
+      const callbackResponse = await agent
+        .get("/auth/code/callback")
+        .query(QUERY_PARAMS);
+      expect(callbackResponse.status).to.equal(FOUND);
+
+      const sessionResponse = await agent.get("/test/session");
+      expect(sessionResponse.body.authenticatedAt).to.equal(now);
+      expect(sessionResponse.body.lastActivityAt).to.equal(now);
+    });
+
     it("responds with 400 when auth request body doesn't match schema", async () => {
       const wrongQueryParams = { missing: "property" };
 
@@ -1045,6 +1092,7 @@ describe("Auth Handlers", () => {
           regenerate: (callback: (error?: Error | null) => void): void => {
             callbackReq.sessionID = "rotated-callback-session";
             callbackReq.session = {
+              cookie: { maxAge: config.session.cookie.maxAge },
               save: (saveCallback: (error?: Error | null) => void): void =>
                 saveCallback(),
             } as Request["session"];
@@ -1145,6 +1193,7 @@ describe("Auth Handlers", () => {
           regenerate: (callback: (error?: Error | null) => void): void => {
             req.sessionID = "new-authenticated-session";
             req.session = {
+              cookie: { maxAge: config.session.cookie.maxAge },
               save: (saveCallback: (error?: Error | null) => void): void =>
                 saveCallback(new Error("session store unavailable")),
               destroy: (destroyCallback: (error?: Error | null) => void): void => {
@@ -1373,6 +1422,7 @@ describe("Auth Handlers", () => {
           regenerate: (callback: (error?: Error | null) => void): void => {
             req.sessionID = "new-session-id";
             req.session = {
+              cookie: { maxAge: config.session.cookie.maxAge },
               save: (saveCallback: (error?: Error | null) => void): void =>
                 saveCallback(),
             } as Request["session"];
@@ -1393,8 +1443,12 @@ describe("Auth Handlers", () => {
 
       await authCodeCallback(req, res, next);
 
-      expect(createStub.calledOnceWithExactly({ sessionId: "new-session-id" }))
-        .to.be.true;
+      expect(
+        createStub.calledOnceWithExactly({
+          cacheExpiresAt: sinon.match.number,
+          sessionId: "new-session-id",
+        }),
+      ).to.be.true;
       const redirect = res.redirect as sinon.SinonStub;
       expect(redirect.calledOnceWithExactly(returnTo)).to.be.true;
       expectAllowedLocalLocation(redirect.firstCall.args[0]);

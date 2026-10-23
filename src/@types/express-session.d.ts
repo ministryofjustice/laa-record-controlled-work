@@ -16,11 +16,13 @@ interface SessionMsalReference {
 declare module "express-session" {
   interface SessionData {
     account?: AccountInfo & KnownClaims;
+    authenticatedAt?: number;
     authFlowPending?: string;
     isAuthenticated?: boolean;
     journeyDrafts?: Record<string, Record<string, unknown>>;
     journeyDraftVersions?: Record<string, string>;
     journeySubmitted?: Record<string, boolean>;
+    lastActivityAt?: number;
     msal?: SessionMsalReference;
     returnTo?: string;
     selectedOffice?: Office;

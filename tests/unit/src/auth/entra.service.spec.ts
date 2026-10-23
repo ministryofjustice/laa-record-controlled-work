@@ -280,6 +280,13 @@ describe("EntraService", () => {
       expect(result.value).to.not.have.property("authCodeUrlRequest");
     });
 
+    it("uses the login prompt for forced interactive authentication", async () => {
+      await service.initiateAuthCodeFlow(undefined, { prompt: "login" });
+
+      const [requestArg] = (msalStub.getAuthCodeUrl as sinon.SinonStub).args[0];
+      expect(requestArg.prompt).to.equal("login");
+    });
+
     it("returns a random authState and passes it as the state parameter", async () => {
       const result =
         (await service.initiateAuthCodeFlow()) as Success<AuthCodeFlowState>;

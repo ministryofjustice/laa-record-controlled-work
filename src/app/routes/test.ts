@@ -5,6 +5,7 @@ import {
   getTestSessionAccount,
   LAA_ACCOUNT,
 } from "#/auth/actions/getTestSessionAccount.action.js";
+import { setLifecycle } from "#/auth/session.lifecycle.js";
 import { OK } from "#/lib/constants/http.js";
 
 const router: Router = Router();
@@ -23,6 +24,7 @@ router.get("/signin", (req, res, next) => {
   req.session.msal = {
     homeAccountId: "test.user@example.com",
   };
+  setLifecycle(req.session, Date.now());
 
   req.session.save((err: Error | null | undefined) => {
     if (err instanceof Error) {

@@ -11,13 +11,18 @@ import { type Either, failure, success } from "#/lib/either.js";
  *
  * @param homeAccountId - MSAL account reference stored in `session.account.homeAccountId`.
  * @param sessionId - Session identifier stored in `session.id`.
+ * @param cacheExpiresAt - Absolute expiry for the session-scoped token cache.
  * @returns Either a refreshed access token or an auth-related refresh error.
  */
 export async function refreshToken(
   homeAccountId: string,
   sessionId: string,
+  cacheExpiresAt?: number,
 ): Promise<Either<TokenRefreshError, AuthenticationResult>> {
-  const entraService = EntraService.create({ sessionId });
+  const entraService = EntraService.create({
+    cacheExpiresAt,
+    sessionId,
+  });
 
   const tokenResult = await entraService.refreshToken(
     homeAccountId,

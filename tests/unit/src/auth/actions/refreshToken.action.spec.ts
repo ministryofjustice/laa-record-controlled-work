@@ -34,12 +34,37 @@ describe("refreshToken", () => {
     const result = await refreshToken(HOME_ACCOUNT_ID, SESSION_ID);
 
     expect(createMock.calledOnce).to.be.true;
-    expect(createMock.calledWith({ sessionId: SESSION_ID })).to.be.true;
+    expect(
+      createMock.calledOnceWithExactly({
+        cacheExpiresAt: undefined,
+        sessionId: SESSION_ID,
+      }),
+    ).to.be.true;
 
     const refreshTokenArgs = [HOME_ACCOUNT_ID, config.entra.scopes];
     expect(refreshTokenMock.calledOnce).to.be.true;
     expect(refreshTokenMock.calledWith(...refreshTokenArgs)).to.be.true;
     expect(result).to.deep.equal(success(refreshTokenMockResult));
+  });
+
+  it("passes the session cache expiry when refreshing", async () => {
+    const cacheExpiresAt = Date.now() + 30 * 60 * 1000;
+    const createMock = sinon.stub(EntraService, "create").returns({
+      refreshToken: sinon
+        .stub()
+        .resolves(
+          success({ accessToken: "new-access-token" } as AuthenticationResult),
+        ),
+    } as unknown as EntraService);
+
+    await refreshToken(HOME_ACCOUNT_ID, SESSION_ID, cacheExpiresAt);
+
+    expect(
+      createMock.calledOnceWithExactly({
+        cacheExpiresAt,
+        sessionId: SESSION_ID,
+      }),
+    ).to.be.true;
   });
 
   it("returns a TokenRefreshError on failure", async () => {
