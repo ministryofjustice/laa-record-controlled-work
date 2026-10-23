@@ -77,6 +77,9 @@ if [[ "$1" == "test" ]]; then
   fi
   exit "$SNYK_TEST_EXIT"
 fi
+if [[ "$1" == "container" && "${2:-}" == "monitor" ]]; then
+  exit "$SNYK_CONTAINER_MONITOR_EXIT"
+fi
 if [[ "$1" == "monitor" ]]; then
   exit "$SNYK_MONITOR_EXIT"
 fi
@@ -108,6 +111,7 @@ run_case() {
   local fail_on_findings=${6:-false}
   local report_to_snyk=${7:-false}
   local empty_scans=${8:-}
+  local container_monitor_exit=${9:-0}
   local image_uri=registry.example/app@sha256:$(printf 'a%.0s' {1..64})
 
   if [[ "$scan_mode" == "monitor" ]]; then
@@ -134,6 +138,7 @@ run_case() {
     GITHUB_RUN_ATTEMPT=1 \
     SNYK_DELTA_EXIT="$delta_exit" \
     SNYK_MONITOR_EXIT="$monitor_exit" \
+    SNYK_CONTAINER_MONITOR_EXIT="$container_monitor_exit" \
     SNYK_REPORT_DIR="$tmp_dir/reports" \
     SNYK_RENDER_DIR="$tmp_dir/rendered" \
     GITHUB_STEP_SUMMARY="$tmp_dir/summary.md" \
@@ -290,6 +295,16 @@ if ! grep -Fq 'No findings.' "$tmp_dir/reports/findings.md" ||
   echo 'Successful clean scans should not create findings sections' >&2
   exit 1
 fi
+if run_case absolute 0 0 0 test-org-id false true '' 1; then
+  echo 'A failed Container monitor write with exit code 1 should fail the workflow' >&2
+  exit 1
+fi
+if ! grep -Fq 'Snyk Container monitoring failed with exit code 1' "$tmp_dir/output.log" ||
+  ! grep -Fq '| Container monitoring | tool error (1) |' "$tmp_dir/summary.md" ||
+  grep -Fq '| Container monitoring | findings |' "$tmp_dir/summary.md"; then
+  echo 'Container monitor failures should be reported as operational errors' >&2
+  exit 1
+fi
 assert_logged 'snyk code test --severity-threshold=high --report --project-name=laa-record-controlled-work-code --target-reference=main --sarif-file-output='
 assert_logged '--severity-threshold=high --report --target-name=laa-record-controlled-work-iac --target-reference=main --sarif-file-output='
 
@@ -308,9 +323,18 @@ if grep -Fq 'container test' "$tmp_dir/calls.log"; then
   echo 'Monitor mode should run only the Open Source monitor' >&2
   exit 1
 fi
-if ! run_case monitor 0 0 1; then
+if run_case monitor 0 0 1; then
   cat "$tmp_dir/output.log" >&2
-  echo 'Monitoring findings should not fail the workflow' >&2
+  echo 'A failed monitoring write with exit code 1 should fail the workflow' >&2
+  exit 1
+fi
+if ! grep -Fq 'Snyk Open Source monitoring failed with exit code 1' "$tmp_dir/output.log"; then
+  echo 'The monitoring failure should be reported as an operational error' >&2
+  exit 1
+fi
+if ! grep -Fq '| Open Source monitoring | tool error (1) |' "$tmp_dir/summary.md" ||
+  grep -Fq '| Open Source monitoring | findings |' "$tmp_dir/summary.md"; then
+  echo 'A failed OSS monitor write should not be summarized as vulnerability findings' >&2
   exit 1
 fi
 if run_case monitor 0 0 2; then
@@ -318,6 +342,10 @@ if run_case monitor 0 0 2; then
   exit 1
 fi
 
+if ! grep -Fq 'Snyk Open Source monitoring failed with exit code 2' "$tmp_dir/output.log"; then
+  echo 'The monitoring failure should identify the operational exit code' >&2
+  exit 1
+fi
 node --test "$repo_root/.github/scripts/test-format-snyk-findings.mjs"
 
 echo 'Snyk scan mode checks passed'
