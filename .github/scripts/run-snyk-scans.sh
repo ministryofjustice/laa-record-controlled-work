@@ -12,37 +12,77 @@ render_dir=${SNYK_RENDER_DIR:-rendered-templates}
 summary_path=${GITHUB_STEP_SUMMARY:-}
 overall_status=0
 
-if [[ ! "$source_sha" =~ ^[0-9a-fA-F]{40}$ ]]; then
+is_delta_scan() {
+  [[ "$scan_mode" == "delta" ]]
+}
+
+is_absolute_scan() {
+  [[ "$scan_mode" == "absolute" ]]
+}
+
+is_monitor_scan() {
+  [[ "$scan_mode" == "monitor" ]]
+}
+
+is_supported_scan_mode() {
+  is_delta_scan || is_absolute_scan || is_monitor_scan
+}
+
+requires_snyk_org() {
+  is_delta_scan || is_monitor_scan
+}
+
+runs_full_scan_set() {
+  ! is_monitor_scan
+}
+
+has_full_source_sha() {
+  [[ "$source_sha" =~ ^[0-9a-fA-F]{40}$ ]]
+}
+
+has_immutable_image_uri() {
+  [[ "$image_uri" =~ ^[^[:space:]@]+@sha256:[a-f0-9]{64}$ ]]
+}
+
+is_boolean_value() {
+  [[ "$1" == "true" || "$1" == "false" ]]
+}
+
+has_summary() {
+  [[ -n "$summary_path" ]]
+}
+
+if ! has_full_source_sha; then
   echo "::error::source_sha must be a full commit SHA"
   exit 1
 fi
 
-if [[ "$scan_mode" != "delta" && "$scan_mode" != "absolute" && "$scan_mode" != "monitor" ]]; then
+if ! is_supported_scan_mode; then
   echo "::error::SCAN_MODE must be delta, absolute, or monitor"
   exit 1
 fi
 
-if [[ "$scan_mode" == "delta" && -z "${SNYK_TOKEN:-}" ]]; then
+if is_delta_scan && [[ -z "${SNYK_TOKEN:-}" ]]; then
   echo "::error::SNYK_TOKEN is required for Snyk Delta"
   exit 1
 fi
 
-if [[ "$scan_mode" == "delta" || "$scan_mode" == "monitor" ]] && [[ -z "${SNYK_ORG_ID:-}" ]]; then
+if requires_snyk_org && [[ -z "${SNYK_ORG_ID:-}" ]]; then
   echo "::error::SNYK_ORG_ID is required for Snyk Delta and monitoring"
   exit 1
 fi
 
-if [[ "$scan_mode" != "monitor" && ! "$image_uri" =~ ^[^[:space:]@]+@sha256:[a-f0-9]{64}$ ]]; then
+if runs_full_scan_set && ! has_immutable_image_uri; then
   echo "::error::image_uri must reference an immutable sha256 digest"
   exit 1
 fi
 
-if [[ "$report_to_snyk" != "true" && "$report_to_snyk" != "false" ]]; then
+if ! is_boolean_value "$report_to_snyk"; then
   echo "::error::REPORT_TO_SNYK must be true or false"
   exit 1
 fi
 
-if [[ "$findings_are_errors" != "true" && "$findings_are_errors" != "false" ]]; then
+if ! is_boolean_value "$findings_are_errors"; then
   echo "::error::FAIL_ON_FINDINGS must be true or false"
   exit 1
 fi
@@ -50,7 +90,7 @@ fi
 mkdir -p "$report_dir" "$render_dir"
 
 run_url="${GITHUB_SERVER_URL:-https://github.com}/${GITHUB_REPOSITORY:-}/actions/runs/${GITHUB_RUN_ID:-}/attempts/${GITHUB_RUN_ATTEMPT:-1}"
-if [[ -n "$summary_path" ]]; then
+if has_summary; then
   {
     echo "## Snyk security gate"
     echo
@@ -68,9 +108,11 @@ fi
 record_status() {
   local name=$1
   local status=$2
-  if [[ -n "$summary_path" ]]; then
+
+  if has_summary; then
     printf '| %s | %s |\n' "$name" "$status" >> "$summary_path"
   fi
+
   if [[ "$status" != "passed" && "$status" != "findings" ]]; then
     overall_status=1
   fi
@@ -79,6 +121,7 @@ record_status() {
 record_setup() {
   local name=$1
   local outcome=$2
+
   if [[ "$outcome" == "success" ]]; then
     record_status "$name" passed
   else
@@ -88,19 +131,19 @@ record_setup() {
 }
 
 record_setup "Node and dependency setup" "${SETUP_NODE_OUTCOME:-success}"
-if [[ "$scan_mode" != "monitor" ]]; then
+if runs_full_scan_set; then
   record_setup "ECR credentials" "${ECR_AUTH_OUTCOME:-success}"
   record_setup "ECR login" "${ECR_LOGIN_OUTCOME:-success}"
   record_setup "Helm installation" "${HELM_SETUP_OUTCOME:-success}"
 fi
 record_setup "Snyk CLI installation" "${SNYK_CLI_INSTALL_OUTCOME:-success}"
-if [[ "$scan_mode" == "delta" ]]; then
+if is_delta_scan; then
   record_setup "Snyk Delta installation" "${SNYK_DELTA_INSTALL_OUTCOME:-success}"
 fi
 record_setup "Snyk OAuth action" "${SNYK_AUTH_OUTCOME:-success}"
 record_setup "Snyk OAuth token masking" "${SNYK_TOKEN_MASK_OUTCOME:-success}"
 
-if [[ -n "$summary_path" ]]; then
+if has_summary; then
   {
     echo
     echo "## Snyk scan results"
@@ -115,14 +158,30 @@ if [[ -f .snyk ]]; then
   policy_args+=(--policy-path=.snyk)
 fi
 
+is_monitor_operation() {
+  local command=${1:-}
+  local subcommand=${2:-}
+  local operation=${3:-}
+
+  case "$command:$subcommand:$operation" in
+    snyk:monitor:*|snyk:container:monitor) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+is_findings_exit() {
+  [[ "$1" == "1" && "$2" != "true" ]]
+}
+
 run_scan() {
   local name=$1
   shift
   local exit_code
   local monitor_operation=false
-  case "${1:-}:${2:-}:${3:-}" in
-    snyk:monitor:*|snyk:container:monitor) monitor_operation=true ;;
-  esac
+
+  if is_monitor_operation "$@"; then
+    monitor_operation=true
+  fi
 
   echo "::group::Snyk $name"
   if "$@"; then
@@ -134,7 +193,7 @@ run_scan() {
 
   if [[ "$exit_code" == "0" ]]; then
     record_status "$name" passed
-  elif [[ "$exit_code" == "1" && "$monitor_operation" != "true" ]]; then
+  elif is_findings_exit "$exit_code" "$monitor_operation"; then
     if [[ "$findings_are_errors" == "true" ]]; then
       echo "::error::Snyk $name found high-severity findings"
       overall_status=1
@@ -148,23 +207,38 @@ run_scan() {
   fi
 }
 
+has_missing_delta_baseline() {
+  grep -Fq 'Could not find a matching monitored Snyk project.' "$1"
+}
+
 run_delta_scan() {
   local snyk_status
   local delta_status
+  local output_status
+  local delta_output="$report_dir/snyk-open-source-delta.log"
   local -a pipeline_status
 
   echo "::group::Snyk Open Source Delta"
+  : > "$delta_output"
   snyk test --org="$SNYK_ORG_ID" \
     --project-name=laa-record-controlled-work-open-source \
     --target-reference=main \
     --dev --severity-threshold=high --json --print-deps "${policy_args[@]}" \
-    | snyk-delta --targetReference main
+    | snyk-delta --targetReference main --type vuln 2>&1 \
+    | tee "$delta_output"
   pipeline_status=("${PIPESTATUS[@]}")
   echo "::endgroup::"
 
   snyk_status=${pipeline_status[0]}
   delta_status=${pipeline_status[1]}
-  if (( snyk_status > 1 )); then
+  output_status=${pipeline_status[2]}
+  if has_missing_delta_baseline "$delta_output"; then
+    echo "::error::Snyk Delta could not find the monitored main Open Source baseline"
+    record_status "Open Source Delta" "baseline unavailable"
+  elif (( output_status != 0 )); then
+    echo "::error::Failed to preserve Snyk Delta comparison output"
+    record_status "Open Source Delta" "report error ($output_status)"
+  elif (( snyk_status > 1 )); then
     echo "::error::Snyk Open Source test failed with exit code $snyk_status"
     record_status "Open Source Delta" "tool error ($snyk_status)"
   elif (( delta_status == 0 )); then
@@ -179,13 +253,13 @@ run_delta_scan() {
   fi
 }
 
-if [[ "$scan_mode" == "monitor" ]]; then
+if is_monitor_scan; then
   run_scan "Open Source monitoring" snyk monitor \
     --org="$SNYK_ORG_ID" --dev \
     --project-name=laa-record-controlled-work-open-source \
     --target-reference=main "${policy_args[@]}"
 else
-  if [[ "$scan_mode" == "delta" ]]; then
+  if is_delta_scan; then
     run_delta_scan
   else
     run_scan "Open Source" snyk test --all-projects --dev \
@@ -235,7 +309,7 @@ else
   run_scan "IaC" snyk iac test "${iac_args[@]}"
 fi
 
-if [[ "$scan_mode" != "monitor" && -n "$summary_path" ]]; then
+if runs_full_scan_set && has_summary; then
   {
     echo
     echo "## Validation"
@@ -246,20 +320,20 @@ if [[ "$scan_mode" != "monitor" && -n "$summary_path" ]]; then
   } >> "$summary_path"
 fi
 
-if [[ "$scan_mode" == "absolute" ]]; then
+if is_absolute_scan; then
   if ! node .github/scripts/format-snyk-findings.mjs "$report_dir"; then
     echo "::error::Failed to format findings from Snyk SARIF reports"
     overall_status=1
   fi
   markdown_findings_path="$report_dir/findings.md"
-  if [[ -n "$summary_path" && -f "$markdown_findings_path" ]]; then
+  if has_summary && [[ -f "$markdown_findings_path" ]]; then
     echo >> "$summary_path"
     echo "## Findings" >> "$summary_path"
     cat "$markdown_findings_path" >> "$summary_path"
   fi
 fi
 
-if [[ -n "$summary_path" ]]; then
+if has_summary; then
   echo >> "$summary_path"
   echo "Reports and rendered templates are attached to the [workflow run]($run_url)." >> "$summary_path"
 fi

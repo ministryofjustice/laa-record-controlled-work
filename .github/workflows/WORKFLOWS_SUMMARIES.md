@@ -17,12 +17,14 @@ Runs for pull requests, main pushes, merge groups, and manual dispatches.
 ## Snyk Security Gates
 
 `snyk` calls `.github/workflows/snyk.yml`, the sole Snyk scan owner. PR and
-merge-group Open Source checks pipe JSON results into `snyk-delta`, failing on
-new high-severity findings. Main skips the full scan suite and runs Open Source
-monitoring only, independently of image build and deployment. Nightly runs the
-same scans in strict mode. Contributor and nightly scans also scan the pushed ECR
-image, Snyk Code, and rendered UAT, staging, and production manifests. The CLI
-is pinned to `1.1307.4`;
+merge-group Open Source checks compare JSON results against the monitored main
+baseline, failing on new high/critical vulnerabilities. Container and IaC use
+absolute high/critical gates, and Code uses an absolute high gate. Contributor
+runs do not publish Snyk snapshots. Main skips the full scan suite and runs
+Open Source monitoring only, independently of image build and deployment.
+Nightly runs the same scans in strict mode. Contributor and nightly scans also
+scan the pushed ECR image, Snyk Code, and rendered UAT, staging, and production
+manifests. The CLI is pinned to `1.1308.1`;
 `snyk-delta` is pinned to `1.14.0`. CICD scans the immutable image digest
 returned by Docker push.
 
