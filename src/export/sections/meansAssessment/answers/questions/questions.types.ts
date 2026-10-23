@@ -6,21 +6,66 @@ export enum PropertyOwnership {
 }
 
 import type { EligibilityData } from "#/api/clients/rcw/model/eligibilityData.zod.gen.js";
+import type { EligibilityDataBankAccount } from "#/api/clients/rcw/model/eligibilityDataBankAccount.zod.gen.js";
+import type { EligibilityDataBenefit } from "#/api/clients/rcw/model/eligibilityDataBenefit.zod.gen.js";
+import type { EligibilityDataIncome } from "#/api/clients/rcw/model/eligibilityDataIncome.zod.gen.js";
+import type { EligibilityDataProperty } from "#/api/clients/rcw/model/eligibilityDataProperty.zod.gen.js";
 
 export interface AnswerSelection {
-  additionalProperties: (
-    answers: EligibilityData,
-  ) => readonly SavedAdditionalProperty[];
-  additionalPropertyOwned: (answers: EligibilityData) => string;
-  benefits: (answers: EligibilityData) => EligibilityData["benefits"];
-  employmentIncomes: (answers: EligibilityData) => EligibilityData["incomes"];
-  employmentStatus: (answers: EligibilityData) => null | string | undefined;
-  isDisputeApplicable: (answers: EligibilityData) => boolean;
-  isPresent: (answers: EligibilityData) => boolean;
+  additionalProperties: SavedAdditionalPropertiesSelector;
+  additionalPropertyOwned: SavedStringSelector;
+  assets: AssetAnswerSelectors;
+  benefits: SavedBenefitsSelector;
+  employmentIncomes: SavedEmploymentIncomesSelector;
+  employmentStatus: SavedNullableStringSelector;
+  isDisputeApplicable: SavedBooleanSelector;
+  isPresent: SavedBooleanSelector;
   otherIncome: OtherIncomeSelectorsByCategory;
   payments: PaymentAnswerSelectorsByType;
-  receivesBenefits: (answers: EligibilityData) => boolean | null | undefined;
+  receivesBenefits: SavedNullableBooleanSelector;
 }
+export interface AssetAnswerSelectors {
+  bankAccounts: SavedBankAccountsSelector;
+  investments: AssetValueSelectors;
+  valuables: AssetValueSelectors;
+}
+export type SavedNullableBooleanSelector = (
+  answers: EligibilityData,
+) => boolean | null | undefined;
+
+interface AssetValueSelectors {
+  amount: SavedNullableNumberSelector;
+  disputed: SavedNullableBooleanSelector;
+  relevant: SavedNullableBooleanSelector;
+}
+
+type SavedAdditionalPropertiesSelector = (
+  answers: EligibilityData,
+) => readonly EligibilityDataProperty[];
+
+type SavedBankAccountsSelector = (
+  answers: EligibilityData,
+) => EligibilityDataBankAccount[] | null | undefined;
+
+type SavedBenefitsSelector = (
+  answers: EligibilityData,
+) => EligibilityDataBenefit[] | null | undefined;
+
+type SavedBooleanSelector = (answers: EligibilityData) => boolean;
+
+type SavedEmploymentIncomesSelector = (
+  answers: EligibilityData,
+) => EligibilityDataIncome[] | null | undefined;
+
+type SavedNullableNumberSelector = (
+  answers: EligibilityData,
+) => null | number | undefined;
+
+type SavedNullableStringSelector = (
+  answers: EligibilityData,
+) => null | string | undefined;
+
+type SavedStringSelector = (answers: EligibilityData) => string;
 
 export const propertyOwnershipChoices = {
   none: "housing.property.ownership.none",
@@ -30,9 +75,9 @@ export const propertyOwnershipChoices = {
 };
 
 export interface OtherIncomeCategorySelectors {
-  amount: (answers: EligibilityData) => null | number | undefined;
-  frequency?: (answers: EligibilityData) => null | string | undefined;
-  relevant: (answers: EligibilityData) => boolean | null | undefined;
+  amount: SavedNullableNumberSelector;
+  frequency?: SavedNullableStringSelector;
+  relevant: SavedNullableBooleanSelector;
 }
 
 export interface OtherIncomeSelectorsByCategory {
@@ -45,9 +90,9 @@ export interface OtherIncomeSelectorsByCategory {
 }
 
 export interface PaymentAnswerSelectors {
-  amount: (answers: EligibilityData) => null | number | undefined;
-  frequency: (answers: EligibilityData) => null | string | undefined;
-  relevant: (answers: EligibilityData) => boolean | null | undefined;
+  amount: SavedNullableNumberSelector;
+  frequency: SavedNullableStringSelector;
+  relevant: SavedNullableBooleanSelector;
 }
 
 export interface PaymentAnswerSelectorsByType {
@@ -55,13 +100,3 @@ export interface PaymentAnswerSelectorsByType {
   legalAid: PaymentAnswerSelectors;
   maintenance: PaymentAnswerSelectors;
 }
-
-export type SavedAdditionalProperty = NonNullable<
-  EligibilityData["additional_properties"]
->[number];
-
-export type SavedBenefit = NonNullable<EligibilityData["benefits"]>[number];
-
-export type SavedEmploymentIncome = NonNullable<
-  EligibilityData["incomes"]
->[number];

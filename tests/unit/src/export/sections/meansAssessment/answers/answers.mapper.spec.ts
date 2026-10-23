@@ -16,6 +16,7 @@ const ANSWERS = {
   employment_status: "unemployed",
   friends_or_family_relevant: false,
   immigration_or_asylum: false,
+  investments_relevant: false,
   legal_aid_payments_relevant: false,
   level_of_help: "controlled",
   maintenance_relevant: false,
@@ -32,6 +33,7 @@ const ANSWERS = {
   property_or_lodger_relevant: false,
   receives_benefits: false,
   student_finance_relevant: false,
+  valuables_relevant: false,
   housing_payments: 0,
   housing_benefit_relevant: false,
 } satisfies EligibilityData;
@@ -106,6 +108,16 @@ const SUMMARIES = [
     rows: [
       {
         key: "Does your client own any other property, a holiday home or land?",
+        value: "No",
+      },
+    ],
+  },
+  {
+    heading: "Client assets",
+    rows: [
+      { key: "Does your client have any investments?", value: "No" },
+      {
+        key: "Does your client have valuable items worth £500 or more?",
         value: "No",
       },
     ],
@@ -216,8 +228,13 @@ describe("saved means answers", () => {
           },
         ],
       },
-      SUMMARIES.at(-3),
-      SUMMARIES.at(-1),
+      ...SUMMARIES.filter(({ heading }) =>
+        [
+          "Home client usually lives in",
+          "Client other property",
+          "Client assets",
+        ].includes(heading),
+      ),
     ]);
     expect(section?.calculations).to.deep.equal({
       capital: { status: "not_calculated" },
