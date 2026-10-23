@@ -52,6 +52,8 @@ gzip_types          application/atom+xml
 server {
   listen 8080;
 
+  include /etc/nginx/security-headers.conf;
+
   access_log /var/log/nginx/access.log json_combined;
 
   # MoJ CP/EKS ranges
@@ -90,6 +92,7 @@ server {
   }
 
   location /ccq/assets/ {
+    include     /etc/nginx/security-headers.conf;
     include     /etc/nginx/proxy.conf;
     proxy_pass  http://${NGINX_UPSTREAM_CCQ};
     
