@@ -745,15 +745,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ministryofjustice/hmpps-forge@npm:^0.4.4":
-  version: 0.4.4
-  resolution: "@ministryofjustice/hmpps-forge@npm:0.4.4"
+"@ministryofjustice/hmpps-forge@npm:^0.4.5":
+  version: 0.4.5
+  resolution: "@ministryofjustice/hmpps-forge@npm:0.4.5"
   dependencies:
     express: "npm:^4.21.0 || ^5.0.0"
     nunjucks: "npm:^3.2.4"
     ws: "npm:^8.18.0"
     zod: "npm:^4.5.0"
-  checksum: 10c0/9fc155ee2577c503c4d8f90e4f116413eb7289e908cf697783a2ff69a74faf905847142f92e94679c39bfa065658951f869b2c32dbe806c9487ffb2d0e724908
+  checksum: 10c0/f4769efaf019c9e619b469a981eb5a0545c4bdfd0fb19befdd9e61fc893002ba4f2919af3cc16ea8cf1835682748f262bbd39f99c0197c3821eec14ecfbf6709
   languageName: node
   linkType: hard
 
@@ -5394,7 +5394,7 @@ __metadata:
     "@faker-js/faker": "npm:^10.6.0"
     "@j178/prek": "npm:^0.5.5"
     "@ministryofjustice/frontend": "npm:11.1.0"
-    "@ministryofjustice/hmpps-forge": "npm:^0.4.4"
+    "@ministryofjustice/hmpps-forge": "npm:^0.4.5"
     "@playwright/test": "npm:^1.64.1"
     "@sentry/browser": "npm:^10.76.2"
     "@sentry/node": "npm:^10.76.2"
