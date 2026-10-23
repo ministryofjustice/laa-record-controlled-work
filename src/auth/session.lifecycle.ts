@@ -16,19 +16,6 @@ export const SESSION_ABSOLUTE_TIMEOUT_MS = 12 * HOUR;
 /* eslint-enable @typescript-eslint/no-magic-numbers */
 
 /**
- * Calculates the earlier idle or absolute lifecycle deadline.
- * @param session - A session with valid lifecycle metadata.
- * @returns The earlier idle or absolute deadline in milliseconds.
- */
-export function lifecycleExpiresAt(session: AuthenticatedSession): number {
-  const { authenticatedAt, lastActivityAt } = session;
-  const absoluteExpiresAt = authenticatedAt + SESSION_ABSOLUTE_TIMEOUT_MS;
-  const idleExpiresAt = lastActivityAt + SESSION_IDLE_TIMEOUT_MS;
-
-  return Math.min(absoluteExpiresAt, idleExpiresAt);
-}
-
-/**
  * Checks that authenticated session lifecycle metadata is valid.
  * @param session - The session to check.
  * @param now - The current server time in milliseconds.
@@ -45,6 +32,19 @@ export function hasValidLifecycle(
     authenticatedAt <= lastActivityAt &&
     lastActivityAt <= now
   );
+}
+
+/**
+ * Calculates the earlier idle or absolute lifecycle deadline.
+ * @param session - A session with valid lifecycle metadata.
+ * @returns The earlier idle or absolute deadline in milliseconds.
+ */
+export function lifecycleExpiresAt(session: AuthenticatedSession): number {
+  const { authenticatedAt, lastActivityAt } = session;
+  const absoluteExpiresAt = authenticatedAt + SESSION_ABSOLUTE_TIMEOUT_MS;
+  const idleExpiresAt = lastActivityAt + SESSION_IDLE_TIMEOUT_MS;
+
+  return Math.min(absoluteExpiresAt, idleExpiresAt);
 }
 
 /**
