@@ -4,6 +4,7 @@ import express from "express";
 import type { CreateRedisStore, GetRedisClient } from "#/lib/redis.js";
 
 import { initForge } from "#/app/forge.js";
+import { initMetrics } from "#/app/metrics.js";
 import { initMiddleware } from "#/app/middleware.js";
 import { handleGlobalErrors } from "#/app/middleware/handleGlobalErrors.middleware.js";
 import { logGlobalErrors } from "#/app/middleware/logGlobalError.middleware.js";
@@ -29,6 +30,7 @@ const createApp = async (
   const app = express();
 
   initSecurity(app);
+  initMetrics(app);
   await initMiddleware(app, dependencies);
   initRoutes(app);
   initForge(app);
