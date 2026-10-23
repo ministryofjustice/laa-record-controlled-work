@@ -72,6 +72,45 @@ const clientAndCaseDetails: ClientAndCaseDetailsSection = {
   ],
 };
 
+const meansAssessment = {
+  answerSummaries: [
+    {
+      cards: [
+        {
+          heading: "Client age",
+          rows: [
+            {
+              key: "What age is your client?",
+              value: "<script>alert(1)</script>",
+            },
+          ],
+        },
+      ],
+      heading: "Client details",
+    },
+  ],
+  outcomeSummary: {
+    heading: "Means assessment",
+    outcome: {
+      contributions: [],
+      description:
+        "Your client qualifies financially for civil legal aid based on the information you entered. Before you (or a provider of advice or services funded by legal aid) proceed with your client's case, it must also be within scope for legal aid and satisfy the relevant merits criteria set out in the relevant legislation and guidance. These calculations were made in line with the latest version of the Lord Chancellor's Guidance on Determining Financial Eligibility for Controlled Work.",
+      heading: "Your client is financially eligible for controlled work.",
+    },
+    totals: {
+      heading: "Your client's key eligibility totals",
+      items: [
+        {
+          amount: "£500",
+          detail: "Below the saved upper limit.",
+          heading: "Gross monthly income",
+        },
+      ],
+    },
+    yourAnswersHeading: "Your answers",
+  },
+};
+
 function createViewApp() {
   const app = express();
   setupNunjucks(app);
@@ -84,6 +123,7 @@ function createViewApp() {
       applicationRefNumber: req.query.reference ?? null,
       clientAndCaseDetails,
       clientName: req.query.client ?? null,
+      meansAssessment,
     });
   });
   return app;
@@ -102,9 +142,7 @@ describe("export application view", () => {
     );
     expect(response.text).to.include("Jane &lt;script&gt; &amp; Doe");
     expect(response.text).to.include("CW-&lt;123&gt;");
-    expect(response.text).to.match(
-      /<h1[^>]*>Record Controlled Work<\/h1>/,
-    );
+    expect(response.text).to.match(/<h1[^>]*>Record Controlled Work<\/h1>/);
     expect(response.text).to.match(/<img[^>]+alt="Legal Aid Agency logo"/);
     expect(response.text).to.match(
       /<link[^>]+rel="stylesheet"[^>]+href="\/css\/[^"?]+\.css"/,
@@ -112,7 +150,9 @@ describe("export application view", () => {
     expect(response.text).to.match(
       /<img[^>]+src="\/views\/icons\/laa-logo\.svg"/,
     );
-    expect(response.text).to.not.include("ebd50ba0-9ed9-4003-83a8-c11ac07d9e32");
+    expect(response.text).to.not.include(
+      "ebd50ba0-9ed9-4003-83a8-c11ac07d9e32",
+    );
     expect(response.text).to.not.include("providerOfficeCode");
   });
 
@@ -127,9 +167,7 @@ describe("export application view", () => {
     const response = await request(createViewApp()).get("/export");
 
     expect(response.status).to.equal(200);
-    expect(response.text).to.match(
-      /<h2[^>]*>Client and case details<\/h2>/,
-    );
+    expect(response.text).to.match(/<h2[^>]*>Client and case details<\/h2>/);
     expect(response.text).to.include("ECF");
     expect(response.text).to.include("No");
     expect(response.text).to.include("Type of family law");
@@ -150,9 +188,7 @@ describe("export application view", () => {
     expect(response.text).to.include("For the same matter within 6 months");
     expect(response.text).to.include("Yes");
     expect(response.text).to.include("Reason for reapplication");
-    expect(response.text).to.include(
-      reasonForReapplication,
-    );
+    expect(response.text).to.include(reasonForReapplication);
     expect(response.text).to.include("First name");
     expect(response.text).to.include(firstName);
     expect(response.text).to.include("Last name");
@@ -165,5 +201,38 @@ describe("export application view", () => {
     expect(response.text).to.include(formattedAddress[0]);
     expect(response.text).to.include(formattedAddress[1]);
     expect(response.text).to.include(formattedAddress[2]);
+  });
+
+  it("renders prepared means totals and answer cards", async () => {
+    const response = await request(createViewApp()).get("/export");
+
+    expect(response.status).to.equal(200);
+    expect(response.text).to.include("<h2");
+    expect(response.text).to.include("Means assessment");
+    expect(response.text).to.include(
+      meansAssessment.outcomeSummary.outcome.description.replaceAll(
+        "'",
+        "&#39;",
+      ),
+    );
+    expect(response.text).to.include(
+      "Your client&#39;s key eligibility totals",
+    );
+    expect(response.text).to.include("Gross monthly income");
+    expect(response.text).to.include("£500");
+    expect(response.text).to.include("Your answers");
+    expect(response.text).to.include("Client details");
+    expect(response.text).to.include("Client age");
+    expect(response.text).to.include(
+      '<dl class="govuk-summary-list app-means-assessment__summary-list">',
+    );
+    expect(response.text).to.include("&lt;script&gt;alert(1)&lt;/script&gt;");
+    expect(response.text).not.to.include("<script>alert(1)</script>");
+    expect(response.text.indexOf("Client and case details")).to.be.lessThan(
+      response.text.indexOf("Means assessment"),
+    );
+    expect(response.text.indexOf("Your answers")).to.be.lessThan(
+      response.text.indexOf("Client details"),
+    );
   });
 });

@@ -81,11 +81,52 @@ const DECLARATION = {
 
 const ELIGIBILITY = {
   eligibility: {
-    data: null,
+    data: {
+      additional_property_owned: "none",
+      adult_dependants: false,
+      bank_accounts: [],
+      child_dependants: false,
+      childcare_payments_relevant: false,
+      client_age: "standard",
+      employment_status: "unemployed",
+      friends_or_family_relevant: false,
+      housing_benefit_relevant: false,
+      housing_payments: 0,
+      immigration_or_asylum: false,
+      investments_relevant: false,
+      legal_aid_payments_relevant: false,
+      level_of_help: "controlled",
+      maintenance_payments_relevant: false,
+      maintenance_relevant: false,
+      other_relevant: false,
+      partner: false,
+      passporting: false,
+      pension_relevant: false,
+      property_or_lodger_relevant: false,
+      property_owned: "none",
+      receives_benefits: false,
+      student_finance_relevant: false,
+      valuables_relevant: false,
+    },
     result: {
-      result_summary: { overall_result: { result: "eligible" } },
+      result_summary: {
+        capital: {
+          combined_assessed_capital: 700,
+          proceeding_types: [{ result: "eligible", upper_threshold: 3000 }],
+        },
+        disposable_income: {
+          combined_total_disposable_income: 108,
+          proceeding_types: [{ result: "eligible", upper_threshold: 733 }],
+        },
+        gross_income: {
+          combined_total_gross_income: 2450,
+          proceeding_types: [{ result: "eligible", upper_threshold: 2657 }],
+        },
+        overall_result: { result: "eligible" },
+      },
     },
   },
+  meansAssessmentRequired: true,
 };
 
 const EVIDENCE = {

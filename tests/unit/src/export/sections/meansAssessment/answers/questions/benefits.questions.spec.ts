@@ -3,6 +3,7 @@ import { before, describe, it } from "mocha";
 
 import type { EligibilityData } from "#/api/clients/rcw/model/eligibilityData.zod.gen.js";
 
+import { answerCards } from "#tests/unit/src/export/sections/meansAssessment/answers/answers.fixtures.js";
 import { toMeansAssessmentSection } from "#/export/sections/meansAssessment/meansAssessment.mapper.js";
 import { initializeI18nextSync } from "#/lib/i18n.js";
 import { getGetApplicationResponseMock } from "#orval/mocks/rcw/fakers/applications/applications.faker.gen.js";
@@ -19,7 +20,7 @@ const BASE_ANSWERS = {
 } satisfies EligibilityData;
 
 function summaries(overrides: Partial<EligibilityData> = {}) {
-  return (
+  return answerCards(
     toMeansAssessmentSection(
       getGetApplicationResponseMock({
         eligibility: {
@@ -28,7 +29,7 @@ function summaries(overrides: Partial<EligibilityData> = {}) {
         },
         meansAssessmentRequired: true,
       }),
-    )?.answerSummaries ?? []
+    )?.answerSummaries,
   );
 }
 
@@ -67,14 +68,15 @@ describe("saved benefit answers", () => {
       "Partner benefits",
       "Partner benefit 1 details",
     ]);
-    expect(benefitSummaries.map(({ rows }) => rows.map(({ value }) => value)))
-      .to.deep.equal([
-        ["Yes"],
-        ["Saved benefit name / award wording", "£215.40", "Monthly"],
-        ["Saved benefit name / award wording", "£30.00", "Every week"],
-        ["Yes"],
-        ["Partner saved benefit wording", "£150.00", "Every 4 weeks"],
-      ]);
+    expect(
+      benefitSummaries.map(({ rows }) => rows.map(({ value }) => value)),
+    ).to.deep.equal([
+      ["Yes"],
+      ["Saved benefit name / award wording", "£215.40", "Monthly"],
+      ["Saved benefit name / award wording", "£30.00", "Every week"],
+      ["Yes"],
+      ["Partner saved benefit wording", "£150.00", "Every 4 weeks"],
+    ]);
   });
 
   it("hides stale benefit details when benefits are not received", () => {
