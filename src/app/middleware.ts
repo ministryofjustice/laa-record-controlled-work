@@ -42,7 +42,13 @@ export async function initMiddleware(
   // Parse cookies and adds them to `req.cookies`.
   app.use(cookieParser());
 
-  // Serve static files from the specified public directory.
+  // Setup CSP nonce.
+  app.use(cspNonce());
+
+  // Setup Helmet for security headers.
+  app.use(helmet());
+
+  // Serve static files after setting security headers.
   app.use(express.static(config.app.paths.static));
 
   // Parse URL-encoded bodies. Note that we require extended parsing to support Forge form submissions.
@@ -53,12 +59,6 @@ export async function initMiddleware(
 
   // Handle request/response compression.
   app.use(compression());
-
-  // Setup CSP nonce.
-  app.use(cspNonce());
-
-  // Setup Helmet for security headers.
-  app.use(helmet());
 
   // TODO Refactor these to pure middleware, rather than setup methods.
   // Set up rate limiting.
