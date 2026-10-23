@@ -4,6 +4,7 @@ import {
   redirect,
   step,
   submit,
+  tieBreaker,
 } from "@ministryofjustice/hmpps-forge/core/authoring";
 
 import { evidenceEffects } from "#/journeys/evidence/evidence.effects.js";
@@ -14,6 +15,8 @@ import {
 import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
 import { submitButton } from "#/journeys/shared.blocks.js";
 import { t } from "#/lib/i18n.js";
+
+const TIE_BREAKER_PRIORITY = 100;
 
 export const checkAnswersStep = (): ReturnType<typeof step> =>
   step({
@@ -36,5 +39,9 @@ export const checkAnswersStep = (): ReturnType<typeof step> =>
       }),
     ],
     path: "check-answers",
+    reachability: {
+      entryWhen: true,
+      tieBreakers: [tieBreaker({ priority: TIE_BREAKER_PRIORITY })],
+    },
     title: t("journeys.createApplication.checkAnswers.title"),
   });

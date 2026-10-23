@@ -23,7 +23,6 @@ import { autocomplete } from "#/journeys/components/autocomplete/autocomplete.co
 import createApplicationJourney from "#/journeys/create-application/create-application.index.js";
 import declaration from "#/journeys/declaration/declaration.package.js";
 import { editApplicationPackage } from "#/journeys/edit-application/editApplication.package.js";
-import { evidencePackage } from "#/journeys/evidence/evidence.package.js";
 import { selectOfficePackage } from "#/journeys/select-office/select-office.journey.js";
 import { viewApplicationPackage } from "#/journeys/view-application/viewApplication.package.js";
 import { yourCasesPackage } from "#/journeys/your-cases/your-cases.journey.js";
@@ -48,11 +47,11 @@ export function initForge(app: Express): void {
     .registerPackage(editApplicationPackage, {
       getApplication,
       updateApplicationDetails,
+      updateApplicationEvidence,
       updateApplicationStatus,
     })
     .registerPackage(createApplicationJourney, { createApplication })
     .registerPackage(declaration, { updateApplicationDeclaration })
-    .registerPackage(evidencePackage, { updateApplicationEvidence })
     .registerPackage(viewApplicationPackage, { getApplication });
 
   const forgeRouter = createExpressRouter(forge, { nunjucksEnv });

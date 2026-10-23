@@ -12,6 +12,7 @@ import { clearAllDraftAnswers } from "#/journeys/effects/clearAllDraftAnswers.js
 import { clearFieldAnswers } from "#/journeys/effects/clearFieldAnswers.js";
 import { loadDraftAnswers } from "#/journeys/effects/loadDraftAnswers.js";
 import { saveDraftAnswers } from "#/journeys/effects/saveDraftAnswers.js";
+import { loadEvidenceAsAnswers } from "#/journeys/evidence/effects/loadEvidenceAsAnswers.js";
 
 export const editApplicationEffectsRegistry =
   new EffectRegistry<EditApplicationEffectsDeps>();
@@ -27,6 +28,9 @@ export const editApplicationEffects = {
     loadApplicationAsAnswers,
   ),
   loadDraftAnswers: editApplicationEffectsRegistry.register(loadDraftAnswers),
+  loadEvidenceAsAnswers: editApplicationEffectsRegistry.register(
+    loadEvidenceAsAnswers,
+  ),
   saveDraftAnswers: editApplicationEffectsRegistry.register(saveDraftAnswers),
   setTaskListStatuses:
     editApplicationEffectsRegistry.register(setTaskListStatuses),

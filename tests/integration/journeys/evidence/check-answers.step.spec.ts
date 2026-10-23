@@ -4,10 +4,8 @@ import {
 } from "@ministryofjustice/hmpps-forge/core/testing";
 import { expect } from "chai";
 import sinon from "sinon";
-import { createForgeTestClient } from "../../utils/helpers.js";
+import { createEvidenceJourneyTestClient } from "../../utils/helpers.js";
 import { RenderBlock } from "@ministryofjustice/hmpps-forge/core/framework";
-import { evidenceEffectsRegistry } from "#/journeys/evidence/evidence.effects.js";
-import { evidenceJourney } from "#/journeys/evidence/evidence.journey.js";
 
 describe("Check answers step", () => {
   const applicationId = "123e4567-e89b-12d3-a456-426614174000";
@@ -15,13 +13,9 @@ describe("Check answers step", () => {
     status: 204,
   });
 
-  const client = createForgeTestClient(
-    evidenceJourney,
-    evidenceEffectsRegistry,
-    {
-      dependencies: { updateApplicationEvidence: updateApplicationEvidenceStub },
-    },
-  );
+  const client = createEvidenceJourneyTestClient({
+    updateApplicationEvidence: updateApplicationEvidenceStub,
+  });
 
   const createSession = () => ({
     journeyDrafts: {

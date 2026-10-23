@@ -2,6 +2,7 @@ import type { EffectFunctionContext } from "@ministryofjustice/hmpps-forge/core"
 
 import type { updateApplicationEvidence } from "#/api/clients/rcw/schema/applications/applications.gen.js";
 import type { JourneySession } from "#/journeys/context.type.js";
+import type { EditApplicationData } from "#/journeys/edit-application/editApplication.types.js";
 
 export interface EvidenceAnswers extends Record<string, unknown> {
   asylumSupportEvidence?: string[];
@@ -10,6 +11,8 @@ export interface EvidenceAnswers extends Record<string, unknown> {
   childCareEvidence?: string[];
   doYouHaveEvidence: "no" | "yes";
   employedEvidence?: string[];
+  haveEvidenceOfCapital?: "no" | "yes";
+  haveEvidenceOfExpenditure?: "no" | "yes";
   housingCostsEvidence?: string[];
   incomeEvidence?: string[];
   maintenanceEvidence?: string[];
@@ -27,13 +30,13 @@ export type EvidenceContext = EffectFunctionContext<
   JourneySession
 >;
 
-export interface EvidenceData extends Record<string, unknown> {}
+export interface EvidenceData extends EditApplicationData {}
 
 export interface EvidenceEffectsDeps {
   updateApplicationEvidence: typeof updateApplicationEvidence;
 }
 
-type EvidenceExemptionReasonCode =
+export type EvidenceExemptionReasonCode =
   "adviceOverPhone" | "notPossibleBeforeStart" | "personalCircumstances";
 
 /**

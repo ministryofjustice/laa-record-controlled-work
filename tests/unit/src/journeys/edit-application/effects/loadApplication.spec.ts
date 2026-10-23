@@ -32,6 +32,7 @@ describe("loadApplication", () => {
     deps = {
       getApplication: getApplicationStub,
       updateApplicationDetails: sinon.stub(),
+      updateApplicationEvidence: sinon.stub(),
       updateApplicationStatus: sinon.stub(),
     };
     setData = sinon.stub();

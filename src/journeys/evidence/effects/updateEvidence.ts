@@ -2,13 +2,13 @@ import type { UpdateEvidenceRequestBody } from "#/api/clients/rcw/model/updateEv
 
 import { ApiResponseError } from "#/api/clients/api.errors.js";
 import { getRcwApiDefaultOptions } from "#/api/clients/getRcwApiDefaultOptions.js";
+import { EvidenceDto } from "#/api/dto/evidence/evidence.dto.js";
 import { getAuthDebugHeaders } from "#/auth/auth.debug.js";
 import {
   type EvidenceContext,
   type EvidenceEffectsDeps,
   isEvidenceAnswers,
 } from "#/journeys/evidence/evidence.types.js";
-import { mapEvidenceToEvidenceRequest } from "#/journeys/evidence/mappers/mapEvidenceToEvidenceRequest.js";
 import { PARAMS_KEYS } from "#/journeys/journey.constants.js";
 import {
   InvalidEvidenceError,
@@ -49,7 +49,7 @@ export const updateEvidence =
       }
 
       const updateEvidenceReq: UpdateEvidenceRequestBody =
-        mapEvidenceToEvidenceRequest(journeyAnswers);
+        EvidenceDto.fromAnswers(journeyAnswers).toRcwApi();
 
       const correlationId = context
         .getRequestHeader("x-correlation-id")
