@@ -17,6 +17,7 @@ import {
 import { setupHealthChecks } from "#/app/middleware/setupHealthChecks.js";
 import { isEnv } from "#/app/utils/isEnv.js";
 import config from "#/config.js";
+import { PRIVATE_NO_STORE_CACHE_CONTROL } from "#/lib/constants/http.js";
 import { createSession } from "#/lib/session.js";
 import { setupConfig } from "#/middleware/setupConfigs.js";
 import { setupRateLimit } from "#/middleware/setupRateLimit.js";
@@ -44,6 +45,11 @@ export async function initMiddleware(
 
   // Serve static files from the specified public directory.
   app.use(express.static(config.app.paths.static));
+
+  app.use((_req, res, next) => {
+    res.set("Cache-Control", PRIVATE_NO_STORE_CACHE_CONTROL);
+    next();
+  });
 
   // Parse URL-encoded bodies. Note that we require extended parsing to support Forge form submissions.
   app.use(express.urlencoded({ extended: true }));

@@ -29,7 +29,10 @@ import { EntraErrorCode } from "#/auth/domain/EntraErrorCode.enum.js";
 import { EntraService } from "#/auth/entra.service.js";
 import { getMsalCacheKey } from "#/auth/msal.cache-key.js";
 import config from "#/config.js";
-import { FORBIDDEN } from "#/lib/constants/http.js";
+import {
+  FORBIDDEN,
+  PRIVATE_NO_STORE_CACHE_CONTROL,
+} from "#/lib/constants/http.js";
 import { getRedisClient } from "#/lib/redis.js";
 import { logger } from "#/logger.js";
 
@@ -316,7 +319,7 @@ function handleRelay(data: CallbackData, req: Request, res: Response): boolean {
   targetUrl.searchParams.set("state", data.state);
 
   logger.info("Relaying auth callback", { targetHostname: targetUrl.hostname });
-  res.set("Cache-Control", "no-store");
+  res.set("Cache-Control", PRIVATE_NO_STORE_CACHE_CONTROL);
   res.redirect(targetUrl.toString());
   return true;
 }

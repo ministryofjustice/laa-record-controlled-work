@@ -8,14 +8,18 @@ import { NotAuthenticatedError } from "#/auth/auth.errors.js";
 import { LoadApplicationForExportError } from "#/export/export.errors.js";
 import { toExportApplicationViewModel } from "#/export/export.mappers.js";
 import { loadApplicationForExport } from "#/export/export.service.js";
-import { BAD_REQUEST, UNAUTHORIZED } from "#/lib/constants/http.js";
+import {
+  BAD_REQUEST,
+  PRIVATE_NO_STORE_CACHE_CONTROL,
+  UNAUTHORIZED,
+} from "#/lib/constants/http.js";
 import { logger } from "#/logger.js";
 
 export const createGetExportHandler =
   (deps: LoadApplicationForExportDeps) =>
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     res.set({
-      "Cache-Control": "no-cache, no-store, must-revalidate",
+      "Cache-Control": PRIVATE_NO_STORE_CACHE_CONTROL,
       Expires: "0",
       Pragma: "no-cache",
     });

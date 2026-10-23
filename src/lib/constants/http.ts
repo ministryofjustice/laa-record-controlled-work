@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers -- This is a cleaner way to define and destructure variables */
 
+export const PRIVATE_NO_STORE_CACHE_CONTROL = "private, no-store";
+
 export const HTTP_STATUS = {
   BAD_GATEWAY: 502,
   BAD_REQUEST: 400,
