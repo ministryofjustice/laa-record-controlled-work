@@ -48,7 +48,7 @@
     "node": "26.12.1"
   },
   "dependencies": {
-    "@azure/msal-node": "^6.0.1",
+    "@azure/msal-node": "^7.0.0",
     "@ministryofjustice/frontend": "11.1.0",
     "@ministryofjustice/hmpps-forge": "^0.4.5",
     "@sentry/browser": "^10.76.2",
