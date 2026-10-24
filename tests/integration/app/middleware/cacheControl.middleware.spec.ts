@@ -100,37 +100,32 @@ describe("sensitive response caching", () => {
     sinon.restore();
   });
 
-  it("marks sensitive pages, exports, eligibility data, redirects and errors no-store", async () => {
-    const agent = request.agent(app);
-    await agent.get("/test/select-office");
+  const sensitiveResponses = [
+    ["sensitive HTML", "/sensitive/html", 200],
+    ["export", `/cases/${APPLICATION_ID}/export`, 200],
+    [
+      "eligibility JSON",
+      `/api/applications/${APPLICATION_ID}/eligibility`,
+      200,
+    ],
+    ["redirect", "/sensitive/redirect", 302],
+    ["unauthorized error", "/sensitive/unauthorized", 302],
+    ["not-found error", "/sensitive/not-found", 404],
+    ["server error", "/sensitive/server-error", 500],
+  ] as const;
 
-    const responses = [
-      ["HTML", await agent.get("/sensitive/html")],
-      ["export", await agent.get(`/cases/${APPLICATION_ID}/export`)],
-      [
-        "eligibility JSON",
-        await agent.get(`/api/applications/${APPLICATION_ID}/eligibility`),
-      ],
-      ["redirect", await agent.get("/sensitive/redirect")],
-      ["unauthorized error", await agent.get("/sensitive/unauthorized")],
-      ["not-found error", await agent.get("/sensitive/not-found")],
-      ["server error", await agent.get("/sensitive/server-error")],
-    ] as const;
+  sensitiveResponses.forEach(([name, responsePath, expectedStatus]) => {
+    it(`marks ${name} response private and no-store`, async () => {
+      const agent = request.agent(app);
+      await agent.get("/test/select-office");
 
-    expect(responses[0][1].status).to.equal(200);
-    expect(responses[1][1].status).to.equal(200);
-    expect(responses[2][1].status).to.equal(200);
-    expect(responses[3][1].status).to.equal(302);
-    expect(responses[4][1].status).to.equal(302);
-    expect(responses[5][1].status).to.equal(404);
-    expect(responses[6][1].status).to.equal(500);
+      const response = await agent.get(responsePath);
 
-    for (const [responseType, response] of responses) {
-      expect(
-        response.headers["cache-control"],
-        `${responseType} response`,
-      ).to.equal(CACHE_CONTROL);
-    }
+      expect(response.status).to.equal(expectedStatus);
+      expect(response.headers["cache-control"], `${name} response`).to.equal(
+        CACHE_CONTROL,
+      );
+    });
   });
 
   it("preserves the public static asset cache policy", async () => {
