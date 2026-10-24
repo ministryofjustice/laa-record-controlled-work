@@ -1711,7 +1711,26 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@scalar/json-magic@npm:0.15.7, @scalar/json-magic@npm:^0.15.6":
+"@scalar/helpers@npm:0.16.4":
+  version: 0.16.4
+  resolution: "@scalar/helpers@npm:0.16.4"
+  checksum: 10c0/5347ace1a7451b2145a37087419efa201c756427aa5b902b2b92647bf99c8ecf511a1ca36e269ef8a26573966e251e276b370395f728f7cff2b24dea93463843
+  languageName: node
+  linkType: hard
+
+"@scalar/json-magic@npm:0.16.0":
+  version: 0.16.0
+  resolution: "@scalar/json-magic@npm:0.16.0"
+  dependencies:
+    "@scalar/helpers": "npm:0.16.4"
+    pathe: "npm:^2.0.3"
+    undici: "npm:7.29.1"
+    yaml: "npm:^2.9.0"
+  checksum: 10c0/6ed1351294d0d0a3d4a646a3837db4d1b28f7bfa2482e32ce3730dfa76a6a78caa63d580953d1534898e5c1fc52db0887e2c67e8bfcc1b9baf4a7cf3a8df2105
+  languageName: node
+  linkType: hard
+
+"@scalar/json-magic@npm:^0.15.6":
   version: 0.15.7
   resolution: "@scalar/json-magic@npm:0.15.7"
   dependencies:
@@ -1723,32 +1742,32 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@scalar/json-schema-validator@npm:0.1.12":
-  version: 0.1.12
-  resolution: "@scalar/json-schema-validator@npm:0.1.12"
+"@scalar/json-schema-validator@npm:0.1.13":
+  version: 0.1.13
+  resolution: "@scalar/json-schema-validator@npm:0.1.13"
   dependencies:
-    "@scalar/helpers": "npm:0.16.3"
-    "@scalar/types": "npm:0.23.2"
+    "@scalar/helpers": "npm:0.16.4"
+    "@scalar/types": "npm:0.24.0"
     ajv: "npm:^8.20.0"
     ajv-draft-04: "npm:^1.0.0"
     ajv-formats: "npm:^3.0.1"
     yaml: "npm:^2.9.0"
-  checksum: 10c0/beb7d563bceb764829d65b902d8f6f3e3a33686fdc68eddc2f561220d73dfcaccfe99344d46cd04b3e24d72bf5b1176f9c8b6d9bed8cba931b2ee1e0ff4e2282
+  checksum: 10c0/c2cb2675cf84f4661231b918c8f7f5c32f3bb9629d6c370168bb3d66cb469488c2c60b1cbcb55ff8c74e0a7a3234c92b6fdb526519a016f5c8a7ac374786c196
   languageName: node
   linkType: hard
 
 "@scalar/openapi-parser@npm:^0.29.12":
-  version: 0.29.13
-  resolution: "@scalar/openapi-parser@npm:0.29.13"
+  version: 0.29.14
+  resolution: "@scalar/openapi-parser@npm:0.29.14"
   dependencies:
-    "@scalar/helpers": "npm:0.16.3"
-    "@scalar/json-magic": "npm:0.15.7"
+    "@scalar/helpers": "npm:0.16.4"
+    "@scalar/json-magic": "npm:0.16.0"
     "@scalar/openapi-types": "npm:0.9.8"
-    "@scalar/openapi-upgrader": "npm:0.4.4"
-    "@scalar/openapi-validator": "npm:0.1.12"
-    "@scalar/types": "npm:0.23.2"
+    "@scalar/openapi-upgrader": "npm:0.4.5"
+    "@scalar/openapi-validator": "npm:0.1.13"
+    "@scalar/types": "npm:0.24.0"
     yaml: "npm:^2.9.0"
-  checksum: 10c0/a8c8bb4250dc29a4b61e3985499a7658cb71710f551e70efc49927f77ba852d6927eca6191441625fa5a6fcbb1688e2fa485cae0a07443fcfe9be027d275ed18
+  checksum: 10c0/6f59b29163f82e61e2895162cc8d5015e3d36edc00a6602c23193deeea74ba7194ed36c7ddd21ebc615949f5232fce049a353cadad1f221f35ed4fdd7af5c62f
   languageName: node
   linkType: hard
 
@@ -1766,37 +1785,37 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@scalar/openapi-upgrader@npm:0.4.4":
-  version: 0.4.4
-  resolution: "@scalar/openapi-upgrader@npm:0.4.4"
+"@scalar/openapi-upgrader@npm:0.4.5":
+  version: 0.4.5
+  resolution: "@scalar/openapi-upgrader@npm:0.4.5"
   dependencies:
-    "@scalar/helpers": "npm:0.16.3"
+    "@scalar/helpers": "npm:0.16.4"
     "@scalar/openapi-types": "npm:0.9.8"
-  checksum: 10c0/3023289108d4ccf54dd957cf9f11e7b112815dc4cd20f83f0fc3b400fb61ea9d28d96fc9ed0ae2f867d35826f0ec62d3c1d8105d77263d0d4685a4f6e243b692
+  checksum: 10c0/be47049b1063f6c53cbd628cbde56ba9585fc770bf84895b9b4aad9ce97ee60d6dfc6490db81234c33236e394adefccc83f2df2c210d588f07ddd4e788930231
   languageName: node
   linkType: hard
 
-"@scalar/openapi-validator@npm:0.1.12":
-  version: 0.1.12
-  resolution: "@scalar/openapi-validator@npm:0.1.12"
+"@scalar/openapi-validator@npm:0.1.13":
+  version: 0.1.13
+  resolution: "@scalar/openapi-validator@npm:0.1.13"
   dependencies:
-    "@scalar/helpers": "npm:0.16.3"
-    "@scalar/json-schema-validator": "npm:0.1.12"
-    "@scalar/types": "npm:0.23.2"
+    "@scalar/helpers": "npm:0.16.4"
+    "@scalar/json-schema-validator": "npm:0.1.13"
+    "@scalar/types": "npm:0.24.0"
     yaml: "npm:^2.9.0"
-  checksum: 10c0/4db19f2df9f496543216667a584c563ed3ade6b671f4a60a4b1a04b98bbc2a119707a1c50b37984f447b509e07cd71b22b4c7c2636e8366a5c0f3f557888b077
+  checksum: 10c0/1db6192ae2c305e64384afbd52dbf568e2ec2755fdda4a1831fd28e9d5c93359a77257d5cc017b3972ba8046fc74eb18f44f5025d351eb29f0a81f09cfa3208d
   languageName: node
   linkType: hard
 
-"@scalar/types@npm:0.23.2":
-  version: 0.23.2
-  resolution: "@scalar/types@npm:0.23.2"
+"@scalar/types@npm:0.24.0":
+  version: 0.24.0
+  resolution: "@scalar/types@npm:0.24.0"
   dependencies:
-    "@scalar/helpers": "npm:0.16.3"
+    "@scalar/helpers": "npm:0.16.4"
     nanoid: "npm:^5.1.6"
     type-fest: "npm:^5.8.0"
     zod: "npm:^4.4.3"
-  checksum: 10c0/2bd74d62301d77aee8c732e1178be1f8f6f7ebc66da303782ae0ed715718723a6ba62ea5fb56a9542a4f118b8823efb19f7eab8d47e4d1762446eaca2690e5f4
+  checksum: 10c0/1d2f68137b840d1613cb2574e021af0acb3c41dfa42e8c6b827b4489eee88945b6f098b18bfcef8e2f1a42d2bf939fc818d15e787dcecd6d6e5382dff8443116
   languageName: node
   linkType: hard
 
@@ -7167,9 +7186,9 @@ __metadata:
   linkType: hard
 
 "set-cookie-parser@npm:^3.0.1":
-  version: 3.1.3
-  resolution: "set-cookie-parser@npm:3.1.3"
-  checksum: 10c0/c942e2fab9f540d2c4a0ac7069f700dde4c51bbd36dbcc288a47016185928bc54a9dd1358b53dafe2ae03fd940ac541987c3a808d5b8069812dd166a16dad52d
+  version: 3.1.4
+  resolution: "set-cookie-parser@npm:3.1.4"
+  checksum: 10c0/620dae812cee1714a1971ed3573ab4b1c895b689460004c879df7ba75b513480ff1be493c614b637ebb38b8c93b9021c24df21306994a05653a69ddf048411e1
   languageName: node
   linkType: hard
 
@@ -7576,11 +7595,11 @@ __metadata:
   linkType: hard
 
 "sync-child-process@npm:^1.0.2":
-  version: 1.0.2
-  resolution: "sync-child-process@npm:1.0.2"
+  version: 1.1.0
+  resolution: "sync-child-process@npm:1.1.0"
   dependencies:
     sync-message-port: "npm:^1.0.0"
-  checksum: 10c0/f73c87251346fba28da8ac5bc8ed4c9474504a5250ab4bd44582beae8e25c230e0a5b7b16076488fee1aed39a1865de5ed4cec19c6fa4efdbb1081c514615170
+  checksum: 10c0/b917d394d8a32f537401e054df2f961a28da295cc93a2002f6730399f524f404b9c12c834fb96bc14b5ca4e9470ffc04a1b019ddafddc6893bc1fa48adad5cb5
   languageName: node
   linkType: hard
 
