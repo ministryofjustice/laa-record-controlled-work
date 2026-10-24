@@ -25,4 +25,13 @@ spec:
       ports:
         - protocol: TCP
           port: 3000
+    {{- if .Values.monitoring.enabled }}
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              component: monitoring
+      ports:
+        - protocol: TCP
+          port: 3000
+    {{- end }}
 {{- end }}

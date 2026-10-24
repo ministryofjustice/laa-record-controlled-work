@@ -1,0 +1,64 @@
+{{- if and .Values.monitoring.enabled .Values.monitoring.alerts.enabled }}
+{{- $service := printf "%s-rcw" (include "laa-record-controlled-work.fullname" .) }}
+{{- $severity := required "monitoring.alerts.severity must be the custom severity supplied by Cloud Platform" .Values.monitoring.alerts.severity }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ $service }}
+  labels:
+    {{- include "laa-record-controlled-work.labels" . | nindent 4 }}
+    role: alert-rules
+spec:
+  groups:
+    - name: {{ $service }}
+      rules:
+        - alert: RCWMetricsUnavailable
+          expr: >-
+            up{namespace="{{ .Release.Namespace }}",service="{{ $service }}"} == 0
+            or absent(up{namespace="{{ .Release.Namespace }}",service="{{ $service }}"})
+          for: 5m
+          labels:
+            severity: {{ $severity | quote }}
+            namespace: {{ .Release.Namespace | quote }}
+            service: {{ $service | quote }}
+          annotations:
+            message: "Prometheus cannot scrape RCW in {{ .Release.Namespace }}. Check ServiceMonitor discovery, endpoints, pod health and network policies."
+        - alert: RCWHighErrorRate
+          expr: >-
+            (
+              sum(rate(rcw_http_requests_total{namespace="{{ .Release.Namespace }}",service="{{ $service }}",status_code=~"5.."}[5m]))
+              / sum(rate(rcw_http_requests_total{namespace="{{ .Release.Namespace }}",service="{{ $service }}"}[5m]))
+            ) > {{ .Values.monitoring.alerts.errorRateThreshold }}
+            and sum(increase(rcw_http_requests_total{namespace="{{ .Release.Namespace }}",service="{{ $service }}"}[5m])) >= {{ .Values.monitoring.alerts.minimumRequests }}
+          for: 5m
+          labels:
+            severity: {{ $severity | quote }}
+            namespace: {{ .Release.Namespace | quote }}
+            service: {{ $service | quote }}
+          annotations:
+            message: "RCW in {{ .Release.Namespace }} has a sustained elevated 5xx response rate. Check application errors and upstream API health."
+        - alert: RCWHighLatency
+          expr: >-
+            histogram_quantile(0.95,
+              sum by (le) (rate(rcw_http_request_duration_seconds_bucket{namespace="{{ .Release.Namespace }}",service="{{ $service }}"}[5m]))
+            ) > {{ .Values.monitoring.alerts.latencyThresholdSeconds }}
+            and sum(increase(rcw_http_requests_total{namespace="{{ .Release.Namespace }}",service="{{ $service }}"}[5m])) >= {{ .Values.monitoring.alerts.minimumRequests }}
+          for: 10m
+          labels:
+            severity: {{ $severity | quote }}
+            namespace: {{ .Release.Namespace | quote }}
+            service: {{ $service | quote }}
+          annotations:
+            message: "RCW in {{ .Release.Namespace }} has sustained high p95 latency. Check resource saturation, Redis and upstream API latency."
+        - alert: RCWDeploymentUnavailable
+          expr: >-
+            kube_deployment_status_replicas_available{namespace="{{ .Release.Namespace }}",deployment="{{ $service }}"}
+            < kube_deployment_spec_replicas{namespace="{{ .Release.Namespace }}",deployment="{{ $service }}"}
+          for: 10m
+          labels:
+            severity: {{ $severity | quote }}
+            namespace: {{ .Release.Namespace | quote }}
+            service: {{ $service | quote }}
+          annotations:
+            message: "RCW in {{ .Release.Namespace }} has fewer available replicas than desired. Check rollout status, pod events, image pulls and readiness probes."
+{{- end }}

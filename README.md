@@ -5,6 +5,11 @@
 ## Template
 
 This repo was generated from [laa-express-typescript-template](https://ministryofjustice.github.io/laa-express-typescript-template/)
+
+## Monitoring
+
+See [Prometheus monitoring and alerting](docs/monitoring.md) for metrics, Cloud Platform scraping, alert routing and rollout checks.
+
 ## Get Started
 ### Prerequisites
 

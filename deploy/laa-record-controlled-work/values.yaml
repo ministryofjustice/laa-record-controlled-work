@@ -27,6 +27,18 @@ ingress:
 networkPolicy:
   enabled: true
 
+monitoring:
+  enabled: true
+  interval: 15s
+  scrapeTimeout: 10s
+  serviceMonitorLabels: {}
+  alerts:
+    enabled: false
+    severity: ""
+    errorRateThreshold: 0.05
+    latencyThresholdSeconds: 1
+    minimumRequests: 100
+
 rcw:
   replicaCount: 1
 
